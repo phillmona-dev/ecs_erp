@@ -1,0 +1,156 @@
+<odoo>
+<record id="account_loan_action" model="ir.actions.act_window">
+    <field name="name">Loan Managmet</field>
+    <field name="res_model">account.loan</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+<!-- menu for Loan anagment -->
+<menuitem id="loan_menu_root" name="Loan Managment">
+    <menuitem id="bank_loan_menu" name="Tresury">
+        <menuitem id="account_loan_menu_action" action="account_loan_action"/>
+    </menuitem>
+</menuitem>
+
+
+<!--  tree view of the accoun loan m
+model-->
+    <record id="account_loan_view_tree" model="ir.ui.view">
+        <field name="name">account.loan.view.tree</field>
+        <field name="model">account.loan</field>
+        <field name="arch" type="xml">
+            <tree string="Loan">
+                  <field name="name"/>
+                        <field name="loan_amount"/> 
+
+                        <field name="isinterest"/> 
+                        <field name="cumulative_balance"/>
+                       
+                        <field name="loan_statement_number"/> 
+                        <field name="anual_interest_rate"/>
+                        <field name="daily_interest_rate"/>
+                        <field name="anual_penalit_rate"/> 
+                         <field name="daily_penalit_rate"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!--form view -->
+    <record id="account_loan_view_form" model="ir.ui.view">
+        <field name="name">account_loan.view.form</field>
+        <field name="model">account.loan</field>
+        <field name="arch" type="xml">
+            <form string="">
+                
+                <sheet>
+                    <group>
+                        <group  >
+                            <field name="name"/>
+                            </group>
+                            <group >
+                            <field name="loan_type"/>
+                             <field name="contract_date"/>
+                              <field name="interest_start_date"/>
+                            </group>
+                            <group name="name" string="Interest Information">
+                                <group  >
+                                    <field name="anual_interest_rate"/>
+                                    <field name="anual_penalit_rate"/> 
+                                </group>
+                            
+                            
+                                <group >
+                                    <field name="daily_interest_rate"/>
+                                
+                                    <field name="daily_penalit_rate"/> 
+                                </group>
+                                
+                            
+                            </group>
+                            
+                            <group>
+                                
+                                <field name="loan_amount"/> 
+                                <field name="loan_statement_number"/>
+                                <field name="cumulative_balance"/>
+                            
+                                 
+                                <field name="isinterest"/>
+                                <field name="isactive"/>
+                                <field name="cumulative_interest"/>
+                                
+                            </group>
+                            
+                            <group >
+                                <field name="total_interest"/>
+                                
+                                
+                            </group>
+
+                    </group>
+                    
+                    
+                    <notebook>
+                    <page string="Payment Schedule">
+                          
+                            <field name="loan_schedule_ids" >
+                                <tree  editable="bottom" >
+                                    <field name="name"/>
+                                    <field name="payment_date"/>
+                                    
+                                </tree>
+                            </field>
+                            
+                        </page>
+                        <page string="Repayment">
+                            <!-- you can display child data like code below -->
+                            <field name="loan_repayment_ids" >
+                                <tree  editable="bottom"  >
+                                    <field name="payment_term"/>
+                                    <field name="expected_payment_date"/>
+                                    
+                                    <field name="value_date"/>
+                                    <field name="principal_repayment"/>
+                                    
+                                    <field name="is_interest"/>
+                                    <field name="is_paied"/>
+                                    
+                                    
+                                    
+                                </tree>
+                            </field>
+                            
+                        </page>
+                        <page string="Receipt">
+                          
+                            <field name="loan_receipt_ids">
+                                <tree editable="bottom" >
+                                    <field name="receipt"/>
+                                    <field name="value_date"/>
+                                    <field name="cumulative_total"/>
+                                </tree>
+                            </field>
+                            
+                        </page>
+                        <page string="Interest">
+                            
+                            <field name="loan_interest_ids">
+                                <tree  editable="bottom">
+                                    <field name="daily_interest_amount"/>
+                                    <field name="daily_penality_amount"/>
+                                    <field name="daily_interest_total"/>
+                                    <field name="cumulative_interest_total"/>
+                                    <field name="value_date"/>
+                                    <field name="daily_interest_rate"/>
+                                    <field name="daily_penality_rate"/>
+                                </tree>
+                            </field>
+                            
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
