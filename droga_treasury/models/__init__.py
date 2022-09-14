@@ -1,3 +1,5 @@
-# -*- coding: utf-8 -*-
-
-from . import models
+from . import loan
+from . import receipt
+from . import repayment
+from . import interest
+from . import loan_type
