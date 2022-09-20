@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!-- action for purchase order -->
+    <record id="droga_purchase_rfq_order_action" model="ir.actions.act_window">
+        <field name="name">Purchase order from RFQ</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('rfq_id', '=', active_id)]</field>
+        <field name="context">{'default_rfq_id': active_id}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Purchase order from Request for Quotation
+            </p>
+        </field>
+    </record>
+
+    <record id="droga_purchase_request_order_action" model="ir.actions.act_window">
+        <field name="name">Purchase order from RFQ</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('purchase_request_id', '=', active_id)]</field>
+        <field name="context">{'default_purchase_request_id': active_id}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Purchase order from Purchase Request for Foregin Purchases
+            </p>
+        </field>
+    </record>
+
+    <!-- inherited for view of purchase.order -->
+    <record id="inherit_for_purchase_order_form" model="ir.ui.view">
+        <field name="name">Purchase Order</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form" />
+        <field name="arch" type="xml">
+
+            <xpath expr = "//field[@name='partner_ref']" position = "after">
+                <field name="rfq_id" options="{'no_create':True}" readonly="1" string="Request for Quotation"/>
+                <field name="purchase_request_id" options="{'no_create':True}" readonly="1" string="Purchase Request"/>
+            </xpath>
+
+
+        </field>
+    </record>
+
+</odoo>

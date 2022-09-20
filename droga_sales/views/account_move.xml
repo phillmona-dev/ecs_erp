@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- inherited for view of account.move -->
+    <record id="inherit_for_xml_account_move_form" model="ir.ui.view">
+        <field name="name">Account Move XML Generator Button</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+
+            <xpath expr = "//button[@name='button_draft']" position = "after">
+                <button string = "Print to POS" type = "object" class = "oe_highlight" name = "generate_sales_xml" />
+            </xpath>
+
+
+        </field>
+    </record>
+
+</odoo>
