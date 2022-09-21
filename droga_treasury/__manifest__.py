@@ -4,6 +4,8 @@
 'category': 'Accounting',
 'version':'1.0',
 'depends':['base'],
-'data':['views/account_loan.xml',
+'data':['security/ir.model.access.csv',
+        'views/account_loan.xml',
+        'views/acout_setting.xml',
         'data/crron_interest.xml'],
 }

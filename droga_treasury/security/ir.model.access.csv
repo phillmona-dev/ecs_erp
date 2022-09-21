@@ -1,2 +1,13 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_droga_treasury_droga_treasury,droga_treasury.droga_treasury,model_droga_treasury_droga_treasury,base.group_user,1,1,1,1
+access_account_loan,account.loan,model_account_loan,account.group_account_manager,1,1,1,1
+access_account_loan_receipt,account.loan.receipt,model_account_loan_receipt,account.group_account_manager,1,1,1,1
+
+access_account_loan_interest,account.loan.interest,model_account_loan_interest,account.group_account_manager,1,1,1,1
+
+access_account_loan_schedule,account.loan.schedule,model_account_loan_schedule,account.group_account_manager,1,1,1,1
+access_account_loan_type,account.loan.type,model_account_loan_type,account.group_account_manager,1,1,1,1
+
+
+
+access_account_loan_penality,account.loan.penality,model_account_loan_penality,account.group_account_manager,1,1,1,1
+access_account_loan_repayment,account.loan.repayment,model_account_loan_repayment,account.group_account_manager,1,1,1,1

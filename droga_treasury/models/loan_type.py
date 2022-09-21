@@ -5,7 +5,7 @@ class AccountLoanType(models.Model):
     _description = "This model is used to catagoraize difrent type of loan"
 
     name=fields.Char('Loan Type', required=True)
-    isinterest= fields.Boolean(string="Is intest has interest?")
+    isinterest= fields.Boolean(string="Compound Interest?")
     
    
     

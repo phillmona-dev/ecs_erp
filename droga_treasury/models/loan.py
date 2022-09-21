@@ -3,6 +3,9 @@ from odoo import api, fields, models
 import calendar
 from datetime import date, datetime,timedelta
 
+
+from dateutil.relativedelta import relativedelta
+
 #from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
@@ -13,6 +16,7 @@ from odoo.tools import float_compare, float_is_zero
 class AccountLoan(models.Model):
     _name = "account.loan"
     _description = "Loan"
+    
 
 
     name=fields.Many2one('res.bank', string="Bank", required=True)  
@@ -23,26 +27,111 @@ class AccountLoan(models.Model):
 
 
     loan_statement_number=fields.Char('Loan Statment Number',required=True )
-    loan_period_peryear=fields.Float('Loan Period in Year')
+    loan_period_year=fields.Float('Loan period in years' ,)
+    schedule_numberof_payment=fields.Float('Number of payments per year',compute="_compute_yearr")
+    total_number_of_payment=fields.Float('Total Number of Payment',compute="_compute_yearr")
+    payment=fields.Float('Payment Amount per Period')
+    payment_month=fields.Integer('Payment Ranage in Month')
+    
+
+    @api.depends("payment_month","loan_period_year")
+    def _compute_yearr(self):
+        for record in self:
+            pe=0.000000
+            if record.payment_month:
+                 pe=12/record.payment_month
+            record.schedule_numberof_payment = pe
+            
+            record.total_number_of_payment = pe*record.loan_period_year
+
+
+
+    #@api.depends("payment_month","total_number_of_payment","payment","payment_start_date")
+    def compute_schedule(self):
+        for record in self:
+            nloop=0.00
+            inte=0
+            dayint=0.000
+            ipay=0.00000
+            rint=0.0000
+            ppay=0.00000
+            self.env["account.loan.schedule"].search([('payment_amount','=',record.payment)]).unlink()
+
+            
+            if record.payment_month:
+                if record.payment:
+                    if record.total_number_of_payment:
+                        if record.payment_start_date:
+                            nloop=record.total_number_of_payment
+                            i=0
+                            balance=record.loan_amount
+
+                            while nloop>0:
+                                month=i*record.payment_month
+                                dt=record.payment_start_date+ relativedelta(months=month)
+                                if i==0:
+                                    inte=record.payment_start_date-record.interest_start_date
+                                else :
+                                     inte=dt-at
+                                mul=inte/timedelta(days=1)
+                                dayint=record.daily_interest_rate*mul*balance/100
+                                
+                                rint=+dayint
+                                if rint>record.payment:
+                                    ipay=record.payment
+                                    rint=rint-record.payment
+                                    ppay=0
+                                else:
+                                     if record.payment>rint:
+                                        ipay = dayint
+                                        ppay=record.payment-ipay
+
+
+                                balance=balance-ppay
+                                if not record.isinterest:
+                                    schedule = self.env['account.loan.schedule'].create(
+                                        {'acount_loan_id': record.id, 'payment_date': dt,'payment_amount': record.payment,
+                                        'name':i+1,'prencipal':ppay,'interest':ipay,'balance':balance}) 
+                                elif  record.isinterest:
+                                    schedule = self.env['account.loan.schedule'].create(
+                                        {'acount_loan_id': record.id, 'payment_date': dt,'payment_amount': record.payment,
+                                        'name':i+1,'prencipal':ppay+ipay,'interest':0,'balance':balance+rint}) 
+                                at=dt
+                                nloop-=1
+                                i=i+1
+                            
+
+#Next payment and payment amount
+#gene. payment when payment == next payment date 
+#remaning days to nex payment
+#when next paymentdate==payment date gene
+    next_payment_date=fields.Date(string="Next Payment Date")
+    remaining_days=fields.Integer(string="Remaning Days")
+
+   
+    
+
+    
     anual_interest_rate=fields.Float('Anual Interst Rate', required=True)
     daily_interest_rate=fields.Float('Daily Interst Rate',compute="_compute_interestdaily",digits=(12,6))
     
     current_cumlative_balace=fields.Float('Currrent Cumlative Balance')
     current_cumlative_interest=fields.Float('Current Cumlative Balance')
     current_interest_total=fields.Float('Current Interest Total')
-    
 
-    interest_start_date=fields.Date("Interst Start Date", required=True)
+    payment_start_date=fields.Date("Payment Start Date", )
+
+    interest_start_date=fields.Date("Interst Start Date", )
     anual_penalit_rate=fields.Float('Anual Penality Rate ')
     daily_penalit_rate=fields.Float('Daily Penality Rate',compute="_compute_penalitydaily",digits=(12,6))
     # schedule_payment_=fields.Float('Schedule Payment')
-    schedule_numberof_payment=fields.Float('Schedule Number of Payment per year')
+   
     grace_period=fields.Float('Grace Period')
     contract_date=fields.Date('Contrt Date')
     total_interest=fields.Float('Total Interst',compute='_compute_total_interest')
     cumulative_interest  =fields.Float('Cumulative interest',compute='_compute_total_interest')
     
-    isinterest= fields.Boolean(string="Is intest has interest?", compute='_compute_isinterest')
+    isinterest= fields.Boolean(string="Compound Interest?", compute='_compute_isinterest')
     isactive= fields.Boolean(string="Active?")
     isdone= fields.Boolean(string="Done?")
     cumulative_balance = fields.Float(compute='_compute_qty_amount',string="Cumulative Principal Balance")
@@ -51,19 +140,39 @@ class AccountLoan(models.Model):
     loan_interest_ids = fields.One2many('account.loan.interest', 'acount_loan_id', string="Interest")
     loan_schedule_ids = fields.One2many('account.loan.schedule', 'acount_loan_id', string="Schedule")
     
-    
+    payment_gene=fields.Boolean(string="Gen?")
+    num=fields.Integer('term')
+    def compute_daily_cron(self):                          
 
-    def compute_daily_cron(self):
+
         interst_amount=0.0000000
         penality_amount=0.0000000
         daily_interest_total=0.0000000
         current_date=datetime.today()
+        
         cday = current_date.date()
         acount_loan = self.env['account.loan'].search(
             [('isactive', '=', True)])   
             
         for predone in acount_loan:
+            # if predone.remaining_days<23:
+            #    # newnot=predone.name+": "+predone.next_payment_date+' Remains for Payment!'
+            #     def create_notification(self):
+            #         message = {
+            #             'type': 'ir.actions.client',
+            #             'tag': 'display_notification',
+            #             'params': {
+            #                 'title': _('Warning!'),
+            #                 'message': 'You havesome Bank Payment in Resent',
+            #                 'sticky': False,
+            #             }
+            #         } 
+            #         return message
+
+            if predone.next_payment_date:
+                predone.remaining_days=(predone.next_payment_date-cday)/timedelta(days=1)
             
+
             if cday>=predone.interest_start_date:
                 
                 for penality in predone.loan_repayment_ids:                    
@@ -85,8 +194,46 @@ class AccountLoan(models.Model):
                     {'acount_loan_id': predone.id, 'value_date': date.today().strftime('%Y-%m-%d'),
                     'daily_penality_rate': predone.daily_penalit_rate, 'daily_interest_rate': predone.daily_interest_rate,
                     'daily_interest_amount':interst_amount , 'daily_penality_amount': penality_amount, 
-                    'daily_interest_total': daily_interest_total}) 
+                    'daily_interest_total': daily_interest_total})
             
+            if not predone.next_payment_date:
+            
+ 
+                
+                predone.next_payment_date=predone.payment_start_date
+                acount_schedule = self.env['account.loan.schedule'].search(
+                [('payment_date', '=', predone.next_payment_date)]) 
+
+                for scedule in acount_schedule:
+                    acount_payment = self.env['account.loan.repayment'].search(
+                [('expected_payment_date', '=', predone.next_payment_date)]) 
+                    if not acount_payment:
+                        payments= self.env['account.loan.repayment'].create({'acount_loan_id': predone.id, 
+                            'expected_payment_date':predone.next_payment_date ,'total_payment': predone.payment,
+                                'payment_term':scedule.name })  
+                    predone.remaining_days=(predone.next_payment_date-cday)/timedelta(days=1)
+            
+                
+                
+                
+                    
+            
+            else:
+                if cday>= predone.next_payment_date:
+                    predone.next_payment_date=predone.next_payment_date+ relativedelta(months=predone.payment_month)
+                    acount_schedule = self.env['account.loan.schedule'].search(
+                [('payment_date', '=', predone.next_payment_date)]) 
+
+                    for scedule in acount_schedule:
+                        acount_payment = self.env['account.loan.repayment'].search(
+                [('expected_payment_date', '=', predone.next_payment_date)]) 
+                        if not acount_payment:
+                            payments= self.env['account.loan.repayment'].create({'acount_loan_id': predone.id, 
+                            'expected_payment_date':predone.next_payment_date ,'total_payment': predone.payment,
+                                'payment_term':scedule.name }) 
+                predone.remaining_days=(predone.next_payment_date-cday)/timedelta(days=1)
+            
+                                           
             
         
         
@@ -120,7 +267,8 @@ class AccountLoan(models.Model):
                     repay += repayment.principal_repayment
             else:
                 for repayment in line.loan_repayment_ids:
-                    if not repayment.is_interest:
+                    if repayment.is_paied:
+                    #if not repayment.is_interest:
                         repay += repayment.principal_repayment
             # """ calculating total repayment """  
             if line.isinterest:
@@ -129,7 +277,7 @@ class AccountLoan(models.Model):
 
                 
 
-            balance=line.loan_amount-repay+reciep+interest
+            balance=reciep+interest-repay
             line.cumulative_balance=balance+line.current_cumlative_balace
 
    
@@ -170,7 +318,7 @@ class AccountLoan(models.Model):
 
             itotal=0.00000
             value=0.0000
-            repayment=0.00000
+            repaymenti=0.00000
             ctotal=0.00000
             for inter in record.loan_interest_ids:
                 itotal +=inter.daily_interest_total
@@ -178,10 +326,11 @@ class AccountLoan(models.Model):
             record.total_interest=itotal+record.current_interest_total
             if not record.isinterest:
                 for repay in record.loan_repayment_ids:
-                    if repay.is_interest:
-                        repayment += repay.principal_repayment
+                    #if repay.is_interest:
+                    if repay.is_paied:
+                        repaymenti += repay.is_interest
                 ctotal=itotal
-            value=ctotal-repayment
+            value=ctotal-repaymenti
                     
             record.cumulative_interest=value+record.current_cumlative_interest
  
@@ -215,7 +364,11 @@ class AccountLoanSchedule(models.Model):
     name=fields.Char(string='Peyment term')
     payment_date = fields.Date(string="Payment Date")
  
-    acount_loan_id = fields.Many2one('account.loan', string="Parent ID")    
+    acount_loan_id = fields.Many2one('account.loan', string="Parent ID") 
+    payment_amount=fields.Float(string="Payment") 
+    interest=fields.Float(string="Interest") 
+    prencipal=fields.Float(string="Prencipal")
+    balance=fields.Float(string="Remaining Balance")
     
     @api.depends("payment_date")
     def _compute_penalitydaily(self):
