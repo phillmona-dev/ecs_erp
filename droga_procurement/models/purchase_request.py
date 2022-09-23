@@ -86,7 +86,7 @@ class purhcase_request(models.Model):
     def approve_request(self):
         self.write({'state': 'Approved'})
         # load status steps
-        self.load_foregin_purchase_status()
+        #self.load_foregin_purchase_status()
 
         return True
 
@@ -139,6 +139,8 @@ class purchase_foregin_status(models.Model):
 
     purchase_request_id_rfq_phase = fields.Many2one(
         "droga.purhcase.request", string="Purchase Request")
+
+    rfq_id = fields.Many2one("droga.purhcase.request.rfq")
 
     phase = fields.Many2one("droga.foregin.purchase.phases")
     phase_name = fields.Selection(related="phase.phase_name", store=True)

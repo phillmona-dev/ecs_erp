@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-
-
-
-
     <!-- action for rfq -->
     <record id="droga_purchase_request_rfq_action" model="ir.actions.act_window">
         <field name="name">Request for Quotation</field>
         <field name="res_model">droga.purhcase.request.rfq</field>
         <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_rfq_view_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_view_form')})]" />
+        <field name="domain">[('purhcase_request_id', '=', active_id)]</field>
+        <field name="context">{'default_purhcase_request_id': active_id}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Request for Quotation
+            </p>
+        </field>
+    </record>
+
+    <record id="droga_purchase_request_rfq_foregin_action" model="ir.actions.act_window">
+        <field name="name">Request for Quotation</field>
+        <field name="res_model">droga.purhcase.request.rfq</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_rfq_foregin_view_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_foregin_view_form')})]" />
         <field name="domain">[('purhcase_request_id', '=', active_id)]</field>
         <field name="context">{'default_purhcase_request_id': active_id}</field>
         <field name="help" type="html">
@@ -24,8 +39,8 @@
         <field name="name">Status Tracking</field>
         <field name="res_model">droga.purchase.foregin.status</field>
         <field name="view_mode">tree</field>
-        <field name="domain">[('purchase_request_id_rfq_phase', '=', active_id)]</field>
-        <field name="context">{'default_purchase_request_id_rfq_phase': active_id,'search_default_group_phase': 1}</field>
+        <field name="domain">[('rfq_id', '=', active_id)]</field>
+        <field name="context">{'default_rfq_id': active_id,'search_default_group_phase': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Foregin Purchase Status Tracking
@@ -92,7 +107,7 @@
                                 <tree editable="bottom">
                                     <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}"/>
                                     <field name="product_qty" />
-                                    <field name="product_uom_category_id" />
+                                    <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="remark" />
                                 </tree>
@@ -102,7 +117,7 @@
                         <page string="Other Information">
                             <group>
                                 <group>
-                                    <field name="company_id" context="{'company_id': parent.company_id}" readonly="1" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="company_id" context="{'company_id': parent.company_id}" options="{'no_create':True,'no_open':True}"/>
                                 </group>
                             </group>
                         </page>
@@ -164,7 +179,7 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_request_order_action)d" string="Purchase Order" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', '!=', 'Approved')]}"/>
+                        <button name="%(droga_purchase_request_rfq_foregin_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"/>
                         <button name="%(droga_purchase_foregin_status_tracking_action)d" string="Status Tracking" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', '!=', 'Approved')]}"/>
                     </div>
                     <div class="oe_title">
@@ -190,21 +205,21 @@
                                 <tree editable="bottom">
                                     <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}"/>
                                     <field name="product_qty" />
-                                    <field name="product_uom_category_id" />
+                                    <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="remark" />
                                 </tree>
 
                             </field>
                         </page>
-                        <page string="Other Information" invisible="1">
+                        <page string="Other Information">
                             <group>
                                 <group>
-                                    <field name="company_id" context="{'company_id': parent.company_id}" readonly="1" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="company_id" context="{'company_id': parent.company_id}" options="{'no_create':True,'no_open':True}"/>
                                 </group>
                             </group>
                         </page>
-                        <page string="Buying Method" invisible="1">
+                        <page string="Buying Method" attrs="{'invisible': [('state', 'not in', ('Approved'))]}">
                             <group>
                                 <field name="buying_method"/>
 
@@ -217,7 +232,7 @@
                             </field>
 
                         </page>
-                        
+
 
                     </notebook>
                 </sheet>
