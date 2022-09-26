@@ -15,6 +15,8 @@ class Rfq(models.Model):
     name = fields.Char('Request Reference', required=True,
                        index=True, copy=False, default='New')
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
+    request_type = fields.Selection(
+        related="purhcase_request_id.request_type", store=True)
 
     date = fields.Datetime("Date", required=True)
     rfq_lines = fields.One2many(
@@ -28,6 +30,9 @@ class Rfq(models.Model):
                                   required=True, store=False)
 
     procurement_committee = fields.Many2many("hr.employee")
+
+    rfq_foregin_status = fields.One2many(
+        "droga.purchase.foregin.status", "rfq_id")
 
     state = fields.Selection(
         [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"), ("Committee Approval", "Committee Approved"), ("CEO Approval", "CEO Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
@@ -50,7 +55,20 @@ class Rfq(models.Model):
     # ceo approval
     def ceo_approval(self):
         self.write({'state': 'CEO Approval'})
+        self.load_foregin_rfq_status()
         return True
+
+    def load_foregin_rfq_status(self):
+        # get phase 1 or request for quotation steps
+        rfq_steps = self.env["droga.foregin.purchase.phases"].search([])
+
+        for rfq_step in rfq_steps:
+            # create record in rfq step status one2manyobject
+            status = {'rfq_id': self.id,
+                      'phase': rfq_step.id,
+                      'status': 'Not Started'}
+            # create the record in database
+            sta = self.env['droga.purchase.foregin.status'].create(status)
 
     @api.model
     def create(self, vals):
@@ -106,12 +124,8 @@ class Rfq(models.Model):
         suppliers = []
         # get unique suppliers from the rfq
         for line in self.rfq_lines:
-            if line.winner == "Yes" and line not in suppliers:
+            if line.winner == "Yes" and self.check_supplier(line.supplier_name, suppliers) == 0:
                 suppliers.append(line)
-
-        a = (0, 0,)
-        b = ()
-        c = ()
 
         if suppliers:
             for supplier in suppliers:
@@ -143,7 +157,22 @@ class Rfq(models.Model):
                 # create purchase orders
                 purchase_order = self.env['purchase.order'].create(vals)
 
-        return True
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': 'Purchase Order Created Successfully',
+                'type': 'success',
+                'sticky': False
+            }
+        }
+
+    def check_supplier(self, supplier_name, suppliers):
+        count = 0
+        for s in suppliers:
+            if supplier_name == s.supplier_name:
+                count += 1
+        return count
 
 
 class Rfq_Detail(models.Model):
