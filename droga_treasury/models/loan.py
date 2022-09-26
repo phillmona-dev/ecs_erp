@@ -1,5 +1,3 @@
-
-from re import I
 from odoo import api, fields, models
 import calendar
 from datetime import date, datetime,timedelta
