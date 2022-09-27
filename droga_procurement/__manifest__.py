@@ -19,17 +19,20 @@
     'version': '1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'purchase', 'stock','web_studio'],
+    'depends': ['base', 'purchase', 'stock', 'web_studio'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'security/procurement_security.xml',
         'views/purchase_order.xml',
+        'views/pre_import_permit.xml',
+        'views/rfq.xml',
         'views/purchase_request.xml',
 
-        'views/rfq.xml',
+
         'views/purchase_foregin_status.xml',
+        'views/lc.xml',
         'views/configuration.xml',
         'report/paper_format.xml',
         'report/purchase_request.xml',

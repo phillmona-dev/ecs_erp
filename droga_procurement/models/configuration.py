@@ -27,5 +27,14 @@ class foregin_purchase_phases(models.Model):
         result = []
         for record in self:
             result.append((record.id, record.phase_name))
-            
+
         return result
+
+
+class Reconciliation_Doc(models.Model):
+    _name = 'droga.purchase.reconciliation.docs'
+    _description = 'Reconciliation Documents'
+
+    name = fields.Char('Name', required=True)
+    order = fields.Integer("Step Order", required=True)
+    doc_type = fields.Char('Document Type')

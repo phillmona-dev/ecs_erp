@@ -23,6 +23,7 @@
     <menuitem id="droga_purhcase_supplier_registration" name="Vendors" sequence="100" parent="purchase.menu_purchase_config" action="account.res_partner_action_supplier" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
     <menuitem id="droga_purhcase_committee_menu" name="Procurement Committee" sequence="101" parent="purchase.menu_purchase_config" action="committee_configuration_view_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
     <menuitem id="droga_purhcase_procurement_phase_menu" name="Foregin Procurement Phase" sequence="102" parent="purchase.menu_purchase_config" action="droga_foregin_purchase_phases_view__action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
+    <menuitem id="droga_purhcase_procurement_reconciliation_documents_menu" name="Reconciliation Documents" sequence="102" parent="purchase.menu_purchase_config" action="droga_purchase_reconciliation_docs_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
 
 
 </odoo>

@@ -14,7 +14,7 @@ class Rfq(models.Model):
 
     name = fields.Char('Request Reference', required=True,
                        index=True, copy=False, default='New')
-    purhcase_request_id = fields.Many2one("droga.purhcase.request")
+    purhcase_request_id = fields.Many2one("droga.purhcase.request",required=True)
     request_type = fields.Selection(
         related="purhcase_request_id.request_type", store=True)
 
@@ -33,6 +33,8 @@ class Rfq(models.Model):
 
     rfq_foregin_status = fields.One2many(
         "droga.purchase.foregin.status", "rfq_id")
+
+    lcs = fields.One2many('droga.purchase.lc', 'rfq_id')
 
     state = fields.Selection(
         [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"), ("Committee Approval", "Committee Approved"), ("CEO Approval", "CEO Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
@@ -212,6 +214,9 @@ class Rfq_Detail(models.Model):
 
     winner = fields.Selection([('Yes', 'Yes'), ('No', 'No')], default="No")
 
+
+    
+
     @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id')
     def _compute_total(self):
         for record in self:
@@ -233,13 +238,7 @@ class Rfq_Detail(models.Model):
 
         return super(Rfq_Detail, self).create(vals)
 
-    @api.model
-    def write(self, vals):
-        if vals:
-            if self.check_double_product_supplier_entry(vals) > 1:
-                raise UserError(_("You can't enter duplicate data"))
-
-        return super(Rfq_Detail, self).write(vals)
+    
 
     @api.depends('product_qty', 'unit_price')
     def _compute_total_price(self):
