@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="droga_inventory_transfer_custom_action" model="ir.actions.act_window">
+        <field name="name">Store transfer request</field>
+        <field name="res_model">droga.inventory.transfer.custom</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_inventory_transfer_custom_view_tree" model="ir.ui.view">
+        <field name="name">droga.inventory.transfer.custom.view.tree</field>
+        <field name="model">droga.inventory.transfer.custom</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="name"></field>
+                <field name="transfer_reference"></field>
+                <field name="location_dest_id"></field>
+                <field name="state"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_inventory_transfer_custom_view_form" model="ir.ui.view">
+        <field name="name">droga.inventory.transfer.custom.view.form</field>
+        <field name="model">droga.inventory.transfer.custom</field>
+        <field name="arch" type="xml">
+            <form string="Transfers">
+                <header>
+                    <button name="action_request"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done')),('id','=',None)]}"
+                            string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_cancel"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done')),('id','=',None)]}"
+                            string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="location_filter" invisible="1"></field>
+                            <field name="location_dest_id" domain="location_filter" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="transfer_reference" attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
+                        </group>
+                        <group>
+                            <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Product Details">
+                            <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
+                                <tree editable="bottom">
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="product_id" required="1" context="{'default_detailed_type': 'product'}"/>
+                                    <field name="product_uom"/>
+                                    <field name="product_uom_category_id" invisible="1"/>
+                                    <field name="product_uom_qty" string="Request"/>
+                                    <!--
+                                    <field name="location_source_id" domain="([('usage','=','internal')])" string="Source location"/>
+                                    -->
+                                    <field name="warehouse_id"></field>
+                                    <field name="available_qty" string="Available"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <menuitem
+            id="droga_stock_transfer_menu"
+            name="Store transfer requests"
+            action="droga_inventory_transfer_custom_action"
+            groups="inventory_li,inventory_me,inventory_md,inventory_ms,inventory_os"
+            parent="stock.menu_stock_warehouse_mgmt"/>
+</odoo>

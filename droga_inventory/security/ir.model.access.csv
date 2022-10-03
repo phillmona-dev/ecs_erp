@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_droga_inventory_droga_inventory,droga_inventory.droga_inventory,model_droga_inventory_droga_inventory,base.group_user,1,1,1,1
+access_inventory_trans_request,droga.inventory.transfer.custom,model_droga_inventory_transfer_custom,stock.group_stock_user,1,1,1,1
+access_inventory_trans_request_detail,droga.inventory.transfer.custom.detail,model_droga_inventory_transfer_custom_detail,stock.group_stock_user,1,1,1,1
