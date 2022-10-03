@@ -48,7 +48,7 @@ class droga_tender_submission_detail(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'droga.tender.submission.detail',
-            'view_id': self.env.ref('DROGA_TENDER.droga_tender_competitors_view_tree').id,
+            'view_id': self.env.ref('droga_tender.droga_tender_competitors_view_tree').id,
             'type': 'ir.actions.act_window',
 
             # This will pass the detail ID if a record is present

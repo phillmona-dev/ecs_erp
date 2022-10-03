@@ -40,7 +40,7 @@ class droga_tender_master(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'droga.tender.performance.evaluation',
-            'view_id': self.env.ref('DROGA_TENDER.droga_tender_perf_eval_view_tree').id,
+            'view_id': self.env.ref('droga_tender.droga_tender_perf_eval_view_tree').id,
             'type': 'ir.actions.act_window',
 
             #This will pass the detail ID if a record is present

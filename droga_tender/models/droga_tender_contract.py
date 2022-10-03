@@ -47,7 +47,7 @@ class droga_tender_master(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'droga.tender.contract',
-            'view_id': self.env.ref('DROGA_TENDER.droga_tender_advance_view_form').id,
+            'view_id': self.env.ref('droga_tender.droga_tender_advance_view_form').id,
             'type': 'ir.actions.act_window',
             'target': 'new',
             'res_id': self.id
@@ -59,7 +59,7 @@ class droga_tender_master(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'droga.tender.contract',
-            'view_id': self.env.ref('DROGA_TENDER.droga_tender_performance_view_form').id,
+            'view_id': self.env.ref('droga_tender.droga_tender_performance_view_form').id,
             'type': 'ir.actions.act_window',
             'target': 'new',
             'res_id': self.id
@@ -71,7 +71,7 @@ class droga_tender_master(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'droga.tender.security.detail',
-            'view_id': self.env.ref('DROGA_TENDER.droga_tender_sec_detail_view_form').id,
+            'view_id': self.env.ref('droga_tender.droga_tender_sec_detail_view_form').id,
             'type': 'ir.actions.act_window',
 
             #This will pass the detail ID if a record is present

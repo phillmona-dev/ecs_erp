@@ -21,7 +21,7 @@ class droga_tender_master_detail(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'droga.tender.master.detail',
-            'view_id': self.env.ref('DROGA_TENDER.droga_tender_master_detail_view_form').id,
+            'view_id': self.env.ref('droga_tender.droga_tender_master_detail_view_form').id,
             'type': 'ir.actions.act_window',
             #'res_id': self.bid_security.id,
         }
