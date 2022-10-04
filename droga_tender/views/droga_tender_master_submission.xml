@@ -33,21 +33,17 @@
         <field name="arch" type="xml">
 
             <form>
-                <sheet style="max-width:90%;">
-                    <div class="oe_button_box" name="button_box">
+                <notebook>
 
-                            <button icon="fa-credit-card-alt" type="object" string="Bid Security" name="bid_security_open" class="oe_stat_button" ></button>
 
-                        </div>
-                    <notebook>
 
-                        <page string="Tender Submission Detail">
-
+                    <page string="Tender Submission Detail">
                             <field name="detail_submissions" mode="tree">
                                 <tree editable="bottom">
 
                                     <field name="lot_number"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="product"/>
                                     <field name="item_des"/>
                                     <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
                                     <field name="quantity"/>
@@ -73,6 +69,13 @@
                         </page>
 
                     </notebook>
+                <sheet style="max-width:90%;">
+
+                    <div class="oe_button_box" name="button_box">
+
+                            <button icon="fa-credit-card-alt" type="object" string="Bid Security" name="bid_security_open" class="oe_stat_button" ></button>
+
+                        </div>
 
                     <notebook>
                         <page string="Tender Performance Evaluation">

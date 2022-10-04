@@ -4,7 +4,7 @@ from odoo.exceptions import UserError
 from odoo.tools.view_validation import READONLY
 
 
-class droga_stock_cons_receive(models.Model):
+class droga_stock_cons_issue(models.Model):
     _name = 'droga.inventory.consignment.issue'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
@@ -13,12 +13,18 @@ class droga_stock_cons_receive(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
+        ('stmg', 'Store manager'),  #Issue sent to store manager for warehouse allocation
         ('waiting', 'Requested'),   #When consignment is waiting for storekeeper to issue at warehouse
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
         ('done', 'Processed'),      #When request is processed
     ], string='Status', default="draft", readonly=True, tracking=True,
         help=" * Requested: The consignment issue order is sent to warehouse.\n"
              " * Done: The consignment items are issued from warehouse.\n")
+
+    issue_type = fields.Selection([('CONI', 'Consignment'), ('SIF', 'Free sample'),('SIR', 'Sample to be returned')],string='Issue type',requird=True)
+    #SIF - Sample issue free        -   This will post under expense account (transfer to sample location)
+    #SIR - Sample issue to return   -   This will post under sample receivable
+    #CONI - Consignment issue       -   This will post under consignment receivable (transfer to consignment location)
 
     detail_entries = fields.One2many('droga.inventory.cons.issue.detail', 'cons_header')
 
@@ -29,6 +35,7 @@ class droga_stock_cons_receive(models.Model):
                                    state={'draft': [('readonly', False)]})
 
     consignment_reference = fields.Text(string='Order reference', default='', readonly=True)
+    cons_ref=fields.One2many('stock.picking','cons_sample_issue_request')
 
     @api.model
     def create(self, vals_list):
@@ -39,36 +46,43 @@ class droga_stock_cons_receive(models.Model):
             if not _name:
                 raise UserError("Order sequence not found.")
             vals_list['name']=_name
-        return super(droga_stock_cons_receive, self).create(vals_list)
+        return super(droga_stock_cons_issue, self).create(vals_list)
 
     def action_cancel(self):
         self.state='cancel'
 
+    def action_send_to_store_manager(self):
+        self.state = 'stmg'
     def action_send_to_store(self):
         warehouse_list=set(self.detail_entries['warehouse_id'])
+
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=','CONI'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=',self.issue_type), ('warehouse_id', '=', wh.id)]).id
+            cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
             if not pick_type_id :
                 raise UserError("Picking type is not configured for one of the warehouses.")
+            if not cust_locat:
+                raise UserError("Customer location for type "+self.issue_type+" not set. Please configure accordingly.")
 
-        cons_cust=self.env['stock.location'].search([('name','=','Consignment customer location')]).id
-
-        if not cons_cust:
-            raise UserError("Consignment customer location not set. Please configure under name 'Consignment customer location'.")
 
         for wh in warehouse_list:
+            #Get picking type for issue type per warehouse.
+            #Issue type will be configured per warehouse.
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=','CONI'), ('warehouse_id', '=', wh.id)]).id
-            def_loc_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=','CONI'), ('warehouse_id', '=', wh.id)]).default_location_src_id.id
+                [('sequence_code', '=',self.issue_type), ('warehouse_id', '=', wh.id)]).id
+            #Get default location for the warehouse
+            def_loc_id = self.env['stock.location'].search(
+                [('complete_name', 'like', wh.code + '/Stock%'), ('usage', '=', 'internal')])[0].id
+
             picking_vals = {
                 'partner_id': self.customer.id,
                 'company_id': self.company_id.id,
                 'picking_type_id': pick_type_id,
                 'location_id': def_loc_id,
-                'location_dest_id': cons_cust,
+                'location_dest_id': cust_locat,
                 'origin': self.name,
+                'cons_sample_issue_request': self.id,
                 'state': 'confirmed',
                 'scheduled_date': self.issue_date
             }
@@ -90,15 +104,15 @@ class droga_stock_cons_receive(models.Model):
                         'product_uom': rec['product_uom'].id,
                         'product_uom_qty': rec['product_uom_qty'],
                         'location_id': def_loc_id,
-                        'location_dest_id': cons_cust,
+                        'location_dest_id': cust_locat,
                         'state': 'confirmed',
                         'company_id': self.company_id.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)
 
-            picking_id.sudo().action_confirm()
-            picking_id.sudo().action_assign()
+            #picking_id.sudo().action_confirm()
+            #picking_id.sudo().action_assign()
 
         self.state = 'waiting'
 
@@ -108,10 +122,19 @@ class droga_stock_cons_receive(models.Model):
 class droga_stock_cons_issue_detail(models.Model):
     _name = 'droga.inventory.cons.issue.detail'
     cons_header = fields.Many2one('droga.inventory.consignment.issue', required=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('cancel', 'Cancelled'),  # When requester cancels it from draft
+        ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
+        ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
+        ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
+        ('done', 'Processed'),  # When request is processed
+    ], string='Status', default="draft", related='cons_header.state')
+
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]})
     warehouse_id = fields.Many2one(
-        'stock.warehouse', "Receipt warehouse",
+        'stock.warehouse', "Issuer warehouse",
         required=True, check_company=True,
         state={'draft': [('readonly', False)]})
 

@@ -1,3 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_inventory_trans_request,droga.inventory.transfer.custom,model_droga_inventory_transfer_custom,stock.group_stock_user,1,1,1,1
 access_inventory_trans_request_detail,droga.inventory.transfer.custom.detail,model_droga_inventory_transfer_custom_detail,stock.group_stock_user,1,1,1,1
+
+access_inventory_cons_request,droga.inventory.consignment.issue,model_droga_inventory_consignment_issue,stock.group_stock_user,1,1,1,1
+access_inventory_cons_request_detail,droga.inventory.cons.issue.detail,model_droga_inventory_cons_issue_detail,stock.group_stock_user,1,1,1,1
+
+access_inventory_cons_receive,droga.inventory.consignment.receive,model_droga_inventory_consignment_receive,stock.group_stock_user,1,1,1,1
+access_inventory_cons_receive_detail,droga.inventory.cons.receive.detail,model_droga_inventory_cons_receive_detail,stock.group_stock_user,1,1,1,1

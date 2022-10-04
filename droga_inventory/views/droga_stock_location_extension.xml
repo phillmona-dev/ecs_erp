@@ -6,7 +6,20 @@
         <field name="inherit_id" ref="stock.view_location_form" />
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='usage']" position="after">
-                <field name="warehouse"/>
+                <field name="con_type"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_picking_transfer_add" model="ir.ui.view">
+        <field name="name">stock.picking.inherited.transfer</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group/group/field[@name='origin']" position="replace">
+                <field name="trans_issue_request" attrs="{'invisible': [('trans_issue_request', '=', False)]}"></field>
+                <field name="cons_sample_issue_request" attrs="{'invisible': [('cons_sample_issue_request', '=', False)]}"></field>
+                <field name="cons_receive_request" attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
             </xpath>
         </field>
     </record>

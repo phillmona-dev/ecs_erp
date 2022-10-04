@@ -10,6 +10,7 @@ class droga_stock_cons_receive(models.Model):
 
     name = fields.Char('Name', default='New')
     supplier=fields.Many2one('res.partner',string='Supplier')
+    cons_ref = fields.One2many('stock.picking', 'cons_receive_request')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
@@ -52,10 +53,10 @@ class droga_stock_cons_receive(models.Model):
             if not pick_type_id :
                 raise UserError("Picking type is not configured for one of the warehouses.")
 
-        cons_vendor=self.env['stock.location'].search([('name','=','Consignment vendor location')]).id
+        cons_vendor=self.env['stock.location'].search([('con_type', '=', 'CONR')]).id
 
         if not cons_vendor:
-            raise UserError("Consignment vendor location not set. Please configure under name 'Consignment vendor location'.")
+            raise UserError("Consignment vendor location not set. Please configure accordingly.")
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
@@ -68,17 +69,18 @@ class droga_stock_cons_receive(models.Model):
                 'picking_type_id': pick_type_id,
                 'location_id': cons_vendor,
                 'location_dest_id': def_loc_id,
+                'cons_receive_request': self.id,
                 #'auto_generated': True,
                 'origin': self.name,
-                'state': 'confirmed',
+                'state': 'draft',
                 'scheduled_date': self.receipt_date
             }
             picking_id = self.env['stock.picking'].sudo().create(picking_vals)
 
             if not self.consignment_reference:
-                self.consignment_reference = picking_id.name + ','
+                self.consignment_reference = picking_id.name + '\n'
             else:
-                self.consignment_reference = self.consignment_reference + picking_id.name + ','
+                self.consignment_reference = self.consignment_reference + picking_id.name + '\n'
 
             for rec in self.detail_entries:
 
@@ -93,14 +95,14 @@ class droga_stock_cons_receive(models.Model):
                         'price_unit': rec['price_unit'],
                         'location_id': cons_vendor,
                         'location_dest_id': def_loc_id,
-                        'state': 'confirmed',
+                        'state': 'draft',
                         'company_id': self.company_id.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)
 
-            picking_id.sudo().action_confirm()
-            picking_id.sudo().action_assign()
+            #picking_id.sudo().action_confirm()
+            #picking_id.sudo().action_assign()
 
         self.state = 'waiting'
 

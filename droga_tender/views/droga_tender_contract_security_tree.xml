@@ -10,7 +10,7 @@
                         <page name="name" string="Performance Security">
                             <field name="performance_security" mode="tree">
                                 <tree editable="bottom">
-                                    <field name="security_type" options="{'no_create':True,'no_open':True}"></field>
+                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="issue_date" required="1"></field>
                                     <field name="bank" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="bank_number"></field>
@@ -39,7 +39,7 @@
                         <page name="name" string="Advance Security">
                             <field name="advance_security" mode="tree">
                                 <tree editable="bottom">
-                                    <field name="security_type" options="{'no_create':True,'no_open':True}"></field>
+                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="issue_date" required="1"></field>
                                     <field name="bank" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="bank_number"></field>
@@ -68,7 +68,7 @@
                         <page name="name" string="Bid Security">
                             <field name="bid_security" mode="tree">
                                 <tree editable="bottom">
-                                    <field name="security_type" options="{'no_create':True,'no_open':True}"></field>
+                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="issue_date" required="1"></field>
                                     <field name="bank" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="bank_number"></field>

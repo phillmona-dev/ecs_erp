@@ -12,6 +12,7 @@ class droga_tender_submission_detail(models.Model):
     #Text fields
     lot_number=fields.Char("Lot Number",required=True)
     item_des = fields.Char("Item Description")
+    product=fields.Many2one('product.product','Product')
     brand_model = fields.Char("Brand/Model")
     remark = fields.Char("Description and remark")
     award_fold_num = fields.Char("Award folder number")
@@ -68,6 +69,8 @@ class droga_tender_submission_detail(models.Model):
             to_create_perf_eval = {
                     "lot_number": vals_list["lot_number"],
                     "quantity": vals_list["quantity"],
+                    "unit_price":vals_list["unit_price"],
+                    "amount":vals_list["unit_price"]*vals_list["quantity"],
                     "type_item": vals_list["type_item"],
                     "item_des":vals_list["item_des"],
                     "parent_tender_performance": vals_list["parent_tender_submission"],
@@ -85,11 +88,11 @@ class droga_tender_submission_detail(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        if 'status' not in vals:
-            return super().write(vals)
         if 'quantity' in vals:
             if vals["quantity"]==0:
                 raise UserError("Quantity can not be zero.")
+        if 'status' not in vals:
+            return super().write(vals)
         if vals["status"]=="awarded":
             to_create_perf_eval = {
                 "lot_number": self.lot_number,

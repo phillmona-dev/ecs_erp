@@ -25,6 +25,7 @@
         'views/droga_stock_transfer_custom.xml',
         'views/droga_stock_consignment_receipt.xml',
         'views/droga_stock_consignment_issue.xml',
+        'views/droga_stock_location_extension.xml',
     ],
 
     # any module necessary for this one to work correctly

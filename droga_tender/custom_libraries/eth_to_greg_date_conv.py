@@ -12,7 +12,6 @@ class converter:
             month_converted=mm+8
             month_to_compare=mm+8
 
-        year_converted=0
         if mm+8>12:
             year_converted=yyyy+8
         else:

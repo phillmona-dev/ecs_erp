@@ -19,7 +19,7 @@ class droga_stock_transfer_custom(models.Model):
     ], string='Status', default="draft", readonly=True, tracking=True,
         help=" * Requested: The transfer is requested to the sending warehouse.\n"
              " * Done: The transfer is approved and processed.\n")
-
+    cons_ref = fields.One2many('stock.picking', 'trans_issue_request')
     detail_entries = fields.One2many('droga.inventory.transfer.custom.detail', 'transfer_header')
 
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
@@ -111,7 +111,9 @@ class droga_stock_transfer_custom(models.Model):
                 'location_dest_id': self.location_dest_id.id,
                 #'auto_generated': True,
                 'origin': self.name,
-                'state': 'confirmed',
+                #'state': 'confirmed',
+                'state': 'draft',
+                'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
             }
             picking_id = self.env['stock.picking'].sudo().create(picking_vals)
@@ -133,7 +135,8 @@ class droga_stock_transfer_custom(models.Model):
                         'product_uom_qty': rec['product_uom_qty'],
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
-                        'state': 'confirmed',
+                        #'state': 'confirmed',
+                        'state': 'draft',
                         'company_id': self.company_id.id
                     }
 
@@ -145,6 +148,7 @@ class droga_stock_transfer_custom(models.Model):
 class droga_stock_transfer_custom_detail(models.Model):
     _name = 'droga.inventory.transfer.custom.detail'
     transfer_header = fields.Many2one('droga.inventory.transfer.custom', required=True)
+
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]})
     location_source_id = fields.Many2one(
@@ -154,7 +158,6 @@ class droga_stock_transfer_custom_detail(models.Model):
 
     warehouse_id=fields.Many2one(
         'stock.warehouse', "Source warehouse",
-        required=True,
         state={'draft': [('readonly', False)]})
     @api.depends('location_source_id')
     def _get_wh(self):

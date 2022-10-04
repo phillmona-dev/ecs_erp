@@ -11,13 +11,14 @@ class droga_tender_master(models.Model):
     # decimal fields
     quantity = fields.Float("Quantity")
     unit_price = fields.Float("Unit price")
-    amount = fields.Float("Amount sent",compute="compute_amount")
+    amount = fields.Float("Amount sent")
+
+    award_cost = fields.Float("Awarded cost", compute="compute_amount")
+
     @api.depends("unit_price", "quantity")
     def compute_amount(self):
         for rec in self:
-            rec.amount = rec.unit_price * rec.quantity
-
-    award_cost = fields.Float("Awarded cost")
+            rec.award_cost = rec.unit_price * rec.quantity
     perf_pct=fields.Float('% of Performance',compute="compute_performance")
     @api.depends("amount", "award_cost")
     def compute_performance(self):

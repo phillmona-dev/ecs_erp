@@ -25,34 +25,40 @@
         <field name="arch" type="xml">
             <form string="Consignment issue">
                 <header>
+                    <button name="action_send_to_store_manager"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','stmg','reject','cancel','done')),('id','=',None)]}"
+                            string="Send to store manager" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_send_to_store"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done')),('id','=',None)]}"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','draft','reject','cancel','done')),('id','=',None)]}"
                             string="Send to store" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done')),('id','=',None)]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
                             <field name="customer"></field>
-                            <field name="consignment_reference"></field>
+                            <field name="issue_type" required="True"></field>
                         </group>
                         <group>
-                            <field name="issue_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="issue_date" attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
+                            <field name="consignment_reference"></field>
                         </group>
                     </group>
                     <notebook>
                         <page string="Product Details">
+                            <field name="state" invisible="1"></field>
                             <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
                                 <tree editable="bottom">
                                     <field name="company_id" invisible="1"/>
                                     <field name="product_id" required="1" context="{'default_detailed_type': 'product'}"/>
                                     <field name="product_uom"/>
                                     <field name="product_uom_category_id" invisible="1"/>
+                                    <field name="state" invisible="1"/>
                                     <field name="product_uom_qty" string="Quantity"/>
-                                    <field name="warehouse_id" string="Issuer warehouse"/>
+                                    <field name="warehouse_id" attrs="{'required': [('state', '!=','draft')]}" string="Issuer warehouse"/>
                                 </tree>
                             </field>
                         </page>
@@ -70,7 +76,7 @@
 
     <menuitem
             id="droga_stock_cons_issue_menu"
-            name="Store consignment issue order"
+            name="Store consignment/sample issue order"
             action="droga_inventory_consignment_issue_action"
             groups="inventory_li,inventory_me,inventory_md,inventory_ms,inventory_os"
             parent="stock.menu_stock_warehouse_mgmt"/>
