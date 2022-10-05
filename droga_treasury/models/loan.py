@@ -16,14 +16,9 @@ class AccountLoan(models.Model):
     _name = "account.loan"
     _description = "Loan"
     
-
-
     name=fields.Many2one('res.bank', string="Bank", required=True)  
     loan_amount=fields.Float('Loan Amount',required=True )
     loan_type = fields.Many2one('account.loan.type', string="Loan Type", required=True)  
-
-    
-
 
     loan_statement_number=fields.Char('Loan Statment Number',required=True )
     loan_period_year=fields.Float('period in years' ,)
@@ -49,9 +44,6 @@ class AccountLoan(models.Model):
                 if record.payment_start_date:
                     record.next_payment_date=record.payment_start_date
                     record.remaining_days=(record.next_payment_date-cday)/timedelta(days=1)
-
-
-
 
     #@api.depends("payment_month","total_number_of_payment","payment","payment_start_date")
     def compute_schedule(self):
@@ -121,18 +113,13 @@ class AccountLoan(models.Model):
                                 nloop-=1
                                 i=i+1
                             
-
-#Next payment and payment amount
-#gene. payment when payment == next payment date 
-#remaning days to nex payment
-#when next paymentdate==payment date gene
+    #Next payment and payment amount
+    #gene. payment when payment == next payment date 
+    #remaning days to nex payment
+    #when next paymentdate==payment date gene
     next_payment_date=fields.Date(string="Next Payment Date")
     remaining_days=fields.Integer(string="Remaning Days")
 
-   
-    
-
-    
     anual_interest_rate=fields.Float('Anual Interst Rate %', required=True)
     daily_interest_rate=fields.Float('Daily Interst Rate %',compute="_compute_interestdaily",digits=(12,6))
     
@@ -266,11 +253,7 @@ class AccountLoan(models.Model):
                                 tadd-=1
                                 i=i+1
                             
-
-                
-            
-
-            
+         
     payment_gene=fields.Boolean(string="Gen?")
     num=fields.Integer('term')
     def compute_daily_cron(self):                          
@@ -452,21 +435,13 @@ class AccountLoan(models.Model):
 
                     predone.remaining_days=(predone.next_payment_date-cday)/timedelta(days=1)
 
-            
-                                           
-            
-        
-        
-     
-
-   
+                                 
     """  #calculating cumulative amount with the formula
     cumulative balance= loan amount+recit-payment some payment are 
     for interest and not calculated
     in some case interest can be added
     cumulative balance=loan amount+reciet+interest-payment """
-
-    
+ 
     @api.depends('loan_repayment_ids','loan_receipt_ids','loan_interest_ids','current_cumlative_balace')
     def _compute_qty_amount(self):
         for line in self:
@@ -515,10 +490,6 @@ class AccountLoan(models.Model):
                                 interest.daily_penality_amount=penality.daily_penality_amount
                                 interest.daily_interest_total=interest.daily_interest_amount+interest.daily_penality_amount
 
-
-            #
-    
-
     @api.depends('loan_interest_ids','loan_repayment_ids','current_cumlative_interest')
     def _compute_total_interest(self):
         for record in self:
@@ -555,17 +526,15 @@ class AccountLoan(models.Model):
             record.cumulative_interest=value+record.current_cumlative_interest
  
 
-    
     @api.depends("loan_type")
     def _compute_isinterest(self):
         for record in self:
             record.isinterest = record.loan_type.isinterest
 
-    
+
     def compute_done(self):
         for record in self:
             record.isactive = False
-
 
     @api.depends("anual_interest_rate")
     def _compute_interestdaily(self):
@@ -579,7 +548,31 @@ class AccountLoan(models.Model):
             record.daily_penalit_rate = record.anual_penalit_rate/365
     
 
-    
+    def open_renew(self):
+        view = self.env.ref(
+            'droga_treasury.account_loan_renew_view_tree')
+
+        return {
+            'name': 'Renew',
+            'view_mode': 'tree',
+            'res_model': 'account.loan.renew',
+            'view_id': view.id,
+            'type': 'ir.actions.act_window',
+            'res_id': self.id
+        }
+
+    def open_renew_schedule(self):
+        view = self.env.ref(
+            'droga_treasury.account_loan_renew_schedule_view_tree')
+
+        return {
+            'name': 'Renew Schedule',
+            'view_mode': 'tree',
+            'res_model': 'account.loan.renew.schedule',
+            'view_id': view.id,
+            'type': 'ir.actions.act_window',
+            'res_id': self.id
+        }
     
             
             

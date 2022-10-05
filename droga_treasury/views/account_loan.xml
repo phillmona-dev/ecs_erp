@@ -1,36 +1,36 @@
 <odoo>
-<record id="account_loan_action" model="ir.actions.act_window">
-    <field name="name">Loan Managmet</field>
-    <field name="res_model">account.loan</field>
-    <field name="view_mode">tree,form</field>
-</record>
+    <record id="account_loan_action" model="ir.actions.act_window">
+        <field name="name">Loan Managmet</field>
+        <field name="res_model">account.loan</field>
+        <field name="view_mode">tree,form</field>
+    </record>
 
-<!-- menu for Loan anagment -->
-<menuitem id="loan_menu_root" name="Loan Managment">
-    <menuitem id="bank_loan_menu" name="Tresury">
-        <menuitem id="account_loan_menu_action" action="account_loan_action"/>
+    <!-- menu for Loan anagment -->
+    <menuitem id="loan_menu_root" name="Loan Managment">
+        <menuitem id="bank_loan_menu" name="Tresury">
+            <menuitem id="account_loan_menu_action" action="account_loan_action"/>
+        </menuitem>
     </menuitem>
-</menuitem>
 
 
-<!--  tree view of the accoun loan m
+    <!--  tree view of the accoun loan m
 model-->
     <record id="account_loan_view_tree" model="ir.ui.view">
         <field name="name">account.loan.view.tree</field>
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
             <tree string="Loan">
-                  <field name="name"/>
-                        <field name="loan_amount"/> 
+                <field name="name"/>
+                <field name="loan_amount"/>
 
-                        <field name="isinterest"/> 
-                        <field name="cumulative_balance"/>
-                       
-                        <field name="loan_statement_number"/> 
-                        <field name="anual_interest_rate"/>
-                        <field name="daily_interest_rate"/>
-                        <field name="anual_penalit_rate"/> 
-                         <field name="daily_penalit_rate"/>
+                <field name="isinterest"/>
+                <field name="cumulative_balance"/>
+
+                <field name="loan_statement_number"/>
+                <field name="anual_interest_rate"/>
+                <field name="daily_interest_rate"/>
+                <field name="anual_penalit_rate"/>
+                <field name="daily_penalit_rate"/>
             </tree>
         </field>
     </record>
@@ -42,173 +42,173 @@ model-->
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
             <form string="">
-                
+
                 <sheet>
-                <data>
-                
-                    <div name="button_box" class="oe_button_box">
-                    <button class="oe_stat_button" icon="fa-diamond" type="action" name="668">
-                        <field widget="statinfo" name="x_acount_loan_id_account_loan_renew_count" string="Renew"/>
-                    </button>
-                    <button class="oe_stat_button" icon="fa-diamond" type="action" name="669">
-                        <field widget="statinfo" name="x_acount_loan_id_account_loan_renew_schedule_count" string="Renew Schedule"/>
-                    </button>
-                    
-                    </div>
-                
-                </data>
-                <header>
-                    <button name="compute_schedule" string="Schedule" type="object" />
-                     <button name="compute_renew" string="Renew" type="object" />
-                    <button name="compute_done" string="DONE" type="object" />
-               
-                </header>
-                
+                    <data>
+
+                        <div name="button_box" class="oe_button_box">
+                            <button class="oe_stat_button" icon="fa-diamond" type="object" name="open_renew" string="Renew">
+                                <!--<field widget="statinfo" name="x_acount_loan_id_account_loan_renew_count" string="Renew"/>-->
+                            </button>
+                            <button class="oe_stat_button" icon="fa-diamond" type="object" name="open_renew_schedule" string="Renew Schedule">
+                                <!--<field widget="statinfo" name="x_acount_loan_id_account_loan_renew_schedul_count" string="Renew Schedule"/>-->
+                            </button>
+
+                        </div>
+
+                    </data>
+                    <header>
+                        <button name="compute_schedule" string="Schedule" type="object" />
+                        <button name="compute_renew" string="Renew" type="object" />
+                        <button name="compute_done" string="DONE" type="object" />
+
+                    </header>
+
                     <group>
                         <group  >
                             <field name="name"/>
-                           <field name="loan_amount"/> 
+                            <field name="loan_amount"/>
                             <field name="loan_statement_number"/>
-                           
 
-                            </group>
-                            <group >
+
+                        </group>
+                        <group >
                             <field name="loan_type"/>
-                             <field name="contract_date"/>
-                              
-                              <field name="payment_start_date"/>
-                           
-                              
-                            </group>
-                            
-                            
-                         
-                            
-                          
-                    
+                            <field name="contract_date"/>
+
+                            <field name="payment_start_date"/>
+
+
+                        </group>
+
+
+
+
+
+
 
                     </group>
                     <notebook>
-                    <page string="Interest Information">
-                    <group name="name" string="Interest Information">
-                    <group >
-                       <field name="interest_start_date"/> 
-                       <field name="total_interest"/>
-                        <field name="isinterest"/>
-                    </group>
-                        <group name="name" string="Interest Rates">
-                                <group  >
-                                    <field name="anual_interest_rate"/>
-                                    <field name="anual_penalit_rate"/> 
-                                </group>
-                            
-                            
+                        <page string="Interest Information">
+                            <group name="name" string="Interest Information">
                                 <group >
-                                    <field name="daily_interest_rate"/>
-                                
-                                    <field name="daily_penalit_rate"/> 
+                                    <field name="interest_start_date"/>
+                                    <field name="total_interest"/>
+                                    <field name="isinterest"/>
                                 </group>
-                                
-                            
-                            </group>
-                    </group>
-                    
-                    </page>
-                     <page string="Period Information">
-                    <group name="name" string="Period Info">
-                    <group >
-                     <field name="loan_period_year"/>
-                            <field name="payment"/>
-                            <field name="payment_month"/>
-                                 <field name="isactive"/>
-                               
-                              
-                    </group>
-                    <group name ="name" string="Period Calculated">
-                        <field name="total_number_of_payment"/>
-                            <field name="schedule_numberof_payment"/>
-                             <field name="remaining_days"/>
-                             <field name="next_payment_date"/>
-                    </group>
-                    </group>
+                                <group name="name" string="Interest Rates">
+                                    <group  >
+                                        <field name="anual_interest_rate"/>
+                                        <field name="anual_penalit_rate"/>
+                                    </group>
 
-                    </page>
-                     <page string="Cumulatives">
-                    <group >
-                    <group >
-                        <field name="cumulative_balance"/>
-                        <field name="cumulative_interest"/>
-                    </group>
-                    <group>
-                        <field name="current_cumlative_balace"/>
-                        <field name="current_cumlative_interest"/>
-                        
-                    </group>
-                    </group>
-                    </page>
+
+                                    <group >
+                                        <field name="daily_interest_rate"/>
+
+                                        <field name="daily_penalit_rate"/>
+                                    </group>
+
+
+                                </group>
+                            </group>
+
+                        </page>
+                        <page string="Period Information">
+                            <group name="name" string="Period Info">
+                                <group >
+                                    <field name="loan_period_year"/>
+                                    <field name="payment"/>
+                                    <field name="payment_month"/>
+                                    <field name="isactive"/>
+
+
+                                </group>
+                                <group name ="name" string="Period Calculated">
+                                    <field name="total_number_of_payment"/>
+                                    <field name="schedule_numberof_payment"/>
+                                    <field name="remaining_days"/>
+                                    <field name="next_payment_date"/>
+                                </group>
+                            </group>
+
+                        </page>
+                        <page string="Cumulatives">
+                            <group >
+                                <group >
+                                    <field name="cumulative_balance"/>
+                                    <field name="cumulative_interest"/>
+                                </group>
+                                <group>
+                                    <field name="current_cumlative_balace"/>
+                                    <field name="current_cumlative_interest"/>
+
+                                </group>
+                            </group>
+                        </page>
                     </notebook>
-                    
+
                     <notebook>
-                    <page string="Payment Schedule">
-                          
-                            <field name="loan_schedule_ids" >
-                                <tree  create="false" edit="false" >
+                        <page string="Payment Schedule">
+
+                            <field name="loan_schedule_ids">
+                                <tree create="false" edit="false">
                                     <field name="name"/>
                                     <field name="payment_date"/>
-                                     <field name="payment_amount"/>
-                                     <field name="prencipal"/>
-                                     <field name="interest"/>
-                                     <field name="balance"/>
-                                    
+                                    <field name="payment_amount"/>
+                                    <field name="prencipal"/>
+                                    <field name="interest"/>
+                                    <field name="balance"/>
+
                                 </tree>
                             </field>
-                            
+
                         </page>
                         <page string="Repayment">
                             <!-- you can display child data like code below -->
-                            <field name="loan_repayment_ids" >
-                                <tree  editable="bottom"  >
+                            <field name="loan_repayment_ids">
+                                <tree editable="bottom">
                                     <field name="payment_term"/>
                                     <field name="expected_payment_date"/>
-                                    
+
                                     <field name="value_date"/>
                                     <field name="principal_repayment"/>
-                                    
+
                                     <field name="is_interest"/>
                                     <field name="total_payment"/>
                                     <field name="is_paied"/>
-                                    
-                                    
-                                    
+
+
+
                                 </tree>
                             </field>
-                            
+
                         </page>
                         <page string="Receipt">
-                          
+
                             <field name="loan_receipt_ids">
-                                <tree editable="bottom" >
+                                <tree editable="bottom">
                                     <field name="receipt"/>
                                     <field name="value_date"/>
-                                  
+
                                 </tree>
                             </field>
-                            
+
                         </page>
                         <page string="Interest">
-                            
+
                             <field name="loan_interest_ids">
-                                <tree  editable="bottom">
+                                <tree editable="bottom">
                                     <field name="daily_interest_amount"/>
                                     <field name="daily_penality_amount"/>
                                     <field name="daily_interest_total"/>
-                                    
+
                                     <field name="value_date"/>
                                     <field name="daily_interest_rate"/>
                                     <field name="daily_penality_rate"/>
                                 </tree>
                             </field>
-                            
+
                         </page>
                     </notebook>
                 </sheet>
@@ -219,94 +219,94 @@ model-->
 
 
 
-     <record id="account_loan_view_tree_report" model="ir.ui.view">
+    <record id="account_loan_view_tree_report" model="ir.ui.view">
         <field name="name">account.loan.view.tree.report</field>
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
             <tree string="Loan" create="false" edit="false">
-                  <field name="name"/>
-                        <field name="loan_amount"/> 
-                        <field name="loan_type"/>
-                         <field name="loan_amount"/>
-                         <field name="cumulative_balance"/> 
-                         <field name="cumulative_interest"/>
-                         <!-- <field name=" next_payment_date"/>  -->
-                         <field name="remaining_days"/>
-                         <field name="payment"/>
+                <field name="name"/>
+                <field name="loan_amount"/>
+                <field name="loan_type"/>
+                <field name="loan_amount"/>
+                <field name="cumulative_balance"/>
+                <field name="cumulative_interest"/>
+                <!-- <field name=" next_payment_date"/>  -->
+                <field name="remaining_days"/>
+                <field name="payment"/>
 
-                        
-                        
-                        
-                        
+
+
+
+
             </tree>
         </field>
     </record>
     <record id="account_loan_action_report" model="ir.actions.act_window">
-    <field name="name">Loan Status Summary</field>
-    <field name="res_model">account.loan</field>
-    <field name="view_mode">tree</field>
-    <field name="view_id" ref="account_loan_view_tree_report"/>
-</record>
-<menuitem id="loan_report_menu" name="Report" parent="loan_menu_root">
-    <menuitem id="bank_loan_report_menu" name="Status Summary">
-        <menuitem id="account_loan_report_menu_action" action="account_loan_action_report"/>
-       
-      
+        <field name="name">Loan Status Summary</field>
+        <field name="res_model">account.loan</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="account_loan_view_tree_report"/>
+    </record>
+    <menuitem id="loan_report_menu" name="Report" parent="loan_menu_root">
+        <menuitem id="bank_loan_report_menu" name="Status Summary">
+            <menuitem id="account_loan_report_menu_action" action="account_loan_action_report"/>
+
+
+        </menuitem>
     </menuitem>
-</menuitem>
 
 
 
-     <record id="account_loan_renew_schedule_view_tree" model="ir.ui.view">
+    <record id="account_loan_renew_schedule_view_tree" model="ir.ui.view">
         <field name="name">account.loan.renew.schedule.view.tree</field>
         <field name="model">account.loan.renew.schedule</field>
         <field name="arch" type="xml">
             <tree string="Renew Loan Schedule" create="false" edit="false">
-                  <field name="name"/>
-                        <field name="payment_date"/> 
-                        <field name="payment_amount"/>
-                         <field name="interest"/>
-                         <field name="prencipal"/> 
-                         <field name="balance"/>
-                         <!-- <field name=" next_payment_date"/>  -->
-                       
-                        
-                        
-                        
-                        
+                <field name="name"/>
+                <field name="payment_date"/>
+                <field name="payment_amount"/>
+                <field name="interest"/>
+                <field name="prencipal"/>
+                <field name="balance"/>
+                <!-- <field name=" next_payment_date"/>  -->
+
+
+
+
+
             </tree>
         </field>
     </record>
-    
-     <record id="account_loan_renew_view_tree" model="ir.ui.view">
+
+    <record id="account_loan_renew_view_tree" model="ir.ui.view">
         <field name="name">account.loan.renew.view.tree</field>
         <field name="model">account.loan.renew</field>
         <field name="arch" type="xml">
-            <tree string="Renew Loan" editable="bottom" >
-                  <field name="name"/>
-                        <field name="payment_amount"/> 
-                        <field name="anual_interest_rate"/>
-                         <field name="anual_penality_rate"/>
-                         <field name="renew_date"/> 
-                         <field name="addtional_payment"/>
-                         <field name="renew_start_date"/>
-                         <field name="cumulative_interest"/> 
-                         <field name="cumulative_balance"/> 
-                         <field name="payment_month"/> 
-                         <!-- <field name=" next_payment_date"/>  -->
-                       
-                        
-                        
-                        
-                        
+            <tree string="Renew Loan" editable="bottom">
+                <field name="name"/>
+                <field name="payment_amount"/>
+                <field name="anual_interest_rate"/>
+                <field name="anual_penality_rate"/>
+                <field name="renew_date"/>
+                <field name="addtional_payment"/>
+                <field name="renew_start_date"/>
+                <field name="cumulative_interest"/>
+                <field name="cumulative_balance"/>
+                <field name="payment_month"/>
+                <!-- <field name=" next_payment_date"/>  -->
+
+
+
+
+
             </tree>
         </field>
     </record>
 
 
 
-<!-- menu for Loan anagment -->
-<!-- <menuitem id="loan_menu_root_report" name="Report" parent="loan_menu_root">
+    <!-- menu for Loan anagment -->
+    <!-- <menuitem id="loan_menu_root_report" name="Report" parent="loan_menu_root">
     <menuitem id="bank_loan_menu_report" name="Loan Status Summary">
         <menuitem id="account_loan_menu_action" action="account_loan_action_report"/>
     </menuitem>
