@@ -39,7 +39,7 @@
                             </div>
                             <div class="col-3 bm-2">
                                 <strong>Branch:</strong>
-                                <p t-field="o.request_by" class="m-0"/>
+                                <p t-field="o.branch" class="m-0"/>
                             </div>
                             <div class="col-3 bm-2">
                                 <strong>Order Date:</strong>
@@ -68,6 +68,12 @@
                                     <th name="th_quantity">
                                         <strong>Qty</strong>
                                     </th>
+                                    <th name="th_quantity">
+                                        <strong>Unit Price</strong>
+                                    </th>
+                                    <th name="th_quantity">
+                                        <strong>Total Price</strong>
+                                    </th>
                                     <th name="th_uom">
                                         <strong>UoM</strong>
                                     </th>
@@ -89,6 +95,12 @@
 
                                         <td id="qty">
                                             <span t-field="line.product_qty"/>
+                                        </td>
+                                        <td id="qty">
+                                            <span t-field="line.unit_price"/>
+                                        </td>
+                                        <td id="qty">
+                                            <span t-field="line.total_price"/>
                                         </td>
                                         <td id="uom">
                                             <span t-field="line.product_uom"/>

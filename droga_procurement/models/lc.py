@@ -11,6 +11,7 @@ class Lc(models.Model):
     _description = 'LC Tracking'
 
     rfq_id = fields.Many2one('droga.purhcase.request.rfq')
+    purchase_order_id=fields.Many2one("purchase.order")
 
     name = fields.Char("LC/TT Number", required=True)
     bank_name = fields.Char("Bank Name")

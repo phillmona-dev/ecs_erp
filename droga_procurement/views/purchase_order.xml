@@ -41,6 +41,26 @@
                 <field name="purchase_request_id" options="{'no_create':True}" readonly="1" string="Purchase Request"/>
             </xpath>
 
+            <xpath expr = "//button[@name='action_view_invoice']" position = "after">
+                <button name="%(droga_finance.droga_account_payment_request1_action)d" type="action" string="Payment Request" states="purchase" class="oe_stat_button" icon="fa-file-text" data-hotkey="l"/>
+                <button name="%(droga_finance.droga_account_payment_request_urgent1_action)d" type="action" string="Payment Request-U" states="purchase" class="oe_stat_button" icon="fa-file-text" data-hotkey="l"/>
+
+            </xpath>
+
+            <xpath expr = "//page[@name='purchase_delivery_invoice']" position = "after">
+                <page name="lc" string="LC">
+                    <field name="lcs" mode="tree">
+                        <tree editable="bottom">
+                            <field name="name" />
+                            <field name="bank_name" />
+                            <field name="state" />
+                            <button name="open_lc_detail" string="LC Reconciliation" type="object" class="oe_stat_button" icon="fa-file-text" />
+
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+
 
         </field>
     </record>

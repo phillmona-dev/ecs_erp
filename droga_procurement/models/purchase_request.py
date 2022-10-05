@@ -52,6 +52,17 @@ class purhcase_request(models.Model):
     foregin_phase_rfqs = fields.One2many(
         "droga.purchase.foregin.status", "purchase_request_id_rfq_phase")
 
+    # approvers
+    department_manager = fields.Many2one(
+        "hr.employee", compute="_get_manager_id")
+    branch = fields.Many2one("account.analytic.account", string="Branch", domain=[
+                             ('group_id', '=', 'Branch')])
+
+    @api.depends("department")
+    def _get_manager_id(self):
+        for record in self:
+            record.department_manager = record.department.manager_id
+
     @api.model
     def create(self, vals):
         # get sequence number for each company
@@ -86,7 +97,7 @@ class purhcase_request(models.Model):
     def approve_request(self):
         self.write({'state': 'Approved'})
         # load status steps
-        #self.load_foregin_purchase_status()
+        # self.load_foregin_purchase_status()
 
         return True
 
@@ -125,12 +136,27 @@ class purhcase_request_line(models.Model):
                                  ('purchase_ok', '=', True)], change_default=True)
     product_qty = fields.Float(
         string='Quantity', digits='Product Unit of Measure', required=True, default=1)
+
+    unit_price = fields.Float('Unit Price')
+    total_price = fields.Float(
+        'Total Price', compute="_compute_total", store=True)
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
                                   domain="[('category_id', '=', product_uom_category_id)]", required=True)
     product_uom_category_id = fields.Many2one(
         related='product_id.uom_id.category_id')
 
     remark = fields.Char("Remark")
+
+    @api.depends('product_qty', 'unit_price')
+    def _compute_total(self):
+        for record in self:
+            record.total_price = record.unit_price*record.product_qty
+
+    # set unit of measure
+    @api.onchange('product_id')
+    def set_unit(self):
+        for record in self:
+            record.product_uom = record.product_id.uom_id
 
 
 class purchase_foregin_status(models.Model):
