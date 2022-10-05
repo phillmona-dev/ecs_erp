@@ -88,6 +88,7 @@
                             <field name="remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="technical_remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="procurement_committee" widget="many2many_tags" string="Committee"/>
+                            <field name="total_winner_amount" />
                         </group>
                     </group>
 
@@ -201,7 +202,7 @@
 
                             </field>
                         </page>
-                        <page string="LC">
+                        <page string="LC" invisible="1">
                             <field name="lcs" mode="tree">
                                 <tree editable="bottom">
                                     <field name="name" />

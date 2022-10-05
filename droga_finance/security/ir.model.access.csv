@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_droga_finance_droga_finance,droga_finance.droga_finance,model_droga_finance_droga_finance,base.group_user,1,1,1,1
+access_droga_finance_payment_request,droga.account.payment.request,model_droga_account_payment_request,droga_finance.self_service_group,1,1,1,1

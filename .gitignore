@@ -50,3 +50,14 @@ Thumbs.db
 
 ~/.gitignore
 **/__pycache__
+*.pyc
+*.pyc
+*.pyc
+droga_treasury/__pycache__/__init__.cpython-37.pyc
+droga_treasury/models/__pycache__/__init__.cpython-37.pyc
+droga_treasury/models/__pycache__/interest.cpython-37.pyc
+droga_treasury/models/__pycache__/loan.cpython-37.pyc
+droga_treasury/models/__pycache__/loan_type.cpython-37.pyc
+droga_treasury/models/__pycache__/receipt.cpython-37.pyc
+droga_treasury/models/__pycache__/renew.cpython-37.pyc
+droga_treasury/models/__pycache__/repayment.cpython-37.pyc
