@@ -1,3 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from . import models
+from . import droga_tender_master,droga_tender_master_detail,droga_tender_security,droga_tender_submission_detail,droga_tender_perfor_eval,droga_tender_contract,droga_tender_competitors
+from .settings import media,sec_type,incoterm,competitors,type_or_item
+#from .views import droga_awarded_tenders
