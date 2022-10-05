@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="droga_cust_contact_extension" model="ir.ui.view">
+        <field name="name">customer</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/field[@name='comment']" position="before">
+                <field name="working_hours" mode="tree">
+                        <tree editable="bottom">
+                            <field name="day"/>
+                            <field name="time_from" widget="float_time"/>
+                            <field name="time_to" widget="float_time"/>
+                        </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+</odoo>
