@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="droga_crm_customer_visit_action" model="ir.actions.act_window">
+        <field name="name">Customers visit log book</field>
+        <field name="res_model">droga.customer.visit</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_crm_customer_visit_view_tree" model="ir.ui.view">
+        <field name="name">droga.customer.visit.view.tree</field>
+        <field name="model">droga.customer.visit</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="visit_client"></field>
+                <field name="visit_contact" domain="([('parent_id','=',visit_client)])"></field>
+                <field name="visit_date"></field>
+                <field name="planned_visit_time_from" string="Planned visit time"></field>
+                <field name="actual_visit_time_from" string="Actual visit time"></field>
+                <field name="remark"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_crm_customer_visit_view_form" model="ir.ui.view">
+        <field name="name">droga.customer.visit.view.form</field>
+        <field name="model">droga.customer.visit</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <field name="visit_client"></field>
+                        <field name="visit_contact" domain="([('parent_id','=',visit_client)])"></field>
+                        <field name="visit_date"></field>
+                        <field name="planned_visit_time_from" widget="float_time"></field>
+                        <field name="planned_visit_time_to" widget="float_time"></field>
+                        <field name="actual_visit_time_from" widget="float_time"></field>
+                        <field name="actual_visit_time_to" widget="float_time"></field>
+                        <field name="remark"></field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_vist_log"
+        name="Visit log book"
+        parent="crm.crm_menu_root"
+        sequence="25"/>
+
+    <menuitem
+        id="droga_crm_customer_visit"
+        name="Customer visit log"
+        action="droga_crm_customer_visit_action"
+        parent="menu_vist_log"
+        sequence="18"/>
+
+</odoo>

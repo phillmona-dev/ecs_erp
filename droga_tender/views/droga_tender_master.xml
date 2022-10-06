@@ -47,7 +47,7 @@
                             <group style="white-space:nowrap">
 
                                 <field name="media" options="{'no_create':True,'no_open':True}" domain="[('status', '=', 'Active')]" ></field>
-                                <field name="customer" options="{'no_create':True,'no_open':True}" domain="[('is_company', '=', 'True')]" ></field>
+                                <field name="customer" domain="[('is_company', '=', 'True')]" ></field>
                                 <field name="customer_tender_no"></field>
                                 <field name="bid_security_amount"></field>
                                 <field name="bid_submit_place"></field>

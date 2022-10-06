@@ -8,7 +8,7 @@
             <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/field[@name='comment']" position="before">
                 <field name="working_hours" mode="tree">
                         <tree editable="bottom">
-                            <field name="day"/>
+                            <field name="day" required="True"/>
                             <field name="time_from" widget="float_time"/>
                             <field name="time_to" widget="float_time"/>
                         </tree>

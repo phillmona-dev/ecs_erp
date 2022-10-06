@@ -19,6 +19,7 @@
     # always loaded
     'data': [
         'views/cust_extension.xml',
+        'views/customer_visits.xml',
     ],
 
     # any module necessary for this one to work correctly
