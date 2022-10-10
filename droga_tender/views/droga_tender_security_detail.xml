@@ -16,7 +16,7 @@
                     <field name="bank"></field>
                     <field name="bank_number"></field>
                     <field name="starting_date"></field>
-                    <field name="security_amount"></field>
+                    <field name="security_amount" widget='monetary'></field>
                     <field name="security_period_in_days"></field>
                     <field name="dead_line_date"></field>
                     <field name="status"></field>
@@ -37,7 +37,7 @@
                             <field name="bank"></field>
                             <field name="bank_number"></field>
                             <field name="starting_date"></field>
-                            <field name="security_amount"></field>
+                            <field name="security_amount" widget='monetary'></field>
                             <field name="security_period_in_days"></field>
                             <field name="dead_line_date"></field>
                             <field name="status"></field>

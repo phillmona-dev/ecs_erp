@@ -105,6 +105,7 @@ class droga_tender_master(models.Model):
 
     # relational fields selection
     media = fields.Many2one('droga.tender.settings.media', string='Media')
+    bid_submit_place = fields.Many2one('droga.tender.settings.submission_place',string="Bid submission place")
     customer = fields.Many2one('res.partner', string='Customer', required=True)
     assigned_person = fields.Many2one('hr.employee', string='Assigned Person')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
@@ -112,7 +113,8 @@ class droga_tender_master(models.Model):
 
     # relational fields models
     detail_tenders = fields.One2many('droga.tender.master.detail', 'parent_tender', required=True)
-    detail_submissions = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission', required=True)
+    detail_submissions_tec = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission', required=True)
+    detail_submissions_fin = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission')
     bid_security = fields.One2many('droga.tender.security.detail', 'bid_security')
     detail_performance = fields.One2many('droga.tender.performance.evaluation', 'parent_tender_performance')
     detail_contract = fields.One2many('droga.tender.contract', 'parent_tender_contract')
@@ -149,7 +151,7 @@ class droga_tender_master(models.Model):
         result = []
         for record in self:
             result.append(
-                (record.id, record.customer["commercial_company_name"]+" for "+record.closing_date_gre.strftime("%B %d,%Y")))
+                (record.id, record.customer["name"]+" for "+record.closing_date_gre.strftime("%B %d,%Y")))
             return result
 
     @api.model

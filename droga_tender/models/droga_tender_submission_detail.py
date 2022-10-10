@@ -16,6 +16,7 @@ class droga_tender_submission_detail(models.Model):
     brand_model = fields.Char("Brand/Model")
     remark = fields.Char("Description and remark")
     award_fold_num = fields.Char("Award folder number")
+    supplier_new=fields.Char('New supplier')
 
     # decimal fields
     quantity=fields.Float("Quantity",default=1)
@@ -32,7 +33,7 @@ class droga_tender_submission_detail(models.Model):
     parent_tender_submission=fields.Many2one('droga.tender.master',required=True)
     unit_of_measure=fields.Many2one('uom.uom', string='UOM')
     currency=fields.Many2one('res.currency',string='Currency')
-    supplier=fields.Many2one('res.partner',string='Supplier')
+    supplier=fields.Many2one('res.partner',string='Existing supplier')
     country = fields.Many2one('res.country', string='Country')
     incoterm=fields.Many2one('droga.tender.settings.incoterm','Incoterm')
     competi_id = fields.One2many('droga.tender.competitors', 'submission_id')

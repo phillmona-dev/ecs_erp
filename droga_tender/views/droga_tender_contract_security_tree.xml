@@ -15,7 +15,7 @@
                                     <field name="bank" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="bank_number"></field>
                                     <field name="starting_date" required="1"></field>
-                                    <field name="security_amount" required="1"></field>
+                                    <field name="security_amount" widget='monetary' required="1"></field>
                                     <field name="security_period_in_days" required="1"></field>
                                     <field name="dead_line_date"></field>
                                     <field name="status"></field>

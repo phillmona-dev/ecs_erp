@@ -33,48 +33,71 @@
         <field name="arch" type="xml">
 
             <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+
+                            <button icon="fa-credit-card-alt" type="object" string="Bid Security" name="bid_security_open" class="oe_stat_button" ></button>
+
+                        </div>
+
                 <notebook>
 
 
-                    <page string="Tender Submission Detail">
-                            <field name="detail_submissions" mode="tree">
+                    <page string="Tender Submission Detail Technical">
+                            <field name="detail_submissions_tec" mode="tree">
                                 <tree editable="bottom">
 
                                     <field name="lot_number"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="product"/>
+                                    <field name="product" options="{'no_create':True,'no_open':True}"/>
                                     <field name="item_des"/>
                                     <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
                                     <field name="quantity"/>
-                                    <field name="unit_price"/>
-                                    <field name="amount"/>
-                                    <field name="currency" options="{'no_create':True,'no_open':True}"/>
                                     <field name="supplier" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="supplier_new"/>
                                     <field name="brand_model"/>
                                     <field name="country" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
+
                                     <field name="deliv_period"/>
-                                    <field name="fin_open"/>
                                     <field name="tech_result"/>
-                                    <field name="status"/>
-                                    <field name="st_date"/>
-                                    <field name="award_fold_num"/>
+
                                     <field name="remark"/>
-                                    <button icon="fa-credit-card-alt" type="object" string="Competitors"
-                                            name="competitors_open" class="oe_stat_button"></button>
+
                                 </tree>
                             </field>
 
                         </page>
 
                     </notebook>
+                    <notebook>
+                        <page string="Tender Submission Detail Financial">
+                            <field name="detail_submissions_fin" mode="tree">
+                                <tree editable="bottom">
+                                    <field name="lot_number"/>
+                                    <field name="type_item" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="product" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="item_des"/>
+                                    <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price" widget='monetary'/>
+                                    <field name="amount" widget='monetary'/>
+                                    <field name="currency" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="fin_open"/>
+                                    <field name="status"/>
+                                    <field name="st_date"/>
+                                    <field name="award_fold_num"/>
+                                    <button icon="fa-credit-card-alt" type="object" string="Competitors"
+                                            name="competitors_open" class="oe_stat_button"></button>
+                        </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+                </sheet>
                 <sheet style="max-width:90%;">
 
-                    <div class="oe_button_box" name="button_box">
 
-                            <button icon="fa-credit-card-alt" type="object" string="Bid Security" name="bid_security_open" class="oe_stat_button" ></button>
-
-                        </div>
 
                     <notebook>
                         <page string="Tender Performance Evaluation">
@@ -85,8 +108,8 @@
                                     <field name="item_des"/>
                                     <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
                                     <field name="quantity"/>
-                                    <field name="unit_price"/>
-                                    <field name="amount"/>
+                                    <field name="unit_price" widget='monetary'/>
+                                    <field name="amount" widget='monetary'/>
                                     <field name="award_cost"/>
                                     <field name="perf_pct"/>
                                 </tree>

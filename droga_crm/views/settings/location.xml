@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="droga_crm_customer_settings_location_action" model="ir.actions.act_window">
+        <field name="name">Location settings</field>
+        <field name="res_model">droga.crm.settings.location</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_crm_customer_location_view_tree" model="ir.ui.view">
+        <field name="name">droga.crm.settings.location.view.tree</field>
+        <field name="model">droga.crm.settings.location</field>
+        <field name="arch" type="xml">
+            <tree string="" editable="top">
+                <field name="parent_parent" options="{'no_create':True,'no_open':True}" ></field>
+                <field name="parent_id" domain="([('parent_id','=',parent_parent)])" options="{'no_create':True,'no_open':True}" ></field>
+                <field name="location_name"></field>
+                <field name="location_descr"></field>
+                <field name="status"></field>
+            </tree>
+        </field>
+    </record>
+
+
+    <menuitem
+        id="droga_crm_customer_settings_location"
+        name="Location settings"
+        action="droga_crm_customer_settings_location_action"
+        parent="customer_settings_sub_menu"
+        sequence="21"/>
+
+</odoo>

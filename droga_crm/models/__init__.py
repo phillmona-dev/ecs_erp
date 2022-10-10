@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from . import cust_contact_extension,customer_visit
+from . import extensions,customer_visit
+from .settings import region,area,city,location,sub_location

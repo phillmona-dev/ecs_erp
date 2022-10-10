@@ -23,8 +23,8 @@
                                     <field name="competitor" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="quantity"></field>
-                                    <field name="unit_price"></field>
-                                    <field name="amount"></field>
+                                    <field name="unit_price" widget='monetary'></field>
+                                    <field name="amount" widget='monetary'></field>
                                     <field name="currency" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="tech_result"></field>
                                     <field name="status"></field>

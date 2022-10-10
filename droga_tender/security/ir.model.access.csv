@@ -4,6 +4,7 @@ access_tender_settings_type_item,droga.tender.settings.type.item,model_droga_ten
 access_tender_settings_incoterm,droga.tender.settings.incoterm,model_droga_tender_settings_incoterm,droga_tender.tender_manager,1,1,1,1
 access_tender_settings_media,droga.tender.settings.media,model_droga_tender_settings_media,droga_tender.tender_manager,1,1,1,1
 access_tender_settings_sec_type,droga.tender.settings.sec.type,model_droga_tender_settings_sec_type,droga_tender.tender_manager,1,1,1,1
+access_tender_settings_submission_place,droga.tender.settings.submission_place,model_droga_tender_settings_submission_place,droga_tender.tender_manager,1,1,1,1
 
 access_tender_competitors,droga.tender.competitors,model_droga_tender_competitors,droga_tender.tender_user,1,1,1,1
 access_tender_contract,droga.tender.contract,model_droga_tender_contract,droga_tender.tender_user,1,1,1,1
