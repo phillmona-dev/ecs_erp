@@ -2,7 +2,6 @@
 <odoo>
 
 
-
     <!-- action for status tracking -->
     <record id="droga_purchase_foregin_status_tracking_action" model="ir.actions.act_window">
         <field name="name">Status Tracking</field>
@@ -38,12 +37,14 @@
         <field name="model">droga.purhcase.request.rfq</field>
         <field name="arch" type="xml">
             <tree string="RFQ">
-                <field name="purhcase_request_id" />
-                <field name="name" />
-                <field name="date" />
-                <field name="request_type" />
-                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')" decoration-danger="state == 'Cancel'" decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
-                <field name="company_id" />
+                <field name="purhcase_request_id"/>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="request_type"/>
+                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')"
+                       decoration-danger="state == 'Cancel'"
+                       decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
+                <field name="company_id"/>
             </tree>
         </field>
     </record>
@@ -56,20 +57,29 @@
             <form string="" create="0" delete="0" duplicate="0">
                 <header>
 
-                    <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked" data-hotkey="v" class="oe_highlight" />
-                    <button name="committee_approval" type="object" states="Checked" string="Committee" id="committee_approval" data-hotkey="v" class="oe_highlight" />
-                    <button name="ceo_approval" type="object" states="Checked" string="CEO Approval" id="ceo_approval" data-hotkey="v" class="oe_highlight" />
-                    <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request" data-hotkey="v" />
+                    <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked"
+                            data-hotkey="v" class="oe_highlight"/>
+                    <button name="committee_approval" type="object" states="Checked" string="Committee"
+                            id="committee_approval" data-hotkey="v" class="oe_highlight"/>
+                    <button name="ceo_approval" type="object" states="Checked" string="CEO Approval" id="ceo_approval"
+                            data-hotkey="v" class="oe_highlight"/>
+                    <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request"
+                            data-hotkey="v"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_rfq_order_action)d" string="List PO" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
-                        <button name="create_purchase_orders_automatically" string="Create PO" type="object" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+                        <button name="%(droga_purchase_rfq_order_action)d" string="List PO" type="action"
+                                class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+                        <button name="create_purchase_orders_automatically" string="Create PO" type="object"
+                                class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
 
                     </div>
                     <div class="oe_button_box" name="button_box">
-                        <button name="pick_winner" string="Pick Winner" type="object" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>
+                        <button name="pick_winner" string="Pick Winner" type="object" class="oe_stat_button"
+                                icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">RFQ</span>
@@ -88,7 +98,7 @@
                             <field name="remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="technical_remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="procurement_committee" widget="many2many_tags" string="Committee"/>
-                            <field name="total_winner_amount" />
+                            <field name="total_winner_amount"/>
                         </group>
                     </group>
 
@@ -97,16 +107,19 @@
                         <page string="Products">
                             <field name="rfq_lines" mode="tree" attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
                                 <tree editable="bottom">
-                                    <field name="supplier_id" />
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}"/>
+                                    <field name="supplier_id"/>
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}"
+                                           context="{'company_id': parent.company_id}"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="product_qty" />
-                                    <field name="unit_price" />
+                                    <field name="product_qty"/>
+                                    <field name="unit_price"/>
                                     <field name="tax_id" widget="many2many_tags"/>
                                     <field name="price_tax"/>
-                                    <field name="total_price" decoration-warning="winner == 'No'" decoration-success="winner == 'Yes'" widget="badge"/>
-                                    <field name="winner" decoration-warning="winner == 'No'" decoration-success="winner == 'Yes'" widget="badge"/>
-                                    <field name="product_uom_category_id" invisible="1" />
+                                    <field name="total_price" decoration-warning="winner == 'No'"
+                                           decoration-success="winner == 'Yes'" widget="badge"/>
+                                    <field name="winner" decoration-warning="winner == 'No'"
+                                           decoration-success="winner == 'Yes'" widget="badge"/>
+                                    <field name="product_uom_category_id" invisible="1"/>
                                 </tree>
 
                             </field>
@@ -128,12 +141,14 @@
         <field name="model">droga.purhcase.request.rfq</field>
         <field name="arch" type="xml">
             <tree string="RFQ">
-                <field name="purhcase_request_id" />
-                <field name="name" />
-                <field name="date" />
-                <field name="request_type" />
-                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')" decoration-danger="state == 'Cancel'" decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
-                <field name="company_id" />
+                <field name="purhcase_request_id"/>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="request_type"/>
+                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')"
+                       decoration-danger="state == 'Cancel'"
+                       decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
+                <field name="company_id"/>
             </tree>
         </field>
     </record>
@@ -146,22 +161,34 @@
             <form string="" create="0" delete="0" duplicate="0">
                 <header>
 
-                    <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked" data-hotkey="v" class="oe_highlight" />
+                    <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked"
+                            data-hotkey="v" class="oe_highlight"/>
                     <!--<button name="committee_approval" type="object" states="Checked" string="Committee" id="committee_approval" data-hotkey="v" class="oe_highlight" attrs="{'invisible': [('request_type', 'in', ('Foregin'))]}"/>-->
-                    <button name="ceo_approval" type="object" states="Checked" string="CEO Approval" id="ceo_approval" data-hotkey="v" class="oe_highlight" />
-                    <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request" data-hotkey="v" />
+                    <button name="ceo_approval" type="object" states="Checked" string="CEO Approval" id="ceo_approval"
+                            data-hotkey="v" class="oe_highlight"/>
+                    <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request"
+                            data-hotkey="v"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purhcase_request_rfq_line_pre_import_permit_action)d" string="Pre Import Permit" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>
-                        <button name="%(droga_purchase_foregin_status_tracking_action)d" string="Status Tracking" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>
-                        <button name="%(droga_purchase_rfq_order_action)d" string="List PO" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
-                        <button name="create_purchase_orders_automatically" string="Create PO" type="object" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+                        <button name="%(droga_purhcase_request_rfq_line_pre_import_permit_action)d"
+                                string="Pre Import Permit" type="action" class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>
+                        <button name="%(droga_purchase_foregin_status_tracking_action)d" string="Status Tracking"
+                                type="action" class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>
+                        <button name="%(droga_purchase_rfq_order_action)d" string="List PO" type="action"
+                                class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+                        <button name="create_purchase_orders_automatically" string="Create PO" type="object"
+                                class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
 
                     </div>
                     <div class="oe_button_box" name="button_box">
-                        <button name="pick_winner" string="Pick Winner" type="object" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>
+                        <button name="pick_winner" string="Pick Winner" type="object" class="oe_stat_button"
+                                icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">RFQ</span>
@@ -173,7 +200,7 @@
                         <group>
                             <field name="purhcase_request_id" readonly="1"/>
                             <field name="date" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
-                            <field name="request_type" />
+                            <field name="request_type"/>
                             <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="1"/>
                         </group>
                         <group>
@@ -188,16 +215,24 @@
                         <page string="Products">
                             <field name="rfq_lines" mode="tree" attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
                                 <tree editable="bottom">
-                                    <field name="supplier_id" />
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}"/>
+                                    <field name="supplier_id"/>
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}"
+                                           context="{'company_id': parent.company_id}"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="product_qty" />
-                                    <field name="unit_price" />
+                                    <field name="product_qty"/>
+                                    <field name="unit_price"/>
                                     <field name="tax_id" widget="many2many_tags"/>
                                     <field name="price_tax"/>
-                                    <field name="total_price" decoration-warning="winner == 'No'" decoration-success="winner == 'Yes'" widget="badge"/>
-                                    <field name="winner" decoration-warning="winner == 'No'" decoration-success="winner == 'Yes'" widget="badge"/>
-                                    <field name="product_uom_category_id" invisible="1" />
+                                    <field name="total_price" decoration-warning="winner == 'No'"
+                                           decoration-success="winner == 'Yes'" widget="badge"/>
+                                    <field name="winner" decoration-warning="winner == 'No'"
+                                           decoration-success="winner == 'Yes'" widget="badge"/>
+                                    <field name="product_uom_category_id" invisible="1"/>
+                                    <button icon="fa-credit-card-alt" type="object" string="Foregin supp. list"
+                                            name="open_suppliers_list" class="oe_stat_button"/>
+                                    <button icon="fa-credit-card-alt" type="object"
+                                            string="Competitors comparative analysis"
+                                            name="open_competitors_comparative_list" class="oe_stat_button"/>
                                 </tree>
 
                             </field>
@@ -205,10 +240,11 @@
                         <page string="LC" invisible="1">
                             <field name="lcs" mode="tree">
                                 <tree editable="bottom">
-                                    <field name="name" />
-                                    <field name="bank_name" />
-                                    <field name="state" />
-                                    <button name="open_lc_detail" string="LC Reconciliation" type="object" class="oe_stat_button" icon="fa-file-text" />
+                                    <field name="name"/>
+                                    <field name="bank_name"/>
+                                    <field name="state"/>
+                                    <button name="open_lc_detail" string="LC Reconciliation" type="object"
+                                            class="oe_stat_button" icon="fa-file-text"/>
 
                                 </tree>
                             </field>
@@ -231,7 +267,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_rfq_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_view_form')})]"/>
         <field name="domain">[('request_type','=','Local')]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
@@ -247,7 +283,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_rfq_foregin_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_foregin_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_foregin_view_form')})]"/>
         <field name="domain">[('request_type','=','Foregin')]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
@@ -263,7 +299,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_rfq_foregin_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_foregin_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_foregin_view_form')})]"/>
         <field name="domain">[('purhcase_request_id', '=', active_id)]</field>
         <field name="context">{'default_purhcase_request_id': active_id}</field>
         <field name="help" type="html">

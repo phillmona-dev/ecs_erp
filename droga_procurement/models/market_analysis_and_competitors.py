@@ -28,8 +28,8 @@ class purchase_request_market_analysis(models.Model):
     epss_volume = fields.Float('EPSS stock volume')
     remark=fields.Char('Remark')
 
-class purchase_order_line_link(models.Model):
-    _inherit = 'purchase.order.line'
+class purchase_rfq_line_link(models.Model):
+    _inherit = 'droga.purhcase.request.rfq.line'
     suppliers_list=fields.One2many('droga.purhcase.order.foreign.suppliers.list','po_line')
     competitors_comparative=fields.One2many('droga.purchase.order.foreign.competitors.comparative','po_line')
 
@@ -38,8 +38,8 @@ class purchase_order_line_link(models.Model):
             'name': 'Suppliers list',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'purchase.order.line',
-            'view_id': self.env.ref('droga_procurement.droga_procurement_purchase_order_supp_list').id,
+            'res_model': 'droga.purhcase.request.rfq.line',
+            'view_id': self.env.ref('droga_procurement.droga_procurement_purchase_rfq_supp_list').id,
             'type': 'ir.actions.act_window',
             'target': 'new',
             'res_id': self.id,
@@ -50,8 +50,8 @@ class purchase_order_line_link(models.Model):
             'name': 'Comparative analysis list',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'purchase.order.line',
-            'view_id': self.env.ref('droga_procurement.droga_procurement_purchase_order_comp_comparative').id,
+            'res_model': 'droga.purhcase.request.rfq.line',
+            'view_id': self.env.ref('droga_procurement.droga_procurement_purchase_rfq_comp_comparative').id,
             'type': 'ir.actions.act_window',
             'target': 'new',
             'res_id': self.id,
@@ -60,7 +60,7 @@ class purchase_order_line_link(models.Model):
 #Our foreign suppliers list for each purchase order line
 class purchase_order_foreign_droga_suppliers_list(models.Model):
     _name = 'droga.purhcase.order.foreign.suppliers.list'
-    po_line=fields.Many2one('purchase.order.line')
+    po_line=fields.Many2one('droga.purhcase.request.rfq.line')
     manufacturer=fields.Many2one('res.partner','Manufacturer')
     unit_price=fields.Float('Unit price')
     shelf_life=fields.Float('Shelf life')
@@ -69,7 +69,7 @@ class purchase_order_foreign_droga_suppliers_list(models.Model):
 #Our foreign suppliers competitors list for each purchase order line
 class purhcase_order_foreign_competitors_comparative(models.Model):
     _name='droga.purchase.order.foreign.competitors.comparative'
-    po_line = fields.Many2one('purchase.order.line')
+    po_line = fields.Many2one('droga.purhcase.request.rfq.line')
     importer=fields.Char('Importer')        #Make from settings page if not highly variant
     manufacturer = fields.Char('Manufacturer')
     unit = fields.Many2one('uom.uom')

@@ -50,12 +50,13 @@ class tender_master_xls(models.TransientModel):
         }
 
     def generate_xlsx_report(self, workbook):
-        sheet=self.get_droga_stockcard_sheet_with_header('MySheet',workbook,4)
+        sheet = workbook.add_worksheet('StockCard')
+        self.get_droga_stockcard_sheet_with_header(sheet,workbook,0)
+        self.get_droga_stockcard_sheet_with_header(sheet, workbook, 15)
 
 
-    def get_droga_stockcard_sheet_with_header(self, sheet_name,workbook,row_start):
+    def get_droga_stockcard_sheet_with_header(self, sheet,workbook,row_start):
 
-        sheet = workbook.add_worksheet(sheet_name)
         sheet.set_column('B:B', 10)
         #region excel_formats
         bold = workbook.add_format({'bold': True})
