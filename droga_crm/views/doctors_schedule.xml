@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="droga_crm_doctors_schedule_action" model="ir.actions.act_window">
+        <field name="name">Doctors schedule</field>
+        <field name="res_model">droga.crm.customers.contacts.view</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_crm_doctors_schedule_view_tree" model="ir.ui.view">
+        <field name="name">droga.crm.customers.contacts.view.tree</field>
+        <field name="model">droga.crm.customers.contacts.view</field>
+        <field name="arch" type="xml">
+            <tree string="" create="0">
+                <field name="cust_name"></field>
+                <field name="cust_area"></field>
+                <field name="cont_name"></field>
+                <field name="day"></field>
+                <field name="time_from"></field>
+                <field name="time_to"></field>
+            </tree>
+        </field>
+    </record>
+
+
+    <menuitem
+        id="droga_crm_contacts_schedule_area"
+        name="Doctors schedule"
+        action="droga_crm_doctors_schedule_action"
+        parent="menu_vist_log"
+        sequence="20"/>
+
+</odoo>

@@ -2,9 +2,6 @@
 <odoo>
 
 
-
-
-
     <!-- action for rfq -->
     <record id="droga_purchase_request_rfq_action" model="ir.actions.act_window">
         <field name="name">Request for Quotation</field>
@@ -12,7 +9,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_rfq_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_view_form')})]"/>
         <field name="domain">[('purhcase_request_id', '=', active_id)]</field>
         <field name="context">{'default_purhcase_request_id': active_id}</field>
         <field name="help" type="html">
@@ -33,8 +30,10 @@
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
-                <field name="company_id" />
-                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Submitted','Verified','Budget Checked')" decoration-danger="state == 'Cancel'" decoration-success="state == 'Approved'" widget="badge"/>
+                <field name="company_id"/>
+                <field name="state" decoration-warning="state in('Draft')"
+                       decoration-info="state in('Submitted','Verified','Budget Checked')"
+                       decoration-danger="state == 'Cancel'" decoration-success="state == 'Approved'" widget="badge"/>
             </tree>
         </field>
     </record>
@@ -46,17 +45,24 @@
         <field name="arch" type="xml">
             <form string="Purhcase Request" delete="0">
                 <header>
-                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request" data-hotkey="v"/>
-                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="budget_checked_request" type="object" states="Verified" string="Budget Checked" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="approve_request" type="object" states="Budget Checked" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request" data-hotkey="v"/>
+                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight"
+                            id="submit_request" data-hotkey="v"/>
+                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request"
+                            class="oe_highlight" data-hotkey="v"/>
+                    <button name="budget_checked_request" type="object" states="Verified" string="Budget Checked"
+                            id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="approve_request" type="object" states="Budget Checked" string="Approve"
+                            id="approve_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request"
+                            data-hotkey="v"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_request_rfq_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"/>
+                        <button name="%(droga_purchase_request_rfq_action)d" string="RFQ" type="action"
+                                class="oe_stat_button" icon="fa-arrows-v"
+                                attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Purchase Requistion</span>
@@ -65,10 +71,12 @@
                         </h1>
                     </div>
                     <group>
-                        <group >
-                            <field name="request_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
-                            <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
-                            <field name="department_manager" readonly="1" />
+                        <group>
+                            <field name="request_by" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                            <field name="department" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                            <field name="department_manager" readonly="1"/>
                             <field name="branch" options="{'no_create':True,'no_open':True}"/>
                         </group>
                         <group>
@@ -79,15 +87,17 @@
                     </group>
                     <notebook>
                         <page string="Products">
-                            <field name="purhcase_request_lines" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
+                            <field name="purhcase_request_lines" mode="tree"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree editable="bottom">
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}"/>
-                                    <field name="product_qty" />
-                                    <field name="unit_price" />
-                                    <field name="total_price" />
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}"
+                                           context="{'company_id': parent.company_id}"/>
+                                    <field name="product_qty"/>
+                                    <field name="unit_price"/>
+                                    <field name="total_price"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="remark" />
+                                    <field name="remark"/>
                                 </tree>
 
                             </field>
@@ -95,7 +105,8 @@
                         <page string="Other Information">
                             <group>
                                 <group>
-                                    <field name="company_id" context="{'company_id': parent.company_id}" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="company_id" context="{'company_id': parent.company_id}"
+                                           options="{'no_create':True,'no_open':True}"/>
                                 </group>
                             </group>
                         </page>
@@ -105,9 +116,9 @@
 
                             </group>
                             <field name="rfqs" mode="tree" attrs="{'invisible': [('buying_method', 'in', ('Bid'))]}">
-                                <tree >
-                                    <field name="name" />
-                                    <field name="date" />
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="date"/>
                                 </tree>
                             </field>
 
@@ -134,8 +145,10 @@
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
-                <field name="company_id" />
-                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Submitted','Verified','Budget Checked')" decoration-danger="state == 'Cancel'" decoration-success="state == 'Approved'" widget="badge"/>
+                <field name="company_id"/>
+                <field name="state" decoration-warning="state in('Draft')"
+                       decoration-info="state in('Submitted','Verified','Budget Checked')"
+                       decoration-danger="state == 'Cancel'" decoration-success="state == 'Approved'" widget="badge"/>
             </tree>
         </field>
     </record>
@@ -147,17 +160,24 @@
         <field name="arch" type="xml">
             <form string="Purhcase Request" delete="0">
                 <header>
-                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request" data-hotkey="v"/>
-                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="budget_checked_request" type="object" states="Verified" string="Budget Checked" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="approve_request" type="object" states="Budget Checked" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request" data-hotkey="v"/>
+                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight"
+                            id="submit_request" data-hotkey="v"/>
+                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request"
+                            class="oe_highlight" data-hotkey="v"/>
+                    <button name="budget_checked_request" type="object" states="Verified" string="Budget Checked"
+                            id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="approve_request" type="object" states="Budget Checked" string="Approve"
+                            id="approve_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request"
+                            data-hotkey="v"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_request_rfq_foregin_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"/>
+                        <button name="%(droga_purchase_request_rfq_foregin_action)d" string="RFQ" type="action"
+                                class="oe_stat_button" icon="fa-arrows-v"
+                                attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Purchase Requistion</span>
@@ -166,9 +186,11 @@
                         </h1>
                     </div>
                     <group>
-                        <group >
-                            <field name="request_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
-                            <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                        <group>
+                            <field name="request_by" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                            <field name="department" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                         </group>
                         <group>
 
@@ -178,15 +200,19 @@
                     </group>
                     <notebook>
                         <page string="Products">
-                            <field name="purhcase_request_lines" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
+                            <field name="purhcase_request_lines" mode="tree"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree editable="bottom">
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}"/>
-                                    <field name="product_qty" />
-                                    <field name="unit_price" />
-                                    <field name="total_price" />
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}"
+                                           context="{'company_id': parent.company_id}"/>
+                                    <field name="product_qty"/>
+                                    <field name="unit_price"/>
+                                    <field name="total_price"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="remark" />
+                                    <field name="remark"/>
+                                    <button icon="fa-credit-card-alt" type="object" string="Market analysis"
+                                            name="open_market_analysis" class="oe_stat_button"/>
                                 </tree>
 
                             </field>
@@ -194,7 +220,8 @@
                         <page string="Other Information">
                             <group>
                                 <group>
-                                    <field name="company_id" context="{'company_id': parent.company_id}" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="company_id" context="{'company_id': parent.company_id}"
+                                           options="{'no_create':True,'no_open':True}"/>
                                 </group>
                             </group>
                         </page>
@@ -204,9 +231,9 @@
 
                             </group>
                             <field name="rfqs" mode="tree" attrs="{'invisible': [('buying_method', 'in', ('Bid'))]}">
-                                <tree >
-                                    <field name="name" />
-                                    <field name="date" />
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="date"/>
                                 </tree>
                             </field>
 
@@ -232,14 +259,14 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_request_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_request_view_form')})]"/>
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="domain">[('request_type', '=', 'Local')]</field>
         <field name="context">{'default_request_type': 'Local'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No purchase requsition found. Let's create one!
+                No purchase requsition found. Let's create one!
             </p>
         </field>
     </record>
@@ -254,19 +281,14 @@
         <field name="context">{'default_request_type': 'Foregin','default_buying_method': 'RFQ'}</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_foregin_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_request_foregin_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_request_foregin_view_form')})]"/>
 
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No purchase requsition found. Let's create one!
+                No purchase requsition found. Let's create one!
             </p>
         </field>
     </record>
-
-
-
-
-
 
 
     <!-- rule for filtering data specific data -->
@@ -276,8 +298,6 @@
         <field name="global" eval="True"/>
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
-
-
 
 
 </odoo>

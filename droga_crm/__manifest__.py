@@ -20,6 +20,7 @@
     'data': [
         'views/cust_extension.xml',
         'views/customer_visits.xml',
+        'views/doctors_schedule.xml',
         'views/cust_grade.xml',
         'views/settings/region.xml',
         'views/settings/city.xml',

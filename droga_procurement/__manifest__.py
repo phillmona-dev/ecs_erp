@@ -30,7 +30,7 @@
         'views/rfq.xml',
         'views/purchase_request.xml',
 
-
+        'views/market_analysis_and_competitors.xml',
         'views/purchase_foregin_status.xml',
         'views/lc.xml',
         'views/configuration.xml',

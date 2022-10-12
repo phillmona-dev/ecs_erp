@@ -26,6 +26,7 @@
         'views/droga_stock_consignment_receipt.xml',
         'views/droga_stock_consignment_issue.xml',
         'views/droga_stock_location_extension.xml',
+        'report/xls_stock_card.xml',
     ],
 
     # any module necessary for this one to work correctly

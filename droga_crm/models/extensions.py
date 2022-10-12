@@ -1,4 +1,5 @@
-from odoo import models,fields
+from odoo import models, fields, api
+
 
 class cust_contact_extension(models.Model):
     _inherit = 'res.partner'
@@ -20,7 +21,9 @@ class sales_team_extension(models.Model):
 
 class contact_working_hours(models.Model):
     _name='droga.cust.contact.working.hours'
+    #This is the doctor ID
     parent_customer_id=fields.Many2one('res.partner')
+
     day=fields.Selection([('0','Monday'),('1','Tuesday'),('2','Wednesday'),('3','Thursday'),('4','Friday'),('5','Saturday')])
     time_from=fields.Float('Time from (ETH)')
     time_to = fields.Float('Time to (ETH)')
@@ -35,3 +38,4 @@ class customer_grade(models.Model):
 class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
     plan_id=fields.Many2one('droga.customer.visit.detail')
+

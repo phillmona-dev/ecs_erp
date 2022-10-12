@@ -37,11 +37,14 @@ class customer_visit_header(models.Model):
     def visit_detail_open(self):
         return {
             'name': 'Visit detail',
+            #'view_type': 'form',
+            'view_mode': 'tree',
             'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'droga.customer.visit.header',
-            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_view_form').id,
+            'res_model': 'droga.customer.visit.detail',
+            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_detail_view_tree').id,
             'type': 'ir.actions.act_window',
+            'context': "{'search_default_group_week_no':1}",
+            'domain': [('visit_header', '=', self.id)],
             #'target': 'new',
             'res_id': self.id,
         }
@@ -156,6 +159,7 @@ class customer_visit_detail(models.Model):
     _order = 'visit_date'
     visit_date=fields.Date('Visit date')
     visit_date_descr=fields.Char('Day',compute='_get_date_descr',store=True)
+
     @api.depends('visit_date')
     def _get_date_descr(self):
         for rec in self:
