@@ -5,8 +5,7 @@ from odoo import api, fields, models
 from io import BytesIO
 import xlsxwriter
 import datetime
-import skimage.io
-from . import _excel_formats
+
 try:
     from base64 import encodebytes
 except ImportError:

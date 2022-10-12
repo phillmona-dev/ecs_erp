@@ -132,6 +132,8 @@ class purhcase_request_line(models.Model):
     _description = "Purchase Request Line"
 
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
+    status=fields.Selection(
+        [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Checked", "Budget Checked"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True,related='purhcase_request_id.state')
     product_id = fields.Many2one('product.product', string='Product', domain=[
                                  ('purchase_ok', '=', True)], change_default=True)
     product_qty = fields.Float(
@@ -144,6 +146,13 @@ class purhcase_request_line(models.Model):
                                   domain="[('category_id', '=', product_uom_category_id)]", required=True)
     product_uom_category_id = fields.Many2one(
         related='product_id.uom_id.category_id')
+
+    budget_product=fields.Boolean('Budget product?')
+    expected_average_mon_cons=fields.Float('Expected average monthly consumption')      #Fix me, compute using product master
+    current_stock_balance=fields.Float('Current balance')                               #Fix me, fetch from inventory
+    selling_price_after_arrival=fields.Float('Arrival selling price')
+    expected_margin=fields.Float('Expected margin')                     #Fix me, compute using sales price
+    arrival_time=fields.Date('Arrival time')
 
     remark = fields.Char("Remark")
 

@@ -228,11 +228,6 @@
                                     <field name="winner" decoration-warning="winner == 'No'"
                                            decoration-success="winner == 'Yes'" widget="badge"/>
                                     <field name="product_uom_category_id" invisible="1"/>
-                                    <button icon="fa-credit-card-alt" type="object" string="Foregin supp. list"
-                                            name="open_suppliers_list" class="oe_stat_button"/>
-                                    <button icon="fa-credit-card-alt" type="object"
-                                            string="Competitors comparative analysis"
-                                            name="open_competitors_comparative_list" class="oe_stat_button"/>
                                 </tree>
 
                             </field>

@@ -210,9 +210,25 @@
                                     <field name="total_price"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
+
+                                    <field name="budget_product"/>
+                                    <field name="expected_average_mon_cons"/>
+                                    <field name="current_stock_balance"/>
+                                    <field name="selling_price_after_arrival"/>
+                                    <field name="expected_margin"/>
+                                    <field name="arrival_time"/>
+                                    <field name="status" invisible="1"/>
+
                                     <field name="remark"/>
                                     <button icon="fa-credit-card-alt" type="object" string="Market analysis"
                                             name="open_market_analysis" class="oe_stat_button"/>
+                                    <button icon="fa-credit-card-alt" type="object" string="Foregin supp. list"
+                                            attrs="{'invisible': [('status', '=', 'Draft')]}"
+                                            name="open_suppliers_list" class="oe_stat_button"/>
+                                    <button icon="fa-credit-card-alt" type="object"
+                                            string="Competitors comparative analysis"
+                                            attrs="{'invisible': [('status', '=', 'Draft')]}"
+                                            name="open_competitors_comparative_list" class="oe_stat_button"/>
                                 </tree>
 
                             </field>

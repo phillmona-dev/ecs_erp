@@ -16,6 +16,7 @@
                                     <field name="avail_stock" required="1"></field>
                                     <field name="sell_up" required="1"></field>
                                     <field name="epss_volume" required="1"></field>
+                                    <field name="local_man_status"></field>
                                     <field name="remark"></field>
                                 </tree>
                             </field>
@@ -26,9 +27,9 @@
         </field>
     </record>
 
-    <record id="droga_procurement_purchase_rfq_supp_list" model="ir.ui.view">
-        <field name="name">droga.purhcase.request.rfq.line.supp.list</field>
-        <field name="model">droga.purhcase.request.rfq.line</field>
+    <record id="droga_procurement_purchase_request_supp_list" model="ir.ui.view">
+        <field name="name">droga.purhcase.request.line.supp.list</field>
+        <field name="model">droga.purhcase.request.line</field>
         <field name="arch" type="xml">
             <form string="">
                 <sheet>
@@ -49,9 +50,9 @@
         </field>
     </record>
 
-    <record id="droga_procurement_purchase_rfq_comp_comparative" model="ir.ui.view">
-        <field name="name">droga.purhcase.request.rfq.line.supp.list</field>
-        <field name="model">droga.purhcase.request.rfq.line</field>
+    <record id="droga_procurement_purchase_request_comp_comparative" model="ir.ui.view">
+        <field name="name">droga.purhcase.request.line.line.supp.list</field>
+        <field name="model">droga.purhcase.request.line</field>
         <field name="arch" type="xml">
             <form string="">
                 <sheet>
