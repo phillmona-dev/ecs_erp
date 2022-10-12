@@ -105,7 +105,7 @@ class droga_tender_master(models.Model):
 
     # relational fields selection
     media = fields.Many2one('droga.tender.settings.media', string='Media')
-    bid_submit_place = fields.Many2one('droga.tender.settings.submission_place',string="Bid submission place")
+    bid_submit_place = fields.Many2one('droga.tender.settings.submission.place',string="Bid submission place")
     customer = fields.Many2one('res.partner', string='Customer', required=True)
     assigned_person = fields.Many2one('hr.employee', string='Assigned Person')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,

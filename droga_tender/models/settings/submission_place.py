@@ -2,7 +2,7 @@ from odoo import models, fields, api
 
 
 class droga_tender_settings_submission_place(models.Model):
-    _name = 'droga.tender.settings.submission_place'
+    _name = 'droga.tender.settings.submission.place'
 
     _rec_name = "submission_place_name"
     submission_place_name = fields.Char("Submission place Name",required=True)
