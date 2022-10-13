@@ -10,6 +10,7 @@
     """,
 
     'author': "Afomsoft Technologies",
+    'website': "https://afomsoft.com",
 
     # Categories can be used to filter modules in modules listing
     # for the full list

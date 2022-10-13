@@ -14,7 +14,7 @@ except ImportError:
 #class tender_master_xls(models.AbstractModel):     Default type
 #My point is to have a transient model inherit the report.report_xlsx.abstract and immplement all logic and use interface from here as well
 class tender_master_xls(models.TransientModel):
-    _name='droga.inventory.reports.excel'
+    _name='droga.inventory.reports.sc.excel'
     #_inherit = 'report.report_xlsx.abstract'
 
     warehouse=fields.Many2one('stock.warehouse','Warehouse')
@@ -50,9 +50,13 @@ class tender_master_xls(models.TransientModel):
 
     def generate_xlsx_report(self, workbook):
         sheet = workbook.add_worksheet('StockCard')
+        #Header row count is 10
         self.get_droga_stockcard_sheet_with_header(sheet,workbook,0)
-        self.get_droga_stockcard_sheet_with_header(sheet, workbook, 15)
+        stock_move_data=self.env['stock.move'].search([('state','=','done'),('location_id.complete_name', 'like', self.warehouse.code),('date','>=',self.date_from),('date','<=',self.date_to)])
+        x='df'
 
+    def generate_stockcard_per_item(self,sheet,workbook,row_start,item,warehouse,stock_move_data):
+        pass
 
     def get_droga_stockcard_sheet_with_header(self, sheet,workbook,row_start):
 
