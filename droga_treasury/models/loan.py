@@ -1,3 +1,6 @@
+
+from distutils.log import debug
+from re import I
 from odoo import api, fields, models
 import calendar
 from datetime import date, datetime,timedelta
@@ -16,16 +19,17 @@ class AccountLoan(models.Model):
     _name = "account.loan"
     _description = "Loan"
     
+
+
     name=fields.Many2one('res.bank', string="Bank", required=True)  
-    loan_amount=fields.Float('Loan Amount',required=True )
+    
     loan_type = fields.Many2one('account.loan.type', string="Loan Type", required=True)  
 
+    
+
+
     loan_statement_number=fields.Char('Loan Statment Number',required=True )
-    loan_period_year=fields.Float('period in years' ,)
-    schedule_numberof_payment=fields.Float('payments per year',compute="_compute_yearr")
-    total_number_of_payment=fields.Float('Total Payments',compute="_compute_yearr")
-    payment=fields.Float('Payment Amount per Period')
-    payment_month=fields.Integer('Payment Ranage in Month')
+    
     
 
     @api.depends("payment_month","loan_period_year","payment_start_date")
@@ -40,10 +44,15 @@ class AccountLoan(models.Model):
             record.schedule_numberof_payment = pe
             
             record.total_number_of_payment = pe*record.loan_period_year
+            if record.loan_period_year<1:
+                record.schedule_numberof_payment=record.total_number_of_payment
             if not record.next_payment_date:
                 if record.payment_start_date:
                     record.next_payment_date=record.payment_start_date
                     record.remaining_days=(record.next_payment_date-cday)/timedelta(days=1)
+
+
+
 
     #@api.depends("payment_month","total_number_of_payment","payment","payment_start_date")
     def compute_schedule(self):
@@ -56,6 +65,7 @@ class AccountLoan(models.Model):
             ppay=0.00000
             payments=0.00000
             cpay=0.00000
+            mul=0
             self.env["account.loan.schedule"].search([('id','>',0)]).unlink()
 
             payment=record.payment
@@ -113,45 +123,56 @@ class AccountLoan(models.Model):
                                 nloop-=1
                                 i=i+1
                             
-    #Next payment and payment amount
-    #gene. payment when payment == next payment date 
-    #remaning days to nex payment
-    #when next paymentdate==payment date gene
+#Date
     next_payment_date=fields.Date(string="Next Payment Date")
+    payment_start_date=fields.Date("Payment Start Date", )
+    interest_renew_date=fields.Date("Interst Renew Date",compute="compute_renew" )
+    interest_start_date=fields.Date("Interst Start Date", )
+    contract_date=fields.Date('Contrt Date')
+#integer
     remaining_days=fields.Integer(string="Remaning Days")
-
+    payment_month=fields.Integer('Payment Ranage in Month')
+   
+    
+#flaot
+    payment=fields.Float('Payment Amount per Period')
+    
+    loan_period_year=fields.Float('period in years' ,)
+    loan_amount=fields.Float('Loan Amount',required=True )
+    schedule_numberof_payment=fields.Float('payments per year',compute="_compute_yearr")
+    total_number_of_payment=fields.Float('Total Payments',compute="_compute_yearr")
     anual_interest_rate=fields.Float('Anual Interst Rate %', required=True)
     daily_interest_rate=fields.Float('Daily Interst Rate %',compute="_compute_interestdaily",digits=(12,6))
     
     current_cumlative_balace=fields.Float('Start Cumlative Balance')
     current_cumlative_interest=fields.Float('Start Cumlative Interest')
     current_interest_total=fields.Float('Current Interest Total')
-
-    payment_start_date=fields.Date("Payment Start Date", )
-
-    interest_start_date=fields.Date("Interst Start Date", )
     anual_penalit_rate=fields.Float('Anual Penality Rate %')
     daily_penalit_rate=fields.Float('Daily Penality Rate %',compute="_compute_penalitydaily",digits=(12,6))
     # schedule_payment_=fields.Float('Schedule Payment')
-   
     grace_period=fields.Float('Grace Period')
-    contract_date=fields.Date('Contrt Date')
     total_interest=fields.Float('Total Interst',compute='_compute_total_interest')
     cumulative_interest  =fields.Float('Cumulative interest',compute='_compute_total_interest')
-    
+    cumulative_balance = fields.Float(compute='_compute_qty_amount',string="Cumulative Principal Balance")
+   
+#boolean
     isinterest= fields.Boolean(string="Compound Interest?", compute='_compute_isinterest')
     isactive= fields.Boolean(string="Active?", default=True)
     isdone= fields.Boolean(string="Done?")
-    cumulative_balance = fields.Float(compute='_compute_qty_amount',string="Cumulative Principal Balance")
+    isposted= fields.Boolean(string="Posted?")
+#one2many
     loan_repayment_ids = fields.One2many('account.loan.repayment', 'acount_loan_id', string="Repayment")
     loan_receipt_ids = fields.One2many('account.loan.receipt', 'acount_loan_id', string="Receipt")
     loan_schedule_ids = fields.One2many('account.loan.schedule', 'acount_loan_id', string="Schedule")
-
-    loan_interest_ids = fields.One2many('account.loan.interest', 'acount_loan_id', string="Interest")
+    loan_interest_ids = fields.One2many('account.loan.int', 'acount_loan_id', string="Interest")
     loan_renew_ids = fields.One2many('account.loan.renew', 'acount_loan_id', string="Renew")
-    loan_old_ids = fields.One2many('account.loan.renew.schedule', 'acount_loan_id', string="Old Schedule")
-    interest_renew_date=fields.Date("Interst Renew Date",compute="compute_renew" )
+    loan_old_ids = fields.One2many('account.loan.renew.schedule', 'acount_loan_id', string="Renewed Schedule")
+    penality_range_ids = fields.One2many('account.loan.penality.range', 'acount_loan_penality_id', string="Penality Range")
+    monthly_closing_ids = fields.One2many('droga.monthly.close', 'acount_monthly_closing_id', )
+   
+    #loan_renews_ids = fields.One2many('account.loan.renews', 'acount_loan_id', string="Renews")
 
+   
     @api.depends('loan_renew_ids')
     def compute_renew(self):
         for record in self:
@@ -253,9 +274,16 @@ class AccountLoan(models.Model):
                                 tadd-=1
                                 i=i+1
                             
-         
+
+                
+            
+
+            
     payment_gene=fields.Boolean(string="Gen?")
     num=fields.Integer('term')
+
+
+
     def compute_daily_cron(self):                          
 
 
@@ -264,8 +292,16 @@ class AccountLoan(models.Model):
         daily_interest_total=0.0000000
         current_date=datetime.today()
         num=0
-        
+        rint=0.00000
+        rpint=0.00000
+        penal=0.000000
         cday = current_date.date()
+        rstatdate=cday
+        daq=0
+        starting_days=[[7,8,'ሃምሌ'],[8,7,'ነሃሴ'],[9,11,'መስከረም'],[10,11,'ጥቅምት'],
+                       [11,10,'ህዳር'],[12,10,'ታህሳስ'],[1,9,'ጥር'],[2,8,'የካቲት'],
+                       [3,10,'መጋቢት'],[4,9,'ሚያዚያ'],[5,9,'ግንቦት'],[6,8,'ሰኔ'] ]
+        
         acount_loan = self.env['account.loan'].search(
             [('isactive', '=', True)])
         acount_sc = self.env['account.loan.renew.schedule'].search(
@@ -274,174 +310,207 @@ class AccountLoan(models.Model):
         for predone in acount_loan:
             day_int=predone.daily_interest_rate
             day_pint=predone.daily_penalit_rate
-
             if predone.next_payment_date:
                 predone.remaining_days=(predone.next_payment_date-cday)/timedelta(days=1)
             
-            acount_renew = self.env['account.loan.renew'].search(
-                [('id', '>', 0)])
+            acount_renew = self.env['account.loan.renew'].search([('id', '>', 0)])
             for data in acount_renew:
-                if data.id>num:
-                
+                if data.id>num:                
                     num=data.id
-            if num:
-                renew = self.env['account.loan.renew'].search(
-                    [('id', '=', num)]) 
-                if renew.renew_start_date:
-                    if cday >=renew.renew_start_date:
-                        day_int=renew.anual_interest_rate/365
-                        day_pint=renew.anual_penality_rate/365
+            
+                    
             da=predone.interest_start_date
-            while cday>da:
-                acount_int = self.env['account.loan.interest'].search(
-                [('value_date', '=', da)])
-                if not acount_int:
+            while cday>=da:
+                closing_day=cday
+                stday=cday
+                tern=0
+                add_day=0
+                ayear=0
+                nyear=da.year
+                et_years=0    
 
-                    interst_amount=day_int*predone.cumulative_balance/100
-                    daily_int = self.env['account.loan.interest'].create(
-                {'acount_loan_id': predone.id, 'value_date':da,
-                    'daily_penality_rate': day_pint, 'daily_interest_rate': day_int,
-                    'daily_interest_amount':interst_amount , 'daily_penality_amount': 0, 
-                    'daily_interest_total': interst_amount})
-                da=da+ relativedelta(days=1)
-            if cday>=predone.interest_start_date:
-                
-                
-                
-                for penality in predone.loan_repayment_ids:                    
-                    ndate=penality.expected_payment_date
-                    if penality.expected_payment_date:
-                                        
-                        if(penality.expected_payment_date<cday):
-                        
-                            if not penality.is_paied:
-                                penality_amount=day_pint*predone.cumulative_balance/100
-                                daily_penality = self.env['account.loan.penality'].create(
-                    {'acount_repayment_id': penality.id, 'penality_date': date.today().strftime('%Y-%m-%d'),'daily_penality_amount': penality_amount, }) 
-                            
                     
+                if num:
+                    renew = self.env['account.loan.renew'].search([('id', '=', num)]) 
+                    if renew.renew_start_date:
+                        if da >=renew.renew_start_date:
+                            rint=renew.anual_interest_rate/365
+                            rpint=renew.anual_penality_rate/365
+                            rstatdate=renew.renew_start_date
+                if rstatdate>da:
+                    day_int=predone.daily_interest_rate
+                    day_pint=predone.daily_penalit_rate
                 
-                interst_amount=predone.daily_interest_rate*predone.cumulative_balance/100
-                daily_interest_total=interst_amount+penality_amount
-                acount_int = self.env['account.loan.interest'].search(
-                [('value_date', '=', da)])
-                if not acount_int:
-                    daily_int = self.env['account.loan.interest'].create(
-                    {'acount_loan_id': predone.id, 'value_date': date.today().strftime('%Y-%m-%d'),
-                    'daily_penality_rate': day_pint, 'daily_interest_rate': day_int,
-                    'daily_interest_amount':interst_amount , 'daily_penality_amount': penality_amount, 
-                    'daily_interest_total': daily_interest_total})
+                else:
+                    if rint>0:
+                        day_int=rint
+                        day_pint=rpint
+                acount_recipt = self.env['account.loan.receipt'].search([('value_date', '<=', da)])
+                crecipt=0
+                for recipt in acount_recipt:
+                    crecipt+=recipt.receipt
+                acount_repay = self.env['account.loan.repayment'].search([('value_date', '<=', da),('is_paied', '=', True)])
+                crepay=0
+                for apayment in acount_repay:
+                    crepay+=apayment.total_payment
             
-            if not predone.next_payment_date:
-            
- 
-                
-                predone.next_payment_date=predone.payment_start_date
-                acount_schedule = self.env['account.loan.schedule'].search(
-                [('payment_date', '=', predone.next_payment_date)]) 
-
-                for scedule in acount_schedule:
-                    acount_payment = self.env['account.loan.repayment'].search(
-                [('expected_payment_date', '=', predone.next_payment_date)]) 
-                    if not acount_payment:
-                        payments= self.env['account.loan.repayment'].create({'acount_loan_id': predone.id, 
-                            'expected_payment_date':predone.next_payment_date ,'total_payment': predone.payment,
-                                'payment_term':scedule.name })  
-                    predone.remaining_days=(predone.next_payment_date-cday)/timedelta(days=1)
-            
-                
-                
-                
-                    
-            
-            else:
-                
-                    
-                if cday>= predone.next_payment_date:
-                    predone.next_payment_date=predone.next_payment_date+ relativedelta(months=predone.payment_month)
-                    
-                    
-                    acount_schedule = self.env['account.loan.schedule'].search(
-                        [('payment_date', '=', predone.next_payment_date)]) 
-                    acount_sch = self.env['account.loan.renew.schedule'].search(
-                            [('payment_date', '=', predone.next_payment_date)])
-                    
-                    if not acount_sch.payment_date:
-
-                        for scedule in acount_schedule:
+        #repayment
+                if predone.loan_schedule_ids:
+                    for schedule in predone.loan_schedule_ids: 
+                        if schedule.payment_date<da:
                             acount_payment = self.env['account.loan.repayment'].search(
-                                [('expected_payment_date', '=', predone.next_payment_date)]) 
+                            [('expected_payment_date', '=', schedule.payment_date)]) 
                             if not acount_payment:
                                 payments= self.env['account.loan.repayment'].create({'acount_loan_id': predone.id, 
-                                'expected_payment_date':predone.next_payment_date ,'total_payment': predone.payment,
-                                'payment_term':scedule.name })
-                    else :
+                                'expected_payment_date':schedule.payment_date ,'total_payment': predone.payment,
+                                'payment_term':schedule.name })  
+
+
+        #penality calculation
+
+                cumulative_balance=predone.current_cumlative_balace+crecipt-crepay
+                interst_amount=day_int*cumulative_balance/100
+                acount_int = self.env['account.loan.int'].search([('value_date', '=', da),('posted','>',False)])
+                acount_pint = self.env['account.loan.int'].search([('value_date', '<', da)])
+                if acount_int :
+                    for penality in predone.loan_repayment_ids:                    
+                        ndate=penality.expected_payment_date
+                        if ndate:
+                            cdate=ndate
+                            rdate=ndate                
+
+
+
+                            penality_range = self.env['account.loan.penality.range'].search([('id','>',0)], order='id')                                        
+                            for prange in penality_range:
+                                
+                                                  
+                                if prange.name=='upto':
+                                    cdate+=relativedelta(days=prange.num_days)
+                                    if(ndate<da):
+
+                                       if(da<cdate):
+                                        penal=prange.anual_penality_rate/365
+                                        break
+                                       
+                                    
+                                elif prange.name=='morethan':
+                                    if(da>rdate):
+                                        penal=prange.anual_penality_rate/365
+                                        break
+                                # if da>cdate:
+                                #     cdate+=relativedelta(days=prange.num_days)  
+                                    rdate=cdate
+
+                                        
+                                        
+
+                        if ndate:
+                            if(ndate<da):
                         
-                        if acount_sch:
+                                if not penality.is_paied:
+                                    
+                                    #penal=0
+                                    penality_amount=penal*cumulative_balance/100
+                                   
+             
 
-                            for scedule in acount_sch:
-                                acount_payment = self.env['account.loan.repayment'].search(
-                            [('expected_payment_date', '=', predone.next_payment_date)]) 
-                                if not acount_payment:
-                                    payments= self.env['account.loan.repayment'].create({'acount_loan_id': predone.id, 
-                                        'expected_payment_date':predone.next_payment_date ,'total_payment': acount_sch.payment_amount,
-                                        'payment_term':acount_sch.name })
+               
+        # itnerest creating
+                if not acount_int:
 
-                    predone.remaining_days=(predone.next_payment_date-cday)/timedelta(days=1)
-
+                    
+                    daily_int = self.env['account.loan.int'].create(
+                {'acount_loan_id': predone.id, 'value_date':da,
+                    'daily_penality_rate': day_pint, 'daily_interest_rate': day_int,
+                    'daily_interest_amount':interst_amount , 'daily_penality_amount':penality_amount , 
+                    'daily_interest_total': interst_amount+penality_amount})
+        #INTEREST UPDATING
                 else:
+                    #if not acount_int.posted:
+                    acount_int.daily_penality_rate= day_pint
+                    acount_int.daily_interest_rate= day_int
+                    acount_int.daily_interest_amount= interst_amount
+                    if penality_amount>0:
+                        acount_int.daily_penality_amount= penality_amount
+                    acount_int.daily_interest_total= interst_amount+penality_amount
+                da=da+ relativedelta(days=1)
 
-                    if predone.next_payment_date:
-                        acount_schedule = self.env['account.loan.schedule'].search(
-                        [('payment_date', '=', predone.next_payment_date)]) 
-                        acount_sch = self.env['account.loan.renew.schedule'].search(
-                            [('payment_date', '=', predone.next_payment_date)])
-                        if not acount_sch.payment_date:
+#post data on each month                
+                for start_day in starting_days: 
+                    add_day=30
+                    ayear=nyear
+                    
+                    stday=date(ayear,start_day[0],start_day[1])
+                    
+                    if tern==1:
+                        add_day=35
+                    closing_day=stday+relativedelta(days=add_day)
+                    if ayear%4==3:
+                        if tern==1:
+                            closing_day=stday+relativedelta(days=1)
+                        elif tern>1 & tern<8:
+                            closing_day=closing_day+relativedelta(days=1)
+                            stday=stday+relativedelta(days=1)
+                    if stday<=da<=closing_day:
+                        break
+                    tern +1
+                et_years=ayear-8
+                if stday.month>8:
+                    et_years=ayear-7
+                
+                
+                if closing_day>=predone.interest_start_date :
+                   
                         
+                        
+                    if da>=stday:
+                        month_acount_recipt = self.env['account.loan.receipt'].search([('value_date', '>=', stday),
+                                            ('value_date', '<', closing_day),])
+                        monthrecipt=0
+                        for mrecipt in month_acount_recipt:
+                            monthrecipt+=mrecipt.receipt
+                            mrecipt.posted=True
+                        month_acount_repayment = self.env['account.loan.repayment'].search([('value_date', '>=', stday),
+                                            ('value_date', '<', closing_day),('is_paied', '=', True)])
+                        monthrepaymentprincipal=0
+                        monthrepaymentinte=0
+                        for mrepayment in month_acount_repayment:
+                            monthrepaymentprincipal+=mrepayment.principal_repayment
+                            monthrepaymentinte=mrepayment.is_interest
+                            mrepayment.posted=True
+                        #acount_pint = self.env['account.loan.int'].search([('value_date', '<', da)])
+                        month_acount_inte = self.env['account.loan.int'].search([('value_date', '>=', stday),
+                                            ('value_date', '<', closing_day),])
+                        monthinterest=0
+                        monthpenality=0
+                        i=0
+                        for minterest in month_acount_inte:
+                            monthinterest+=minterest.daily_interest_amount
+                            monthpenality=minterest.daily_penality_amount
+                            i+=1
+                            minterest.posted=True
+                        month_financials = self.env['droga.monthly.close'].search([('closing_day', '=', closing_day),
+                                            ('name', '=', start_day[2]),('starting_day', '=', stday)])
+                        if not month_financials:
+                            if i>=30 or stday<=predone.interest_start_date<closing_day:
+                                month_financial = self.env['droga.monthly.close'].create(
+                                {'acount_monthly_closing_id': predone.id, 'name':start_day[2],
+                                'recipt': monthrecipt, 'penality': monthpenality,
+                                'interest':monthinterest , 'Interest_payment':monthrepaymentinte , 
+                                'Principal_payment': monthrepaymentprincipal,'et_year':et_years , 
+                                'starting_day':stday , 
+                                'closing_day': closing_day})
 
-                            for scedule in acount_schedule:
-                                acount_payment = self.env['account.loan.repayment'].search(
-                            [('expected_payment_date', '=', predone.next_payment_date)]) 
-                                if not acount_payment:
-                                    payments= self.env['account.loan.repayment'].create({'acount_loan_id': predone.id, 
-                            'expected_payment_date':predone.next_payment_date ,'total_payment': predone.payment,
-                                'payment_term':scedule.name })
-                        else:
-                            acount_schedule = self.env['account.loan.schedule'].search(
-                            [('payment_date', '=', predone.next_payment_date)]) 
-                            acount_sch = self.env['account.loan.renew.schedule'].search(
-                            [('payment_date', '=', predone.next_payment_date)])
-                            if acount_schedule:
-
-                                for scedule in acount_schedule:
-                                    acount_payment = self.env['account.loan.repayment'].search(
-                                [('expected_payment_date', '=', predone.next_payment_date)]) 
-                                    if not acount_payment:
-                                        payments= self.env['account.loan.repayment'].create({'acount_loan_id': predone.id, 
-                                'expected_payment_date':predone.next_payment_date ,'total_payment': predone.payment,
-                                'payment_term':scedule.name })
-                    # else:
-                    #     acount_sch = self.env['account.loan.renew.schedule'].search(
-                    #         [('payment_date', '=', predone.next_payment_date)])
-                    #     if acount_sch:
-
-                    #         for scedule in acount_sch:
-                    #             acount_payment = self.env['account.loan.repayment'].search(
-                    #         [('expected_payment_date', '=', predone.next_payment_date)]) 
-                    #             if not acount_payment:
-                    #                 payments= self.env['account.loan.repayment'].create({'acount_loan_id': predone.id, 
-                    #                     'expected_payment_date':predone.next_payment_date ,'total_payment': acount_sch.payment_amount,
-                    #                     'payment_term':acount_sch.name })
-
-                    predone.remaining_days=(predone.next_payment_date-cday)/timedelta(days=1)
-
-                                 
+            
+        
     """  #calculating cumulative amount with the formula
     cumulative balance= loan amount+recit-payment some payment are 
     for interest and not calculated
     in some case interest can be added
     cumulative balance=loan amount+reciet+interest-payment """
- 
+
+    
     @api.depends('loan_repayment_ids','loan_receipt_ids','loan_interest_ids','current_cumlative_balace')
     def _compute_qty_amount(self):
         for line in self:
@@ -449,14 +518,15 @@ class AccountLoan(models.Model):
             repay=0.0000
             reciep=0.0000
             interest=0.0000
+            recipt = self.env['account.loan.receipt'].search([('id','>',0)], order='id', limit=1)
+            if recipt:
+                line.interest_start_date=recipt.value_date
+
 
            #""" calculating total reciept """
             for reciept in line.loan_receipt_ids:
                 reciep += reciept.receipt
-            # if line.id
-           # """ calculating total repayment """
-           #""" if the interest is calculable and has interest calculating
-           #the all payments as a repayment with out checking  """
+           
             if line.isinterest:
                 for repayment in line.loan_repayment_ids:
                     repay += repayment.principal_repayment
@@ -465,44 +535,48 @@ class AccountLoan(models.Model):
                     if repayment.is_paied:
                     #if not repayment.is_interest:
                         repay += repayment.principal_repayment
+                        acount_int = self.env['account.loan.int'].search(
+                            [('value_date', '<=', repayment.value_date)])
+                        # recipt = self.env['account.loan.receipt'].search([('id','>',0)], order='id', limit=1)
+           
+                        # if acount_int:
+                        #     for interesta in acount_int:
+                        #         interesta.daily_penality_amount=0
+                        #         interesta.daily_interest_total=interesta.daily_interest_amount
+                                                        
             # """ calculating total repayment """  
             if line.isinterest:
                 for inter in line.loan_interest_ids:
-                    interest +=inter.daily_interest_total
-
-                
+                    interest +=inter.daily_interest_total    
 
             balance=reciep+interest-repay
             line.cumulative_balance=balance+line.current_cumlative_balace
 
    
-    @api.depends('loan_repayment_ids')
-    def _compute_penality(self):
-        for record in self:
+    # @api.depends('loan_repayment_ids')
+    # def _compute_penality(self):
+    #     for record in self:
             
-            current_date=datetime.today()
-            cday = current_date.date()
-            for repayment in record.loan_repayment_ids:
-                for penality in repayment.loan_penality_ids:
-                    if penality.penality_date:
-                        for interest in record.loan_interest_ids:
-                            if penality.penality_date==interest.value_date:
-                                interest.daily_penality_amount=penality.daily_penality_amount
-                                interest.daily_interest_total=interest.daily_interest_amount+interest.daily_penality_amount
+    #         current_date=datetime.today()
+    #         cday = current_date.date()
+    #         for repayment in record.loan_repayment_ids:
+    #             for penality in repayment.loan_penality_ids:
+    #                 if penality.penality_date:
+    #                     for interest in record.loan_interest_ids:
+    #                         if penality.penality_date==interest.value_date:
+    #                             interest.daily_penality_amount=penality.daily_penality_amount
+    #                             interest.daily_interest_total=interest.daily_interest_amount+interest.daily_penality_amount
+
+
+            #
+    
 
     @api.depends('loan_interest_ids','loan_repayment_ids','current_cumlative_interest')
     def _compute_total_interest(self):
         for record in self:
             current_date=datetime.today()
             cday = current_date.date()
-            for repayment in record.loan_repayment_ids:
-                for penality in repayment.loan_penality_ids:
-                    if penality.penality_date:
-                        for interest in record.loan_interest_ids:
-                            if penality.penality_date==interest.value_date:
-                                interest.daily_penality_amount=penality.daily_penality_amount
-                                interest.daily_interest_total=interest.daily_interest_amount+interest.daily_penality_amount
-
+            
             if not record.isinterest:
                 record.cumulative_interest=0.00
         
@@ -526,15 +600,96 @@ class AccountLoan(models.Model):
             record.cumulative_interest=value+record.current_cumlative_interest
  
 
+    
     @api.depends("loan_type")
     def _compute_isinterest(self):
         for record in self:
             record.isinterest = record.loan_type.isinterest
 
-
+    
     def compute_done(self):
         for record in self:
+            current_date=datetime.today()
+            cday=current_date.date
+            tern=0
+            da =cday
+            closing_day=cday
+            stday=cday
+            tern=0
+            add_day=0
+            ayear=0
+            #nyear=da.year
+            et_years=0
+            add_day=30
+            ayear=0
+            namename=""
+            starting_days=[[7,8,'ሃምሌ'],[8,7,'ነሃሴ'],[9,11,'መስከረም'],[10,11,'ጥቅምት'],
+                       [11,10,'ህዳር'],[12,10,'ታህሳስ'],[1,9,'ጥር'],[2,8,'የካቲት'],
+                       [3,10,'መጋቢት'],[4,9,'ሚያዚያ'],[5,9,'ግንቦት'],[6,8,'ሰኔ'] ]
+
+            month_f=self.env['droga.monthly.close'].search([])[-1].id
+               
+            month_finance= self.env['droga.monthly.close'].search([('id', '=', month_f)                                        ])
+                      
+            for months in month_finance: 
+                da=months.closing_day
+
+            for start_day in starting_days: 
+                ayear=da.year
+                
+                stday=date(ayear,start_day[0],start_day[1])
+                namename=start_day[2]
+                if tern==1:
+                    add_day=35
+                closing_day=stday+relativedelta(days=add_day)
+                if ayear%4==3:
+                    if tern==1:
+                        closing_day=stday+relativedelta(days=1)
+                    elif tern>1 & tern<8:
+                        closing_day=closing_day+relativedelta(days=1)
+                        stday=stday+relativedelta(days=1)
+                if stday==da:
+                    break
+                tern +1
+            et_years=ayear-8
+            if stday.month>8:
+                et_years=ayear-7
+            if da:
+                month_acount_recipt = self.env['account.loan.receipt'].search([('value_date', '>=', stday),
+                                            ('value_date', '<', closing_day),])
+                monthrecipt=0
+                for mrecipt in month_acount_recipt:
+                    monthrecipt+=mrecipt.receipt
+                    #mrecipt.posted=True   
+                month_acount_repayment = self.env['account.loan.repayment'].search([('value_date', '>=', stday),
+                                            ('value_date', '<', closing_day),('is_paied', '=', True)])
+                monthrepaymentprincipal=0
+                monthrepaymentinte=0
+                for mrepayment in month_acount_repayment:
+                    monthrepaymentprincipal+=mrepayment.principal_repayment
+                    monthrepaymentinte=mrepayment.is_interest
+                    #mrepayment.posted=True
+                        #acount_pint = self.env['account.loan.int'].search([('value_date', '<', da)])
+                month_acount_inte = self.env['account.loan.int'].search([('value_date', '>=', stday),
+                                            ('value_date', '<', closing_day),])
+                monthinterest=0
+                monthpenality=0
+                
+                for minterest in month_acount_inte:
+                    monthinterest+=minterest.daily_interest_amount
+                    monthpenality=minterest.daily_penality_amount
+                        
+                month_financial = self.env['droga.monthly.close'].create(
+                                {'acount_monthly_closing_id': record.id, 'name':namename,
+                                'recipt': monthrecipt, 'penality': monthpenality,
+                                'interest':monthinterest , 'Interest_payment':monthrepaymentinte , 
+                                'Principal_payment': monthrepaymentprincipal,'et_year':et_years , 
+                                'starting_day':stday , 
+                                'closing_day': closing_day})
+
             record.isactive = False
+
+
 
     @api.depends("anual_interest_rate")
     def _compute_interestdaily(self):
@@ -546,33 +701,10 @@ class AccountLoan(models.Model):
     def _compute_penalitydaily(self):
         for record in self:
             record.daily_penalit_rate = record.anual_penalit_rate/365
+#ceating closing date
+        
+
     
-
-    def open_renew(self):
-        view = self.env.ref(
-            'droga_treasury.account_loan_renew_view_tree')
-
-        return {
-            'name': 'Renew',
-            'view_mode': 'tree',
-            'res_model': 'account.loan.renew',
-            'view_id': view.id,
-            'type': 'ir.actions.act_window',
-            'res_id': self.id
-        }
-
-    def open_renew_schedule(self):
-        view = self.env.ref(
-            'droga_treasury.account_loan_renew_schedule_view_tree')
-
-        return {
-            'name': 'Renew Schedule',
-            'view_mode': 'tree',
-            'res_model': 'account.loan.renew.schedule',
-            'view_id': view.id,
-            'type': 'ir.actions.act_window',
-            'res_id': self.id
-        }
     
             
             
@@ -587,11 +719,20 @@ class AccountLoanSchedule(models.Model):
     name=fields.Char(string='Peyment term')
     payment_date = fields.Date(string="Payment Date")
  
-    acount_loan_id = fields.Many2one('account.loan', string="Parent ID") 
+    acount_loan_id = fields.Many2one(comodel_name='account.loan', string="Parent ID") 
     payment_amount=fields.Float(string="Payment") 
     interest=fields.Float(string="Interest") 
     prencipal=fields.Float(string="Prencipal")
     balance=fields.Float(string="Remaining Balance")
+
+    @api.model
+    def write(self, values):
+        result = super(AccountLoanSchedule, self).write(values)
+        return result
+
+    @api.model
+    def create(self, values):
+        return super(AccountLoanSchedule, self).create(values)
     
     @api.depends("payment_date")
     def _compute_penalitydaily(self):
