@@ -20,7 +20,7 @@ class DrogaMonthlyclose(models.Model):
     
     name= fields.Char(string="የወሩ ስም",readonly=True)
     acount_monthly_closing_id = fields.Many2one(comodel_name='account.loan', string="Parent ID") 
-    _sql_constraints = [ ('unique_closing', 'unique(et_year, name)', 'Cannot Use one tr')	]
+    _sql_constraints = [ ('unique_closing', 'unique(et_year, name,acount_monthly_closing_id)', 'Cannot Use one tr')	]
     
     # @api.depends('closing_day')
     # def _compute_start_field(self):

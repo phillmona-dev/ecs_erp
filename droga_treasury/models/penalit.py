@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.exceptions import UserError,ValidationError
 class AccountLoanPenalityRange(models.Model):
     _name = 'account.loan.penality.range'
     
@@ -9,6 +10,14 @@ class AccountLoanPenalityRange(models.Model):
     num_days=fields.Integer(string="Days",required=True)
     acount_loan_penality_id = fields.Many2one(comodel_name='account.loan', string="Parent ID", index=True, ondelete='cascade', required=True)
     
+    @api.constrains('renew_date','renew_start_date')
+    def _check_date(self):
+        for loans in self:
+           
+            if loans.anual_penality_rate<=0 :
+                raise ValidationError("Check The Penality rate")
+            if not loans.name:
+                raise ValidationError("Please enter the Range on Penality")
     @api.depends("anual_penality_rate",'name')
     def _compute_penalitydaily(self):
         for record in self:

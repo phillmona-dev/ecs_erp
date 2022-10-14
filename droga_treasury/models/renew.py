@@ -1,10 +1,13 @@
 
 from copy import copy
 from odoo import api, fields, models
+from dateutil.relativedelta import relativedelta
+from datetime import datetime,date,time
+from odoo.exceptions import UserError,ValidationError
 class AccountLoanRenew(models.Model):
     _name = 'account.loan.renew'
     
-    name=fields.Char(string='Peyment Reason')
+    name=fields.Char(string='Extension Reason')
     #payment_date = fields.Date(string="Payment Date")
  
     acount_loan_id = fields.Many2one(comodel_name='account.loan', string="Parent ID") 
@@ -19,7 +22,22 @@ class AccountLoanRenew(models.Model):
     cumulative_balance = fields.Float(related='acount_loan_id.cumulative_balance',string="Cumulative Principal Balance",copy=True,store=True)
     payment_month=fields.Integer('Payment Ranage in Month',related='acount_loan_id.payment_month',copy=True,store=True,)
     
-    @api.model
+    @api.constrains('renew_date','renew_start_date')
+    def _check_date(self):
+        for loans in self:
+            current_date=datetime.today()
+            cday = current_date.date()
+            #if isinstance(record.id, models.NewId):
+            if loans.renew_start_date>loans.acount_loan_id.contract_date:
+
+                raise ValidationError("Check The Renew Start Date")
+            if loans.renew_date>loans.acount_loan_id.contract_date:
+
+                raise ValidationError("Check The Renew Date")
+            if loans.anual_interest_rate<=0  or loans.payment_amount<=0:
+                raise ValidationError("Check The Interest rate and payment amount")
+            if not loans.name:
+                raise ValidationError("Please enter the Extension Reason")
     def write(self, values):
         result = super(AccountLoanRenew, self).write(values)
         return result
