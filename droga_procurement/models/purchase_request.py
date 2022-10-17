@@ -54,7 +54,10 @@ class purhcase_request(models.Model):
 
     # approvers
     department_manager = fields.Many2one(
-        "hr.employee", compute="_get_manager_id")
+        "hr.employee", compute="_get_manager_id", store=True)
+    department_manager_user_id = fields.Many2one(
+        related="department_manager.user_id", store=True)
+
     branch = fields.Many2one("account.analytic.account", string="Branch", domain=[
                              ('group_id', '=', 'Branch')])
 
@@ -86,6 +89,11 @@ class purhcase_request(models.Model):
     # verify request
     def verify_request(self):
         self.write({'state': 'Verified'})
+        # mark activity as done
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        if activity:
+            activity.action_feedback()
         return True
 
     # budget checked
@@ -132,8 +140,8 @@ class purhcase_request_line(models.Model):
     _description = "Purchase Request Line"
 
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
-    status=fields.Selection(
-        [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Checked", "Budget Checked"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True,related='purhcase_request_id.state')
+    status = fields.Selection(
+        [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Checked", "Budget Checked"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True, related='purhcase_request_id.state')
     product_id = fields.Many2one('product.product', string='Product', domain=[
                                  ('purchase_ok', '=', True)], change_default=True)
     product_qty = fields.Float(
@@ -147,12 +155,15 @@ class purhcase_request_line(models.Model):
     product_uom_category_id = fields.Many2one(
         related='product_id.uom_id.category_id')
 
-    budget_product=fields.Boolean('Budget product?')
-    expected_average_mon_cons=fields.Float('Expected average monthly consumption')      #Fix me, compute using product master
-    current_stock_balance=fields.Float('Current balance')                               #Fix me, fetch from inventory
-    selling_price_after_arrival=fields.Float('Arrival selling price')
-    expected_margin=fields.Float('Expected margin')                     #Fix me, compute using sales price
-    arrival_time=fields.Date('Arrival time')
+    budget_product = fields.Boolean('Budget product?')
+    expected_average_mon_cons = fields.Float(
+        'Expected average monthly consumption')  # Fix me, compute using product master
+    current_stock_balance = fields.Float(
+        'Current balance')  # Fix me, fetch from inventory
+    selling_price_after_arrival = fields.Float('Arrival selling price')
+    # Fix me, compute using sales price
+    expected_margin = fields.Float('Expected margin')
+    arrival_time = fields.Date('Arrival time')
 
     remark = fields.Char("Remark")
 

@@ -7,6 +7,9 @@
             <menuitem id="droga_account_payment_request_menu" name="Payment Request" action="droga_account_payment_request_action" groups="droga_finance.self_service_group" sequence="1"/>
             <menuitem id="droga_account_payment_request_urgent_menu" name="Payment Request Urgent" action="droga_account_payment_request_urgent_action" groups="droga_finance.self_service_group" sequence="2"/>
             <menuitem id="droga_account_payment_request_withoutpo_menu" name="Payment Request Without PO" action="droga_account_payment_request_withoutpo_action" groups="droga_finance.self_service_group" sequence="3"/>
+            <menuitem id="droga_account_purchase_requests_local_approval_menu" name="Purchase Request - Local" action="droga_procurement.droga_purhcase_request_for_approval_action" groups="droga_finance.self_service_group" sequence="4"/>
+            <menuitem id="droga_account_purchase_requests_foregin_approval_menu" name="Purchase Request - Foregin" action="droga_procurement.droga_purhcase_request_foregin_for_approval_action" groups="droga_finance.self_service_group" sequence="4"/>
+
         </menuitem>
     </menuitem>
 
