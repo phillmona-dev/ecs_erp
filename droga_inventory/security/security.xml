@@ -27,6 +27,16 @@
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
         <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
     </record>
+    <record id="inventory_ws" model="res.groups">
+        <field name="name">WS Store keeper</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+    </record>
+    <record id="inventory_of" model="res.groups">
+        <field name="name">OF Store keeper</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+    </record>
 </odoo>
 
 

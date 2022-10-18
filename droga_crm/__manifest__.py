@@ -22,7 +22,9 @@
         'views/cust_extension.xml',
         'views/customer_visits.xml',
         'views/doctors_schedule.xml',
-        'views/cust_grade.xml',
+        'views/sales_target.xml',
+        'views/settings/cust_grade.xml',
+        'views/settings/cust_type.xml',
         'views/settings/region.xml',
         'views/settings/city.xml',
         'views/settings/area.xml',
@@ -34,7 +36,7 @@
 
     'depends': ['base','hr',
                 'mail',
-                'resource',
+                'resource','stock',
                 'web', 'crm'],
     "license": "AGPL-3",
     # only loaded in demonstration mode

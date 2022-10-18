@@ -29,43 +29,6 @@
         </field>
     </record>
 
-    <!---Not used-->
-    <record id="droga_crm_customer_visit_view_form" model="ir.ui.view">
-        <field name="name">droga.customer.visit.header.view.form</field>
-        <field name="model">droga.customer.visit.header</field>
-        <field name="arch" type="xml">
-            <form string="">
-                <sheet>
-                    <notebook>
-                        <page string="Plan details">
-                            <group>
-                                <field name="month"></field>
-                                <field name="year"></field>
-                            </group>
-                            <field name="plan_detail" domain="[('week_num','=','1')]" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" ></field>
-                                    <field name="visit_contact" domain="([('parent_id','=',visit_client)])" options="{'no_create':True,'no_open':True}"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Show schedule"
-                                            name="visit_schedule_open" class="oe_stat_button"/>
-                                    <field name="visit_date"></field>
-                                    <field name="visit_date_descr"></field>
-                                    <field name="week_num"></field>
-                                    <field name="planned_visit_time_from" widget="float_time"></field>
-                                    <field name="planned_visit_time_to" widget="float_time"></field>
-
-                                    <field name="remark"></field>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-
     <record id="droga_crm_customer_visit_detail_action" model="ir.actions.act_window">
         <field name="name">Customers visit detail log book</field>
         <field name="res_model">droga.customer.visit.detail</field>
@@ -76,17 +39,18 @@
         <field name="name">droga.customer.visit.detail.view.tree</field>
         <field name="model">droga.customer.visit.detail</field>
         <field name="arch" type="xml">
-            <tree editable="top" expand="1">
+            <tree editable="top" delete="1" expand="1">
                 <field name="visit_client" options="{'no_create':True,'no_open':True}" ></field>
                 <field name="visit_contact" domain="([('parent_id','=',visit_client)])" options="{'no_create':True,'no_open':True}"></field>
+                <field name="visit_location"></field>
+                <field name="core_products" widget="many2many_tags" options="{'no_create':True,'no_open':True}"></field>
                 <button icon="fa-credit-card-alt"
                         type="object" string=" Show schedule"
                         name="visit_schedule_open" class="oe_stat_button"/>
                 <field name="visit_date"></field>
                 <field name="visit_date_descr"></field>
                 <field name="week_num"></field>
-                <field name="planned_visit_time_from" widget="float_time"></field>
-                <field name="planned_visit_time_to" widget="float_time"></field>
+                <field name="planned_visit_time" widget="float_time"></field>
                 <field name="remark"></field>
             </tree>
         </field>
@@ -99,8 +63,10 @@
             <search>
                 <field name="visit_client" options="{'no_create':True,'no_open':True}" ></field>
                 <field name="visit_contact" domain="([('parent_id','=',visit_client)])" options="{'no_create':True,'no_open':True}"></field>
+                <field name="visit_location"></field>
                 <field name="visit_date"></field>
                 <field name="visit_date_descr"></field>
+                <field name="core_products"></field>
                 <field name="week_num"></field>
                 <field name="remark"></field>
                 <filter name="group_week_no" string="Week no" context="{'group_by':'week_num'}"/>
@@ -110,7 +76,7 @@
 
     <menuitem
         id="menu_vist_log"
-        name="Monthly visit log"
+        name="Visit plan and target"
         parent="crm.crm_menu_root"
         sequence="25"/>
 
@@ -120,7 +86,4 @@
         action="droga_crm_customer_visit_action"
         parent="menu_vist_log"
         sequence="18"/>
-
-
-
 </odoo>

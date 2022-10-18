@@ -58,7 +58,7 @@ class customer_visit_header(models.Model):
 
         #The schedule starts from Monday and excludes sunday
         for i in range(1, calendar.monthlen(yearp, monthp) + 1):
-            if (monday_found or datetime.date(yearp, monthp, i).weekday()==0) and (datetime.date(yearp, monthp, i).weekday()!=6):
+            if (monday_found or datetime.date(yearp, monthp, i).weekday()==0) and (datetime.date(yearp, monthp, i).weekday() not in (5,6)):
                 monday_found=True
                 dates.append(datetime.date(yearp, monthp, i))
 
@@ -68,8 +68,9 @@ class customer_visit_header(models.Model):
             yearp=yearp+1
         else:
             monthp=monthp+1
+
         for i in range(1, calendar.monthlen(yearp, monthp) + 1):
-            if datetime.date(yearp, monthp, i).weekday() not in (0,6):
+            if datetime.date(yearp, monthp, i).weekday() not in (0,5,6):
                 dates.append(datetime.date(yearp, monthp, i))
             else:
                 break
@@ -86,7 +87,8 @@ class customer_visit_header(models.Model):
 
         #Get customers under that area
         custs=self.env['res.partner'].search(
-            [('area','in',areas.ids)]
+            #[('area','in',areas.ids)]
+            [('area', 'in', [2])]
         )
 
         #custs['cust_grade']['visit_times_per_month']
@@ -94,7 +96,8 @@ class customer_visit_header(models.Model):
         week_num=0
         #Creates a list of visit details for user under month
         plan_vals_all=[]        #plan_vals_all is a list of all to be created visit details
-        days_with_weeks={}      #This contains all dates with their corresponding week number, having count as 0. - Count is additional visits for that day
+        days_with_weeks={}      #This contains all dates with their corresponding week number, having count as 0. - Count is additional visits for that day.
+                                # Key is date and values are week number and additional count for that date
         for d in self.date_iter(int(vals_list['year']), int(vals_list['month'])):
             if d.weekday()==0:
                 week_num=week_num+1
@@ -109,10 +112,17 @@ class customer_visit_header(models.Model):
         date_assigned=False
         #Iterate over our customers and update visit vals, if no available entry, create a new visit val for doctor schedule
         for cust in custs:
+            cust_contacts_schedule=self.env['droga.crm.customers.contacts.view'].search([('cust_id','=',cust.id)])
             for counter in range(1,cust['cust_grade']['visit_times_per_month']+1):
                 for plan_val in plan_vals_all:
-                    if plan_val['week_num']==counter and plan_val.get("visit_client")==None:
+                    #Creates a visit entry for that customer for that day per week. It also checks for contact availability
+                    if plan_val['week_num']==counter and plan_val.get("visit_client")==None and plan_val['visit_date'].weekday() in [int(row['day_int']) for row in cust_contacts_schedule]:
                         plan_val.update(visit_client=cust.id)
+                        for cust_contact in cust_contacts_schedule:
+                            if plan_val['visit_date'].weekday()==int(cust_contact.day_int):
+                                plan_val.update(visit_contact=cust_contact.cont_id)
+                                plan_val.update(planned_visit_time=cust_contact.time_from)
+                                break
                         date_assigned=True
                         break
                 if not date_assigned:
@@ -120,22 +130,32 @@ class customer_visit_header(models.Model):
                     #Get date and update count
                     min_count=999
                     d=''
+                    cont_id=0
+                    planned_time=0
                     for key,value in days_with_weeks.items():
-                        if value[0]==counter and value[1]<min_count:
+                        if value[0]==counter and value[1]<min_count and key.weekday() in [int(row['day_int']) for row in cust_contacts_schedule]:
                             d=key
                             min_count=value[1]
+                            for cust_contact in cust_contacts_schedule:
+                                if key.weekday() == int(cust_contact.day_int):
+                                    cont_id=cust_contact.cont_id
+                                    planned_time=cust_contact.time_from
+                                    break
                     #d is the date in the week with minimum engagement
                     #Add one counter to days count
-                    days_with_weeks[d][1]=days_with_weeks[d][1]+1
+                    if d!='':
+                        days_with_weeks[d][1]=days_with_weeks[d][1]+1
 
-                    #Append new visit detail
-                    plan_vals = {
-                        'visit_header': res.id,
-                        'visit_date': d,
-                        'week_num': counter,
-                        'visit_client':cust.id
-                    }
-                    plan_vals_all.append(plan_vals)
+                        #Append new visit detail
+                        plan_vals = {
+                            'visit_header': res.id,
+                            'visit_contact': cont_id,
+                            'planned_visit_time':planned_time,
+                            'visit_date': d,
+                            'week_num': counter,
+                            'visit_client':cust.id
+                        }
+                        plan_vals_all.append(plan_vals)
                 else:
                     date_assigned=False
                 pass
@@ -155,19 +175,20 @@ class customer_visit_detail(models.Model):
     visit_header=fields.Many2one('droga.customer.visit.header',required=True)
     visit_client=fields.Many2one('res.partner','Customer')
     visit_contact = fields.Many2one('res.partner',string='Contact')
-    visit_location=fields.Many2one('droga.crm.settings.location')
+    visit_location=fields.Char('Visit location')
     _order = 'visit_date'
     visit_date=fields.Date('Visit date')
     visit_date_descr=fields.Char('Day',compute='_get_date_descr',store=True)
+    core_products=fields.Many2many('product.template',domain=[('is_core_product','=','true')])
 
     @api.depends('visit_date')
     def _get_date_descr(self):
         for rec in self:
             if rec.visit_date:
                 rec.visit_date_descr=rec.visit_date.strftime("%A")
+
     week_num=fields.Integer('Week number')
-    planned_visit_time_from=fields.Float('Planned visit time from')
-    planned_visit_time_to = fields.Float('Planned visit time to')
+    planned_visit_time=fields.Float('Planned visit time')
     actual_visit_time_from = fields.Float('Actual visit time from')
     actual_visit_time_to = fields.Float('Actual visit time to')
     remark = fields.Char('Remark')
@@ -178,13 +199,28 @@ class customer_visit_detail(models.Model):
 
     def visit_schedule_open(self):
         self.generate_leads()
-        pass
+        return {
+            'name': 'Contact schedule',
+            'view_mode': 'tree',
+            'view_type': 'form',
+            'res_model': 'droga.crm.customers.contacts.view',
+            'context': "{'search_default_group_cust_name':1}",
+            'view_id': self.env.ref('droga_crm.droga_crm_doctors_schedule_view_tree').id,
+            'type': 'ir.actions.act_window',
+            'domain': [('day', '=', self.visit_date_descr)],
+            'target': 'new',
+            'res_id': self.id,
+        }
 
     def generate_leads(self):
-        details=self.env['droga.customer.visit.detail'].search([(1,'=',1)])
-        for det in details:
+
+        for det in self:
+            descr = det['visit_client'].name if det['visit_client'].name else ''
+            for prod in det['core_products']:
+                descr=', '+descr+prod.name
+
             leads = {
-                'name' : 'Item to sell description',    #Fix me
+                'name' : descr,
                 'user_id':self.env.user.id,
                 'team_id':0,                            #Fix me
                 'company_id':self.env.company.id,
@@ -193,8 +229,8 @@ class customer_visit_detail(models.Model):
                 'expected_revenue':0,                   #Fix me
                 'date_open':det['visit_date'],
                 'partner_id' : det['visit_client'].id,
-                'partner_name' : 'contact',             #Fix me
-                'mobile':'0'                            #Fix me
+                'contact_name' : det['visit_contact'].name,
             }
             self.env['crm.lead'].create(leads)
             det['status']='scheduled'
+

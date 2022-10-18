@@ -5,7 +5,8 @@
         <field name="model">droga.tender.master</field>
         <field name="arch" type="xml">
             <tree string="">
-                <field name="customer"></field>
+                <field name="ten_id" string="Tender ID"></field>
+                <field name="customer" ></field>
                 <field name="posted_date_gre" string="Floated date"></field>
                 <field name="closing_date_gre" string="Closing date"></field>
                 <field name="open_date_gre" invisible="1"></field>
@@ -56,12 +57,13 @@
                                     <field name="supplier" options="{'no_create':True,'no_open':True}"/>
                                     <field name="supplier_new"/>
                                     <field name="brand_model"/>
+                                    <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
                                     <field name="country" options="{'no_create':True,'no_open':True}"/>
 
                                     <field name="deliv_period"/>
                                     <field name="tech_result"/>
 
-                                    <field name="remark"/>
+
 
                                 </tree>
                             </field>
@@ -82,10 +84,11 @@
                                     <field name="unit_price" widget='monetary'/>
                                     <field name="amount" widget='monetary'/>
                                     <field name="currency" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
+
                                     <field name="fin_open"/>
                                     <field name="status"/>
                                     <field name="st_date"/>
+                                    <field name="remark"/>
                                     <field name="award_fold_num"/>
                                     <button icon="fa-credit-card-alt" type="object" string="Competitors"
                                             name="competitors_open" class="oe_stat_button"></button>

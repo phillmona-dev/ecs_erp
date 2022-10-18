@@ -1,10 +1,9 @@
-import base64
-import io
 
 from odoo import api, fields, models
 from io import BytesIO
 import xlsxwriter
 import datetime
+from odoo.exceptions import UserError
 
 try:
     from base64 import encodebytes
@@ -15,16 +14,23 @@ except ImportError:
 #My point is to have a transient model inherit the report.report_xlsx.abstract and immplement all logic and use interface from here as well
 class tender_master_xls(models.TransientModel):
     _name='droga.inventory.reports.sc.excel'
-    #_inherit = 'report.report_xlsx.abstract'
 
     warehouse=fields.Many2one('stock.warehouse','Warehouse')
     product = fields.Many2one('product.product','Product')
     date_from=fields.Date('Date from')
     date_to = fields.Date('Date to')
+    per_location = fields.Binary('Per location?')
     fileout = fields.Binary('File', readonly=True)
     #fileout_filename = fields.Char('Filename', readonly=True)
 
     def action_get_xls(self):
+        if not self.date_from:
+            raise UserError("Date from field must be selected.")
+        if not self.date_to:
+            raise UserError("Date to field must be selected.")
+        if not self.warehouse:
+            raise UserError("Warehouse field must be selected.")
+
         #This generates our excel file
         file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
@@ -51,16 +57,83 @@ class tender_master_xls(models.TransientModel):
     def generate_xlsx_report(self, workbook):
         sheet = workbook.add_worksheet('StockCard')
         #Header row count is 10
-        self.get_droga_stockcard_sheet_with_header(sheet,workbook,0)
-        stock_move_data=self.env['stock.move'].search([('state','=','done'),('location_id.complete_name', 'like', self.warehouse.code),('date','>=',self.date_from),('date','<=',self.date_to)])
-        x='df'
 
-    def generate_stockcard_per_item(self,sheet,workbook,row_start,item,warehouse,stock_move_data):
+        row_start=0
+        loc_ids_under_wh=self.env['stock.location'].search([('complete_name', 'like', self.warehouse.code+'%'),('usage', '=', 'internal')])
+        if self.product:
+            stock_move_data=self.env['stock.move.line'].search(['|',('location_id', 'in', loc_ids_under_wh.ids),('location_dest_id', 'in', loc_ids_under_wh.ids),('state','=','done'),('date','>=',self.date_from),('date','<=',self.date_to),('product_id','=',self.product.id)],order="move_id desc").sorted(key=lambda r: r.move_id.date)
+        else:
+            stock_move_data = self.env['stock.move.line'].search(
+                ['|', ('location_id', 'in', loc_ids_under_wh.ids), ('location_dest_id', 'in', loc_ids_under_wh.ids),
+                 ('state', '=', 'done'), ('date', '>=', self.date_from), ('date', '<=', self.date_to)],
+                order="move_id desc").sorted(key=lambda r: r.move_id.date)
+        stock_products=list(dict.fromkeys(stock_move_data.sorted(key=lambda r: r.product_id.name)['product_id']))
+        for prod in stock_products:
+            self.get_droga_stockcard_sheet_with_header(sheet, workbook, prod,row_start)
+            row_start+=11
+            #self.generate_stockcard_per_item(sheet,workbook,row_start,stock_move_data.sorted(key=lambda r: r.move_id.date),loc_ids_under_wh)
+            for move_line in stock_move_data:
+                if move_line['product_id'].id==prod.id:
+                    self.generate_stockcard_per_item(sheet,workbook,row_start,move_line,loc_ids_under_wh)
+            row_start+=5
+
+
+    def generate_stockcard_per_item(self,sheet,workbook,row_start,stock_move_data,loc_ids):
+        date_format = workbook.add_format({'num_format': 'd mmm yyyy','border': 7})
+        num_format = workbook.add_format({'num_format': 43,'border': 7})
+        cent_format = workbook.add_format({'num_format': 41,'border': 7})
+        border=workbook.add_format({'border': 7})
+        balance=0
+
+        for stock_move in stock_move_data:
+            sheet.write(row_start, 0, stock_move['move_id'].date,date_format)
+            sheet.write(row_start, 1, stock_move['reference'])
+            #This avoids internal transfers from printed in the system
+            if stock_move['location_id'] in loc_ids and stock_move['location_dest_id'] in loc_ids.ids:
+                continue
+            if stock_move['location_id'] in loc_ids:
+                sheet.write(row_start, 2, stock_move['location_dest_id'].complete_name)
+            else:
+                sheet.write(row_start, 2, stock_move['location_id'].complete_name)
+
+            if stock_move['location_id'] in loc_ids:
+                if stock_move['location_dest_id'].usage=='inventory':
+                    sheet.write(row_start, 5, stock_move['qty_done']*-1, num_format)
+                    balance-=stock_move['qty_done']
+                    sheet.write(row_start, 3, 0, num_format)
+                    sheet.write(row_start, 4, 0, num_format)
+                else:
+                    sheet.write(row_start, 4, stock_move['qty_done'],num_format)
+                    balance += stock_move['qty_done']
+                    sheet.write(row_start, 3, 0,num_format)
+                    sheet.write(row_start, 5, 0, num_format)
+            else:
+                if stock_move['location_id'].usage == 'inventory':
+                    sheet.write(row_start, 5, stock_move['qty_done'], num_format)
+                    balance += stock_move['qty_done']
+                    sheet.write(row_start, 4, 0, num_format)
+                    sheet.write(row_start, 3, 0, num_format)
+                else:
+                    sheet.write(row_start, 3, stock_move['qty_done'],num_format)
+                    balance += stock_move['qty_done']
+                    sheet.write(row_start, 4, 0,num_format)
+                    sheet.write(row_start, 5,0, num_format)
+
+            sheet.write(row_start, 6, balance, num_format)
+
+            sheet.write(row_start, 7, int(stock_move['product_id'].list_price), num_format)
+            sheet.write(row_start, 8, (stock_move['product_id'].list_price-int(stock_move['product_id'].list_price))*100, cent_format)
+            if stock_move['lot_id'].name:
+                sheet.write(row_start, 9, stock_move['lot_id'].name)
+            if stock_move['expiration_date']:
+                sheet.write(row_start, 10, stock_move['expiration_date'], date_format)
+            row_start+=1
         pass
 
-    def get_droga_stockcard_sheet_with_header(self, sheet,workbook,row_start):
+    def get_droga_stockcard_sheet_with_header(self, sheet,workbook,prod,row_start):
 
         sheet.set_column('B:B', 10)
+        sheet.set_column('A:A', 10.5)
         #region excel_formats
         bold = workbook.add_format({'bold': True})
         header_format = workbook.add_format({
@@ -110,35 +183,39 @@ class tender_master_xls(models.TransientModel):
 
         sheet.merge_range('A'+str(row_start+1)+':L'+str(row_start+1), 'DROGA PHARMA PLC', header_format)
         sheet.merge_range('A'+str(row_start+2)+':L'+str(row_start+2), 'Stock record card', main_title_format)
-        sheet.merge_range('A'+str(row_start+3)+':L'+str(row_start+3), 'Product name, strength and dosage form : ', parameter_format)
+        sheet.merge_range('A'+str(row_start+3)+':L'+str(row_start+3), 'Product name, strength and dosage form : '+prod.name, parameter_format)
 
-        sheet.merge_range('A'+str(row_start+4)+':F'+str(row_start+4), 'Unit of measure : ', parameter_format)
-        sheet.merge_range('G'+str(row_start+4)+':L'+str(row_start+4), 'Location : ', parameter_format)
+        sheet.merge_range('A'+str(row_start+4)+':F'+str(row_start+4), 'Unit of measure : '+prod.product_tmpl_id.uom_id.name, parameter_format)
+        sheet.merge_range('G'+str(row_start+4)+':L'+str(row_start+4), 'Location : '+self.warehouse.name, parameter_format)
 
-        sheet.merge_range('A'+str(row_start+5)+':F'+str(row_start+5), 'Maximum stock level : ', parameter_format)
-        sheet.merge_range('G'+str(row_start+5)+':L'+str(row_start+5), 'Emergency order point : ', parameter_format)
+        sheet.merge_range('A'+str(row_start+5)+':F'+str(row_start+5), 'Maximum stock level : '+str(prod.reordering_max_qty), parameter_format)
+        sheet.merge_range('G'+str(row_start+5)+':L'+str(row_start+5), 'Emergency order point : '+str(prod.reordering_max_qty), parameter_format)
 
         sheet.merge_range('A'+str(row_start+6)+':F'+str(row_start+6), 'Average monthly consumption (AMC) : ', parameter_format)
-        sheet.merge_range('G'+str(row_start+6)+':L'+str(row_start+6), 'Product category : ', parameter_format)
+        sheet.merge_range('G'+str(row_start+6)+':L'+str(row_start+6), 'Product category : '+prod.categ_id.name, parameter_format)
 
-        sheet.merge_range('A'+str(row_start+7)+':L'+str(row_start+7), '', separator_format)
+        sheet.merge_range('A' + str(row_start + 7) + ':F' + str(row_start + 7), 'Date from : '+str(self.date_from),parameter_format)
+        sheet.merge_range('G' + str(row_start + 7) + ':L' + str(row_start + 7), 'Date to : '+str(self.date_to), parameter_format)
 
-        sheet.merge_range('A'+str(row_start+8)+':A'+str(row_start+10), 'Date', title_format)
-        sheet.merge_range('B'+str(row_start+8)+':B'+str(row_start+10), 'Doc No.\n(Receiving\nor Issue)', title_format)
-        sheet.merge_range('C'+str(row_start+8)+':C'+str(row_start+10), 'Received\nfrom or\nIssued to)', title_format)
+        sheet.merge_range('A'+str(row_start+8)+':L'+str(row_start+8), '', separator_format)
 
-        sheet.merge_range('D'+str(row_start+8)+':G'+str(row_start+9), 'Quantity', title_format)
-        sheet.write(row_start+9, 3, 'Received',title_format)
-        sheet.write(row_start+9, 4, 'Issued', title_format)
-        sheet.write(row_start+9, 5, 'Loss/Adj.', title_format)
-        sheet.write(row_start+9, 6, 'Balance', title_format)
+        sheet.merge_range('A'+str(row_start+9)+':A'+str(row_start+11), 'Date', title_format)
+        sheet.merge_range('B'+str(row_start+9)+':B'+str(row_start+11), 'Doc No.\n(Receiving\nor Issue)', title_format)
+        sheet.merge_range('C'+str(row_start+9)+':C'+str(row_start+11), 'Received\nfrom or\nIssued to)', title_format)
 
-        sheet.merge_range('H'+str(row_start+8)+':I'+str(row_start+9), 'Unit Price', title_format)
-        sheet.write(row_start+9, 7, 'Birr', title_format)
-        sheet.write(row_start+9, 8, 'Cent', title_format)
+        sheet.merge_range('D'+str(row_start+9)+':G'+str(row_start+10), 'Quantity', title_format)
+        sheet.write(row_start+10, 3, 'Received',title_format)
+        sheet.write(row_start+10, 4, 'Issued', title_format)
+        sheet.write(row_start+10, 5, 'Loss/Adj.', title_format)
+        sheet.write(row_start+10, 6, 'Balance', title_format)
 
-        sheet.merge_range('J'+str(row_start+8)+':J'+str(row_start+10), 'Batch #', title_format)
-        sheet.merge_range('K'+str(row_start+8)+':K'+str(row_start+10), 'Expiry\nDate', title_format)
-        sheet.merge_range('L'+str(row_start+8)+':L'+str(row_start+10), 'Remark', title_format)
+        sheet.merge_range('H'+str(row_start+9)+':I'+str(row_start+10), 'Unit Price', title_format)
+        sheet.write(row_start+10, 7, 'Birr', title_format)
+        sheet.write(row_start+10, 8, 'Cent', title_format)
+
+        sheet.merge_range('J'+str(row_start+9)+':J'+str(row_start+11), 'Batch #', title_format)
+        sheet.merge_range('K'+str(row_start+9)+':K'+str(row_start+11), 'Expiry\nDate', title_format)
+        sheet.merge_range('L'+str(row_start+9)+':L'+str(row_start+11), 'Remark', title_format)
+
         return sheet
 

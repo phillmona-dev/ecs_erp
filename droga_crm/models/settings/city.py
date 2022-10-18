@@ -13,4 +13,3 @@ class droga_crm_settings_city(models.Model):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]})
 
-
