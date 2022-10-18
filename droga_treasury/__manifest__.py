@@ -1,6 +1,7 @@
 {
 'name':'Droga Treasury',
-'author':'Nathan Endrias',
+'author': "Afomsoft Technologies",
+'website': "https://afomsoft.com",
 'category': 'Accounting',
 'version':'1.0',
 'depends':['base'],
