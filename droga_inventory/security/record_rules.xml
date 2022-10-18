@@ -167,4 +167,5 @@
         <field name = "perm_unlink" eval = "True" />
         <field name = "domain_force"> [('warehouse_id', '=', 'Medicine Store'),	('name','!=','Operation Manager')] </field>
     </record>
+    
 </odoo>
