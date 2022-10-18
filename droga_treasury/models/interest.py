@@ -10,15 +10,15 @@ class AccountLoanInterest(models.Model):
     _name = 'account.loan.interest'
     
    
-    daily_interest_amount=fields.Float('Interest Amount',)
-    daily_penality_amount=fields.Float('Penality Amount')
-    daily_interest_rate=fields.Float('Daily Interest Rate',)
-    daily_penality_rate=fields.Float('Daily Penality Rate', )
-    daily_interest_total=fields.Float('Daily Interest  Total',)
+    daily_interest_amount=fields.Float('Interest Amount',readonly=True,)
+    daily_penality_amount=fields.Float('Penality Amount',readonly=True)
+    daily_interest_rate=fields.Float('Daily Interest Rate',readonly=True,)
+    daily_penality_rate=fields.Float('Daily Penality Rate',readonly=True, )
+    daily_interest_total=fields.Float('Daily Interest  Total',readonly=True,)
  
     #cumulative_interest_total = fields.Float(string="Cumulative Interest",related='acount_loan_id.daily_penalit_rate', readonly=True, store=True,)
-    value_date= fields.Date(string="Value Date")
-    posted=fields.Boolean(string="Posted?")
+    value_date= fields.Date(string="Value Date",readonly=True)
+    posted=fields.Boolean(string="Posted?",readonly=True)
     acount_loan_id = fields.Many2one(comodel_name='account.loan', ondelete='cascade', required=True,
                                    copy=True)
                                   

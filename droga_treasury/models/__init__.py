@@ -5,5 +5,5 @@ from . import penalit
 from . import loan_type
 from . import renew
 from . import renenews
-from . import monthlyclosing
+from . import monthlyclosing,loan_const
 

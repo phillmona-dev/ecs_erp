@@ -16,3 +16,6 @@ access_account_loan_renew_schedule,account.loan.renew.schedule,model_account_loa
 access_account_loan_renew,account.loan.renew,model_account_loan_renew,account.group_account_manager,1,1,1,1
 access_account_loan_renews,account.loan.renews,model_account_loan_renews,account.group_account_manager,1,1,1,1
 
+
+access_account_loan_penality_range,account.loan.penality.range,model_account_loan_penality_range,account.group_account_manager,1,1,1,1
+

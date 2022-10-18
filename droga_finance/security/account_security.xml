@@ -16,39 +16,56 @@
         <field name="comment">The user will be able to access all ERP modules.</field>        <!---->
     </record>
 
-    <record id="account_risk_treasury_manager_group" model="res.groups">
-        <field name="name">Risk and Treasury Manager</field>
+    <!-- Account Payable -->
+    <record id="account_payable_team_leader_group" model="res.groups">
+        <field name="name">Account Payable Team Leader</field>
         <field name="category_id" ref="base.module_category_droga_finance"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">The user will be able to access all modules related to treasury.</field>        <!---->
-    </record>
-
-    <record id="account_risk_treasury_senior_accountant_group" model="res.groups">
-        <field name="name">Risk and Treasury Senior Accountant</field>
-        <field name="category_id" ref="base.module_category_droga_finance"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">The user will be able to access all modules related to treasury.</field>        <!---->
+        <field name="comment">The user will be able to access all Account Payable modules Functionalities.</field>
     </record>
 
     <record id="account_payable_senior_accountant_group" model="res.groups">
         <field name="name">Account Payable Senior Accountant</field>
         <field name="category_id" ref="base.module_category_droga_finance"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">The user will be able to access all modules related to account payable.</field>        <!---->
+        <field name="comment">The user will be able to access all modules related to account payable.</field>
+    </record>
+
+
+    <record id="account_payable_accountant_group" model="res.groups">
+        <field name="name">Account Payable Accountant</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">The user will be able to access all modules related to account payable.</field>
     </record>
 
     <record id="account_payable_cashier_accountant_group" model="res.groups">
         <field name="name">Account Payable Cashier Accountant</field>
         <field name="category_id" ref="base.module_category_droga_finance"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">The user will be able to access all modules related to account payable.</field>        <!---->
+        <field name="comment">The user will be able to access all modules related to account payable.</field>
+    </record>
+
+    <!-- Account Recivables -->
+    <record id="account_receivable_team_leader_group" model="res.groups">
+        <field name="name">Account Receivable Team Leader</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">The user will be able to access all Account Receivable modules Functionalities.</field>
     </record>
 
     <record id="account_recivables_senior_accountant_group" model="res.groups">
         <field name="name">Account Recivables Senior Accountant</field>
         <field name="category_id" ref="base.module_category_droga_finance"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">The user will be able to access all modules related to account recivables.</field>        <!---->
+        <field name="comment">The user will be able to access all modules related to account recivables.</field>
+    </record>
+
+    <record id="account_recivables_accountant_group" model="res.groups">
+        <field name="name">Account Recivables Accountant</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">The user will be able to access all modules related to account recivables.</field>
     </record>
 
     <record id="account_recivables_cashier_accountant_group" model="res.groups">
@@ -58,12 +75,98 @@
         <field name="comment">The user will be able to access all modules related to account recivables.</field>        <!---->
     </record>
 
+
+
+
+
+
+
+    <!-- risk and treasury manager -->
+    <record id="account_risk_treasury_manager_group" model="res.groups">
+        <field name="name">Risk and Treasury Manager</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">The user will be able to access all modules related to treasury.</field>
+    </record>
+
+    <record id="account_risk_treasury_team_leader_group" model="res.groups">
+        <field name="name">Risk and Treasury Team Leader</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">The user will be able to access all modules related to treasury.</field>
+    </record>
+
+    <record id="account_risk_treasury_accountant_group" model="res.groups">
+        <field name="name">Risk and Treasury Accountant</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">The user will be able to access all modules related to treasury.</field>
+    </record>
+
+    <record id="account_risk_treasury_senior_accountant_group" model="res.groups">
+        <field name="name">Risk and Treasury Senior Accountant</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">The user will be able to access all modules related to treasury.</field>
+    </record>
+
+
+
+
+
+
+    <!-- General Ledger -->
+    <record id="account_general_ledger_team_leader_group" model="res.groups">
+        <field name="name">General Ledger Team Leader</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">The user will be able to access all modules related to General Ledger.</field>
+    </record>
+
     <record id="account_general_ledger_senior_accountant_group" model="res.groups">
         <field name="name">General Ledger Senior Accountant</field>
         <field name="category_id" ref="base.module_category_droga_finance"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">The user will be able to access all modules related to General Ledger.</field>        <!---->
+        <field name="comment">The user will be able to access all modules related to General Ledger.</field>
     </record>
+
+    <!-- Business Control -->
+    <record id="business_control_reporting_manager_group" model="res.groups">
+        <field name="name">Business Control and Reporting Manager</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">--</field>
+    </record>
+
+    <record id="business_control_planning_reporting_team_leader_group" model="res.groups">
+        <field name="name">Business Planning,Control and Planning Team Leader</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">--</field>
+    </record>
+
+    <record id="business_control_specialist_group" model="res.groups">
+        <field name="name">Business Control Specialist</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">--</field>
+    </record>
+
+
+    <record id="internal_process_improvement_team_leader_group" model="res.groups">
+        <field name="name">Internal Process Improvement Team Leader</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">--</field>
+    </record>
+
+    <record id="internal_process_improvement_specialists_group" model="res.groups">
+        <field name="name">Internal Process Improvement Specialists</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">--</field>
+    </record>
+
 
     <record id="self_service_group" model="res.groups">
         <field name="name">Employee Self Service</field>
@@ -72,10 +175,6 @@
         <field name="comment">The user will be able to access all Self service forms.</field>        <!---->
     </record>
 
-   
 
-    
-
-   
 
 </odoo>

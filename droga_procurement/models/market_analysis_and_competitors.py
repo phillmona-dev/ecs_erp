@@ -1,10 +1,15 @@
-from odoo import models,fields
+from odoo import models, fields
+
 
 class purchase_request_link(models.Model):
     _inherit = 'droga.purhcase.request.line'
-    market_analysis=fields.One2many('droga.purhcase.request.market.analysis','pr_line')
-    suppliers_list = fields.One2many('droga.purhcase.order.foreign.suppliers.list', 'po_line')
-    competitors_comparative = fields.One2many('droga.purchase.order.foreign.competitors.comparative', 'po_line')
+    market_analysis = fields.One2many(
+        'droga.purhcase.request.market.analysis', 'pr_line')
+    suppliers_list = fields.One2many(
+        'droga.purhcase.order.foreign.suppliers.list', 'po_line')
+    competitors_comparative = fields.One2many(
+        'droga.purchase.order.foreign.competitors.comparative', 'po_line')
+
     def open_market_analysis(self):
         return {
             'name': 'Market analysis',
@@ -42,33 +47,44 @@ class purchase_request_link(models.Model):
         }
 
 
-#Market analysis class for purchase request
+# Market analysis class for purchase request
 class purchase_request_market_analysis(models.Model):
-    _name='droga.purhcase.request.market.analysis'
-    pr_line=fields.Many2one('droga.purhcase.request.line')
-    importer_name=fields.Char('Name of importer')
+    _name = 'droga.purhcase.request.market.analysis'
+    pr_line = fields.Many2one('droga.purhcase.request.line')
+    purhcase_request_id = fields.Many2one(
+        related='pr_line.purhcase_request_id', store=True)
+    importer_name = fields.Char('Name of importer')
     manufacturer = fields.Char('Manufacturer')
     unit = fields.Many2one('uom.uom')
-    avail_stock=fields.Float('Available stock')
+    avail_stock = fields.Float('Available stock')
     sell_up = fields.Float('Selling unit price')
     epss_volume = fields.Float('EPSS stock volume')
-    local_man_status=fields.Char('Local manufacturers stock and RM status')
-    remark=fields.Char('Remark')
+    local_man_status = fields.Char('Local manufacturers stock and RM status')
+    remark = fields.Char('Remark')
 
-#Our foreign suppliers list for each purchase order line
+# Our foreign suppliers list for each purchase order line
+
+
 class purchase_order_foreign_droga_suppliers_list(models.Model):
     _name = 'droga.purhcase.order.foreign.suppliers.list'
-    po_line=fields.Many2one('droga.purhcase.request.line')
-    manufacturer=fields.Many2one('res.partner','Manufacturer')
-    unit_price=fields.Float('Unit price')
-    shelf_life=fields.Float('Shelf life')
-    is_sup_regsitered=fields.Boolean('Is supplier registered?',default=True)
-
-#Our foreign suppliers competitors list for each purchase order line
-class purhcase_order_foreign_competitors_comparative(models.Model):
-    _name='droga.purchase.order.foreign.competitors.comparative'
     po_line = fields.Many2one('droga.purhcase.request.line')
-    importer=fields.Char('Importer')        #Make from settings page if not highly variant
+    purhcase_request_id = fields.Many2one(
+        related='po_line.purhcase_request_id', store=True)
+    manufacturer = fields.Many2one('res.partner', 'Manufacturer')
+    unit_price = fields.Float('Unit price')
+    shelf_life = fields.Float('Shelf life')
+    is_sup_regsitered = fields.Boolean('Is supplier registered?', default=True)
+
+# Our foreign suppliers competitors list for each purchase order line
+
+
+class purhcase_order_foreign_competitors_comparative(models.Model):
+    _name = 'droga.purchase.order.foreign.competitors.comparative'
+    po_line = fields.Many2one('droga.purhcase.request.line')
+    purhcase_request_id = fields.Many2one(
+        related='po_line.purhcase_request_id', store=True)
+    # Make from settings page if not highly variant
+    importer = fields.Char('Importer')
     manufacturer = fields.Char('Manufacturer')
     unit = fields.Many2one('uom.uom')
     p_up = fields.Float('Private unit price')

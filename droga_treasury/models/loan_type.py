@@ -11,13 +11,13 @@ class AccountLoanInt(models.Model):
     _name = "account.loan.int"
     _description = "This model is used to catagoraize difrent type of loan"
  
-    daily_interest_amount=fields.Float('Interest Amount',)
-    daily_penality_amount=fields.Float('Penality Amount')
-    value_date= fields.Date(string="Value Date")
+    daily_interest_amount=fields.Float('Interest Amount',readonly=True,)
+    daily_penality_amount=fields.Float('Penality Amount',readonly=True)
+    value_date= fields.Date(string="Value Date",readonly=True)
     acount_loan_id = fields.Many2one(comodel_name='account.loan', string="Parent ID")
-    daily_penality_rate=fields.Float('Daily Penality Rate', )
-    daily_interest_rate=fields.Float('Daily Penality Rate', )
-    daily_interest_total=fields.Float('Daily Interest  Total',)
+    daily_penality_rate=fields.Float('Daily Penality Rate',readonly=True, )
+    daily_interest_rate=fields.Float('Daily Penality Rate',readonly=True, )
+    daily_interest_total=fields.Float('Daily Interest  Total',readonly=True,)
     posted=fields.Boolean(string="Posted?")
     @api.model
     def write(self, values):
