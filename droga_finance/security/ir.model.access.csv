@@ -1,5 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_droga_finance_payment_request,droga.account.payment.request,model_droga_account_payment_request,droga_finance.self_service_group,1,1,1,1
 access_droga_finance_payment_request,droga.account.payment.request,model_droga_account_payment_request,droga_finance.self_service_group,1,1,1,1
-access_droga_procurement_purhcase_request_for_approval,droga.purhcase.request,droga_procurement.model_droga_purhcase_request,droga_finance.self_service_group,1,1,0,0
-access_droga_procurement_purhcase_request_line_for_approval,droga.purhcase.request.line,droga_procurement.model_droga_purhcase_request_line,droga_finance.self_service_group,1,1,0,0
