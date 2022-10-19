@@ -39,5 +39,5 @@
     "license": "AGPL-3",
     # only loaded in demonstration mode
     'installable': True,
-    'application': False
+    'application': True
 }

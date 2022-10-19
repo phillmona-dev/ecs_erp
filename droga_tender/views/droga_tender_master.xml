@@ -5,7 +5,8 @@
             <field name="model">droga.tender.master</field>
             <field name="arch" type="xml">
                 <tree string="">
-                    <field name="customer"></field>
+                    <field name="ten_id" string="Tender ID"></field>
+                    <field name="customer" ></field>
                     <field name="posted_date_gre" string="Floated date"></field>
                     <field name="closing_date_gre" string="Closing date"></field>
                     <field name="open_date_gre" invisible="1"></field>
@@ -75,6 +76,8 @@
                                 <field name="extension_date_eth"></field>
                                 <field name="open_date_eth"></field>
                                 <field name="status"></field>
+                                <field name="performance_amt_sent"></field>
+                                <field name="performance_amt_award"></field>
                             </group>
 
 

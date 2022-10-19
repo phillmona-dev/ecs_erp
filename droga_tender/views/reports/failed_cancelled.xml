@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+        <record id="droga_report_failed_tenders" model="ir.ui.view">
+            <field name="name">droga.report.failed.tender</field>
+            <field name="model">droga.tender.submission.detail</field>
+            <field name="arch" type="xml">
+                <tree string="" expand="1">
+                    <field name="ten_id" string="Tender ID"></field>
+                    <field name="customer" ></field>
+                    <field name="procurement_title" ></field>
+                    <field name="amount" ></field>
+                    <field name="status" ></field>
+                    <field name="remark" ></field>
+                </tree>
+            </field>
+        </record>
+
+    <record id="droga_tender_failed_cancelled_search_tree" model="ir.ui.view">
+        <field name="name">droga.tender.failed.performance.search.tree</field>
+        <field name="model">droga.tender.submission.detail</field>
+        <field name="arch" type="xml">
+            <search string="Upcoming Tenders">
+                <field name="ten_id" string="Tender ID"></field>
+                    <field name="customer" ></field>
+                    <field name="procurement_title" ></field>
+                    <field name="amount" ></field>
+                    <field name="status" ></field>
+                <filter string="Status cancelled" domain="[('status', 'in',['cancelled','faiten','lost'])]" name="status_cancelled"></filter>
+            </search>
+        </field>
+    </record>
+
+    <record id="droga_tender_report_failed_cancelled" model="ir.actions.act_window">
+            <field name="name">Failed/cancelled tenders</field>
+            <field name="res_model">droga.tender.submission.detail</field>
+            <field name="view_mode">tree</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_report_failed_tenders')})]"/>
+            <field name="search_view_id" ref="droga_tender_failed_cancelled_search_tree"></field>
+        <field name="context">{'search_default_status_cancelled': 1}</field>
+        </record>
+
+        <menuitem
+            id="droga_report_failed_tenders"
+            name="Failed/cancelled tenders"
+            action="droga_tender_report_failed_cancelled"
+            parent="tender_reports"
+            groups="tender_user"
+            sequence="11"/>
+</odoo>

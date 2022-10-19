@@ -77,6 +77,7 @@ class droga_tender_master(models.Model):
     remark = fields.Char("Remark")
     customer_tender_no = fields.Char("Customer tender no")
     procurement_title=fields.Char('Procurement title')
+    ten_id=fields.Char('Droga tender ID')
 
     # Selection fields
     period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')])
@@ -151,11 +152,14 @@ class droga_tender_master(models.Model):
         result = []
         for record in self:
             result.append(
-                (record.id, record.customer["name"]+" for "+record.closing_date_gre.strftime("%B %d,%Y")))
+                (record.id, record.ten_id+' - '+ record.customer["name"]+" for "+record.closing_date_gre.strftime("%B %d,%Y")))
             return result
 
     @api.model
     def create(self, vals_list):
+        vals_list['ten_id'] = self.env['ir.sequence'].next_by_code(
+            'droga.tender.master.custom.sequence')
+
         res=super().create(vals_list)
         to_create_bid_security = {
                 "bid_security": res.id,

@@ -80,7 +80,6 @@
 
 
 
-
     <!-- risk and treasury manager -->
     <record id="account_risk_treasury_manager_group" model="res.groups">
         <field name="name">Risk and Treasury Manager</field>

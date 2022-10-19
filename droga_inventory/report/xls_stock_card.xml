@@ -35,6 +35,6 @@
             name="Stock card - Excel"
             action="droga_inventory_reports_excel_action"
             parent="stock.menu_warehouse_report"
-            groups="stock.group_stock_manager"
+            groups="stock.group_stock_user"
             sequence="13"/>
 </odoo>

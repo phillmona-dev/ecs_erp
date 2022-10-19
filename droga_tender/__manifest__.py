@@ -34,15 +34,18 @@
         'views/droga_tender_master_submission.xml',
         'views/droga_tender_competitors.xml',
         'views/droga_tender_contract_security_tree.xml',
-        'reports/report_basic_pdf.xml',
-        'reports/report_basic_xls.xml',
+        'views/reports/total_tenders.xml',
+        'views/reports/total_awarded.xml',
+        'views/reports/total_performance.xml',
+        'views/reports/failed_cancelled.xml',
+        'data/droga_tender_sequence.xml',
     ],
 
     # any module necessary for this one to work correctly
 
     'depends': ['base','hr',
-                'mail',
-                'resource',
+                'mail','droga_crm','hr',
+                'resource','stock',
                 'web','report_xlsx'],
     "license": "AGPL-3",
     # only loaded in demonstration mode
