@@ -17,8 +17,9 @@ from odoo.tools import float_compare, float_is_zero
 class AccountLoan(models.Model):
     _name = "account.loan"
     _description = "Loan"
-    
 
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
+    
 
     name=fields.Many2one('res.bank', string="Bank", required=True)  
     
