@@ -157,7 +157,7 @@
         <field name = "domain_force"> [('warehouse_id', '=', 'Wholesale Store'),	('name','!=','Operation Manager')] </field>
     </record>
 
-    <record id = "inventory_md_picking_type_access" model = "ir.rule">
+    <record id = "inventory_of_picking_type_access" model = "ir.rule">
         <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
         <field name = "model_id" search="[('model','=','stock.picking.type')]" />
         <field name = "groups" eval = "[(4, ref ('inventory_md'))]" />
@@ -165,6 +165,6 @@
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> [('warehouse_id', '=', 'Medicine Store'),	('name','!=','Operation Manager')] </field>
+        <field name = "domain_force"> [('warehouse_id', '=', 'Office supplies Store'),	('name','!=','Operation Manager')] </field>
     </record>
 </odoo>

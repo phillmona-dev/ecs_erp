@@ -45,8 +45,8 @@ class droga_tender_master_related(models.Model):
             type_item=''
             for det_tend in rec.detail_tenders:
                 #type_item=type_item+'\nLot '+det_tend.lot_number+' - ' if type_item!='' else 'Lot '+det_tend.lot_number+' - '
-                type_item = type_item.rstrip(type_item[-1]) + '\nLot ' + det_tend.lot_number + ' - ' if type_item != '' else 'Lot ' + det_tend.lot_number + ' - '
+                type_item = type_item.rstrip(type_item[-1]).rstrip(type_item[-2]) + '\nLot ' + det_tend.lot_number + ' - ' if type_item != '' else 'Lot ' + det_tend.lot_number + ' - '
                 for item_de in det_tend.type_item:
                     type_item=type_item+item_de.type_or_item_name+', '
-            rec.item_types=type_item.rstrip(type_item[-1]) if type_item != '' else type_item
+            rec.item_types=type_item.rstrip(type_item[-1]).rstrip(type_item[-2]) if type_item != '' else type_item
 
