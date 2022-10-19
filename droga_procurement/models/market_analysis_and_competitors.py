@@ -10,6 +10,9 @@ class purchase_request_link(models.Model):
     competitors_comparative = fields.One2many(
         'droga.purchase.order.foreign.competitors.comparative', 'po_line')
 
+    expected_costs = fields.One2many(
+        'droga.purhcase.request.expected.cost', 'pr_line')
+
     def open_market_analysis(self):
         return {
             'name': 'Market analysis',
@@ -41,6 +44,18 @@ class purchase_request_link(models.Model):
             'view_mode': 'form',
             'res_model': 'droga.purhcase.request.line',
             'view_id': self.env.ref('droga_procurement.droga_procurement_purchase_request_comp_comparative').id,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'res_id': self.id,
+        }
+
+    def open_expected_cost(self):
+        return {
+            'name': 'Expected Cost',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.purhcase.request.line',
+            'view_id': self.env.ref('droga_procurement.droga_procurement_purchase_request_expected_cost_form').id,
             'type': 'ir.actions.act_window',
             'target': 'new',
             'res_id': self.id,
@@ -90,5 +105,25 @@ class purhcase_order_foreign_competitors_comparative(models.Model):
     p_up = fields.Float('Private unit price')
     p_qty = fields.Float('Private quantity')
     p_date = fields.Float('Private ordered date')
-    e_u_p = fields.Float('EPSA Unit price')
-    EPSA_winner = fields.Char('EPSA Winner manufacturer')
+    e_u_p = fields.Float('EPSS Unit price')
+    EPSA_winner = fields.Char('EPSS Winner manufacturer')
+
+
+class purchase_request_expected_costs(models.Model):
+    _name = 'droga.purhcase.request.expected.cost'
+
+    pr_line = fields.Many2one('droga.purhcase.request.line')
+    purhcase_request_id = fields.Many2one(
+        related='pr_line.purhcase_request_id', store=True)
+
+    tax_amount = fields.Float("Tax Amount based on Invoice value (Birr)")
+    demurrage_cost = fields.Float("Demurrage Cost")
+    estimated_arriving_cost = fields.Float("Estimated Arriving Cost")
+    expected_selling_price = fields.Float(
+        "Expected selling price by 50% margin")
+    port_of_loading = fields.Float("Port of loading")
+    less_container = fields.Selection(
+        [('Yes', 'Yes'), ('No', 'No')], string="Less Container if by sea")
+    estimated_arrival_date = fields.Date("Estimated Warehouse arival dat")
+    unassembled_form = fields.Boolean(
+        "Can the product imported in unassembled form")
