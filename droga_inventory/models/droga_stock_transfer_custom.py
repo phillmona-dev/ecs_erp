@@ -39,7 +39,7 @@ class droga_stock_transfer_custom(models.Model):
         for user_group in user_groups_list:
             given_ules=user_group.rule_groups
             for rule in given_ules:
-                if 512 in rule.model_id.ids:
+                if 'Warehouse' in rule.model_id.name:
                     compiled_domain.append(rule.domain_force.strip().replace("[('code', '=', ",'').replace("'",'').replace(')]',''))
 
         if len(compiled_domain)==0:
