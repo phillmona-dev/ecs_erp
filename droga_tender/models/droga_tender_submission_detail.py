@@ -99,8 +99,8 @@ class droga_tender_submission_detail(models.Model):
                 "lot_number": self.lot_number,
                 "quantity": self.quantity,
                 "type_item": self.type_item.id,
-                "unit_price": self.unit_price,
-                "amount": self.unit_price * self.quantity,
+                "unit_price": vals['unit_price'] if 'unit_price' in vals else self.unit_price,
+                "amount": (vals['unit_price'] if 'unit_price' in vals else self.unit_price) * self.quantity,
                 "item_des": self.item_des,
                 "parent_tender_performance": self.parent_tender_submission.id,
             }
