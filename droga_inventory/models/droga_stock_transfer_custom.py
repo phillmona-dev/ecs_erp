@@ -99,7 +99,7 @@ class droga_stock_transfer_custom(models.Model):
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'INT'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'INTOUT'), ('warehouse_id', '=', wh.id)]).id
             def_location_id=self.env['stock.location'].search([('complete_name','like',wh.code+'/Stock%'),('usage','=','internal')])[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")

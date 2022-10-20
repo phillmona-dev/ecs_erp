@@ -200,7 +200,7 @@
         </record>
 
          <record id="seq_goods_return_ws" model="ir.sequence">
-            <field name="name">Goods return wS store</field>
+            <field name="name">Goods return WS store</field>
             <field name="code">droga.inventory.goods.return.sequence.ws</field>
             <field name="prefix">WGR/WS/%(y)s/</field>
             <field name="suffix"></field>

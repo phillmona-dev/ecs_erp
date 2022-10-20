@@ -12,7 +12,7 @@
         <field name="arch" type="xml">
             <tree string="">
                 <field name="name"></field>
-                <field name="transfer_reference" options="{'no_create':True,'no_open':True}"></field>
+                <field name="transfer_reference"></field>
                 <field name="location_dest_id"></field>
                 <field name="state"></field>
             </tree>
@@ -37,7 +37,7 @@
                     <group>
                         <group>
                             <field name="location_filter" invisible="1"></field>
-                            <field name="location_dest_id" domain="location_filter" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="location_dest_id" options="{'no_create':True,'no_open':True}" domain="location_filter" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
                             <field name="transfer_reference" attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
                         </group>
                         <group>
@@ -49,14 +49,14 @@
                             <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
                                 <tree editable="bottom">
                                     <field name="company_id" invisible="1"/>
-                                    <field name="product_id" required="1" context="{'default_detailed_type': 'product'}"/>
+                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
                                     <field name="product_uom"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom_qty" string="Request"/>
                                     <!--
                                     <field name="location_source_id" domain="([('usage','=','internal')])" string="Source location"/>
                                     -->
-                                    <field name="warehouse_id"></field>
+                                    <field name="warehouse_id" options="{'no_create':True,'no_open':True}"></field>
                                 </tree>
                             </field>
                         </page>
