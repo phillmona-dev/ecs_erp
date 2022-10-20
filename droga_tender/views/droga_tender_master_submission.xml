@@ -74,7 +74,7 @@
                     <notebook>
                         <page string="Tender Submission Detail Financial">
                             <field name="detail_submissions_fin" mode="tree">
-                                <tree editable="bottom">
+                                <tree editable="1" create="0">
                                     <field name="lot_number"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product" options="{'no_create':True,'no_open':True}"/>

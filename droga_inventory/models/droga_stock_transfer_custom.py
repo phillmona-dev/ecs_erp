@@ -93,7 +93,7 @@ class droga_stock_transfer_custom(models.Model):
         warehouse_list=self.detail_entries['warehouse_id']
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'INT'),('warehouse_id', 'like', wh.id)]).id
+                [('sequence_code', '=', 'INTOUT'),('warehouse_id', 'like', wh.id)]).id
             if not pick_type_id :
                 raise UserError("Picking type is not configured for one of the warehouses.")
 

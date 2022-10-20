@@ -65,9 +65,9 @@ class droga_tender_submission_detail(models.Model):
     def create(self, vals_list):
         if vals_list["quantity"]==0:
             raise UserError("Quantity can not be zero.")
-
-        if vals_list["status"]=="awarded":
-            to_create_perf_eval = {
+        if "status" in vals_list:
+            if vals_list["status"]=="awarded":
+                to_create_perf_eval = {
                     "lot_number": vals_list["lot_number"],
                     "quantity": vals_list["quantity"],
                     "unit_price":vals_list["unit_price"],
@@ -76,15 +76,15 @@ class droga_tender_submission_detail(models.Model):
                     "item_des":vals_list["item_des"],
                     "parent_tender_performance": vals_list["parent_tender_submission"],
                 }
-            self.env["droga.tender.performance.evaluation"].create(to_create_perf_eval)
+                self.env["droga.tender.performance.evaluation"].create(to_create_perf_eval)
 
-            to_create_cont_agreement = {
+                to_create_cont_agreement = {
                 "lot_number": vals_list["lot_number"],
                 "type_item": vals_list["type_item"],
                 "item_des": vals_list["item_des"],
                 "parent_tender_contract": vals_list["parent_tender_submission"],
             }
-            self.env["droga.tender.contract"].create(to_create_cont_agreement)
+                self.env["droga.tender.contract"].create(to_create_cont_agreement)
 
         return super().create(vals_list)
 
