@@ -1,5 +1,9 @@
 import calendar
 import datetime
+try:
+    from calendar import monthlen
+except ImportError:
+    from calendar import _monthlen as monthlen
 
 from odoo import models, fields, api
 
