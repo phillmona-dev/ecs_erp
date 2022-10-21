@@ -61,7 +61,7 @@ class customer_visit_header(models.Model):
         monday_found=False
 
         #The schedule starts from Monday and excludes sunday
-        for i in range(1, calendar.monthlen(yearp, monthp) + 1):
+        for i in range(1, monthlen(yearp, monthp) + 1):
             if (monday_found or datetime.date(yearp, monthp, i).weekday()==0) and (datetime.date(yearp, monthp, i).weekday() not in (5,6)):
                 monday_found=True
                 dates.append(datetime.date(yearp, monthp, i))
@@ -73,7 +73,7 @@ class customer_visit_header(models.Model):
         else:
             monthp=monthp+1
 
-        for i in range(1, calendar.monthlen(yearp, monthp) + 1):
+        for i in range(1, monthlen(yearp, monthp) + 1):
             if datetime.date(yearp, monthp, i).weekday() not in (0,5,6):
                 dates.append(datetime.date(yearp, monthp, i))
             else:
