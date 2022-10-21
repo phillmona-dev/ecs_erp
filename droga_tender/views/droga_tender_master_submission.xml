@@ -28,6 +28,13 @@
         </field>
     </record>
 
+<record id="action_import_tender_details" model="ir.actions.client">
+        <field name="name">Employees Import</field>
+        <field name="tag">import</field>
+        <field name="params">{ 'model': 'droga.tender.submission.detail','parent_tender_submission': 1 }</field>
+    <field name="context">{ 'default_parent_tender_submission': 1 }</field>
+    </record>
+
     <record id="droga_tender_upcoming_view_form" model="ir.ui.view">
         <field name="name">droga.tender.upcoming.view.form</field>
         <field name="model">droga.tender.master</field>
@@ -38,7 +45,7 @@
                     <div class="oe_button_box" name="button_box">
 
                             <button icon="fa-credit-card-alt" type="object" string="Bid Security" name="bid_security_open" class="oe_stat_button" ></button>
-
+                         <button icon="fa-credit-card-alt" name="%(action_import_tender_details)d" string="Import submission details"  class="oe_stat_button"  type="action"/>
                         </div>
 
                 <notebook>
@@ -46,13 +53,15 @@
 
                     <page string="Tender Submission Detail Technical">
                             <field name="detail_submissions_tec" mode="tree">
-                                <tree editable="bottom">
+                                <tree editable="bottom" multi_line="1">
 
                                     <field name="lot_number"/>
+                                    <field name="item_num"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product" options="{'no_create':True,'no_open':True}"/>
                                     <field name="item_des"/>
                                     <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="uom_free_field"></field>
                                     <field name="quantity"/>
                                     <field name="supplier" options="{'no_create':True,'no_open':True}"/>
                                     <field name="supplier_new"/>
@@ -76,10 +85,10 @@
                             <field name="detail_submissions_fin" mode="tree">
                                 <tree editable="1" create="0">
                                     <field name="lot_number"/>
+                                    <field name="item_num"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product" options="{'no_create':True,'no_open':True}"/>
                                     <field name="item_des"/>
-                                    <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
                                     <field name="quantity"/>
                                     <field name="unit_price" widget='monetary'/>
                                     <field name="amount" widget='monetary'/>
@@ -146,6 +155,7 @@
         </field>
 
     </record>
+
 
     <record id="droga_tender_upcoming_search_tree" model="ir.ui.view">
         <field name="name">droga.tender.upcoming.search.tree</field>

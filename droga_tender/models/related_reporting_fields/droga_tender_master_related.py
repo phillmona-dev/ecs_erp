@@ -6,12 +6,12 @@ class droga_tender_master_related(models.Model):
     cus_type = fields.Many2one(related='customer.cust_type_ext', string='Customer type',store=True)
     phone_add = fields.Char(related='customer.phone', string='Phone number')
     awarded_amt_total=fields.Float('Awarded total amount',compute='_compute_awarded_amt_total',store=True)
-    performance_amt_sent=fields.Float('Amount sent',compute='_compute_amt_performance',store=True)
-    performance_amt_award=fields.Float('Amount awarded',compute='_compute_amt_performance',store=True)
+    performance_amt_sent=fields.Float('Total Quotation',compute='_compute_amt_performance',store=True)
+    performance_amt_award=fields.Float('Total award',compute='_compute_amt_performance',store=True)
     performance_pct=fields.Float('Percentage performance',compute='_compute_amt_performance',store=True)
     award_folder=fields.Char(related='detail_submissions_fin.award_fold_num')
     item_types=fields.Text('Item / types',compute='_get_item_types')
-    tender_amt_participated=fields.Float('Amount participated',compute='_compute_awarded_amt_total')
+    tender_amt_participated=fields.Float('Total Quotation',compute='_compute_awarded_amt_total')
 
     @api.depends('detail_submissions_fin.amount','detail_submissions_fin.status')
     def _compute_awarded_amt_total(self):
@@ -29,15 +29,12 @@ class droga_tender_master_related(models.Model):
     @api.depends('detail_performance.amount', 'detail_performance.award_cost')
     def _compute_amt_performance(self):
         for rec in self:
-            amount = 0
             awarded_cost = 0
             det_performance = rec.detail_performance
             for perf_line in det_performance:
-                amount += perf_line['amount']
                 awarded_cost += perf_line['award_cost']
-            rec.performance_amt_sent = amount
             rec.performance_amt_award = awarded_cost
-            rec.performance_pct=(awarded_cost/amount)*100 if amount!=0 else 0
+            rec.performance_pct=(float(rec.performance_amt_award/rec.tender_amt_participated) )*100 if rec.tender_amt_participated!=0 else 0
 
     @api.depends('detail_tenders.lot_number','detail_tenders.type_item')
     def _get_item_types(self):

@@ -38,6 +38,7 @@
         'views/reports/total_awarded.xml',
         'views/reports/total_performance.xml',
         'views/reports/failed_cancelled.xml',
+        'views/droga_tender_detail_input.xml',
         'data/droga_tender_sequence.xml',
     ],
 

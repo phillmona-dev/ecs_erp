@@ -17,6 +17,8 @@ class droga_tender_submission_detail(models.Model):
     remark = fields.Char("Description and remark")
     award_fold_num = fields.Char("Award folder number")
     supplier_new=fields.Char('New supplier')
+    uom_free_field=fields.Char('UOM unregistered')
+    item_num=fields.Integer('Item Number')
 
     # decimal fields
     quantity=fields.Float("Quantity",default=1)

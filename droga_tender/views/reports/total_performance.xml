@@ -10,7 +10,7 @@
                     <field name="ten_id" string="Tender ID"></field>
                     <field name="customer" ></field>
                     <field name="procurement_title" ></field>
-                    <field name="performance_amt_sent" ></field>
+                    <field name="tender_amt_participated" ></field>
                     <field name="performance_amt_award" ></field>
                     <field name="performance_pct" ></field>
                     <field name="remark"></field>
@@ -26,7 +26,7 @@
                 <field name="ten_id" string="Tender ID"></field>
                     <field name="customer" ></field>
                     <field name="procurement_title" ></field>
-                    <field name="performance_amt_sent" ></field>
+                    <field name="tender_amt_participated" ></field>
                     <field name="performance_amt_award" ></field>
                     <field name="performance_pct" ></field>
                 <field name="cus_type" invisible="1" ></field>

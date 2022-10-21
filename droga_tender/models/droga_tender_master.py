@@ -5,7 +5,7 @@ from ..custom_libraries import eth_to_greg_date_conv
 
 class droga_tender_master(models.Model):
     _name = 'droga.tender.master'
-
+    _rec_name='ten_id'
     #region fields definition
     # Date fields
     posted_date_gre = fields.Date("Posted/floated date GRE",  required=True,compute="conv_posted_date",store=True,inverse='inverse_posted_date')

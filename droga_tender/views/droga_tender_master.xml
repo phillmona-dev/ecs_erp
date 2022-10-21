@@ -6,6 +6,7 @@
             <field name="arch" type="xml">
                 <tree string="">
                     <field name="ten_id" string="Tender ID"></field>
+                    <button icon="fa-credit-card-alt" type="object" string="Submission details" name="sub_detail_open" class="oe_stat_button" ></button>
                     <field name="customer" ></field>
                     <field name="posted_date_gre" string="Floated date"></field>
                     <field name="closing_date_gre" string="Closing date"></field>
@@ -24,7 +25,6 @@
                     <field name="bid_doc_purch_price" invisible="1"></field>
                     <field name="refloat" invisible="1"></field>
                     <field name="status" decoration-success="status == 'active'" decoration-muted="status == 'closed'" widget="badge"></field>
-                    <button icon="fa-credit-card-alt" type="object" string="Submission details" name="sub_detail_open" class="oe_stat_button" ></button>
                 </tree>
             </field>
         </record>
@@ -76,8 +76,6 @@
                                 <field name="extension_date_eth"></field>
                                 <field name="open_date_eth"></field>
                                 <field name="status"></field>
-                                <field name="performance_amt_sent"></field>
-                                <field name="performance_amt_award"></field>
                             </group>
 
 

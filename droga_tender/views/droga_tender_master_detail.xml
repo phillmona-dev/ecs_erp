@@ -18,21 +18,4 @@
                 </tree>
             </field>
         </record>
-
-    <record id="droga_tender_master_detail_view_form" model="ir.ui.view">
-            <field name="name">droga.tender.master.detail.view.form</field>
-            <field name="model">droga.tender.master.detail</field>
-            <field name="arch" type="xml">
-                <form string="">
-
-                    <sheet>
-
-                        <notebook>
-
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-
-        </record>
 </odoo>

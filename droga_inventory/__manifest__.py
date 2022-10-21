@@ -27,6 +27,7 @@
         'views/droga_stock_consignment_receipt.xml',
         'views/droga_stock_consignment_issue.xml',
         'views/droga_stock_location_extension.xml',
+        'views/droga_stock_product_extension.xml',
         'report/xls_stock_card.xml',
     ],
 
