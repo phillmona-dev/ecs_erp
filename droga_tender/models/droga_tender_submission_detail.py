@@ -11,12 +11,13 @@ class droga_tender_submission_detail(models.Model):
 
     #Text fields
     lot_number=fields.Char("Lot Number",required=True)
-    item_des = fields.Char("Item Description")
+    item_des = fields.Char("Item requested")
+    item_pro = fields.Char("Item proposed")
     product=fields.Many2one('product.product','Product')
     brand_model = fields.Char("Brand/Model")
     remark = fields.Char("Description and remark")
     award_fold_num = fields.Char("Award folder number")
-    supplier_new=fields.Char('New supplier')
+    supplier_new=fields.Char('Supplier')
     uom_free_field=fields.Char('UOM unregistered')
     item_num=fields.Integer('Item Number')
 
