@@ -6,7 +6,7 @@
     <field name="res_model">account.loan.type</field>
     <field name="view_mode">tree,form</field>
 </record>
-<menuitem id="loan_type_menu_root" name="Setting" parent="loan_menu_root">
+<menuitem id="loan_type_menu_root" name="Configuration" parent="loan_menu_root">
     <menuitem id="bank_loan_type_menu" name="Bank Loan Type">
         <menuitem id="account_loan_type_menu_action" action="account_loan_type_action"/>
        
