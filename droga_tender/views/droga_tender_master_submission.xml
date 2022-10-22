@@ -58,12 +58,11 @@
                                     <field name="lot_number"/>
                                     <field name="item_num"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="product" options="{'no_create':True,'no_open':True}"/>
                                     <field name="item_des"/>
+                                    <field name="item_pro"/>
                                     <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
                                     <field name="uom_free_field"></field>
                                     <field name="quantity"/>
-                                    <field name="supplier" options="{'no_create':True,'no_open':True}"/>
                                     <field name="supplier_new"/>
                                     <field name="brand_model"/>
                                     <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
@@ -87,8 +86,8 @@
                                     <field name="lot_number"/>
                                     <field name="item_num"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="product" options="{'no_create':True,'no_open':True}"/>
                                     <field name="item_des"/>
+                                    <field name="item_pro"/>
                                     <field name="quantity"/>
                                     <field name="unit_price" widget='monetary'/>
                                     <field name="amount" widget='monetary'/>
@@ -118,6 +117,7 @@
                                     <field name="lot_number"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
                                     <field name="item_des"/>
+                                    <field name="item_pro"/>
                                     <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
                                     <field name="quantity"/>
                                     <field name="unit_price" widget='monetary'/>

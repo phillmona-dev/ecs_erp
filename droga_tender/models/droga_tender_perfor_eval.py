@@ -6,7 +6,8 @@ class droga_tender_master(models.Model):
 
     # Text fields
     lot_number = fields.Char("Lot number")
-    item_des = fields.Char("Item description")
+    item_des = fields.Char("Item requested")
+    item_pro = fields.Char("Item proposed")
 
     # decimal fields
     quantity = fields.Float("Quantity")
