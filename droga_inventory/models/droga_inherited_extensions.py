@@ -23,5 +23,8 @@ class droga_stock_product_extension(models.Model):
         change_default=True, default='', group_expand='_read_group_categ_id',
         required=True, help="Select category for the current product")
     default_code = fields.Char(
-        'Internal Reference', compute='_compute_default_code',
-        inverse='_set_default_code', store=True,required=True)
+        'Internal Reference', store=True,required=True)
+    property_stock_inventory = fields.Many2one(
+        'stock.location', "Inventory Location",
+        company_dependent=True, check_company=True,default='',
+        domain="[('usage', '=', 'internal'), '|', ('company_id', '=', False), ('company_id', '=', allowed_company_ids[0])]")

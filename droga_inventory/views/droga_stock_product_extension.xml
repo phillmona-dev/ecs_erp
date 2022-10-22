@@ -5,10 +5,58 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//form/sheet/notebook/page/group/group[@name='group_standard_price']/field[@name='categ_id']" position="replace">
-                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}" domain="[('complete_name','not like','All%')]"/>
+
+             <!--> Hide print and replinsh buttons -->
+            <xpath expr="//form/header" position="attributes">
+                <attribute name="invisible">True</attribute>
             </xpath>
+
+             <!--> Hide button box -->
+            <xpath expr="//form/sheet/div[@name='button_box']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+             <!--> Hide sales page -->
+            <xpath expr="//form/sheet/notebook/page[@name='sales']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <!--> Hide purchase page -->
+            <xpath expr="//form/sheet/notebook/page[@name='purchase']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <!--> Hide inventory page -->
+            <xpath expr="//form/sheet/notebook/page[@name='inventory']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <!--> General info right side -->
+            <xpath expr="//form/sheet/notebook/page/group/group[@name='group_standard_price']" position="replace">
+                <group>
+                <label for="list_price" class="mt-1"  invisible="1"/>
+                <div name="pricing"  invisible="1">
+                  <field name="list_price" class="oe_inline" widget='monetary'
+                    options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                </div>
+                <label invisible="1" for="standard_price" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
+                <div invisible="1" name="standard_price_uom" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}" class="o_row">
+                    <field name="standard_price" widget='monetary' options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
+                    <span groups="uom.group_uom" class="oe_read_only">per
+                        <field name="uom_name"/>
+                    </span>
+                </div>
+                <field name="property_stock_inventory" string="Default location" options="{'no_create':True,'no_open':True}"/>
+                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}" domain="[('complete_name','not like','All%')]"/>
+                <field name="company_id" groups="base.group_multi_company"
+                    options="{'no_create': True}"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="cost_currency_id" invisible="1"/>
+                <field name="product_variant_id" invisible="1"/>
+                </group>
+            </xpath>
+
         </field>
     </record>
 
-    </odoo>
+</odoo>
