@@ -56,6 +56,42 @@ class customer_visit_header(models.Model):
     def request_approval(self):
         self.state='requested'
 
+    def approve(self):
+        for det in self.plan_detail:
+            descr = det['visit_client'].name if det['visit_client'].name else ''
+            for prod in det['core_products']:
+                descr = ', ' + descr + prod.name
+            if descr=='':
+                continue
+            lead = {
+                'name': descr,
+                'user_id': self.env.user.id,
+                'team_id': 0,  # Fix me
+                'company_id': self.env.company.id,
+                'type': 'lead',
+                'stage_id': 1,
+                'expected_revenue': 0,  # Fix me
+                'date_open': det['visit_date'],
+                'partner_id': det['visit_client'].id,
+                'contact_name': det['visit_contact'].name,
+            }
+            lead_created=self.env['crm.lead'].sudo().create(lead)
+
+            self.env['mail.activity'].sudo().create({
+                'res_model_id': self.env.ref('crm.model_crm_lead').id,
+                'res_name':descr,
+                'res_id': lead_created.id,
+                'user_id': self.env.user.id,
+                'date_deadline':det['visit_date'],
+                'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
+                'summary': descr,
+                'note': descr
+            })
+
+            det['status'] = 'scheduled'
+
+        self.state='approved'
+
     def date_iter(self,yearp, monthp):
         dates=[]
         monday_found=False
@@ -202,7 +238,6 @@ class customer_visit_detail(models.Model):
     ], string='Status', default="active", readonly=True, tracking=True)
 
     def visit_schedule_open(self):
-        self.generate_leads()
         return {
             'name': 'Contact schedule',
             'view_mode': 'tree',
@@ -216,25 +251,4 @@ class customer_visit_detail(models.Model):
             'res_id': self.id,
         }
 
-    def generate_leads(self):
-
-        for det in self:
-            descr = det['visit_client'].name if det['visit_client'].name else ''
-            for prod in det['core_products']:
-                descr=', '+descr+prod.name
-
-            leads = {
-                'name' : descr,
-                'user_id':self.env.user.id,
-                'team_id':0,                            #Fix me
-                'company_id':self.env.company.id,
-                'type' : 'lead',
-                'stage_id': 1,
-                'expected_revenue':0,                   #Fix me
-                'date_open':det['visit_date'],
-                'partner_id' : det['visit_client'].id,
-                'contact_name' : det['visit_contact'].name,
-            }
-            self.env['crm.lead'].create(leads)
-            det['status']='scheduled'
 

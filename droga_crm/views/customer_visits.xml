@@ -25,6 +25,10 @@
                         attrs="{'invisible': [('state', '!=', ('draft'))]}"
                         type="object" string=" Request approval"
                                             name="request_approval" class="oe_stat_button"/>
+                <button icon="fa-credit-card-alt"
+                        attrs="{'invisible': [('state', '!=', ('requested'))]}"
+                        type="object" string=" Approve"
+                                            name="approve" class="oe_stat_button"/>
             </tree>
         </field>
     </record>

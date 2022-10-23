@@ -39,6 +39,7 @@ class droga_tender_submission_detail(models.Model):
     supplier=fields.Many2one('res.partner',string='Existing supplier')
     country = fields.Many2one('res.country', string='Country')
     incoterm=fields.Many2one('droga.tender.settings.incoterm','Incoterm')
+    tender_specs=fields.One2many('droga.tender.specs.detail','submission_detail')
     competi_id = fields.One2many('droga.tender.competitors', 'submission_id')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]})
@@ -64,6 +65,22 @@ class droga_tender_submission_detail(models.Model):
 
         }
 
+    def tech_specs_open(self):
+        return {
+            'name': 'Technical specification',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.tender.submission.detail',
+            'view_id': self.env.ref('droga_tender.droga_tender_specs_view_tree').id,
+            'type': 'ir.actions.act_window',
+
+            # This will pass the detail ID if a record is present
+            'res_id': self.id,
+
+            # When target is new, it will popup else it will use it's own form, wow ferenj
+            'target': 'new',
+
+        }
     @api.model
     def create(self, vals_list):
         if vals_list["quantity"]==0:

@@ -15,7 +15,8 @@ class droga_stock_transfer_custom(models.Model):
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
         ('waiting', 'Requested'),   #When request is waiting for approval/response
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
-        ('done', 'Processed'),      #When request is processed
+        ('processed', 'Processed'),  # When request is processed
+        ('done', 'Received'),      #When request is processed
     ], string='Status', default="draft", readonly=True, tracking=True,
         help=" * Requested: The transfer is requested to the sending warehouse.\n"
              " * Done: The transfer is approved and processed.\n")
@@ -95,7 +96,7 @@ class droga_stock_transfer_custom(models.Model):
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'INTOUT'),('warehouse_id', 'like', wh.id)]).id
             if not pick_type_id :
-                raise UserError("Picking type is not configured for one of the warehouses.")
+                raise UserError("Picking type 'INTOUT' is not configured for one of the warehouses.")
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
@@ -144,6 +145,9 @@ class droga_stock_transfer_custom(models.Model):
 
         self.state = 'waiting'
 
+    def action_receive(self):
+
+        self.state = 'done'
 
 class droga_stock_transfer_custom_detail(models.Model):
     _name = 'droga.inventory.transfer.custom.detail'

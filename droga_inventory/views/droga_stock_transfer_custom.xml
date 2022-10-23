@@ -26,12 +26,15 @@
             <form string="Transfers">
                 <header>
                     <button name="action_request"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done')),('id','=',None)]}"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','processed')),('id','=',None)]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_receive"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','draft')),('id','=',None)]}"
+                            string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_cancel"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done')),('id','=',None)]}"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done','processed')),('id','=',None)]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,processed,done"/>
                 </header>
                 <sheet>
                     <group>
@@ -41,7 +44,7 @@
                             <field name="transfer_reference" attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
                         </group>
                         <group>
-                            <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
                         </group>
                     </group>
                     <notebook>

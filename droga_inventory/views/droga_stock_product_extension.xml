@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
+
 <record id="product_template_inventory_extension" model="ir.ui.view">
         <field name="name">product.template.product.inventory.extension.form</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="priority" eval="10000"/>
         <field name="arch" type="xml">
 
              <!--> Hide print and replinsh buttons -->
@@ -21,6 +23,11 @@
                 <attribute name="invisible">True</attribute>
             </xpath>
 
+            <!--> Hide accounting page -->
+            <xpath expr="//page[@name='invoicing']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
             <!--> Hide purchase page -->
             <xpath expr="//form/sheet/notebook/page[@name='purchase']" position="attributes">
                 <attribute name="invisible">True</attribute>
@@ -31,6 +38,32 @@
                 <attribute name="invisible">True</attribute>
             </xpath>
 
+            <!--> General info left side -->
+            <xpath expr="//form/sheet/notebook/page/group/group[@name='group_general']" position="replace">
+                    <group name="group_general">
+
+                    <label for="list_price" invisible="1"/>
+                      <field name="list_price" invisible="1"/>
+
+
+
+                        <div invisible="1" name="standard_price_uom">
+                            <field name="standard_price" invisible="1"/>
+                        </div>
+                        <div invisible="1" name="pricing"></div>
+
+                        <field name="active" invisible="1"/>
+
+                        <field name="detailed_type" />
+
+                        <field name="uom_id" domain="[('uom_type','=','reference')]" options="{'no_create': True}"/>
+                        <field name="emergency_order_point" />
+                        <field name="maximum_stock_level" />
+                        <field name="average_month_consumption"/>
+                        <field name="uom_po_id" invisible="1" groups="uom.group_uom" options="{'no_create': True}"/>
+                </group>
+            </xpath>
+
             <!--> General info right side -->
             <xpath expr="//form/sheet/notebook/page/group/group[@name='group_standard_price']" position="replace">
                     <group name="group_standard_price">
@@ -39,6 +72,7 @@
                                     <field name="list_price" widget='monetary'/>
 
                                     <field name="property_stock_inventory" string="Default location" options="{'no_create':True,'no_open':True}"/>
+
                                     <field name="product_tag_ids" invisible="1"/>
                                     <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}" domain="[('complete_name','not like','All%')]"/>
                                     <field name="company_id" groups="base.group_multi_company"
@@ -53,3 +87,5 @@
     </record>
 
 </odoo>
+
+

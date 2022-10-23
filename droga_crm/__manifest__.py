@@ -28,8 +28,6 @@
         'views/settings/region.xml',
         'views/settings/city.xml',
         'views/settings/area.xml',
-        'views/settings/location.xml',
-        'views/settings/sub_location.xml',
     ],
 
     # any module necessary for this one to work correctly
