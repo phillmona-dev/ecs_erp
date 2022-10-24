@@ -39,7 +39,7 @@
 
     <menuitem
             id="droga_crm_settings_cust_type"
-            name="Customer type Registry"
+            name="Customer type registry"
             action="droga_crm_cust_type_action"
             parent="crm.crm_menu_config"
             sequence="16"/>

@@ -38,11 +38,11 @@ class contact_working_hours(models.Model):
     def _check_date_end(self):
         for record in self:
             if record.time_to < record.time_from:
-                raise ValidationError("Time to must be greater than time from for "+record.contact_name)+"."
+                raise ValidationError("Time to must be greater than time from for "+str(record.contact_name)+".")
             elif not 0 <= record.time_to <= 24:
-                raise ValidationError("Time to must be between 0 and 24 for "+record.contact_name)+"."
+                raise ValidationError("Time to must be between 0 and 24 for "+str(record.contact_name)+".")
             elif not 0 <= record.time_from <= 24:
-                raise ValidationError("Time from must be between 0 and 24for "+record.contact_name)+"."
+                raise ValidationError("Time from must be between 0 and 24for "+str(record.contact_name)+".")
 class customer_grade(models.Model):
     _name='droga.cust.grade'
     _rec_name = "grade"

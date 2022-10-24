@@ -19,6 +19,8 @@
 
     # always loaded
     'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
         'views/cust_extension.xml',
         'views/customer_visits.xml',
         'views/doctors_schedule.xml',

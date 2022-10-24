@@ -37,7 +37,7 @@
 
     <menuitem
             id="droga_crm_settings_cust_grade"
-            name="Customer grade Registry"
+            name="Customer grade registry"
             action="droga_crm_cust_grade_action"
             parent="crm.crm_menu_config"
             sequence="16"/>
