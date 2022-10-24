@@ -155,10 +155,8 @@ class customer_visit_header(models.Model):
             cust_contacts_schedule=self.env['droga.crm.customers.contacts.view'].search([('cust_id','=',cust.id)])
             for counter in range(1,cust['cust_grade']['visit_times_per_month']+1):
                 for plan_val in plan_vals_all:
-                    date_assigned = False
                     #Creates a visit entry for that customer for that day per week. It also checks for contact availability
-#                    if plan_val['week_num']==counter and plan_val.get("visit_client")==None and plan_val['visit_date'].weekday() in [int(row['day_int']) for row in cust_contacts_schedule]:
-                    if plan_val['week_num'] == counter and plan_val.get("visit_client") == None:
+                    if plan_val['week_num']==counter and plan_val.get("visit_client")==None and plan_val['visit_date'].weekday() in [int(row['day_int']) for row in cust_contacts_schedule]:
                         plan_val.update(visit_client=cust.id)
                         for cust_contact in cust_contacts_schedule:
                             if plan_val['visit_date'].weekday()==int(cust_contact.day_int):
@@ -198,6 +196,9 @@ class customer_visit_header(models.Model):
                             'visit_client':cust.id
                         }
                         plan_vals_all.append(plan_vals)
+                else:
+                    date_assigned=False
+                pass
 
         for p in plan_vals_all:
             self.env['droga.customer.visit.detail'].create(p)

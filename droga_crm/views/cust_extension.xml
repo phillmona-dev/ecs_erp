@@ -37,7 +37,7 @@
 
                     <field name="cust_grade" options="{'no_create':True,'no_open':True}" string="Customer grade"></field>
                     <field name="cust_type_ext" options="{'no_create':True,'no_open':True}" string="Customer type"></field>
-
+                    <field name="area" options="{'no_create':True,'no_open':True}" string="Sales area/team"></field>
                     <field name="location"></field>
 
                 </group>
@@ -53,7 +53,8 @@
         <field name="inherit_id" ref="sales_team.crm_team_view_form" />
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='active']" position="after">
-
+                <field name="area" mode="tree">
+                </field>
             </xpath>
 
         </field>
