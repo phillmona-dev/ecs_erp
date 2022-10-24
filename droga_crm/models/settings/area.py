@@ -4,6 +4,7 @@ from odoo import models, fields, api
 class droga_crm_settings_area(models.Model):
     _name = 'droga.crm.settings.area'
 
+    _rec_name = 'area_name'
     parent_id = fields.Many2one('droga.crm.settings.city','City',required=True)
     area_name = fields.Char("Area name",required=True)
     area_descr = fields.Char("Area description",required=True)
