@@ -13,7 +13,7 @@
         <field name="arch" type="xml">
             <tree string="" editable="top">
                 <field name="parent_id" options="{'no_create':True,'no_open':True}" ></field>
-                <field name="city_name"></field>
+                <field name="city"></field>
                 <field name="city_descr"></field>
                 <field name="status"></field>
             </tree>

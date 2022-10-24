@@ -37,7 +37,7 @@
 
                     <field name="cust_grade" options="{'no_create':True,'no_open':True}" string="Customer grade"></field>
                     <field name="cust_type_ext" options="{'no_create':True,'no_open':True}" string="Customer type"></field>
-                    
+
                     <field name="location"></field>
 
                 </group>

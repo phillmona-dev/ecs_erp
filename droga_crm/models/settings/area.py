@@ -15,5 +15,5 @@ class droga_crm_settings_area(models.Model):
         result = []
         for record in self:
             result.append(
-                (record.id, record.parent_id.city_name+'-'+record.area_name))
+                (record.id, record.parent_id.city+'-'+record.area_name))
         return result

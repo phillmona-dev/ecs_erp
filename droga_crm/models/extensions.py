@@ -14,14 +14,14 @@ class cust_contact_extension(models.Model):
 
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
-    city_name = fields.Many2one('droga.crm.settings.city')
+    city = fields.Many2one('droga.crm.settings.city')
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
 
 class sales_team_extension(models.Model):
     _inherit = 'crm.team'
-    _rec_name = 'city_name'
-    city_name = fields.Many2one('droga.crm.settings.city')
+    _rec_name = 'city'
+    city = fields.Many2one('droga.crm.settings.city')
 
 class contact_working_hours(models.Model):
     _name='droga.cust.contact.working.hours'
