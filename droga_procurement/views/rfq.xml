@@ -92,7 +92,7 @@
                             <field name="purhcase_request_id" readonly="1"/>
                             <field name="date" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
 
-                            <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="1"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="0"/>
                         </group>
                         <group>
                             <field name="remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
@@ -201,7 +201,7 @@
                             <field name="purhcase_request_id" readonly="1"/>
                             <field name="date" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="request_type"/>
-                            <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="1"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="0"/>
                         </group>
                         <group>
                             <field name="remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>

@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_droga_bd_droga_bd,droga_bd.droga_bd,model_droga_bd_droga_bd,base.group_user,1,1,1,1
+access_droga_budget_commitment_budget,droga.budget.commitment.budget,model_droga_budget_commitment_budget,droga_finance.self_service_group,1,1,1,1

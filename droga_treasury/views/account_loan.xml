@@ -7,7 +7,7 @@
 
     <!-- menu for Loan anagment -->
     <menuitem id="loan_menu_root" name="Loan Managment">
-        <menuitem id="bank_loan_menu" name="Tresury">
+        <menuitem id="bank_loan_menu" name="Treasury">
             <menuitem id="account_loan_menu_action" action="account_loan_action"/>
         </menuitem>
     </menuitem>

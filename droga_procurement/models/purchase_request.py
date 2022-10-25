@@ -59,7 +59,7 @@ class purhcase_request(models.Model):
         related="department_manager.user_id", store=True)
 
     branch = fields.Many2one("account.analytic.account", string="Branch", domain=[
-                             ('group_id', '=', 'Branch')])
+                             ('plan_id', '=', 'Profit Center')])
 
     @api.depends("department")
     def _get_manager_id(self):
@@ -69,7 +69,10 @@ class purhcase_request(models.Model):
     @api.model
     def create(self, vals):
         # get sequence number for each company
-        self_comp = self.with_company(self.company_id)
+        company_id = vals.get('company_id', self.default_get(
+            ['company_id'])['company_id'])
+
+        self_comp = self.with_company(company_id)
         vals['name'] = self_comp.env['ir.sequence'].next_by_code(
             'droga.purchase.request') or '/'
         res = super(purhcase_request, self_comp).create(vals)
@@ -104,8 +107,8 @@ class purhcase_request(models.Model):
     # approve request
     def approve_request(self):
         self.write({'state': 'Approved'})
-        # load status steps
-        # self.load_foregin_purchase_status()
+        # record commitment budget
+        self.record_commitment_budget()
 
         return True
 
@@ -134,12 +137,37 @@ class purhcase_request(models.Model):
             # create the record in database
             sta = self.env['droga.purchase.foregin.status'].create(status)
 
+    def record_commitment_budget(self):
+        # record commitement budget when the budget approves
+        for record in self:
+            if record.state == "Approved":
+                # total purchase amount
+                total_purchase_amount = 0
+                for line in record.purhcase_request_lines:
+                    total_purchase_amount += line.total_price
+
+                # create commitment record
+                commitment_budget = {
+                    'document_type': 'PR',
+                    'purchase_request_id': record.id,
+                    'purchase_request_total_amount': total_purchase_amount,
+                    'budget_date':record.request_date,
+                    'company_id': record.company_id.id,
+                    'state': 'Active'
+                }
+
+                # persist to database
+                self.env['droga.budget.commitment.budget'].create(
+                    commitment_budget)
+
 
 class purhcase_request_line(models.Model):
     _name = "droga.purhcase.request.line"
     _description = "Purchase Request Line"
 
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
+    company_id = fields.Many2one(
+        'res.company', related='purhcase_request_id.company_id', string='Company', store=True, readonly=True)
     status = fields.Selection(
         [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Checked", "Budget Checked"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True, related='purhcase_request_id.state')
     product_id = fields.Many2one('product.product', string='Product', domain=[
