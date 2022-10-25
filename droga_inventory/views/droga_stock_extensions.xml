@@ -16,11 +16,28 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//form/header/button[@name='action_confirm']" position="after">
+                <button name="action_purchase_request" attrs="{'invisible': [('state', '=','draft')]}" string="Purchas request" groups="base.group_user" type="object"/>
+            </xpath>
+
             <xpath expr="//form/sheet/group/group/field[@name='origin']" position="replace">
                 <field name="trans_issue_request" attrs="{'invisible': [('trans_issue_request', '=', False)]}"></field>
+                <field name="office_request" attrs="{'invisible': [('office_request', '=', False)]}"></field>
                 <field name="cons_sample_issue_request" attrs="{'invisible': [('cons_sample_issue_request', '=', False)]}"></field>
                 <field name="cons_receive_request" attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
             </xpath>
         </field>
     </record>
+
+    <record id="stock_purchase_request" model="ir.ui.view">
+        <field name="name">droga.purhcase.request.inherited</field>
+        <field name="model">droga.purhcase.request</field>
+        <field name="inherit_id" ref="droga_procurement.droga_purhcase_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group/group/field[@name='purpose']" position="after">
+                <field string='Store origin' name="store_origin_form" attrs="{'invisible': [('store_origin_form', '=', False)]}"></field>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

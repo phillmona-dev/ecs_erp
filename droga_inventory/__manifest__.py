@@ -26,8 +26,9 @@
         'views/droga_stock_transfer_custom.xml',
         'views/droga_stock_consignment_receipt.xml',
         'views/droga_stock_consignment_issue.xml',
-        'views/droga_stock_location_extension.xml',
+        'views/droga_stock_extensions.xml',
         'views/droga_stock_product_extension.xml',
+        'views/droga_stock_office_supplies_request.xml',
         'report/xls_stock_card.xml',
     ],
 
@@ -35,7 +36,7 @@
 
     'depends': ['base',
                 'mail',
-                'resource',
+                'resource','droga_procurement',
                 'web', 'crm'],
     "license": "AGPL-3",
     # only loaded in demonstration mode

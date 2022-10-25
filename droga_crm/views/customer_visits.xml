@@ -29,7 +29,8 @@
                         attrs="{'invisible': [('state', '!=', ('requested'))]}"
                         type="object" string=" Approve"
                                             name="approve" class="oe_stat_button"/>
-            </tree>
+                </tree>
+
         </field>
     </record>
 

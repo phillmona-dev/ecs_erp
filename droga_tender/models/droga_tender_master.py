@@ -148,6 +148,20 @@ class droga_tender_master(models.Model):
             #When target is new, it will popup else it will use it's own form, wow ferenj
             #'target': 'new',
         }
+
+    def pay_req_open(self):
+        return {
+            'name': 'Payment request',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.account.payment.request',
+            'view_id': self.env.ref('droga_finance.droga_account_payment_request_withoutpo_view_form').id,
+            'type': 'ir.actions.act_window',
+
+            'context': {
+                'default_tender_origin_form': self.id,
+            }
+        }
     def name_get(self):
         result = []
         for record in self:

@@ -16,7 +16,7 @@ class droga_stock_transfer_custom(models.Model):
         ('waiting', 'Requested'),   #When request is waiting for approval/response
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
-        ('done', 'Received'),      #When request is processed
+        ('done', 'Received'),      #When request is received
     ], string='Status', default="draft", readonly=True, tracking=True,
         help=" * Requested: The transfer is requested to the sending warehouse.\n"
              " * Done: The transfer is approved and processed.\n")

@@ -10,6 +10,7 @@ from odoo import models, fields, api
 
 class customer_visit_header(models.Model):
     _name='droga.customer.visit.header'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
     _order = 'year desc,month desc'
@@ -121,14 +122,13 @@ class customer_visit_header(models.Model):
         res=super().create(vals_list)
 
         #Get assigned areas
-        areas=self.env['crm.team.member'].search(
+        cities=self.env['crm.team.member'].search(
             [('user_id','=',self.env.user.id)]
-        )['crm_team_id']['area']
+        )['crm_team_id']['city_name']
 
         #Get customers under that area
         custs=self.env['res.partner'].search(
-            #[('area','in',areas.ids)]
-            [('area', 'in', [2])]
+            [('city_name', 'in', cities.ids)]
         )
 
         #custs['cust_grade']['visit_times_per_month']
@@ -152,7 +152,7 @@ class customer_visit_header(models.Model):
         date_assigned=False
         #Iterate over our customers and update visit vals, if no available entry, create a new visit val for doctor schedule
         for cust in custs:
-            cust_contacts_schedule=self.env['droga.crm.customers.contacts.view'].search([('cust_id','=',cust.id)])
+            cust_contacts_schedule=self.env['droga.cust.contact.working.hours'].search([('cust_id','=',cust.id)])
             for counter in range(1,cust['cust_grade']['visit_times_per_month']+1):
                 for plan_val in plan_vals_all:
                     date_assigned = False
@@ -161,7 +161,7 @@ class customer_visit_header(models.Model):
                     if plan_val['week_num'] == counter and plan_val.get("visit_client") == None:
                         plan_val.update(visit_client=cust.id)
                         for cust_contact in cust_contacts_schedule:
-                            if plan_val['visit_date'].weekday()==int(cust_contact.day_int):
+                            if plan_val['visit_date'].weekday()==int(cust_contact.day):
                                 plan_val.update(visit_contact=cust_contact.cont_id)
                                 plan_val.update(planned_visit_time=cust_contact.time_from)
                                 break
@@ -175,11 +175,11 @@ class customer_visit_header(models.Model):
                     cont_id=0
                     planned_time=0
                     for key,value in days_with_weeks.items():
-                        if value[0]==counter and value[1]<min_count and key.weekday() in [int(row['day_int']) for row in cust_contacts_schedule]:
+                        if value[0]==counter and value[1]<min_count:
                             d=key
                             min_count=value[1]
                             for cust_contact in cust_contacts_schedule:
-                                if key.weekday() == int(cust_contact.day_int):
+                                if key.weekday() == int(cust_contact.day):
                                     cont_id=cust_contact.cont_id
                                     planned_time=cust_contact.time_from
                                     break
@@ -241,13 +241,12 @@ class customer_visit_detail(models.Model):
             'name': 'Contact schedule',
             'view_mode': 'tree',
             'view_type': 'form',
-            'res_model': 'droga.crm.customers.contacts.view',
+            'res_model': 'droga.cust.contact.working.hours',
             'context': "{'search_default_group_cust_name':1}",
             'view_id': self.env.ref('droga_crm.droga_crm_doctors_schedule_view_tree').id,
             'type': 'ir.actions.act_window',
-            'domain': [('day', '=', self.visit_date_descr)],
+            'domain': [('day', '=', self.visit_date.weekday())],
             'target': 'new',
-            'res_id': self.id,
         }
 
 

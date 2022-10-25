@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="droga_inventory_office_supplies_request_action" model="ir.actions.act_window">
+        <field name="name">Office supplies request</field>
+        <field name="res_model">droga.inventory.office.supplies.request</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_inventory_office_supplies_request_tree" model="ir.ui.view">
+        <field name="name">droga.inventory.office.supplies.request.tree</field>
+        <field name="model">droga.inventory.office.supplies.request</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="name"></field>
+                <field name="request_reference"></field>
+                <field name="request_date"></field>
+                <field name="state"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_inventory_office_supplies_request_form" model="ir.ui.view">
+        <field name="name">droga.inventory.office.supplies.request.form</field>
+        <field name="model">droga.inventory.office.supplies.request</field>
+        <field name="arch" type="xml">
+            <form string="Office supplies request">
+                <header>
+                    <button name="action_request"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','processed')),('id','=',None)]}"
+                            string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_receive"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','draft')),('id','=',None)]}"
+                            string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_cancel"
+                            attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done','processed')),('id','=',None)]}"
+                            string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,processed,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="requested_by" options="{'no_create':True,'no_open':True}"></field>
+                        </group>
+                        <group>
+                            <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Product Details">
+                            <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
+                                <tree editable="bottom">
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
+                                    <field name="product_uom"/>
+                                    <field name="product_uom_category_id" invisible="1"/>
+                                    <field name="product_uom_qty" string="Request"/>
+                                    <!--
+                                    <field name="location_source_id" domain="([('usage','=','internal')])" string="Source location"/>
+                                    -->
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <menuitem
+            id="droga_stock_office_supplies_request_menu"
+            name="Office supplies request"
+            action="droga_inventory_office_supplies_request_action"
+            groups="base.group_user"
+            parent="stock.menu_stock_warehouse_mgmt"/>
+</odoo>

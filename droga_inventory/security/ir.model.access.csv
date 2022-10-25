@@ -8,4 +8,7 @@ access_inventory_cons_request_detail,droga.inventory.cons.issue.detail,model_dro
 access_inventory_cons_receive,droga.inventory.consignment.receive,model_droga_inventory_consignment_receive,stock.group_stock_user,1,1,1,1
 access_inventory_cons_receive_detail,droga.inventory.cons.receive.detail,model_droga_inventory_cons_receive_detail,stock.group_stock_user,1,1,1,1
 
+access_droga_inventory_office_supplies_request,droga.inventory.office.supplies.request,model_droga_inventory_office_supplies_request,base.group_user,1,1,1,1
+access_droga_inventory_office_supplies_request_detail,droga.inventory.office.supplies.request.detail,model_droga_inventory_office_supplies_request_detail,base.group_user,1,1,1,1
+
 access_inventory_stock_report,droga.inventory.reports.sc.excel,model_droga_inventory_reports_sc_excel,stock.group_stock_user,1,1,1,1

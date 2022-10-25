@@ -88,6 +88,17 @@
         <field name = "domain_force"> ['|','|','|','|','|','|',('code', '=', 'MD'),('code', '=', 'WS'),('code', '=', 'OF'),('code', '=', 'OS'),('code', '=', 'ME'),('code', '=', 'LI'),('code', '=', 'MS')] </field>
     </record>
 
+    <record id = "inventory_of_warehouse_all_read_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]" />
+        <field name = "groups" eval = "[(4, ref ('base.group_user'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "False" />
+        <field name = "perm_create" eval = "False" />
+        <field name = "perm_unlink" eval = "False" />
+        <field name = "domain_force"> [('code', '=', 'OF')] </field>
+    </record>
+
 
 
 

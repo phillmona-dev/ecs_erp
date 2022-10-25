@@ -33,7 +33,9 @@ class contact_working_hours(models.Model):
     #Related reporting fields
     contact_title = fields.Char(related='parent_customer_id.title.name', string='Contact title')
     contact_name = fields.Char(related='parent_customer_id.name',string='Contact name')
+    cont_id = fields.Integer(related='parent_customer_id.id', string='Contact ID')
     customer_name = fields.Char(related='parent_customer_id.parent_id.name',string='Customer name',store=True)
+    cust_id = fields.Integer(related='parent_customer_id.parent_id.id', string='Customer ID', store=True)
 
     @api.constrains('time_from','time_to')
     def _check_date_end(self):

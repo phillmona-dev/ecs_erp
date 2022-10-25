@@ -40,6 +40,7 @@
                         <div class="oe_button_box" name="button_box">
 
                             <button icon="fa-credit-card-alt" type="object" string="Submission details" name="sub_detail_open" class="oe_stat_button" ></button>
+                            <button icon="fa-credit-card-alt" type="object" string="Payment request" name="pay_req_open" class="oe_stat_button" ></button>
 
                         </div>
 
