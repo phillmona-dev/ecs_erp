@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="droga_commitment_budget_main_menu" name="Commitment Budget" sequence="31" parent="account_accountant.menu_accounting" groups="droga_finance.self_service_group">
+        <menuitem id="droga_commitment_budget_menu" name="Commitment Budget Purchase Request" action="droga_budget_commitment_budget_action" groups="droga_finance.self_service_group" sequence="1"/>
+        <menuitem id="droga_commitment_budget_purchase_order_menu" name="Commitment Budget Purchase Order" action="droga_budget_commitment_budget_purchase_order_action" groups="droga_finance.self_service_group" sequence="2"/>
+
+    </menuitem>
+    
+
+</odoo>

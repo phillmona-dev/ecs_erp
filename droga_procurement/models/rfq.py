@@ -45,7 +45,7 @@ class Rfq(models.Model):
     total_winner_amount = fields.Float(
         "Total Winner Amount", compute="_compute_total_winner_amount", store=True, default=0)
 
-    @api.depends('rfq_lines','purhcase_request_id','state')
+    @api.depends('rfq_lines', 'purhcase_request_id', 'state')
     def _compute_total_winner_amount(self):
         for record in self:
             for r in record.rfq_lines:
@@ -84,6 +84,28 @@ class Rfq(models.Model):
                       'status': 'Not Started'}
             # create the record in database
             sta = self.env['droga.purchase.foregin.status'].create(status)
+
+    def record_commitment_budget(self):
+        # record commitement budget when the budget approves
+        for record in self:
+            if record.state == "Approved":
+                # total purchase amount
+                total_purchase_amount = 0
+                for line in record.purhcase_request_lines:
+                    total_purchase_amount += line.total_price
+
+                # create commitment record
+                commitment_budget = {
+                    'document_type': 'PO',
+                    'purchase_request_id': record.id,
+                    'purchase_request_total_amount': total_purchase_amount,
+                    'company_id': record.company_id.id,
+                    'state': 'Active'
+                }
+
+                # persist to database
+                self.env['droga.budget.commitment.budget'].create(
+                    commitment_budget)
 
     @api.model
     def create(self, vals):
@@ -143,6 +165,9 @@ class Rfq(models.Model):
                 suppliers.append(line)
 
         if suppliers:
+            # close the status of purchase request commitment budget
+            self.close_purchase_request_commitment_budget()
+
             for supplier in suppliers:
                 vals = {
                     'name': 'New',
@@ -172,6 +197,20 @@ class Rfq(models.Model):
                 # create purchase orders
                 purchase_order = self.env['purchase.order'].create(vals)
 
+                # create purchase order commitment budget
+                commitment_budget = {
+                    'document_type': 'PO',
+                    'purchase_order_id': purchase_order.id,
+                    'purchase_order_total_amount': purchase_order.amount_total,
+                    'budget_date':purchase_order.date_order,
+                    'company_id': self.company_id.id,
+                    'state': 'Active'
+                }
+
+                # persist to database
+                self.env['droga.budget.commitment.budget'].create(
+                    commitment_budget)
+
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -189,6 +228,13 @@ class Rfq(models.Model):
                 count += 1
         return count
 
+    def close_purchase_request_commitment_budget(self):
+        commitment_budget = self.env['droga.budget.commitment.budget'].search(
+            [('purchase_request_id', '=', self.purhcase_request_id.id)])
+
+        for record in commitment_budget:
+            record.write({'state': 'Closed'})
+
 
 class Rfq_Detail(models.Model):
     _name = 'droga.purhcase.request.rfq.line'
@@ -196,6 +242,8 @@ class Rfq_Detail(models.Model):
     _order = "supplier_name asc"
 
     rfq_id = fields.Many2one("droga.purhcase.request.rfq")
+    company_id = fields.Many2one(
+        'res.company', related='rfq_id.company_id', string='Company', store=True, readonly=True)
     # related fields
     purhcase_request_id = fields.Many2one(related='rfq_id.purhcase_request_id')
     purhcase_request_lines = fields.One2many(
