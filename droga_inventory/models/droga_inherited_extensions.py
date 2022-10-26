@@ -39,9 +39,13 @@ class droga_stock_picking_extension(models.Model):
                 'default_store_origin_form': self.id,
             }
         }
+
     def button_validate(self):
+        if self.state=='processed':
+            return super(droga_stock_picking_extension, self).button_validate()
         if self.origin:
             if self.origin.startswith('MTIV') :
+                self.sudo().action_assign()
                 self.state='processed'
                 trans_requests=self.env['droga.inventory.transfer.custom'].search([('name','=',self.origin)])
                 for rec in trans_requests:
@@ -50,8 +54,10 @@ class droga_stock_picking_extension(models.Model):
                 office_requests = self.env['droga.inventory.office.supplies.request'].search([('name', '=', self.origin)])
                 for rec in office_requests:
                     rec.state = 'processed'
+            else:
+                return super(droga_stock_picking_extension, self).button_validate()
         else:
-            super(droga_stock_picking_extension, self).button_validate()
+            return super(droga_stock_picking_extension, self).button_validate()
 
 class purchase_request_extension(models.Model):
     _inherit = 'droga.purhcase.request'

@@ -12,7 +12,7 @@
         <field name="arch" type="xml">
             <tree string="">
                 <field name="name"></field>
-                <field name="request_reference"></field>
+                <field name="request_picking"></field>
                 <field name="request_date"></field>
                 <field name="state"></field>
             </tree>
@@ -40,6 +40,7 @@
                     <group>
                         <group>
                             <field name="requested_by" options="{'no_create':True,'no_open':True}"></field>
+                            <field name="request_picking" attrs="{'invisible': [('state', 'in', ('draft'))]}" string="Request id" widget="many2many_tags" readonly="1"/>
                         </group>
                         <group>
                             <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>

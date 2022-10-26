@@ -33,7 +33,8 @@ class droga_stock_office_supplies(models.Model):
         "hr.employee", string="Requested By", required=True)
 
 
-    request_reference = fields.Text(string='Request reference', readonly=True)
+    #request_reference = fields.Text(string='Request reference', readonly=True)
+    request_picking=fields.One2many('stock.picking','office_request')
 
     @api.model
     def create(self, vals_list):
@@ -62,31 +63,31 @@ class droga_stock_office_supplies(models.Model):
         pick_type_id = self.env['stock.picking.type'].sudo().search(
             [('sequence_code', '=', 'INTOUT'), ('warehouse_id', '=', wh.id)]).id
         def_location_id=self.env['stock.location'].search([('complete_name','like',wh.code+'/Stock%'),('usage','=','internal')])[0].id
-        def_dest_id = self.env['stock.location'].search([('name', 'like', 'Office supplies expense')])[0]
+        def_dest_id = self.env['stock.location'].search([('name', 'like', 'Office supplies expense')])
 
         if not def_location_id:
             raise UserError("Default internal location is not configured for source warehouse.")
         if not def_dest_id:
-            raise UserError("Default expense location is not configured for office supplies.")
+            raise UserError("Default expense location 'Office supplies expense' is not configured for office supplies.")
         picking_vals = {
             'partner_id': self.company_id.partner_id.id,
             'company_id': self.company_id.id,
             'picking_type_id': pick_type_id,
             'location_id': def_location_id,
-            'location_dest_id': def_dest_id.id,
+            'location_dest_id': def_dest_id[0].id,
             #'auto_generated': True,
             'origin': self.name,
             #'state': 'confirmed',
-            'state': 'draft',
+            'state': 'confirmed',
             'office_request':self.id,
             'scheduled_date': self.request_date
         }
         picking_id = self.env['stock.picking'].sudo().create(picking_vals)
 
-        if not self.request_reference:
-            self.request_reference = picking_id.name + '\n'
-        else:
-            self.request_reference = self.request_reference + picking_id.name + '\n'
+        #if not self.request_reference:
+        #    self.request_reference = picking_id.name + '\n'
+        #else:
+        #    self.request_reference = self.request_reference + picking_id.name + '\n'
 
         for rec in self.detail_entries:
             move_vals = {
@@ -97,9 +98,9 @@ class droga_stock_office_supplies(models.Model):
                 'product_uom': rec['product_uom'].id,
                 'product_uom_qty': rec['product_uom_qty'],
                 'location_id': def_location_id,
-                'location_dest_id': def_dest_id.id,
-                #'state': 'confirmed',
-                'state': 'draft',
+                'location_dest_id': def_dest_id[0].id,
+                #'state': 'confirmed',          Confirmed is waiting status
+                'state': 'confirmed',
                 'company_id': self.company_id.id
             }
 
@@ -126,12 +127,12 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
         'Request',
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True, state={'done': [('readonly', True)]})
-    available_qty = fields.Float('Available', readonly=True, compute="get_count")
+    #available_qty = fields.Float('Available', readonly=True, compute="get_count")
 
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
                                   domain="[('category_id', '=', product_uom_category_id)]")
 
-    @api.depends( 'product_uom_qty', 'product_id', 'product_uom')
+    #@api.depends( 'product_uom_qty', 'product_id', 'product_uom')
     def get_count(self):
         loc_id=self.env['stock.location'].search([('name', 'like', 'Office supplies expense')])[0].id
         for rec in self:

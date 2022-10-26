@@ -35,7 +35,7 @@ class droga_stock_cons_issue(models.Model):
                                    state={'draft': [('readonly', False)]})
 
     consignment_reference = fields.Text(string='Order reference', default='', readonly=True)
-    cons_ref=fields.One2many('stock.picking','cons_sample_issue_request')
+    cons_ref=fields.One2many('stock.picking','cons_sample_issue_request',string='Consignment reference')
 
     @api.model
     def create(self, vals_list):

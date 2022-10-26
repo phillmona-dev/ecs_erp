@@ -71,6 +71,7 @@ class droga_stock_transfer_custom(models.Model):
                                    state={'draft': [('readonly', False)]})
 
     transfer_reference = fields.Text(string='Request reference', readonly=True)
+    transfer_picking=fields.One2many('stock.picking','trans_issue_request',string='Transfer reference')
 
     @api.model
     def create(self, vals_list):
@@ -113,7 +114,7 @@ class droga_stock_transfer_custom(models.Model):
                 #'auto_generated': True,
                 'origin': self.name,
                 #'state': 'confirmed',
-                'state': 'draft',
+                'state': 'confirmed',
                 'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
             }
@@ -137,7 +138,7 @@ class droga_stock_transfer_custom(models.Model):
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
                         #'state': 'confirmed',
-                        'state': 'draft',
+                        'state': 'confirmed',
                         'company_id': self.company_id.id
                     }
 
@@ -146,7 +147,8 @@ class droga_stock_transfer_custom(models.Model):
         self.state = 'waiting'
 
     def action_receive(self):
-
+        for record in self.transfer_picking:
+            record.button_validate();
         self.state = 'done'
 
 class droga_stock_transfer_custom_detail(models.Model):
