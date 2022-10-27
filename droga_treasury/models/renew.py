@@ -28,12 +28,12 @@ class AccountLoanRenew(models.Model):
             current_date=datetime.today()
             cday = current_date.date()
             #if isinstance(record.id, models.NewId):
-            if loans.renew_start_date>loans.acount_loan_id.contract_date:
+            #if loans.renew_start_date>loans.acount_loan_id.contract_date:
 
-                raise ValidationError("Check The Renew Start Date")
-            if loans.renew_date>loans.acount_loan_id.contract_date:
+                #raise ValidationError("Check The Renew Start Date")
+            #if loans.renew_date>loans.acount_loan_id.contract_date:
 
-                raise ValidationError("Check The Renew Date")
+                #raise ValidationError("Check The Renew Date")
             if loans.anual_interest_rate<=0  or loans.payment_amount<=0:
                 raise ValidationError("Check The Interest rate and payment amount")
             if not loans.name:

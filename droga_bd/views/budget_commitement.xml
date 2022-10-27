@@ -10,6 +10,7 @@
                 <field name="document_type" readonly="1"/>
                 <field name="purchase_request_id" readonly="1" string="Reference No" />
                 <field name="budget_date" />
+                <field name="budgetary_position" />
                 <field name="expense_account" options="{'no_create':True,'no_open':True}"/>
                 <field name="company_id" readonly="1"/>
                 <field name="purchase_request_total_amount" readonly="1" sum="Total"/>
@@ -27,6 +28,7 @@
                 <field name="document_type" readonly="1"/>
                 <field name="purchase_order_id" readonly="1" string="Reference No" />
                 <field name="budget_date" />
+                <field name="budgetary_position" options="{'no_create':True,'no_open':True}"/>
                 <field name="expense_account" options="{'no_create':True,'no_open':True}"/>
                 <field name="company_id" readonly="1"/>
                 <field name="purchase_order_total_amount" readonly="1" sum="Total"/>
