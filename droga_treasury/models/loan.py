@@ -399,7 +399,7 @@ class AccountLoan(models.Model):
 
                             penality_range = self.env['account.loan.penality.range'].search(
                                 [('id', '>', 0), ('acount_loan_penality_id', '=', predone.id)], order='id')
-                            for prange in penality_range:
+                            for prange in predone.penality_range_ids:
 
                                 if prange.name == 'upto':
                                     cdate += relativedelta(days=prange.num_days)
