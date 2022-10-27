@@ -12,7 +12,7 @@
         <field name="arch" type="xml">
             <tree string="">
                 <field name="name"></field>
-                <field name="transfer_reference"></field>
+                <field name="transfer_picking" widget="many2many_tags"></field>
                 <field name="location_dest_id"></field>
                 <field name="state"></field>
             </tree>
@@ -41,7 +41,7 @@
                         <group>
                             <field name="location_filter" invisible="1"></field>
                             <field name="location_dest_id" options="{'no_create':True,'no_open':True}" domain="location_filter" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
-                            <field name="transfer_reference" attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
+                            <field name="transfer_picking" readonly="1" widget="many2many_tags" attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
                         </group>
                         <group>
                             <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>

@@ -69,7 +69,7 @@
             <field name="priority" eval="10001"/>
             <field name="arch" type="xml">
 
-                <xpath expr="//form/sheet/notebook/page/group/group/field[@name='uom_po_id']" position="before">
+                <xpath expr="//form/sheet/notebook/page/group/group/field[@name='taxes_id']" position="before">
                     <field name="is_core_product"/>
                 </xpath>
 

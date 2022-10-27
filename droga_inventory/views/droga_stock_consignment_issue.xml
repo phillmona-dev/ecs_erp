@@ -13,7 +13,7 @@
             <tree string="">
                 <field name="name"></field>
                 <field name="customer"></field>
-                <field name="consignment_reference"></field>
+                <field name="cons_ref" widget="many2many_tags" readonly="1"></field>
                 <field name="state"></field>
             </tree>
         </field>
@@ -44,7 +44,7 @@
                         </group>
                         <group>
                             <field name="issue_date" attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
-                            <field name="consignment_reference"></field>
+                            <field name="cons_ref" widget="many2many_tags" readonly="1"></field>
                         </group>
                     </group>
                     <notebook>

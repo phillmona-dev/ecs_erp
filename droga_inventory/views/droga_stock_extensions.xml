@@ -16,15 +16,15 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//form/header/button[@name='action_confirm']" position="after">
+            <xpath expr="//form/header/button[@name='action_cancel']" position="after">
                 <button name="action_purchase_request" attrs="{'invisible': [('state', '=','draft')]}" string="Purchas request" groups="base.group_user" type="object"/>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='origin']" position="replace">
-                <field name="trans_issue_request" attrs="{'invisible': [('trans_issue_request', '=', False)]}"></field>
-                <field name="office_request" attrs="{'invisible': [('office_request', '=', False)]}"></field>
-                <field name="cons_sample_issue_request" attrs="{'invisible': [('cons_sample_issue_request', '=', False)]}"></field>
-                <field name="cons_receive_request" attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
+                <field name="trans_issue_request" readonly="1" attrs="{'invisible': [('trans_issue_request', '=', False)]}"></field>
+                <field name="office_request" readonly="1" attrs="{'invisible': [('office_request', '=', False)]}"></field>
+                <field name="cons_sample_issue_request" readonly="1" attrs="{'invisible': [('cons_sample_issue_request', '=', False)]}"></field>
+                <field name="cons_receive_request" readonly="1" attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
             </xpath>
         </field>
     </record>
