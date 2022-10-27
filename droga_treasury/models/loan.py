@@ -369,7 +369,7 @@ class AccountLoan(models.Model):
                     [('value_date', '<=', da), ('is_paied', '=', True), ('acount_loan_id', '=', predone.id)])
                 crepay = 0
                 for apayment in acount_repay:
-                    crepay += apayment.total_payment
+                    crepay += apayment.principal_repayment
 
         # repayment
                 if predone.loan_schedule_ids:
