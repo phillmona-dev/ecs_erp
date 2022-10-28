@@ -32,6 +32,5 @@ class CrossoveredBudgetLines(models.Model):
                         line.write({'commitment_budget': total_commitment*-1})
 
                     # calculate remaining balance
-                    remaining_balance = line.planned_amount + \
-                        line.practical_amount+line.commitment_budget
-                    line.write({'remaining_balance': remaining_balance})
+                remaining_balance = line.planned_amount + line.practical_amount+line.commitment_budget
+                line.write({'remaining_balance': remaining_balance})
