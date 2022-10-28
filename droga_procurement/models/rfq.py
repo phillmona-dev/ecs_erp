@@ -117,7 +117,7 @@ class Rfq(models.Model):
                 winner_supplier = suppliers[0]
 
                 for supplier in suppliers:
-                    if supplier.total_price < winner_supplier.total_price:
+                    if supplier.unit_price < winner_supplier.unit_price:
                         winner_supplier = supplier
 
                 if winner_supplier:
@@ -131,9 +131,6 @@ class Rfq(models.Model):
         # check if there is no purchase related with the rfq
         puchase_orders = self.env['purchase.order'].search(
             [('rfq_id', '=', self.id)])
-
-        # purchase_request = self.env['droga.purhcase.request'].search(
-        # [('id', '=', self.purhcase_request_id.id)])
 
         if puchase_orders.ids:
             raise UserError(
@@ -178,14 +175,12 @@ class Rfq(models.Model):
                 # create purchase orders
                 purchase_order = self.env['purchase.order'].create(vals)
 
-                # create purchase order commitment budget
-
-                for line in self.rfq_lines:
+            # create purchase order commitment budget
+            for line in self.rfq_lines:
                     if line.winner == "Yes":
                         # get budgetary position and expense account from purchase request
-
                         purchase_request = self.env['droga.purhcase.request.line'].search(
-                            [('purhcase_request_id', '=', self.purhcase_request_id.id), ('product_id', '=', line.product_id)])
+                            [('purhcase_request_id', '=', self.purhcase_request_id.id), ('product_id', '=', line.product_id.id)])
 
                         commitment_budget = {
                             'document_type': 'PO',

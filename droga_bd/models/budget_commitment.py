@@ -59,3 +59,4 @@ class BudgetCommitment(models.Model):
         accounts = self.budgetary_position.account_ids.ids
         return {'domain': {'expense_account': [('id', 'in', (accounts))]}}
 
+    
