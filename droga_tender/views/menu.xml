@@ -2,7 +2,7 @@
 <odoo>
         
 
-    <menuitem id="tender_main_menu" name="Tender" groups="tender_user"
+    <menuitem id="tender_main_menu" name="Tender" groups="tender_user" web_icon="droga_crm,static/description/icon.png"
               sequence="10"/>
 
     <menuitem id="tender_settings_menu" name="Settings" parent="tender_main_menu" groups="tender_manager"

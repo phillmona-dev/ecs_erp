@@ -42,6 +42,7 @@
         'views/reports/total_performance.xml',
         'views/droga_tender_detail_input.xml',
         'data/droga_tender_sequence.xml',
+        'security/tender_scheduled_alerts.xml'
     ],
 
     # any module necessary for this one to work correctly
