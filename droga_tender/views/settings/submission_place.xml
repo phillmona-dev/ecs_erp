@@ -2,7 +2,7 @@
 
 <odoo>
     <record id="droga_tender_settings_submission_place_action" model="ir.actions.act_window">
-        <field name="name">Submission place settings registration</field>
+        <field name="name">Submission places registry</field>
         <field name="res_model">droga.tender.settings.submission.place</field>
         <field name="view_mode">tree,form</field>
     </record>

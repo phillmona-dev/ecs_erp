@@ -2,7 +2,7 @@
 
 <odoo>
     <record id="droga_tender_settings_type_or_item_action" model="ir.actions.act_window">
-        <field name="name">Type/item settings registration</field>
+        <field name="name">Type/items registry</field>
         <field name="res_model">droga.tender.settings.type.item</field>
         <field name="view_mode">tree,form</field>
     </record>

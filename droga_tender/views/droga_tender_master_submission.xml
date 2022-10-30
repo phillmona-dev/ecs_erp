@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <tree string="">
                 <field name="ten_id" string="Tender ID"></field>
-                <field name="customer" ></field>
+                <field name="customer"></field>
                 <field name="posted_date_gre" string="Floated date"></field>
                 <field name="closing_date_gre" string="Closing date"></field>
                 <field name="open_date_gre" invisible="1"></field>
@@ -23,16 +23,17 @@
                 <field name="bid_type" invisible="1"></field>
                 <field name="bid_doc_purch_price" invisible="1"></field>
                 <field name="refloat" invisible="1"></field>
-                <field name="status" decoration-success="status == 'active'" decoration-muted="status == 'closed'" widget="badge"></field>
+                <field name="status" decoration-success="status == 'active'" decoration-muted="status == 'closed'"
+                       widget="badge"></field>
             </tree>
         </field>
     </record>
 
-<record id="action_import_tender_details" model="ir.actions.client">
+    <record id="action_import_tender_details" model="ir.actions.client">
         <field name="name">Employees Import</field>
         <field name="tag">import</field>
         <field name="params">{ 'model': 'droga.tender.submission.detail','parent_tender_submission': 1 }</field>
-    <field name="context">{ 'default_parent_tender_submission': 1 }</field>
+        <field name="context">{ 'default_parent_tender_submission': 1 }</field>
     </record>
 
     <record id="droga_tender_upcoming_view_form" model="ir.ui.view">
@@ -44,14 +45,16 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
 
-                            <button icon="fa-credit-card-alt" type="object" string="Bid Security" name="bid_security_open" class="oe_stat_button" ></button>
-                         <button icon="fa-credit-card-alt" name="%(action_import_tender_details)d" string="Import submission details"  class="oe_stat_button"  type="action"/>
-                        </div>
+                        <button icon="fa-credit-card-alt" type="object" string="Bid Security" name="bid_security_open"
+                                class="oe_stat_button"></button>
+                        <button icon="fa-credit-card-alt" name="%(action_import_tender_details)d"
+                                string="Import submission details" class="oe_stat_button" type="action"/>
+                    </div>
 
-                <notebook>
+                    <notebook>
 
 
-                    <page string="Tender Submission Detail Technical">
+                        <page string="Tender Submission Detail Technical">
                             <field name="detail_submissions_tec" mode="tree">
                                 <tree editable="bottom" multi_line="1">
 
@@ -101,12 +104,11 @@
                                     <field name="award_fold_num"/>
                                     <button icon="fa-credit-card-alt" type="object" string="Competitors"
                                             name="competitors_open" class="oe_stat_button"></button>
-                        </tree>
+                                </tree>
                             </field>
                         </page>
 
                     </notebook>
-
 
 
                     <notebook>
@@ -141,6 +143,8 @@
                                     <field name="ext_deadline"/>
                                     <field name="amount"/>
                                     <field name="remark"/>
+                                    <button icon="fa-credit-card-alt" type="object" string="Sales order"
+                                            name="sales_order_open" class="oe_stat_button"/>
                                     <button icon="fa-credit-card-alt" type="object" string="Advance Security"
                                             name="adv_security_open" class="oe_stat_button"/>
                                     <button icon="fa-credit-card-alt" type="object" string="Performance Security"
@@ -162,10 +166,18 @@
         <field name="arch" type="xml">
             <search string="Upcoming Tenders">
                 <field name="customer"></field>
-                <filter string="Active tenders" domain="[('closing_date_gre', '&gt;', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]" name="is_active"></filter>
-                <filter string="To submit within a week" domain="[('closing_date_gre', '&gt;', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),('closing_date_gre', '&lt;', (context_today()+datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d'))]" name="submit_week"></filter>
-                <filter string="To submit within a month" domain="[('closing_date_gre', '&gt;', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),('closing_date_gre', '&lt;', (context_today()+datetime.timedelta(days=30)).strftime('%%Y-%%m-%%d'))]" name="submit_month"></filter>
-                <filter string="Submitted within the last week" domain="[('closing_date_gre', '&lt;', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),('closing_date_gre', '&gt;', (context_today()-datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d'))]" name="submitted_within3days"></filter>
+                <filter string="Active tenders"
+                        domain="[('closing_date_gre', '&gt;', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"
+                        name="is_active"></filter>
+                <filter string="To submit within a week"
+                        domain="[('closing_date_gre', '&gt;', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),('closing_date_gre', '&lt;', (context_today()+datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d'))]"
+                        name="submit_week"></filter>
+                <filter string="To submit within a month"
+                        domain="[('closing_date_gre', '&gt;', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),('closing_date_gre', '&lt;', (context_today()+datetime.timedelta(days=30)).strftime('%%Y-%%m-%%d'))]"
+                        name="submit_month"></filter>
+                <filter string="Submitted within the last week"
+                        domain="[('closing_date_gre', '&lt;', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),('closing_date_gre', '&gt;', (context_today()-datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d'))]"
+                        name="submitted_within3days"></filter>
             </search>
         </field>
     </record>

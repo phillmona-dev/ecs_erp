@@ -29,6 +29,7 @@
         'views/settings/sec_type.xml',
         'views/settings/incoterm.xml',
         'views/settings/competitors.xml',
+        'views/settings/customers.xml',
         'views/settings/submission_place.xml',
         'views/settings/type_or_item.xml',
         'views/droga_tender_master_submission.xml',
@@ -46,8 +47,8 @@
     # any module necessary for this one to work correctly
 
     'depends': ['base','hr',
-                'mail','droga_crm','hr','droga_finance',
-                'resource','stock',
+                'mail','droga_crm','hr','droga_finance','droga_inventory',
+                'resource','stock','sale',
                 'web','report_xlsx'],
     "license": "AGPL-3",
     # only loaded in demonstration mode

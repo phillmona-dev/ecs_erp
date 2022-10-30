@@ -5,7 +5,10 @@ from ..custom_libraries import eth_to_greg_date_conv
 
 class droga_tender_master(models.Model):
     _name = 'droga.tender.master'
-    _rec_name='ten_id'
+    _description = 'Tender master file'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name='ten_name'
+
     #region fields definition
     # Date fields
     posted_date_gre = fields.Date("Posted/floated date GRE",  required=True,compute="conv_posted_date",store=True,inverse='inverse_posted_date')
@@ -73,11 +76,11 @@ class droga_tender_master(models.Model):
     closing_date_eth = fields.Char("Closing date ETH(dd-mm-yy)",default='')
     float_period = fields.Char("Float period in days")
     ext_period = fields.Char("Extension period in days")
-    bid_submit_place = fields.Char("Bid submission place")
     remark = fields.Char("Remark")
     customer_tender_no = fields.Char("Customer tender no")
     procurement_title=fields.Char('Procurement title')
     ten_id=fields.Char('Droga tender ID')
+    ten_name=fields.Char('Tender description',compute='_get_tender_description')
 
     # Selection fields
     period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')])
@@ -107,7 +110,7 @@ class droga_tender_master(models.Model):
     # relational fields selection
     media = fields.Many2one('droga.tender.settings.media', string='Media')
     bid_submit_place = fields.Many2one('droga.tender.settings.submission.place',string="Bid submission place")
-    customer = fields.Many2one('res.partner', string='Customer', required=True)
+    customer = fields.Many2one('droga.tender.settings.customers', string='Customer', required=True)
     assigned_person = fields.Many2one('hr.employee', string='Assigned Person')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]})
@@ -162,12 +165,33 @@ class droga_tender_master(models.Model):
                 'default_tender_origin_form': self.id,
             }
         }
+
+    def pay_sam_open(self):
+        return {
+            'name': 'Sample request',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.inventory.consignment.issue',
+            'view_id': self.env.ref('droga_inventory.droga_inventory_consignment_issue_view_form').id,
+            'type': 'ir.actions.act_window',
+
+            'context': {
+                'default_tender_origin_form': self.id,
+                'default_issue_type':'SIF'
+            }
+        }
+
     def name_get(self):
         result = []
         for record in self:
             result.append(
                 (record.id, record.ten_id+' - '+ record.customer["name"]+" for "+record.closing_date_gre.strftime("%B %d,%Y")))
             return result
+
+    @api.depends('customer')
+    def _get_tender_description(self):
+        for rec in self:
+            rec.ten_name= rec.ten_id+' - '+ rec.customer["name"]+" for "+rec.closing_date_gre.strftime("%B %d,%Y")
 
     @api.model
     def create(self, vals_list):

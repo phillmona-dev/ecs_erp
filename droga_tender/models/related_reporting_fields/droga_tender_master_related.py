@@ -3,8 +3,8 @@ from odoo import models, fields, api
 
 class droga_tender_master_related(models.Model):
     _inherit='droga.tender.master'
-    cus_type = fields.Many2one(related='customer.cust_type_ext', string='Customer type',store=True)
-    phone_add = fields.Char(related='customer.phone', string='Phone number')
+    cus_type = fields.Many2one(related='customer.customer_type', string='Customer type',store=True)
+    phone_add = fields.Char(related='customer.master_cust_id.phone', string='Phone number')
     awarded_amt_total=fields.Float('Awarded total amount',compute='_compute_awarded_amt_total',store=True)
     performance_amt_sent=fields.Float('Total Quotation',compute='_compute_amt_performance',store=True)
     performance_amt_award=fields.Float('Total award',compute='_compute_amt_performance',store=True)
@@ -12,6 +12,11 @@ class droga_tender_master_related(models.Model):
     award_folder=fields.Char(related='detail_submissions_fin.award_fold_num')
     item_types=fields.Text('Item / types',compute='_get_item_types')
     tender_amt_participated=fields.Float('Total Quotation',compute='_compute_awarded_amt_total')
+
+    #Alert booleans
+    submission_alert_sent=fields.Boolean('Submission alert sent status')
+    opening_alert_sent = fields.Boolean('Opening alert sent status')
+    extension_alert_sent = fields.Boolean('Extension alert sent status')
 
     @api.depends('detail_submissions_fin.amount','detail_submissions_fin.status')
     def _compute_awarded_amt_total(self):

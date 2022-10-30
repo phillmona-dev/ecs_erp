@@ -17,6 +17,7 @@ class droga_tender_master(models.Model):
     # relational fields
     type_item = fields.Many2one('droga.tender.settings.type.item', string='Type or items')
     parent_tender_contract = fields.Many2one('droga.tender.master', required=True)
+    name=fields.Char(related='parent_tender_contract.ten_id')
     performance_security = fields.One2many('droga.tender.security.detail', 'performance_security')
     advance_security = fields.One2many('droga.tender.security.detail', 'advance_security')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
@@ -25,6 +26,10 @@ class droga_tender_master(models.Model):
     #date fields
     signing_date = fields.Date("Signing date GRE")
     agree_deadline = fields.Date("Agreement deadline GRE",compute="compute_agreement_deadline")
+
+    #alert bool fields
+    agree_alert_sent=fields.Boolean('Agreement deadline alert sent')
+    ext_alert_sent = fields.Boolean('Extension deadline alert sent')
     @api.depends("signing_date", "cont_period")
     def compute_agreement_deadline(self):
         for record in self:
@@ -51,6 +56,20 @@ class droga_tender_master(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
             'res_id': self.id
+        }
+
+    def sales_order_open(self):
+        return {
+            'name': 'Sales order',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sale.order',
+            'view_id': self.env.ref('sale.view_order_form').id,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_tender_origin_form': self.id,
+                'default_partner_id': self.parent_tender_contract.customer.master_cust_id.id,
+            }
         }
 
     def performance_security_open(self):
