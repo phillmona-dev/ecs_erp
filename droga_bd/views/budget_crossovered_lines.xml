@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="inherit_for_purchase_order_form" model="ir.ui.view">
+        <field name="name">Cross Overed Budget</field>
+        <field name="model">crossovered.budget</field>
+        <field name="inherit_id" ref="account_budget.crossovered_budget_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='practical_amount']" position="after">
+
+                <field name="commitment_budget" sum="Total" readonly="1"/>
+                <field name="remaining_balance" sum="Total" readonly="1"/>
+            </xpath>
+
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='theoritical_amount']" position="attributes">
+
+                <attribute name="invisible">True</attribute>
+
+            </xpath>
+
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='paid_date']" position="attributes">
+
+                <attribute name="invisible">True</attribute>
+
+            </xpath>
+
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='percentage']" position="attributes">
+
+                <attribute name="invisible">True</attribute>
+
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>

@@ -58,7 +58,7 @@ class purhcase_request(models.Model):
     department_manager_user_id = fields.Many2one(
         related="department_manager.user_id", store=True)
 
-    branch = fields.Many2one("account.analytic.account", string="Branch", domain=[
+    branch = fields.Many2one("account.analytic.account", string="Cost Center", domain=[
                              ('plan_id', '=', 'Profit Center')])
 
     @api.depends("department")
@@ -142,23 +142,24 @@ class purhcase_request(models.Model):
         for record in self:
             if record.state == "Approved":
                 # total purchase amount
-                total_purchase_amount = 0
+                lines_include_in_total = []
                 for line in record.purhcase_request_lines:
-                    total_purchase_amount += line.total_price
 
-                # create commitment record
-                commitment_budget = {
-                    'document_type': 'PR',
-                    'purchase_request_id': record.id,
-                    'purchase_request_total_amount': total_purchase_amount,
-                    'budget_date':record.request_date,
-                    'company_id': record.company_id.id,
-                    'state': 'Active'
-                }
+                    # create commitment record
+                    commitment_budget = {
+                        'document_type': 'PR',
+                        'purchase_request_id': record.id,
+                        'purchase_request_total_amount': line.total_price,
+                        'budget_date': record.request_date,
+                        'budgetary_position': line.budgetary_position.id,
+                        'expense_account': line.expense_account.id,
+                        'company_id': record.company_id.id,
+                        'state': 'Active'
+                    }
 
-                # persist to database
-                self.env['droga.budget.commitment.budget'].create(
-                    commitment_budget)
+                    # persist to database
+                    self.env['droga.budget.commitment.budget'].create(
+                        commitment_budget)
 
 
 class purhcase_request_line(models.Model):
@@ -193,6 +194,9 @@ class purhcase_request_line(models.Model):
     expected_margin = fields.Float('Expected margin')
     arrival_time = fields.Date('Arrival time')
 
+    budgetary_position = fields.Many2one("account.budget.post")
+    expense_account = fields.Many2one("account.account")
+
     remark = fields.Char("Remark")
 
     @api.depends('product_qty', 'unit_price')
@@ -205,6 +209,11 @@ class purhcase_request_line(models.Model):
     def set_unit(self):
         for record in self:
             record.product_uom = record.product_id.uom_id
+
+    @api.onchange('budgetary_position', 'expense_account')
+    def _load_budgetary_position_accounts(self):
+        accounts = self.budgetary_position.account_ids.ids
+        return {'domain': {'expense_account': [('id', 'in', (accounts))]}}
 
 
 class purchase_foregin_status(models.Model):

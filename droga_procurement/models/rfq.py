@@ -45,6 +45,16 @@ class Rfq(models.Model):
     total_winner_amount = fields.Float(
         "Total Winner Amount", compute="_compute_total_winner_amount", store=True, default=0)
 
+    @api.model
+    def create(self, vals):
+        # get sequence number for each company
+        self_comp = self.with_company(self.company_id)
+        vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+            'droga.purchase.request.rfq') or '/'
+        res = super(Rfq, self_comp).create(vals)
+
+        return res
+
     @api.depends('rfq_lines', 'purhcase_request_id', 'state')
     def _compute_total_winner_amount(self):
         for record in self:
@@ -85,38 +95,6 @@ class Rfq(models.Model):
             # create the record in database
             sta = self.env['droga.purchase.foregin.status'].create(status)
 
-    def record_commitment_budget(self):
-        # record commitement budget when the budget approves
-        for record in self:
-            if record.state == "Approved":
-                # total purchase amount
-                total_purchase_amount = 0
-                for line in record.purhcase_request_lines:
-                    total_purchase_amount += line.total_price
-
-                # create commitment record
-                commitment_budget = {
-                    'document_type': 'PO',
-                    'purchase_request_id': record.id,
-                    'purchase_request_total_amount': total_purchase_amount,
-                    'company_id': record.company_id.id,
-                    'state': 'Active'
-                }
-
-                # persist to database
-                self.env['droga.budget.commitment.budget'].create(
-                    commitment_budget)
-
-    @api.model
-    def create(self, vals):
-        # get sequence number for each company
-        self_comp = self.with_company(self.company_id)
-        vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-            'droga.purchase.request.rfq') or '/'
-        res = super(Rfq, self_comp).create(vals)
-
-        return res
-
     def pick_winner(self):
         # update all record to no
         partners = self.env['droga.purhcase.request.rfq.line'].search(
@@ -139,7 +117,7 @@ class Rfq(models.Model):
                 winner_supplier = suppliers[0]
 
                 for supplier in suppliers:
-                    if supplier.total_price < winner_supplier.total_price:
+                    if supplier.unit_price < winner_supplier.unit_price:
                         winner_supplier = supplier
 
                 if winner_supplier:
@@ -197,19 +175,27 @@ class Rfq(models.Model):
                 # create purchase orders
                 purchase_order = self.env['purchase.order'].create(vals)
 
-                # create purchase order commitment budget
-                commitment_budget = {
-                    'document_type': 'PO',
-                    'purchase_order_id': purchase_order.id,
-                    'purchase_order_total_amount': purchase_order.amount_total,
-                    'budget_date':purchase_order.date_order,
-                    'company_id': self.company_id.id,
-                    'state': 'Active'
-                }
+            # create purchase order commitment budget
+            for line in self.rfq_lines:
+                    if line.winner == "Yes":
+                        # get budgetary position and expense account from purchase request
+                        purchase_request = self.env['droga.purhcase.request.line'].search(
+                            [('purhcase_request_id', '=', self.purhcase_request_id.id), ('product_id', '=', line.product_id.id)])
 
-                # persist to database
-                self.env['droga.budget.commitment.budget'].create(
-                    commitment_budget)
+                        commitment_budget = {
+                            'document_type': 'PO',
+                            'purchase_order_id': purchase_order.id,
+                            'purchase_order_total_amount': purchase_order.amount_total,
+                            'budget_date': purchase_order.date_order,
+                            'budgetary_position': purchase_request.budgetary_position.id,
+                            'expense_account': purchase_request.expense_account.id,
+                            'company_id': self.company_id.id,
+                            'state': 'Active'
+                        }
+
+                        # persist to database
+                        self.env['droga.budget.commitment.budget'].create(
+                            commitment_budget)
 
         return {
             'type': 'ir.actions.client',

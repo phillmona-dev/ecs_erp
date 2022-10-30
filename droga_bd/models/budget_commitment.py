@@ -16,8 +16,10 @@ class BudgetCommitment(models.Model):
     paid_amount = fields.Float("Paid Amount", default=0)
     remaining_amount = fields.Float(
         "Remaining Amount", compute="_compute_remaining_amount", store=True)
+    budgetary_position = fields.Many2one("account.budget.post")
     expense_account = fields.Many2one("account.account")
     budget_date = fields.Date("Date")
+    analytic_account_id = fields.Many2one("account.analytic.account")
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
     state = fields.Selection([("Active", "Active"), ("Closed", "Closed")])
@@ -51,3 +53,9 @@ class BudgetCommitment(models.Model):
                 # close the status if the remaining amount is zero
                 if record.remaining_amount <= 0:
                     record.write({'state': 'Closed'})
+
+     # load accounts related with budgetary position
+    @api.onchange('budgetary_position')
+    def _load_budgetary_position_accounts(self):
+        accounts = self.budgetary_position.account_ids.ids
+        return {'domain': {'expense_account': [('id', 'in', (accounts))]}}

@@ -3,17 +3,31 @@
 
     <data noupdate="1">
         <record id="purchase_order_commitment_budget_update_cron" model="ir.cron">
-        <field name="name">Update Paid Purchae Order Commitment Budget</field>
-        <field name="model_id" ref="model_droga_budget_commitment_budget"/>
-        <field name="state">code</field>
-        <field name="code">model.update_paid_amount()</field>
-        <field name="user_id" ref="base.user_root"/>
-        <field name='interval_number'>1</field>
-        <field name='interval_type'>minutes</field>
-        <field name="numbercall">-1</field>
-        <field name="doall" eval="False"/>
+            <field name="name">Update Paid Purchae Order Commitment Budget</field>
+            <field name="model_id" ref="model_droga_budget_commitment_budget"/>
+            <field name="state">code</field>
+            <field name="code">model.update_paid_amount()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name='interval_number'>1</field>
+            <field name='interval_type'>minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
 
-    </record>
- </data>
+        </record>
+
+        <record id="commitment_budget_update_cron" model="ir.cron">
+            <field name="name">Update Commitment Budget</field>
+            <field name="model_id" ref="model_crossovered_budget_lines"/>
+            <field name="state">code</field>
+            <field name="code">model.load_commitment_budget()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name='interval_number'>1</field>
+            <field name='interval_type'>minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+
+        </record>
+
+    </data>
 
 </odoo>
