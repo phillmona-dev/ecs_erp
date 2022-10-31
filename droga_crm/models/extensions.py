@@ -71,7 +71,3 @@ class customer_type(models.Model):
 class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
     plan_id=fields.Many2one('droga.customer.visit.detail')
-
-class crm_product_extension(models.Model):
-    _inherit = 'product.template'
-    is_core_product = fields.Boolean('Is core product for promoters')

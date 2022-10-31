@@ -85,6 +85,7 @@ class droga_stock_product_extension(models.Model):
     emergency_order_point=fields.Float('Emergency order point')
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
+    is_core_product = fields.Boolean('Is core product for promoters')
     def _get_avg_monthly_consumption(self):
         for rec in self:
             rec.average_month_consumption=0

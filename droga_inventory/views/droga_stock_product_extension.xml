@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
-<record id="product_template_inventory_extension" model="ir.ui.view">
+    <record id="product_template_inventory_extension" model="ir.ui.view">
         <field name="name">product.template.product.inventory.extension.form</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="priority" eval="100000000"/>
         <field name="arch" type="xml">
 
-             <!--> Hide print and replinsh buttons -->
+            <!--> Hide print and replinsh buttons -->
             <xpath expr="//form/header" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
 
-             <!--> Hide button box -->
+            <!--> Hide button box -->
             <xpath expr="//form/sheet/div[@name='button_box']" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
 
-             <!--> Hide sales page -->
+            <!--> Hide sales page -->
             <xpath expr="//form/sheet/notebook/page[@name='sales']" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
 
             <!--> Hide accounting page -->
             <xpath expr="//page[@name='invoicing']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
+                <attribute name="invisible">1</attribute>
+            </xpath>
 
             <!--> Hide purchase page -->
             <xpath expr="//form/sheet/notebook/page[@name='purchase']" position="attributes">
@@ -40,41 +40,42 @@
 
             <!--> General info left side -->
             <xpath expr="//form/sheet/notebook/page/group/group[@name='group_general']" position="replace">
-                    <group col="1" name="group_general">
+                <group col="1" name="group_general">
 
                     <label for="list_price" invisible="1"/>
-                      <field name="list_price" invisible="1"/>
+                    <field name="list_price" invisible="1"/>
 
 
+                    <div invisible="1" name="standard_price_uom">
+                        <field name="standard_price" invisible="1"/>
+                    </div>
+                    <div invisible="1" name="pricing"></div>
 
-                        <div invisible="1" name="standard_price_uom">
-                            <field name="standard_price" invisible="1"/>
-                        </div>
-                        <div invisible="1" name="pricing"></div>
+                    <field name="active" invisible="1"/>
+                    <group col="1">
+                        <field name="detailed_type"/>
 
-                        <field name="active" invisible="1"/>
-                        <group col="1">
-                        <field name="detailed_type" />
+                        <field name="emergency_order_point"/>
 
-                        <field name="emergency_order_point" />
-
-                            <field name="maximum_stock_level" />
+                        <field name="maximum_stock_level"/>
 
                         <field name="average_month_consumption"/>
-                        </group>
+                        <field name="is_core_product"/>
+                    </group>
 
-                        <group string="Tracebility">
+                    <group string="Tracebility">
 
-                            <field name="tracking" widget="radio" attrs="{'invisible': [('type', '=', 'service')]}"/>
-                            <field name="use_expiration_date" string="Expiration Date" attrs="{'invisible': [('tracking', '=','none')]}"/>
-                        </group>
+                        <field name="tracking" widget="radio" attrs="{'invisible': [('type', '=', 'service')]}"/>
+                        <field name="use_expiration_date" string="Expiration Date"
+                               attrs="{'invisible': [('tracking', '=','none')]}"/>
+                    </group>
 
-                        <group string="Dates" name="expiry_and_lots" groups="stock.group_production_lot"
-                        attrs="{'invisible': ['|', ('tracking', '=','none'), ('use_expiration_date', '=', False)]}">
+                    <group string="Dates" name="expiry_and_lots" groups="stock.group_production_lot"
+                           attrs="{'invisible': ['|', ('tracking', '=','none'), ('use_expiration_date', '=', False)]}">
                         <label for="expiration_time"/>
                         <div>
                             <field name="expiration_time" class="oe_inline"/>
-                            <span> days after receipt</span>
+                            <span>days after receipt</span>
                         </div>
                         <label for="use_time"/>
                         <div>
@@ -93,36 +94,41 @@
                         </div>
                     </group>
 
-                        <field name="uom_po_id" invisible="1" groups="uom.group_uom" options="{'no_create': True}"/>
+                    <field name="uom_po_id" invisible="1" groups="uom.group_uom" options="{'no_create': True}"/>
                 </group>
             </xpath>
 
             <!--> General info right side -->
             <xpath expr="//form/sheet/notebook/page/group/group[@name='group_standard_price']" position="replace">
-                    <group name="group_standard_price">
+                <group name="group_standard_price">
 
-                        <field invisible="1" name="standard_price" widget='monetary'/>
-                        <field name="list_price" widget='monetary'/>
+                    <field invisible="1" name="standard_price" widget='monetary'/>
+                    <field name="list_price" widget='monetary'/>
 
-                        <field name="property_stock_inventory" string="Default location" options="{'no_create':True,'no_open':True}"/>
-                        <field name="uom_id" options="{'no_create': True}"/>
-                        <field name="categ_id" invisible="1" string="Product Category" options="{'no_create':True,'no_open':True}" domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
-                        <field name="product_tag_ids" invisible="1"/>
+                    <field name="property_stock_inventory" string="Default location"
+                           options="{'no_create':True,'no_open':True}"/>
+                    <field name="uom_id" options="{'no_create': True}"/>
+                    <field name="categ_id" invisible="1" string="Product Category"
+                           options="{'no_create':True,'no_open':True}"
+                           domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
+                    <field name="product_tag_ids" invisible="1"/>
 
-                        <field name="company_id" groups="base.group_multi_company"
-                            options="{'no_create': True}"/>
-                        <field name="currency_id" invisible="1"/>
-                        <field name="cost_currency_id" invisible="1"/>
-                        <field name="product_variant_id" invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company"
+                           options="{'no_create': True}"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="cost_currency_id" invisible="1"/>
+                    <field name="product_variant_id" invisible="1"/>
 
-                        <field name="taxes_id" widget="many2many_tags"/>
+                    <field name="taxes_id" widget="many2many_tags"/>
 
                 </group>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page/group/group/field[@name='taxes_id']" position="before">
-                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}" domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
-                <field name="sub_categ_id" string="Product sub-category" options="{'no_create':True,'no_open':True}" domain="[('complete_name','not like','All%'),('parent_id','=',categ_id)]"/>
+                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
+                       domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
+                <field name="sub_categ_id" string="Product sub-category" options="{'no_create':True,'no_open':True}"
+                       domain="[('complete_name','not like','All%'),('parent_id','=',categ_id)]"/>
             </xpath>
 
         </field>
