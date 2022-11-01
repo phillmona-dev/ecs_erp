@@ -131,6 +131,7 @@ class AccountLoan(models.Model):
         "Interst Renew Date", compute="compute_renew")
     interest_start_date = fields.Date("Interst Start Date", )
     contract_date = fields.Date('Contract Date',required=True)
+    opening_date = fields.Date('Opening Date')
 # integer
     remaining_days = fields.Integer(string="Remaning Days")
     payment_month = fields.Integer('Payment Ranage in Month',required=True)
@@ -161,6 +162,10 @@ class AccountLoan(models.Model):
         'Total Interst', compute='_compute_total_interest')
     cumulative_interest = fields.Float(
         'Cumulative interest', compute='_compute_total_interest')
+    cumulative_penality = fields.Float(
+        'Cumulative Penality', compute='_compute_total_interest')
+    total_penality = fields.Float(
+        'Total Penality', compute='_compute_total_interest')
     cumulative_balance = fields.Float(
         compute='_compute_qty_amount', string="Cumulative Principal Balance")
 
@@ -187,6 +192,9 @@ class AccountLoan(models.Model):
         'account.loan.penality.range', 'acount_loan_penality_id', string="Penality Range")
     monthly_closing_ids = fields.One2many(
         'droga.monthly.close', 'acount_monthly_closing_id', )
+    calculatess = fields.Boolean(
+        string="Compound Interest?", compute='_compute_all_sa')
+     
 
     #loan_renews_ids = fields.One2many('account.loan.renews', 'acount_loan_id', string="Renews")
 
@@ -196,8 +204,8 @@ class AccountLoan(models.Model):
             self.env["account.loan.renew.schedule"].search(
                 [('id', '>', 0), ('acount_loan_id', '=', record.id)]).unlink()
 
-            balance = 0.0000
-            tinte = 0.0000
+            balance = 0.00000000000000000000
+            tinte = 0.0000000000000000000000000000
             num = 0
             current_date = datetime.today()
 
@@ -208,9 +216,9 @@ class AccountLoan(models.Model):
             zdate = record.payment_start_date
             mot = 0
             tadd = 0
-            payment = 0.0000
-            aint = 0.0000
-            total_len = self.env['account.loan.repayment'].search_count([('value_date', '<', ydate),
+            payment = 0.00000000000000000000000000000000000000000000000000
+            aint = 0.0000000000000000000000000000000000000000000000000000000000
+            total_len = self.env['account.loan.repayment.detail'].search_count([('value_date', '<', ydate),
                                                                          ('acount_loan_id', '=', record.id)])
 
             acount_renew = self.env['account.loan.renew'].search(
@@ -225,7 +233,7 @@ class AccountLoan(models.Model):
 
                 if renew:
                     balance = renew.cumulative_balance
-                    tinte = renew.cumulative_balance
+                    tinte = renew.cumulative_interest
                     tday = renew.renew_start_date
                     mot = renew.payment_month
                     tadd = renew.addtional_payment
@@ -242,10 +250,10 @@ class AccountLoan(models.Model):
 
             tadd = tadd+total_sch
             inte = 0
-            dayint = 0.000
-            ipay = 0.00000
+            dayint = 0.0000000000000000000000000000000000000000
+            ipay = 0.000000000000000000000000000000000000000000
             rint = tinte
-            ppay = 0.00000
+            ppay = 0.00000000000000000000000000000000000000000000000
 
             cpay = 0.00000
             i = 0
@@ -296,7 +304,7 @@ class AccountLoan(models.Model):
 
     payment_gene = fields.Boolean(string="Gen?")
     num = fields.Integer('term')
-
+     
     def compute_daily_cron(self):
 
         interst_amount = 0.0000000
@@ -365,11 +373,16 @@ class AccountLoan(models.Model):
                 crecipt = 0
                 for recipt in acount_recipt:
                     crecipt += recipt.receipt
-                acount_repay = self.env['account.loan.repayment'].search(
-                    [('value_date', '<=', da), ('is_paied', '=', True), ('acount_loan_id', '=', predone.id)])
                 crepay = 0
-                for apayment in acount_repay:
-                    crepay += apayment.total_payment
+                for apaymente in predone.loan_repayment_ids:
+                    acount_repay = self.env['account.loan.repayment.detail'].search(
+                        [('value_date', '<=', da),  ('acount_loan_id', '=',apaymente.id)])
+                    
+                    for apayment in acount_repay:
+                        crepay += apayment.principal_repayment
+                        if da==apayment.value_date:
+                            break
+
 
         # repayment
                 if predone.loan_schedule_ids:
@@ -420,10 +433,10 @@ class AccountLoan(models.Model):
                         if ndate:
                             if (ndate < da):
 
-                                if not penality.is_paied:
+                                #  if not penality.is_paied:
 
                                     # penal=0
-                                    penality_amount = penal*cumulative_balance/100
+                                penality_amount = penal*cumulative_balance/100
 
         # itnerest creating
                 if not acount_int:
@@ -439,8 +452,8 @@ class AccountLoan(models.Model):
                     acount_int.daily_penality_rate = day_pint
                     acount_int.daily_interest_rate = day_int
                     acount_int.daily_interest_amount = interst_amount
-
-                    acount_int.daily_penality_amount = penality_amount
+                    if penality_amount>0:
+                        acount_int.daily_penality_amount = penality_amount
                     acount_int.daily_interest_total = interst_amount+penality_amount
                 da = da + relativedelta(days=1)
 
@@ -476,14 +489,17 @@ class AccountLoan(models.Model):
                         for mrecipt in month_acount_recipt:
                             monthrecipt += mrecipt.receipt
                             mrecipt.posted = True
-                        month_acount_repayment = self.env['account.loan.repayment'].search([('value_date', '>=', stday),
-                                                                                            ('value_date', '<', closing_day), ('is_paied', '=', True), ('acount_loan_id', '=', predone.id)])
                         monthrepaymentprincipal = 0
                         monthrepaymentinte = 0
-                        for mrepayment in month_acount_repayment:
-                            monthrepaymentprincipal += mrepayment.principal_repayment
-                            monthrepaymentinte = mrepayment.is_interest
-                            mrepayment.posted = True
+                        for apaymente in predone.loan_repayment_ids:
+                        
+                            month_acount_repayment = self.env['account.loan.repayment.detail'].search([('value_date', '>=', stday),
+                                                                                                ('value_date', '<', closing_day),  ('acount_loan_id', '=',apaymente.id)])
+                            
+                            for mrepayment in month_acount_repayment:
+                                monthrepaymentprincipal += mrepayment.principal_repayment
+                                monthrepaymentinte += mrepayment.is_interest
+                            
                         #acount_pint = self.env['account.loan.int'].search([('value_date', '<', da)])
                         month_acount_inte = self.env['account.loan.int'].search([('value_date', '>=', stday),
                                                                                  ('value_date', '<', closing_day), ('acount_loan_id', '=', predone.id)])
@@ -527,18 +543,23 @@ class AccountLoan(models.Model):
     in some case interest can be added
     cumulative balance=loan amount+reciet+interest-payment """
 
-    @api.depends('loan_repayment_ids', 'loan_receipt_ids', 'loan_interest_ids', 'current_cumlative_balace')
+    @api.depends('loan_repayment_ids', 'loan_receipt_ids', 'loan_interest_ids', 'current_cumlative_balace','payment_month')
     def _compute_qty_amount(self):
         for line in self:
-            balance = 0.0000
-            repay = 0.0000
-            reciep = 0.0000
-            interest = 0.0000
+            balance = 0.00000000000000000000000000000
+            repay = 0.000000000000000000000000000000000
+            reciep = 0.000000000000000000000000000000000000000000
+            interest = 0.000000000000000000000000000000000000000
+            penality=0.000000000000000000000000000000000000000
             recipt = self.env['account.loan.receipt'].search(
                 [('id', '>', 0), ('acount_loan_id', '=', line.id)], order='id', limit=1)
             if recipt:
                 line.interest_start_date = recipt.value_date
-
+                
+                line.payment_start_date=recipt.value_date+relativedelta(months=line.payment_month)
+            if line.current_cumlative_balace:
+                if line.opening_date:
+                    line.interest_start_date=line.opening_date
            #""" calculating total reciept """
             for reciept in line.loan_receipt_ids:
                 reciep += reciept.receipt
@@ -547,11 +568,11 @@ class AccountLoan(models.Model):
                 for repayment in line.loan_repayment_ids:
                     repay += repayment.principal_repayment
             else:
-                for repayment in line.loan_repayment_ids:
-                    if repayment.is_paied:
+                for repayment in line.loan_repayment_ids.loan_repayment_detail_ids:
+                    
                         # if not repayment.is_interest:
-                        repay += repayment.principal_repayment
-                        acount_int = self.env['account.loan.int'].search(
+                    repay += repayment.principal_repayment
+                    acount_int = self.env['account.loan.int'].search(
                             [('value_date', '<=', repayment.value_date), ('acount_loan_id', '=', line.id)])
                         # recipt = self.env['account.loan.receipt'].search([('id','>',0)], order='id', limit=1)
 
@@ -593,23 +614,31 @@ class AccountLoan(models.Model):
             if not record.isinterest:
                 record.cumulative_interest = 0.00
 
-            itotal = 0.00000
-            value = 0.0000
-            repaymenti = 0.00000
-            ctotal = 0.00000
+            itotal = 0.00000000000000000000000000
+            value = 0.00000000000000000000000000000
+            repaymenti = 0.000000000000000000000000000
+            ctotal = 0.00000000000000000000000000000
+            ptotal=0.000000000000000000000000000000000000000000
+            pctotal=0.000000000000000000000000000000000000000000
+            repaymentp = 0.000000000000000000000000000
             for inter in record.loan_interest_ids:
-                itotal += inter.daily_interest_total
+                itotal += inter.daily_interest_amount
+                ptotal+=inter.daily_penality_amount
 
             record.total_interest = itotal+record.current_interest_total
+            record.total_penality=ptotal
             if not record.isinterest:
                 for repay in record.loan_repayment_ids:
                     # if repay.is_interest:
-                    if repay.is_paied:
-                        repaymenti += repay.is_interest
+                    
+                    repaymenti += repay.is_interest
+                    repaymentp+=repay.is_penality
                 ctotal = itotal
             value = ctotal-repaymenti
+            pctotal=ptotal-repaymentp
 
             record.cumulative_interest = value+record.current_cumlative_interest
+            record.cumulative_penality=pctotal
 
     @api.depends("loan_type")
     def _compute_isinterest(self):
@@ -638,7 +667,7 @@ class AccountLoan(models.Model):
                              [3, 10, 'መጋቢት'], [4, 9, 'ሚያዚያ'], [5, 9, 'ግንቦት'], [6, 8, 'ሰኔ']]
 
             month_f = self.env['droga.monthly.close'].search(
-                [('acount_monthly_closing_id', '=', predone.id)])[-1].id
+                [('acount_monthly_closing_id', '=', self.id)])[-1].id
 
             month_finance = self.env['droga.monthly.close'].search(
                 [('id', '=', month_f)])
@@ -673,13 +702,15 @@ class AccountLoan(models.Model):
                 for mrecipt in month_acount_recipt:
                     monthrecipt += mrecipt.receipt
                     # mrecipt.posted=True
-                month_acount_repayment = self.env['account.loan.repayment'].search([('value_date', '>=', stday),
-                                                                                    ('value_date', '<', closing_day), ('is_paied', '=', True), ('acount_loan_id', '=', record.id)])
+                month_acount_repayment = self.env['account.loan.repayment.detail'].search([('value_date', '>=', stday),
+                                                                                    ('value_date', '<', closing_day),  ('acount_loan_id', '=', record.id)])
                 monthrepaymentprincipal = 0
                 monthrepaymentinte = 0
+                monthrepaymentpinte=0
                 for mrepayment in month_acount_repayment:
                     monthrepaymentprincipal += mrepayment.principal_repayment
                     monthrepaymentinte = mrepayment.is_interest
+                    monthrepaymentpinte=mrepayment.is_penality
                     # mrepayment.posted=True
                     #acount_pint = self.env['account.loan.int'].search([('value_date', '<', da)])
                 month_acount_inte = self.env['account.loan.int'].search([('value_date', '>=', stday),
@@ -705,7 +736,7 @@ class AccountLoan(models.Model):
     def _compute_interestdaily(self):
         for record in self:
             record.daily_interest_rate = record.anual_interest_rate/365
-
+           # loan=self.env['account.loan']._compute_all_sa()
     # daily penality calculation
     @api.depends("anual_penalit_rate")
     def _compute_penalitydaily(self):
