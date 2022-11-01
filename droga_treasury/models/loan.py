@@ -218,7 +218,7 @@ class AccountLoan(models.Model):
             tadd = 0
             payment = 0.00000000000000000000000000000000000000000000000000
             aint = 0.0000000000000000000000000000000000000000000000000000000000
-            total_len = self.env['account.loan.repayment'].search_count([('value_date', '<', ydate),
+            total_len = self.env['account.loan.repayment.detail'].search_count([('value_date', '<', ydate),
                                                                          ('acount_loan_id', '=', record.id)])
 
             acount_renew = self.env['account.loan.renew'].search(
@@ -304,7 +304,7 @@ class AccountLoan(models.Model):
 
     payment_gene = fields.Boolean(string="Gen?")
     num = fields.Integer('term')
-    
+     
     def compute_daily_cron(self):
 
         interst_amount = 0.0000000
@@ -373,11 +373,16 @@ class AccountLoan(models.Model):
                 crecipt = 0
                 for recipt in acount_recipt:
                     crecipt += recipt.receipt
-                acount_repay = self.env['account.loan.repayment'].search(
-                    [('value_date', '<=', da), ('is_paied', '=', True), ('acount_loan_id', '=', predone.id)])
                 crepay = 0
-                for apayment in acount_repay:
-                    crepay += apayment.total_payment
+                for apaymente in predone.loan_repayment_ids:
+                    acount_repay = self.env['account.loan.repayment.detail'].search(
+                        [('value_date', '<=', da),  ('acount_loan_id', '=',apaymente.id)])
+                    
+                    for apayment in acount_repay:
+                        crepay += apayment.principal_repayment
+                        if da==apayment.value_date:
+                            break
+
 
         # repayment
                 if predone.loan_schedule_ids:
@@ -428,10 +433,10 @@ class AccountLoan(models.Model):
                         if ndate:
                             if (ndate < da):
 
-                                if not penality.is_paied:
+                                #  if not penality.is_paied:
 
                                     # penal=0
-                                    penality_amount = penal*cumulative_balance/100
+                                penality_amount = penal*cumulative_balance/100
 
         # itnerest creating
                 if not acount_int:
@@ -484,14 +489,17 @@ class AccountLoan(models.Model):
                         for mrecipt in month_acount_recipt:
                             monthrecipt += mrecipt.receipt
                             mrecipt.posted = True
-                        month_acount_repayment = self.env['account.loan.repayment'].search([('value_date', '>=', stday),
-                                                                                            ('value_date', '<', closing_day), ('is_paied', '=', True), ('acount_loan_id', '=', predone.id)])
                         monthrepaymentprincipal = 0
                         monthrepaymentinte = 0
-                        for mrepayment in month_acount_repayment:
-                            monthrepaymentprincipal += mrepayment.principal_repayment
-                            monthrepaymentinte = mrepayment.is_interest
-                            mrepayment.posted = True
+                        for apaymente in predone.loan_repayment_ids:
+                        
+                            month_acount_repayment = self.env['account.loan.repayment.detail'].search([('value_date', '>=', stday),
+                                                                                                ('value_date', '<', closing_day),  ('acount_loan_id', '=',apaymente.id)])
+                            
+                            for mrepayment in month_acount_repayment:
+                                monthrepaymentprincipal += mrepayment.principal_repayment
+                                monthrepaymentinte += mrepayment.is_interest
+                            
                         #acount_pint = self.env['account.loan.int'].search([('value_date', '<', da)])
                         month_acount_inte = self.env['account.loan.int'].search([('value_date', '>=', stday),
                                                                                  ('value_date', '<', closing_day), ('acount_loan_id', '=', predone.id)])
@@ -622,9 +630,9 @@ class AccountLoan(models.Model):
             if not record.isinterest:
                 for repay in record.loan_repayment_ids:
                     # if repay.is_interest:
-                    if repay.is_paied:
-                        repaymenti += repay.is_interest
-                        repaymentp+=repay.is_penality
+                    
+                    repaymenti += repay.is_interest
+                    repaymentp+=repay.is_penality
                 ctotal = itotal
             value = ctotal-repaymenti
             pctotal=ptotal-repaymentp
@@ -659,7 +667,7 @@ class AccountLoan(models.Model):
                              [3, 10, 'መጋቢት'], [4, 9, 'ሚያዚያ'], [5, 9, 'ግንቦት'], [6, 8, 'ሰኔ']]
 
             month_f = self.env['droga.monthly.close'].search(
-                [('acount_monthly_closing_id', '=', predone.id)])[-1].id
+                [('acount_monthly_closing_id', '=', self.id)])[-1].id
 
             month_finance = self.env['droga.monthly.close'].search(
                 [('id', '=', month_f)])
@@ -694,13 +702,15 @@ class AccountLoan(models.Model):
                 for mrecipt in month_acount_recipt:
                     monthrecipt += mrecipt.receipt
                     # mrecipt.posted=True
-                month_acount_repayment = self.env['account.loan.repayment'].search([('value_date', '>=', stday),
-                                                                                    ('value_date', '<', closing_day), ('is_paied', '=', True), ('acount_loan_id', '=', record.id)])
+                month_acount_repayment = self.env['account.loan.repayment.detail'].search([('value_date', '>=', stday),
+                                                                                    ('value_date', '<', closing_day),  ('acount_loan_id', '=', record.id)])
                 monthrepaymentprincipal = 0
                 monthrepaymentinte = 0
+                monthrepaymentpinte=0
                 for mrepayment in month_acount_repayment:
                     monthrepaymentprincipal += mrepayment.principal_repayment
                     monthrepaymentinte = mrepayment.is_interest
+                    monthrepaymentpinte=mrepayment.is_penality
                     # mrepayment.posted=True
                     #acount_pint = self.env['account.loan.int'].search([('value_date', '<', da)])
                 month_acount_inte = self.env['account.loan.int'].search([('value_date', '>=', stday),

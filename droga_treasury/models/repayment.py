@@ -28,9 +28,11 @@ class AccountLoanRepayment(models.Model):
     posted=fields.Boolean(string="Posted?")
     with_out=fields.Boolean(string="with out Penality?")
     reference=fields.Char(string='Reference',)
-    desc=fields.Char(string='Description',)
+    desc=fields.Char(string='Description')
+    num=fields.Integer("num",compute="_thisistest" )
     loan_repayment_detail_ids = fields.One2many(
         'account.loan.repayment.detail', 'acount_loan_id', string="Repayment Detail")
+    
    
     
 
@@ -47,8 +49,28 @@ class AccountLoanRepayment(models.Model):
                 if payment.value_date>cday:
                     raise ValidationError("The Value Date cannot be set in the Furure")
               
-          
-    @api.depends("value_date")
+    @api.onchange('loan_repayment_detail_ids','num')
+    def _thisistest(self):
+        for record in self:
+            kk=record.num
+            if record.loan_repayment_detail_ids:
+                penality=0.0000000000000000000000000
+                intestt=0.000000000000000000000000000
+                total_payment=0.00000000000000000000000
+                pincipal=0.0000000000000000000000000000
+                for detail in record.loan_repayment_detail_ids:
+                    penality+=detail.is_penality
+                    intestt+=detail.is_interest
+                    total_payment+=detail.total_payment
+                    pincipal+=detail.principal_repayment
+                record.total_payment =total_payment
+                record.is_interest =intestt
+                record.is_penality =penality
+                record.principal_repayment =pincipal
+            record.num=penality 
+            
+    
+    @api.depends("value_date","loan_repayment_detail_ids","num")
     def _compute_paied(self):
         for record in self:
             
@@ -115,23 +137,24 @@ class AccountLoanRepayment(models.Model):
                     for interest in ecu_interest:
                         interest.payied=True
                 record.total_payment =record.is_penality+record.is_interest+record.principal_repayment
-                if record.loan_repayment_detail_ids:
-                    penality=0.0000000000000000000000000
-                    intestt=0.000000000000000000000000000
-                    total_payment=0.00000000000000000000000
-                    pincipal=0.0000000000000000000000000000
-                    for detail in record.loan_repayment_detail_ids:
-                        penality+=detail.is_penality
-                        intestt+=detail.is_interest
-                        total_payment+=detail.is_penality
-                        pincipal+=detail.principal_repayment
-                    record.total_payment =total_payment
-                    record.is_interest =intestt
-                    record.is_penality =penality
-                    record.principal_repayment =pincipal
-
+               
            
             else: record.is_paied = False
+            if record.loan_repayment_detail_ids:
+                penality=0.0000000000000000000000000
+                intestt=0.000000000000000000000000000
+                total_payment=0.00000000000000000000000
+                pincipal=0.0000000000000000000000000000
+                for detail in record.loan_repayment_detail_ids:
+                    penality+=detail.is_penality
+                    intestt+=detail.is_interest
+                    total_payment+=detail.total_payment
+                    pincipal+=detail.principal_repayment
+                record.total_payment =total_payment
+                record.is_interest =intestt
+                record.is_penality =penality
+                record.principal_repayment =pincipal
+
     
 
    #penlity calculation and total payment
@@ -254,7 +277,7 @@ class AccountLoanRepaymentDetail(models.Model):
     def _compute_penality(self):
         for penality in self:
            penality.total_payment =penality.is_penality+penality.is_interest+penality.principal_repayment
-
+           penality.acount_loan_id.num+=1
                         
     @api.constrains('value_date')
     def _check_date(self):
