@@ -56,13 +56,18 @@ class droga_tender_master_related(models.Model):
                     type_item=type_item+item_de.type_or_item_name+', '
             rec.item_types=type_item.rstrip(type_item[-1]).rstrip(type_item[-2]) if type_item != '' else type_item
 
-    @api.model
-    def automated_activity_generate(self):
+
+    def update_submission_activity(self):
         for rec in self:
             rec.submission_alert_sent=False
+
+    def update_extension_activity(self):
+        for rec in self:
             rec.extension_alert_sent = False
+
+    def update_opening_activity(self):
+        for rec in self:
             rec.opening_alert_sent = False
-            # Clear bool fields here, change their status to true
 
     @api.model
     def generate_activity(self):
