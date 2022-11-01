@@ -82,7 +82,7 @@ class droga_tender_master_related(models.Model):
                                                        ('closing_date_gre', '<', compare_date_addis),
                                                        ('bid_submit_place.submission_place_name', '=ilike', 'addis')])
         for rec in recs:
-            descr = 'Tender submission for ' + rec['customer'].name +' on '+rec['closing_date_gre'].strftime("%B %d,%Y")
+            descr = 'Tender submission for ' + rec['customer'].name +' is on '+rec['closing_date_gre'].strftime("%B %d,%Y")
             rec['submission_alert_sent'] = True
             if rec['closing_date_gre'] == rec['open_date_gre']:
                 rec['opening_alert_sent'] = True
@@ -104,7 +104,7 @@ class droga_tender_master_related(models.Model):
                                                            'bid_submit_place.submission_place_name', 'not ilike',
                                                            'Addis')])
         for rec in recs:
-            descr = 'Tender submission for ' + rec['customer'].name +' on '+rec['closing_date_gre'].strftime("%B %d,%Y")
+            descr = 'Tender submission for ' + rec['customer'].name +' is on '+rec['closing_date_gre'].strftime("%B %d,%Y")
             rec['submission_alert_sent'] = True
             if rec['closing_date_gre'] == rec['open_date_gre']:
                 rec['opening_alert_sent'] = True
@@ -128,7 +128,7 @@ class droga_tender_master_related(models.Model):
         recs = self.env['droga.tender.master'].search([('opening_alert_sent', '=', False),
                                                        ('open_date_gre', '<', compare_date)])
         for rec in recs:
-            descr = 'Tender open date for ' + rec['customer'].name + ' on ' + rec['open_date_gre'].strftime("%B %d,%Y")
+            descr = 'Tender open date for ' + rec['customer'].name + ' is on ' + rec['open_date_gre'].strftime("%B %d,%Y")
             rec['opening_alert_sent'] = True
 
             for ten_user in tender_users:
@@ -154,7 +154,7 @@ class droga_tender_master_related(models.Model):
                                                        ('bid_submit_place.submission_place_name', '=ilike',
                                                         'addis')])
         for rec in recs:
-            descr = 'Tender extended submission for ' + rec['customer'].name + ' on ' + rec['extension_date_gre'].strftime("%B %d,%Y")
+            descr = 'Tender extended submission for ' + rec['customer'].name + ' is on ' + rec['extension_date_gre'].strftime("%B %d,%Y")
             rec['extension_alert_sent'] = True
             if rec['extension_date_gre'] == rec['open_date_gre']:
                 rec['opening_alert_sent'] = True
@@ -176,7 +176,7 @@ class droga_tender_master_related(models.Model):
                                                        ('bid_submit_place.submission_place_name', 'not ilike',
                                                         'addis')])
         for rec in recs:
-            descr = 'Tender extended submission for ' + rec['customer'].name + ' on ' + rec['extension_date_gre'].strftime("%B %d,%Y")
+            descr = 'Tender extended submission for ' + rec['customer'].name + ' is on ' + rec['extension_date_gre'].strftime("%B %d,%Y")
             rec['submission_alert_sent'] = True
             if rec['extension_date_gre'] == rec['open_date_gre']:
                 rec['opening_alert_sent'] = True
@@ -200,7 +200,7 @@ class droga_tender_master_related(models.Model):
         recs = self.env['droga.tender.submission.detail'].search([('fin_alert_sent', '=', False),
                                                        ('fin_open', '<', compare_date)])
         for rec in recs:
-            descr = 'Tender financial opening for ' + rec['parent_tender_submission'].customer.name + ' on ' + rec['fin_open'].strftime("%B %d,%Y")
+            descr = 'Tender financial opening for ' + rec['parent_tender_submission'].customer.name + ' is on ' + rec['fin_open'].strftime("%B %d,%Y")
             rec['fin_alert_sent'] = True
 
             for ten_user in tender_users:
@@ -223,7 +223,7 @@ class droga_tender_master_related(models.Model):
         recs = self.env['droga.tender.contract'].search([('agree_alert_sent', '=', False),
                                                                   ('agree_deadline', '<', compare_date)])
         for rec in recs:
-            descr = 'Tender contract deadline for ' + rec['parent_tender_contract'].customer.name + ' on ' + rec['agree_deadline'].strftime("%B %d,%Y")
+            descr = 'Tender contract deadline for ' + rec['parent_tender_contract'].customer.name + ' is on ' + rec['agree_deadline'].strftime("%B %d,%Y")
             rec['agree_alert_sent'] = True
 
             for ten_user in tender_users:
@@ -243,7 +243,7 @@ class droga_tender_master_related(models.Model):
         recs = self.env['droga.tender.contract'].search([('ext_alert_sent', '=', False),
                                                          ('ext_deadline', '<', compare_date)])
         for rec in recs:
-            descr = 'Tender contract extension for ' + rec['parent_tender_contract'].customer.name + ' on ' + rec['ext_deadline'].strftime(
+            descr = 'Tender contract extension for ' + rec['parent_tender_contract'].customer.name + ' is on ' + rec['ext_deadline'].strftime(
                 "%B %d,%Y")
             rec['ext_alert_sent'] = True
 
