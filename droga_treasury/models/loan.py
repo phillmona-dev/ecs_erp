@@ -447,8 +447,8 @@ class AccountLoan(models.Model):
                     acount_int.daily_penality_rate = day_pint
                     acount_int.daily_interest_rate = day_int
                     acount_int.daily_interest_amount = interst_amount
-
-                    acount_int.daily_penality_amount = penality_amount
+                    if penality_amount>0:
+                        acount_int.daily_penality_amount = penality_amount
                     acount_int.daily_interest_total = interst_amount+penality_amount
                 da = da + relativedelta(days=1)
 
