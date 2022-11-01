@@ -6,11 +6,11 @@
     <field name="name">droga_monthly_close.view.tree</field>
     <field name="model">droga.monthly.close</field>
     <field name="arch" type="xml">
-        <tree string="Monthly Postings" create="false" edit="false" >
+        <tree string="Monthly Postings" default_order='closing_day, name, et_year' create="false" edit="false" >
             <field name="name"/>
             <field name="acount_monthly_closing_id"/>
             <field name="et_year"/>
-                                    
+                                   
             <field name="Principal_payment"/>
             <field name="Interest_payment"/>
                                     
@@ -22,20 +22,22 @@
     </field>
 </record>
 
+
 <record id="account_loan_monthly_action" model="ir.actions.act_window">
     <field name="name">Financial Closing</field>
     <field name="res_model">droga.monthly.close</field>
+   
     <field name="view_mode">tree</field>
 </record>
 
 <!-- menu for Loan anagment -->
 
    
-    <menuitem id="bank_loan_monthly_menu" name="Monthly Closing" parent="loan_menu_root">
+    <!-- <menuitem id="bank_loan_monthly_menu" name="Monthly Closing" parent="loan_menu_root">
         <menuitem id="account_loan_monthly_menu_action" action="account_loan_monthly_action"/>
        
       
-    </menuitem>
+    </menuitem> -->
 
    
 </odoo>

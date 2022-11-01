@@ -15,7 +15,7 @@ class AccountLoanRenew(models.Model):
     anual_interest_rate=fields.Float(string="Anual Interest %",required=True) 
     anual_penality_rate=fields.Float(string="Anual Penality %",required=True) 
     #payment_range=fields.Integer(string="Period Range in Month")
-    addtional_payment=fields.Integer(string="Addtional No. Payments",required=True)
+    addtional_payment=fields.Integer(string="Addtional Loan Period",required=True)
     renew_date=fields.Date(string="Renewed Date",required=True)
     renew_start_date=fields.Date(string="New Calculation Start Date",required=True)
     cumulative_interest  =fields.Float('Cumulative interest',related='acount_loan_id.cumulative_interest',copy=True,store=True)
@@ -28,12 +28,12 @@ class AccountLoanRenew(models.Model):
             current_date=datetime.today()
             cday = current_date.date()
             #if isinstance(record.id, models.NewId):
-            #if loans.renew_start_date>loans.acount_loan_id.contract_date:
+            if loans.renew_start_date<loans.acount_loan_id.contract_date:
 
-                #raise ValidationError("Check The Renew Start Date")
-            #if loans.renew_date>loans.acount_loan_id.contract_date:
+                raise ValidationError("Check The Renew Start Date and Contract_date")
+            # if loans.renew_date>loans.acount_loan_id.contract_date:
 
-                #raise ValidationError("Check The Renew Date")
+            #     raise ValidationError("Check The Renew Date")
             if loans.anual_interest_rate<=0  or loans.payment_amount<=0:
                 raise ValidationError("Check The Interest rate and payment amount")
             if not loans.name:

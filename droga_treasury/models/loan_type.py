@@ -19,6 +19,7 @@ class AccountLoanInt(models.Model):
     daily_interest_rate=fields.Float('Daily Penality Rate',readonly=True, )
     daily_interest_total=fields.Float('Daily Interest  Total',readonly=True,)
     posted=fields.Boolean(string="Posted?")
+    payied=fields.Boolean(string="Payied?")
     @api.model
     def write(self, values):
         result = super(AccountLoanInt, self).write(values)

@@ -8,6 +8,7 @@
              'views/account_loan.xml',
              'views/monthlyclosing.xml',
              'views/acout_setting.xml',
+             'views/payment_detail.xml',
              'data/crron_interest.xml'],
 
     'installable': True,
