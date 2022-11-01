@@ -25,7 +25,7 @@ class droga_tender_master(models.Model):
 
     #date fields
     signing_date = fields.Date("Signing date GRE")
-    agree_deadline = fields.Date("Agreement deadline GRE",compute="compute_agreement_deadline")
+    agree_deadline = fields.Date("Agreement deadline GRE",compute="compute_agreement_deadline",store=True)
 
     #alert bool fields
     agree_alert_sent=fields.Boolean('Agreement deadline alert sent')
@@ -37,7 +37,7 @@ class droga_tender_master(models.Model):
                 record.agree_deadline = record.signing_date + timedelta(days=record.cont_period)
             else:
                 record.agree_deadline = record.signing_date
-    ext_deadline = fields.Date("Extension deadline GRE",compute="compute_ext_deadline")
+    ext_deadline = fields.Date("Extension deadline GRE",compute="compute_ext_deadline",store=True)
     @api.depends("agree_deadline", "ext_period")
     def compute_ext_deadline(self):
         for record in self:
@@ -55,7 +55,11 @@ class droga_tender_master(models.Model):
             'view_id': self.env.ref('droga_tender.droga_tender_advance_view_form').id,
             'type': 'ir.actions.act_window',
             'target': 'new',
-            'res_id': self.id
+            'res_id': self.id,
+            'context': {
+                'default_tender_id': self.parent_tender_contract.id,
+                'default_security_for': 'Advance security'
+            }
         }
 
     def sales_order_open(self):
@@ -81,7 +85,11 @@ class droga_tender_master(models.Model):
             'view_id': self.env.ref('droga_tender.droga_tender_performance_view_form').id,
             'type': 'ir.actions.act_window',
             'target': 'new',
-            'res_id': self.id
+            'res_id': self.id,
+            'context': {
+                'default_tender_id': self.parent_tender_contract.id,
+                'default_security_for': 'Performance security'
+            }
         }
 
     def performance_security_open_not_used_left_for_reference(self):
@@ -102,5 +110,6 @@ class droga_tender_master(models.Model):
             #Context is used to pass information, on another note domain is used to filter information
             'context':{
                 'default_performance_security':self.id,
+                'default_tender_id':self.parent_tender_contract.id,
             }
         }

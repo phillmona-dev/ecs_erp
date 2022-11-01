@@ -8,10 +8,12 @@ class ModelName(models.Model):
     _name = 'droga.tender.security.detail'
 
     #relation fields
+    tender_id=fields.Many2one('droga.tender.master')
     bid_security=fields.Many2one('droga.tender.master')
     performance_security=fields.Many2one('droga.tender.contract')
     advance_security = fields.Many2one('droga.tender.contract')
     security_type=fields.Many2one('droga.tender.settings.sec.type','Security Type')
+    security_for=fields.Char('Security for')
     bank = fields.Many2one('res.bank', 'Bank')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]})

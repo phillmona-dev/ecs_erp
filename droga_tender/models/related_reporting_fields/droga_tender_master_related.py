@@ -6,31 +6,34 @@ class droga_tender_master_related(models.Model):
     _inherit='droga.tender.master'
     cus_type = fields.Many2one(related='customer.customer_type', string='Customer type',store=True)
     phone_add = fields.Char(related='customer.master_cust_id.phone', string='Phone number')
-    awarded_amt_total=fields.Float('Awarded total amount',compute='_compute_awarded_amt_total',store=True)
-    performance_amt_sent=fields.Float('Total Quotation',compute='_compute_amt_performance',store=True)
-    performance_amt_award=fields.Float('Total award',compute='_compute_amt_performance',store=True)
-    performance_pct=fields.Float('Percentage performance',compute='_compute_amt_performance',store=True)
+    awarded_amt_total=fields.Float('Awarded total amount',compute='_compute_awarded_amt_total',store=True)          #Total tender awarded
+    tender_amt_participated = fields.Float('Total Quotation', compute='_compute_awarded_amt_total', store=True)     #Total tender participated
+    performance_amt_sent=fields.Float('Total Quotation',compute='_compute_amt_performance',store=True)              #Not active
+    performance_amt_award=fields.Float('Total award',compute='_compute_amt_performance',store=True)                 #Not active
+    performance_pct=fields.Float('Percentage performance',compute='_compute_awarded_amt_total',store=True)
     award_folder=fields.Char(related='detail_submissions_fin.award_fold_num')
     item_types=fields.Text('Item / types',compute='_get_item_types')
-    tender_amt_participated=fields.Float('Total Quotation',compute='_compute_awarded_amt_total')
+
 
     #Alert booleans
-    submission_alert_sent=fields.Boolean('Submission alert sent status')
-    opening_alert_sent = fields.Boolean('Opening alert sent status')
-    extension_alert_sent = fields.Boolean('Extension alert sent status')
+    submission_alert_sent=fields.Boolean('Submission alert sent status',default=False)
+    opening_alert_sent = fields.Boolean('Opening alert sent status',default=False)
+    extension_alert_sent = fields.Boolean('Extension alert sent status',default=False)
 
     @api.depends('detail_submissions_fin.amount','detail_submissions_fin.status')
     def _compute_awarded_amt_total(self):
         for rec in self:
             fin_details = rec.detail_submissions_fin
-            amount = 0
+            amo_total = 0
             amt_participated=0
             for fin_line in fin_details:
                 amt_participated+=fin_line['amount']
                 if fin_line['status']=='awarded':
-                    amount += fin_line['amount']
-            rec.awarded_amt_total = amount
+                    amo_total += fin_line['amount']
+            rec.awarded_amt_total = amo_total
             rec.tender_amt_participated=amt_participated
+            rec.performance_pct = (float(
+                rec.awarded_amt_total / rec.tender_amt_participated)) * 100 if rec.tender_amt_participated != 0 else 0
 
     @api.depends('detail_performance.amount', 'detail_performance.award_cost')
     def _compute_amt_performance(self):
@@ -53,20 +56,28 @@ class droga_tender_master_related(models.Model):
                     type_item=type_item+item_de.type_or_item_name+', '
             rec.item_types=type_item.rstrip(type_item[-1]).rstrip(type_item[-2]) if type_item != '' else type_item
 
-    def _run_alert_scheduler(self):
+    @api.model
+    def automated_activity_generate(self):
         for rec in self:
             rec.submission_alert_sent=False
             rec.extension_alert_sent = False
+            rec.opening_alert_sent = False
+            # Clear bool fields here, change their status to true
+
+    @api.model
+    def generate_activity(self):
+        # recs = self.env['droga.tender.master'].search([('closing_date_gre','>=','datetime.datetime.combine(context_today(), datetime.time(0,0,0))')])
+
         tender_users = self.env['res.groups'].search([('name', '=', 'Tender User')])[0]['users']
 
-        # region submission alerts
+        #region submission alerts
         compare_date_addis = datetime.date.today() + datetime.timedelta(days=3)
         compare_date_other = datetime.date.today() + datetime.timedelta(days=5)
         recs = self.env['droga.tender.master'].search([('submission_alert_sent', '=', False),
                                                        ('closing_date_gre', '<', compare_date_addis),
                                                        ('bid_submit_place.submission_place_name', '=ilike', 'addis')])
         for rec in recs:
-            descr = 'Tender submission, 3 days left for ' + rec['ten_name']
+            descr = 'Tender submission for ' + rec['customer'].name +' on '+rec['closing_date_gre'].strftime("%B %d,%Y")
             rec['submission_alert_sent'] = True
             if rec['closing_date_gre'] == rec['open_date_gre']:
                 rec['opening_alert_sent'] = True
@@ -88,7 +99,7 @@ class droga_tender_master_related(models.Model):
                                                            'bid_submit_place.submission_place_name', 'not ilike',
                                                            'Addis')])
         for rec in recs:
-            descr = 'Tender submission, 5 days left for ' + rec['ten_name']
+            descr = 'Tender submission for ' + rec['customer'].name +' on '+rec['closing_date_gre'].strftime("%B %d,%Y")
             rec['submission_alert_sent'] = True
             if rec['closing_date_gre'] == rec['open_date_gre']:
                 rec['opening_alert_sent'] = True
@@ -105,14 +116,14 @@ class droga_tender_master_related(models.Model):
                     'summary': descr,
                     'note': rec['ten_name']
                 })
-        # endregion
+        #endregion
 
         # region open date alerts
         compare_date = datetime.date.today() + datetime.timedelta(days=1)
         recs = self.env['droga.tender.master'].search([('opening_alert_sent', '=', False),
                                                        ('open_date_gre', '<', compare_date)])
         for rec in recs:
-            descr = 'Tender open date, 1 day left for ' + rec['ten_name']
+            descr = 'Tender open date for ' + rec['customer'].name + ' on ' + rec['open_date_gre'].strftime("%B %d,%Y")
             rec['opening_alert_sent'] = True
 
             for ten_user in tender_users:
@@ -128,7 +139,7 @@ class droga_tender_master_related(models.Model):
                     'summary': descr,
                     'note': rec['ten_name']
                 })
-        # endregion
+        #endregion
 
         # region extension date alerts
         compare_date_addis = datetime.date.today() + datetime.timedelta(days=3)
@@ -138,7 +149,7 @@ class droga_tender_master_related(models.Model):
                                                        ('bid_submit_place.submission_place_name', '=ilike',
                                                         'addis')])
         for rec in recs:
-            descr = 'Tender extended submission, 3 days left for ' + rec['ten_name']
+            descr = 'Tender extended submission for ' + rec['customer'].name + ' on ' + rec['extension_date_gre'].strftime("%B %d,%Y")
             rec['extension_alert_sent'] = True
             if rec['extension_date_gre'] == rec['open_date_gre']:
                 rec['opening_alert_sent'] = True
@@ -160,7 +171,7 @@ class droga_tender_master_related(models.Model):
                                                        ('bid_submit_place.submission_place_name', 'not ilike',
                                                         'addis')])
         for rec in recs:
-            descr = 'Tender extended submission, 5 days left for ' + rec['ten_name']
+            descr = 'Tender extended submission for ' + rec['customer'].name + ' on ' + rec['extension_date_gre'].strftime("%B %d,%Y")
             rec['submission_alert_sent'] = True
             if rec['extension_date_gre'] == rec['open_date_gre']:
                 rec['opening_alert_sent'] = True
@@ -179,4 +190,70 @@ class droga_tender_master_related(models.Model):
                 })
         # endregion
 
+        # region financial opening alert
+        compare_date = datetime.date.today() + datetime.timedelta(days=1)
+        recs = self.env['droga.tender.submission.detail'].search([('fin_alert_sent', '=', False),
+                                                       ('fin_open', '<', compare_date)])
+        for rec in recs:
+            descr = 'Tender financial opening for ' + rec['parent_tender_submission'].customer.name + ' on ' + rec['fin_open'].strftime("%B %d,%Y")
+            rec['fin_alert_sent'] = True
+
+            for ten_user in tender_users:
+                self.env['mail.activity'].sudo().create({
+                    'res_model_id': self.env.ref('droga_tender.model_droga_tender_master').id,
+                    'res_name': descr,
+                    'res_id': rec.parent_tender_submission.id,
+                    'automated': True,
+                    'user_id': ten_user.id,
+                    'date_deadline': rec['fin_open'],
+                    'activity_type_id': self.env['mail.activity.type'].search(
+                        [('name', 'like', '%Tender financial opening%')]).id,
+                    'summary': descr,
+                    'note': rec['parent_tender_submission'].ten_name
+                })
+        # endregion
+
+        # region contract agreement deadline
+        compare_date = datetime.date.today() + datetime.timedelta(days=10)
+        recs = self.env['droga.tender.contract'].search([('agree_alert_sent', '=', False),
+                                                                  ('agree_deadline', '<', compare_date)])
+        for rec in recs:
+            descr = 'Tender contract deadline for ' + rec['parent_tender_contract'].customer.name + ' on ' + rec['agree_deadline'].strftime("%B %d,%Y")
+            rec['agree_alert_sent'] = True
+
+            for ten_user in tender_users:
+                self.env['mail.activity'].sudo().create({
+                    'res_model_id': self.env.ref('droga_tender.model_droga_tender_master').id,
+                    'res_name': descr,
+                    'res_id': rec.parent_tender_contract.id,
+                    'automated': True,
+                    'user_id': ten_user.id,
+                    'date_deadline': rec['agree_deadline'],
+                    'activity_type_id': self.env['mail.activity.type'].search(
+                        [('name', 'like', '%Contract agreement deadline%')]).id,
+                    'summary': descr,
+                    'note': rec['parent_tender_contract'].ten_name
+                })
+
+        recs = self.env['droga.tender.contract'].search([('ext_alert_sent', '=', False),
+                                                         ('ext_deadline', '<', compare_date)])
+        for rec in recs:
+            descr = 'Tender contract extension for ' + rec['parent_tender_contract'].customer.name + ' on ' + rec['ext_deadline'].strftime(
+                "%B %d,%Y")
+            rec['ext_alert_sent'] = True
+
+            for ten_user in tender_users:
+                self.env['mail.activity'].sudo().create({
+                    'res_model_id': self.env.ref('droga_tender.model_droga_tender_master').id,
+                    'res_name': descr,
+                    'res_id': rec.parent_tender_contract.id,
+                    'automated': True,
+                    'user_id': ten_user.id,
+                    'date_deadline': rec['ext_deadline'],
+                    'activity_type_id': self.env['mail.activity.type'].search(
+                        [('name', 'like', '%Contract agreement deadline%')]).id,
+                    'summary': descr,
+                    'note': rec['parent_tender_contract'].ten_name
+                })
+        # endregion
 

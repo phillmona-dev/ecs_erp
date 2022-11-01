@@ -4,7 +4,7 @@
         <field name="name">droga.tender.upcoming.view.tree</field>
         <field name="model">droga.tender.master</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" create="false" delete="false">
                 <field name="ten_id" string="Tender ID"></field>
                 <field name="customer"></field>
                 <field name="posted_date_gre" string="Floated date"></field>

@@ -21,6 +21,10 @@ class droga_tender_submission_detail(models.Model):
     uom_free_field=fields.Char('UOM unregistered')
     item_num=fields.Integer('Item Number')
 
+    _sql_constraints = [
+            ('lot_number_item_num_unique', 'unique (lot_number,item_num,month)', 'The combination lot number and item number already exists!')
+        ]
+
     # decimal fields
     quantity=fields.Float("Quantity",default=1)
     unit_price = fields.Float("Unit Price")

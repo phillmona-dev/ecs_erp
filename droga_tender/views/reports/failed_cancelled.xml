@@ -3,10 +3,10 @@
 
 
         <record id="droga_report_failed_tenders" model="ir.ui.view">
-            <field name="name">droga.report.failed.tender</field>
+            <field name="name">droga.report.failed.cancelled.tender</field>
             <field name="model">droga.tender.submission.detail</field>
             <field name="arch" type="xml">
-                <tree string="" create="false" expand="1">
+                <tree string="" create="false" delete="false" expand="1">
                     <field name="ten_id" string="Tender ID"></field>
                     <field name="customer" ></field>
                     <field name="procurement_title" ></field>
@@ -18,7 +18,7 @@
         </record>
 
     <record id="droga_tender_failed_cancelled_search_tree" model="ir.ui.view">
-        <field name="name">droga.tender.failed.performance.search.tree</field>
+        <field name="name">droga.tender.failed.cancelled.search.tree</field>
         <field name="model">droga.tender.submission.detail</field>
         <field name="arch" type="xml">
             <search string="Upcoming Tenders">
@@ -43,7 +43,7 @@
         </record>
 
         <menuitem
-            id="droga_report_failed_tenders"
+            id="droga_report_failed_cancelled_tenders"
             name="Failed/cancelled tenders"
             action="droga_tender_report_failed_cancelled"
             parent="tender_reports"

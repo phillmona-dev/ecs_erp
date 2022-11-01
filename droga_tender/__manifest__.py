@@ -38,9 +38,13 @@
         'views/droga_tender_module_extensions.xml',
         'views/droga_tender_contract_security_tree.xml',
         'views/reports/total_tenders.xml',
+        'views/reports/failed_cancelled.xml',
+        'views/reports/security_grouped.xml',
         'views/reports/total_awarded.xml',
         'views/reports/total_performance.xml',
         'views/droga_tender_detail_input.xml',
+        'reports/excel_reports/financial_proposal.xml',
+        'reports/excel_reports/technical_proposal.xml',
         'data/droga_tender_sequence.xml',
         'security/tender_scheduled_alerts.xml'
     ],

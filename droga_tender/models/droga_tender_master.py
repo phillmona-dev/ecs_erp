@@ -134,6 +134,10 @@ class droga_tender_master(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
             'res_id': self.id,
+            'context': {
+                'default_tender_id': self.id,
+                'default_security_for':'Bid security'
+            }
         }
 
     def sub_detail_open(self):
@@ -201,6 +205,7 @@ class droga_tender_master(models.Model):
         res=super().create(vals_list)
         to_create_bid_security = {
                 "bid_security": res.id,
+                "tender_id":res.id,
                 "security_amount": vals_list["bid_security_amount"],
                 "security_period_in_days": vals_list["security_period_in_days"],
             }
