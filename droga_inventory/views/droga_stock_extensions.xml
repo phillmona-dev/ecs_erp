@@ -40,4 +40,16 @@
         </field>
     </record>
 
+    <record id="stock_product_category" model="ir.ui.view">
+        <field name="name">droga.product.category.inherited</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group/field[@name='parent_id']" position="after">
+                <field name="avail_in_product_master" ></field>
+            </xpath>
+        </field>
+    </record>
+
+
 </odoo>

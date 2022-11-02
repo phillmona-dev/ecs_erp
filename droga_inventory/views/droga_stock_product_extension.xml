@@ -126,7 +126,7 @@
 
             <xpath expr="//form/sheet/notebook/page/group/group/field[@name='taxes_id']" position="before">
                 <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
-                       domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
+                       domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True)]"/>
                 <field name="sub_categ_id" string="Product sub-category" options="{'no_create':True,'no_open':True}"
                        domain="[('complete_name','not like','All%'),('parent_id','=',categ_id)]"/>
             </xpath>

@@ -89,3 +89,8 @@ class droga_stock_product_extension(models.Model):
     def _get_avg_monthly_consumption(self):
         for rec in self:
             rec.average_month_consumption=0
+
+
+class product_selection_field(models.Model):
+    _inherit = 'product.category'
+    avail_in_product_master=fields.Boolean('Available in product master file',default=False)
