@@ -50,13 +50,13 @@ class droga_stock_transfer_custom(models.Model):
             #User has access to 1 warehouse, it will return internal locations under that warehouse
             #my_domain = json.dumps([('usage', '=', 'internal'),('complete_name',"like",+"'"+compiled_domain[0]+"/Stock%'")])
             wareh=compiled_domain[0] + '/Stock%'
-            my_domain = json.dumps([('usage', '=', 'internal'), ('complete_name', 'like', wareh)])
+            my_domain = json.dumps([('usage', '=', 'production'), ('complete_name', 'like', compiled_domain[0]+' Receive transit')])
         else:
             dom=''
             for wh in compiled_domain:
-                dom='"|",'+dom+'["complete_name","like","'+wh+'/Stock%"],'
+                dom='"|",'+dom+'["complete_name","like","'+wh+' Receive transit"],'
 
-            dom='[["usage", "=", "internal"],'+dom[4:].rstrip(dom[-1])+']'
+            dom='[["usage", "=", "production"],'+dom[4:].rstrip(dom[-1])+']'
             my_domain=json.dumps(dom).replace("\\","")
             my_domain=my_domain.rstrip(my_domain[-1]).lstrip(my_domain[-1])
         for rec in self:
@@ -78,7 +78,7 @@ class droga_stock_transfer_custom(models.Model):
         if vals_list.get('name', 'New') == 'New':
             if len(vals_list['detail_entries'])==0:
                 raise UserError("At least one product must be requested to save record.")
-            _name = self.env['ir.sequence'].next_by_code('droga.inventory.transfer.custom.sequence.'+self.env['stock.location'].search([('id','=',vals_list['location_dest_id'])]).warehouse_id.code.lower())
+            _name = self.env['ir.sequence'].next_by_code('droga.inventory.transfer.custom.sequence.all')
             if not _name:
                 raise UserError("Request sequence not found.")
             vals_list['name']=_name
@@ -95,13 +95,13 @@ class droga_stock_transfer_custom(models.Model):
         warehouse_list=self.detail_entries['warehouse_id']
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'INTOUT'),('warehouse_id', 'like', wh.id)]).id
+                [('sequence_code', '=', 'MTOV'),('warehouse_id', 'like', wh.id)]).id
             if not pick_type_id :
-                raise UserError("Picking type 'INTOUT' is not configured for one of the warehouses.")
+                raise UserError("Picking type 'MTOV' is not configured for one of the warehouses.")
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'INTOUT'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
             def_location_id=self.env['stock.location'].search([('complete_name','like',wh.code+'/Stock%'),('usage','=','internal')])[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")
@@ -113,8 +113,8 @@ class droga_stock_transfer_custom(models.Model):
                 'location_dest_id': self.location_dest_id.id,
                 #'auto_generated': True,
                 'origin': self.name,
-                #'state': 'confirmed',
-                'state': 'confirmed',
+                #'state': 'draft',
+                'state': 'draft',
                 'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
             }
@@ -137,8 +137,8 @@ class droga_stock_transfer_custom(models.Model):
                         'product_uom_qty': rec['product_uom_qty'],
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
-                        #'state': 'confirmed',
-                        'state': 'confirmed',
+                        #'state': 'draft',
+                        'state': 'draft',
                         'company_id': self.company_id.id
                     }
 

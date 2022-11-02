@@ -15,12 +15,11 @@
                         <page string="Technical specs">
                             <field name="tender_specs" mode="tree">
                                 <tree editable="bottom">
-
                                     <field name="spec_requested" ></field>
                                     <field name="spec_offered" ></field>
                                     <field name="bidder_compliance_remark"></field>
+                                    <field name="group"></field>
                                     <field name="remark" ></field>
-
                                 </tree>
                             </field>
                         </page>

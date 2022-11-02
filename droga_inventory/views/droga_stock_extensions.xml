@@ -21,10 +21,12 @@
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='origin']" position="replace">
+                <field name="origin" readonly="1" attrs="{'invisible': [('origin', '=', False)]}"></field>
                 <field name="trans_issue_request" readonly="1" attrs="{'invisible': [('trans_issue_request', '=', False)]}"></field>
                 <field name="office_request" readonly="1" attrs="{'invisible': [('office_request', '=', False)]}"></field>
                 <field name="cons_sample_issue_request" readonly="1" attrs="{'invisible': [('cons_sample_issue_request', '=', False)]}"></field>
                 <field name="cons_receive_request" readonly="1" attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
+                <field name="products_availability_state"/>
             </xpath>
         </field>
     </record>
@@ -39,5 +41,17 @@
             </xpath>
         </field>
     </record>
+
+    <record id="stock_product_category" model="ir.ui.view">
+        <field name="name">droga.product.category.inherited</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group/field[@name='parent_id']" position="after">
+                <field name="avail_in_product_master" ></field>
+            </xpath>
+        </field>
+    </record>
+
 
 </odoo>

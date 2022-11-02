@@ -12,7 +12,7 @@ except ImportError:
 
 #class tender_master_xls(models.AbstractModel):     Default type
 #My point is to have a transient model inherit the report.report_xlsx.abstract and immplement all logic and use interface from here as well
-class tender_master_xls(models.TransientModel):
+class inventory_stock_card_xls(models.TransientModel):
     _name='droga.inventory.reports.sc.excel'
 
     warehouse=fields.Many2one('stock.warehouse','Warehouse')

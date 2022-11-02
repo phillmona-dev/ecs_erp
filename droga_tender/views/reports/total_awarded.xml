@@ -6,7 +6,7 @@
             <field name="name">droga.report.total.awarded.tender</field>
             <field name="model">droga.tender.master</field>
             <field name="arch" type="xml">
-                <tree create="false" string="">
+                <tree string="" create="false" delete="false" expand="1">
                     <field name="ten_id" string="Tender ID"></field>
                     <field name="customer" ></field>
                     <field name="award_folder" ></field>

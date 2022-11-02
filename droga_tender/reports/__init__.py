@@ -1,1 +1,1 @@
-from . import tender_master_xls
+from . import excel_reports

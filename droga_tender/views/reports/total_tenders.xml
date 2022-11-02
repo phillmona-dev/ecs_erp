@@ -4,7 +4,7 @@
             <field name="name">droga.report.total.tender</field>
             <field name="model">droga.tender.master</field>
             <field name="arch" type="xml">
-                <tree create="false" string="">
+                <tree string="" create="false" delete="false" expand="1">
                     <field name="ten_id" string="Tender ID"></field>
                     <field name="posted_date_gre" string="Floated date"></field>
                     <field name="customer" ></field>

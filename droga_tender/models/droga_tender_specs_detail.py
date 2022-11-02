@@ -11,3 +11,5 @@ class ModelName(models.Model):
     remark=fields.Char('Remark')
     submission_detail=fields.Many2one('droga.tender.submission.detail')
     parent_tender_submission=fields.Many2one('droga.tender.master',related='submission_detail.parent_tender_submission')
+    group=fields.Char('Spec group')
+

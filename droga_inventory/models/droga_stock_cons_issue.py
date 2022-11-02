@@ -83,7 +83,7 @@ class droga_stock_cons_issue(models.Model):
                 'location_dest_id': cust_locat,
                 'origin': self.name,
                 'cons_sample_issue_request': self.id,
-                'state': 'confirmed',
+                'state': 'draft',
                 'scheduled_date': self.issue_date
             }
             picking_id = self.env['stock.picking'].sudo().create(picking_vals)
@@ -105,7 +105,7 @@ class droga_stock_cons_issue(models.Model):
                         'product_uom_qty': rec['product_uom_qty'],
                         'location_id': def_loc_id,
                         'location_dest_id': cust_locat,
-                        'state': 'confirmed',
+                        'state': 'draft',
                         'company_id': self.company_id.id
                     }
 

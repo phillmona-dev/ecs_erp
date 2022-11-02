@@ -1,0 +1,180 @@
+from odoo import _, api, fields, models
+from datetime import datetime
+
+
+class BudgetReallocation(models.Model):
+    _name = 'droga.budget.reallocation'
+
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
+
+    name = fields.Char('Request Reference', required=True,
+                       index=True, copy=False, default='New')
+    budget_id = fields.Many2one('crossovered.budget', required=True)
+    request_by = fields.Many2one('hr.employee', string="Requested By")
+    request_date = fields.Date("Request Date", default=datetime.today())
+    analytic_account = fields.Many2one("account.analytic.account")
+    purpose = fields.Char("Purpose")
+    budget_reallocations = fields.One2many(
+        'droga.budget.reallocation.line', 'budget_reallocation_id')
+    budget_additions = fields.One2many(
+        'droga.budget.addition.line', 'budget_addition_id')
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                                 index=True, default=lambda self: self.env.company.id)
+    state = fields.Selection([('Draft', 'Draft'), ("Submitted", "Submitted"), ('Verified', 'Verified'),
+                             ('Approved', 'Approved'), ('Cancelled', 'Cancelled')], default='Draft', tracking=True)
+    reallocation_status = fields.Selection(
+        [('Draft', 'Draft'), ('Done', 'Done')], default="Draft")
+
+    # draft request
+    def draft_request(self):
+        self.write({'state': 'Draft'})
+        return True
+
+    def submit_request(self):
+        self.write({'state': 'Submitted'})
+        return True
+
+    # verify request
+    def verify_request(self):
+        self.write({'state': 'Verified'})
+        return True
+
+    def approve_request(self):
+        self.write({'state': 'Approved'})
+        self.calculate_reallocation_addition()
+        return True
+
+    def cancel_request(self):
+        self.write({'state': 'Cancelled'})
+        return True
+
+    @api.model
+    def create(self, vals):
+        # get sequence number for each company
+        company_id = vals.get('company_id', self.default_get(
+            ['company_id'])['company_id'])
+
+        self_comp = self.with_company(company_id)
+        vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+            'droga.budget.reallocation') or '/'
+        res = super(BudgetReallocation, self_comp).create(vals)
+
+        return res
+
+    def calculate_reallocation_addition(self):
+        # get reallocation not transfered
+        reallocations = self.env['droga.budget.reallocation'].search([
+                                                                     ('reallocation_status', '=', 'Draft')])
+        for reallocation in reallocations:
+            # budget reallocation
+            for line in reallocation.budget_reallocations:
+                #reallocation_amount += line.transfer_amount
+
+                # update reallocation on both transfer and reciving ends
+                # get transfer line and update transefer
+
+                transfer_line_from = self.env['crossovered.budget.lines.detail'].search([('crossovered_budget_id', '=', reallocation.budget_id.id),
+                                                                                         ('date_from', '>=', line.date_from), ('date_to', '<=', line.date_to), ('general_budget_id', '=', line.from_budgetary_position.id)])
+
+                transfer_line_to = self.env['crossovered.budget.lines.detail'].search([('crossovered_budget_id', '=', reallocation.budget_id.id),
+                                                                                       ('date_from', '>=', line.date_from), ('date_to', '<=', line.date_to), ('general_budget_id', '=', line.to_budgetary_position.id)])
+
+                # update transfer from
+                transfer_amount = 0
+                for transfer in transfer_line_from:
+                    if transfer.account.id == line.account_from.id:
+                        transfer_amount += line.transfer_amount
+
+                # update recive amount
+                recive_amount = 0
+                for recive in transfer_line_to:
+                    if recive.account.id == line.account_to.id:
+                        recive_amount += line.transfer_amount
+
+            # search reallocation line and update
+
+                if transfer_line_from and transfer_line_to:
+                    for transfer in transfer_line_from:
+                        if transfer.account.id == line.account_from.id:
+                            # update reallocation deduction
+                            amount = transfer_amount * -1
+                            transfer.write(
+                                {'reallaocation': amount})
+                if transfer_line_to:
+                    # update reallocation deduction
+                    for recive in transfer_line_to:
+                        if recive.account.id == line.account_to.id:
+                            recive.write(
+                                {'reallaocation': recive_amount})
+
+            # additional budget
+            for line1 in reallocation.budget_additions:
+
+                addition_line_from = self.env['crossovered.budget.lines.detail'].search([('crossovered_budget_id', '=', reallocation.budget_id.id),
+                                                                                         ('date_from', '>=', line1.date_from), ('date_to', '<=', line1.date_to), ('general_budget_id', '=', line1.bdugetary_position.id)])
+
+                addition_amount = 0
+                for addition in addition_line_from:
+                    if addition.account.id == line1.account.id:
+                        addition_amount += line1.addition_amount
+
+                if addition_line_from:
+                    for addition in addition_line_from:
+                        if addition.account.id == line1.account.id:
+                            addition.write(
+                                {'addition': addition_amount})
+
+
+class BudgetReallocationDetail(models.Model):
+    _name = 'droga.budget.reallocation.line'
+
+    budget_reallocation_id = fields.Many2one("droga.budget.reallocation")
+    from_budgetary_position = fields.Many2one("account.budget.post")
+    to_budgetary_position = fields.Many2one("account.budget.post")
+    account_from = fields.Many2one("account.account")
+    account_to = fields.Many2one("account.account")
+    date_from = fields.Date("Date From")
+    date_to = fields.Date("Date To")
+    remaining_amount = fields.Float(
+        "Remaining Amount", compute="_calculate_remaining_amount", store=True)
+    transfer_amount = fields.Float("Transfer Amount")
+
+    @api.depends('from_budgetary_position', 'account_from', 'date_from', 'date_to')
+    def _calculate_remaining_amount(self):
+        if self.from_budgetary_position and self.date_from and self.date_to and self.budget_reallocation_id.analytic_account and self.account_from:
+            # get remaining amount
+            budgets = self.env['crossovered.budget'].search(
+                [('id', '=', self.budget_reallocation_id.budget_id.id)])
+
+            budget_lines = self.env['crossovered.budget.lines'].search(
+                [('crossovered_budget_id', '=', self.budget_reallocation_id.budget_id.id),
+                 ('general_budget_id', '=', self.from_budgetary_position.id),
+                 ('analytic_account_id', '=',
+                  self.budget_reallocation_id.analytic_account.id),
+                 ('date_from', '>=', self.date_from), ('date_to', '<=', self.date_to)])
+
+            reamining_amount = 0
+            if budget_lines:
+                for line in budget_lines.budget_line_details:
+                    # if line.date_from >= self.date_from and line.date_to <= self.date_to and line.general_budget_id.id == self.from_budgetary_position.id and line.analytic_account_id.id == self.budget_reallocation_id.analytic_account.id:
+                    if line.account.id == self.account_from.id:
+                        reamining_amount += line.remaining_balance
+
+            self.remaining_amount = reamining_amount
+
+
+class BudgetAdditionDetail(models.Model):
+    _name = 'droga.budget.addition.line'
+
+    budget_addition_id = fields.Many2one("droga.budget.reallocation")
+    bdugetary_position = fields.Many2one("account.budget.post")
+    account = fields.Many2one(
+        "account.account")
+    date_from = fields.Date("Date From")
+    date_to = fields.Date("Date To")
+    addition_amount = fields.Float("Addition Amount")
+
+    @api.onchange('bdugetary_position')
+    def _load_budgetary_position_accounts(self):
+        accounts = self.bdugetary_position.account_ids.ids
+        return {'domain': {'account': [('id', 'in', (accounts))]}}

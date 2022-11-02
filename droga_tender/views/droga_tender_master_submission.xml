@@ -4,7 +4,7 @@
         <field name="name">droga.tender.upcoming.view.tree</field>
         <field name="model">droga.tender.master</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" create="false" delete="false">
                 <field name="ten_id" string="Tender ID"></field>
                 <field name="customer"></field>
                 <field name="posted_date_gre" string="Floated date"></field>
@@ -30,7 +30,7 @@
     </record>
 
     <record id="action_import_tender_details" model="ir.actions.client">
-        <field name="name">Employees Import</field>
+        <field name="name">Tender submission details import</field>
         <field name="tag">import</field>
         <field name="params">{ 'model': 'droga.tender.submission.detail','parent_tender_submission': 1 }</field>
         <field name="context">{ 'default_parent_tender_submission': 1 }</field>
@@ -73,6 +73,7 @@
 
                                     <field name="deliv_period"/>
                                     <field name="tech_result"/>
+                                    <field name="id"/>
 
                                     <button icon="fa-credit-card-alt" type="object" string="Technical specification"
                                             name="tech_specs_open" class="oe_stat_button"></button>

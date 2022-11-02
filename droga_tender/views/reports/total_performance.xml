@@ -2,35 +2,35 @@
 <odoo>
 
 
-        <record id="droga_report_total_tender_performance" model="ir.ui.view">
-            <field name="name">droga.report.total.tender.performance</field>
-            <field name="model">droga.tender.master</field>
-            <field name="arch" type="xml">
-                <tree create="false" string="" expand="1">
-                    <field name="ten_id" string="Tender ID"></field>
-                    <field name="customer" ></field>
-                    <field name="procurement_title" ></field>
-                    <field name="tender_amt_participated" ></field>
-                    <field name="performance_amt_award" ></field>
-                    <field name="performance_pct" ></field>
-                    <field name="remark"></field>
-                </tree>
-            </field>
-        </record>
+    <record id="droga_report_total_tender_performance" model="ir.ui.view">
+        <field name="name">droga.report.total.tender.performance</field>
+        <field name="model">droga.tender.master</field>
+        <field name="arch" type="xml">
+            <tree string="" create="false" delete="false" expand="1">
+                <field name="ten_id" string="Tender ID"></field>
+                <field name="customer"></field>
+                <field name="procurement_title"></field>
+                <field name="tender_amt_participated"></field>
+                <field name="performance_amt_award"></field>
+                <field name="performance_pct"></field>
+                <field name="remark"></field>
+            </tree>
+        </field>
+    </record>
 
     <record id="droga_tender_performance_search_tree" model="ir.ui.view">
         <field name="name">droga.tender.tender.performance.search.tree</field>
         <field name="model">droga.tender.master</field>
         <field name="arch" type="xml">
-            <search string="Upcoming Tenders">
+            <search string="Upcoming Tenders" >
                 <field name="ten_id" string="Tender ID"></field>
-                    <field name="customer" ></field>
-                    <field name="procurement_title" ></field>
-                    <field name="tender_amt_participated" ></field>
-                    <field name="performance_amt_award" ></field>
-                    <field name="performance_pct" ></field>
-                <field name="cus_type" invisible="1" ></field>
-                    <field name="remark"></field>
+                <field name="customer"></field>
+                <field name="procurement_title"></field>
+                <field name="awarded_amt_total"></field>
+                <field name="tender_amt_participated"></field>
+                <field name="performance_pct"></field>
+                <field name="cus_type" invisible="1"></field>
+                <field name="remark"></field>
                 <filter string="Performance eval" domain="[('performance_amt_award', '>',0)]" name="performance_list"></filter>
                 <filter name="group_cust" string="Customer type" context="{'group_by':'cus_type'}"/>
             </search>
@@ -38,16 +38,16 @@
     </record>
 
     <record id="droga_tender_report_tender_performance_status" model="ir.actions.act_window">
-            <field name="name">Total performance</field>
-            <field name="res_model">droga.tender.master</field>
-            <field name="view_mode">tree</field>
-            <field name="view_ids" eval="[(5, 0, 0),
+        <field name="name">Total performance</field>
+        <field name="res_model">droga.tender.master</field>
+        <field name="view_mode">tree</field>
+        <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_report_total_tender_performance')})]"/>
-            <field name="search_view_id" ref="droga_tender_performance_search_tree"></field>
+        <field name="search_view_id" ref="droga_tender_performance_search_tree"></field>
         <field name="context">{'search_default_group_cust': 1,'search_default_performance_list': 1}</field>
-        </record>
+    </record>
 
-        <menuitem
+    <menuitem
             id="droga_report_total_tender_status"
             name="Total perfromance"
             action="droga_tender_report_tender_performance_status"
