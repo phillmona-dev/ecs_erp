@@ -52,9 +52,10 @@ class AccountLoanRepayment(models.Model):
     @api.onchange('loan_repayment_detail_ids','num')
     def _thisistest(self):
         for record in self:
+            penality=0.0000000000000000000000000
             kk=record.num
             if record.loan_repayment_detail_ids:
-                penality=0.0000000000000000000000000
+                
                 intestt=0.000000000000000000000000000
                 total_payment=0.00000000000000000000000
                 pincipal=0.0000000000000000000000000000
