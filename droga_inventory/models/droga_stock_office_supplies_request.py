@@ -77,8 +77,8 @@ class droga_stock_office_supplies(models.Model):
             'location_dest_id': def_dest_id[0].id,
             #'auto_generated': True,
             'origin': self.name,
-            #'state': 'confirmed',
-            'state': 'confirmed',
+            #'state': 'draft',
+            'state': 'draft',
             'office_request':self.id,
             'scheduled_date': self.request_date
         }
@@ -99,8 +99,8 @@ class droga_stock_office_supplies(models.Model):
                 'product_uom_qty': rec['product_uom_qty'],
                 'location_id': def_location_id,
                 'location_dest_id': def_dest_id[0].id,
-                #'state': 'confirmed',          Confirmed is waiting status
-                'state': 'confirmed',
+                #'state': 'draft',          Confirmed is waiting status
+                'state': 'draft',
                 'company_id': self.company_id.id
             }
 
