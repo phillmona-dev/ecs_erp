@@ -209,6 +209,7 @@ class droga_tender_master(models.Model):
                 "tender_id":res.id,
                 "security_amount": vals_list["bid_security_amount"],
                 "security_period_in_days": vals_list["security_period_in_days"],
+                "security_for": 'Bid security'
             }
         self.env["droga.tender.security.detail"].create(to_create_bid_security)
         return res

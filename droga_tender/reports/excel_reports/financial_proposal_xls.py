@@ -98,6 +98,15 @@ class tender_financial_proposal_master_xls(models.TransientModel):
             'font_size': 11,
             'text_wrap': 1,
             'fg_color': '#F6F5F5'})
+        title_format_num= workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'num_format': 43,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 11,
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
 
         sheet.merge_range('A' + str(row_start + 1) + ':G' + str(row_start + 1), self.tender_id['customer'].name, header_format)
         sheet.merge_range('A' + str(row_start + 2) + ':G' + str(row_start + 2), self.tender_id['procurement_title'],header_format)
@@ -115,21 +124,21 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         tot_amount=0
 
         for rec in self.tender_id['detail_submissions_fin']:
-            sheet.write(row_start, 0, rec.item_num)
-            item=rec.item_pro if rec.item_pro else rec.type_item
-            sheet.write(row_start, 1, item if item else ' ')
+            sheet.write(row_start, 0, rec.item_num,border)
+            item=rec.item_pro if rec.item_pro else rec.type_item.type_or_item_name
+            sheet.write(row_start, 1, item if item else ' ',border)
             uom=rec.uom_free_field if rec.uom_free_field else rec.unit_of_measure
-            sheet.write(row_start, 2, uom if uom else ' ')
-            sheet.write(row_start, 3, rec.quantity)
-            sheet.write(row_start, 4, rec.unit_price)
-            sheet.write(row_start, 5, rec.amount)
+            sheet.write(row_start, 2, uom if uom else ' ',border)
+            sheet.write(row_start, 3, rec.quantity,num_format)
+            sheet.write(row_start, 4, rec.unit_price,num_format)
+            sheet.write(row_start, 5, rec.amount,num_format)
             tot_amount+=rec.amount
-            sheet.write(row_start, 6, rec.remark if rec.remark else ' ')
+            sheet.write(row_start, 6, rec.remark if rec.remark else ' ',border)
 
             row_start+=1
 
         sheet.write(row_start , 4, 'Total price', title_format)
-        sheet.write(row_start, 5, tot_amount, title_format)
+        sheet.write(row_start, 5, tot_amount, title_format_num)
 
         row_start+=2
 
