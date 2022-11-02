@@ -95,13 +95,13 @@ class droga_stock_transfer_custom(models.Model):
         warehouse_list=self.detail_entries['warehouse_id']
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'INTOUT'),('warehouse_id', 'like', wh.id)]).id
+                [('sequence_code', '=', 'MTOV'),('warehouse_id', 'like', wh.id)]).id
             if not pick_type_id :
-                raise UserError("Picking type 'INTOUT' is not configured for one of the warehouses.")
+                raise UserError("Picking type 'MTOV' is not configured for one of the warehouses.")
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'INTOUT'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
             def_location_id=self.env['stock.location'].search([('complete_name','like',wh.code+'/Stock%'),('usage','=','internal')])[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")

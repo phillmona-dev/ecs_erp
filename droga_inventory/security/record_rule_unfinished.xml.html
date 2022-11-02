@@ -1,0 +1,24 @@
+<odoo>
+    <record id = "inventory_of_product_category_restrict_access" model = "ir.rule">
+        <field name = "name"> Office supplies groups will not be accessed by operational warehouses </field>
+        <field name = "model_id" search="[('model','=','product.category')]" />
+        <field name = "groups" eval = "[(4, ref ('base.group_user'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('name', '=', 'Office supplies - stationary'),	('name','=','Office supplies - cleaning supplies')] </field>
+    </record>
+
+    <record id = "inventory_of_product_category_enable_access" model = "ir.rule">
+        <field name = "name"> Office supplies groups will be accessed by supplies store keeper only </field>
+        <field name = "model_id" search="[('model','=','product.category')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_of'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('name', '=', 'Office supplies - stationary'),	('name','=','Office supplies - cleaning supplies')] </field>
+    </record>
+
+</odoo>
