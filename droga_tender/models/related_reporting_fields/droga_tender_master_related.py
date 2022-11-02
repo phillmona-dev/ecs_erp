@@ -110,7 +110,7 @@ class droga_tender_master_related(models.Model):
                 })
         #endregion
 
-        # region open date alerts
+        # region open date alerts.
         compare_date = datetime.date.today() + datetime.timedelta(days=1)
         recs = self.env['droga.tender.master'].search([('opening_alert_sent', '=', False),
                                                        ('open_date_gre', '<', compare_date)])
