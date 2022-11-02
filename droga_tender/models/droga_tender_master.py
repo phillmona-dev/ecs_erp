@@ -7,7 +7,7 @@ class droga_tender_master(models.Model):
     _name = 'droga.tender.master'
     _description = 'Tender master file'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name='ten_name'
+    #_rec_name='ten_id'
 
     #region fields definition
     # Date fields
@@ -57,16 +57,17 @@ class droga_tender_master(models.Model):
     extension_date_gre = fields.Datetime("Extension date and time GRE",compute="conv_ext_date",store=True,inverse='inverse_ext_date')
     @api.depends("extension_date_eth","closing_date_gre","ext_period")
     def conv_ext_date(self):
-        if not self.ext_period:
-            return
-        try:
-            if self.extension_date_eth=='':
-                self.extension_date_gre=self.closing_date_gre+timedelta(days=int(self.ext_period))
-            else:
-                converted_date=eth_to_greg_date_conv.converter.eth_to_greg_convert(int(self.extension_date_eth.split("-")[0]),int(self.extension_date_eth.split("-")[1]),2000+int(self.extension_date_eth.split("-")[2]))
-                self.extension_date_gre=converted_date
-        except Exception as e:
-            self.extension_date_eth=""
+        for rec in self:
+            if not rec.ext_period:
+                return
+            try:
+                if rec.extension_date_eth=='':
+                    rec.extension_date_gre=rec.closing_date_gre+timedelta(days=int(rec.ext_period))
+                else:
+                    converted_date=eth_to_greg_date_conv.converter.eth_to_greg_convert(int(rec.extension_date_eth.split("-")[0]),int(rec.extension_date_eth.split("-")[1]),2000+int(rec.extension_date_eth.split("-")[2]))
+                    rec.extension_date_gre=converted_date
+            except Exception as e:
+                rec.extension_date_eth=""
     def inverse_ext_date(self):
         pass
     # Text fields
@@ -190,7 +191,7 @@ class droga_tender_master(models.Model):
         for record in self:
             result.append(
                 (record.id, record.ten_id+' - '+ record.customer["name"]+" for "+record.closing_date_gre.strftime("%B %d,%Y")))
-            return result
+        return result
 
     @api.depends('customer')
     def _get_tender_description(self):

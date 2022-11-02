@@ -30,7 +30,7 @@
     </record>
 
     <record id="action_import_tender_details" model="ir.actions.client">
-        <field name="name">Employees Import</field>
+        <field name="name">Tender submission details import</field>
         <field name="tag">import</field>
         <field name="params">{ 'model': 'droga.tender.submission.detail','parent_tender_submission': 1 }</field>
         <field name="context">{ 'default_parent_tender_submission': 1 }</field>
