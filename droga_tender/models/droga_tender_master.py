@@ -7,7 +7,7 @@ class droga_tender_master(models.Model):
     _name = 'droga.tender.master'
     _description = 'Tender master file'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    #_rec_name='ten_id'
+    _rec_name='ten_name'
 
     #region fields definition
     # Date fields
