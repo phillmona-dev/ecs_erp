@@ -27,6 +27,9 @@
         'security/ir.model.access.csv',
         'views/budget_commitement.xml',
         'views/budget_crossovered_lines.xml',
+        'views/budget_reallocation.xml',
+        'reports/paper_format.xml',
+        'reports/budget.xml',
         'views/menu.xml',
         'data/cron_job.xml',
 

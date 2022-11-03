@@ -6,10 +6,24 @@
         <field name="model">crossovered.budget</field>
         <field name="inherit_id" ref="account_budget.crossovered_budget_view_form" />
         <field name="arch" type="xml">
+
+
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='practical_amount']" position="before">
+
+                <field name="reallaocation_addition" sum="Total" readonly="1" width="20" string="Reallocation" invisible="0"/>
+                <field name="addition" sum="Total" readonly="1" width="20" invisible="0"/>
+                <field name="revised_budget" sum="Total" readonly="1" width="15"/>
+
+
+            </xpath>
+
             <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='practical_amount']" position="after">
 
-                <field name="commitment_budget" sum="Total" readonly="1"/>
-                <field name="remaining_balance" sum="Total" readonly="1"/>
+
+                <field name="commitment_budget" sum="Total" readonly="1" width="15"/>
+                <field name="remaining_balance" sum="Total" readonly="1" width="15"/>
+                <button name="open_detail_budget" type="object" class="oe_highlight" id="budget_detail" data-hotkey="v" icon="fa-align-justify"/>
+
             </xpath>
 
             <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='theoritical_amount']" position="attributes">
@@ -30,8 +44,59 @@
 
             </xpath>
 
+            <!-- rename columns -->
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='planned_amount']" position="attributes">
+
+                <attribute name="string">Budget</attribute>
+
+            </xpath>
+
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='practical_amount']" position="attributes">
+
+                <attribute name="string">Actual</attribute>
+
+            </xpath>
+
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='analytic_account_id']" position="attributes">
+
+                <attribute name="string">Analytic</attribute>
+
+            </xpath>
+
+
         </field>
     </record>
 
+
+    <!-- form view for for budget detail -->
+    <record id="crossovered_budget_lines_view_form" model="ir.ui.view">
+        <field name="name">crossovered.budget.lines.view.form</field>
+        <field name="model">crossovered.budget.lines</field>
+        <field name="arch" type="xml">
+            <form string="Budget Detail">
+                <sheet>
+                    <group>
+                        <field name="general_budget_id" options="{'no_create':True,'no_open':True}" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page name="name" string="Detail Budget">
+                            <field name="budget_line_details" mode="tree" create="0" delete="0">
+                                <tree editable="bottom" create="0" delete="0">
+                                    <field name="account" width="20" readonly="1"/>
+                                    <field name="budget_amount" width="15" sum="Total"/>
+                                    <field name="commitment_budget" width="15" sum="Total" readonly="1"/>
+                                    <field name="reallaocation" width="15" sum="Total" readonly="1"/>
+                                    <field name="addition" width="15" sum="Total" readonly="1"/>
+                                    <field name="revised_budget" width="15" sum="Total" readonly="1"/>
+                                    <field name="actual" width="15" sum="Total" readonly="1"/>
+                                    <field name="remaining_balance" width="15" sum="Total" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
 </odoo>

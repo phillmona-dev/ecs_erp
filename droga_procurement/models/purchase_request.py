@@ -153,6 +153,7 @@ class purhcase_request(models.Model):
                         'budget_date': record.request_date,
                         'budgetary_position': line.budgetary_position.id,
                         'expense_account': line.expense_account.id,
+                        'analytic_account_id': self.branch.id,
                         'company_id': record.company_id.id,
                         'state': 'Active'
                     }

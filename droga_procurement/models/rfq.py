@@ -189,6 +189,7 @@ class Rfq(models.Model):
                             'budget_date': purchase_order.date_order,
                             'budgetary_position': purchase_request.budgetary_position.id,
                             'expense_account': purchase_request.expense_account.id,
+                            'analytic_account_id': self.purhcase_request_id.branch.id,
                             'company_id': self.company_id.id,
                             'state': 'Active'
                         }
