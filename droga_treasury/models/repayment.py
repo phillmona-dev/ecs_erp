@@ -339,4 +339,42 @@ class AccountLoanRepaymentDetail(models.Model):
             if payment.value_date:  
                 if payment.value_date>cday:
                     raise ValidationError("The Value Date cannot be set in the Furure")
+    def compute_postt(self):
+        for record in self:
+            current_date = datetime.today()
+
+            cday = current_date.date()
+            pday=cday
+            acount_recipt = self.env['account.loan'].search([('id', '=', record.acount_loan_id.id)])
               
+            journal=record.acount_loan_id.acount_loan_id.account_jornal.id
+            account_bank=record.acount_loan_id.acount_loan_id.account_bank.id
+            account_disbursement=record.acount_loan_id.acount_loan_id.disbursement.id
+            accrued_interest_payable=record.acount_loan_id.acount_loan_id.accrued_interest_payable.id
+            lines_vals_list = []
+
+            if  record.value_date:
+                pday=record.value_date
+            payment = self.env['account.move'].create(
+                                    {'date':pday,'journal_id':journal
+                                    ,'ref':record.reference,
+                                     })                                    
+            if payment:
+                t=payment.id
+                lines_vals_list.append({
+                    'move_id': t,                   
+                    'credit':record.total_payment,
+                    'account_id': account_bank                   
+                 })
+                
+                lines_vals_list.append({  
+                    'move_id': t,
+                    'debit':record.principal_repayment,
+                    'account_id': account_disbursement 
+                 })
+                lines_vals_list.append({  
+                    'move_id': t,
+                    'debit':record.is_penality+record.is_interest,
+                    'account_id': accrued_interest_payable 
+                 })
+                self.env['account.move.line'].create(lines_vals_list)

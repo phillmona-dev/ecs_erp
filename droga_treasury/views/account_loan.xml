@@ -170,7 +170,8 @@ model-->
                                     <field name="value_date"/>
                                     <field name="reference"/>
                                     <field name="desc"/>
-
+                                    <button  type="object" name="compute_postt" string="Post"
+                                        class="oe_stat_button" icon="fa-file-text"/>
                                 </tree>
                             </field>
 
@@ -262,17 +263,20 @@ model-->
                             <field name="company_id"/>
                         </group>
                         <group name="name" string="Accounting">
-                            <group name="name" string="">
+                            <group name="name" string="Accounting With Journal">
                                 <field name="account_penality"/>
-                                <field name="account_nterest"/>
-                                <field name="account_recipt"/>
-                                <field name="account_jornal"/>
+                                <field name="account_interest"/>
+                               
+                                <field name="accrued_interest_payable"/>
+                                 <field name="account_jornal_inte"/>
 
                             </group>
-                            <group name="name" string="">
-                                <field name="account_penality_payment"/>
-                                <field name="account_interest_payment"/>
-                                <field name="account_principal_payment"/>
+                            <group name="name" string="Accounting With Journal">
+                                <field name="account_bank"/>
+                                <field name="disbursement"/>
+                                
+                                
+                                <field name="account_jornal"/>
                             </group>
                         </group>
                         

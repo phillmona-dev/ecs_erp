@@ -200,24 +200,24 @@ class AccountLoan(models.Model):
         default=lambda self: self.env.company)
     account_penality = fields.Many2one(
         'account.account', 'Penality'
-       )
+       ,required=True)
    
-    account_nterest = fields.Many2one(
-        'account.account', 'Interest')
+    account_interest = fields.Many2one(
+        'account.account', 'Interest',required=True)
    
-    account_recipt = fields.Many2one(
-        'account.account', 'Recipt')
+    account_bank = fields.Many2one(
+        'account.account', 'Bank',required=True)
    
-    account_penality_payment = fields.Many2one(
-        'account.account', 'Penality Payment')
+    disbursement = fields.Many2one(
+        'account.account', 'Disbursement',required=True)
+    accrued_interest_payable = fields.Many2one(
+        'account.account', 'Accrued Interest payable',required=True)
    
-    account_interest_payment = fields.Many2one(
-         'account.account', 'Interest Payment')
-   
-    account_principal_payment = fields.Many2one(
-        'account.account', 'Principal Payment')
+
     account_jornal = fields.Many2one(
-        'account.journal', 'Journal')
+        'account.journal', 'Journal',required=True)
+    account_jornal_inte = fields.Many2one(
+        'account.journal', 'Journal Interest',required=True)
    
 
      
