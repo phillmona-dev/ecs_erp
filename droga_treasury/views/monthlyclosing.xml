@@ -17,6 +17,15 @@
             <field name="interest"/>
             <field name="penality"/>
             <field name="recipt"/>
+             <!-- <button  type="object" name="compute_post" string="Calculate Interest"
+                        class="oe_stat_button" icon="fa-file-text"
+                         -->
+                       
+                
+                <!-- <button name="compute_post" type="object"class="oe_stat_button" icon="fa-file-text">
+          
+                </button> -->
+            
                                     
         </tree>
     </field>

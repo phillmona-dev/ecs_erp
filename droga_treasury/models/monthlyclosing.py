@@ -23,11 +23,33 @@ class DrogaMonthlyclose(models.Model):
     _sql_constraints = [ ('unique_closing', 'unique(et_year, name,acount_monthly_closing_id)', 'Cannot Use one tr')	]
     
     # @api.depends('closing_day')
-    # def _compute_start_field(self):
+    # def compute_post(self):
     #     for record in self:
+    #         current_date = datetime.today()
+
+    #         cday = current_date.date()
+    #         pday=cday
+    #         acount_recipt = self.env['account.loan'].search([('id', '=', record.acount_monthly_closing_id.id)])
+              
+    #         journal=record.acount_monthly_closing_id.account_jornal.id
+    #         account_penality=record.acount_monthly_closing_id.account_penality.id
+    #         account_interest=record.acount_monthly_closing_id.account_nterest.id
             
+
     #         if  record.closing_day:
-    #             record.end_day=record.closing_day-relativedelta(days=-1)
+    #             pday=record.closing_day-relativedelta(days=-1)
+    #         penality = self.env['account.move'].create(
+    #                                 {'date':pday,'journal_id':journal
+    #                                  }) 
+                                    
+
+    #         if penality:
+    #             t=penality.id
+    #             penality_move = self.env['account.move.line'].create(
+    #                         {'account_id':account_penality,'debit':record.recipt
+    #                                 ,'move_id':t }) 
+                                                              
+            
                     
                
                
