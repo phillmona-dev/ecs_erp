@@ -71,3 +71,12 @@ class customer_type(models.Model):
 class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
     plan_id=fields.Many2one('droga.customer.visit.detail')
+    contacts_schedule=fields.One2many('droga.crm.contacts.schedule','leads')
+    date_planned=fields.Datetime('Lead date')
+    planned_visit_selection = fields.Selection([
+        ('Early Morning', 'Early Morning'),
+        ('Late Morning', 'Late Morning'),
+        ('Lunch', 'Lunch'),
+        ('Early Afternoon', 'Early Afternoon'),
+        ('Late Afternoon', 'Late Afternoon'),
+    ], string='Visit session', default="Early Morning")

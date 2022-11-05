@@ -10,3 +10,6 @@ access_droga_customer_visit_detail,droga_crm.droga_customer_visit_detail,model_d
 access_droga_cust_contact_working_hours,droga_crm.droga_cust_contact_working_hours,model_droga_cust_contact_working_hours,droga_crm.crm_user,1,1,1,1
 access_droga_cust_grade,droga_crm.droga_cust_grade,model_droga_cust_grade,droga_crm.crm_user,1,1,1,1
 access_droga_cust_type,droga_crm.droga_cust_type,model_droga_cust_type,droga_crm.crm_user,1,1,1,1
+access_droga_crm_contacts_schedule,droga_crm.droga_crm_contacts_schedule,model_droga_crm_contacts_schedule,droga_crm.crm_user,1,1,1,1
+
+

@@ -44,6 +44,9 @@
                 </group>
 
             </xpath>
+            <xpath expr="//form/sheet/group/group/field[@name='website']" position="replace">
+                    <field name="vat" string="Tin No"></field>
+            </xpath>
         </field>
     </record>
 

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="crm_lead_extension" model="ir.ui.view">
+        <field name="name">Lead extension</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="arch" type="xml">
+
+
+            <xpath expr="//form/sheet/group/group[@name='lead_info']" position="replace">
+                <group name="lead_info" attrs="{'invisible': [('type', '=', 'opportunity')]}">
+                    <!--<label for="contact_name" />
+                    <div class="o_row">
+                        <field name="contact_name" required="True" />
+                        <field name="title" placeholder="Title" domain="[]" options='{"no_open": True}' />
+                    </div>-->
+                    <field name="date_planned" readonly="True"/>
+                    <field name="planned_visit_selection" readonly="True"/>
+                    <field name="is_blacklisted" invisible="1" />
+                    <field name="phone_blacklisted" invisible="1" />
+                    <field name="email_state" invisible="1" />
+                    <field name="phone_state" invisible="1" />
+                    <field name="partner_email_update" invisible="1" />
+                    <field name="partner_phone_update" invisible="1" />
+
+                </group>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page[@name='internal_notes']" position="replace">
+                <page string="Contacts" name="contact_list">
+                    <field name="contacts_schedule" attrs="{'invisible': [('type', '=', 'opportunity')]}" mode="tree">
+                        <tree editable="bottom">
+                            <field name="contact" />
+                            <field name="phone_no" />
+                            <field name="sales_avail" />
+                        </tree>
+                    </field>
+                    <field name="description" string="Notes" placeholder="Add a description..." options="{'collaborative': true}" />
+                </page>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/field[@name='tag_ids']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/div/h2/div/div[@id='probability']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/field[@name='user_id']" position="replace">
+
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group[@name='lead_partner']" position="replace">
+
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/field[@name='priority']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/field[@name='tag_ids']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group[@name='lead_priority']/field[@name='tag_ids']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/field[@name='user_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/field[@name='team_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group[@name='opportunity_partner']" position="replace">
+                <group name="opportunity_partner" attrs="{'invisible': [('type', '=', 'lead')]}">
+                    <field name="partner_id" widget="res_partner_many2one" string="Customer" invisible="False" />
+                    <field name="is_blacklisted" invisible="1" />
+                    <field name="partner_is_blacklisted" invisible="1" />
+                    <field name="phone_blacklisted" invisible="1" />
+                    <field name="mobile_blacklisted" invisible="1" />
+                    <field name="email_state" invisible="1" />
+                    <field name="phone_state" invisible="1" />
+                    <field name="user_company_ids" invisible="1" />
+                    <field name="partner_email_update" invisible="1" />
+                    <field name="partner_phone_update" invisible="1" />
+                    <!--<field name="partner_name" string="Opportunity Descr." />-->
+                    <field name="mobile" required="True" widget="phone" />
+
+
+                    <label for="email_from" class="oe_inline" />
+                    <div class="o_row o_row_readonly">
+                        <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger" title="This email is blacklisted for mass mailings. Click to unblacklist." type="object" context="{'default_email': email_from}" groups="base.group_user" attrs="{'invisible': [('is_blacklisted', '=', False)]}" />
+                        <field name="email_from" string="Email" widget="email" />
+                        <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer email will also be updated." attrs="{'invisible': [('partner_email_update', '=', False)]}" />
+                    </div>
+                    <label for="phone" class="oe_inline" invisible="True" />
+                    <div class="o_row o_row_readonly" invisible="True">
+                        <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': phone}" groups="base.group_user" attrs="{'invisible': [('phone_blacklisted', '=', False)]}" />
+                        <field name="phone" widget="phone" />
+                        <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer phone number will also be updated." attrs="{'invisible': [('partner_phone_update', '=', False)]}" />
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
