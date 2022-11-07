@@ -587,6 +587,7 @@ class AccountLoan(models.Model):
     in some case interest can be added
     cumulative balance=loan amount+reciet+interest-payment """
 
+    
     @api.depends('loan_repayment_ids', 'loan_receipt_ids', 'loan_interest_ids', 'current_cumlative_balace','payment_month')
     def _compute_qty_amount(self):
         for line in self:
@@ -603,22 +604,26 @@ class AccountLoan(models.Model):
                 line.payment_start_date=recipt.value_date+relativedelta(months=line.payment_month)
                 if line.loan_schedule_ids:
                     idddd=0
-                        # if isinstance(record.id, models.NewId):
-                        #     idddd=line.id.origin
-                        # else:
-                        #     idddd=line.id
-                    acount_payment = self.env['account.loan.repayment'].search(
-                                [('expected_payment_date', '=',  line.payment_start_date), ('acount_loan_id', '=', line.id)])
-                    if not  acount_payment:
-                        payments = self.env['account.loan.repayment'].create({'acount_loan_id': line.id,
-                                                                            'expected_payment_date': line.payment_start_date, 'total_payment': line.payment,
-                                                                                 'payment_term':'1'})
-                        line.next_payment_date = line.payment_start_date                                                         
-       
-                
+                       
+                    
             if line.current_cumlative_balace:
                 if line.opening_date:
                     line.interest_start_date=line.opening_date
+            if line.opening_date or recipt:
+                pay=self.env['account.loan.repayment'].search(
+                [('id', '>', 0), ('acount_loan_id', '=', line.id)], order='id', limit=1)
+                acount_payment = self.env['account.loan.repayment'].search(
+                                [ ('id', '=', pay.id)])
+                if not  acount_payment:
+                    payments = self.env['account.loan.repayment'].create({'acount_loan_id': line.id,
+                                                                            'expected_payment_date': line.payment_start_date, 'total_payment': line.payment,
+                                                                                 'payment_term':'1'})
+                    line.next_payment_date = line.payment_start_date                                                         
+                else:
+                    line.next_payment_date = line.payment_start_date 
+                    acount_payment.expected_payment_date=line.payment_start_date
+                    acount_payment.total_payment=line.payment
+                
            #""" calculating total reciept """
             for reciept in line.loan_receipt_ids:
                 reciep += reciept.receipt
@@ -633,13 +638,7 @@ class AccountLoan(models.Model):
                     repay += repayment.principal_repayment
                     acount_int = self.env['account.loan.int'].search(
                             [('value_date', '<=', repayment.value_date), ('acount_loan_id', '=', line.id)])
-                        # recipt = self.env['account.loan.receipt'].search([('id','>',0)], order='id', limit=1)
-
-                        # if acount_int:
-                        #     for interesta in acount_int:
-                        #         interesta.daily_penality_amount=0
-                        #         interesta.daily_interest_total=interesta.daily_interest_amount
-
+                       
             # """ calculating total repayment """
             if line.isinterest:
                 for inter in line.loan_interest_ids:
@@ -647,23 +646,6 @@ class AccountLoan(models.Model):
 
             balance = reciep+interest-repay
             line.cumulative_balance = balance+line.current_cumlative_balace
-
-    # @api.depends('loan_repayment_ids')
-    # def _compute_penality(self):
-    #     for record in self:
-
-    #         current_date=datetime.today()
-    #         cday = current_date.date()
-    #         for repayment in record.loan_repayment_ids:
-    #             for penality in repayment.loan_penality_ids:
-    #                 if penality.penality_date:
-    #                     for interest in record.loan_interest_ids:
-    #                         if penality.penality_date==interest.value_date:
-    #                             interest.daily_penality_amount=penality.daily_penality_amount
-    #                             interest.daily_interest_total=interest.daily_interest_amount+interest.daily_penality_amount
-
-            #
- 
 
     @api.depends('loan_interest_ids', 'loan_repayment_ids', 'current_cumlative_interest')
     def _compute_total_interest(self):
