@@ -329,7 +329,7 @@ class Rfq_Detail(models.Model):
     @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id', 'exchange_rate', 'unit_price_foregin')
     def _compute_total(self):
         for record in self:
-            if self.purhcase_request_id.request_type == "Local":
+            if record.purhcase_request_id.request_type == "Local":
                 record.total_price = record.unit_price*record.product_qty
             else:
                 record.unit_price = record.unit_price_foregin*record.exchange_rate
