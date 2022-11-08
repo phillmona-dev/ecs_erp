@@ -10,7 +10,7 @@
         <field name="report_file">droga_bd.droga_budget_reallocation_report</field>
         <field name="print_report_name">'Budget Reallocation Report - %s' % (object.name)
         </field>
-        <field name="paperformat_id" ref="droga_bd.paperformat_droga_budget_landscape_a4"/>
+        <field name="paperformat_id" ref="droga_bd.paperformat_droga_budget_a4"/>
         <field name="binding_model_id" ref="model_droga_budget_reallocation"/>
         <field name="binding_type">report</field>
     </record>
