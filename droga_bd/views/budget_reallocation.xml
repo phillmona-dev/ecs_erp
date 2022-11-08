@@ -45,12 +45,12 @@
                             <field name="analytic_account" string="Cost Center" options="{'no_create':True,'no_open':True}" required="1" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="purpose" required="1" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="company_id" readonly="1" options="{'no_create':True,'no_open':True}"/>
-                            <field name="document_type" attrs="{'readonly': [('state', 'not in', ('Draft'))]}" required="1"/>
+                            <field name="document_type" attrs="{'readonly': [('state', 'not in', ('Draft'))]}" invisible="1"/>
                         </group>
                     </group>
 
                     <notebook>
-                        <page string="Reallocation" attrs="{'invisible': [('document_type', 'not in', ('Reallocation'))]}">
+                        <page string="Reallocation">
                             <field name="budget_reallocations" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}">
                                 <tree editable="bottom">
                                     <field name="from_budgetary_position" options="{'no_create':True,'no_open':True}" width="20" required="1" string="BP From"/>
@@ -64,7 +64,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Addition" attrs="{'invisible': [('document_type', 'not in', ('Addition'))]}">
+                        <page string="Addition">
                             <field name="budget_additions" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}">
                                 <tree editable="bottom">
                                     <field name="bdugetary_position" options="{'no_create':True,'no_open':True}" width="50" required="1"/>

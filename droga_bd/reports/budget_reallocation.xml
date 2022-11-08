@@ -60,9 +60,10 @@
 
                         </div>
                         <br></br>
-                        <h4>Budget Item Reallocation</h4>
+
 
                         <t t-if="o.budget_reallocations">
+                            <h4>Budget Item Reallocation</h4>
                             <table style="width:100%" class="table table-hover table-sm">
                                 <thead class="thead-dark">
                                     <tr>
@@ -126,8 +127,9 @@
                             </table>
                         </t>
                         <br></br>
-                        <h4>New Budget Item</h4>
+
                         <t t-if="o.budget_additions">
+                            <h4>New Budget Item</h4>
                             <table style="width:100%" class="table table-hover table-sm">
                                 <thead class="thead-dark">
                                     <tr>
