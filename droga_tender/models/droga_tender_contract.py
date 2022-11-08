@@ -71,7 +71,7 @@ class droga_tender_master(models.Model):
             'view_id': self.env.ref('sale.view_order_form').id,
             'type': 'ir.actions.act_window',
             'context': {
-                'default_tender_origin_form': self.parent_tender_contract.id,
+                'default_tender_origin_form_tender': self.parent_tender_contract.id,
                 'default_partner_id': self.parent_tender_contract.customer.master_cust_id.id,
             }
         }
