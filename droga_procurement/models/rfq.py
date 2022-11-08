@@ -1,7 +1,5 @@
-from email.policy import default
-from turtle import pu
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError, UserError
+from odoo.exceptions import UserError
 from datetime import datetime
 
 
@@ -20,9 +18,15 @@ class Rfq(models.Model):
     request_type = fields.Selection(
         related="purhcase_request_id.request_type", store=True)
 
-    date = fields.Datetime("Date", required=True)
+    supplier_id = fields.Many2one('res.partner', string='Supplier')
+
+    date = fields.Datetime("Date", required=True, default=datetime.today())
     rfq_lines = fields.One2many(
         'droga.purhcase.request.rfq.line', 'rfq_id', required=True)
+
+    rfq_lines_expected_cost = fields.One2many(
+        'droga.purhcase.request.rfq.line', 'rfq_id', required=True)
+
     remark = fields.Html("Remark")
     technical_remark = fields.Html("Technical remark")
 
@@ -30,6 +34,8 @@ class Rfq(models.Model):
                                  index=True, default=lambda self: self.env.company.id)
     currency_id = fields.Many2one("res.currency", related='company_id.currency_id', string="Currency", readonly=True,
                                   required=True, store=False)
+    exchange_rate = fields.Float(
+        "Exchange Rate", required=True, default=1.00, digits=(12, 4))
 
     procurement_committee = fields.Many2many("hr.employee")
 
@@ -41,16 +47,32 @@ class Rfq(models.Model):
     state = fields.Selection(
         [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"), ("Committee Approval", "Committee Approved"), ("CEO Approval", "CEO Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
 
+    state_rfq = fields.Selection(
+        [('Draft', 'Draft'), ('RFQ Sent', 'RFQ Sent')], default='Draft')
+
     # total winner amount
     total_winner_amount = fields.Float(
         "Total Winner Amount", compute="_compute_total_winner_amount", store=True, default=0)
 
+    @api.onchange('supplier_id')
+    def _fill_supplier_for_each_item(self):
+        if self.request_type == "Foregin":
+            for record in self.rfq_lines:
+                # update suplier
+                record.supplier_id = self.supplier_id
+
     @api.model
     def create(self, vals):
+
         # get sequence number for each company
         self_comp = self.with_company(self.company_id)
-        vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-            'droga.purchase.request.rfq') or '/'
+        if self.purhcase_request_id.request_type == 'Local':
+            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+                'droga.purchase.request.rfq.local') or '/'
+        else:
+            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+                'droga.purchase.request.rfq.foreign') or '/'
+
         res = super(Rfq, self_comp).create(vals)
 
         return res
@@ -81,6 +103,15 @@ class Rfq(models.Model):
     def ceo_approval(self):
         self.write({'state': 'CEO Approval'})
         self.load_foregin_rfq_status()
+        return True
+
+    # rejet request
+    def reject_request(self):
+        self.write({'state': 'Draft'})
+        return True
+
+    def cancel_request(self):
+        self.write({'state': 'Cancel'})
         return True
 
     def load_foregin_rfq_status(self):
@@ -152,7 +183,8 @@ class Rfq(models.Model):
                             'state': 'draft',
                             'date_order': datetime.now(),
                             'rfq_id': supplier.rfq_id.id,
-                            'partner_id': supplier.supplier_id.id
+                            'partner_id': supplier.supplier_id.id,
+                            'request_type': self.request_type
                 }
                 vals['order_line'] = []
 
@@ -177,26 +209,26 @@ class Rfq(models.Model):
 
             # create purchase order commitment budget
             for line in self.rfq_lines:
-                    if line.winner == "Yes":
-                        # get budgetary position and expense account from purchase request
-                        purchase_request = self.env['droga.purhcase.request.line'].search(
-                            [('purhcase_request_id', '=', self.purhcase_request_id.id), ('product_id', '=', line.product_id.id)])
+                if line.winner == "Yes":
+                    # get budgetary position and expense account from purchase request
+                    purchase_request = self.env['droga.purhcase.request.line'].search(
+                        [('purhcase_request_id', '=', self.purhcase_request_id.id), ('product_id', '=', line.product_id.id)])
 
-                        commitment_budget = {
-                            'document_type': 'PO',
-                            'purchase_order_id': purchase_order.id,
-                            'purchase_order_total_amount': purchase_order.amount_total,
-                            'budget_date': purchase_order.date_order,
-                            'budgetary_position': purchase_request.budgetary_position.id,
-                            'expense_account': purchase_request.expense_account.id,
-                            'analytic_account_id': self.purhcase_request_id.branch.id,
-                            'company_id': self.company_id.id,
-                            'state': 'Active'
-                        }
+                    commitment_budget = {
+                        'document_type': 'PO',
+                        'purchase_order_id': purchase_order.id,
+                        'purchase_order_total_amount': purchase_order.amount_total,
+                        'budget_date': purchase_order.date_order,
+                        'budgetary_position': purchase_request.budgetary_position.id,
+                        'expense_account': purchase_request.expense_account.id,
+                        'analytic_account_id': self.purhcase_request_id.branch.id,
+                        'company_id': self.company_id.id,
+                        'state': 'Active'
+                    }
 
-                        # persist to database
-                        self.env['droga.budget.commitment.budget'].create(
-                            commitment_budget)
+                    # persist to database
+                    self.env['droga.budget.commitment.budget'].create(
+                        commitment_budget)
 
         return {
             'type': 'ir.actions.client',
@@ -222,6 +254,15 @@ class Rfq(models.Model):
         for record in commitment_budget:
             record.write({'state': 'Closed'})
 
+    def load_items_from_pr(self):
+
+        for record in self.purhcase_request_id.purhcase_request_lines:
+            line = {'rfq_id': self.id, 'supplier_id': self.supplier_id.id, 'product_id': record.product_id.id,
+                    'product_qty': record.product_qty, 'product_uom': record.product_uom.id, 'unit_price': 0, 'winner': 'Yes'}
+
+            self.env['droga.purhcase.request.rfq.line'].create(
+                line)
+
 
 class Rfq_Detail(models.Model):
     _name = 'droga.purhcase.request.rfq.line'
@@ -233,6 +274,8 @@ class Rfq_Detail(models.Model):
         'res.company', related='rfq_id.company_id', string='Company', store=True, readonly=True)
     # related fields
     purhcase_request_id = fields.Many2one(related='rfq_id.purhcase_request_id')
+    exchange_rate = fields.Float(
+        related="rfq_id.exchange_rate", store=True)
     purhcase_request_lines = fields.One2many(
         related='purhcase_request_id.purhcase_request_lines')
 
@@ -245,6 +288,11 @@ class Rfq_Detail(models.Model):
     unit_price = fields.Float('Unit Price', required=True)
     total_price = fields.Float(
         'Total Price', compute="_compute_total", store=True)
+
+    unit_price_foregin = fields.Float('Unit Price')
+    total_price_foregin = fields.Float(
+        'Total Price', compute="_compute_total", store=True)
+
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
                                   domain="[('category_id', '=', product_uom_category_id)]", required=True)
     product_uom_category_id = fields.Many2one(
@@ -262,9 +310,32 @@ class Rfq_Detail(models.Model):
 
     winner = fields.Selection([('Yes', 'Yes'), ('No', 'No')], default="No")
 
-    @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id')
+    # expected price
+    tax_amount = fields.Float(
+        "Tax Amount", help="Tax Amount based on Invoice value (Birr)")
+    demurrage_cost = fields.Float("Demurrage Cost", help="Demurrage Cost")
+    estimated_arriving_cost = fields.Float(
+        "Cost", help="Estimated Arriving Cost")
+    expected_selling_price = fields.Float(
+        "Margin", help="Expected selling price by 50% margin")
+    port_of_loading = fields.Float("Port of loading", help="Port of Loading")
+    less_container = fields.Selection(
+        [('Yes', 'Yes'), ('No', 'No')], string="Less Container", help="Less Container if By Sea")
+    estimated_arrival_date = fields.Date(
+        "Arrival Date", help="Estimated Warehouse Arrival Date")
+    unassembled_form = fields.Boolean(
+        "Unassembled Form", help="Can the product imported in unassembled form")
+
+    @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id', 'exchange_rate', 'unit_price_foregin')
     def _compute_total(self):
         for record in self:
+            if self.purhcase_request_id.request_type == "Local":
+                record.total_price = record.unit_price*record.product_qty
+            else:
+                record.unit_price = record.unit_price_foregin*record.exchange_rate
+                record.total_price = record.unit_price*record.product_qty
+                record.total_price_foregin = record.unit_price_foregin*record.product_qty
+
             price = record.unit_price
             taxes = record.tax_id.compute_all(
                 price, record.rfq_id.currency_id, record.product_qty)
@@ -277,9 +348,9 @@ class Rfq_Detail(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals:
-            if self.check_double_product_supplier_entry(vals) > 0:
-                raise UserError(_("You can't enter duplicate data"))
+        # if vals:
+        # if self.check_double_product_supplier_entry(vals) > 0:
+        # raise UserError(_("You can't enter duplicate data"))
 
         return super(Rfq_Detail, self).create(vals)
 
@@ -307,3 +378,10 @@ class Rfq_Detail(models.Model):
         else:
             return self.env['droga.purhcase.request.rfq.line'].search_count(
                 [('rfq_id', '=', vals['rfq_id']), ('supplier_id', '=', vals['supplier_id']), ('product_id', '=', vals['product_id'])])
+
+    @api.onchange('supplier_id')
+    def _fill_supplier_for_each_item(self):
+        if self.purhcase_request_id.request_type == "Foreign":
+            for record in self:
+                # update suplier
+                record.supplier_id = self.rfq_id.supplier_id

@@ -36,11 +36,29 @@ class purhcase_request(models.Model):
     purhcase_request_lines = fields.One2many(
         "droga.purhcase.request.line", "purhcase_request_id", required=True)
 
+    purhcase_request_lines_expectetd = fields.One2many(
+        "droga.purhcase.request.line", "purhcase_request_id", required=True)
+
+    purhcase_request_lines_market_analysis = fields.One2many(
+        "droga.purhcase.request.line", "purhcase_request_id", required=True)
+
+    purhcase_request_lines_foregin_supp_list = fields.One2many(
+        "droga.purhcase.request.line", "purhcase_request_id", required=True)
+
+    purhcase_request_lines_foregin_competitors = fields.One2many(
+        "droga.purhcase.request.line", "purhcase_request_id", required=True)
+
     state = fields.Selection(
         [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Checked", "Budget Checked"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
 
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
+
+    currency_id = fields.Many2one(
+        "res.currency", string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
+
+    exchange_rate = fields.Float(
+        "Exchange Rate", required=True, default=1.00, digits=(12, 4))
 
     approvals = fields.One2many(
         'studio.approval.entry', 'res_id', string='Approvals')
@@ -73,8 +91,14 @@ class purhcase_request(models.Model):
             ['company_id'])['company_id'])
 
         self_comp = self.with_company(company_id)
-        vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-            'droga.purchase.request') or '/'
+
+        if vals['request_type'] == 'Local':
+            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+                'droga.purchase.request.local') or '/'
+        else:
+            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+                'droga.purchase.request.foreign') or '/'
+
         res = super(purhcase_request, self_comp).create(vals)
 
         return res
@@ -97,6 +121,15 @@ class purhcase_request(models.Model):
             [('res_name', '=', self.name)])
         if activity:
             activity.action_feedback()
+        return True
+
+    # rejet request
+    def reject_request(self):
+        self.write({'state': 'Draft'})
+        return True
+
+    def cancel_request(self):
+        self.write({'state': 'Cancel'})
         return True
 
     # budget checked
@@ -168,6 +201,8 @@ class purhcase_request_line(models.Model):
     _description = "Purchase Request Line"
 
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
+    exchange_rate = fields.Float(
+        related="purhcase_request_id.exchange_rate", store=True)
     company_id = fields.Many2one(
         'res.company', related='purhcase_request_id.company_id', string='Company', store=True, readonly=True)
     status = fields.Selection(
@@ -180,6 +215,11 @@ class purhcase_request_line(models.Model):
     unit_price = fields.Float('Unit Price')
     total_price = fields.Float(
         'Total Price', compute="_compute_total", store=True)
+
+    unit_price_foregin = fields.Float('Unit Price')
+    total_price_foregin = fields.Float(
+        'Total Price', compute="_compute_total", store=True)
+
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
                                   domain="[('category_id', '=', product_uom_category_id)]", required=True)
     product_uom_category_id = fields.Many2one(
@@ -200,10 +240,15 @@ class purhcase_request_line(models.Model):
 
     remark = fields.Char("Remark")
 
-    @api.depends('product_qty', 'unit_price')
+    @api.depends('product_qty', 'unit_price', 'unit_price_foregin', 'exchange_rate')
     def _compute_total(self):
         for record in self:
-            record.total_price = record.unit_price*record.product_qty
+            if record.purhcase_request_id.request_type == 'Local':
+                record.total_price = record.unit_price*record.product_qty
+            else:
+                record.unit_price = record.unit_price_foregin*record.exchange_rate
+                record.total_price = record.unit_price*record.product_qty
+                record.total_price_foregin = record.unit_price_foregin*record.product_qty
 
     # set unit of measure
     @api.onchange('product_id')

@@ -39,6 +39,7 @@
             <xpath expr = "//field[@name='partner_ref']" position = "after">
                 <field name="rfq_id" options="{'no_create':True}" readonly="1" string="Request for Quotation"/>
                 <field name="purchase_request_id" options="{'no_create':True}" readonly="1" string="Purchase Request"/>
+                <field name="request_type" required="1" />
             </xpath>
 
             <xpath expr = "//button[@name='action_view_invoice']" position = "after">
@@ -62,6 +63,50 @@
             </xpath>
 
 
+        </field>
+    </record>
+
+    <record id="purchase_form_local_action" model="ir.actions.act_window">
+        <field name="name">Purchase Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_mode">tree,kanban,form,pivot,graph,calendar,activity</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_view_tree')}),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('purchase.purchase_order_view_kanban_without_dashboard')}),
+        ]"/>
+        <field name="domain">[('state','in',('purchase', 'done')),('request_type','=','Local')]</field>
+        <field name="search_view_id" ref="purchase.purchase_order_view_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No purchase order found. Let's create one!
+            </p>
+            <p>
+            Once you ordered your products to your supplier, confirm your request for quotation and it will turn into a purchase order.
+            </p>
+        </field>
+    </record>
+
+    <record id="purchase_form_foreign_action" model="ir.actions.act_window">
+        <field name="name">Purchase Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_mode">tree,kanban,form,pivot,graph,calendar,activity</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_view_tree')}),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('purchase.purchase_order_view_kanban_without_dashboard')}),
+        ]"/>
+        <field name="domain">[('state','in',('purchase', 'done')),('request_type','=','Foreign')]</field>
+        <field name="search_view_id" ref="purchase.purchase_order_view_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No purchase order found. Let's create one!
+            </p>
+            <p>
+            Once you ordered your products to your supplier, confirm your request for quotation and it will turn into a purchase order.
+            </p>
         </field>
     </record>
 

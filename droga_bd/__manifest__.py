@@ -30,6 +30,7 @@
         'views/budget_reallocation.xml',
         'reports/paper_format.xml',
         'reports/budget.xml',
+        'reports/budget_reallocation.xml',
         'views/menu.xml',
         'data/cron_job.xml',
 
