@@ -10,8 +10,8 @@ class AccountLoanInterest(models.Model):
     _name = 'account.loan.interest'
     
    
-    daily_interest_amount=fields.Float('Interest Amount',readonly=True,)
-    daily_penality_amount=fields.Float('Penality Amount',readonly=True)
+    daily_interest_amount=fields.Float('Interest Amount',readonly=True,digits=(12, 6))
+    daily_penality_amount=fields.Float('Penality Amount',readonly=Truedigits=(12, 6))
     daily_interest_rate=fields.Float('Daily Interest Rate',readonly=True,)
     daily_penality_rate=fields.Float('Daily Penality Rate',readonly=True, )
     daily_interest_total=fields.Float('Daily Interest  Total',readonly=True,)

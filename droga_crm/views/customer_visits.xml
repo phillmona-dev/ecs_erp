@@ -15,6 +15,7 @@
                 <field name="userid"></field>
                 <field name="month"></field>
                 <field name="year"></field>
+                <field name="city_name" widget="many2many_tags"></field>
                 <field name="state"></field>
 
                 <button icon="fa-credit-card-alt"
@@ -45,17 +46,16 @@
         <field name="model">droga.customer.visit.detail</field>
         <field name="arch" type="xml">
             <tree editable="top" delete="1" expand="1">
-                <field name="visit_client" options="{'no_create':True,'no_open':True}" ></field>
-                <field name="visit_contact" domain="([('parent_id','=',visit_client)])" options="{'no_create':True,'no_open':True}"></field>
+                <field name="visit_client" options="{'no_create':True,'no_open':True}" domain="[('is_company', '=',True),('city_name', 'in',city_name)]" ></field>
+                <field name="visit_contact" widget="many2many_tags" domain="([('parent_id','=',visit_client)])" options="{'no_create':True,'no_open':True}"></field>
                 <field name="visit_location"></field>
+                <field name="city_name" invisible="1"></field>
                 <field name="core_products" widget="many2many_tags" options="{'no_create':True,'no_open':True}"></field>
                 <button icon="fa-credit-card-alt"
                         type="object" string=" Show schedule"
                         name="visit_schedule_open" class="oe_stat_button"/>
-                <field name="visit_date"></field>
-                <field name="visit_date_descr"></field>
-                <field name="week_num"></field>
-                <field name="planned_visit_time" widget="float_time"></field>
+                <field name="day_and_date"></field>
+                <field name="planned_visit_selection"></field>
                 <field name="remark"></field>
             </tree>
         </field>

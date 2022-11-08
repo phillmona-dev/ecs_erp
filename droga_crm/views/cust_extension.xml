@@ -3,21 +3,21 @@
     <record id="droga_cust_contact_extension" model="ir.ui.view">
         <field name="name">customer</field>
         <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/field[@name='comment']" position="before">
-                <field name="contact_tobe_accessed_by"></field>
-                <field name="working_hours" mode="tree">
-                        <tree editable="bottom">
-                            <field name="day" required="True"/>
-                            <field name="time_from" widget="float_time"/>
-                            <field name="time_to" widget="float_time"/>
+            <xpath expr="//form/sheet/notebook/page[@name='contact_addresses']" position="replace">
+                <page string="Contacts">
+                    <field name="contacts" mode="tree">
+                        <tree editable="1" create="1">
+                            <field name="specialty" options="{'no_create':True,'no_open':True}"/>
+                            <field name="contact_name"/>
+                            <field name="job_pos"/>
+                            <field name="gender"/>
+                            <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
+                            <field name="cont_grade" options="{'no_create':True,'no_open':True}"/>
                         </tree>
-                </field>
-            </xpath>
-
-            <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']" position="attributes">
-                <attribute name="context">{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_lang': lang, 'default_user_id': user_id, 'default_type': 'contact'}</attribute>
+                    </field>
+                </page>
             </xpath>
 
             <xpath expr="//form/sheet/group/group" position="attributes">
@@ -35,14 +35,21 @@
             <xpath expr="//form/sheet/group/group" position="after">
                 <group>
 
-                    <field name="cust_grade" options="{'no_create':True,'no_open':True}" string="Customer grade"></field>
-                    <field name="cust_type_ext" attrs="{'required': True}" options="{'no_create':True,'no_open':True}" string="Customer type"></field>
-                    <field name="city_name" options="{'no_create':True,'no_open':True}" string="City/sub-city team"></field>
-                    <field name="area" options="{'no_create':True,'no_open':True}" string="Area" domain="([('parent_id','=',city_name)])"></field>
+                    <field name="cust_grade" options="{'no_create':True,'no_open':True}"
+                           string="Customer grade"></field>
+                    <field name="cust_type_ext" attrs="{'required': True}" options="{'no_create':True,'no_open':True}"
+                           string="Customer type"></field>
+                    <field name="city_name" options="{'no_create':True,'no_open':True}"
+                           string="City/sub-city team"></field>
+                    <field name="area" options="{'no_create':True,'no_open':True}" string="Area"
+                           domain="([('parent_id','=',city_name)])"></field>
                     <field name="location"></field>
 
                 </group>
 
+            </xpath>
+            <xpath expr="//form/sheet/group/group/field[@name='website']" position="replace">
+                <field name="vat" string="Tin No"></field>
             </xpath>
         </field>
     </record>
@@ -51,7 +58,7 @@
     <record id="droga_crm_teams_extension" model="ir.ui.view">
         <field name="name">CRM teams</field>
         <field name="model">crm.team</field>
-        <field name="inherit_id" ref="sales_team.crm_team_view_form" />
+        <field name="inherit_id" ref="sales_team.crm_team_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='active']" position="after">
                 <field name="city_name" mode="tree">

@@ -82,54 +82,29 @@ model-->
 
                     </group>
                     <notebook>
-                        <page string="Payment Schedule">
-
-                            <field name="loan_schedule_ids">
-                                <tree editable="bottom" create="0" delete="0">
-                                    <field name="name"/>
-                                    <field name="payment_date"/>
-                                    <field name="payment_amount"/>
-                                    <field name="prencipal"/>
-                                    <field name="interest"/>
-                                    <field name="balance"/>
-
-                                </tree>
-                            </field>
-
-                        </page>
-                        <page string="Interest">
-
-                            <field name="loan_interest_ids">
-                                <tree editable="bottom" create="0" delete="0">
-                                    <field name="daily_interest_amount"/>
-                                    <field name="daily_penality_amount"/>
-                                    <field name="daily_interest_total"/>
-
-                                    <field name="value_date"/>
-
-                                </tree>
-                            </field>
-
-                        </page>
-
-
                         <page string="Setting">
-                            <group name="name" string="Period Information">
+                        <notebook>
+                            <page name="name" string="Period Information">
                                 <group >
                                     <group name="name" string="">
                                     <field name="loan_period_year"/>
                                     <field name="payment"/>
                                     <field name="payment_month"/>
-                                    
+                                    <field name="anual_interest_rate"/>
                                     </group>
                                    
-                                <group name ="name" string="Period Calculated">
-                                    <field name="total_number_of_payment"/>
-                                    <field name="schedule_numberof_payment"/>
-                                    <field name="remaining_days"/>
-                                    <field name="next_payment_date"/>
-                                </group></group>
-                                <group string="Cumulatives">
+                                    <group name ="name" string="Period Calculated">
+                                        <field name="total_number_of_payment"/>
+                                        <field name="schedule_numberof_payment"/>
+                                        <field name="remaining_days"/>
+                                        <field name="next_payment_date"/>
+                                        <field name="daily_interest_rate"/>
+                                    </group>
+                                </group>
+                                
+                            </page>
+                            <page name="name" string="Cumulatives">
+                                 <group string="Cumulatives">
                                     <group >
                                         <field name="cumulative_balance"/>
                                         <field name="cumulative_interest"/>
@@ -146,17 +121,8 @@ model-->
     
                                     </group>
                                 </group>
-                                <group>
-                                    <group name="name" string="Interest Rates"> 
-                                        <field name="anual_interest_rate"/>
-                                    
-                                        <field name="daily_interest_rate"/>
-                                    </group>
-
-                                </group>
-                            </group>
-
-                        </page>
+                            </page>
+                            
                         <page name="droga_renew" string="Penality Range">
                             <field name="penality_range_ids">
 
@@ -174,6 +140,42 @@ model-->
                         </page>
                         
                        
+                        <page name="droga_renew" string="Renew">
+                            <field name="loan_renew_ids">
+
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="payment_amount"/>
+                                    <field name="anual_interest_rate"/>
+                                    <field name="anual_penality_rate"/>
+                                    <field name="addtional_payment"/>
+                                    <field name="renew_date"/>
+                                    <field name="renew_start_date"/>
+
+                                </tree>
+                            </field>
+
+
+                        </page>
+                        
+                        </notebook>
+                           
+
+                        </page>
+                       <page string="Receipt">
+
+                            <field name="loan_receipt_ids">
+                                <tree editable="bottom">
+                                    <field name="receipt"/>
+                                    <field name="value_date"/>
+                                    <field name="reference"/>
+                                    <field name="desc"/>
+                                    <button  type="object" name="compute_postt" string="Post"
+                                        class="oe_stat_button" icon="fa-file-text"/>
+                                </tree>
+                            </field>
+
+                        </page>
                         <page string="Repayment">
                             <!-- you can display child data like code below -->
                             <field name="loan_repayment_ids" >
@@ -198,37 +200,42 @@ model-->
                             </field>
 
                         </page>
-                        <page string="Receipt">
-
-                            <field name="loan_receipt_ids">
-                                <tree editable="bottom">
-                                    <field name="receipt"/>
-                                    <field name="value_date"/>
-                                    <field name="reference"/>
-                                    <field name="desc"/>
-
-                                </tree>
-                            </field>
-
-                        </page>
-                        <page name="droga_renew" string="Renew">
-                            <field name="loan_renew_ids">
-
-                                <tree editable="bottom">
-                                    <field name="name"/>
-                                    <field name="payment_amount"/>
-                                    <field name="anual_interest_rate"/>
-                                    <field name="anual_penality_rate"/>
-                                    <field name="addtional_payment"/>
-                                    <field name="renew_date"/>
-                                    <field name="renew_start_date"/>
-
-                                </tree>
-                            </field>
-
-
-                        </page>
                         
+                        <page name="name" string="Schedule">
+                        <notebook string="">
+                        
+                      
+                          <page string="Interest">
+
+                            <field name="loan_interest_ids">
+                                <tree editable="bottom" create="0" delete="0">
+                                    <field name="daily_interest_amount"/>
+                                    <field name="daily_penality_amount"/>
+                                    <field name="daily_interest_total"/>
+
+                                    <field name="value_date"/>
+
+                                </tree>
+                            </field>
+
+                        </page>
+                            
+                    
+                        <page string="Payment Schedule">
+
+                            <field name="loan_schedule_ids">
+                                <tree editable="bottom" create="0" delete="0">
+                                    <field name="name"/>
+                                    <field name="payment_date"/>
+                                    <field name="payment_amount"/>
+                                    <field name="prencipal"/>
+                                    <field name="interest"/>
+                                    <field name="balance"/>
+
+                                </tree>
+                            </field>
+
+                        </page>
 
                         <page name="schedule" string="Renewed Schedule">
 
@@ -247,12 +254,41 @@ model-->
                             </field>
 
                         </page>
-
                         
 
-                  
+                        </notebook>
+                          </page>
+                        <page string="Other">
+                        <group name="name" string="company">
+                            <field name="company_id"/>
+                        </group>
+                        <group name="name" string="Accounting">
+                            <group name="name" string="Accounting With Journal">
+                                <field name="account_penality"/>
+                                <field name="account_interest"/>
+                               
+                                <field name="accrued_interest_payable"/>
+                                 <field name="account_jornal_inte"/>
+
+                            </group>
+                            <group name="name" string="Accounting With Journal">
+                                <field name="account_bank"/>
+                                <field name="disbursement"/>
+                                
+                                
+                                <field name="account_jornal"/>
+                            </group>
+                        </group>
+                        
+                        
+                        </page>
                        
                     </notebook>
+                     <button  type="object" name="compute_daily_crons" string="Calculate Interest"
+                        class="oe_stat_button" icon="fa-file-text"
+                        context="{'default_acount_monthly_closing_id':active_id}"
+                       
+                 />
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" groups="base.group_user"/>
@@ -301,6 +337,8 @@ model-->
 
 
         </menuitem>
+
+
     </menuitem>
 
 

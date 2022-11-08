@@ -55,13 +55,13 @@ class droga_stock_office_supplies(models.Model):
         wh=self.env['stock.warehouse'].search([('code','=','OF')])
 
         pick_type_id = self.env['stock.picking.type'].sudo().search(
-            [('sequence_code', '=', 'INTOUT'),('warehouse_id', 'like', wh.id)]).id
+            [('sequence_code', '=', 'MTOV'),('warehouse_id', 'like', wh.id)]).id
         if not pick_type_id :
-            raise UserError("Picking type 'INTOUT' is not configured for office supplies.")
+            raise UserError("Picking type 'MTOV' is not configured for office supplies.")
 
 
         pick_type_id = self.env['stock.picking.type'].sudo().search(
-            [('sequence_code', '=', 'INTOUT'), ('warehouse_id', '=', wh.id)]).id
+            [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
         def_location_id=self.env['stock.location'].search([('complete_name','like',wh.code+'/Stock%'),('usage','=','internal')])[0].id
         def_dest_id = self.env['stock.location'].search([('name', 'like', 'Office supplies expense')])
 
@@ -120,7 +120,7 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     product_id = fields.Many2one(
         'product.product', 'Product',
         check_company=True,
-        domain="[('categ_id.name', '=', ['Office supply items']), '|', ('company_id', '=', False), ('company_id', '=', company_id)]",
+        domain="[('categ_id.name', 'like', ['Office supply items%']), '|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         index=True, required=True,
         state={'done': [('readonly', True)]})
     product_uom_qty = fields.Float(

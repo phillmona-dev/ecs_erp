@@ -13,6 +13,7 @@ class customer_visit_header(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
+    city_name=fields.Many2many('droga.crm.settings.city',string='Sales city/sub-city')
     _order = 'year desc,month desc'
     #state=fields.Selection([('new','New'),('draft','Draft'),('requested','Requested')('approved','Approved')],readonly=True,default='new',string='State')
     state = fields.Selection([
@@ -59,9 +60,9 @@ class customer_visit_header(models.Model):
 
     def approve(self):
         for det in self.plan_detail:
-            descr = det['visit_client'].name if det['visit_client'].name else ''
-            for prod in det['core_products']:
-                descr = ', ' + descr + prod.name
+            descr = det['visit_client'].name+' - ' if det['visit_client'].name else ''
+            for id,prod in enumerate(det['core_products']) :
+                descr = descr+ prod.name if id==0 else descr+', ' + prod.name
             if descr=='':
                 continue
             lead = {
@@ -72,11 +73,19 @@ class customer_visit_header(models.Model):
                 'type': 'lead',
                 'stage_id': 1,
                 'expected_revenue': 0,  # Fix me
-                'date_open': det['visit_date'],
+                'date_planned': det['visit_date'],
                 'partner_id': det['visit_client'].id,
-                'contact_name': det['visit_contact'].name,
+                'planned_visit_selection':det['planned_visit_selection']
+                #'contact_name': det['visit_contact'].name,
             }
             lead_created=self.env['crm.lead'].sudo().create(lead)
+
+            for cont in det['visit_contact']:
+                cont={
+                    'contact':cont.id,
+                    'leads':lead_created.id
+                 }
+                self.env['droga.crm.contacts.schedule'].sudo().create(cont)
 
             self.env['mail.activity'].sudo().create({
                 'res_model_id': self.env.ref('crm.model_crm_lead').id,
@@ -144,7 +153,7 @@ class customer_visit_header(models.Model):
             plan_vals={
                 'visit_header':res.id,
                 'visit_date':d,
-                'week_num':week_num,
+                'week_num':'Week-'+str(week_num),
             }
             plan_vals_all.append(plan_vals)
             days_with_weeks[d]=[week_num,0]
@@ -194,7 +203,7 @@ class customer_visit_header(models.Model):
                             'visit_contact': cont_id,
                             'planned_visit_time':planned_time,
                             'visit_date': d,
-                            'week_num': counter,
+                            'week_num': 'Week'+str(counter),
                             'visit_client':cust.id
                         }
                         plan_vals_all.append(plan_vals)
@@ -211,11 +220,12 @@ class customer_visit_header(models.Model):
             return result
 class customer_visit_detail(models.Model):
     _name='droga.customer.visit.detail'
+    _order = 'visit_date'
     visit_header=fields.Many2one('droga.customer.visit.header',required=True)
     visit_client=fields.Many2one('res.partner','Customer')
-    visit_contact = fields.Many2one('res.partner',string='Contact')
+    visit_contact = fields.Many2many('res.partner',string='Contact')
     visit_location=fields.Char('Visit location')
-    _order = 'visit_date'
+    city_name=fields.Many2many('droga.crm.settings.city',related='visit_header.city_name')
     visit_date=fields.Date('Visit date')
     visit_date_descr=fields.Char('Day',compute='_get_date_descr',store=True)
     core_products=fields.Many2many('product.template',domain=[('is_core_product','=','true')])
@@ -226,7 +236,7 @@ class customer_visit_detail(models.Model):
             if rec.visit_date:
                 rec.visit_date_descr=rec.visit_date.strftime("%A")
 
-    week_num=fields.Integer('Week number')
+    week_num=fields.Char('Week number')
     planned_visit_time=fields.Float('Planned visit time')
     actual_visit_time_from = fields.Float('Actual visit time from')
     actual_visit_time_to = fields.Float('Actual visit time to')
@@ -235,6 +245,17 @@ class customer_visit_detail(models.Model):
         ('active', 'Active'),
         ('scheduled', 'Scheduled'),
     ], string='Status', default="active", readonly=True, tracking=True)
+    planned_visit_selection=fields.Selection([
+        ('Early Morning', 'Early Morning'),
+        ('Late Morning', 'Late Morning'),
+        ('Lunch', 'Lunch'),
+        ('Early Afternoon', 'Early Afternoon'),
+        ('Late Afternoon', 'Late Afternoon'),
+    ], string='Visit session', default="Early Morning")
+    day_and_date=fields.Char('Visit Date',compute='_get_visit_date_and_day')
+    def _get_visit_date_and_day(self):
+        for rec in self:
+            rec.day_and_date=rec.visit_date_descr+'-'+rec.visit_date.strftime("%B %d,%Y")
 
     def visit_schedule_open(self):
         return {

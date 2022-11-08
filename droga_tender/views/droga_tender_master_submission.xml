@@ -41,7 +41,7 @@
         <field name="model">droga.tender.master</field>
         <field name="arch" type="xml">
 
-            <form>
+            <form delete="0">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
 
@@ -54,7 +54,7 @@
                     <notebook>
 
 
-                        <page string="Tender Submission Detail Technical">
+                        <page string="Technical detail">
                             <field name="detail_submissions_tec" mode="tree">
                                 <tree editable="bottom" multi_line="1">
 
@@ -63,15 +63,13 @@
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
                                     <field name="item_des"/>
                                     <field name="item_pro"/>
-                                    <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
                                     <field name="uom_free_field"></field>
                                     <field name="quantity"/>
                                     <field name="supplier_new"/>
                                     <field name="brand_model"/>
-                                    <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
                                     <field name="country" options="{'no_create':True,'no_open':True}"/>
 
-                                    <field name="deliv_period"/>
+                                    <field name="deliv_period_text"/>
                                     <field name="tech_result"/>
                                     <field name="id"/>
 
@@ -85,47 +83,53 @@
 
                     </notebook>
                     <notebook>
-                        <page string="Tender Submission Detail Financial">
+                        <page string="Financial detail">
                             <field name="detail_submissions_fin" mode="tree">
                                 <tree editable="1" create="0">
                                     <field name="lot_number"/>
                                     <field name="item_num"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="item_des"/>
                                     <field name="item_pro"/>
-                                    <field name="quantity"/>
+                                    <field name="quantity" sum="Total"/>
                                     <field name="unit_price" widget='monetary'/>
-                                    <field name="amount" widget='monetary'/>
-                                    <field name="currency" options="{'no_create':True,'no_open':True}"/>
-
-                                    <field name="fin_open"/>
+                                    <field name="amount" sum="Total" widget='monetary'/>
                                     <field name="status"/>
-                                    <field name="st_date"/>
                                     <field name="remark"/>
-                                    <field name="award_fold_num"/>
                                     <button icon="fa-credit-card-alt" type="object" string="Competitors"
                                             name="competitors_open" class="oe_stat_button"></button>
                                 </tree>
                             </field>
+                            </page>
+                            <page string="Additional info">
+                            <field name="detail_submissions_additional" mode="tree">
+                                <tree editable="1" create="0">
+                                    <field name="lot_number"/>
+                                    <field name="item_num"/>
+                                    <field name="item_pro"/>
+                                    <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="currency" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="fin_open"/>
+                                    <field name="st_date"/>
+                                    <field name="award_fold_num"/>
+                                </tree>
+                            </field>
                         </page>
-
                     </notebook>
 
 
                     <notebook>
-                        <page string="Tender Performance Evaluation">
+                        <page string="Awarded tenders">
                             <field name="detail_performance" mode="tree">
                                 <tree editable="bottom">
                                     <field name="lot_number"/>
                                     <field name="type_item" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="item_des"/>
                                     <field name="item_pro"/>
-                                    <field name="unit_of_measure" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="quantity"/>
+                                    <field name="quantity" sum="Total"/>
                                     <field name="unit_price" widget='monetary'/>
-                                    <field name="amount" widget='monetary'/>
-                                    <field name="award_cost"/>
-                                    <field name="perf_pct"/>
+                                    <field name="amount" sum="Total" widget='monetary'/>
+                                    <field name="award_cost" sum="Total"/>
+                                    <button icon="fa-credit-card-alt" type="object" string="Sales order"
+                                            name="sales_order_open" class="oe_stat_button"/>
                                 </tree>
                             </field>
                         </page>

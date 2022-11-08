@@ -11,7 +11,7 @@ class droga_tender_master(models.Model):
 
     #region fields definition
     # Date fields
-    posted_date_gre = fields.Date("Posted/floated date GRE",  required=True,compute="conv_posted_date",store=True,inverse='inverse_posted_date')
+    posted_date_gre = fields.Date("Posted/floated date GRE",  required=True,compute="conv_posted_date",store=True,inverse='inverse_posted_date',help="Time should be in Ethiopian format not AM/PM.")
     @api.depends("posted_date_eth")
     def conv_posted_date(self):
         try:
@@ -24,8 +24,8 @@ class droga_tender_master(models.Model):
 
     def inverse_posted_date(self):
         pass
-    closing_date_gre = fields.Datetime("Closing date and time GRE", required=True,compute="conv_close_date",store=True,inverse='inverse_close_date')
-    @api.depends("closing_date_eth","float_period","posted_date_gre")
+    closing_date_gre = fields.Datetime("Closing date and time GRE", required=True,compute="conv_close_date",store=True,inverse='inverse_close_date',help="Time should be in Ethiopian format not AM/PM.")
+    @api.depends("closing_date_eth","float_period","posted_date_gre","open_date_gre")
     def conv_close_date(self):
         try:
             if self.closing_date_eth=='':
@@ -39,12 +39,12 @@ class droga_tender_master(models.Model):
             self.closing_date_eth = ""
     def inverse_close_date(self):
         pass
-    open_date_gre = fields.Datetime("Opening date and time GRE",compute="conv_open_date",store=True,inverse='inverse_open_date')
-    @api.depends("open_date_eth",'posted_date_gre','float_period')
+    open_date_gre = fields.Datetime("Opening date and time GRE",compute="conv_open_date",store=True,inverse='inverse_open_date',help="Time should be in Ethiopian format not AM/PM.")
+    @api.depends("open_date_eth",'posted_date_gre','float_period','closing_date_gre')
     def conv_open_date(self):
         try:
             if self.open_date_eth=='':
-                self.open_date_gre=self.posted_date_gre+timedelta(days=int(self.float_period))
+                self.open_date_gre=self.closing_date_gre
             else:
                 converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
                     int(self.open_date_eth.split("-")[0]), int(self.open_date_eth.split("-")[1]),
@@ -54,7 +54,7 @@ class droga_tender_master(models.Model):
             self.open_date_eth = ""
     def inverse_open_date(self):
         pass
-    extension_date_gre = fields.Datetime("Extension date and time GRE",compute="conv_ext_date",store=True,inverse='inverse_ext_date')
+    extension_date_gre = fields.Datetime("Extension date and time GRE",compute="conv_ext_date",store=True,inverse='inverse_ext_date',help="Time should be in Ethiopian format not AM/PM.")
     @api.depends("extension_date_eth","closing_date_gre","ext_period")
     def conv_ext_date(self):
         for rec in self:
@@ -107,6 +107,7 @@ class droga_tender_master(models.Model):
     security_period_in_days = fields.Integer('Bid sec. period in days')
     # bool fields
     refloat = fields.Boolean("Is refloated tender?", default=False)
+    active=fields.Boolean("Active",default=True)
 
     # relational fields selection
     media = fields.Many2one('droga.tender.settings.media', string='Media')
@@ -120,6 +121,7 @@ class droga_tender_master(models.Model):
     detail_tenders = fields.One2many('droga.tender.master.detail', 'parent_tender', required=True)
     detail_submissions_tec = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission', required=True)
     detail_submissions_fin = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission')
+    detail_submissions_additional = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission')
     bid_security = fields.One2many('droga.tender.security.detail', 'bid_security')
     detail_performance = fields.One2many('droga.tender.performance.evaluation', 'parent_tender_performance')
     detail_contract = fields.One2many('droga.tender.contract', 'parent_tender_contract')
@@ -213,6 +215,13 @@ class droga_tender_master(models.Model):
             }
         self.env["droga.tender.security.detail"].create(to_create_bid_security)
         return res
+
+    def action_set_archive(self):
+        for rec in self:
+            if rec.active:
+                rec.active=False
+            else:
+                rec.active=True
 
     
     

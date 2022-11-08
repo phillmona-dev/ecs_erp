@@ -11,15 +11,20 @@ class AccountLoanInt(models.Model):
     _name = "account.loan.int"
     _description = "This model is used to catagoraize difrent type of loan"
  
-    daily_interest_amount=fields.Float('Interest Amount',readonly=True,)
-    daily_penality_amount=fields.Float('Penality Amount',readonly=True)
+    daily_interest_amount=fields.Float('Interest Amount',readonly=True,digits=(12, 8))
+    daily_penality_amount=fields.Float('Penality Amount',readonly=True,digits=(12, 8))
     value_date= fields.Date(string="Value Date",readonly=True)
     acount_loan_id = fields.Many2one(comodel_name='account.loan', string="Parent ID")
     daily_penality_rate=fields.Float('Daily Penality Rate',readonly=True, )
     daily_interest_rate=fields.Float('Daily Penality Rate',readonly=True, )
-    daily_interest_total=fields.Float('Daily Interest  Total',readonly=True,)
+    daily_interest_total=fields.Float('Daily Interest  Total',readonly=True,digits=(12, 8),compute='_compute_interest_toatal')
     posted=fields.Boolean(string="Posted?")
     payied=fields.Boolean(string="Payied?")
+
+    @api.depends("daily_interest_amount","daily_penality_amount")
+    def _compute_interest_toatal(self):
+        for record in self:
+            record.daily_interest_total = record.daily_interest_amount+record.daily_penality_amount
     @api.model
     def write(self, values):
         result = super(AccountLoanInt, self).write(values)

@@ -49,7 +49,6 @@ class droga_stock_transfer_custom(models.Model):
         elif len(compiled_domain)==1:
             #User has access to 1 warehouse, it will return internal locations under that warehouse
             #my_domain = json.dumps([('usage', '=', 'internal'),('complete_name',"like",+"'"+compiled_domain[0]+"/Stock%'")])
-            wareh=compiled_domain[0] + '/Stock%'
             my_domain = json.dumps([('usage', '=', 'production'), ('complete_name', 'like', compiled_domain[0]+' Receive transit')])
         else:
             dom=''
@@ -102,7 +101,7 @@ class droga_stock_transfer_custom(models.Model):
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
-            def_location_id=self.env['stock.location'].search([('complete_name','like',wh.code+'/Stock%'),('usage','=','internal')])[0].id
+            def_location_id=self.env['stock.location'].search([('usage','=','internal')])[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")
             picking_vals = {
@@ -114,7 +113,7 @@ class droga_stock_transfer_custom(models.Model):
                 #'auto_generated': True,
                 'origin': self.name,
                 #'state': 'draft',
-                'state': 'draft',
+                'state': 'confirmed',
                 'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
             }
@@ -138,7 +137,7 @@ class droga_stock_transfer_custom(models.Model):
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
                         #'state': 'draft',
-                        'state': 'draft',
+                        'state': 'confirmed',
                         'company_id': self.company_id.id
                     }
 
