@@ -20,6 +20,7 @@ class droga_tender_submission_detail(models.Model):
     supplier_new=fields.Char('Supplier')
     uom_free_field=fields.Char('UOM unregistered')
     item_num=fields.Integer('Item Number')
+    deliv_period_text = fields.Char("Delivery period")
 
     _sql_constraints = [
             ('lot_number_item_num_unique', 'unique (lot_number,item_num,month)', 'The combination lot number and item number already exists!')
@@ -47,6 +48,7 @@ class droga_tender_submission_detail(models.Model):
     competi_id = fields.One2many('droga.tender.competitors', 'submission_id')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]})
+    detail_performance = fields.One2many('droga.tender.performance.evaluation', 'parent_tender_performance_detail')
 
     # Date fields
     fin_open = fields.Datetime("Financial opening GRE")
@@ -87,30 +89,28 @@ class droga_tender_submission_detail(models.Model):
         }
     @api.model
     def create(self, vals_list):
+        res = super().create(vals_list)
         if vals_list["quantity"]==0:
             raise UserError("Quantity can not be zero.")
         if "status" in vals_list:
             if vals_list["status"]=="awarded":
                 to_create_perf_eval = {
-                    "lot_number": vals_list["lot_number"],
-                    "quantity": vals_list["quantity"],
-                    "unit_price":vals_list["unit_price"],
-                    "amount":vals_list["unit_price"]*vals_list["quantity"],
-                    "type_item": vals_list["type_item"],
-                    "item_des":vals_list["item_des"],
+                    "award_cost":vals_list["unit_price"]*vals_list["quantity"],
                     "parent_tender_performance": vals_list["parent_tender_submission"],
+                    "parent_tender_performance_detail": res.id,
                 }
                 self.env["droga.tender.performance.evaluation"].create(to_create_perf_eval)
+                cont_created=self.env['droga.tender.contract'].search([('lot_number','=',vals_list["lot_number"])])
+                if len(cont_created)==0:
+                    to_create_cont_agreement = {
+                    "lot_number": vals_list["lot_number"],
+                    "type_item": vals_list["type_item"],
+                    "parent_tender_contract": vals_list["parent_tender_submission"],
+                    'company_id':vals_list["company_id"]
+                    }
+                    self.env["droga.tender.contract"].create(to_create_cont_agreement)
 
-                to_create_cont_agreement = {
-                "lot_number": vals_list["lot_number"],
-                "type_item": vals_list["type_item"],
-                "item_des": vals_list["item_des"],
-                "parent_tender_contract": vals_list["parent_tender_submission"],
-            }
-                self.env["droga.tender.contract"].create(to_create_cont_agreement)
-
-        return super().create(vals_list)
+        return res
 
     def write(self, vals):
         if 'quantity' in vals:
@@ -120,21 +120,19 @@ class droga_tender_submission_detail(models.Model):
             return super().write(vals)
         if vals["status"]=="awarded":
             to_create_perf_eval = {
-                "lot_number": self.lot_number,
-                "quantity": self.quantity,
-                "type_item": self.type_item.id,
-                "unit_price": vals['unit_price'] if 'unit_price' in vals else self.unit_price,
-                "amount": (vals['unit_price'] if 'unit_price' in vals else self.unit_price) * self.quantity,
-                "item_des": self.item_des,
+                "parent_tender_performance_detail": self.id,
+                "award_cost": (vals['unit_price'] if 'unit_price' in vals else self.unit_price) * (vals['quantity'] if 'quantity' in vals else self.quantity),
                 "parent_tender_performance": self.parent_tender_submission.id,
             }
             self.env["droga.tender.performance.evaluation"].create(to_create_perf_eval)
 
-            to_create_cont_agreement = {
-                "lot_number": self.lot_number,
-                "type_item": self.type_item.id,
-                "item_des": self.item_des,
-                "parent_tender_contract": self.parent_tender_submission.id,
-            }
-            self.env["droga.tender.contract"].create(to_create_cont_agreement)
+            cont_created = self.env['droga.tender.contract'].search([('lot_number', '=', self.lot_number)])
+            if len(cont_created) == 0:
+                to_create_cont_agreement = {
+                    "lot_number": self.lot_number,
+                    "type_item": self.type_item.id,
+                    "item_des": self.item_des,
+                    "parent_tender_contract": self.parent_tender_submission.id,
+                }
+                self.env["droga.tender.contract"].create(to_create_cont_agreement)
         return super().write(vals)

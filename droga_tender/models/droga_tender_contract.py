@@ -7,7 +7,7 @@ class droga_tender_master(models.Model):
     # Text fields
     lot_number = fields.Char("Lot number")
     item_des = fields.Char("Item description")
-    remark = fields.Char("Item description")
+    remark = fields.Char("Remark")
 
     # decimal fields
     cont_period = fields.Integer("Contract period")
@@ -71,7 +71,7 @@ class droga_tender_master(models.Model):
             'view_id': self.env.ref('sale.view_order_form').id,
             'type': 'ir.actions.act_window',
             'context': {
-                'default_tender_origin_form': self.id,
+                'default_tender_origin_form': self.parent_tender_contract.id,
                 'default_partner_id': self.parent_tender_contract.customer.master_cust_id.id,
             }
         }

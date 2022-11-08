@@ -17,6 +17,7 @@ class cust_contact_extension(models.Model):
     city_name = fields.Many2one('droga.crm.settings.city')
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
+    contacts=fields.One2many('droga.crm.contacts','parent_customer')
 
 class sales_team_extension(models.Model):
     _inherit = 'crm.team'
@@ -30,6 +31,7 @@ class contact_working_hours(models.Model):
     day=fields.Selection([('0','Monday'),('1','Tuesday'),('2','Wednesday'),('3','Thursday'),('4','Friday'),('5','Saturday')])
     time_from=fields.Float('Time from (ETH)')
     time_to = fields.Float('Time to (ETH)')
+
     #Related reporting fields
     contact_title = fields.Char(related='parent_customer_id.title.name', string='Contact title')
     contact_name = fields.Char(related='parent_customer_id.name',string='Contact name')
@@ -51,6 +53,13 @@ class customer_grade(models.Model):
     _rec_name = "grade"
     grade=fields.Char('Grade')
     visit_times_per_month = fields.Integer('Visit per month')
+    status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True,default='Active')
+
+class contact_speciality(models.Model):
+    _name='droga.cust.specialty'
+    _rec_name = "specialty"
+    specialty=fields.Char('Specialty')
+    specialty_description = fields.Char('Description')
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True,default='Active')
 
 class customer_type(models.Model):

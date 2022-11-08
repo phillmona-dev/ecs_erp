@@ -26,6 +26,7 @@
         'views/doctors_schedule.xml',
         'views/sales_target.xml',
         'views/settings/cust_grade.xml',
+        'views/settings/specialty.xml',
         'views/settings/cust_type.xml',
         'views/settings/region.xml',
         'views/settings/city.xml',
