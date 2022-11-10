@@ -319,4 +319,92 @@
         </t>
     </template>
 
+    <!-- action for foregin rfq -->
+    <record id="droga_purhcase_rfq_without_price_foreign_report_action" model="ir.actions.report">
+        <field name="name">Request for Quotation</field>
+        <field name="model">droga.purhcase.request.rfq</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_procurement.droga_purhcase_rfq_without_price_report</field>
+        <field name="report_file">droga_procurement.droga_purhcase_rfq_without_price_report</field>
+        <field name="print_report_name">'Request for Quotation - %s' % (object.name)
+        </field>
+        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a4"/>
+        <field name="binding_model_id" ref="model_droga_purhcase_request_rfq"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="droga_purhcase_rfq_without_price_report" name="Request for Quotation">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <h2>Request for Quotation #<span t-field="o.name"/>
+                        </h2>
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <strong>Supplier:</strong>
+                                <p t-field="o.supplier_id.name" class="m-0"/>
+                            </div>
+
+                            <div class="col-3 bm-2">
+                                <strong>Date:</strong>
+                                <p t-field="o.date" class="m-0"/>
+                            </div>
+
+                            <div class="col-3 bm-2">
+                                <strong>Currency:</strong>
+                                <p t-field="o.currency_id.name" class="m-0"/>
+                            </div>
+
+                        </div>
+                        <br/>
+
+                        <table style="width:100%" class="table table-hover table-sm table-pos-info">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>
+                                        <strong class="small">No</strong>
+                                    </th>
+                                    <th>
+                                        <strong class="small">Product</strong>
+                                    </th>
+
+                                    <th>
+                                        <strong class="small">UoM</strong>
+                                    </th>
+                                    <th>
+                                        <strong class="small">Qty</strong>
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.rfq_lines" t-as="rfq_lines">
+                                    <td>
+                                        <t t-esc="rfq_lines_index+1"/>
+                                    </td>
+                                    <td class="small">
+                                        <t t-esc="rfq_lines.product_id.name"/>
+                                    </td>
+
+                                    <td class="small">
+                                        <t t-esc="rfq_lines.product_uom.name"/>
+                                    </td>
+                                    <td class="small">
+                                        <t t-esc="rfq_lines.product_qty"/>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
 </odoo>

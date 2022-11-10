@@ -31,6 +31,20 @@
         </field>
     </record>
 
+    <record id="droga_foreign_currency_request_action" model="ir.actions.act_window">
+        <field name="name">Currency Request</field>
+        <field name="res_model">droga.account.foreign.currency.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('rfq_id', '=', active_id)]</field>
+        <field name="context">{'default_rfq_id': active_id}</field>
+        <field name="target">current</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Foreign Currency Request
+            </p>
+        </field>
+    </record>
+
     <!-- tree view -->
     <record id="droga_purhcase_request_rfq_view_tree" model="ir.ui.view">
         <field name="name">droga_purhcase_request_rfq.view.tree</field>
@@ -148,27 +162,32 @@
         <field name="arch" type="xml">
             <form string="" create="0" delete="0" duplicate="0">
                 <header>
-
+                    <button name="pick_winner" string="Submit" type="object" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>
                     <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked" data-hotkey="v" class="oe_highlight"/>
-                    <!--<button name="committee_approval" type="object" states="Checked" string="Committee" id="committee_approval" data-hotkey="v" class="oe_highlight" attrs="{'invisible': [('request_type', 'in', ('Foregin'))]}"/>-->
-                    <button name="ceo_approval" type="object" states="Checked" string="CEO Approval" id="ceo_approval" data-hotkey="v" class="oe_highlight"/>
+                    <button name="operational_approval" type="object" states="Checked" string="Operation" id="operational_approval" data-hotkey="v" class="oe_highlight" />
+                    <button name="finance_approval" type="object" states="Operation Manager" string="Finance" id="finance_approval" data-hotkey="v" class="oe_highlight" />
+                    <button name="ceo_approval" type="object" states="Finance" string="CEO Approval" id="ceo_approval" data-hotkey="v" class="oe_highlight"/>
+
                     <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request" data-hotkey="v"/>
 
 
-                    <button name="reject_request" type="object" states="Winner Picked,Checked" string="Reject" id="reject_request" data-hotkey="v" class="btn-warning" confirm="Are you sure you want to reject the request?"/>
+                    <button name="reject_request" type="object" states="Winner Picked,Checked,Operation Manager,Finance" string="Reject" id="reject_request" data-hotkey="v" class="btn-warning" confirm="Are you sure you want to reject the request?"/>
                     <button name="cancel_request" type="object" states="Draft" string="Cancel" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="btn-danger"/>
 
-                    <field name="state" widget="statusbar" statusbar_visible="Draft,Checked,CEO Approval"/>
-                    <field name="state_rfq" widget="statusbar" />
+
+                    <field name="state" widget="statusbar" statusbar_visible="Draft,Checked,Operation Manager,Finance,CEO Approval"/>
+                    <!--<field name="state_rfq" widget="statusbar" />-->
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="pick_winner" string="Pick Winner" type="object" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>
-                        <button name="load_items_from_pr" string="Load Items" type="object" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>
+                        <button name="load_items_from_pr" string="Load Items" type="object" class="oe_stat_button" icon="fa-list" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>
+                        <button name="send_rfq" type="object" string="Send RFQ" data-hotkey="v" class="btn-info" icon="fa-mail-forward" attrs="{'invisible': [('state', 'in', ('Cancel'))]}"/>
 
-                        <button name="%(droga_purhcase_request_rfq_line_pre_import_permit_action)d" string="Pre Import Permit" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>
-                        <button name="%(droga_purchase_foregin_status_tracking_action)d" string="Status Tracking" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>
-                        <button name="%(droga_purchase_rfq_order_action)d" string="List PO" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+
+                        <!--<button name="%(droga_purhcase_request_rfq_line_pre_import_permit_action)d" string="Pre Import Permit" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>
+                        <button name="%(droga_purchase_foregin_status_tracking_action)d" string="Status Tracking" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>-->
+                        <button name="foreign_currency_request" string="Currency Request" type="object" class="oe_stat_button" icon="fa-money" attrs="{'invisible': [('state', 'not in', ('CEO Approval'))]}"/>
+                        <button name="%(droga_purchase_rfq_order_action)d" string="View PO" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
                         <button name="create_purchase_orders_automatically" string="Create PO" type="object" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
 
                     </div>
@@ -233,6 +252,48 @@
                                     <field name="less_container" width="15" />
                                     <field name="estimated_arrival_date" width="15" />
                                     <field name="unassembled_form" width="15" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Status Tracking">
+                            <field name="rfq_status" mode="tree">
+                                <tree create="0" delete="0" editable="bottom">
+                                    <field name="order" width="5"/>
+                                    <field name="step" width="30"/>
+                                    <field name="status" width="15"/>
+                                    <field name="done_date" width="10" string="Date"/>
+                                    <field name="remark" width="30"/>
+                                </tree>
+                            </field>
+
+                        </page>
+                        <page string="Proforma Invoice">
+                            <group>
+                                <group>
+                                    <field name="proforma_invoice_no" />
+                                </group>
+                            </group>
+
+                            <field name="rfq_pi_status" mode="tree">
+                                <tree create="0" delete="0" editable="bottom">
+                                    <field name="document" width="45" readonly="1"/>
+                                    <field name="available" width="15"/>
+
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="name" string="Currency Request">
+
+                            <field name="currency_requests" mode="tree">
+                                <tree create="0" delete="0">
+                                    <field name="name" width="15" readonly="1"/>
+                                    <field name="request_by" width="15"/>
+                                    <field name="department" width="15"/>
+                                    <field name="request_date" width="15"/>
+                                    <field name="currency_id" width="15"/>
+                                    <field name="total_amount" width="15"/>
+                                    <field name="state" width="15"/>
+
                                 </tree>
                             </field>
                         </page>

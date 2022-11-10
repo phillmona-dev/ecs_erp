@@ -19,7 +19,7 @@
     'version': '1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'purchase', 'stock','hr', 'web_studio','droga_finance'],
+    'depends': ['base', 'purchase', 'stock', 'hr', 'web_studio', 'droga_finance'],
 
     # always loaded
     'data': [
@@ -33,11 +33,13 @@
         'views/market_analysis_and_competitors.xml',
         'views/purchase_foregin_status.xml',
         'views/lc.xml',
+        'views/foreign_currency_request.xml',
         'views/configuration.xml',
         'report/paper_format.xml',
         'report/purchase_request.xml',
         'report/purchase_request_foreign.xml',
         'report/rfq.xml',
+        'data/mail_template.xml',
         'views/menu.xml',
 
     ],
