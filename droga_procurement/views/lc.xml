@@ -19,7 +19,7 @@
                             <field name="expire_date" />
                         </group>
                         <group>
-                            <field name="bank_name" options="{'no_create':True,'no_open':True}"/>
+                            <field name="bank" options="{'no_create':True,'no_open':True}"/>
                             <field name="branch" />
                             <field name="total_amount_etb" />
                             <field name="total_amount_usd" />

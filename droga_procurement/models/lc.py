@@ -14,7 +14,8 @@ class Lc(models.Model):
     purchase_order_id = fields.Many2one("purchase.order")
 
     name = fields.Char("LC/TT Number", required=True)
-    bank_name = fields.Many2one("res.bank", required=True)
+    bank_name = fields.Char("Bank")
+    bank = fields.Many2one("res.bank", required=True)
     branch = fields.Char("Branch", required=True)
     expire_date = fields.Date("Expire Date", required=True)
     lc_details = fields.One2many('droga.purchase.lc.detail', 'lc_id')

@@ -33,7 +33,7 @@ class Rfq(models.Model):
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
     currency_id = fields.Many2one("res.currency", related='company_id.currency_id', string="Currency", readonly=True,
-                                  required=True, store=True)
+                                  store=True)
     exchange_rate = fields.Float(
         "Exchange Rate", required=True, default=1.00, digits=(12, 4))
 
