@@ -24,7 +24,7 @@
 
     # always loaded
     'data': [
-        
+
         'security/account_security.xml',
         'security/ir.model.access.csv',
         'views/payment_request.xml',
