@@ -24,7 +24,7 @@
 
     # always loaded
     'data': [
-        
+        'views/credit_limit.xml',
         'security/account_security.xml',
         'security/ir.model.access.csv',
         'views/payment_request.xml',
