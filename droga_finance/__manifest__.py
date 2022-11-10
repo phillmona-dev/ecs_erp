@@ -21,7 +21,6 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'account', 'purchase','hr'],
-    'depends': ['base', 'account', 'purchase','hr','sale'],
 
     # always loaded
     'data': [
