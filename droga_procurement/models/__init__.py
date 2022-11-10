@@ -5,4 +5,5 @@ from . import rfq
 from . import purchase_order
 from . import lc
 from . import pre_import_permit
+from . import foreign_currency_request
 from . import configuration,market_analysis_and_competitors

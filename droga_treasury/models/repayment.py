@@ -74,33 +74,19 @@ class AccountLoanRepayment(models.Model):
     @api.onchange("value_date","loan_repayment_detail_ids","num")
     def _compute_paied(self):
         for record in self:
-            if record.loan_repayment_detail_ids:
-                penality=0.0000000000000000000000000
-                intestt=0.000000000000000000000000000
-                total_payment=0.00000000000000000000000
-                pincipal=0.0000000000000000000000000000
-                for detail in record.loan_repayment_detail_ids:
-                    penality+=detail.is_penality
-                    intestt+=detail.is_interest
-                    total_payment+=detail.total_payment
-                    pincipal+=detail.principal_repayment
-                record.total_payment =total_payment
-                record.is_interest =intestt
-                record.is_penality =penality
-                record.principal_repayment =pincipal
-            else:
-                intest =0.000000000000000000000000000
-                paiedint=0.00000000000000000000000000000
+            intest =0.000000000000000000000000000
+            paiedint=0.00000000000000000000000000000
                 #record.is_interest=0
-                theinte=0
-                penality=0.00000000000000000000000
-                paiedpenality=0.0000000000000000000
-                idsids=0
-                
+            theinte=0
+            penality=0.00000000000000000000000
+            paiedpenality=0.0000000000000000000
+            idsids=0
+            current_date=datetime.today()
+            cday = current_date.date()
+            if cday:    
                 if record.value_date:
                     
-                    current_date=datetime.today()
-                    cday = current_date.date()
+                    
                     if not record.is_paied:
                         if record.is_compound:
                             theinte=0
@@ -160,12 +146,18 @@ class AccountLoanRepayment(models.Model):
                                 [('payment_date', '=', datepaied), ('acount_loan_id', '=', idddd)])
                         amount=0.00000000
                         payment_term='1'
+                        payment_term=acount_schedulee.name
+                        if racount_schedule:
+                            payment_term=racount_schedule.name
+
                         if acount_schedulee:
+                            
                             for schedule in acount_schedulee:
                                 amount=schedule.payment_amount
                                 payment_term=schedule.name
                                 break
                         if racount_schedule:
+                            payment_term=schedule.name
                             for schedule in racount_schedule:
                                 amount=schedule.payment_amount
                                 payment_term=schedule.name
@@ -177,6 +169,8 @@ class AccountLoanRepayment(models.Model):
                                                                          'expected_payment_date':datepaied, 'total_payment': amount,
                                                                          'payment_term':payment_term})
                             record.acount_loan_id.next_payment_date=datepaied
+                        else :
+                            acount_payment.payment_term=payment_term
                         if theinte>0:
                             record.is_interest= theinte
                             break
@@ -199,7 +193,20 @@ class AccountLoanRepayment(models.Model):
                     
            
                 else: record.is_paied = False
-           
+            if record.loan_repayment_detail_ids:
+                penality=0.0000000000000000000000000
+                intestt=0.000000000000000000000000000
+                total_payment=0.00000000000000000000000
+                pincipal=0.0000000000000000000000000000
+                for detail in record.loan_repayment_detail_ids:
+                    penality+=detail.is_penality
+                    intestt+=detail.is_interest
+                    total_payment+=detail.total_payment
+                    pincipal+=detail.principal_repayment
+                record.total_payment =intestt+penality+pincipal
+                record.is_interest =intestt
+                record.is_penality =penality
+                record.principal_repayment =pincipal
 
     
 

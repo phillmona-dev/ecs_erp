@@ -1,7 +1,5 @@
-from email.policy import default
-from turtle import pu
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError, UserError
+from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
 
 
@@ -20,38 +18,76 @@ class Rfq(models.Model):
     request_type = fields.Selection(
         related="purhcase_request_id.request_type", store=True)
 
-    date = fields.Datetime("Date", required=True)
+    supplier_id = fields.Many2one('res.partner', string='Supplier')
+
+    date = fields.Datetime("Date", required=True, default=datetime.today())
     rfq_lines = fields.One2many(
         'droga.purhcase.request.rfq.line', 'rfq_id', required=True)
+
+    rfq_lines_expected_cost = fields.One2many(
+        'droga.purhcase.request.rfq.line', 'rfq_id', required=True)
+
     remark = fields.Html("Remark")
     technical_remark = fields.Html("Technical remark")
 
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
     currency_id = fields.Many2one("res.currency", related='company_id.currency_id', string="Currency", readonly=True,
-                                  required=True, store=False)
+                                  store=True)
+    exchange_rate = fields.Float(
+        "Exchange Rate", required=True, default=1.00, digits=(12, 4))
 
     procurement_committee = fields.Many2many("hr.employee")
 
     rfq_foregin_status = fields.One2many(
         "droga.purchase.foregin.status", "rfq_id")
 
+    rfq_status = fields.One2many(
+        "droga.purchase.rfq.foregin.status", "rfq_id")
+
+    rfq_pi_status = fields.One2many(
+        "droga.purchase.pi.foregin.status", "rfq_id")
+
     lcs = fields.One2many('droga.purchase.lc', 'rfq_id')
 
     state = fields.Selection(
-        [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"), ("Committee Approval", "Committee Approved"), ("CEO Approval", "CEO Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
+        [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"), ("Committee Approval", "Committee Approved"), ("Operation Manager", "Operation Manager"), ("Finance", "Finance"), ("CEO Approval", "CEO"), ("Cancel", "Canceled")], default="Draft", tracking=True)
 
+    state_rfq = fields.Selection(
+        [('Draft', 'Draft'), ('RFQ Sent', 'RFQ Sent'), ('Proforma Invoice', 'Proforma Invoice')], default='Draft', tracking=True)
+
+    currency_requests = fields.One2many(
+        'droga.account.foreign.currency.request', 'rfq_id')
     # total winner amount
     total_winner_amount = fields.Float(
         "Total Winner Amount", compute="_compute_total_winner_amount", store=True, default=0)
 
+    # proforma invoice
+    proforma_invoice_no = fields.Char("Proforma Invoice")
+
+    @api.onchange('supplier_id')
+    def _fill_supplier_for_each_item(self):
+        if self.request_type == "Foregin":
+            for record in self.rfq_lines:
+                # update suplier
+                record.supplier_id = self.supplier_id
+
     @api.model
     def create(self, vals):
+
         # get sequence number for each company
         self_comp = self.with_company(self.company_id)
-        vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-            'droga.purchase.request.rfq') or '/'
+        if self.purhcase_request_id.request_type == 'Local':
+            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+                'droga.purchase.request.rfq.local') or '/'
+        else:
+            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+                'droga.purchase.request.rfq.foreign') or '/'
+
         res = super(Rfq, self_comp).create(vals)
+
+        # create status tracking record
+        self.load_rfq_status(res.id)
 
         return res
 
@@ -77,10 +113,27 @@ class Rfq(models.Model):
         self.write({'state': 'Committee Approval'})
         return True
 
+    def operational_approval(self):
+        self.write({'state': 'Operation Manager'})
+        return True
+
+    def finance_approval(self):
+        self.write({'state': 'Finance'})
+        return True
+
     # ceo approval
     def ceo_approval(self):
         self.write({'state': 'CEO Approval'})
         self.load_foregin_rfq_status()
+        return True
+
+    # rejet request
+    def reject_request(self):
+        self.write({'state': 'Draft'})
+        return True
+
+    def cancel_request(self):
+        self.write({'state': 'Cancel'})
         return True
 
     def load_foregin_rfq_status(self):
@@ -128,13 +181,56 @@ class Rfq(models.Model):
         return True
 
     def create_purchase_orders_automatically(self):
+
+        message = self.check_documents()
+        if message != '':
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                        'message': message,
+                        'type': 'danger',
+                        'sticky': False
+                }
+            }
         # check if there is no purchase related with the rfq
         puchase_orders = self.env['purchase.order'].search(
             [('rfq_id', '=', self.id)])
 
+        # check if foregin currency is approved
+        if self.currency_requests.ids:
+            for record in self.currency_requests:
+                if record.state != 'Approved':
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
+                            'message': 'Requested foreign currency is not approved ',
+                            'type': 'danger',
+                            'sticky': False
+                        }
+                    }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'message': 'Foreign currency is not requested, please request the form before issuing the purchase order ',
+                    'type': 'danger',
+                    'sticky': False
+                }
+            }
+
         if puchase_orders.ids:
-            raise UserError(
-                _("Purchase order for the current Request for Quotation is created "))
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'message': 'Purchase order for the current Request for Quotation is already created ',
+                    'type': 'danger',
+                    'sticky': False
+                }
+            }
 
         suppliers = []
         # get unique suppliers from the rfq
@@ -152,7 +248,9 @@ class Rfq(models.Model):
                             'state': 'draft',
                             'date_order': datetime.now(),
                             'rfq_id': supplier.rfq_id.id,
-                            'partner_id': supplier.supplier_id.id
+                            'partner_id': supplier.supplier_id.id,
+                            'request_type': self.request_type
+
                 }
                 vals['order_line'] = []
 
@@ -167,6 +265,7 @@ class Rfq(models.Model):
                             'product_id': line.product_id.id,
                             'product_qty':  line.product_qty,
                             'product_uom': line.product_uom.id,
+                            'unit_price_foregin': line.unit_price_foregin,
                             'taxes_id': [(6, 0, line.tax_id.ids)],
                         })
 
@@ -177,26 +276,26 @@ class Rfq(models.Model):
 
             # create purchase order commitment budget
             for line in self.rfq_lines:
-                    if line.winner == "Yes":
-                        # get budgetary position and expense account from purchase request
-                        purchase_request = self.env['droga.purhcase.request.line'].search(
-                            [('purhcase_request_id', '=', self.purhcase_request_id.id), ('product_id', '=', line.product_id.id)])
+                if line.winner == "Yes":
+                    # get budgetary position and expense account from purchase request
+                    purchase_request = self.env['droga.purhcase.request.line'].search(
+                        [('purhcase_request_id', '=', self.purhcase_request_id.id), ('product_id', '=', line.product_id.id)])
 
-                        commitment_budget = {
-                            'document_type': 'PO',
-                            'purchase_order_id': purchase_order.id,
-                            'purchase_order_total_amount': purchase_order.amount_total,
-                            'budget_date': purchase_order.date_order,
-                            'budgetary_position': purchase_request.budgetary_position.id,
-                            'expense_account': purchase_request.expense_account.id,
-                            'analytic_account_id': self.purhcase_request_id.branch.id,
-                            'company_id': self.company_id.id,
-                            'state': 'Active'
-                        }
+                    commitment_budget = {
+                        'document_type': 'PO',
+                        'purchase_order_id': purchase_order.id,
+                        'purchase_order_total_amount': purchase_order.amount_total,
+                        'budget_date': purchase_order.date_order,
+                        'budgetary_position': purchase_request.budgetary_position.id,
+                        'expense_account': purchase_request.expense_account.id,
+                        'analytic_account_id': self.purhcase_request_id.branch.id,
+                        'company_id': self.company_id.id,
+                        'state': 'Active'
+                    }
 
-                        # persist to database
-                        self.env['droga.budget.commitment.budget'].create(
-                            commitment_budget)
+                    # persist to database
+                    self.env['droga.budget.commitment.budget'].create(
+                        commitment_budget)
 
         return {
             'type': 'ir.actions.client',
@@ -222,6 +321,166 @@ class Rfq(models.Model):
         for record in commitment_budget:
             record.write({'state': 'Closed'})
 
+    def load_items_from_pr(self):
+
+        for record in self.purhcase_request_id.purhcase_request_lines:
+            line = {'rfq_id': self.id, 'supplier_id': self.supplier_id.id, 'product_id': record.product_id.id,
+                    'product_qty': record.product_qty, 'product_uom': record.product_uom.id, 'unit_price': 0, 'winner': 'Yes'}
+
+            self.env['droga.purhcase.request.rfq.line'].create(
+                line)
+
+    # send rfq to the supplier
+    def send_rfq(self):
+        '''
+        This function opens a window to compose an email, with the edi purchase template message loaded by default
+        '''
+        self.ensure_one()
+        ir_model_data = self.env['ir.model.data']
+        try:
+            if self.env.context.get('send_rfq', False):
+                template_id = ir_model_data._xmlid_lookup(
+                    'droga_procurement.email_template_rfq')[2]
+            else:
+                template_id = ir_model_data._xmlid_lookup(
+                    'droga_procurement.email_template_rfq')[2]
+        except ValueError:
+            template_id = False
+        try:
+            compose_form_id = ir_model_data._xmlid_lookup(
+                'mail.email_compose_message_wizard_form')[2]
+        except ValueError:
+            compose_form_id = False
+        ctx = dict(self.env.context or {})
+        ctx.update({
+            'default_model': 'droga.purhcase.request.rfq',
+            'active_model': 'droga.purhcase.request.rfq',
+            'active_id': self.ids[0],
+            'default_res_id': self.ids[0],
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+            'default_email_layout_xmlid': "mail.mail_notification_layout_with_responsible_signature",
+            'force_email': True,
+            'mark_rfq_as_sent': True,
+        })
+
+        # In the case of a RFQ or a PO, we want the "View..." button in line with the state of the
+        # object. Therefore, we pass the model description in the context, in the language in which
+        # the template is rendered.
+        lang = self.env.context.get('lang')
+        if {'default_template_id', 'default_model', 'default_res_id'} <= ctx.keys():
+            template = self.env['mail.template'].browse(
+                ctx['default_template_id'])
+            if template and template.lang:
+                lang = template._render_lang([ctx['default_res_id']])[
+                    ctx['default_res_id']]
+
+        self = self.with_context(lang=lang)
+        if self.state in ['draft', 'sent']:
+            ctx['model_description'] = _('Request for Quotation')
+        else:
+            ctx['model_description'] = _('Purchase Order')
+
+        return {
+            'name': _('Compose Email'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
+
+    def load_rfq_status(self, rfq_id):
+        # get phase 1 or request for quotation steps
+        rfq_steps = self.env["droga.foregin.purchase.phases"].search(
+            [('phase_name', '=', '1')])
+
+        for rfq_step in rfq_steps:
+            # create record in rfq step status one2manyobject
+            status = {'rfq_id': rfq_id,
+                      'phase': rfq_step.id,
+                      'status': 'Not Started'}
+            # create the record in database
+            sta = self.env['droga.purchase.rfq.foregin.status'].create(status)
+
+        # get proforma invoice documents
+        proforma_invoices = self.env["droga.purchase.reconciliation.docs"].search(
+            [('doc_type', '=', 'PI')])
+
+        for proforma_invoice in proforma_invoices:
+            pi_status = {
+                'rfq_id': rfq_id,
+                'document': proforma_invoice.id,
+            }
+
+            self.env['droga.purchase.pi.foregin.status'].create(pi_status)
+
+    def foreign_currency_request(self):
+
+        message = self.check_documents()
+        if message != '':
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                        'message': message,
+                        'type': 'danger',
+                        'sticky': False
+                }
+            }
+
+        total_amount = 0
+        # get total amount from the RFQ
+        for record in self.rfq_lines:
+            total_amount += record.total_price_foregin
+
+        return {
+            'name': 'Currency Request',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.account.foreign.currency.request',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'domain': [('rfq_id', '=', self.id)],
+            'context': {
+                'default_rfq_id': self.id,
+                'default_supplier_id': self.supplier_id.id,
+                'default_currency_id': self.currency_id.id,
+                'default_total_amount': total_amount,
+                'default_exchange_rate': self.exchange_rate}
+        }
+
+    def check_documents(self):
+        # validate document before opening currency request
+        message = ''
+        for record1 in self.rfq_status:
+            if record1.status != 'Done':
+                message += 'There are not done activities on the status tracking, please update the status before proceeding.'
+                break
+
+        for record2 in self.rfq_pi_status:
+            if not record2.available:
+                if message == '':
+                    message += ' There are not done activities on the proforma invoice tab, please update the status before proceeding.'
+                else:
+                    message += ', There are not done activities on the proforma invoice tab, please update the status before proceeding.'
+                break
+
+        return message
+    # constraints
+    # Proforma invoice Field to be unique
+
+    @api.constrains('proforma_invoice_no')
+    def _check_proforma_invoice_no_unique(self):
+        counts = self.search_count(
+            [('proforma_invoice_no', '=', self.proforma_invoice_no)])
+
+        if counts > 1:
+            raise ValidationError("Proforma invoice number already exists!")
+
 
 class Rfq_Detail(models.Model):
     _name = 'droga.purhcase.request.rfq.line'
@@ -233,6 +492,8 @@ class Rfq_Detail(models.Model):
         'res.company', related='rfq_id.company_id', string='Company', store=True, readonly=True)
     # related fields
     purhcase_request_id = fields.Many2one(related='rfq_id.purhcase_request_id')
+    exchange_rate = fields.Float(
+        related="rfq_id.exchange_rate", store=True, digits=(12, 4))
     purhcase_request_lines = fields.One2many(
         related='purhcase_request_id.purhcase_request_lines')
 
@@ -245,6 +506,11 @@ class Rfq_Detail(models.Model):
     unit_price = fields.Float('Unit Price', required=True)
     total_price = fields.Float(
         'Total Price', compute="_compute_total", store=True)
+
+    unit_price_foregin = fields.Float('Unit Price')
+    total_price_foregin = fields.Float(
+        'Total Price', compute="_compute_total", store=True)
+
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
                                   domain="[('category_id', '=', product_uom_category_id)]", required=True)
     product_uom_category_id = fields.Many2one(
@@ -262,9 +528,32 @@ class Rfq_Detail(models.Model):
 
     winner = fields.Selection([('Yes', 'Yes'), ('No', 'No')], default="No")
 
-    @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id')
+    # expected price
+    tax_amount = fields.Float(
+        "Tax Amount", help="Tax Amount based on Invoice value (Birr)")
+    demurrage_cost = fields.Float("Demurrage Cost", help="Demurrage Cost")
+    estimated_arriving_cost = fields.Float(
+        "Cost", help="Estimated Arriving Cost")
+    expected_selling_price = fields.Float(
+        "Margin", help="Expected selling price by 50% margin")
+    port_of_loading = fields.Float("Port of loading", help="Port of Loading")
+    less_container = fields.Selection(
+        [('Yes', 'Yes'), ('No', 'No')], string="Less Container", help="Less Container if By Sea")
+    estimated_arrival_date = fields.Date(
+        "Arrival Date", help="Estimated Warehouse Arrival Date")
+    unassembled_form = fields.Boolean(
+        "Unassembled Form", help="Can the product imported in unassembled form")
+
+    @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id', 'exchange_rate', 'unit_price_foregin')
     def _compute_total(self):
         for record in self:
+            if record.purhcase_request_id.request_type == "Local":
+                record.total_price = record.unit_price*record.product_qty
+            else:
+                record.unit_price = record.unit_price_foregin*record.exchange_rate
+                record.total_price = record.unit_price*record.product_qty
+                record.total_price_foregin = record.unit_price_foregin*record.product_qty
+
             price = record.unit_price
             taxes = record.tax_id.compute_all(
                 price, record.rfq_id.currency_id, record.product_qty)
@@ -277,9 +566,9 @@ class Rfq_Detail(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals:
-            if self.check_double_product_supplier_entry(vals) > 0:
-                raise UserError(_("You can't enter duplicate data"))
+        # if vals:
+        # if self.check_double_product_supplier_entry(vals) > 0:
+        # raise UserError(_("You can't enter duplicate data"))
 
         return super(Rfq_Detail, self).create(vals)
 
@@ -307,3 +596,37 @@ class Rfq_Detail(models.Model):
         else:
             return self.env['droga.purhcase.request.rfq.line'].search_count(
                 [('rfq_id', '=', vals['rfq_id']), ('supplier_id', '=', vals['supplier_id']), ('product_id', '=', vals['product_id'])])
+
+    @api.onchange('supplier_id')
+    def _fill_supplier_for_each_item(self):
+        if self.purhcase_request_id.request_type == "Foreign":
+            for record in self:
+                # update suplier
+                record.supplier_id = self.rfq_id.supplier_id
+
+
+class rfq_foregin_status(models.Model):
+    _name = "droga.purchase.rfq.foregin.status"
+    _description = "Status Tracking for Foregin Purchases"
+
+    rfq_id = fields.Many2one("droga.purhcase.request.rfq")
+
+    phase = fields.Many2one("droga.foregin.purchase.phases")
+    phase_name = fields.Selection(related="phase.phase_name", store=True)
+    step = fields.Char(related="phase.step")
+    order = fields.Integer(related="phase.order")
+    status = fields.Selection(
+        [("Not Started", "Not Started"), ("On Progress", "On Progress"),  ("Done", "Done")])
+    done_date = fields.Date("Done Date")
+    remark = fields.Char("Remark")
+
+
+class rfq_proforma_invoice_status(models.Model):
+    _name = "droga.purchase.pi.foregin.status"
+
+    _description = "Status Tracking for Proforma Invoice RFQ"
+
+    rfq_id = fields.Many2one("droga.purhcase.request.rfq")
+    document = fields.Many2one("droga.purchase.reconciliation.docs")
+    order = fields.Integer(related="document.order")
+    available = fields.Boolean("Available", default=False)

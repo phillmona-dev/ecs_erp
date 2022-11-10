@@ -571,15 +571,15 @@ class AccountLoan(models.Model):
             while predone.next_payment_date < cday:
                 predone.next_payment_date += relativedelta(
                     months=predone.payment_month)
-            acount_payment = self.env['account.loan.repayment'].search(
-                [('expected_payment_date', '=', predone.next_payment_date), ('acount_loan_id', '=', predone.id)])
-            if not acount_payment:
-                if predone.loan_schedule_ids:
-                    for schedule in predone.loan_schedule_ids:
-                        if schedule.payment_date == predone.next_payment_date:
-                            payments = self.env['account.loan.repayment'].create({'acount_loan_id': predone.id,
-                                                                                  'expected_payment_date': predone.next_payment_date, 'total_payment': predone.payment,
-                                                                                  'payment_term': schedule.name})
+                acount_payment = self.env['account.loan.repayment'].search(
+                    [('expected_payment_date', '=', predone.next_payment_date), ('acount_loan_id', '=', predone.id)])
+                if not acount_payment:
+                    if predone.loan_schedule_ids:
+                        for schedule in predone.loan_schedule_ids:
+                            if schedule.payment_date == predone.next_payment_date:
+                                payments = self.env['account.loan.repayment'].create({'acount_loan_id': predone.id,
+                                                                                    'expected_payment_date': predone.next_payment_date, 'total_payment': predone.payment,
+                                                                                    'payment_term': schedule.name})
 
     """  #calculating cumulative amount with the formula
     cumulative balance= loan amount+recit-payment some payment are 
@@ -604,11 +604,13 @@ class AccountLoan(models.Model):
                 line.payment_start_date=recipt.value_date+relativedelta(months=line.payment_month)
                 if line.loan_schedule_ids:
                     idddd=0
-                       
+            if line.interest_start_date:        
+                line.payment_start_date=line.payment_start_date-relativedelta(days=1)         
                     
             if line.current_cumlative_balace:
                 if line.opening_date:
                     line.interest_start_date=line.opening_date
+            
             if line.opening_date or recipt:
                 pay=self.env['account.loan.repayment'].search(
                 [('id', '>', 0), ('acount_loan_id', '=', line.id)], order='id', limit=1)

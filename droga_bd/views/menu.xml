@@ -8,7 +8,12 @@
         <menuitem id="droga_commitment_budget_menu" name="Commitment Budget Purchase Request" action="droga_budget_commitment_budget_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="3"/>
         <menuitem id="droga_commitment_budget_purchase_order_menu" name="Commitment Budget Purchase Order" action="droga_budget_commitment_budget_purchase_order_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="4"/>
 
+        <menuitem id="droga_budget_configuartion" name="Configurations" groups="droga_finance.account_risk_treasury_manager_group">
+            <menuitem id="droga_budget_budgetary_position" name="Budgetary Position" action="account_budget.open_budget_post_form" groups="droga_finance.account_risk_treasury_manager_group" sequence="1"/>
+        </menuitem>
+
     </menuitem>
+
 
 
 </odoo>

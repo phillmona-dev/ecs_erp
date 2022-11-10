@@ -11,25 +11,31 @@ class Lc(models.Model):
     _description = 'LC Tracking'
 
     rfq_id = fields.Many2one('droga.purhcase.request.rfq')
-    purchase_order_id=fields.Many2one("purchase.order")
+    purchase_order_id = fields.Many2one("purchase.order")
 
     name = fields.Char("LC/TT Number", required=True)
-    bank_name = fields.Char("Bank Name")
+    bank_name = fields.Char("Bank")
+    bank = fields.Many2one("res.bank", required=True)
+    branch = fields.Char("Branch", required=True)
+    expire_date = fields.Date("Expire Date", required=True)
     lc_details = fields.One2many('droga.purchase.lc.detail', 'lc_id')
-    shipping_details = fields.One2many('droga.purchase.shipping.detail', 'lc_id')
+    shipping_details = fields.One2many(
+        'droga.purchase.shipping.detail', 'lc_id')
+
+    total_amount_etb = fields.Float("Total Amount ETB")
+    total_amount_usd = fields.Float("Total Amount USD/Others")
     state = fields.Selection(
-        [('Active', 'Active'), ('Closed', 'Closed')], default='Active')
+        [('Draft', 'Draft'), ('Active', 'Active'), ('Expired', 'Expired'), ('Closed', 'Closed')], default='Active')
 
     def create(self, vals):
         # get lc Reconciliation Documents types
         lc_reconciliation_docs = self.env['droga.purchase.reconciliation.docs'].search([
                                                                                        ('doc_type', '=', 'LC')])
         Shipping_reconciliation_docs = self.env['droga.purchase.reconciliation.docs'].search([
-                                                                                       ('doc_type', '=', 'Shipping')])
-                                                                                       
+            ('doc_type', '=', 'Shipping')])
 
         vals[0]['lc_details'] = []
-        vals[0]['shipping_details']=[]
+        vals[0]['shipping_details'] = []
 
         for line in lc_reconciliation_docs:
             lc_lines = (0, 0, {
@@ -73,6 +79,7 @@ class LcDetail(models.Model):
     state = fields.Selection([('Right', 'Right'), ('Wrong', 'Wrong')])
     remark = fields.Char("Remark")
 
+
 class LcDetail(models.Model):
     _name = 'droga.purchase.shipping.detail'
     _description = 'Shipping Reconciliation'
@@ -82,5 +89,3 @@ class LcDetail(models.Model):
     order = fields.Integer("Step Order", required=True)
     state = fields.Selection([('Right', 'Right'), ('Wrong', 'Wrong')])
     remark = fields.Char("Remark")
-
-

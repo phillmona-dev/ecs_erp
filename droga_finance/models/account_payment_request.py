@@ -1,5 +1,3 @@
-from email.policy import default
-from statistics import mode
 from odoo import _, api, fields, models
 from datetime import datetime
 from num2words import num2words

@@ -1,5 +1,6 @@
 from odoo import _, api, fields, models
 from datetime import datetime
+from odoo.exceptions import UserError, ValidationError
 
 
 class BudgetReallocation(models.Model):
@@ -25,6 +26,9 @@ class BudgetReallocation(models.Model):
     reallocation_status = fields.Selection(
         [('Draft', 'Draft'), ('Done', 'Done')], default="Draft")
 
+    document_type = fields.Selection(
+        [('Reallocation', 'Reallocation'), ('Addition', 'Addition')], default='Reallocation')
+
     # draft request
     def draft_request(self):
         self.write({'state': 'Draft'})
@@ -48,9 +52,10 @@ class BudgetReallocation(models.Model):
         self.write({'state': 'Cancelled'})
         return True
 
-    @api.model
+    @ api.model
     def create(self, vals):
         # get sequence number for each company
+
         company_id = vals.get('company_id', self.default_get(
             ['company_id'])['company_id'])
 
@@ -64,11 +69,11 @@ class BudgetReallocation(models.Model):
     def calculate_reallocation_addition(self):
         # get reallocation not transfered
         reallocations = self.env['droga.budget.reallocation'].search([
-                                                                     ('reallocation_status', '=', 'Draft')])
+            ('reallocation_status', '=', 'Draft')])
         for reallocation in reallocations:
             # budget reallocation
             for line in reallocation.budget_reallocations:
-                #reallocation_amount += line.transfer_amount
+                # reallocation_amount += line.transfer_amount
 
                 # update reallocation on both transfer and reciving ends
                 # get transfer line and update transefer
@@ -138,6 +143,8 @@ class BudgetReallocationDetail(models.Model):
     remaining_amount = fields.Float(
         "Remaining Amount", compute="_calculate_remaining_amount", store=True)
     transfer_amount = fields.Float("Transfer Amount")
+    is_enough_budget = fields.Boolean(
+        compute="_is_enough_budget_left", default=True, store=True)
 
     @api.depends('from_budgetary_position', 'account_from', 'date_from', 'date_to')
     def _calculate_remaining_amount(self):
@@ -161,6 +168,25 @@ class BudgetReallocationDetail(models.Model):
                         reamining_amount += line.remaining_balance
 
             self.remaining_amount = reamining_amount
+
+    @api.model
+    def create(self, vals):
+
+        return super(BudgetReallocationDetail, self).create(vals)
+
+    def write(self, vals):
+
+        return super(BudgetReallocationDetail, self).write(vals)
+
+    @api.constrains('remaining_amount', 'transfer_amount')
+    def _is_enough_budget_left(self):
+        for record in self:
+            if record.remaining_amount < record.transfer_amount or record.remaining_amount <= 0:
+                record.is_enough_budget = False
+                raise ValidationError(
+                    "There is no enough remaining budget to reallocate")
+            else:
+                record.is_enough_budget = True
 
 
 class BudgetAdditionDetail(models.Model):

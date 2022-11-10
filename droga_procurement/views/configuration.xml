@@ -77,7 +77,7 @@
         <field name="name">droga.purchase.reconciliation.docs.view.tree</field>
         <field name="model">droga.purchase.reconciliation.docs</field>
         <field name="arch" type="xml">
-            <tree string="Reconciliation Document Types">
+            <tree string="Reconciliation Document Types" editable="top">
                 <field name="doc_type" />
                 <field name="name" />
                 <field name="order" />

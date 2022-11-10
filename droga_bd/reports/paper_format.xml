@@ -4,7 +4,7 @@
     <record id="paperformat_droga_budget_a4" model="report.paperformat">
         <field name="name">Droga A4 low margin</field>
         <field name="default" eval="True"/>
-        <field name="format">A4</field>
+        <field name="format">custom</field>
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
@@ -20,7 +20,8 @@
     <record id="paperformat_droga_budget_landscape_a4" model="report.paperformat">
         <field name="name">Droga A4 low margin</field>
         <field name="default" eval="True"/>
-        <field name="format">A4</field>
+        <field name="disable_shrinking" eval="True"/>
+        <field name="format">custom</field>
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Landscape</field>
@@ -32,5 +33,7 @@
         <field name="header_spacing">35</field>
         <field name="dpi">90</field>
     </record>
+
+    
 
 </odoo>
