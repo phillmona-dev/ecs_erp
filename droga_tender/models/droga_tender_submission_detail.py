@@ -116,13 +116,14 @@ class droga_tender_submission_detail(models.Model):
 
                         message = "Please register customer named '" + self.parent_tender_submission.customer.name + "'."
                         message = message + ' Tin No - ' + self.parent_tender_submission.customer.tin_no if self.parent_tender_submission.customer.tin_no else message
-                        channels[0].message_post(
-                            subject="Customer registration.",
-                            body=message,
-                            message_type='comment',
-                            subtype_xmlid='mail.mt_comment',
-                            author_id=self.env.user.id,
-                        )
+                        for c in channels:
+                            c.message_post(
+                                subject="Customer registration.",
+                                body=message,
+                                message_type='comment',
+                                subtype_xmlid='mail.mt_comment',
+                                author_id=self.env.user.id,
+                            )
 
         return res
 
@@ -155,13 +156,14 @@ class droga_tender_submission_detail(models.Model):
 
                 message = "Please register customer named '" + self.parent_tender_submission.customer.name + "'."
                 message = message + ' Tin No - ' + self.parent_tender_submission.customer.tin_no if self.parent_tender_submission.customer.tin_no else message
-                channels[0].message_post(
-                    subject="Customer registration.",
-                    body=message,
-                    message_type='comment',
-                    subtype_xmlid='mail.mt_comment',
-                    author_id=self.env.user.id,
-                )
+                for c in channels:
+                    c.message_post(
+                        subject="Customer registration.",
+                        body=message,
+                        message_type='comment',
+                        subtype_xmlid='mail.mt_comment',
+                        author_id=self.env.user.id,
+                    )
                 self.parent_tender_submission.alert_sent=True
 
         return super().write(vals)

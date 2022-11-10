@@ -26,12 +26,13 @@ class droga_tender_settings_customers(models.Model):
 
         message = "Please register customer named '"+self.name+"'."
         message=message+' Tin No - '+self.tin_no if self.tin_no else message
-        channels[0].message_post(
-            subject="Customer registration.",
-            body=message,
-            message_type='comment',
-            subtype_xmlid='mail.mt_comment',
-            author_id=self.env.user.id,
-        )
+        for c in channels:
+            c.message_post(
+                subject="Customer registration.",
+                body=message,
+                message_type='comment',
+                subtype_xmlid='mail.mt_comment',
+                author_id=self.env.user.id,
+            )
 
 

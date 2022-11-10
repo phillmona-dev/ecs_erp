@@ -52,13 +52,14 @@ class droga_tender_master(models.Model):
 
         message = "Please register product titled '" + self.item_pro + "'."
         message = message + '\n Product group is - ' + self.type_item.type_or_item_name if self.type_item.type_or_item_name else message
-        channels[0].message_post(
-            subject="Product registration. ",
-            body=message,
-            message_type='comment',
-            subtype_xmlid='mail.mt_comment',
-            author_id=self.env.user.id,
-        )
+        for c in channels:
+            c.message_post(
+                subject="Product registration. ",
+                body=message,
+                message_type='comment',
+                subtype_xmlid='mail.mt_comment',
+                author_id=self.env.user.id,
+            )
 
 
     @api.model
