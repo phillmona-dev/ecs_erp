@@ -19,6 +19,7 @@ class cust_contact_extension(models.Model):
     location = fields.Char('Location')
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
 
+
 class sales_team_extension(models.Model):
     _inherit = 'crm.team'
     _rec_name = 'city_name'

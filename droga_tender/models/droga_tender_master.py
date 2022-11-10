@@ -1,6 +1,8 @@
 from email.policy import default
 from odoo import models, fields, api
 from datetime import datetime, date, timedelta
+
+from odoo.exceptions import ValidationError
 from ..custom_libraries import eth_to_greg_date_conv
 
 class droga_tender_master(models.Model):
@@ -107,6 +109,7 @@ class droga_tender_master(models.Model):
     security_period_in_days = fields.Integer('Bid sec. period in days')
     # bool fields
     refloat = fields.Boolean("Is refloated tender?", default=False)
+    alert_sent = fields.Boolean("Alert sent?", default=False)
     active=fields.Boolean("Active",default=True)
 
     # relational fields selection
@@ -172,6 +175,35 @@ class droga_tender_master(models.Model):
                 'default_tender_origin_form': self.id,
             }
         }
+
+    def order_sales(self):
+        if not self.customer.master_cust_id:
+            raise ValidationError("Please register customer before raising a sales order.!")
+        else:
+            order_lines=[]
+            lines_to_raise=self.env['droga.tender.performance.evaluation'].search([('parent_tender_performance.id','=',self.id),('droga_product','!=',False)])
+            for line in lines_to_raise:
+                order_lines.append( {
+                    'name' : line.droga_product.name,
+                    'product_template_id' : line.droga_product.id,
+                    'product_uom' : line.droga_product.uom_id.id,
+                    'product_uom_qty' : line.quantity,
+                    'price_unit':line.unit_price,
+                    'tender_line':line.id
+      })
+            return {
+                'name': 'Sales order',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'sale.order',
+                'view_id': self.env.ref('sale.view_order_form').id,
+                'type': 'ir.actions.act_window',
+                'context': {
+                    'default_tender_origin_form_tender': self.id,
+                    'default_partner_id': self.customer.master_cust_id.id,
+                    'default_order_line': order_lines,
+                }
+            }
 
     def pay_sam_open(self):
         return {

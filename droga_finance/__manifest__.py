@@ -20,11 +20,11 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'purchase','hr'],
+    'depends': ['base', 'account', 'purchase','hr','sale'],
 
     # always loaded
     'data': [
-
+        'views/credit_limit.xml',
         'security/account_security.xml',
         'security/ir.model.access.csv',
         'views/payment_request.xml',

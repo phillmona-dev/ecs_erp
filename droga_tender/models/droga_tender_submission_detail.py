@@ -53,6 +53,7 @@ class droga_tender_submission_detail(models.Model):
     # Date fields
     fin_open = fields.Datetime("Financial opening GRE")
     st_date = fields.Date("Status date GRE")
+    expiry_date = fields.Date("Expiry date")
 
     def competitors_open(self):
         return {
@@ -110,6 +111,19 @@ class droga_tender_submission_detail(models.Model):
                     }
                     self.env["droga.tender.contract"].create(to_create_cont_agreement)
 
+                    if not self.parent_tender_submission.customer.master_cust_id and not self.parent_tender_submission.alert_sent:
+                        channels = self.env['mail.channel'].search([('name', '=', 'Tender sales')])
+
+                        message = "Please register customer named '" + self.parent_tender_submission.customer.name + "'."
+                        message = message + ' Tin No - ' + self.parent_tender_submission.customer.tin_no if self.parent_tender_submission.customer.tin_no else message
+                        channels[0].message_post(
+                            subject="Customer registration.",
+                            body=message,
+                            message_type='comment',
+                            subtype_xmlid='mail.mt_comment',
+                            author_id=self.env.user.id,
+                        )
+
         return res
 
     def write(self, vals):
@@ -135,4 +149,19 @@ class droga_tender_submission_detail(models.Model):
                     "parent_tender_contract": self.parent_tender_submission.id,
                 }
                 self.env["droga.tender.contract"].create(to_create_cont_agreement)
+
+            if not self.parent_tender_submission.customer.master_cust_id and not self.parent_tender_submission.alert_sent:
+                channels = self.env['mail.channel'].search([('name', '=', 'Tender sales')])
+
+                message = "Please register customer named '" + self.parent_tender_submission.customer.name + "'."
+                message = message + ' Tin No - ' + self.parent_tender_submission.customer.tin_no if self.parent_tender_submission.customer.tin_no else message
+                channels[0].message_post(
+                    subject="Customer registration.",
+                    body=message,
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=self.env.user.id,
+                )
+                self.parent_tender_submission.alert_sent=True
+
         return super().write(vals)

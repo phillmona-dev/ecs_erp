@@ -20,12 +20,12 @@
 
             <!--> Hide sales page -->
             <xpath expr="//form/sheet/notebook/page[@name='sales']" position="attributes">
-                <attribute name="invisible">True</attribute>
+                <attribute name="invisible">False</attribute>
             </xpath>
 
             <!--> Hide accounting page -->
             <xpath expr="//page[@name='invoicing']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="invisible">False</attribute>
             </xpath>
 
             <!--> Hide purchase page -->

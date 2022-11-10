@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="droga_sales_credit_limit_action" model="ir.actions.act_window">
+        <field name="name">Credit limit</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree</field>
+        <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_credit_limit_tree')})]"/>
+
+    </record>
+
+    <record id="droga_sales_credit_limit_tree" model="ir.ui.view">
+        <field name="name">res.partner.credit.limit.tree</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <tree create="0" editable="bottom">
+                <field name="name" readonly="1"></field>
+                <field name="vat" string="Tin No"></field>
+                <field name="property_supplier_payment_term_id" string="Payment terms" options="{'no_create':True,'no_open':True}"></field>
+                <field name="cust_credit_limit"></field>
+                <field name="unsettled_amount"></field>
+                <field name="available_amount"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_sales_credit_limit_search" model="ir.ui.view">
+        <field name="name">res.partner.credit.limit.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" ></field>
+                <field name="vat"></field>
+                <field name="property_supplier_payment_term_id"></field>
+                <field name="cust_credit_limit"></field>
+                <field name="unsettled_amount"></field>
+                <field name="available_amount"></field>
+            </search>
+        </field>
+    </record>
+
+
+    <menuitem
+        id="droga_sales_credit_limit_menu"
+        name="Credit limit"
+        action="droga_sales_credit_limit_action"
+        parent="account.account_invoicing_menu"
+        sequence="20"/>
+
+</odoo>
