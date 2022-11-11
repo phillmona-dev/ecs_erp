@@ -10,7 +10,7 @@
                 <field name="vat" string="Tin No"></field>
                 <field name="property_supplier_payment_term_id" string="Payment terms" options="{'no_create':True,'no_open':True}"></field>
                 <field name="cust_credit_limit"></field>
-                <field name="unsettled_amount"></field>
+                <field name="unsettled_amount" readonly="1"></field>
                 <field name="available_amount"></field>
             </tree>
         </field>
@@ -38,7 +38,7 @@
         <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_credit_limit_tree')})]"/>
 
     </record>
-    
+
     <menuitem
         id="droga_sales_credit_limit_menu"
         name="Credit limit"

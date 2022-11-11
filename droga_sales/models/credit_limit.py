@@ -29,8 +29,10 @@ class cust_credit_account_move(models.Model):
 
 class cust_sales_credit_limit(models.Model):
     _inherit = 'sale.order'
-    def action_confirm(self):
-        result = super(cust_sales_credit_limit, self).action_confirm()
+
+    @api.model
+    def create(self, vals):
+        result = super(cust_sales_credit_limit, self).create(vals)
         for so in self:
             if so.partner_id.available_amount <so.amount_total:
                 raise ValidationError("You cannot exceed credit limit!")
