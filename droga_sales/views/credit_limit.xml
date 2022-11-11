@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <odoo>
-    <record id="droga_sales_credit_limit_action" model="ir.actions.act_window">
-        <field name="name">Credit limit</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">tree</field>
-        <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_credit_limit_tree')})]"/>
-
-    </record>
-
     <record id="droga_sales_credit_limit_tree" model="ir.ui.view">
         <field name="name">res.partner.credit.limit.tree</field>
         <field name="model">res.partner</field>
@@ -39,7 +31,14 @@
         </field>
     </record>
 
+    <record id="droga_sales_credit_limit_action" model="ir.actions.act_window">
+        <field name="name">Credit limit</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree</field>
+        <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_credit_limit_tree')})]"/>
 
+    </record>
+    
     <menuitem
         id="droga_sales_credit_limit_menu"
         name="Credit limit"
