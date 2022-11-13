@@ -14,7 +14,8 @@
                         <field name="contact_name" required="True" />
                         <field name="title" placeholder="Title" domain="[]" options='{"no_open": True}' />
                     </div>-->
-                    <field name="date_planned" readonly="True"/>
+                    <field name="date_planned" />
+                    <field name="partner_id" />
                     <field name="planned_visit_selection" readonly="True"/>
                     <field name="is_blacklisted" invisible="1" />
                     <field name="phone_blacklisted" invisible="1" />
@@ -30,9 +31,23 @@
                 <page string="Contacts" name="contact_list">
                     <field name="contacts_schedule" attrs="{'invisible': [('type', '=', 'opportunity')]}" mode="tree">
                         <tree editable="bottom">
-                            <field name="contact_custom" />
+                            <field name="contact_custom"
+                                           domain="([('parent_customer','=',custlead)])"
+                                           options="{'no_create':True,'no_open':True}"></field>
+                            <field name="core_products" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
                             <field name="phone_no" />
                             <field name="sales_avail" />
+                            <field name="custlead" invisible="1" />
+                        </tree>
+                    </field>
+                    <field name="contacts_schedule_opor" attrs="{'invisible': [('type', '=', 'lead')]}" mode="tree">
+                        <tree editable="bottom">
+                            <field name="contact_custom"
+                                           domain="([('parent_customer','=',custlead)])"
+                                           options="{'no_create':True,'no_open':True}"></field>
+                            <field name="core_products" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
+                            <field name="phone_no" />
+                            <field name="custlead" invisible="1" />
                         </tree>
                     </field>
                     <field name="description" string="Notes" placeholder="Add a description..." options="{'collaborative': true}" />

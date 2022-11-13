@@ -41,8 +41,8 @@
         <field name="view_mode">tree</field>
     </record>
 
-    <record id="droga_crm_customer_visit_detail_view_tree" model="ir.ui.view">
-        <field name="name">droga.customer.visit.detail.view.tree</field>
+    <record id="droga_crm_customer_visit_header_view_form" model="ir.ui.view">
+        <field name="name">droga.customer.visit.header.view.form</field>
         <field name="model">droga.customer.visit.header</field>
         <field name="arch" type="xml">
             <form delete="0">
@@ -54,16 +54,16 @@
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('city_name', 'in',city_name)]"></field>
-                                    <field name="visit_contact_custom" widget="many2many_tags"
-                                           domain="([('parent_customer','=',visit_client)])"
-                                           options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="visit_location"></field>
-                                    <field name="city_name" invisible="1"></field>
-                                    <field name="core_products" widget="many2many_tags"
-                                           options="{'no_create':True,'no_open':True}"></field>
+                                    <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Show schedule"
+                                            type="object" string=" Plan"
+                                            name="visit_contact_open" class="oe_stat_button"/>
+
+                                    <field name="city_name" invisible="1"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Schedule"
                                             name="visit_schedule_open" class="oe_stat_button"/>
+                                    <field name="visit_location"></field>
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark"></field>
@@ -72,7 +72,7 @@
                         </page>
                     </notebook>
                     <notebook>
-                            <page string="Week 2 schedule">
+                        <page string="Week 2 schedule">
                             <field name="week_2_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
@@ -80,13 +80,15 @@
                                     <field name="visit_contact_custom" widget="many2many_tags"
                                            domain="([('parent_customer','=',visit_client)])"
                                            options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="visit_location"></field>
-                                    <field name="city_name" invisible="1"></field>
-                                    <field name="core_products" widget="many2many_tags"
-                                           options="{'no_create':True,'no_open':True}"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Show schedule"
+                                            type="object" string=" Contacts visit"
+                                            name="visit_contact_open" class="oe_stat_button"/>
+
+                                    <field name="city_name" invisible="1"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Schedule"
                                             name="visit_schedule_open" class="oe_stat_button"/>
+                                    <field name="visit_location"></field>
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark"></field>
@@ -95,7 +97,7 @@
                         </page>
                     </notebook>
                     <notebook>
-                            <page string="Week 3 schedule">
+                        <page string="Week 3 schedule">
                             <field name="week_3_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
@@ -103,13 +105,15 @@
                                     <field name="visit_contact_custom" widget="many2many_tags"
                                            domain="([('parent_customer','=',visit_client)])"
                                            options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="visit_location"></field>
-                                    <field name="city_name" invisible="1"></field>
-                                    <field name="core_products" widget="many2many_tags"
-                                           options="{'no_create':True,'no_open':True}"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Show schedule"
+                                            type="object" string=" Contacts visit"
+                                            name="visit_contact_open" class="oe_stat_button"/>
+
+                                    <field name="city_name" invisible="1"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Schedule"
                                             name="visit_schedule_open" class="oe_stat_button"/>
+                                    <field name="visit_location"></field>
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark"></field>
@@ -118,7 +122,7 @@
                         </page>
                     </notebook>
                     <notebook>
-                            <page string="Week 4 schedule">
+                        <page string="Week 4 schedule">
                             <field name="week_4_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
@@ -126,13 +130,15 @@
                                     <field name="visit_contact_custom" widget="many2many_tags"
                                            domain="([('parent_customer','=',visit_client)])"
                                            options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="visit_location"></field>
-                                    <field name="city_name" invisible="1"></field>
-                                    <field name="core_products" widget="many2many_tags"
-                                           options="{'no_create':True,'no_open':True}"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Show schedule"
+                                            type="object" string=" Contacts visit"
+                                            name="visit_contact_open" class="oe_stat_button"/>
+
+                                    <field name="city_name" invisible="1"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Schedule"
                                             name="visit_schedule_open" class="oe_stat_button"/>
+                                    <field name="visit_location"></field>
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark"></field>
@@ -141,7 +147,7 @@
                         </page>
                     </notebook>
                     <notebook>
-                            <page string="Week 5 schedule">
+                        <page string="Week 5 schedule">
                             <field name="week_5_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
@@ -149,18 +155,44 @@
                                     <field name="visit_contact_custom" widget="many2many_tags"
                                            domain="([('parent_customer','=',visit_client)])"
                                            options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="visit_location"></field>
-                                    <field name="city_name" invisible="1"></field>
-                                    <field name="core_products" widget="many2many_tags"
-                                           options="{'no_create':True,'no_open':True}"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Show schedule"
+                                            type="object" string=" Contacts visit"
+                                            name="visit_contact_open" class="oe_stat_button"/>
+
+                                    <field name="city_name" invisible="1"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Schedule"
                                             name="visit_schedule_open" class="oe_stat_button"/>
+                                    <field name="visit_location"></field>
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark"></field>
                                 </tree>
                             </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="droga_crm_customer_visit_detail_view_form" model="ir.ui.view">
+        <field name="name">droga.customer.visit.detail.view.form</field>
+        <field name="model">droga.customer.visit.detail</field>
+        <field name="arch" type="xml">
+            <form delete="0">
+                <sheet>
+                    <notebook>
+                        <page string="Contacts schedule">
+                            <field name="contacts_schedule" mode="tree">
+                                <tree editable="bottom">
+                                    <field name="cust"/>
+                                    <field name="contact_custom" domain="([('parent_customer','=',cust)])"
+                                           options="{'no_create':True,'no_open':True}"></field>
+                                    <field name="phone_no"/>
+                                    <field name="core_products" widget="many2many_tags"/>
+                                </tree>
+                    </field>
                         </page>
                     </notebook>
                 </sheet>

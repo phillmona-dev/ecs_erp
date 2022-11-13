@@ -30,6 +30,7 @@ class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
     plan_id=fields.Many2one('droga.customer.visit.detail')
     contacts_schedule=fields.One2many('droga.crm.contacts.schedule','leads')
+    contacts_schedule_opor = fields.One2many('droga.crm.contacts.schedule', 'leads',domain=([('sales_avail', '=', True)]))
     date_planned=fields.Datetime('Lead date')
     planned_visit_selection = fields.Selection([
         ('Early Morning', 'Early Morning'),

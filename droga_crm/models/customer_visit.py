@@ -11,7 +11,6 @@ except ImportError:
 
 from odoo import models, fields, api
 
-
 class customer_visit_header(models.Model):
     _name='droga.customer.visit.header'
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -74,7 +73,7 @@ class customer_visit_header(models.Model):
             'view_mode': 'form',
             'view_type': 'form',
             'res_model': 'droga.customer.visit.header',
-            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_detail_view_tree').id,
+            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_header_view_form').id,
             'type': 'ir.actions.act_window',
             #'context': {'search_default_group_week_no':1,'default_visit_header':self.id},
             #'domain': [('visit_header', '=', self.id)],
@@ -89,11 +88,11 @@ class customer_visit_header(models.Model):
         for det in self.plan_detail:
 
             prods=''
-            for id,prod in enumerate(det['core_products']) :
+            for id,prod in enumerate(set(det['contacts_schedule']['core_products'])):
                 prods = prods+ prod.name if id==0 else prods+', ' + prod.name
             descr = det['visit_client'].name + ' - '+prods if prods else det['visit_client'].name
-            descr = det['visit_location'].name + ' - ' + descr if det['visit_location'].name else descr
-            if descr=='':
+            descr = descr + ' - ' + det['visit_location'].name if det['visit_location'] else descr
+            if descr=='' or not descr:
                 continue
             lead = {
                 'name': descr,
@@ -110,10 +109,11 @@ class customer_visit_header(models.Model):
             }
             lead_created=self.env['crm.lead'].sudo().create(lead)
 
-            for cont in det['visit_contact_custom']:
+            for contdet in det['contacts_schedule']:
                 cont={
-                    'contact_custom':cont.id,
-                    'leads':lead_created.id
+                    'contact_custom':contdet['contact_custom'].id,
+                    'leads':lead_created.id,
+                    'core_products':contdet['core_products'],
                  }
                 self.env['droga.crm.contacts.schedule'].sudo().create(cont)
 
@@ -276,6 +276,7 @@ class customer_visit_detail(models.Model):
     _order = 'visit_date'
     visit_header=fields.Many2one('droga.customer.visit.header', required=True)
 
+    contacts_schedule = fields.One2many('droga.crm.contacts.schedule', 'visits')
     visit_client=fields.Many2one('res.partner','Customer')
     visit_contact_custom = fields.Many2many('droga.crm.contacts',string='Contact')
     visit_location=fields.Char('Visit location')
@@ -310,13 +311,26 @@ class customer_visit_detail(models.Model):
         ('Late Afternoon', 'Late Afternoon'),
     ], string='Visit session', default="Early Morning")
     day_and_date=fields.Char('Visit Date',compute='_get_visit_date_and_day')
+
+    cont_plan_des=fields.Text('Plan',compute='_compute_contact_plan')
+    def _compute_contact_plan(self):
+        for rec in self:
+            descr=''
+            for sched in rec.contacts_schedule:
+                descr=descr+(sched['contact_custom']['job_pos'] +' - ' if sched['contact_custom']['job_pos'] else '')+(sched['contact_custom']['specialty']['specialty']+' - ' if sched['contact_custom']['specialty']['specialty'] else '')+sched['contact_custom']['contact_name']+' : '
+
+                for id, prod in enumerate(sched['core_products']):
+                    descr = descr + prod.name if id == 0 else descr + ', ' + prod['name']
+                descr=descr+'\n'
+
+            rec.cont_plan_des=descr
     def _get_visit_date_and_day(self):
         for rec in self:
             rec.day_and_date=rec.visit_date_descr+'-'+rec.visit_date.strftime("%B %d,%Y")
 
     def visit_schedule_open(self):
         return {
-            'name': 'Contact schedule',
+            'name': str(self.day_and_date)+' contacts schedule',
             'view_mode': 'tree',
             'view_type': 'form',
             'res_model': 'droga.cust.contact.working.hours',
@@ -327,6 +341,19 @@ class customer_visit_detail(models.Model):
             'target': 'new',
         }
 
+    def visit_contact_open(self):
+        return {
+            'name': str(self.visit_client.name)+' contacts visit' if str(self.visit_client.name) else ' Contacts visit',
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_model': 'droga.customer.visit.detail',
+            #'context': "{'search_default_group_cust_name':1}",
+            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_detail_view_form').id,
+            'type': 'ir.actions.act_window',
+            #'domain': [('day', '=', self.visit_date.weekday())],
+            'target': 'new',
+            'res_id': self.id,
+        }
     @api.model
     def create(self, vals):
         res=super(customer_visit_detail, self).create(vals)
