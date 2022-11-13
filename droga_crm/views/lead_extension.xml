@@ -30,7 +30,7 @@
                 <page string="Contacts" name="contact_list">
                     <field name="contacts_schedule" attrs="{'invisible': [('type', '=', 'opportunity')]}" mode="tree">
                         <tree editable="bottom">
-                            <field name="contact" />
+                            <field name="contact_custom" />
                             <field name="phone_no" />
                             <field name="sales_avail" />
                         </tree>

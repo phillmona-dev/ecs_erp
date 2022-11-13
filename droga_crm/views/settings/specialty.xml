@@ -13,7 +13,6 @@
         <field name="arch" type="xml">
             <tree string="">
                 <field name="specialty"></field>
-                <field name="specialty_description"></field>
                 <field name="status"></field>
             </tree>
         </field>
@@ -27,7 +26,6 @@
                 <sheet>
                     <group>
                         <field name="specialty"></field>
-                        <field name="specialty_description"></field>
                         <field name="status"></field>
                     </group>
                 </sheet>

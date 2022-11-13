@@ -1,5 +1,9 @@
 import calendar
 import datetime
+
+from odoo.exceptions import ValidationError
+from datetime import timedelta
+
 try:
     from calendar import monthlen
 except ImportError:
@@ -15,12 +19,25 @@ class customer_visit_header(models.Model):
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
     city_name=fields.Many2many('droga.crm.settings.city',string='Sales city/sub-city')
     _order = 'year desc,month desc'
+    date_from=fields.Date('Date from')
+    date_to = fields.Date('Date to')
+
+    wk1_from = fields.Date('wk from')
+    wk1_to = fields.Date('wk to')
+    wk2_from = fields.Date('wk from')
+    wk2_to = fields.Date('wk to')
+    wk3_from = fields.Date('wk from')
+    wk3_to = fields.Date('wk to')
+    wk4_from = fields.Date('wk from')
+    wk4_to = fields.Date('wk to')
+    wk5_from = fields.Date('wk from')
+    wk5_to = fields.Date('wk to')
     #state=fields.Selection([('new','New'),('draft','Draft'),('requested','Requested')('approved','Approved')],readonly=True,default='new',string='State')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('requested', 'Requested'),
         ('approved', 'Approved'),
-    ], string='Status', default="draft", readonly=True, tracking=True)
+    ], string='Status', default="draft", readonly=True)
     month = fields.Selection(
         [('01', 'January'), ('02', 'February'), ('03', 'March'), ('04', 'April'), ('05', 'May'), ('06', 'June'),
          ('07', 'July'),
@@ -40,17 +57,27 @@ class customer_visit_header(models.Model):
 
     plan_detail=fields.One2many('droga.customer.visit.detail','visit_header')
 
+    week_1_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',domain=([('week_num','=','Week-1')]))
+    week_2_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
+                                    domain=([('week_num', '=', 'Week-2')]))
+    week_3_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
+                                    domain=([('week_num', '=', 'Week-3')]))
+    week_4_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
+                                    domain=([('week_num', '=', 'Week-4')]))
+    week_5_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
+                                    domain=([('week_num', '=', 'Week-5')]))
+
     def visit_detail_open(self):
         return {
             'name': 'Visit detail',
             #'view_type': 'form',
-            'view_mode': 'tree',
+            'view_mode': 'form',
             'view_type': 'form',
-            'res_model': 'droga.customer.visit.detail',
+            'res_model': 'droga.customer.visit.header',
             'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_detail_view_tree').id,
             'type': 'ir.actions.act_window',
-            'context': "{'search_default_group_week_no':1}",
-            'domain': [('visit_header', '=', self.id)],
+            #'context': {'search_default_group_week_no':1,'default_visit_header':self.id},
+            #'domain': [('visit_header', '=', self.id)],
             #'target': 'new',
             'res_id': self.id,
         }
@@ -60,9 +87,12 @@ class customer_visit_header(models.Model):
 
     def approve(self):
         for det in self.plan_detail:
-            descr = det['visit_client'].name+' - ' if det['visit_client'].name else ''
+
+            prods=''
             for id,prod in enumerate(det['core_products']) :
-                descr = descr+ prod.name if id==0 else descr+', ' + prod.name
+                prods = prods+ prod.name if id==0 else prods+', ' + prod.name
+            descr = det['visit_client'].name + ' - '+prods if prods else det['visit_client'].name
+            descr = det['visit_location'].name + ' - ' + descr if det['visit_location'].name else descr
             if descr=='':
                 continue
             lead = {
@@ -80,9 +110,9 @@ class customer_visit_header(models.Model):
             }
             lead_created=self.env['crm.lead'].sudo().create(lead)
 
-            for cont in det['visit_contact']:
+            for cont in det['visit_contact_custom']:
                 cont={
-                    'contact':cont.id,
+                    'contact_custom':cont.id,
                     'leads':lead_created.id
                  }
                 self.env['droga.crm.contacts.schedule'].sudo().create(cont)
@@ -147,16 +177,39 @@ class customer_visit_header(models.Model):
         plan_vals_all=[]        #plan_vals_all is a list of all to be created visit details
         days_with_weeks={}      #This contains all dates with their corresponding week number, having count as 0. - Count is additional visits for that day.
                                 # Key is date and values are week number and additional count for that date
-        for d in self.date_iter(int(vals_list['year']), int(vals_list['month'])):
+        dates=self.date_iter(int(vals_list['year']), int(vals_list['month']))
+        res.date_from = dates[0]
+        res.date_to = dates[len(dates) - 1]
+        for d in dates:
             if d.weekday()==0:
                 week_num=week_num+1
-            plan_vals={
-                'visit_header':res.id,
-                'visit_date':d,
-                'week_num':'Week-'+str(week_num),
+                if not res.wk1_from:
+                    res.wk1_from=d
+                elif not res.wk2_from:
+                    res.wk2_from = d
+                    res.wk1_to=d-timedelta(days=1)
+                elif not res.wk3_from:
+                    res.wk3_from = d
+                    res.wk2_to=d-timedelta(days=1)
+                elif not res.wk4_from:
+                    res.wk4_from = d
+                    res.wk3_to=d-timedelta(days=1)
+                elif not res.wk5_from:
+                    res.wk5_from = d
+                    res.wk4_to=d-timedelta(days=1)
+
+            plan_vals = {
+                'visit_header': res.id,
+                'visit_date': d,
+                'week_num': 'Week-' + str(week_num),
             }
             plan_vals_all.append(plan_vals)
-            days_with_weeks[d]=[week_num,0]
+            days_with_weeks[d] = [week_num, 0]
+
+        if not res.wk5_from:
+            res.wk4_to=dates[len(dates)-1]
+        else:
+            res.wk5_to = dates[len(dates) - 1]
 
         date_assigned=False
         #Iterate over our customers and update visit vals, if no available entry, create a new visit val for doctor schedule
@@ -171,7 +224,7 @@ class customer_visit_header(models.Model):
                         plan_val.update(visit_client=cust.id)
                         for cust_contact in cust_contacts_schedule:
                             if plan_val['visit_date'].weekday()==int(cust_contact.day):
-                                plan_val.update(visit_contact=cust_contact.cont_id)
+                                plan_val.update(visit_contact_custom=cust_contact.cont_id)
                                 plan_val.update(planned_visit_time=cust_contact.time_from)
                                 break
                         date_assigned=True
@@ -200,7 +253,7 @@ class customer_visit_header(models.Model):
                         #Append new visit detail
                         plan_vals = {
                             'visit_header': res.id,
-                            'visit_contact': cont_id,
+                            'visit_contact_custom': cont_id,
                             'planned_visit_time':planned_time,
                             'visit_date': d,
                             'week_num': 'Week'+str(counter),
@@ -221,11 +274,15 @@ class customer_visit_header(models.Model):
 class customer_visit_detail(models.Model):
     _name='droga.customer.visit.detail'
     _order = 'visit_date'
-    visit_header=fields.Many2one('droga.customer.visit.header',required=True)
+    visit_header=fields.Many2one('droga.customer.visit.header', required=True)
+
     visit_client=fields.Many2one('res.partner','Customer')
-    visit_contact = fields.Many2many('res.partner',string='Contact')
+    visit_contact_custom = fields.Many2many('droga.crm.contacts',string='Contact')
     visit_location=fields.Char('Visit location')
     city_name=fields.Many2many('droga.crm.settings.city',related='visit_header.city_name')
+
+    date_from = fields.Date( related='visit_header.date_from')
+    date_to = fields.Date(related='visit_header.date_to')
     visit_date=fields.Date('Visit date')
     visit_date_descr=fields.Char('Day',compute='_get_date_descr',store=True)
     core_products=fields.Many2many('product.template',domain=[('is_core_product','=','true')])
@@ -269,5 +326,30 @@ class customer_visit_detail(models.Model):
             'domain': [('day', '=', self.visit_date.weekday())],
             'target': 'new',
         }
+
+    @api.model
+    def create(self, vals):
+        res=super(customer_visit_detail, self).create(vals)
+
+        #if res.visit_header.wk1_from<=res.visit_date<=res.visit_header.wk1_to:
+
+        if not res.visit_date:
+            raise ValidationError("Visit date must be entered.")
+
+        if res.visit_date<res.date_from or res.visit_date>res.date_to:
+            raise ValidationError("Visit date must be between %s and %s." % (res.date_from,res.date_to))
+
+        if res.visit_header.wk1_from <= res.visit_date <= res.visit_header.wk1_to:
+            res.week_num='Week-1'
+        elif res.visit_header.wk2_from <= res.visit_date <= res.visit_header.wk2_to:
+            res.week_num='Week-2'
+        elif res.visit_header.wk3_from <= res.visit_date <= res.visit_header.wk3_to:
+            res.week_num = 'Week-3'
+        elif res.visit_header.wk4_from <= res.visit_date <= res.visit_header.wk4_to:
+            res.week_num='Week-4'
+        else:
+            res.week_num='Week-5'
+
+        return res
 
 

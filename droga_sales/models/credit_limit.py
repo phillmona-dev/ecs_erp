@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 
 class cust_credit_limit(models.Model):
     _inherit='res.partner'
-    cust_credit_limit = fields.Float(string='Credit limit')
+    cust_credit_limit = fields.Float(string='Credit limit',tracking=True)
     unsettled_amount = fields.Float(string='Unsettled amount')
     available_amount = fields.Float(string='Available credit',compute='_compute_cust_unsetlled_amount')
 
@@ -33,8 +33,15 @@ class cust_sales_credit_limit(models.Model):
     @api.model
     def create(self, vals):
         result = super(cust_sales_credit_limit, self).create(vals)
+        for so in result:
+            if so.partner_id.available_amount <so.amount_total and so.payment_term_id.name!='Immediate Payment':
+                raise ValidationError("You cannot exceed credit limit!")
+        return result
+
+    def action_confirm(self):
+        result = super(cust_sales_credit_limit, self).action_confirm()
         for so in self:
-            if so.partner_id.available_amount <so.amount_total:
+            if so.partner_id.available_amount <so.amount_total and so.payment_term_id.name!='Immediate Payment':
                 raise ValidationError("You cannot exceed credit limit!")
         return result
 

@@ -31,4 +31,7 @@
     # only loaded in demonstration mode
     'demo': [
     ],
+
+    'installable': True,
+    'application': True
 }
