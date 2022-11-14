@@ -88,10 +88,11 @@ class Lc(models.Model):
 
     @api.depends('start_date')
     def _count_days(self):
-        if self.start_date:
-            start_date = fields.Date.from_string(self.start_date)
-            now = fields.Date.from_string(datetime.now())
-            self.count_days = (now-start_date).days
+        for record in self:
+            if record.start_date:
+                start_date = fields.Date.from_string(record.start_date)
+                now = fields.Date.from_string(datetime.now())
+                record.count_days = (now-start_date).days
 
     @api.depends('')
     def _get_currency_request_detail(self):
