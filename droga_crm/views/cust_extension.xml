@@ -9,13 +9,13 @@
                 <page string="Contacts">
                     <field name="contacts" mode="tree">
                         <tree editable="1" create="1">
-                            <field name="specialty" options="{'no_create':True,'no_open':True}"/>
+                            <field name="specialty" domain="([('status','=','Active')])" options="{'no_create':True,'no_open':True}"/>
                             <field name="contact_name"/>
                             <field name="job_pos"/>
                             <field name="gender"/>
                             <field name="mobile"/>
                             <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
-                            <field name="cont_grade" options="{'no_create':True,'no_open':True}"/>
+                            <field name="cont_grade" options="{'no_create':True,'no_open':True}" domain="([('status','=','Active')])"/>
                             <field name="days" widget="many2many_tags"/>
                         </tree>
                     </field>
@@ -38,13 +38,13 @@
                 <group>
 
                     <field name="cust_grade" options="{'no_create':True,'no_open':True}"
-                           string="Customer grade"></field>
-                    <field name="cust_type_ext" attrs="{'required': True}" options="{'no_create':True,'no_open':True}"
+                           string="Customer grade" domain="([('status','=','Active')])"></field>
+                    <field name="cust_type_ext" domain="([('status','=','Active')])" attrs="{'required': True}" options="{'no_create':True,'no_open':True}"
                            string="Customer type"></field>
-                    <field name="city_name" options="{'no_create':True,'no_open':True}"
+                    <field name="city_name" domain="([('status','=','Active')])" options="{'no_create':True,'no_open':True}"
                            string="City/sub-city team"></field>
                     <field name="area" options="{'no_create':True,'no_open':True}" string="Area"
-                           domain="([('parent_id','=',city_name)])"></field>
+                           domain="([('parent_id','=',city_name),('status','=','Active')])"></field>
                     <field name="location"></field>
 
                 </group>
@@ -63,12 +63,10 @@
         <field name="inherit_id" ref="sales_team.crm_team_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='active']" position="after">
-                <field name="city_name" mode="tree">
+                <field name="city_name" domain="([('status','=','Active')])" mode="tree">
                 </field>
             </xpath>
 
         </field>
     </record>
-
-
 </odoo>
