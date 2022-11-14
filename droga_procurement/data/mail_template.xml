@@ -34,7 +34,7 @@
                     </p>
                 </div>
             </field>
-            <field name="report_template" ref="droga_purhcase_rfq_without_price_foreign_report_action"/>
+            <!--<field name="report_template" ref="droga_purhcase_rfq_without_price_foreign_report_action"/>-->
             <field name="report_name">RFQ_{{ (object.name or '').replace('/','_') }}</field>
             <field name="lang">{{ object.supplier_id.lang }}</field>
             <field name="auto_delete" eval="True"/>

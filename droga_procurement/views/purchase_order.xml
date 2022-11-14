@@ -40,6 +40,9 @@
                 <field name="rfq_id" options="{'no_create':True}" readonly="1" string="Request for Quotation"/>
                 <field name="purchase_request_id" options="{'no_create':True}" readonly="1" string="Purchase Request"/>
                 <field name="request_type" required="1" />
+                <field name="bank" invisible="1" />
+                <field name="branch" invisible="1" />
+                <field name="currency_approved_date" invisible="1" />
             </xpath>
 
             <xpath expr = "//button[@name='action_view_invoice']" position = "after">
@@ -64,13 +67,39 @@
                         </group>
                     </group>
                     <notebook>
+
+                        <page string="Import Permit and Insurance">
+                            <group>
+                                <group string="Insurance Detail">
+                                    <field name="insurance_policy_no" />
+                                    <field name="insurance_name" />
+                                    <field name="insurance_date" />
+                                    <field name="insurance_premium_cost" />
+                                </group>
+                                <group string="Import Permit Detail">
+                                    <field name="import_permit_no" />
+                                    <field name="import_permit_date" />
+                                    <field name="import_permit_approved" />
+                                    <field name="lpco_number" />
+                                    <field name="margin" />
+                                    <field name="deposit_amount" />
+                                    <field name="deposit_date" />
+                                    <field name="bank_service_charge" />
+                                </group>
+                            </group>
+                        </page>
+
                         <page name="lc" string="LC">
-                            <field name="lcs" mode="tree" context="{'default_purchase_order_id':active_id}">
+
+                            
+
+                            <field name="lcs" mode="tree" context="{'default_purchase_order_id':active_id,'default_bank':bank,'default_branch':branch,'default_request_approved_date':currency_approved_date}">
                                 <tree>
                                     <field name="name" />
                                     <field name="bank_name" />
                                     <field name="branch" />
-                                    <field name="expire_date" />
+                                    <field name="start_date"/>
+                                    <field name="count_days"/>
                                     <field name="state" />
                                     <button name="open_lc_detail" string="LC Reconciliation" type="object" class="oe_stat_button" icon="fa-file-text" />
 

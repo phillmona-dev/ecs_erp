@@ -36,6 +36,7 @@
         </field>
     </record>
 
+
     <!-- Form view -->
     <record id="droga_purhcase_request_view_form" model="ir.ui.view">
         <field name="name">droga.purhcase.request.view.form</field>
@@ -149,6 +150,13 @@
                 <filter name="budget" string="Budget Checked" domain="[('state', '=', 'Budget Checked')]" />
                 <filter name="approved" string="Approved" domain="[('state', '=', 'Approved')]" />
                 <filter name="canceled" string="Canceled" domain="[('state', '=', 'Canceled')]" />
+                <separator />
+                <filter name="request_date" string="Request Date" date="request_date"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="department" domain="[]" context="{'group_by': 'department'}"/>
+                    <filter string="Request Date" name="request_date" domain="[]" context="{'group_by': 'request_date'}"/>
+                </group>
             </search>
         </field>
     </record>
@@ -191,7 +199,7 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_request_rfq_foregin_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"/>
+                        <button name="%(droga_purchase_request_rfq_foregin_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-list" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}" context="{'default_currency_id': currency_id,'default_exchange_rate':exchange_rate}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Purchase Requistion</span>
@@ -250,7 +258,7 @@
                             </field>
                         </page>
 
-                        <page string="Additional Info" products="expected">
+                        <page string="Product Info" products="expected">
                             <field name="purhcase_request_lines_expectetd" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree create="0" delete="0" editable="bottom">
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
@@ -264,7 +272,7 @@
                             </field>
                         </page>
 
-                        <page string="Market Analysis">
+                        <page string="Current Market Analysis">
                             <field name="purhcase_request_lines_market_analysis" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree create="0" delete="0" editable="bottom">
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
@@ -280,7 +288,7 @@
                             </field>
                         </page>
 
-                        <page string="Competitors">
+                        <page string="Potential Competitors">
                             <field name="purhcase_request_lines_foregin_competitors" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree create="0" delete="0" editable="bottom">
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
@@ -298,7 +306,7 @@
                         </page>
 
 
-                        <page string="Foregin Supp.list">
+                        <page string="Vendors">
                             <field name="purhcase_request_lines_foregin_supp_list" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree create="0" delete="0" editable="bottom">
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
@@ -309,14 +317,21 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Analysis Report">
 
-
-
-
-
-
-
-
+                            <field name="purchase_analysis_report" mode="tree" readonly="1">
+                                <tree create="0" delete="0">
+                                    <field name="product_id" width="25" options="{'no_create':True,'no_open':True}" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
+                                    <field name="product_uom" width="10" options="{'no_create':True,'no_open':True}" string="UoM"/>
+                                    <field name="product_qty" />
+                                    <field name="current_stock_balance" string="Current Stock" decoration-success="current_stock_balance &lt;= four_month_order_qty" decoration-danger="current_stock_balance &gt; four_month_order_qty" widget="badge"/>
+                                    <field name="expected_average_mon_cons" string="Monthly Consumption"/>
+                                    <field name="order_qty_and_current_stcok" decoration-success="order_qty_and_current_stcok &lt;= six_month_order_qty" decoration-danger="order_qty_and_current_stcok &gt; six_month_order_qty" widget="badge"/>
+                                    <field name="four_month_order_qty" decoration-success="four_month_order_qty &gt;= product_qty" decoration-danger="four_month_order_qty &lt; product_qty" widget="badge"/>
+                                    <field name="six_month_order_qty" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
 
                     </notebook>
                 </sheet>
