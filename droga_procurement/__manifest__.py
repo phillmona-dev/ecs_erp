@@ -39,6 +39,7 @@
         'report/purchase_request.xml',
         'report/purchase_request_foreign.xml',
         'report/rfq.xml',
+        'report/purchase_order.xml',
         'data/mail_template.xml',
         'views/menu.xml',
 

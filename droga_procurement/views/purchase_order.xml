@@ -53,14 +53,14 @@
 
             <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']" position="after">
 
-                <field name="unit_price_foregin" string="Unit Price USD"/>
-                <field name="total_price_foregin" string="Total Price USD" sum="Total"/>
+                <field name="unit_price_foregin" string="Unit Price USD" attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
+                <field name="total_price_foregin" string="Total Price USD" sum="Total" attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
             </xpath>
 
             <xpath expr = "//page[@name='purchase_delivery_invoice']" position = "after">
 
 
-                <page string="Ordering">
+                <page string="Ordering" attrs="{'invisible': [('request_type', '==', 'Local')]}">
                     <group>
                         <group>
                             <field name="import_permit_no" />
@@ -134,7 +134,7 @@
                     </notebook>
                 </page>
 
-                <page string="Shipment">
+                <page string="Shipment" attrs="{'invisible': [('request_type', '==', 'Local')]}">
                     <notebook>
                         <page string="Status Tracking">
                             <field name="shipment_phase_status" mode="tree">
@@ -178,7 +178,7 @@
                     </notebook>
                 </page>
 
-                <page string="Good Clearance">
+                <page string="Good Clearance" attrs="{'invisible': [('request_type', '==', 'Local')]}">
                     <notebook>
                         <page string="Status Tracking">
                             <field name="clearance_phase_status" mode="tree">
@@ -222,7 +222,7 @@
                     </notebook>
                 </page>
 
-                <page string="Post Clearance">
+                <page string="Post Clearance" attrs="{'invisible': [('request_type', '==', 'Local')]}">
                     <notebook>
                         <page string="Status Tracking">
                             <field name="post_clearance_phase_status" mode="tree">

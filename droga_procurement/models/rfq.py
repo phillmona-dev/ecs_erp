@@ -197,65 +197,69 @@ class Rfq(models.Model):
 
     def create_purchase_orders_automatically(self):
 
-        message = self.check_documents()
-        if message != '':
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                        'message': message,
-                        'type': 'danger',
-                        'sticky': False
-                }
-            }
-        # check if there is no purchase related with the rfq
-        puchase_orders = self.env['purchase.order'].search(
-            [('rfq_id', '=', self.id)])
-
-        # check if foregin currency is approved
-        if self.currency_requests.ids:
-            for record in self.currency_requests:
-                if record.state != 'Approved':
-                    return {
-                        'type': 'ir.actions.client',
-                        'tag': 'display_notification',
-                        'params': {
-                            'message': 'Requested foreign currency is not approved ',
-                            'type': 'danger',
-                            'sticky': False
-                        }
-                    }
-        else:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'message': 'Foreign currency is not requested, please request the form before issuing the purchase order ',
-                    'type': 'danger',
-                    'sticky': False
-                }
-            }
-
-        if puchase_orders.ids:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'message': 'Purchase order for the current Request for Quotation is already created ',
-                    'type': 'danger',
-                    'sticky': False
-                }
-            }
-
-        # copy approved currency request details
         bank = ""
         bank_branch = ""
         approved_date = ""
-        for record11 in self.currency_requests:
-            if record11.state == "Approved":
-                bank = record11.bank
-                bank_branch = record11.bank_branch
-                approved_date = record11.request_approved_date
+
+
+        if self.request_type!="Local":
+            message = self.check_documents()
+            if message != '':
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                            'message': message,
+                            'type': 'danger',
+                            'sticky': False
+                    }
+                }
+            # check if there is no purchase related with the rfq
+            puchase_orders = self.env['purchase.order'].search(
+                [('rfq_id', '=', self.id)])
+
+            # check if foregin currency is approved
+            if self.currency_requests.ids:
+                for record in self.currency_requests:
+                    if record.state != 'Approved':
+                        return {
+                            'type': 'ir.actions.client',
+                            'tag': 'display_notification',
+                            'params': {
+                                'message': 'Requested foreign currency is not approved ',
+                                'type': 'danger',
+                                'sticky': False
+                            }
+                        }
+            else:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'message': 'Foreign currency is not requested, please request the form before issuing the purchase order ',
+                        'type': 'danger',
+                        'sticky': False
+                    }
+                }
+
+            if puchase_orders.ids:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'message': 'Purchase order for the current Request for Quotation is already created ',
+                        'type': 'danger',
+                        'sticky': False
+                    }
+                }
+
+            # copy approved currency request details
+            
+            for record11 in self.currency_requests:
+                if record11.state == "Approved":
+                    bank = record11.bank
+                    bank_branch = record11.bank_branch
+                    approved_date = record11.request_approved_date
 
         suppliers = []
         # get unique suppliers from the rfq
@@ -275,9 +279,9 @@ class Rfq(models.Model):
                             'rfq_id': supplier.rfq_id.id,
                             'partner_id': supplier.supplier_id.id,
                             'request_type': self.request_type,
-                            'bank': bank.id,
-                            'branch': bank_branch,
-                            'currency_approved_date': approved_date
+                            'bank': bank.id if bank else None,
+                            'branch': bank_branch if bank_branch else None,
+                            'currency_approved_date': approved_date if approved_date else None
 
                 }
                 vals['order_line'] = []
