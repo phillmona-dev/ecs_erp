@@ -23,6 +23,16 @@
         <menuitem id="droga_purchase_order_foreign_menu" name="Purchase Order" sequence="3" action="purchase_form_foreign_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
     </menuitem>
 
+    <!-- reporting -->
+
+    <menuitem id="droga_purcahse_request_report_parent" name="Purchase Request" sequence="1" parent="purchase.purchase_report_main" groups="purchase.group_purchase_manager,purchase.group_purchase_user">
+        <menuitem id="droga_purcahse_request_report" name="Purchase Request Report" sequence="1" action="droga_purhcase_request_report_view_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+    </menuitem>
+
+    <menuitem id="droga_purcahse_report_lc_parent" name="Letter of Credit" sequence="4" parent="purchase.purchase_report_main" groups="purchase.group_purchase_manager,purchase.group_purchase_user">
+        <menuitem id="droga_purcahse_report_lc" name="LC Report" sequence="1" action="droga_purchase_lc_report_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+    </menuitem>
+
 
 
     <!-- Configurations -->
@@ -30,7 +40,7 @@
     <menuitem id="droga_purhcase_committee_menu" name="Procurement Committee" sequence="101" parent="purchase.menu_purchase_config" action="committee_configuration_view_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
     <menuitem id="droga_purhcase_procurement_phase_menu" name="Foregin Procurement Phase" sequence="102" parent="purchase.menu_purchase_config" action="droga_foregin_purchase_phases_view__action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
     <menuitem id="droga_purhcase_procurement_reconciliation_documents_menu" name="Reconciliation Documents" sequence="102" parent="purchase.menu_purchase_config" action="droga_purchase_reconciliation_docs_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
-
+    <menuitem id="droga_purchase_port_of_loading" name="Port of Loading" sequence="104" parent="purchase.menu_purchase_config" action="droga_purchase_port_of_loading_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
 
     <!-- Purchase request menus for finance -->
     <menuitem id="droga_account_purchase_requests_local_approval_menu" name="Purchase Request - Local" action="droga_purhcase_request_for_approval_action" groups="droga_finance.self_service_group" sequence="4" parent="droga_finance.droag_account_payment_request_froms"/>

@@ -33,6 +33,7 @@ class purhcase_request(models.Model):
     department = fields.Many2one(
         "hr.department", string="Department", required=True, default=_get_department_id)
     purpose = fields.Char("Purpose")
+
     purhcase_request_lines = fields.One2many(
         "droga.purhcase.request.line", "purhcase_request_id", required=True)
 
@@ -47,6 +48,9 @@ class purhcase_request(models.Model):
 
     purhcase_request_lines_foregin_competitors = fields.One2many(
         "droga.purhcase.request.line", "purhcase_request_id", required=True)
+
+    purchase_analysis_report = fields.One2many(
+        "droga.purhcase.request.line", "purhcase_request_id")
 
     state = fields.Selection(
         [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Checked", "Budget Checked"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
@@ -240,6 +244,15 @@ class purhcase_request_line(models.Model):
 
     remark = fields.Char("Remark")
 
+    # field for anlysis report
+    four_month_order_qty = fields.Float(
+        "Four Month Qty", compute="_consumption_total", help="Order Quantity times Average Monthly Consumption", store=True)
+    six_month_order_qty = fields.Float(
+        "Six Month Qty", compute="_consumption_total", help="Order Quantity times Average Monthly Consumption", store=True)
+
+    order_qty_and_current_stcok = fields.Float(
+        "Order Qty & Current Stock", compute="_consumption_total", help="Order Quantity Plus Current Stock", store=True)
+
     @api.depends('product_qty', 'unit_price', 'unit_price_foregin', 'exchange_rate')
     def _compute_total(self):
         for record in self:
@@ -260,6 +273,15 @@ class purhcase_request_line(models.Model):
     def _load_budgetary_position_accounts(self):
         accounts = self.budgetary_position.account_ids.ids
         return {'domain': {'expense_account': [('id', 'in', (accounts))]}}
+
+    @api.depends('product_qty','expected_average_mon_cons', 'current_stock_balance')
+    def _consumption_total(self):
+        for record in self:
+            record.four_month_order_qty = record.expected_average_mon_cons*4
+            record.six_month_order_qty = record.expected_average_mon_cons*6
+            record.order_qty_and_current_stcok = record.product_qty + \
+                record.current_stock_balance
+        return True
 
 
 class purchase_foregin_status(models.Model):

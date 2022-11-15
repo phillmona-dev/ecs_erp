@@ -47,7 +47,7 @@ class ForeignCurrencyRequest(models.Model):
         'res.company', 'Company', required=True, default=lambda self: self.env.company.id)
 
     currency_id = fields.Many2one(
-        "res.currency", string="Currency", required=True, default="USD")
+        "res.currency", string="Currency", required=True)
 
     bank = fields.Many2one("res.bank")
     bank_branch = fields.Char("Branch")
