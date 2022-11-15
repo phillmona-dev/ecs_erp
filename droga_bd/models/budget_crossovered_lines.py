@@ -115,6 +115,7 @@ class CrossoveredBudgetLinesDetail(models.Model):
         # self.calculate_remaining_budget()
         return res
 
+   
     def load_commitment_budget(self):
         budget_lines = self.env['crossovered.budget.lines'].search(
             [('crossovered_budget_state', '!=', 'cancel')])
@@ -141,6 +142,8 @@ class CrossoveredBudgetLinesDetail(models.Model):
                     line.write(
                         {'commitment_budget': account_commitment_budget})
 
+    
+     #to calculate crossovered.budget.lines
     def calculate_remaining_budget(self):
 
         # load commitement budget
@@ -169,6 +172,7 @@ class CrossoveredBudgetLinesDetail(models.Model):
 
                 line.write({'remaining_balance': remaining_balance})
 
+    #to calculate crossovered.budget.lines.detail
     def calculate_remaining_budget_detail(self):
         # get active budgets
         budgets = self.env['crossovered.budget.lines'].search(
