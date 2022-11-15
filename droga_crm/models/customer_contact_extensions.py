@@ -56,7 +56,9 @@ class contacts_schedule(models.Model):
     _name='droga.crm.contacts.schedule'
     contact_custom=fields.Many2one('droga.crm.contacts',string='Contact')
     phone_no=fields.Char(related='contact_custom.mobile')
+    sales_close_descr=fields.Char(string='Sales closed?')
     sales_avail=fields.Boolean('Sales available?',default=False)
+    sales_closed = fields.Boolean('Sales Closed?', default=False)
     leads=fields.Many2one('crm.lead','contacts_schedule')
     visits=fields.Many2one('droga.customer.visit.detail','contacts_schedule')
     cust=fields.Many2one('res.partner',related='visits.visit_client')

@@ -20,13 +20,15 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account','resource','stock','sale'],
+    'depends': ['base','account','resource','stock','sale','droga_crm'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/account_move.xml',
         'views/credit_limit.xml',
+        'views/sale_order_line_wh.xml',
+        'views/sales_discount_rules.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

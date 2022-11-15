@@ -29,7 +29,7 @@ class cust_credit_account_move(models.Model):
 
 class cust_sales_credit_limit(models.Model):
     _inherit = 'sale.order'
-
+    available_amount=fields.Float(string='Available amount',related='partner_id.available_amount')
     @api.model
     def create(self, vals):
         result = super(cust_sales_credit_limit, self).create(vals)
@@ -48,10 +48,14 @@ class cust_sales_credit_limit(models.Model):
 
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
+    wareh=fields.Many2one('stock.warehouse',required=True)
 
+    #Restrict multiple sales order invoicing
     @api.model
     def create(self, vals):
         if self.order_id.state!='draft' and self.order_id.state:
             raise ValidationError("Sales order is already invoiced!")
         else:
             return super(cust_sales_no_create_after_invoice, self).create(vals)
+
+

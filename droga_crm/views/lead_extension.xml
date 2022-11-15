@@ -36,7 +36,9 @@
                                            options="{'no_create':True,'no_open':True}"></field>
                             <field name="core_products" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
                             <field name="phone_no" />
-                            <field name="sales_avail" />
+                            <field name="sales_avail" string="Sales interested?"/>
+                            <field name="sales_closed" string="Sales closed?"/>
+                            <field name="sales_close_descr" string="Remark"/>
                             <field name="custlead" invisible="1" />
                         </tree>
                     </field>

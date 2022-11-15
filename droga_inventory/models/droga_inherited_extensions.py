@@ -94,3 +94,4 @@ class droga_stock_product_extension(models.Model):
 class product_selection_field(models.Model):
     _inherit = 'product.category'
     avail_in_product_master=fields.Boolean('Available in product master file',default=False)
+    off_supplies=fields.Boolean('Office supplies group',default=False)

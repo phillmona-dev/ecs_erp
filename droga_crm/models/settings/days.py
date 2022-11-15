@@ -26,3 +26,6 @@ class droga_crm_settings_area(models.Model):
             self.env['droga.crm.settings.day'].sudo().create({
                 'day': 'Firday',
             })
+            self.env['droga.crm.settings.day'].sudo().create({
+                'day': 'Saturday',
+            })
