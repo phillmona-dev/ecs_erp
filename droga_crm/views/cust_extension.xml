@@ -63,8 +63,7 @@
         <field name="inherit_id" ref="sales_team.crm_team_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='active']" position="after">
-                <field name="city_name" domain="([('status','=','Active')])" mode="tree">
-                </field>
+                <field name="city_name" domain="([('status','=','Active')])"></field>
             </xpath>
 
         </field>

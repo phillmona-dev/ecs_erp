@@ -34,14 +34,14 @@ class cust_sales_credit_limit(models.Model):
     def create(self, vals):
         result = super(cust_sales_credit_limit, self).create(vals)
         for so in result:
-            if so.partner_id.available_amount <so.amount_total and so.payment_term_id.name!='Immediate Payment':
+            if so.partner_id.available_amount <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
         return result
 
     def action_confirm(self):
         result = super(cust_sales_credit_limit, self).action_confirm()
         for so in self:
-            if so.partner_id.available_amount <so.amount_total and so.payment_term_id.name!='Immediate Payment':
+            if so.partner_id.available_amount <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
         return result
 
@@ -58,4 +58,8 @@ class cust_sales_no_create_after_invoice(models.Model):
         else:
             return super(cust_sales_no_create_after_invoice, self).create(vals)
 
+
+class payment_term_no_credit(models.Model):
+    _inherit = 'account.payment.term'
+    apply_credit_limit=fields.Boolean(string='Apply credit limit',default=True)
 

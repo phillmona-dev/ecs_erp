@@ -28,7 +28,7 @@ class sale_order_line(models.Model):
         digits='Product Price',
         store=True, readonly=True, required=True, precompute=True)
 
-    @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id')
+    @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id')
     def _compute_price_unit(self):
 
         for line in self:

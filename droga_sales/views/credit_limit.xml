@@ -36,7 +36,19 @@
         <field name="res_model">res.partner</field>
         <field name="view_mode">tree</field>
         <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_credit_limit_tree')})]"/>
+    </record>
 
+    <record id="droga_sales_payment_term_exclusion" model="ir.ui.view">
+        <field name="name">Apply credit limit</field>
+        <field name="model">account.payment.term</field>
+        <field name="inherit_id" ref="account.view_payment_term_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/field[@name='display_on_invoice']" position="after">
+                    <label for="apply_credit_limit"/>
+                        <field name="apply_credit_limit"/>
+            </xpath>
+
+        </field>
     </record>
 
     <menuitem
