@@ -35,7 +35,7 @@ class sale_order_line(models.Model):
 
             #Get discounts/additional payments per type
             type_rates = self.env['droga.price.discount.per.type'].search(
-                [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id),
+                [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id),('status','=','Active'),
                  ('product_group', '=', line.product_id.categ_id.id)])
             core_rate = 0  # Discount rate for core products defined
             non_core_rate = 0  # Discount rate for non-core products defined
@@ -77,7 +77,7 @@ class sale_order_line(models.Model):
         non_core_sum = sum(order_lines_non_core.mapped('price_total'))
 
         amount_rates = self.env['droga.price.discount.per.amount'].search(
-            [('payment_term', '=', self.order_id['payment_term_id'].id)])
+            [('payment_term', '=', self.order_id['payment_term_id'].id),('status','=','Active')])
 
         core_rate=0
         non_core_rate=0

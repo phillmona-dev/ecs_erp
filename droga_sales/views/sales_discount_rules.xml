@@ -23,7 +23,7 @@
                 <sheet>
                     <group>
                         <field name="cust_type" options="{'no_create':True,'no_open':True}"></field>
-                        <field name="product_group" options="{'no_create':True,'no_open':True}"></field>
+                        <field name="product_group" domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True)]" options="{'no_create':True,'no_open':True}"></field>
                         <field name="percent"></field>
                         <field name="core_products_or_all" ></field>
                         <field name="status"></field>
