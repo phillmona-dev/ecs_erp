@@ -1,6 +1,5 @@
 from odoo import _, api, fields, models
 from datetime import datetime
-from num2words import num2words
 
 
 class ForeignCurrencyRequest(models.Model):
@@ -87,8 +86,8 @@ class ForeignCurrencyRequest(models.Model):
     @api.depends('total_amount', 'exchange_rate')
     def _compute_amount_to_word(self):
         for record in self:
-            record.amount_in_word = num2words(
-                record.total_amount, to='currency')
+            record.amount_in_word = str(record.currency_id.amount_to_text(
+                record.total_amount))
 
     def queued_request(self):
         self.write({'state': 'Queued'})

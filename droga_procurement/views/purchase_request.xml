@@ -46,8 +46,8 @@
                 <header>
                     <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request" data-hotkey="v"/>
                     <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="budget_checked_request" type="object" states="Verified" string="Budget Checked" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="approve_request" type="object" states="Budget Checked" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="budget_checked_request" type="object" states="Verified" string="Budget Approved" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="approve_request" type="object" states="Budget Approved" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v"/>
 
 
                     <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request" data-hotkey="v"/>
@@ -71,7 +71,7 @@
                         <group>
                             <field name="request_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
-                            <field name="department_manager" readonly="1"/>
+                            <field name="department_manager" readonly="1" invisible="1"/>
                             <field name="branch" options="{'no_create':True,'no_open':True}" required="1" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="request_type" invisible="1"/>
                         </group>
@@ -92,8 +92,8 @@
                                     <field name="unit_price"/>
                                     <field name="total_price"/>
                                     <field name="product_uom_category_id" invisible="1"/>
-                                    <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="budgetary_position" required="1" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="product_uom" options="{'no_create':True,'no_open':True}" string="UoM"/>
+                                    <field name="budgetary_position" required="1" options="{'no_create':True,'no_open':True}" string="Budget Category"/>
                                     <field name="expense_account" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"/>
                                     <field name="remark"/>
                                 </tree>
@@ -188,7 +188,7 @@
                     <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request" data-hotkey="v"/>
                     <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v"/>
                     <button name="budget_checked_request" type="object" states="Verified" string="Budget Checked" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="approve_request" type="object" states="Budget Checked" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="approve_request" type="object" states="Budget Approved" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v"/>
                     <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request" data-hotkey="v"/>
 
 
@@ -239,7 +239,7 @@
                                     <field name="product_uom_category_id" invisible="1"/>
 
 
-                                    <field name="budgetary_position" width="10" required="1" options="{'no_create':True,'no_open':True}" string="Budget"/>
+                                    <field name="budgetary_position" width="10" required="1" options="{'no_create':True,'no_open':True}" string="Budget Category"/>
                                     <field name="expense_account" width="10" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('Budget Checked'))],'required': [('parent.state', 'in', ('Verified'))]}" />
 
                                     <field name="remark" width="10"/>

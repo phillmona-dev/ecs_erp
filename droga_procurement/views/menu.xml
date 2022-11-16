@@ -9,7 +9,7 @@
 
     <!-- Local Procurement -->
     <menuitem id="droag_procurement_local" name="Local Procurement" sequence="0" parent="purchase.menu_purchase_root" groups="purchase.group_purchase_manager,purchase.group_purchase_user">
-        <menuitem id="droga_purhcase_request_menu" name="Purhcase Request" sequence="1" action="droga_purhcase_request_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
+        <menuitem id="droga_purhcase_request_menu" name="Purchase Request" sequence="1" action="droga_purhcase_request_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
         <menuitem id="droga_purhcase_rfq_menu" name="Request for Quotation" sequence="2" action="droga_purchase_request_rfq_main_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
         <menuitem id="droga_purchase_order_local_menu" name="Purchase Order" sequence="3" action="purchase_form_local_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
         <menuitem id="droga_purhcase_payment_request_withoutpo_menu" name="Payment Request Without PO" sequence="4" action="droga_finance.droga_account_payment_request_withoutpo_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />

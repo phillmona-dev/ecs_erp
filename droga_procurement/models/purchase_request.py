@@ -53,7 +53,7 @@ class purhcase_request(models.Model):
         "droga.purhcase.request.line", "purhcase_request_id")
 
     state = fields.Selection(
-        [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Checked", "Budget Checked"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
+        [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Approved", "Budget Approved"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
 
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
@@ -138,7 +138,20 @@ class purhcase_request(models.Model):
 
     # budget checked
     def budget_checked_request(self):
-        self.write({'state': 'Budget Checked'})
+        # check for budgetary position and expense account
+        for record in self.purhcase_request_lines:
+            if not record.budgetary_position.ids or not record.expense_account.ids:
+                return {
+                    'type': 'ir.actions.client',
+                            'tag': 'display_notification',
+                            'params': {
+                                'message': 'Budget category or expense account can''t be empty',
+                                'type': 'danger',
+                                'sticky': False
+                            }
+                }
+
+        self.write({'state': 'Budget Approved'})
         return True
 
     # approve request
@@ -274,7 +287,7 @@ class purhcase_request_line(models.Model):
         accounts = self.budgetary_position.account_ids.ids
         return {'domain': {'expense_account': [('id', 'in', (accounts))]}}
 
-    @api.depends('product_qty','expected_average_mon_cons', 'current_stock_balance')
+    @api.depends('product_qty', 'expected_average_mon_cons', 'current_stock_balance')
     def _consumption_total(self):
         for record in self:
             record.four_month_order_qty = record.expected_average_mon_cons*4
