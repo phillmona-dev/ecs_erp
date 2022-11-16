@@ -141,6 +141,8 @@ class CrossoveredBudgetLinesDetail(models.Model):
                     line.write(
                         {'commitment_budget': account_commitment_budget})
 
+     # to calculate crossovered.budget.lines
+
     def calculate_remaining_budget(self):
 
         # load commitement budget
@@ -169,11 +171,16 @@ class CrossoveredBudgetLinesDetail(models.Model):
 
                 line.write({'remaining_balance': remaining_balance})
 
-    @api.depends('budget_amount', 'commitment_budget', 'reallaocation', 'addition')
-    def calculate_budget(self):
+    # to calculate crossovered.budget.lines.detail
+    def calculate_remaining_budget_detail(self):
+        # get active budgets
+        budgets = self.env['crossovered.budget.lines'].search(
+            [('crossovered_budget_state', '!=', 'cancel')])
+
+        # budget calculation for the detail
         revised_budget = 0
         remaining_balalnce = 0
-        for record in self:
+        for record in budgets.budget_line_details:
             # calculate revised budget
             if record.budget_amount > 0:
                 revised_budget = record.budget_amount + \
@@ -191,15 +198,61 @@ class CrossoveredBudgetLinesDetail(models.Model):
                                                           record.date_from), ('date', '<=', record.date_to),
                  ('parent_state', '=', 'posted')])
 
+            analytic_account_id = record.budgetary_position_id.analytic_account_id.id
+
             actual = 0
             for line in actual_expense:
-                actual += line.balance
+                for line1 in line.analytic_line_ids:
+                    if analytic_account_id == line1.account_id.id:
+                        actual += line.balance
 
             # update remaining balance
-            record.actual = actual * -1
+            #record.actual = actual * -1
 
             # calcualte remaining balance
             if record.budget_amount > 0:
-                record.remaining_balance = record.revised_budget+record.actual
+                remaining_balalnce = record.revised_budget-record.actual
             else:
-                record.remaining_balance = record.revised_budget+record.actual
+                remaining_balalnce = record.revised_budget-record.actual
+
+            record.write({'revised_budget': revised_budget,
+                         'actual': actual, 'remaining_balance': remaining_balalnce})
+
+    @api.depends('budget_amount', 'commitment_budget', 'reallaocation', 'addition')
+    def calculate_budget(self):
+        revised_budget = 0
+        remaining_balalnce = 0
+        for record in self:
+            # calculate revised budget
+            if record.budget_amount > 0:
+                revised_budget = record.budget_amount + \
+                    record.commitment_budget+record.reallaocation+record.addition
+            else:
+                revised_budget = record.budget_amount + \
+                    record.commitment_budget+record.reallaocation+record.addition
+            # update revised budget
+            record.revised_budget = revised_budget
+
+            analytic_account_id = record.budgetary_position_id.analytic_account_id.id
+            # get actual expense
+            actual_expense = self.env['account.move.line'].search(
+                [('company_id', '=', record.company_id.id),
+                 ('account_id', '=', record.account.id), ('date', '>=',
+                                                          record.date_from), ('date', '<=', record.date_to),
+                 ('parent_state', '=', 'posted')])
+
+            actual = 0
+            for line in actual_expense:
+                for line1 in line.analytic_line_ids:
+                    if analytic_account_id == line1.account_id.id:
+                        actual += line.balance
+
+            # update remaining balance
+            #record.actual = actual * -1
+            record.actual = actual
+
+            # calcualte remaining balance
+            if record.budget_amount > 0:
+                record.remaining_balance = record.revised_budget-record.actual
+            else:
+                record.remaining_balance = record.revised_budget-record.actual

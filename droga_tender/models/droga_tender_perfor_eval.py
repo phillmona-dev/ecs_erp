@@ -1,6 +1,10 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
+class droga_tender_sale_line_extension(models.Model):
+    _inherit='sale.order.line'
+    tender_line=fields.Many2one('droga.tender.performance.evaluation')
+
 class droga_tender_master(models.Model):
     _name = 'droga.tender.performance.evaluation'
 
@@ -14,9 +18,19 @@ class droga_tender_master(models.Model):
     unit_price = fields.Float("Unit price",related='parent_tender_performance_detail.unit_price')
     amount = fields.Float("Amount quoted",related='parent_tender_performance_detail.amount')
 
+    droga_product=fields.Many2one('product.template')
+
     award_cost = fields.Float("Awarded cost")
 
     perf_pct=fields.Float('% of Performance',compute="compute_performance")
+
+    sales_order=fields.Boolean('Sales ordered',compute="_get_order_status")
+    def _get_order_status(self):
+        for rec in self:
+            if self.env['sale.order.line'].search([('tender_line','=',rec.id)]):
+                rec.sales_order=True
+            else:
+                rec.sales_order = False
     @api.depends("amount", "award_cost")
     def compute_performance(self):
         for rec in self:
@@ -33,37 +47,20 @@ class droga_tender_master(models.Model):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]},related='parent_tender_performance_detail.company_id')
 
-    def competitors_open(self):
-        return {
-            'name': 'Competitors',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'droga.tender.performance.evaluation',
-            'view_id': self.env.ref('droga_tender.droga_tender_perf_eval_view_tree').id,
-            'type': 'ir.actions.act_window',
+    def reg_products(self):
+        channels = self.env['mail.channel'].search([('name', '=', 'Tender buisness development')])
 
-            #This will pass the detail ID if a record is present
-            'res_id': self.id,
+        message = "Please register product titled '" + self.item_pro + "'."
+        message = message + '\n Product group is - ' + self.type_item.type_or_item_name if self.type_item.type_or_item_name else message
+        for c in channels:
+            c.message_post(
+                subject="Product registration. ",
+                body=message,
+                message_type='comment',
+                subtype_xmlid='mail.mt_comment',
+                author_id=self.env.user.id,
+            )
 
-            #When target is new, it will popup else it will use it's own form, wow ferenj
-            'target': 'new',
-
-
-        }
-
-    def sales_order_open(self):
-        return {
-            'name': 'Sales order',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'sale.order',
-            'view_id': self.env.ref('sale.view_order_form').id,
-            'type': 'ir.actions.act_window',
-            'context': {
-                'default_tender_origin_form_tender': self.parent_tender_performance.id,
-                'default_partner_id': self.parent_tender_performance.customer.master_cust_id.id,
-            }
-        }
 
     @api.model
     def create(self, vals_list):

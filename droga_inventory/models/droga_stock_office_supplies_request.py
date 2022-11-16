@@ -120,7 +120,7 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     product_id = fields.Many2one(
         'product.product', 'Product',
         check_company=True,
-        domain="[('categ_id.name', 'like', ['Office supply items%']), '|', ('company_id', '=', False), ('company_id', '=', company_id)]",
+        domain="[('categ_id.off_supplies', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         index=True, required=True,
         state={'done': [('readonly', True)]})
     product_uom_qty = fields.Float(

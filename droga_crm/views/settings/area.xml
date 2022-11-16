@@ -12,7 +12,7 @@
         <field name="model">droga.crm.settings.area</field>
         <field name="arch" type="xml">
             <tree string="" editable="top">
-                <field name="parent_id" options="{'no_create':True,'no_open':True}" ></field>
+                <field name="parent_id" options="{'no_create':True,'no_open':True}"  domain="([('status','=','Active')])"></field>
                 <field name="area_name"></field>
                 <field name="area_descr"></field>
                 <field name="status"></field>

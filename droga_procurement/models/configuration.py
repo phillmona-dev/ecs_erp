@@ -38,3 +38,17 @@ class Reconciliation_Doc(models.Model):
     name = fields.Char('Name', required=True)
     order = fields.Integer("Step Order", required=True)
     doc_type = fields.Char('Document Type')
+
+
+class PortOfLoading(models.Model):
+    _name = 'droga.purchase.port.of.loading'
+    _description = 'Port of Loading'
+
+    name = fields.Char("Name", required=True)
+    country = fields.Many2one('res.country', required=True)
+
+    port_type = fields.Selection(
+        [('Loading', 'Loading'), ('Discharge', 'Discharge')], required=True)
+    shipment_type = fields.Selection([('Air', 'Air'),('Sea', 'Sea')], required=True)
+    state = fields.Selection(
+        [('Active', 'Active'), ('Closed', 'Closed')], default="Active")

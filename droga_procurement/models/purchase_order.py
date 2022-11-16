@@ -8,6 +8,9 @@ class purchase_order(models.Model):
     purchase_request_id = fields.Many2one("droga.purhcase.request")
     lcs = fields.One2many('droga.purchase.lc', 'purchase_order_id')
 
+    # copy foregin currency request
+    
+
    # phases
     order_phase_status = fields.One2many(
         'droga.purchase.po.foregin.status', 'purchase_order_id')
@@ -30,6 +33,23 @@ class purchase_order(models.Model):
 
     # ordering
     import_permit_no = fields.Char("Import Permit Number")
+    import_permit_date = fields.Date("Import Permit Date")
+    import_permit_approved = fields.Boolean("Import Permit Approved")
+    lpco_number = fields.Char("LPCO number")
+    margin = fields.Float("Margin")
+    deposit_amount = fields.Float("Deposit Amount")
+    deposit_date = fields.Date("Deposit Date")
+    bank_service_charge = fields.Float("Bank Service Charge")
+
+    # pre import
+    pre_import_no = fields.Char("Pre Import No")
+    pre_import_approved_date = fields.Date("Pre Import Approved Date")
+
+    # import permit and insurance
+    insurance_policy_no = fields.Char('Insurance Policy No')
+    insurance_name = fields.Char("Insurance Name")
+    insurance_date = fields.Date("Insurance Date")
+    insurance_premium_cost = fields.Float("Insurance Premium Cost")
 
     # shipment
     shipment_date = fields.Date("Shipment Date")
@@ -43,10 +63,16 @@ class purchase_order(models.Model):
     # good clearance
     goods_arrival_date = fields.Date("Arrival Date", help="Good Arrival Date")
     mode_of_transport = fields.Selection([('Air', 'Air'), ('Sea', 'Sea')])
-    ports = fields.One2many('droga.purchase.arrival.ports', 'purchase_order_id')
+    ports = fields.One2many(
+        'droga.purchase.arrival.ports', 'purchase_order_id')
 
     goods_release_date = fields.Date("Release Date", help="Good Release Date")
     # post good clearance
+
+    #
+    bank = fields.Many2one("res.bank")
+    branch = fields.Char("Branch")
+    currency_approved_date=fields.Date("Currency Approved DateF")
 
     request_type = fields.Selection(
         [("Local", "Local"), ("Foregin", "Foregin")], default="Local")

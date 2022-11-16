@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="droga_sale_order_warehouse_line" model="ir.ui.view">
+        <field name="name">Sales order line warehouse extension</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr = "//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_uom_readonly']" position = "after">
+                <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
+            </xpath>
+            <xpath expr = "//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']" position = "attributes">
+                <attribute name="readonly">True</attribute>
+            </xpath>
+            <xpath expr = "//form/sheet/group/group/field[@name='partner_id']" position = "after">
+                <field name="available_amount" string="Available balance" options="{'no_create': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

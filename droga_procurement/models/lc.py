@@ -1,8 +1,5 @@
-from email.policy import default
-import imp
-
-
 from odoo import _, api, fields, models
+from datetime import datetime
 
 
 class Lc(models.Model):
@@ -10,22 +7,40 @@ class Lc(models.Model):
     _name = 'droga.purchase.lc'
     _description = 'LC Tracking'
 
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
+
     rfq_id = fields.Many2one('droga.purhcase.request.rfq')
     purchase_order_id = fields.Many2one("purchase.order")
+
+    # related fields
+    rfq_no = fields.Many2one(related="purchase_order_id.rfq_id", store=True)
+    supplier_id = fields.Many2one(
+        related='purchase_order_id.partner_id', store=True)
 
     name = fields.Char("LC/TT Number", required=True)
     bank_name = fields.Char("Bank")
     bank = fields.Many2one("res.bank", required=True)
     branch = fields.Char("Branch", required=True)
-    expire_date = fields.Date("Expire Date", required=True)
+    start_date = fields.Date("Issue Date")
+    expire_date = fields.Date("Expire Date")
+    last_day_shipment = fields.Date("Last Day of Shipment")
+    request_approved_date = fields.Date(
+        "Request Approved Date", help="Foregin Currency Request Approved Date", store=True)
+    count_days = fields.Integer(compute='_count_days', store=True)
     lc_details = fields.One2many('droga.purchase.lc.detail', 'lc_id')
     shipping_details = fields.One2many(
         'droga.purchase.shipping.detail', 'lc_id')
 
+    lc_recived_date_from_supplier = fields.Date("LC Recived Date from Bank")
+    lc_send_date_to_supplier = fields.Date("LC Send Date to Supplier")
+    draft_lc_approved_date = fields.Date("Draft LC Approved Date")
+    draft_lc_approved_date_supplier = fields.Date(
+        "Draft LC Approved Date by Supplier")
+
     total_amount_etb = fields.Float("Total Amount ETB")
     total_amount_usd = fields.Float("Total Amount USD/Others")
     state = fields.Selection(
-        [('Draft', 'Draft'), ('Active', 'Active'), ('Expired', 'Expired'), ('Closed', 'Closed')], default='Active')
+        [('Draft', 'Draft'), ('Active', 'Active'), ('Expired', 'Expired'), ('Closed', 'Closed')], default='Draft', tracking=True)
 
     def create(self, vals):
         # get lc Reconciliation Documents types
@@ -55,6 +70,9 @@ class Lc(models.Model):
 
         return super(Lc, self).create(vals)
 
+    def action_approved(self):
+        self.write({"state": "Active"})
+
     def open_lc_detail(self):
         view = self.env.ref('droga_procurement.droga_purchase_lc_view_form')
 
@@ -68,6 +86,34 @@ class Lc(models.Model):
             'res_id': self.id
         }
 
+    @api.depends('start_date')
+    def _count_days(self):
+        for record in self:
+            if record.start_date:
+                start_date = fields.Date.from_string(record.start_date)
+                now = fields.Date.from_string(datetime.now())
+                record.count_days = (now-start_date).days
+
+    @api.depends('')
+    def _get_currency_request_detail(self):
+        rfq_id = self.purchase_order_id.rfq_id.id
+
+        # search
+        records = self.env['droga.account.foreign.currency.request'].search(
+            [('rfq_id', '=', rfq_id)])
+
+        for record in records:
+            if record.state == "Approved":
+                self.request_approved_date = record.request_approved_date
+                self.bank = record.bank
+                self.branch = record.bank_branch
+
+    # submit request
+    def submit_request(self):
+        self.write({'state': 'Active'})
+
+    def cancel_request(self):
+        self.write({'state': 'Closed'})
 
 class LcDetail(models.Model):
     _name = 'droga.purchase.lc.detail'

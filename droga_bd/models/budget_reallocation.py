@@ -178,6 +178,16 @@ class BudgetReallocationDetail(models.Model):
 
         return super(BudgetReallocationDetail, self).write(vals)
 
+    @api.onchange('from_budgetary_position')
+    def _load_budgetary_position_accounts_from(self):
+        from_accounts = self.from_budgetary_position.account_ids.ids
+        return {'domain': {'account_from': [('id', 'in', (from_accounts))]}}
+    
+    @api.onchange('to_budgetary_position')
+    def _load_budgetary_position_accounts_to(self):
+        to_accounts = self.to_budgetary_position.account_ids.ids
+        return {'domain': {'account_to': [('id', 'in', (to_accounts))]}}
+
     @api.constrains('remaining_amount', 'transfer_amount')
     def _is_enough_budget_left(self):
         for record in self:

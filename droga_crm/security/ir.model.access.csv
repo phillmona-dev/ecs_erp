@@ -13,5 +13,4 @@ access_droga_cust_grade,droga_crm.droga_cust_grade,model_droga_cust_grade,droga_
 access_droga_cust_type,droga_crm.droga_cust_type,model_droga_cust_type,droga_crm.crm_user,1,1,1,1
 access_droga_crm_contacts_schedule,droga_crm.droga_crm_contacts_schedule,model_droga_crm_contacts_schedule,droga_crm.crm_user,1,1,1,1
 access_droga_crm_contacts,droga_crm.droga_crm_contacts,model_droga_crm_contacts,droga_crm.crm_user,1,1,1,1
-
-
+access_droga_crm_settings_day,droga_crm.droga_crm_settings_day,model_droga_crm_settings_day,droga_crm.crm_user,1,0,0,0
