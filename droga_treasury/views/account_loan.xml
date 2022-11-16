@@ -32,9 +32,7 @@ model-->
                 
                  <button  type="object" name="open_monthly" string="Monthly Closings"
                         class="oe_stat_button" icon="fa-file-text"
-                        context="{'default_acount_monthly_closing_id':active_id}"
-                       
-                 />
+                      />
                             
             </tree>
         </field>
