@@ -134,6 +134,7 @@ class purhcase_request(models.Model):
 
     def cancel_request(self):
         self.write({'state': 'Cancel'})
+        self.cancel_commitment_budget()
         return True
 
     # budget checked
@@ -152,14 +153,13 @@ class purhcase_request(models.Model):
                 }
 
         self.write({'state': 'Budget Approved'})
+        self.record_commitment_budget()
         return True
 
     # approve request
     def approve_request(self):
         self.write({'state': 'Approved'})
         # record commitment budget
-        self.record_commitment_budget()
-
         return True
 
     def open_rfq(self):
@@ -190,7 +190,7 @@ class purhcase_request(models.Model):
     def record_commitment_budget(self):
         # record commitement budget when the budget approves
         for record in self:
-            if record.state == "Approved":
+            if record.state == "Budget Approved":
                 # total purchase amount
                 lines_include_in_total = []
                 for line in record.purhcase_request_lines:
@@ -211,6 +211,12 @@ class purhcase_request(models.Model):
                     # persist to database
                     self.env['droga.budget.commitment.budget'].create(
                         commitment_budget)
+
+    def cancel_commitment_budget(self):
+        records = self.env['droga.budget.commitment.budget'].search(
+            [('purchase_request_id', '=', self.id), ('state', '=', 'Active')])
+        for record in records:
+            record.write({'state': 'Closed'})
 
 
 class purhcase_request_line(models.Model):
