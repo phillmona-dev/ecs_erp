@@ -258,9 +258,9 @@ class AccountLoanConst(models.Model):
                 if loans.contract_date > loans.interest_start_date:
                     raise ValidationError(
                         "The Interest Start Date cannot be set in the past of The Contract Date")
-                if loans.interest_start_date > loans.payment_start_date:
-                    raise ValidationError(
-                        "The Payment start date cannot be set in the past the first receipt date")
+                # if loans.interest_start_date > loans.payment_start_date:
+                #     raise ValidationError(
+                #         "The Payment start date cannot be set in the past the first receipt date")
             if loans.contract_date > cday:
                 raise ValidationError(
                     "The Contract Date cannot be set in the Future")
