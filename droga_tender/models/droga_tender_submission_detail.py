@@ -4,10 +4,11 @@ from odoo.exceptions import UserError
 
 class droga_tender_submission_detail(models.Model):
     _name = 'droga.tender.submission.detail'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     #Selection fields
     tech_result = fields.Selection([('Pass', 'Pass'), ('Fail', 'Fail')])
-    status = fields.Selection([('awarded', 'Awarded'), ('cancelled', 'Cancelled'),('undeva', 'Under evaluation'),('faiten', 'Failed tender'),('lost', 'Lost')])
+    status = fields.Selection([('awarded', 'Awarded'), ('cancelled', 'Cancelled'),('undeva', 'Under evaluation'),('faiten', 'Failed tender'),('lost', 'Lost')],traking=True)
 
     #Text fields
     lot_number=fields.Char("Lot Number",required=True)
@@ -28,7 +29,7 @@ class droga_tender_submission_detail(models.Model):
 
     # decimal fields
     quantity=fields.Float("Quantity",default=1)
-    unit_price = fields.Float("Unit Price")
+    unit_price = fields.Float("Unit Price",tracing=True)
     amount = fields.Float("Amount",compute="compute_amount")
     @api.depends("unit_price","quantity")
     def compute_amount(self):

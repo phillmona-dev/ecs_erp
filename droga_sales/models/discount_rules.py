@@ -55,7 +55,7 @@ class sale_order_line(models.Model):
                 continue
             if not line.product_uom or not line.product_id or not line.order_id.pricelist_id:
                 line.price_unit = 0.0
-            else:
+            elif not line.tender_origin_form_tender:
                 price = line.with_company(line.company_id)._get_display_price()
                 line.price_unit = line.product_id._get_tax_included_unit_price(
                     line.company_id,
@@ -91,9 +91,9 @@ class sale_order_line(models.Model):
                 all_rate = all_rate + rate['percent']
 
 
-        if core_rate+all_rate>0:
+        if core_rate+all_rate>0 and not line.tender_origin_form_tender:
             for line in self.filtered(lambda x:  x.product_id.is_core_product):
                 line.price_unit=line.price_unit*(1+((core_rate+all_rate)/100))
-        if non_core_rate+all_rate>0:
+        if non_core_rate+all_rate>0 and not line.tender_origin_form_tender:
             for line in self.filtered(lambda x: not x.product_id.is_core_product):
                 line.price_unit = line.price_unit * (1 + ((non_core_rate + all_rate) / 100))

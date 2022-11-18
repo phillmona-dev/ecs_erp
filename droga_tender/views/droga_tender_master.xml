@@ -53,39 +53,51 @@
 
 
                     <group>
-                        <group style="white-space:nowrap">
+                        <group style="white-space:nowrap" col="1">
 
-                            <field name="media" options="{'no_create':True,'no_open':True}"
-                                   domain="[('status', '=', 'Active')]"></field>
-                            <field name="customer" options="{'no_create':True,'no_open':True}"></field>
-                            <field name="customer_tender_no"></field>
-                            <field name="bid_security_amount" widget='monetary'></field>
-                            <field name="bid_submit_place" options="{'no_create':True,'no_open':True}"
-                                   domain="[('status', '=', 'Active')]"></field>
-                            <field name="assigned_person" options="{'no_create':True,'no_open':True}"></field>
-                            <field name="posted_date_gre"></field>
-                            <field name="float_period"></field>
-                            <field name="closing_date_gre"></field>
-                            <field name="ext_period"></field>
-                            <field name="extension_date_gre"></field>
-                            <field name="open_date_gre"></field>
-                            <field name="refloat"></field>
+                            <group string="Customer info">
+                                <field name="media" options="{'no_create':True,'no_open':True}"
+                                       domain="[('status', '=', 'Active')]"></field>
+                                <field name="customer" options="{'no_create':True,'no_open':True}"></field>
+                                <field name="customer_tender_no"></field>
+
+                                <field name="procurement_title"></field>
+
+                                <field name="assigned_person" options="{'no_create':True,'no_open':True}"></field>
+                                <field name="posted_date_gre"></field>
+                                <field name="float_period"></field>
+                                <field name="period_type"></field>
+                            </group>
+                            <group string="GRE dates">
+                                <field name="closing_date_gre"></field>
+                                <field name="ext_period"></field>
+                                <field name="extension_date_gre"></field>
+                                <field name="open_date_gre"></field>
+                                <field name="refloat"></field>
+                            </group>
+
                         </group>
-                        <group style="white-space:nowrap">
+                        <group style="white-space:nowrap" col="1">
+                            <group string="Bid info">
+                                <field name="price_validity_period"></field>
+                                <field name="bid_type"></field>
+                                <field name="bid_doc_purch_price" widget='monetary'></field>
+                                <field name="security_period_in_days"></field>
+                                <field name="bid_security_amount" widget='monetary'></field>
+                                <field name="posted_date_eth"></field>
+                                <field name="bid_submit_place" options="{'no_create':True,'no_open':True}"
+                                       domain="[('status', '=', 'Active')]"></field>
+                                <field name="remark"></field>
 
-                            <field name="price_validity_period"></field>
-                            <field name="bid_type"></field>
-                            <field name="bid_doc_purch_price" widget='monetary'></field>
-                            <field name="security_period_in_days"></field>
-                            <field name="remark"></field>
-                            <field name="procurement_title"></field>
-                            <field name="posted_date_eth"></field>
-                            <field name="period_type"></field>
-                            <field name="closing_date_eth"></field>
-                            <field name="ext_period_type"></field>
-                            <field name="extension_date_eth"></field>
-                            <field name="open_date_eth"></field>
-                            <field name="status"></field>
+                            </group>
+                            <group string="ETH dates">
+                                <field name="closing_date_eth"></field>
+                                <field name="ext_period_type"></field>
+                                <field name="extension_date_eth"></field>
+                                <field name="open_date_eth"></field>
+                                <field name="status"></field>
+                            </group>
+
                         </group>
 
 

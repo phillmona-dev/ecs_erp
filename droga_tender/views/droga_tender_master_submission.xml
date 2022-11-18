@@ -57,6 +57,8 @@
                                     string="Import sub. details" class="oe_stat_button" type="action"/>
                             <button icon="fa-credit-card-alt" name="%(action_import_tech_spec)d"
                                     string="Import tech. spec." class="oe_stat_button" type="action"/>
+                            <button icon="fa-credit-card-alt" type="object" string="Initiate sales order" name="order_sales"
+                                    class="oe_stat_button"></button>
                         </div>
 
                         <notebook>
@@ -87,8 +89,7 @@
 
                             </page>
 
-                        </notebook>
-                        <notebook>
+
                             <page string="Financial detail">
                                 <field name="detail_submissions_fin" mode="tree">
                                     <tree editable="1" create="0">
@@ -115,29 +116,23 @@
                                         <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
                                         <field name="currency" options="{'no_create':True,'no_open':True}"/>
                                         <field name="fin_open"/>
-                                        <field name="st_date"/>
                                         <field name="award_fold_num"/>
                                     </tree>
                                 </field>
                             </page>
-                        </notebook>
-                        <div></div>
-                        <div class="oe_button_box" name="button_box">
-
-                            <button icon="fa-credit-card-alt" type="object" string="Initiate sales order" name="order_sales"
-                                    class="oe_stat_button"></button>
-                        </div>
-                        <notebook>
                             <page string="Awarded tenders">
                                 <field name="detail_performance" mode="tree">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" create="0">
                                         <field name="lot_number"/>
+                                        <field name="item_num"/>
                                         <field name="type_item" options="{'no_create':True,'no_open':True}"/>
                                         <field name="item_pro"/>
                                         <field name="droga_product"/>
                                         <button icon="fa-edit" type="object" attrs="{'invisible': [('droga_product', '!=', False)]}"
                                                 name="reg_products" class="oe_stat_button"/>
-                                        <field name="sales_order"/>
+                                        <field name="ordered_qty"/>
+                                        <field name="delivered_qty"/>
+                                        <field name="init_sales_order"/>
                                         <field name="quantity" sum="Total"/>
                                         <field name="unit_price" widget='monetary'/>
                                         <field name="amount" sum="Total" widget='monetary'/>
@@ -145,10 +140,8 @@
                                     </tree>
                                 </field>
                             </page>
-                        </notebook>
 
-                        <notebook>
-                            <page string="Contract Agreement">
+                            <page string="Contract agreement">
                                 <field name="detail_contract" mode="tree">
                                     <tree editable="bottom">
                                         <field name="lot_number"/>
