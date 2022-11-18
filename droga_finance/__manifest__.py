@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'purchase','hr','resource'],
+    'depends': ['base', 'account', 'purchase', 'hr', 'resource'],
 
     # always loaded
     'data': [
@@ -29,6 +29,7 @@
         'views/payment_request.xml',
         'views/account_payment.xml',
         'report/payment_request.xml',
+        'report/account_move.xml',
         'views/menu.xml',
     ],
     # only loaded in demonstration mode

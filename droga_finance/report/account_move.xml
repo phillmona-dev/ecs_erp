@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- bank payment voucher -->
+    <record id="droga_account_bank_payment_voucher_action" model="ir.actions.report">
+        <field name="name">Bank Payment Voucher</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_finance.droga_account_bank_payment_voucher_report</field>
+        <field name="report_file">droga_finance.droga_account_bank_payment_voucher_report</field>
+        <field name="print_report_name">'Bank Payment Voucher - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="droga_account_bank_payment_voucher_report" name="Bank Payment Voucher">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+
+
+                    <t t-foreach="request.env['account.payment'].search([('move_id','=',o.id)])" t-as="obj">
+                        <t t-esc="obj.name"/>
+                    </t>
+
+
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2 text-end">
+
+                                <strong>Date:-</strong>
+                                <span t-field="o.date" class="m-0"/>
+
+                                <br></br>
+                                <strong>No:-</strong>
+                                <span t-field="o.name" class="m-0"/>
+
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h2>Bank Payment Voucher</h2>
+                        </div>
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>Payee:-</strong>
+                                <span t-field="o.partner_id.name" class="m-0"/>
+                            </div>
+                        </div>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>Purpose:-</strong>
+                                <span t-field="o.narration" class="m-0"/>
+                            </div>
+                        </div>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                                <strong>Amount in Figures:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total" class="m-0"/>
+                                </u>
+
+                                <br></br>
+                                <strong>Amount in Words:-</strong>
+
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Check No:-</strong>
+                                <br></br>
+                                <strong>Bank Account:-</strong>
+                            </div>
+                        </div>
+                        <br></br>
+                        <table class="table table-sm o_main_table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <strong>Sub Ledger</strong>
+                                    </th>
+                                    <th>
+                                        <strong>GL Account</strong>
+                                    </th>
+                                    <th>
+                                        <strong>GL Description</strong>
+                                    </th>
+                                    <th class="text-end">
+                                        <strong>Debit</strong>
+                                    </th>
+                                    <th class="text-end">
+                                        <strong>Credit</strong>
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="line">
+                                    <td></td>
+                                    <td>
+                                        <t t-esc="line.account_id.code"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.account_id.name"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="line.debit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="line.credit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <strong>Prepared By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Checked By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Approved By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Approved By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Received the above amount</strong>
+                                <br></br>
+                                <br></br>
+                                <span>_________________________________</span>
+                                <br></br>
+                                <span class="text-center">Signature of Payee</span>
+                            </div>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <span>Distribution</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <span>White-Accounts</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <span>Pink-Pad</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+     <!-- Petty Cash payment voucher -->
+    <record id="droga_account_petty_cash_payment_voucher_action" model="ir.actions.report">
+        <field name="name">Petty Cash Payment Voucher</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_finance.droga_account_petty_cash_payment_voucher_report</field>
+        <field name="report_file">droga_finance.droga_account_petty_cash_payment_voucher_report</field>
+        <field name="print_report_name">'Petty Cash Payment Voucher - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="droga_account_petty_cash_payment_voucher_report" name="Petty Cash Payment Voucher">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+
+
+                    <t t-foreach="request.env['account.payment'].search([('move_id','=',o.id)])" t-as="obj">
+                        <t t-esc="obj.name"/>
+                    </t>
+
+
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2 text-end">
+
+                                <strong>Date:-</strong>
+                                <span t-field="o.date" class="m-0"/>
+
+                                <br></br>
+                                <strong>No:-</strong>
+                                <span t-field="o.name" class="m-0"/>
+
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h2>Bank Payment Voucher</h2>
+                        </div>
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>Payee:-</strong>
+                                <span t-field="o.partner_id.name" class="m-0"/>
+                            </div>
+                        </div>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>Purpose:-</strong>
+                                <span t-field="o.narration" class="m-0"/>
+                            </div>
+                        </div>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                                <strong>Amount in Figures:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total" class="m-0"/>
+                                </u>
+
+                                <br></br>
+                                <strong>Amount in Words:-</strong>
+
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Check No:-</strong>
+                                <br></br>
+                                <strong>Bank Account:-</strong>
+                            </div>
+                        </div>
+                        <br></br>
+                        <table class="table table-sm o_main_table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <strong>Sub Ledger</strong>
+                                    </th>
+                                    <th>
+                                        <strong>GL Account</strong>
+                                    </th>
+                                    <th>
+                                        <strong>GL Description</strong>
+                                    </th>
+                                    <th class="text-end">
+                                        <strong>Debit</strong>
+                                    </th>
+                                    <th class="text-end">
+                                        <strong>Credit</strong>
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="line">
+                                    <td></td>
+                                    <td>
+                                        <t t-esc="line.account_id.code"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.account_id.name"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="line.debit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="line.credit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <strong>Prepared By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Checked By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Approved By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Approved By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Received the above amount</strong>
+                                <br></br>
+                                <br></br>
+                                <span>_________________________________</span>
+                                <br></br>
+                                <span class="text-center">Signature of Payee</span>
+                            </div>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <span>Distribution</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <span>White-Accounts</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <span>Pink-Pad</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+    <!-- cash reciept voucher -->
+    <record id="droga_account_cash_reciept_voucher_action" model="ir.actions.report">
+        <field name="name">Cash Reciept Voucher</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_finance.droga_account_cash_reciept_voucher_report</field>
+        <field name="report_file">droga_finance.droga_account_cash_reciept_voucher_report</field>
+        <field name="print_report_name">'Cash Reciept Voucher - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="droga_account_cash_reciept_voucher_report" name="Cash Reciept Voucher">
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <t t-foreach="docs" t-as="o">
+
+
+                    <t t-foreach="request.env['account.payment'].search([('move_id','=',o.id)])" t-as="obj">
+                        <t t-esc="obj.name"/>
+                    </t>
+
+
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2 text-end">
+
+                                <strong>Date:-</strong>
+                                <span t-field="o.date" class="m-0"/>
+
+                                <br></br>
+                                <strong>No:-</strong>
+                                <span t-field="o.name" class="m-0"/>
+
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h2>Cash Reciept Voucher</h2>
+                        </div>
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>Payee:-</strong>
+                                <span t-field="o.partner_id.name" class="m-0"/>
+                            </div>
+                        </div>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>Purpose:-</strong>
+                                <span t-field="o.narration" class="m-0"/>
+                            </div>
+                        </div>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                                <strong>Amount in Figures:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total" class="m-0"/>
+                                </u>
+
+                                <br></br>
+                                <strong>Amount in Words:-</strong>
+
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Check No:-</strong>
+                                <br></br>
+                                <strong>Bank Account:-</strong>
+                            </div>
+                        </div>
+                        <br></br>
+                        <table class="table table-sm o_main_table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <strong>Sub Ledger</strong>
+                                    </th>
+                                    <th>
+                                        <strong>GL Account</strong>
+                                    </th>
+                                    <th>
+                                        <strong>GL Description</strong>
+                                    </th>
+                                    <th class="text-end">
+                                        <strong>Debit</strong>
+                                    </th>
+                                    <th class="text-end">
+                                        <strong>Credit</strong>
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="line">
+                                    <td></td>
+                                    <td>
+                                        <t t-esc="line.account_id.code"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.account_id.name"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="line.debit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="line.credit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <strong>Prepared By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Checked By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Approved By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Approved By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Received the above amount</strong>
+                                <br></br>
+                                <br></br>
+                                <span>_________________________________</span>
+                                <br></br>
+                                <span class="text-center">Signature of Payee</span>
+                            </div>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <span>Distribution</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <span>White-Accounts</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <span>Pink-Pad</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+    <!-- Journal Payment voucher -->
+    <record id="droga_account_journal_voucher_action" model="ir.actions.report">
+        <field name="name">Journal Voucher</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_finance.droga_account_journal_voucher_report</field>
+        <field name="report_file">droga_finance.droga_account_journal_voucher_report</field>
+        <field name="print_report_name">'Journal Voucher - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="droga_account_journal_voucher_report" name="Journal Voucher">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+
+
+                    <t t-foreach="request.env['account.payment'].search([('move_id','=',o.id)])" t-as="obj">
+                        <t t-esc="obj.name"/>
+                    </t>
+
+
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2 text-end">
+
+                                <strong>Date:-</strong>
+                                <span t-field="o.date" class="m-0"/>
+
+                                <br></br>
+                                <strong>No:-</strong>
+                                <span t-field="o.name" class="m-0"/>
+
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h2>Journal Voucher</h2>
+                        </div>
+
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>Purpose:-</strong>
+                                <span t-field="o.narration" class="m-0"/>
+                            </div>
+                        </div>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                                <strong>Amount in Figures:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total" class="m-0"/>
+                                </u>
+
+                                <br></br>
+                                <strong>Amount in Words:-</strong>
+
+                            </div>
+
+                        </div>
+                        <br></br>
+                        <table class="table table-sm o_main_table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <strong>Sub Ledger</strong>
+                                    </th>
+                                    <th>
+                                        <strong>GL Account</strong>
+                                    </th>
+                                    <th>
+                                        <strong>GL Description</strong>
+                                    </th>
+                                    <th class="text-end">
+                                        <strong>Debit</strong>
+                                    </th>
+                                    <th class="text-end">
+                                        <strong>Credit</strong>
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="line">
+                                    <td></td>
+                                    <td>
+                                        <t t-esc="line.account_id.code"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.account_id.name"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="line.debit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="line.credit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <strong>Prepared By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Checked By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Approved By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Approved By</strong>
+                                <br></br>
+                                <br></br>
+                                <span>___________________</span>
+                            </div>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Received the above amount</strong>
+                                <br></br>
+                                <br></br>
+                                <span>_________________________________</span>
+                                <br></br>
+                                <span class="text-center">Signature of Payee</span>
+                            </div>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-3 bm-2">
+                                <span>Distribution</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <span>White-Accounts</span>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <span>Pink-Pad</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+
+
+</odoo>

@@ -25,25 +25,30 @@
         <field name="arch" type="xml">
             <form string="Office supplies request">
                 <header>
-                    <button name="action_request"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','processed')),('id','=',None)]}"
-                            string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="action_receive"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','draft')),('id','=',None)]}"
-                            string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="action_cancel"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done','processed')),('id','=',None)]}"
-                            string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_request" attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','processed')),('id','=',None)]}" string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_receive" attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','draft')),('id','=',None)]}" string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_cancel" attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done','processed')),('id','=',None)]}" string="Cancel" type="object" class="oe_highlight btn-danger" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" />
                     <field name="state" widget="statusbar" statusbar_visible="draft,waiting,processed,done"/>
                 </header>
                 <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label">Store Requistion No</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
                     <group>
                         <group>
                             <field name="requested_by" options="{'no_create':True,'no_open':True}"></field>
                             <field name="request_picking" attrs="{'invisible': [('state', 'in', ('draft'))]}" string="Request id" widget="many2many_tags" readonly="1"/>
+                            <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                            <field name="department_manager" readonly="1" invisible="1"/>
+                            <field name="branch" options="{'no_create':True,'no_open':True}" required="1" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                         </group>
                         <group>
                             <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
+                            <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                         </group>
                     </group>
                     <notebook>
@@ -51,10 +56,12 @@
                             <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
                                 <tree editable="bottom">
                                     <field name="company_id" invisible="1"/>
-                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
-                                    <field name="product_uom"/>
+                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" width="40" context="{'default_detailed_type': 'product'}"/>
+                                    <field name="product_uom" width="10"/>
                                     <field name="product_uom_category_id" invisible="1"/>
-                                    <field name="product_uom_qty" string="Request"/>
+                                    <field name="product_uom_qty" string="Qty" help="Quantity" width="10"/>
+                                    <field name="unit_price" width="20"/>
+                                    <field name="total_price" width="20"/>
                                     <!--
                                     <field name="location_source_id" domain="([('usage','=','internal')])" string="Source location"/>
                                     -->
@@ -73,10 +80,5 @@
         </field>
     </record>
 
-    <menuitem
-            id="droga_stock_office_supplies_request_menu"
-            name="Office supplies request"
-            action="droga_inventory_office_supplies_request_action"
-            groups="base.group_user"
-            parent="stock.menu_stock_warehouse_mgmt"/>
+    <menuitem id="droga_stock_office_supplies_request_menu" name="Office supplies request" action="droga_inventory_office_supplies_request_action" groups="base.group_user" parent="stock.menu_stock_warehouse_mgmt"/>
 </odoo>
