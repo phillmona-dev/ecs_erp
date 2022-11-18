@@ -115,7 +115,6 @@ class CrossoveredBudgetLinesDetail(models.Model):
         # self.calculate_remaining_budget()
         return res
 
-   
     def load_commitment_budget(self):
         budget_lines = self.env['crossovered.budget.lines'].search(
             [('crossovered_budget_state', '!=', 'cancel')])
@@ -142,8 +141,8 @@ class CrossoveredBudgetLinesDetail(models.Model):
                     line.write(
                         {'commitment_budget': account_commitment_budget})
 
-    
-     #to calculate crossovered.budget.lines
+     # to calculate crossovered.budget.lines
+
     def calculate_remaining_budget(self):
 
         # load commitement budget
@@ -172,7 +171,7 @@ class CrossoveredBudgetLinesDetail(models.Model):
 
                 line.write({'remaining_balance': remaining_balance})
 
-    #to calculate crossovered.budget.lines.detail
+    # to calculate crossovered.budget.lines.detail
     def calculate_remaining_budget_detail(self):
         # get active budgets
         budgets = self.env['crossovered.budget.lines'].search(
@@ -199,9 +198,13 @@ class CrossoveredBudgetLinesDetail(models.Model):
                                                           record.date_from), ('date', '<=', record.date_to),
                  ('parent_state', '=', 'posted')])
 
+            analytic_account_id = record.budgetary_position_id.analytic_account_id.id
+
             actual = 0
             for line in actual_expense:
-                actual += line.balance
+                for line1 in line.analytic_line_ids:
+                    if analytic_account_id == line1.account_id.id:
+                        actual += line.balance
 
             # update remaining balance
             #record.actual = actual * -1
@@ -230,6 +233,7 @@ class CrossoveredBudgetLinesDetail(models.Model):
             # update revised budget
             record.revised_budget = revised_budget
 
+            analytic_account_id = record.budgetary_position_id.analytic_account_id.id
             # get actual expense
             actual_expense = self.env['account.move.line'].search(
                 [('company_id', '=', record.company_id.id),
@@ -239,7 +243,9 @@ class CrossoveredBudgetLinesDetail(models.Model):
 
             actual = 0
             for line in actual_expense:
-                actual += line.balance
+                for line1 in line.analytic_line_ids:
+                    if analytic_account_id == line1.account_id.id:
+                        actual += line.balance
 
             # update remaining balance
             #record.actual = actual * -1
