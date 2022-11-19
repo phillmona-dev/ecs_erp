@@ -30,6 +30,7 @@
         'views/account_payment.xml',
         'report/payment_request.xml',
         'report/account_move.xml',
+        'report/withholding_report.xml',
         'views/menu.xml',
     ],
     # only loaded in demonstration mode

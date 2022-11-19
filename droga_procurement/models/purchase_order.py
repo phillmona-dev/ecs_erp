@@ -90,6 +90,7 @@ class purchase_order(models.Model):
             'res_id': self.id
         }
 
+    @api.model
     def create(self, vals):
         # get sequence number for each company
         company_id = vals.get('company_id', self.default_get(

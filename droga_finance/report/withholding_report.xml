@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="droga_finance_reports_withholding_excel_action" model="ir.actions.act_window">
+        <field name="name">Withholding Report - Excel</field>
+        <field name="res_model">droga.finance.witholding.excel.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="droga_finance_reports_witholding_excel_form" model="ir.ui.view">
+        <field name="name">droga.finance.witholding.excel.report.form</field>
+        <field name="model">droga.finance.witholding.excel.report</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <group>
+                    <group>
+                        <field name="date_from" />
+                        <field name="date_to" />
+                        <field name="company_id" options="{'no_create':True,'no_open':True}"></field>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_get_xls" string="Get Excel" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

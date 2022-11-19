@@ -20,4 +20,5 @@
 
     <menuitem id="droga_account_check_followup_menu" name="Check Followup" action="droga_account_check_followup_action" groups="account.group_account_manager" parent="account_accountant.menu_accounting" sequence="10"/>
 
+    <menuitem id="droga_account_withholding_report_menu" name="Witholding Report" action="droga_finance_reports_withholding_excel_action" groups="account.group_account_manager" parent="account_accountant.menu_accounting" sequence="11"/>
 </odoo>

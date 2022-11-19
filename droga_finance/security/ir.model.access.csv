@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_droga_finance_payment_request,droga.account.payment.request,model_droga_account_payment_request,droga_finance.self_service_group,1,1,1,1
 access_droga_finance_payment_request,droga.account.payment.request,model_droga_account_payment_request,droga_finance.self_service_group,1,1,1,1
+access_droga_finance_withholding_report,droga.finance.witholding.excel.report,model_droga_finance_witholding_excel_report,droga_finance.self_service_group,1,1,1,1
