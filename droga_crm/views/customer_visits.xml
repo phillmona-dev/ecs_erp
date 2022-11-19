@@ -182,7 +182,7 @@
                                     <field name="contact_custom" domain="([('parent_customer','=',cust)])"
                                            options="{'no_create':True,'no_open':True}"></field>
                                     <field name="phone_no"/>
-                                    <field name="core_products" widget="many2many_tags"/>
+                                    <field name="core_products" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>/>
                                 </tree>
                     </field>
                         </page>

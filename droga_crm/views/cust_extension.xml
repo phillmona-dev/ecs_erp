@@ -11,7 +11,7 @@
                         <tree editable="1" create="1">
                             <field name="specialty" domain="([('status','=','Active')])" options="{'no_create':True,'no_open':True}"/>
                             <field name="contact_name"/>
-                            <field name="job_pos"/>
+                            <field name="job_position"/>
                             <field name="gender"/>
                             <field name="mobile"/>
                             <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
