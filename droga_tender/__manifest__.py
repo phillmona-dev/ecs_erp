@@ -44,14 +44,14 @@
         'views/reports/total_performance.xml',
         'views/droga_tender_detail_input.xml',
         'reports/excel_reports/financial_proposal.xml',
-
+        'reports/excel_reports/technical_proposal.xml',
         'data/droga_tender_sequence.xml',
         'security/tender_scheduled_alerts.xml'
     ],
 
     # any module necessary for this one to work correctly
 
-    'depends': ['base','hr',
+    'depends': ['base','hr','account',
                 'mail','droga_crm','hr','droga_finance','droga_inventory',
                 'resource','stock','sale',
                 'web','report_xlsx'],

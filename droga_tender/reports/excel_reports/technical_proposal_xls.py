@@ -37,7 +37,7 @@ class tender_technical_proposal_master_xls(models.TransientModel):
 
         #The file name is stored under filename
         datetime_string = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = '%s_%s_%s' % ('technical proposal ',self.tender_id['ten_name'], datetime_string)
+        filename = '%s_%s_%s' % ('Technical proposal ',self.tender_id['ten_name'], datetime_string)
         filename += '%2Exlsx'
 
         #This downloads file. The file is fileout and the name if filename
@@ -49,7 +49,7 @@ class tender_technical_proposal_master_xls(models.TransientModel):
         }
 
     def generate_xlsx_report(self, workbook):
-        sheet = workbook.add_worksheet('technical proposal')
+        sheet = workbook.add_worksheet('Technical proposal')
 
         sheet.set_column('A:A', 10.5)
         sheet.set_column('B:B', 35)
@@ -101,17 +101,21 @@ class tender_technical_proposal_master_xls(models.TransientModel):
             'text_wrap': 1,
             'fg_color': '#F6F5F5'})
 
-        sheet.merge_range('A' + str(row_start + 1) + ':G' + str(row_start + 1), self.tender_id['customer'].name, header_format)
-        sheet.merge_range('A' + str(row_start + 2) + ':G' + str(row_start + 2), self.tender_id['procurement_title'],header_format)
-        sheet.merge_range('A' + str(row_start + 3) + ':G' + str(row_start + 3), 'technical proposal',main_title_format)
+        sheet.merge_range('A' + str(row_start + 1) + ':K' + str(row_start + 1), self.tender_id['customer'].name, header_format)
+        sheet.merge_range('A' + str(row_start + 2) + ':K' + str(row_start + 2), self.tender_id['procurement_title'],header_format)
+        sheet.merge_range('A' + str(row_start + 3) + ':K' + str(row_start + 3), 'Technical proposal',main_title_format)
 
         sheet.write(row_start+4, 0, 'S.No',title_format)
         sheet.write(row_start + 4, 1, 'Items', title_format)
         sheet.write(row_start + 4, 2, 'Unit', title_format)
-        sheet.write(row_start + 4, 3, 'Qty', title_format)
-        sheet.write(row_start + 4, 4, 'Unit price', title_format)
-        sheet.write(row_start + 4, 5, 'Total price', title_format)
-        sheet.write(row_start + 4, 6, 'Remark', title_format)
+        sheet.write(row_start + 4, 3, 'Item requested.', title_format)
+        sheet.write(row_start + 4, 4, 'Item proposed', title_format)
+        sheet.write(row_start + 4, 5, 'Supplier', title_format)
+        sheet.write(row_start + 4, 6, 'Brand', title_format)
+        sheet.write(row_start + 4, 7, 'Qty', title_format)
+        sheet.write(row_start + 4, 8, 'Unit price', title_format)
+        sheet.write(row_start + 4, 9, 'Total price', title_format)
+        sheet.write(row_start + 4, 10, 'Remark', title_format)
         row_start=5
 
         tot_amount=0
@@ -122,16 +126,22 @@ class tender_technical_proposal_master_xls(models.TransientModel):
             sheet.write(row_start, 1, item if item else ' ')
             uom=rec.uom_free_field if rec.uom_free_field else rec.unit_of_measure
             sheet.write(row_start, 2, uom if uom else ' ')
-            sheet.write(row_start, 3, rec.quantity)
-            sheet.write(row_start, 4, rec.unit_price)
-            sheet.write(row_start, 5, rec.amount)
+
+            sheet.write(row_start, 3, rec.item_des if rec.item_des else ' ')
+            sheet.write(row_start, 4, rec.item_pro if rec.item_pro else ' ')
+            sheet.write(row_start, 5, rec.supplier_new if rec.supplier_new else ' ')
+            sheet.write(row_start, 6, rec.brand_model if rec.brand_model else ' ')
+
+            sheet.write(row_start, 7, rec.quantity)
+            sheet.write(row_start, 8, rec.unit_price)
+            sheet.write(row_start, 9, rec.amount)
             tot_amount+=rec.amount
-            sheet.write(row_start, 6, rec.remark if rec.remark else ' ')
+            sheet.write(row_start, 10, rec.remark if rec.remark else ' ')
 
             row_start+=1
 
-        sheet.write(row_start , 4, 'Total price', title_format)
-        sheet.write(row_start, 5, tot_amount, title_format)
+        sheet.write(row_start , 8, 'Total price', title_format)
+        sheet.write(row_start, 9, tot_amount, title_format)
 
         row_start+=2
 

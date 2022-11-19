@@ -28,7 +28,6 @@
         'security/ir.model.access.csv',
         'views/account_move.xml',
         'views/credit_limit.xml',
-        'views/sale_order_line_wh.xml',
         'views/sales_discount_rules.xml'
     ],
     # only loaded in demonstration mode

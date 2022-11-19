@@ -5,15 +5,18 @@ from datetime import datetime, date, timedelta
 from odoo.exceptions import ValidationError
 from ..custom_libraries import eth_to_greg_date_conv
 
+
 class droga_tender_master(models.Model):
     _name = 'droga.tender.master'
     _description = 'Tender master file'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name='ten_name'
+    _rec_name = 'ten_name'
 
-    #region fields definition
+    # region fields definition
     # Date fields
-    posted_date_gre = fields.Date("Posted/floated date GRE",  required=True,compute="conv_posted_date",store=True,inverse='inverse_posted_date',help="Time should be in Ethiopian format not AM/PM.")
+    posted_date_gre = fields.Date("Posted/floated date GRE", required=True, compute="conv_posted_date", store=True,
+                                  inverse='inverse_posted_date', help="Time should be in Ethiopian format not AM/PM.")
+
     @api.depends("posted_date_eth")
     def conv_posted_date(self):
         try:
@@ -26,12 +29,16 @@ class droga_tender_master(models.Model):
 
     def inverse_posted_date(self):
         pass
-    closing_date_gre = fields.Datetime("Closing date and time GRE", required=True,compute="conv_close_date",store=True,inverse='inverse_close_date',help="Time should be in Ethiopian format not AM/PM.")
-    @api.depends("closing_date_eth","float_period","posted_date_gre","open_date_gre")
+
+    closing_date_gre = fields.Datetime("Closing date and time GRE", required=True, compute="conv_close_date",
+                                       store=True, inverse='inverse_close_date',
+                                       help="Time should be in Ethiopian format not AM/PM.")
+
+    @api.depends("closing_date_eth", "float_period", "posted_date_gre", "open_date_gre")
     def conv_close_date(self):
         try:
-            if self.closing_date_eth=='':
-                self.closing_date_gre=self.posted_date_gre+timedelta(days=int(self.float_period))
+            if self.closing_date_eth == '':
+                self.closing_date_gre = self.posted_date_gre + timedelta(days=int(self.float_period))
             else:
                 converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
                     int(self.closing_date_eth.split("-")[0]), int(self.closing_date_eth.split("-")[1]),
@@ -39,14 +46,18 @@ class droga_tender_master(models.Model):
                 self.closing_date_gre = converted_date
         except Exception as e:
             self.closing_date_eth = ""
+
     def inverse_close_date(self):
         pass
-    open_date_gre = fields.Datetime("Opening date and time GRE",compute="conv_open_date",store=True,inverse='inverse_open_date',help="Time should be in Ethiopian format not AM/PM.")
-    @api.depends("open_date_eth",'posted_date_gre','float_period','closing_date_gre')
+
+    open_date_gre = fields.Datetime("Opening date and time GRE", compute="conv_open_date", store=True,
+                                    inverse='inverse_open_date', help="Time should be in Ethiopian format not AM/PM.")
+
+    @api.depends("open_date_eth", 'posted_date_gre', 'float_period', 'closing_date_gre')
     def conv_open_date(self):
         try:
-            if self.open_date_eth=='':
-                self.open_date_gre=self.closing_date_gre
+            if self.open_date_eth == '':
+                self.open_date_gre = self.closing_date_gre
             else:
                 converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
                     int(self.open_date_eth.split("-")[0]), int(self.open_date_eth.split("-")[1]),
@@ -54,67 +65,77 @@ class droga_tender_master(models.Model):
                 self.open_date_gre = converted_date
         except Exception as e:
             self.open_date_eth = ""
+
     def inverse_open_date(self):
         pass
-    extension_date_gre = fields.Datetime("Extension date and time GRE",compute="conv_ext_date",store=True,inverse='inverse_ext_date',help="Time should be in Ethiopian format not AM/PM.")
-    @api.depends("extension_date_eth","closing_date_gre","ext_period")
+
+    extension_date_gre = fields.Datetime("Extension date and time GRE", compute="conv_ext_date", store=True,
+                                         inverse='inverse_ext_date',
+                                         help="Time should be in Ethiopian format not AM/PM.")
+
+    @api.depends("extension_date_eth", "closing_date_gre", "ext_period")
     def conv_ext_date(self):
         for rec in self:
             if not rec.ext_period:
                 return
             try:
-                if rec.extension_date_eth=='':
-                    rec.extension_date_gre=rec.closing_date_gre+timedelta(days=int(rec.ext_period))
+                if rec.extension_date_eth == '':
+                    rec.extension_date_gre = rec.closing_date_gre + timedelta(days=int(rec.ext_period))
                 else:
-                    converted_date=eth_to_greg_date_conv.converter.eth_to_greg_convert(int(rec.extension_date_eth.split("-")[0]),int(rec.extension_date_eth.split("-")[1]),2000+int(rec.extension_date_eth.split("-")[2]))
-                    rec.extension_date_gre=converted_date
+                    converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
+                        int(rec.extension_date_eth.split("-")[0]), int(rec.extension_date_eth.split("-")[1]),
+                        2000 + int(rec.extension_date_eth.split("-")[2]))
+                    rec.extension_date_gre = converted_date
             except Exception as e:
-                rec.extension_date_eth=""
+                rec.extension_date_eth = ""
+
     def inverse_ext_date(self):
         pass
+
     # Text fields
-    extension_date_eth = fields.Char("Extension date ETH(dd-mm-yy)",default='')
-    posted_date_eth = fields.Char("Floated date ETH(dd-mm-yy)",default='')
-    open_date_eth = fields.Char("Opening date ETH(dd-mm-yy)",default='')
-    closing_date_eth = fields.Char("Closing date ETH(dd-mm-yy)",default='')
+    extension_date_eth = fields.Char("Extension date ETH(dd-mm-yy)", default='')
+    posted_date_eth = fields.Char("Floated date ETH(dd-mm-yy)", default='')
+    open_date_eth = fields.Char("Opening date ETH(dd-mm-yy)", default='')
+    closing_date_eth = fields.Char("Closing date ETH(dd-mm-yy)", default='')
     float_period = fields.Char("Float period in days")
     ext_period = fields.Char("Extension period in days")
     remark = fields.Char("Remark")
     customer_tender_no = fields.Char("Customer tender no")
-    procurement_title=fields.Char('Procurement title')
-    ten_id=fields.Char('Droga tender ID')
-    ten_name=fields.Char('Tender description',compute='_get_tender_description')
+    procurement_title = fields.Char('Procurement title')
+    ten_id = fields.Char('Droga tender ID')
+    ten_name = fields.Char('Tender description', compute='_get_tender_description')
 
     # Selection fields
     period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')])
-    ext_period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')],string='Extension period type')
+    ext_period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')],
+                                       string='Extension period type')
     bid_type = fields.Selection([('f', 'Foreign'), ('l', 'Local'), ('F+L', 'F+L')])
-    status = fields.Selection([('active', 'Active'), ('closed', 'Closed')],compute="get_status")
+    status = fields.Selection([('active', 'Active'), ('closed', 'Closed')], compute="get_status")
 
     @api.depends("closing_date_gre")
     def get_status(self):
         for record in self:
             if record.closing_date_gre:
-                if(record.closing_date_gre<datetime.today()):
-                    record.status='closed'
+                if (record.closing_date_gre < datetime.today()):
+                    record.status = 'closed'
                 else:
-                    record.status='active'
+                    record.status = 'active'
             else:
                 record.status = 'closed'
 
     # decimal fields
     bid_doc_purch_price = fields.Float("Bid document purchase price")
     price_validity_period = fields.Integer("Price validity period")
-    bid_security_amount = fields.Float('Security amount', required=True)
+
     security_period_in_days = fields.Integer('Bid sec. period in days')
     # bool fields
     refloat = fields.Boolean("Is refloated tender?", default=False)
     alert_sent = fields.Boolean("Alert sent?", default=False)
-    active=fields.Boolean("Active",default=True)
+    active = fields.Boolean("Active", default=True)
 
     # relational fields selection
     media = fields.Many2one('droga.tender.settings.media', string='Media')
-    bid_submit_place = fields.Many2one('droga.tender.settings.submission.place',string="Bid submission place")
+    bid_submit_place = fields.Many2one('droga.tender.settings.submission.place', string="Bid submission place")
     customer = fields.Many2one('droga.tender.settings.customers', string='Customer', required=True)
     assigned_person = fields.Many2one('hr.employee', string='Assigned Person')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
@@ -122,13 +143,15 @@ class droga_tender_master(models.Model):
 
     # relational fields models
     detail_tenders = fields.One2many('droga.tender.master.detail', 'parent_tender', required=True)
-    detail_submissions_tec = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission', required=True)
+    detail_submissions_tec = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission',
+                                             required=True)
     detail_submissions_fin = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission')
     detail_submissions_additional = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission')
     bid_security = fields.One2many('droga.tender.security.detail', 'bid_security')
     detail_performance = fields.One2many('droga.tender.performance.evaluation', 'parent_tender_performance')
     detail_contract = fields.One2many('droga.tender.contract', 'parent_tender_contract')
-    #endregion
+
+    # endregion
 
     def bid_security_open(self):
         return {
@@ -142,7 +165,7 @@ class droga_tender_master(models.Model):
             'res_id': self.id,
             'context': {
                 'default_tender_id': self.id,
-                'default_security_for':'Bid security'
+                'default_security_for': 'Bid security'
             }
         }
 
@@ -155,11 +178,11 @@ class droga_tender_master(models.Model):
             'view_id': self.env.ref('droga_tender.droga_tender_upcoming_view_form').id,
             'type': 'ir.actions.act_window',
 
-            #This will pass the detail ID if a record is present
+            # This will pass the detail ID if a record is present
             'res_id': self.id,
 
-            #When target is new, it will popup else it will use it's own form, wow ferenj
-            #'target': 'new',
+            # When target is new, it will popup else it will use it's own form, wow ferenj
+            # 'target': 'new',
         }
 
     def pay_req_open(self):
@@ -180,17 +203,21 @@ class droga_tender_master(models.Model):
         if not self.customer.master_cust_id:
             raise ValidationError("Please register customer before raising a sales order.!")
         else:
-            order_lines=[]
-            lines_to_raise=self.env['droga.tender.performance.evaluation'].search([('parent_tender_performance.id','=',self.id),('droga_product','!=',False)])
+            order_lines = []
+            lines_to_raise = self.env['droga.tender.performance.evaluation'].search(
+                [('parent_tender_performance.id', '=', self.id), ('init_sales_order', '=', True),
+                 ('droga_product', '!=', False)])
             for line in lines_to_raise:
-                order_lines.append( {
-                    'name' : line.droga_product.name,
-                    'product_template_id' : line.droga_product.id,
-                    'product_uom' : line.droga_product.uom_id.id,
-                    'product_uom_qty' : line.quantity,
-                    'price_unit':line.unit_price,
-                    'tender_line':line.id
-      })
+                order_lines.append({
+                    'name': line.droga_product.name,
+                    'product_template_id': line.droga_product.id,
+                    'product_uom': line.droga_product.uom_id.id,
+                    'product_id':line.droga_product.id,
+                    'product_uom_qty': line.quantity - line.ordered_qty,
+                    'price_unit': line.unit_price,
+                    'tender_line': line.id
+                })
+                line.init_sales_order=False
             return {
                 'name': 'Sales order',
                 'view_type': 'form',
@@ -216,7 +243,7 @@ class droga_tender_master(models.Model):
 
             'context': {
                 'default_tender_origin_form': self.id,
-                'default_issue_type':'SIF'
+                'default_issue_type': 'SIF'
             }
         }
 
@@ -224,36 +251,39 @@ class droga_tender_master(models.Model):
         result = []
         for record in self:
             result.append(
-                (record.id, record.ten_id+' - '+ record.customer["name"]+" for "+record.closing_date_gre.strftime("%B %d,%Y")))
+                (record.id,
+                 record.customer["name"] + ' - ' + record.ten_id + " for " + record.closing_date_gre.strftime(
+                     "%B %d,%Y")))
         return result
 
     @api.depends('customer')
     def _get_tender_description(self):
         for rec in self:
-            rec.ten_name= rec.ten_id+' - '+ rec.customer["name"]+" for "+rec.closing_date_gre.strftime("%B %d,%Y")
+            rec.ten_name = rec.customer["name"] + ' - ' + rec.ten_id + " for " + rec.closing_date_gre.strftime(
+                "%B %d,%Y")
 
     @api.model
     def create(self, vals_list):
         vals_list['ten_id'] = self.env['ir.sequence'].next_by_code(
             'droga.tender.master.custom.sequence')
 
-        res=super().create(vals_list)
+        res = super().create(vals_list)
         to_create_bid_security = {
-                "bid_security": res.id,
-                "tender_id":res.id,
-                "security_amount": vals_list["bid_security_amount"],
-                "security_period_in_days": vals_list["security_period_in_days"],
-                "security_for": 'Bid security'
-            }
-        self.env["droga.tender.security.detail"].create(to_create_bid_security)
+            "bid_security": res.id,
+            "tender_id": res.id,
+            "security_amount": vals_list["bid_security_amount"],
+            "security_period_in_days": vals_list["security_period_in_days"],
+            "security_for": 'Bid security'
+        }
+        if vals_list["bid_security_amount"]>100:
+            self.env["droga.tender.security.detail"].create(to_create_bid_security)
+        else:
+            vals_list["bid_security_pct"]=vals_list["bid_security_amount"]
         return res
 
     def action_set_archive(self):
         for rec in self:
             if rec.active:
-                rec.active=False
+                rec.active = False
             else:
-                rec.active=True
-
-    
-    
+                rec.active = True

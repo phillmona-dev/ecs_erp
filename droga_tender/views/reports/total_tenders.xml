@@ -5,9 +5,9 @@
             <field name="model">droga.tender.master</field>
             <field name="arch" type="xml">
                 <tree string="" create="false" delete="false" expand="1">
+                    <field name="customer" ></field>
                     <field name="ten_id" string="Tender ID"></field>
                     <field name="posted_date_gre" string="Floated date"></field>
-                    <field name="customer" ></field>
                     <field name="item_types"></field>
                     <field name="closing_date_gre" string="Closing date"></field>
                     <field name="bid_security_amount"></field>

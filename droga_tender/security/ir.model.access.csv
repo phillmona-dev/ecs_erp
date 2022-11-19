@@ -17,6 +17,10 @@ access_tender_security,droga.tender.security.detail,model_droga_tender_security_
 access_tender_sub_detail,droga.tender.submission.detail,model_droga_tender_submission_detail,droga_tender.tender_user,1,1,1,1
 access_tender_reports_financial_proposal,droga.tender.reports.financial.proposal,model_droga_tender_reports_financial_proposal,droga_tender.tender_user,1,1,1,1
 access_tender_reports_technical_proposal,droga.tender.reports.technical.proposal,model_droga_tender_reports_technical_proposal,droga_tender.tender_user,1,1,1,1
-
+access_droga_crm_droga_cust_type,droga.crm.droga.cust.type,droga_crm.model_droga_cust_type,droga_tender.tender_user,1,1,1,1
+access_droga_sale_order,droga.sale.sale.order,sale.model_sale_order,droga_tender.tender_user,1,1,1,1
+access_droga_sale_order_line,droga.sale.sale.order_line,sale.model_sale_order_line,droga_tender.tender_user,1,1,1,1
+access_droga_stock_picking,droga.stock.stock.picking,stock.model_stock_picking,droga_tender.tender_user,1,1,1,1
+access_droga_stock_move,droga.stock.stock.move,stock.model_stock_move,droga_tender.tender_user,1,1,1,1
 
 

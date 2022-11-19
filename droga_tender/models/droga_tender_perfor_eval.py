@@ -9,22 +9,28 @@ class droga_tender_master(models.Model):
     _name = 'droga.tender.performance.evaluation'
 
     # Text fields
-    lot_number = fields.Char("Lot number",related='parent_tender_performance_detail.lot_number')
+    lot_number = fields.Char("Lot #",related='parent_tender_performance_detail.lot_number')
+    item_num = fields.Integer('Item #.',related='parent_tender_performance_detail.item_num')
     item_des = fields.Char("Item requested",related='parent_tender_performance_detail.item_des')
     item_pro = fields.Char("Item proposed",related='parent_tender_performance_detail.item_pro')
 
     # decimal fields
-    quantity = fields.Float("Quantity",related='parent_tender_performance_detail.quantity')
+    quantity = fields.Float("Awarded qty",related='parent_tender_performance_detail.quantity')
     unit_price = fields.Float("Unit price",related='parent_tender_performance_detail.unit_price')
     amount = fields.Float("Amount quoted",related='parent_tender_performance_detail.amount')
 
     droga_product=fields.Many2one('product.template')
 
     award_cost = fields.Float("Awarded cost")
-
     perf_pct=fields.Float('% of Performance',compute="compute_performance")
+    init_sales_order=fields.Boolean('Initiate S.order?',default=False)
 
-    sales_order=fields.Boolean('Sales ordered',compute="_get_order_status")
+    ordered_qty=fields.Float('Ordered qty',compute='_compute_ordered_delivered_qty')
+    delivered_qty = fields.Float('Delivered qty', compute='_compute_ordered_delivered_qty')
+    def _compute_ordered_delivered_qty(self):
+        for rec in self:
+            rec.ordered_qty=0
+            rec.delivered_qty=0
     def _get_order_status(self):
         for rec in self:
             if self.env['sale.order.line'].search([('tender_line','=',rec.id)]):
