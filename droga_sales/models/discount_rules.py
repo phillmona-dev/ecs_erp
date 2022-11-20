@@ -68,12 +68,13 @@ class sale_order_line(models.Model):
                 )*((1+((core_rate+all_rate)/100)) if line.product_id.is_core_product else (1+((non_core_rate+all_rate)/100)))
 
         # Get discounts/additional payments per amount
-        core_sum = 0
-        non_core_sum = 0
-        order_lines_core = self.order_id.order_line.filtered(lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref!=None)
+        super(sale_order_line, self)._compute_amount()
+
+        order_lines_core = self.order_id.order_line.filtered(
+            lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref != None)
         core_sum = sum(order_lines_core.mapped('price_total'))
         order_lines_non_core = self.order_id.order_line.filtered(
-            lambda x: not x.display_type and not x.product_id.is_core_product and x.id.ref!=None)
+            lambda x: not x.display_type and not x.product_id.is_core_product and x.id.ref != None)
         non_core_sum = sum(order_lines_non_core.mapped('price_total'))
 
         amount_rates = self.env['droga.price.discount.per.amount'].search(
@@ -91,9 +92,30 @@ class sale_order_line(models.Model):
                 all_rate = all_rate + rate['percent']
 
 
-        if core_rate+all_rate>0 and not line.tender_origin_form_tender:
+        if core_rate+all_rate!=0 and not line.tender_origin_form_tender:
             for line in self.filtered(lambda x:  x.product_id.is_core_product):
                 line.price_unit=line.price_unit*(1+((core_rate+all_rate)/100))
-        if non_core_rate+all_rate>0 and not line.tender_origin_form_tender:
+        if non_core_rate+all_rate!=0 and not line.tender_origin_form_tender:
             for line in self.filtered(lambda x: not x.product_id.is_core_product):
                 line.price_unit = line.price_unit * (1 + ((non_core_rate + all_rate) / 100))
+
+        super(sale_order_line, self)._compute_amount()
+
+
+class sale_order_ext(models.Model):
+    _inherit='sale.order'
+    core_sum=fields.Float('Core total',compute='_get_sub_totals')
+    non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
+
+
+    @api.depends('order_line.price_total','order_line.product_uom_qty')
+    def _get_sub_totals(self):
+        order_lines_core = self.order_line.filtered(
+            lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref != None)
+        core_sum = sum(order_lines_core.mapped('price_subtotal'))
+        order_lines_non_core = self.order_line.filtered(
+            lambda x: not x.display_type and not x.product_id.is_core_product and x.id.ref != None)
+        non_core_sum = sum(order_lines_non_core.mapped('price_subtotal'))
+
+        self['core_sum'] = core_sum
+        self['non_core_sum'] = non_core_sum
