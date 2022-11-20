@@ -65,7 +65,7 @@ class sale_order_line(models.Model):
                     fiscal_position=line.order_id.fiscal_position_id,
                     product_price_unit=price,
                     product_currency=line.currency_id
-                )*(1+((core_rate+all_rate)/100)) if line.product_id.is_core_product else (1+((non_core_rate+all_rate)/100))
+                )*((1+((core_rate+all_rate)/100)) if line.product_id.is_core_product else (1+((non_core_rate+all_rate)/100)))
 
         # Get discounts/additional payments per amount
         core_sum = 0
