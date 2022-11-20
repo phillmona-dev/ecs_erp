@@ -33,6 +33,7 @@
         'views/settings/city.xml',
         'views/settings/area.xml',
         'views/lead_extension.xml',
+        'reports/plan_analysis.xml',
     ],
 
     # any module necessary for this one to work correctly

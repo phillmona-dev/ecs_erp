@@ -12,7 +12,7 @@ class droga_tender_master_related(models.Model):
     tender_amt_participated = fields.Float('Total Quotation', compute='_compute_awarded_amt_total', store=True)     #Total tender participated
     performance_amt_sent=fields.Float('Total Quotation',compute='_compute_amt_performance',store=True)              #Not active
     performance_amt_award=fields.Float('Total award',compute='_compute_amt_performance',store=True)                 #Not active
-    performance_pct=fields.Float('Percentage performance',compute='_compute_awarded_amt_total',store=True)
+    performance_pct=fields.Float('Percentage performance',compute='_compute_awarded_amt_total',store=True,group_operator='avg')
     award_folder=fields.Char(related='detail_submissions_fin.award_fold_num')
     item_types=fields.Text('Item / types',compute='_get_item_types')
 

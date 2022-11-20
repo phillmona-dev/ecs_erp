@@ -15,8 +15,9 @@ class customer_visit_header(models.Model):
     _name='droga.customer.visit.header'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
+    user_id = fields.Char("Promotor ID", default=lambda self: self.env.user.id, readonly=True, required=True)
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
-    city_name=fields.Many2many('droga.crm.settings.city',string='Sales city/sub-city')
+    city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city')
     _order = 'year desc,month desc'
     date_from=fields.Date('Date from')
     date_to = fields.Date('Date to')
@@ -81,6 +82,20 @@ class customer_visit_header(models.Model):
             'res_id': self.id,
         }
 
+    def plan_analysis(self):
+        return {
+            'name': 'Plan analysis for '+self.userid+' - '+calendar.month_name[int(self.month)]+', '+self.year+' - '+self.city_name.city_descr,
+            'view_mode': 'tree',
+            'view_type': 'form',
+            'res_model': 'droga.crm.grade.vs.schedule.view',
+            'view_id': self.env.ref('droga_crm.droga_crm_required_vs_planned_tree').id,
+            'type': 'ir.actions.act_window',
+            'domain': [('visit_header_id', '=', self.id)],
+            'context': {'search_default_group_cust_type':1},
+            #'target':'new',
+            #'res_id': self.id,
+        }
+
     def request_approval(self):
         self.state='requested'
 
@@ -114,6 +129,7 @@ class customer_visit_header(models.Model):
                     'contact_custom':contdet['contact_custom'].id,
                     'leads':lead_created.id,
                     'core_products':contdet['core_products'],
+                    'co_travel':contdet['co_travel'],
                  }
                 self.env['droga.crm.contacts.schedule'].sudo().create(cont)
 
@@ -159,16 +175,6 @@ class customer_visit_header(models.Model):
     @api.model
     def create(self, vals_list):
         res=super().create(vals_list)
-
-        #Get assigned areas
-        cities=self.env['crm.team.member'].search(
-            [('user_id','=',self.env.user.id)]
-        )['crm_team_id']['city_name']
-
-        #Get customers under that area
-        custs=self.env['res.partner'].search(
-            [('city_name', 'in', cities.ids)]
-        )
 
         #custs['cust_grade']['visit_times_per_month']
 
@@ -226,9 +232,9 @@ class customer_visit_detail(models.Model):
 
     contacts_schedule = fields.One2many('droga.crm.contacts.schedule', 'visits')
     visit_client=fields.Many2one('res.partner','Customer')
-    visit_contact_custom = fields.Many2many('droga.crm.contacts',string='Contact')
+    #visit_contact_custom = fields.Many2many('droga.crm.contacts',string='Contact')
     visit_location=fields.Char('Visit location')
-    city_name=fields.Many2many('droga.crm.settings.city',related='visit_header.city_name')
+    city_name=fields.Many2one('droga.crm.settings.city',related='visit_header.city_name')
 
     date_from = fields.Date( related='visit_header.date_from')
     date_to = fields.Date(related='visit_header.date_to')
@@ -243,9 +249,9 @@ class customer_visit_detail(models.Model):
                 rec.visit_date_descr=rec.visit_date.strftime("%A")
 
     week_num=fields.Char('Week number')
-    planned_visit_time=fields.Float('Planned visit time')
-    actual_visit_time_from = fields.Float('Actual visit time from')
-    actual_visit_time_to = fields.Float('Actual visit time to')
+    #planned_visit_time=fields.Float('Planned visit time')
+    #actual_visit_time_from = fields.Float('Actual visit time from')
+    #actual_visit_time_to = fields.Float('Actual visit time to')
     remark = fields.Char('Remark')
     status=fields.Selection([
         ('active', 'Active'),
@@ -285,7 +291,7 @@ class customer_visit_detail(models.Model):
             'context': "{'search_default_group_cust_name':1}",
             'view_id': self.env.ref('droga_crm.droga_crm_doctors_schedule_view_tree').id,
             'type': 'ir.actions.act_window',
-            'domain': [('days', '=', self.visit_date.strftime("%A"))],
+            'domain': [('days', '=', self.visit_date.strftime("%A")),('contact_area.id','=',self.city_name.ids)],
             'target': 'new',
         }
 

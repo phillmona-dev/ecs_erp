@@ -3,7 +3,10 @@ from odoo import models,fields
 class droga_crm_contacts(models.Model):
     _name='droga.crm.contacts'
     parent_customer=fields.Many2one('res.partner',string='Customer Name')
-    contact_name=fields.Char('Contact Name')
+    contact_area=fields.Many2one('droga.crm.settings.city',related='parent_customer.city_name',store=True)
+    contact_type = fields.Many2one('droga.cust.type', related='parent_customer.cust_type_ext', store=True)
+    parent_name=fields.Char( related='parent_customer.name', store=True)
+    contact_name=fields.Char('Contact Name',required=True)
     mobile = fields.Char('Mobile')
     gender = fields.Selection(
         [('Male', 'Male'), ('Female', 'Female')],
@@ -18,7 +21,8 @@ class droga_crm_contacts(models.Model):
     cont_grade = fields.Many2one('droga.cust.grade', string='Contact grade')
 
     days=fields.Many2many('droga.crm.settings.day',string='Day')
-
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
+                                 state={'done': [('readonly', True)]})
 
     def name_get(self):
         result = []

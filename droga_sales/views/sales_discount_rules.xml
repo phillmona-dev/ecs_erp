@@ -53,7 +53,12 @@
         parent="account.account_invoicing_menu"
         sequence="20"/>
 
-
+    <menuitem
+        id="droga_sales_discount_per_type_menu_sales"
+        name="Sales discount per cust.type"
+        action="droga_sales_discount_per_type_action"
+        parent="sale.menu_sales_config"
+        sequence="20"/>
 
 
 
@@ -118,4 +123,10 @@
         parent="account.account_invoicing_menu"
         sequence="20"/>
 
+    <menuitem
+        id="droga_sales_discount_per_amount_menu_sales"
+        name="Sales discount per sales amount"
+        action="droga_sales_discount_per_amount_action"
+        parent="sale.menu_sales_config"
+        sequence="20"/>
 </odoo>
