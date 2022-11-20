@@ -70,12 +70,18 @@ class sale_order_line(models.Model):
         # Get discounts/additional payments per amount
         super(sale_order_line, self)._compute_amount()
 
+        core_sum=0
+        non_core_sum = 0
         order_lines_core = self.order_id.order_line.filtered(
             lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref != None)
-        core_sum = sum(order_lines_core.mapped('price_total'))
+        for line in order_lines_core:
+            core_sum=core_sum+line['product_uom_qty']*line.product_id.list_price
+        #core_sum = sum(order_lines_core.mapped('price_subtotal'))
         order_lines_non_core = self.order_id.order_line.filtered(
             lambda x: not x.display_type and not x.product_id.is_core_product and x.id.ref != None)
-        non_core_sum = sum(order_lines_non_core.mapped('price_total'))
+        for line in order_lines_non_core:
+            non_core_sum=non_core_sum+line['product_uom_qty']*line.product_id.list_price
+        #non_core_sum = sum(order_lines_non_core.mapped('price_subtotal'))
 
         amount_rates = self.env['droga.price.discount.per.amount'].search(
             [('payment_term', '=', self.order_id['payment_term_id'].id),('status','=','Active')])
@@ -92,12 +98,14 @@ class sale_order_line(models.Model):
                 all_rate = all_rate + rate['percent']
 
 
-        if core_rate+all_rate!=0 and not line.tender_origin_form_tender:
-            for line in self.filtered(lambda x:  x.product_id.is_core_product):
-                line.price_unit=line.price_unit*(1+((core_rate+all_rate)/100))
-        if non_core_rate+all_rate!=0 and not line.tender_origin_form_tender:
-            for line in self.filtered(lambda x: not x.product_id.is_core_product):
-                line.price_unit = line.price_unit * (1 + ((non_core_rate + all_rate) / 100))
+        if core_rate+all_rate!=0 and not self.order_id.tender_origin_form_tender:
+            for lin in self.order_id.order_line.filtered(lambda x:  x.product_id.is_core_product):
+                lin.price_unit=lin.price_unit*(1+((core_rate+all_rate)/100))
+
+        if non_core_rate+all_rate!=0 and not self.order_id.tender_origin_form_tender:
+            for lin in self.order_id.order_line.filtered(lambda x: not x.product_id.is_core_product):
+                lin.price_unit = lin.price_unit * (1 + ((non_core_rate + all_rate) / 100))
+
 
         super(sale_order_line, self)._compute_amount()
 
