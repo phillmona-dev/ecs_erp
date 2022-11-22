@@ -315,16 +315,16 @@ class purhcase_request_line(models.Model):
 
         for record in self:
             # get budget from remaining budget
+            if record.budgetary_position.id and record.purhcase_request_id.branch.id and record.expense_account.id:
+                self.env.cr.execute("""select distinct b.account,a.general_budget_id,a.analytic_account_id,sum(b.remaining_balance) as remaining_balance from crossovered_budget_lines a 
+    inner join crossovered_budget_lines_detail b on a.id=b.budgetary_position_id 
+    where a.general_budget_id=%s and a.analytic_account_id=%s and b.account=%s and (a.date_from>='07/08/2022' and a.date_to<='07/07/2023')
+    group by b.account,a.general_budget_id,a.analytic_account_id """, (record.budgetary_position.id, record.purhcase_request_id.branch.id, record.expense_account.id))
+                res = self.env.cr.dictfetchone()
 
-            self.env.cr.execute("""select distinct b.account,a.general_budget_id,a.analytic_account_id,sum(b.remaining_balance) as remaining_balance from crossovered_budget_lines a 
-inner join crossovered_budget_lines_detail b on a.id=b.budgetary_position_id 
-where a.general_budget_id=%s and a.analytic_account_id=%s and b.account=%s and (a.date_from>='07/08/2022' and a.date_to<='07/07/2023')
-group by b.account,a.general_budget_id,a.analytic_account_id """, (record.budgetary_position.id, record.purhcase_request_id.branch.id, record.expense_account.id))
-            res = self.env.cr.dictfetchone()
-
-            # update remaining balance
-            if res != None:
-                record.remaining_budget = res['remaining_balance']
+                # update remaining balance
+                if res != None:
+                    record.remaining_budget = res['remaining_balance']
 
 
 class purchase_foregin_status(models.Model):
