@@ -6,6 +6,8 @@ class BudgetaryPosition(models.Model):
     _inherit = 'account.budget.post'
     _description = 'Budgetary Position'
 
+    #planned_amount = fields.Monetary(default=0)
+
     @api.model
     def create(self, vals):
         return super(BudgetaryPosition, self).create(vals)

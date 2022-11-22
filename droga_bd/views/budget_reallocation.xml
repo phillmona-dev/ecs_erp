@@ -90,7 +90,7 @@
 
     <!-- actions -->
     <record id="droga_budget_reallocation_action" model="ir.actions.act_window">
-        <field name="name">Budget Reallocation</field>
+        <field name="name">Budget Reallocation/Addition</field>
         <field name="res_model">droga.budget.reallocation</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[]</field>

@@ -53,7 +53,7 @@
                     <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request" data-hotkey="v"/>
 
                     <button name="reject_request" type="object" states="Submitted,Verified,Budget Approved" string="Reject" id="reject_request" data-hotkey="v" class="btn-warning" confirm="Are you sure you want to reject the request?"/>
-                    <button name="cancel_request" type="object" states="Draft" string="Cancel" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="btn-danger"/>
+                    <button name="cancel_request" type="object" states="Draft,Approved" string="Cancel" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="btn-danger"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
@@ -95,6 +95,7 @@
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}" string="UoM"/>
                                     <field name="budgetary_position" required="1" options="{'no_create':True,'no_open':True}" string="Budget Category"/>
                                     <field name="expense_account" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"/>
+                                    <field name="remaining_budget" attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"/>
                                     <field name="remark"/>
                                 </tree>
 
@@ -147,7 +148,7 @@
                 <separator/>
                 <filter name="submitted" string="Submitted" domain="[('state', '=', 'Submitted')]" />
                 <filter name="verified" string="Verified" domain="[('state', '=', 'Verified')]" />
-                <filter name="budget" string="Budget Checked" domain="[('state', '=', 'Budget Checked')]" />
+                <filter name="budget" string="Budget Approved" domain="[('state', '=', 'Budget Approved')]" />
                 <filter name="approved" string="Approved" domain="[('state', '=', 'Approved')]" />
                 <filter name="canceled" string="Canceled" domain="[('state', '=', 'Canceled')]" />
                 <separator />
@@ -193,7 +194,7 @@
 
 
                     <button name="reject_request" type="object" states="Submitted,Verified,Budget Approved" string="Reject" id="reject_request" data-hotkey="v" class="btn-warning" confirm="Are you sure you want to reject the request?"/>
-                    <button name="cancel_request" type="object" states="Draft" string="Cancel" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="btn-danger"/>
+                    <button name="cancel_request" type="object" states="Draft,Approved" string="Cancel" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="btn-danger"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
@@ -241,7 +242,7 @@
 
                                     <field name="budgetary_position" width="10" required="1" options="{'no_create':True,'no_open':True}" string="Budget Category"/>
                                     <field name="expense_account" width="10" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}" />
-
+                                    <field name="remaining_budget" attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"/>
                                     <field name="remark" width="10"/>
 
 
@@ -413,7 +414,7 @@
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="domain">[('request_type', '=', 'Foregin'),('state', 'not in', ('Draft','Approved','Canceled'))]</field>
-        <field name="context">{'default_request_type': 'Local'}</field>
+        <field name="context">{'default_request_type': 'Foregin'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
             No purchase requsition found for approval 

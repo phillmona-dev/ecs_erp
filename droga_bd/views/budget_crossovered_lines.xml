@@ -17,10 +17,15 @@
 
             </xpath>
 
+            <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='practical_amount']" position="before">
+
+                <field name="commitment_budget" sum="Total" readonly="1" width="15"/>
+
+            </xpath>
+
             <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='practical_amount']" position="after">
 
 
-                <field name="commitment_budget" sum="Total" readonly="1" width="15"/>
                 <field name="remaining_balance" sum="Total" readonly="1" width="15"/>
                 <button name="open_detail_budget" type="object" class="oe_highlight" id="budget_detail" data-hotkey="v" icon="fa-align-justify"/>
 
@@ -48,6 +53,7 @@
             <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='planned_amount']" position="attributes">
 
                 <attribute name="string">Budget</attribute>
+                <attribute name="readonly">0</attribute>
 
             </xpath>
 

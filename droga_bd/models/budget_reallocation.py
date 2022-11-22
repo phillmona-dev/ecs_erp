@@ -45,6 +45,7 @@ class BudgetReallocation(models.Model):
 
     def approve_request(self):
         self.write({'state': 'Approved'})
+        self.new_reallocation_addition()
         self.calculate_reallocation_addition()
         return True
 
@@ -69,7 +70,7 @@ class BudgetReallocation(models.Model):
     def calculate_reallocation_addition(self):
         # get reallocation not transfered
         reallocations = self.env['droga.budget.reallocation'].search([
-            ('reallocation_status', '=', 'Draft')])
+            ('reallocation_status', '=', 'Draft'), ('state', '=', 'Approved')])
         for reallocation in reallocations:
             # budget reallocation
             for line in reallocation.budget_reallocations:
@@ -116,18 +117,68 @@ class BudgetReallocation(models.Model):
             for line1 in reallocation.budget_additions:
 
                 addition_line_from = self.env['crossovered.budget.lines.detail'].search([('crossovered_budget_id', '=', reallocation.budget_id.id),
-                                                                                         ('date_from', '>=', line1.date_from), ('date_to', '<=', line1.date_to), ('general_budget_id', '=', line1.bdugetary_position.id)])
+                                                                                         ('date_from', '>=', line1.date_from), ('date_to', '<=', line1.date_to), 
+                                                                                         ('general_budget_id', '=', line1.bdugetary_position.id)])
 
                 addition_amount = 0
                 for addition in addition_line_from:
-                    if addition.account.id == line1.account.id:
+                    if addition.account.id == line1.account.id and addition.budgetary_position_id.analytic_account_id.id==line1.budget_addition_id.analytic_account.id:
                         addition_amount += line1.addition_amount
 
                 if addition_line_from:
                     for addition in addition_line_from:
-                        if addition.account.id == line1.account.id:
+                        if addition.account.id == line1.account.id and addition.budgetary_position_id.analytic_account_id.id==line1.budget_addition_id.analytic_account.id:
                             addition.write(
                                 {'addition': addition_amount})
+
+            # change status transfered reallocation to done
+            reallocation.write({'reallocation_status': 'Done'})
+
+    def new_reallocation_addition(self):
+        for record in self:
+            for line in record.budget_reallocations:
+                # check if the budget reallocation line not found in the budget
+                budget_line = self.env['crossovered.budget.lines'].search(
+                    [('crossovered_budget_id', '=', record.budget_id.id),
+                     ('general_budget_id', '=', line.to_budgetary_position.id),
+                     ('analytic_account_id', '=', record.analytic_account.id),
+                     ('date_from', '>=', line.date_from), ('date_to', '<=', line.date_to)])
+
+                if not budget_line.ids:
+                    # add new budget category line
+                    vals = {
+                        'crossovered_budget_id': record.budget_id.id,
+                        'general_budget_id': line.to_budgetary_position.id,
+                        'analytic_account_id': record.analytic_account.id,
+                        'date_from': line.date_from,
+                        'date_to': line.date_to,
+                        'planned_amount': 0
+
+                    }
+
+                    self.env['crossovered.budget.lines'].create(vals)
+
+            for line in record.budget_additions:
+                # check if the budget reallocation line not found in the budget
+                budget_line = self.env['crossovered.budget.lines'].search(
+                    [('crossovered_budget_id', '=', record.budget_id.id),
+                     ('general_budget_id', '=', line.bdugetary_position.id),
+                     ('analytic_account_id', '=', record.analytic_account.id),
+                     ('date_from', '>=', line.date_from), ('date_to', '<=', line.date_to)])
+
+                if not budget_line.ids:
+                    # add new budget category line
+                    vals = {
+                        'crossovered_budget_id': record.budget_id.id,
+                        'general_budget_id': line.bdugetary_position.id,
+                        'analytic_account_id': record.analytic_account.id,
+                        'date_from': line.date_from,
+                        'date_to': line.date_to,
+                        'planned_amount': 0
+
+                    }
+
+                    self.env['crossovered.budget.lines'].create(vals)
 
 
 class BudgetReallocationDetail(models.Model):
@@ -171,18 +222,22 @@ class BudgetReallocationDetail(models.Model):
 
     @api.model
     def create(self, vals):
+        self.validate_reallocation_lines(vals)
+        res = super(BudgetReallocationDetail, self).create(vals)
 
-        return super(BudgetReallocationDetail, self).create(vals)
+        return res
 
     def write(self, vals):
+        self.validate_reallocation_lines(vals)
+        res = super(BudgetReallocationDetail, self).write(vals)
 
-        return super(BudgetReallocationDetail, self).write(vals)
+        return res
 
     @api.onchange('from_budgetary_position')
     def _load_budgetary_position_accounts_from(self):
         from_accounts = self.from_budgetary_position.account_ids.ids
         return {'domain': {'account_from': [('id', 'in', (from_accounts))]}}
-    
+
     @api.onchange('to_budgetary_position')
     def _load_budgetary_position_accounts_to(self):
         to_accounts = self.to_budgetary_position.account_ids.ids
@@ -197,6 +252,26 @@ class BudgetReallocationDetail(models.Model):
                     "There is no enough remaining budget to reallocate")
             else:
                 record.is_enough_budget = True
+
+    def validate_reallocation_lines(self, vals):
+        if 'account_from' in vals and 'account_to' in vals:
+            if vals['account_from'] == vals['account_to']:
+                raise ValidationError(
+                    "You can't reallocate budget to the same account")
+
+            # get account types
+            account_from = self.env['account.account'].search(
+                [('id', '=', vals['account_from'])])
+
+            account_to = self.env['account.account'].search(
+                [('id', '=', vals['account_to'])])
+
+            if account_from and account_to:
+                if account_from.account_type != account_to.account_type:
+                    raise ValidationError(
+                        "You can't reallocate budget to diffrenet account categories")
+
+    # if the transfer budget category not found add line
 
 
 class BudgetAdditionDetail(models.Model):

@@ -86,9 +86,7 @@
                                     <th class="small text-end">
                                             Budget
                                     </th>
-                                    <th class="small text-end">
-                                        Commitment
-                                    </th>
+
                                     <th class="small text-end">
                                             Reallocation
                                     </th>
@@ -97,6 +95,9 @@
                                     </th>
                                     <th class="small text-end">
                                             Revised
+                                    </th>
+                                    <th class="small text-end">
+                                        Commitment
                                     </th>
                                     <th class="small text-end">
                                             Actual
@@ -134,9 +135,7 @@
                                         <td class="small text-end">
                                             <t t-esc="budget_line.planned_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                         </td>
-                                        <td class="small text-end">
-                                            <t t-esc="budget_line.commitment_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
-                                        </td>
+
                                         <td class="small text-end">
                                             <t t-esc="budget_line.reallaocation_addition" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                         </td>
@@ -145,6 +144,9 @@
                                         </td>
                                         <td class="small text-end">
                                             <t t-esc="budget_line.revised_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                        </td>
+                                        <td class="small text-end">
+                                            <t t-esc="budget_line.commitment_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                         </td>
                                         <td class="small text-end">
                                             <t t-esc="budget_line.practical_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
@@ -160,9 +162,7 @@
                                     <td class="small text-end">
                                         <strong t-esc="budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
-                                    <td class="small text-end">
-                                        <strong t-esc="commitment" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
-                                    </td>
+                                   
                                     <td class="small text-end">
                                         <strong t-esc="reallocation" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
@@ -171,6 +171,9 @@
                                     </td>
                                     <td class="small text-end">
                                         <strong t-esc="revised" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                    <td class="small text-end">
+                                        <strong t-esc="commitment" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
                                     <td class="small text-end">
                                         <strong t-esc="actual" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
@@ -247,9 +250,7 @@
                                     <th class="small text-end">
                                             Budget
                                     </th>
-                                    <th class="small text-end">
-                                        Commitment
-                                    </th>
+
                                     <th class="small text-end">
                                             Reallocation
                                     </th>
@@ -258,6 +259,9 @@
                                     </th>
                                     <th class="small text-end">
                                             Revised
+                                    </th>
+                                    <th class="small text-end">
+                                        Commitment
                                     </th>
                                     <th class="small text-end">
                                             Actual
@@ -295,9 +299,7 @@
                                         <td class="small text-end">
                                             <strong t-esc="budget_line.planned_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                         </td>
-                                        <td class="small text-end">
-                                            <strong t-esc="budget_line.commitment_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
-                                        </td>
+
                                         <td class="small text-end">
                                             <strong t-esc="budget_line.reallaocation_addition" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                         </td>
@@ -306,6 +308,9 @@
                                         </td>
                                         <td class="small text-end">
                                             <strong t-esc="budget_line.revised_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                        </td>
+                                        <td class="small text-end">
+                                            <strong t-esc="budget_line.commitment_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                         </td>
                                         <td class="small text-end">
                                             <strong t-esc="budget_line.practical_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
@@ -329,9 +334,7 @@
                                             <td class="small text-end">
                                                 <t t-esc="budget_line_detail.budget_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                             </td>
-                                            <td class="small text-end">
-                                                <t t-esc="budget_line_detail.commitment_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
-                                            </td>
+
                                             <td class="small text-end">
                                                 <t t-esc="budget_line_detail.reallaocation" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                             </td>
@@ -340,6 +343,9 @@
                                             </td>
                                             <td class="small text-end">
                                                 <t t-esc="budget_line_detail.revised_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                            </td>
+                                            <td class="small text-end">
+                                                <t t-esc="budget_line_detail.commitment_budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                             </td>
                                             <td class="small text-end">
                                                 <t t-esc="budget_line_detail.actual" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
@@ -356,9 +362,7 @@
                                     <td class=" text-end">
                                         <strong t-esc="budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
-                                    <td class=" text-end">
-                                        <strong t-esc="commitment" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
-                                    </td>
+
                                     <td class=" text-end">
                                         <strong t-esc="reallocation" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
@@ -367,6 +371,9 @@
                                     </td>
                                     <td class=" text-end">
                                         <strong t-esc="revised" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                    <td class=" text-end">
+                                        <strong t-esc="commitment" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
                                     <td class=" text-end">
                                         <strong t-esc="actual" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
