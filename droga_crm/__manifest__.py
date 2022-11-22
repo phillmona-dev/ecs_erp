@@ -27,11 +27,13 @@
         'views/sales_target.xml',
         'views/settings/cust_grade.xml',
         'views/settings/specialty.xml',
+        'views/settings/job_position.xml',
         'views/settings/cust_type.xml',
         'views/settings/region.xml',
         'views/settings/city.xml',
         'views/settings/area.xml',
         'views/lead_extension.xml',
+        'reports/plan_analysis.xml',
     ],
 
     # any module necessary for this one to work correctly
@@ -43,5 +45,6 @@
     "license": "AGPL-3",
     # only loaded in demonstration mode
     'installable': True,
-    'application': True
+    'application': True,
+    'post_init_hook':'create_days'
 }

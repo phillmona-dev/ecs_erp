@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="droga_crm_required_vs_planned" model="ir.actions.act_window">
+        <field name="name">Plan vs required visits</field>
+        <field name="res_model">droga.crm.grade.vs.schedule.view</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{'search_default_group_plan_des': 1}</field>
+    </record>
+
+    <record id="droga_crm_required_vs_planned_tree" model="ir.ui.view">
+        <field name="name">droga.crm.grade.vs.schedule.view.tree</field>
+        <field name="model">droga.crm.grade.vs.schedule.view</field>
+        <field name="arch" type="xml">
+            <tree string="" expand="1" create="0">
+                <field name="cust_type"></field>
+                <field name="visit_header_id" invisible="1"></field>
+                <field name="userid" invisible="1"></field>
+                <field name="cust_name"></field>
+                <field name="customer_type"></field>
+                <field name="grade"></field>
+                <field name="required_visits"></field>
+                <field name="planned_visits"></field>
+                <field name="required_vs_planned_status" invisible="1"></field>
+                <field name="diff" invisible="1"></field>
+                <field name="required_vs_planned" decoration-success="required_vs_planned_status == 'greater'" decoration-muted="required_vs_planned_status == 'equal'" decoration-danger="required_vs_planned_status == 'less_than'" widget="badge"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_crm_required_vs_planned_search" model="ir.ui.view">
+        <field name="name">droga.crm.grade.vs.schedule.view.search</field>
+        <field name="model">droga.crm.grade.vs.schedule.view</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="cust_type"></field>
+                <field name="cust_name"></field>
+                <field name="customer_type"></field>
+                <field name="grade"></field>
+                <field name="required_visits"></field>
+                <field name="planned_visits"></field>
+                <field name="required_vs_planned"></field>
+                <filter name="group_cust_type" string="Customer type" context="{'group_by':'cust_type'}"/>
+                <filter string="To revise plans"
+                        domain="[('diff', '&lt;', 0)]"
+                        name="to_revise_plans"></filter>
+            </search>
+        </field>
+    </record>
+
+</odoo>

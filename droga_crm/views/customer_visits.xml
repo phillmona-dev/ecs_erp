@@ -15,7 +15,7 @@
                 <field name="userid"></field>
                 <field name="month"></field>
                 <field name="year"></field>
-                <field name="city_name" widget="many2many_tags"></field>
+                <field name="city_name"></field>
                 <field name="state"></field>
 
                 <button icon="fa-credit-card-alt"
@@ -26,6 +26,9 @@
                         attrs="{'invisible': [('state', '!=', ('draft'))]}"
                         type="object" string=" Request approval"
                         name="request_approval" class="oe_stat_button"/>
+                <button icon="fa-credit-card-alt"
+                        type="object" string=" Plan analysis"
+                        name="plan_analysis" class="oe_stat_button"/>
                 <button icon="fa-credit-card-alt"
                         attrs="{'invisible': [('state', '!=', ('requested'))]}"
                         type="object" string=" Approve"
@@ -53,7 +56,7 @@
                             <field name="week_1_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', 'in',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -76,7 +79,7 @@
                             <field name="week_2_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', 'in',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -99,7 +102,7 @@
                             <field name="week_3_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', 'in',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -122,7 +125,7 @@
                             <field name="week_4_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', 'in',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -145,7 +148,7 @@
                             <field name="week_5_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', 'in',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -181,8 +184,9 @@
                                     <field name="cust"/>
                                     <field name="contact_custom" domain="([('parent_customer','=',cust)])"
                                            options="{'no_create':True,'no_open':True}"></field>
+                                    <field name="co_travel" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
                                     <field name="phone_no"/>
-                                    <field name="core_products" widget="many2many_tags"/>
+                                    <field name="core_products" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>/>
                                 </tree>
                     </field>
                         </page>

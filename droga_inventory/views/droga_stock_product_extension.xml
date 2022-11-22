@@ -53,7 +53,8 @@
 
                     <field name="active" invisible="1"/>
                     <group col="1">
-                        <field name="detailed_type"/>
+                        <field name="detailed_type_cus"/>
+                        <field name="detailed_type" invisible="1"/>
 
                         <field name="emergency_order_point"/>
 
@@ -105,7 +106,7 @@
                     <field invisible="1" name="standard_price" widget='monetary'/>
                     <field name="list_price" widget='monetary'/>
 
-                    <field name="property_stock_inventory" string="Default location"
+                    <field name="default_warehouse" string="Default warehouse"
                            options="{'no_create':True,'no_open':True}"/>
                     <field name="uom_id" options="{'no_create': True}"/>
                     <field name="categ_id" invisible="1" string="Product Category"

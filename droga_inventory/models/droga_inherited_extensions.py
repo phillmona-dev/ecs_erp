@@ -69,6 +69,21 @@ class droga_stock_product_extension(models.Model):
         'product.category', 'Product Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
         required=True, help="Select category for the current product")
+    detailed_type = fields.Selection(selection=[
+        ('consu','Consumables'),
+        ('product', 'Storable Product'),
+        ('service', 'Service')], string='Product Type', default='product', required=True,store=True,compute='_get_type',
+        help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
+             'A service is a non-material product you provide.')
+    detailed_type_cus = fields.Selection(selection=[
+        ('product', 'Storable Product'),
+        ('service', 'Service')], string='Product Type', default='product', required=True, store=True,
+        help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
+             'A service is a non-material product you provide.')
+    @api.depends('detailed_type_cus')
+    def _get_type(self):
+        for rec in self:
+            rec.detailed_type=rec.detailed_type
     sub_categ_id=fields.Many2one(
         'product.category', 'Product Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
@@ -82,6 +97,8 @@ class droga_stock_product_extension(models.Model):
         'stock.location', "Inventory Location",
         company_dependent=True, check_company=True,default='',
         domain="[('usage', '=', 'internal'), '|', ('company_id', '=', False), ('company_id', '=', allowed_company_ids[0])]")
+    default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
+                                      company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")

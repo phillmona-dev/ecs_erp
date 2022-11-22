@@ -39,7 +39,6 @@
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">
             <xpath expr = "//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_uom_readonly']" position = "after">
-                <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
                 <field name="tender_origin_form_tender" invisible="1"/>
             </xpath>
             <xpath expr = "//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']" position = "attributes">

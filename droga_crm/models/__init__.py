@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from . import extensions,customer_visit,sales_target,customer_contacts,customer_contact_extensions
-from .settings import region,area,city,days
+from . import extensions,customer_visit,sales_target,customer_contacts,cont_schedule
+from .settings import region,area,city,days,cust_type,cust_grade,job_position,cust_speciality
+from .db_views import plan_analysis
+
