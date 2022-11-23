@@ -8,7 +8,7 @@
         </menuitem>
         <menuitem id="account_loan_menu_action" sequence="1" action="account_loan_action" parent="bank_loan_menu"/>
              
-    <menuitem id="bank_loan_monthly_menu" name="Monthly Closing" parent="bank_loan_menu" sequence="2">
+    <menuitem id="bank_loan_monthly_menu" name="Monthly Closing" parent="bank_loan_menu" sequence="12">
         <menuitem id="account_loan_monthly_menu_action" action="account_loan_monthly_action" />
        
       
