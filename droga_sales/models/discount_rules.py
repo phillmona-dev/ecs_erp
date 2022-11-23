@@ -130,12 +130,6 @@ class sale_order_ext(models.Model):
     core_sum=fields.Float('Core total',compute='_get_sub_totals')
     non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
 
-    warehouse_id = fields.Many2one(
-        'stock.warehouse', string='Warehouse', required=False,
-        default='', store=True, readonly=False,
-        states={'sale': [('readonly', True)], 'done': [('readonly', False)], 'cancel': [('readonly', False)]},
-        check_company=True)
-
     payment_term_id = fields.Many2one(
         comodel_name='account.payment.term',
         string="Payment Terms",
