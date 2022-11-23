@@ -191,7 +191,7 @@ class crm_visit_plan_report(models.TransientModel):
 
             for cont in rec.contacts_schedule:
                 sheet.write(row_start, 3, cont.contact_custom.descr if cont.contact_custom else '', border)
-                sheet.write(row_start, 4, cont.co_travel if cont.co_travel else '', num_format)
+                sheet.write(row_start, 4, cont.co_travel.name if cont.co_travel else '', num_format)
                 row_start += 1
             if len(rec.contacts_schedule)==0:
                 row_start += 1

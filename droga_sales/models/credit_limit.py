@@ -54,8 +54,15 @@ class cust_sales_credit_limit(models.Model):
 
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
-    wareh=fields.Many2one('stock.warehouse')
+    wareh=fields.Many2one('stock.warehouse',compute='_get_wh',inverse='_inv_wh')
 
+    @api.depends('product_id')
+    def _get_wh(self):
+        for rec in self:
+            rec.wareh=rec.product_id.default_warehouse.id
+
+    def _inv_wh(self):
+        pass
     #Restrict multiple sales order invoicing
     @api.model
     def create(self, vals):
