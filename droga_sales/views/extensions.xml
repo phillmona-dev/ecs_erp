@@ -23,7 +23,7 @@
         <field name="priority" eval="100000000"/>
         <field name="arch" type="xml">
             <xpath expr = "//field[@name='warehouse_id'][@force_save='1']" position = "attributes">
-                <attribute name="invisible">true</attribute>
+
                 <attribute name="required">False</attribute>
             </xpath>
         </field>

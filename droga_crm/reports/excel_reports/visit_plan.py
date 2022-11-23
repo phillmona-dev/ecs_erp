@@ -37,7 +37,7 @@ class crm_visit_plan_report(models.TransientModel):
 
         #The file name is stored under filename
         datetime_string = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = '%s_%s_%s' % ('Visit plan for ',self.visit, datetime_string)
+        filename = '%s%s_%s' % ('Visit plan for ',self.visit.descr, datetime_string)
         filename += '%2Exlsx'
 
         #This downloads file. The file is fileout and the name if filename
@@ -62,7 +62,12 @@ class crm_visit_plan_report(models.TransientModel):
         date_format = workbook.add_format({'num_format': 'd mmm yyyy', 'border': 7})
         num_format = workbook.add_format({'num_format': 43, 'border': 7})
         cent_format = workbook.add_format({'num_format': 41, 'border': 7})
-        border = workbook.add_format({'border': 7})
+        border = workbook.add_format({'border': 7,'align': 'left'})
+        center_middle_aligned_bold = workbook.add_format({'border': 7,'fg_color': '#F6F5F5','bold':1,'align': 'center',
+            'valign': 'vcenter','text_wrap': True})
+        center_middle_aligned = workbook.add_format(
+            {'border': 7, 'align': 'left',
+             'valign': 'vcenter', 'text_wrap': True})
         bold = workbook.add_format({'bold': True})
         header_format = workbook.add_format({
             'bold': 1,
@@ -74,9 +79,9 @@ class crm_visit_plan_report(models.TransientModel):
         main_title_format = workbook.add_format({
             'bold': 1,
             'border': 0,
-            'align': 'center',
+            'align': 'left',
             'valign': 'vcenter',
-            'font_size': 16})
+            'font_size': 14})
         parameter_format = workbook.add_format({
             'bold': 1,
             'border': 7,
@@ -112,8 +117,8 @@ class crm_visit_plan_report(models.TransientModel):
             'fg_color': '#F6F5F5'})
 
         sheet.merge_range('A' + str(row_start + 1) + ':F' + str(row_start + 1), 'Droga Pharma PLC - Daily activity plan', header_format)
-        sheet.merge_range('B' + str(row_start + 2) + ':F' + str(row_start + 2), str(self.visit.userid) + ' : ' + self.visit.city_name.city_descr,main_title_format)
-        sheet.merge_range('B' + str(row_start + 3) + ':C' + str(row_start + 3), 'Role...... ',main_title_format)
+        sheet.merge_range('D' + str(row_start + 2) + ':F' + str(row_start + 2), str(self.visit.userid) + ' : ' + self.visit.city_name.city_descr,main_title_format)
+        #sheet.merge_range('C' + str(row_start + 3) + ':C' + str(row_start + 3), 'Role...... ',main_title_format)
 
         descr=''
         childs=None
@@ -142,21 +147,47 @@ class crm_visit_plan_report(models.TransientModel):
 
         sheet.merge_range('D' + str(row_start + 3) + ':F' + str(row_start + 3), descr,main_title_format)
 
-        sheet.write(row_start + 4, 0, 'Day',title_format)
-        sheet.write(row_start + 4, 1, 'Customer', title_format)
-        sheet.write(row_start + 4, 2, 'Session - area', title_format)
-        sheet.write(row_start + 4, 3, 'Contact - products', title_format)
-        sheet.write(row_start + 4, 4, 'Co-travel', title_format)
-        sheet.write(row_start + 4, 5, 'Remark', title_format)
-        row_start = 5
+        sheet.write(row_start + 3, 0, 'Day',title_format)
+        sheet.write(row_start + 3, 1, 'Customer', title_format)
+        sheet.write(row_start + 3, 2, 'Session - area', title_format)
+        sheet.write(row_start + 3, 3, 'Contact - products', title_format)
+        sheet.write(row_start + 3, 4, 'Co-travel', title_format)
+        sheet.write(row_start + 3, 5, 'Remark', title_format)
+        row_start = 4
 
-        for rec in childs:
+        dates=set(childs.filtered(lambda x: (x.visit_client or x.remark)).mapped('visit_date'))
+        cur_date=None
+
+        for rec in childs.filtered(lambda x: (x.visit_client or x.remark)).sorted(key=lambda r: r.visit_date):
             if not rec.visit_client and not rec.remark:
                 continue
-            sheet.write(row_start, 0, rec.day_and_date, border)
-            sheet.write(row_start, 1, (rec.visit_client.name if rec.visit_client.name else '')+(' - '+rec.visit_client.area.area_name if rec.visit_client.area else ''), border)
-            sheet.write(row_start, 2, rec.planned_visit_selection, border)
-            sheet.write(row_start, 5, rec.remark if rec.remark else ' ', num_format)
+
+            if cur_date!=rec.visit_date:
+                cur_date=rec.visit_date
+                count=0
+                for c in childs.filtered(lambda x: (x.visit_client or x.remark) and x.visit_date == rec.visit_date):
+                    if len(c.contacts_schedule)==0:
+                        count+=1
+                    else:
+                        count=count+len(c.contacts_schedule)
+
+                sheet.merge_range('A' + str(row_start + 1) + ':A' + str(row_start + count),
+                                  rec.day_and_date, center_middle_aligned_bold)
+
+            if len(rec.contacts_schedule)>0:
+                sheet.merge_range('B' + str(row_start + 1) + ':B' + str(row_start + (len(rec.contacts_schedule) if len(rec.contacts_schedule)>0 else 1)),
+                                  (rec.visit_client.name if rec.visit_client.name else '')+(' - '+rec.visit_client.area.area_name if rec.visit_client.area else ''), center_middle_aligned)
+                sheet.merge_range('C' + str(row_start + 1) + ':C' + str(
+                    row_start + (len(rec.contacts_schedule) if len(rec.contacts_schedule) > 0 else 1)),
+                                  rec.planned_visit_selection, center_middle_aligned)
+                sheet.merge_range('F' + str(row_start + 1) + ':F' + str(
+                    row_start + (len(rec.contacts_schedule) if len(rec.contacts_schedule) > 0 else 1)),
+                                  rec.remark if rec.remark else ' ', center_middle_aligned)
+            else:
+                sheet.write(row_start, 1, (rec.visit_client.name if rec.visit_client.name else '')+(' - '+rec.visit_client.area.area_name if rec.visit_client.area else ''), border)
+                sheet.write(row_start, 2, rec.planned_visit_selection, border)
+                sheet.write(row_start, 5, rec.remark if rec.remark else ' ', border)
+
 
             for cont in rec.contacts_schedule:
                 sheet.write(row_start, 3, cont.contact_custom.descr if cont.contact_custom else '', border)

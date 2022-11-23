@@ -156,3 +156,6 @@ class sale_order_ext(models.Model):
             non_core_sum = sum(order_lines_non_core.mapped('price_subtotal'))
         self['core_sum'] = core_sum
         self['non_core_sum'] = non_core_sum
+
+        for line in self.order_line:
+            line._compute_price_unit()
