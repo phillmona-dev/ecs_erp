@@ -6,7 +6,7 @@ class cust_credit_limit(models.Model):
     _inherit='res.partner'
     cust_credit_limit = fields.Float(string='Credit limit',tracking=True)
     unsettled_amount = fields.Float(string='Unsettled amount')
-    available_amount = fields.Float(string='Available credit',compute='_compute_cust_unsetlled_amount')
+    available_amount = fields.Float(string='Credit balance',compute='_compute_cust_unsetlled_amount')
 
     def _compute_cust_unsetlled_amount(self):
         for rec in self:
@@ -18,7 +18,7 @@ class cust_credit_account_move(models.Model):
         result = super(cust_credit_account_move, self).action_post()
         for inv in self:
             for line in inv['line_ids']:
-                if line.account_type=='asset_receivable' or line.account_type=='liability_payable':
+                if line.account_type=='asset_receivable':
                     line.partner_id.unsettled_amount+=line.amount_currency
         return result
 
@@ -29,7 +29,7 @@ class cust_credit_account_move(models.Model):
 
 class cust_sales_credit_limit(models.Model):
     _inherit = 'sale.order'
-    available_amount=fields.Float(string='Available amount',related='partner_id.available_amount')
+    available_amount=fields.Float(string='Credit balance',related='partner_id.available_amount')
     @api.model
     def create(self, vals):
         result = super(cust_sales_credit_limit, self).create(vals)

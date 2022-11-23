@@ -72,16 +72,26 @@ class sale_order_line(models.Model):
 
         core_sum=0
         non_core_sum = 0
-        order_lines_core = self.order_id.order_line.filtered(
-            lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref != None)
-        for line in order_lines_core:
-            core_sum=core_sum+line['product_uom_qty']*line.product_id.list_price
-        #core_sum = sum(order_lines_core.mapped('price_subtotal'))
-        order_lines_non_core = self.order_id.order_line.filtered(
-            lambda x: not x.display_type and not x.product_id.is_core_product and x.id.ref != None)
-        for line in order_lines_non_core:
-            non_core_sum=non_core_sum+line['product_uom_qty']*line.product_id.list_price
-        #non_core_sum = sum(order_lines_non_core.mapped('price_subtotal'))
+        try:
+            order_lines_core = self.order_id.order_line.filtered(
+                lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref != None)
+            for line in order_lines_core:
+                core_sum=core_sum+line['product_uom_qty']*line.price_unit
+            #core_sum = sum(order_lines_core.mapped('price_subtotal'))
+            order_lines_non_core = self.order_id.order_line.filtered(
+                lambda x: not x.display_type and not x.product_id.is_core_product and x.id.ref != None)
+            for line in order_lines_non_core:
+                non_core_sum=non_core_sum+line['product_uom_qty']*line.price_unit
+        except:
+            order_lines_core = self.order_id.order_line.filtered(
+                lambda x: not x.display_type and x.product_id.is_core_product and x.id != None)
+            for line in order_lines_core:
+                core_sum = core_sum + line['product_uom_qty'] * line.price_unit
+            # core_sum = sum(order_lines_core.mapped('price_subtotal'))
+            order_lines_non_core = self.order_id.order_line.filtered(
+                lambda x: not x.display_type and not x.product_id.is_core_product and x.id != None)
+            for line in order_lines_non_core:
+                non_core_sum = non_core_sum + line['product_uom_qty'] * line.price_unit
 
         amount_rates = self.env['droga.price.discount.per.amount'].search(
             [('payment_term', '=', self.order_id['payment_term_id'].id),('status','=','Active')])
@@ -115,15 +125,34 @@ class sale_order_ext(models.Model):
     core_sum=fields.Float('Core total',compute='_get_sub_totals')
     non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
 
+    warehouse_id = fields.Many2one(
+        'stock.warehouse', string='Warehouse', required=False,
+        default='', store=True, readonly=False,
+        states={'sale': [('readonly', True)], 'done': [('readonly', False)], 'cancel': [('readonly', False)]},
+        check_company=True)
+
+    payment_term_id = fields.Many2one(
+        comodel_name='account.payment.term',
+        string="Payment Terms",
+        compute='_compute_payment_term_id',required=True,
+        store=True, readonly=False, precompute=True, check_company=True,  # Unrequired company
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
     @api.depends('order_line.price_total','order_line.product_uom_qty')
     def _get_sub_totals(self):
-        order_lines_core = self.order_line.filtered(
-            lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref != None)
-        core_sum = sum(order_lines_core.mapped('price_subtotal'))
-        order_lines_non_core = self.order_line.filtered(
-            lambda x: not x.display_type and not x.product_id.is_core_product and x.id.ref != None)
-        non_core_sum = sum(order_lines_non_core.mapped('price_subtotal'))
-
+        try:
+            order_lines_core = self.order_line.filtered(
+                lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref != None)
+            core_sum = sum(order_lines_core.mapped('price_subtotal'))
+            order_lines_non_core = self.order_line.filtered(
+                lambda x: not x.display_type and not x.product_id.is_core_product and x.id.ref != None)
+            non_core_sum = sum(order_lines_non_core.mapped('price_subtotal'))
+        except:
+            order_lines_core = self.order_line.filtered(
+                lambda x: not x.display_type and x.product_id.is_core_product and x.id != None)
+            core_sum = sum(order_lines_core.mapped('price_subtotal'))
+            order_lines_non_core = self.order_line.filtered(
+                lambda x: not x.display_type and not x.product_id.is_core_product and x.id != None)
+            non_core_sum = sum(order_lines_non_core.mapped('price_subtotal'))
         self['core_sum'] = core_sum
         self['non_core_sum'] = non_core_sum

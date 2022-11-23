@@ -45,7 +45,7 @@
                 <attribute name="attrs">{'readonly': [('tender_origin_form_tender', '=', False)]}</attribute>
             </xpath>
             <xpath expr = "//form/sheet/group/group/field[@name='partner_id']" position = "after">
-                <field name="available_amount" string="Available balance" options="{'no_create': True}"/>
+                <field name="available_amount" string="Credit balance" options="{'no_create': True}"/>
             </xpath>
         </field>
     </record>

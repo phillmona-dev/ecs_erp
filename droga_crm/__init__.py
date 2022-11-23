@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from . import controllers
-from . import models
+from . import models,reports
 
 
 from odoo import api, SUPERUSER_ID

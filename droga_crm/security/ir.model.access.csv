@@ -15,5 +15,7 @@ access_droga_crm_contacts_schedule,droga_crm.droga_crm_contacts_schedule,model_d
 access_droga_crm_contacts,droga_crm.droga_crm_contacts,model_droga_crm_contacts,droga_crm.crm_user,1,1,1,1
 access_droga_crm_settings_day,droga_crm.droga_crm_settings_day,model_droga_crm_settings_day,droga_crm.crm_user,1,0,0,0
 access_droga_crm_grade_vs_schedule_view,droga_crm.droga_crm_grade_vs_schedule_view,model_droga_crm_grade_vs_schedule_view,droga_crm.crm_user,1,1,1,1
+access_droga_crm_reports_visit_log,droga_crm.droga_crm_reports_visit_log,model_droga_crm_reports_visit_log,droga_crm.crm_user,1,1,1,1
+
 
 
