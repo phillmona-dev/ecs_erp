@@ -11,9 +11,9 @@ class AccountLoanRenew(models.Model):
     #payment_date = fields.Date(string="Payment Date")
  
     acount_loan_id = fields.Many2one(comodel_name='account.loan', string="Parent ID") 
-    payment_amount=fields.Float(string="Payment",required=True) 
+    payment_amount=fields.Float(string="Repayment",required=True) 
     anual_interest_rate=fields.Float(string="Anual Interest %",required=True) 
-    anual_penality_rate=fields.Float(string="Anual Penality %",required=True) 
+    anual_penality_rate=fields.Float(string="Anual Penalty %",required=True) 
     #payment_range=fields.Integer(string="Period Range in Month")
     addtional_payment=fields.Integer(string="Addtional Loan Period",required=True)
     renew_date=fields.Date(string="Renewed Date",required=True)

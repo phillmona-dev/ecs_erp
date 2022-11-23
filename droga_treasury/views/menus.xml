@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+     <menuitem id="loan_menu_root" name="Loan " >
+        
+    </menuitem>
+    <menuitem id="bank_loan_menu" name="Treasury" sequence="1" parent="loan_menu_root" >
+            
+        </menuitem>
+        <menuitem id="account_loan_menu_action" sequence="1" action="account_loan_action" parent="bank_loan_menu"/>
+             
+    <menuitem id="bank_loan_monthly_menu" name="Monthly Closing" parent="bank_loan_menu" sequence="12">
+        <menuitem id="account_loan_monthly_menu_action" action="account_loan_monthly_action" />
+       
+      
+    </menuitem>
+     <menuitem id="loan_report_menu" name="Report" parent="loan_menu_root" sequence="3">
+        <menuitem id="bank_loan_report_menu" name="Status Summary">
+            <menuitem id="account_loan_report_menu_action" action="account_loan_action_report"/>
+
+
+        </menuitem>
+
+
+    </menuitem>
+    <menuitem id="loan_type_menu_root" name="Configuration" parent="loan_menu_root"  sequence="4">
+    <menuitem id="bank_loan_type_menu" name="Bank Loan Type">
+        <menuitem id="account_loan_type_menu_action" action="account_loan_type_action"/>
+       
+      
+    </menuitem>
+</menuitem>
+</odoo>

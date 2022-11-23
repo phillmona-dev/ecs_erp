@@ -14,12 +14,13 @@ class DrogaMonthlyclose(models.Model):
     Principal_payment=fields.Float(string='Principal Payment',readonly=True)
     Interest_payment=fields.Float(string='Interest Payment',readonly=True)
     interest=fields.Float(string='Interest',readonly=True)
-    penality=fields.Float(string='Penality',readonly=True)
+    penality=fields.Float(string='Penalty',readonly=True)
     recipt=fields.Float  (string='Recipt',readonly=True)
    # end_day=fields.Date("Closing Day",compute="_compute_start_field")  
-    
-    name= fields.Char(string="የወሩ ስም",readonly=True)
-    acount_monthly_closing_id = fields.Many2one(comodel_name='account.loan', string="Parent ID") 
+    post=fields.Many2one(string='Account Move',comodel_name='account.move')
+   
+    name= fields.Char(string="Month",readonly=True)
+    acount_monthly_closing_id = fields.Many2one(comodel_name='account.loan', string="Bank") 
     _sql_constraints = [ ('unique_closing', 'unique(et_year, name,acount_monthly_closing_id)', 'Cannot Use one tr')	]
     
     # @api.depends('closing_day')
@@ -29,6 +30,7 @@ class DrogaMonthlyclose(models.Model):
 
             cday = current_date.date()
             pday=cday
+            t=0
             acount_recipt = self.env['account.loan'].search([('id', '=', record.acount_monthly_closing_id.id)])
               
             journal=record.acount_monthly_closing_id.account_jornal_inte.id
@@ -42,7 +44,7 @@ class DrogaMonthlyclose(models.Model):
             penality = self.env['account.move'].create(
                                     {'date':pday,'journal_id':journal
                                      })                                    
-            if penality:
+            if penality and not record.post:
                 t=penality.id
                 lines_vals_list.append({
                     'move_id': t,                   
@@ -60,6 +62,17 @@ class DrogaMonthlyclose(models.Model):
                     'account_id': accrued_interest_payable 
                  })
                 self.env['account.move.line'].create(lines_vals_list)
+                record.post=t
+            else:
+                return {
+                            'type': 'ir.actions.client',
+                            'tag': 'display_notification',
+                            'params': {
+                                'message': 'Requested foreign currency is not approved ',
+                                'type': 'danger',
+                                'sticky': False
+                            }
+                        }
 
                     
                

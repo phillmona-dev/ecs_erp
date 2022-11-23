@@ -3,6 +3,7 @@ import math
 from datetime import datetime,date,time
 from multiprocessing import context
 from dateutil.relativedelta import relativedelta
+from datetime import date, datetime, timedelta
 from odoo.exceptions import UserError,ValidationError
 
 
@@ -20,13 +21,13 @@ class AccountLoanRepayment(models.Model):
     principal_repayment=fields.Float('Principal Repayment')
     cumulative_interest  =fields.Float('Cumulative interest',related='acount_loan_id.cumulative_interest')
     is_interest= fields.Float(string='Interest',)
-    is_penality= fields.Float(string='Penality',)
+    is_penality= fields.Float(string='Penalty',)
     total_payment= fields.Float(string='Total Payment')
     payment_term=fields.Char(string='Payment Period',readonly=True)
     acount_loan_id = fields.Many2one(comodel_name='account.loan', string="Parent ID", index=True, ondelete='cascade', required=True)
     is_compound=fields.Boolean( string='compound', related='acount_loan_id.isinterest')
     posted=fields.Boolean(string="Posted?")
-    with_out=fields.Boolean(string="with out Penality?")
+    with_out=fields.Boolean(string="with out Penalty?")
     reference=fields.Char(string='Reference',)
     desc=fields.Char(string='Description')
     num=fields.Integer("num",compute="_thisistest" )
@@ -169,6 +170,7 @@ class AccountLoanRepayment(models.Model):
                                                                          'expected_payment_date':datepaied, 'total_payment': amount,
                                                                          'payment_term':payment_term})
                             record.acount_loan_id.next_payment_date=datepaied
+                            
                         else :
                             acount_payment.payment_term=payment_term
                         if theinte>0:
@@ -190,6 +192,7 @@ class AccountLoanRepayment(models.Model):
                                 a= interest.daily_penality_amount
                                 daa=interest.value_date
                                 interest.daily_penality_amount=0
+                                interest.calculate=False
                     
            
                 else: record.is_paied = False
@@ -272,6 +275,7 @@ class AccountLoanRepayment(models.Model):
                                 a= interest.daily_penality_amount
                                 daa=interest.value_date
                                 interest.daily_penality_amount=0
+                                interest.calculate=False
                     
                     
                     record.is_paied = True
@@ -312,6 +316,7 @@ class AccountLoanRepayment(models.Model):
             'res_id': self.id,
              'context':{'default_acount_loan_id':self.id},
              'domain': [('acount_loan_id', '=', self.id)],
+              'target': 'new',
         }
 
 class AccountLoanRepaymentDetail(models.Model):
@@ -321,12 +326,13 @@ class AccountLoanRepaymentDetail(models.Model):
     value_date = fields.Date(string="Value Date")
     principal_repayment=fields.Float('Principal Repayment')
     is_interest= fields.Float(string='Interest',)
-    is_penality= fields.Float(string='Penality',)
+    is_penality= fields.Float(string='Penalty',)
     total_payment= fields.Float(string='Total Payment',compute="_compute_penality")
     acount_loan_id = fields.Many2one(comodel_name='account.loan.repayment', string="Parent ID", index=True, ondelete='cascade', required=True)
     is_compound=fields.Boolean( string='compound', related='acount_loan_id.is_compound')
     reference=fields.Char(string='Reference',)
     desc=fields.Char(string='Description',)
+    post=fields.Many2one(string='Account Move',comodel_name='account.move')
    
     @api.depends('is_interest','is_penality','principal_repayment')
     def _compute_penality(self):
@@ -349,7 +355,7 @@ class AccountLoanRepaymentDetail(models.Model):
     def compute_postt(self):
         for record in self:
             current_date = datetime.today()
-
+            t=0
             cday = current_date.date()
             pday=cday
             acount_recipt = self.env['account.loan'].search([('id', '=', record.acount_loan_id.id)])
@@ -366,7 +372,7 @@ class AccountLoanRepaymentDetail(models.Model):
                                     {'date':pday,'journal_id':journal
                                     ,'ref':record.reference,
                                      })                                    
-            if payment:
+            if payment and not record.post:
                 t=payment.id
                 lines_vals_list.append({
                     'move_id': t,                   
@@ -385,3 +391,4 @@ class AccountLoanRepaymentDetail(models.Model):
                     'account_id': accrued_interest_payable 
                  })
                 self.env['account.move.line'].create(lines_vals_list)
+                record.post=t

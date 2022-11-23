@@ -9,6 +9,9 @@
              'views/monthlyclosing.xml',
              'views/acout_setting.xml',
              'views/payment_detail.xml',
+             'views/menus.xml',
+             'views/reciept.xml',
+             'views/payment.xml',
              'data/crron_interest.xml'],
 
     'installable': True,

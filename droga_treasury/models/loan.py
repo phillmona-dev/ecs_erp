@@ -27,6 +27,12 @@ class AccountLoan(models.Model):
         'account.loan.type', string="Loan Type", required=True)
 
     loan_statement_number = fields.Char('Loan Statment Number', required=True)
+    state=fields.Selection([
+        ('draft','Draft'),('active','Active'),
+            ('overdue', 'Overdue'),
+            ('done', 'Done')],
+            string="Status",default='draft', required=True
+    )
 
     @api.depends("payment_month", "loan_period_year", "payment_start_date")
     def _compute_yearr(self):
@@ -125,49 +131,50 @@ class AccountLoan(models.Model):
 
 
 # Date
-    next_payment_date = fields.Date(string="Next Payment Date")
-    payment_start_date = fields.Date("Payment Start Date", required=True)
+    next_payment_date = fields.Date(string="Next Payment Date", readonly=True)
+    payment_start_date = fields.Date("Payment Start Date", required=True,readonly=True)
     interest_renew_date = fields.Date(
         "Interst Renew Date", compute="compute_renew")
-    interest_start_date = fields.Date("Interst Start Date", )
+    interest_start_date = fields.Date("Interst Start Date", readonly=True)
     contract_date = fields.Date('Contract Date',required=True)
     opening_date = fields.Date('Opening Date')
 # integer
-    remaining_days = fields.Integer(string="Remaning Days")
-    payment_month = fields.Integer('Payment Ranage in Month',required=True)
+    remaining_days = fields.Integer(string="Remaining Days", readonly=True)
+    overdue_days = fields.Integer(string="Overdue", readonly=True)
+    payment_month = fields.Integer('Repayment Interval',required=True)
 
 
 # flaot
-    payment = fields.Float('Payment Amount per Period', required=True)
+    payment = fields.Float('Repayment Amount', required=True)
 
-    loan_period_year = fields.Float('Period in years',required=True)
+    loan_period_year = fields.Float('Period in Years',required=True)
     loan_amount = fields.Float('Loan Amount', required=True)
     schedule_numberof_payment = fields.Float(
-        'payments per year', compute="_compute_yearr")
+        'Payments Per Year', compute="_compute_yearr")
     total_number_of_payment = fields.Float(
-        'Total Payments', compute="_compute_yearr")
+        'Total Number Of Payments', compute="_compute_yearr")
     anual_interest_rate = fields.Float('Anual Interst Rate %', required=True)
     daily_interest_rate = fields.Float(
         'Daily Interst Rate %', compute="_compute_interestdaily", digits=(12, 6))
 
-    current_cumlative_balace = fields.Float('Start Cumlative Balance')
-    current_cumlative_interest = fields.Float('Start Cumlative Interest')
+    current_cumlative_balace = fields.Float('Start Outstanding Balance')
+    current_cumlative_interest = fields.Float('Start Outstanding Interest')
     current_interest_total = fields.Float('Current Interest Total')
-    anual_penalit_rate = fields.Float('Anual Penality Rate %')
+    anual_penalit_rate = fields.Float('Anual Penalty Rate %')
     daily_penalit_rate = fields.Float(
-        'Daily Penality Rate %', compute="_compute_penalitydaily", digits=(12, 6))
+        'Daily Penalty Rate %', compute="_compute_penalitydaily", digits=(12, 6))
     # schedule_payment_=fields.Float('Schedule Payment')
     grace_period = fields.Float('Grace Period')
     total_interest = fields.Float(
         'Total Interst', compute='_compute_total_interest')
     cumulative_interest = fields.Float(
-        'Cumulative interest', compute='_compute_total_interest')
+        'Outstanding interest', compute='_compute_total_interest')
     cumulative_penality = fields.Float(
-        'Cumulative Penality', compute='_compute_total_interest')
+        'Outstanding Penalty', compute='_compute_total_interest')
     total_penality = fields.Float(
-        'Total Penality', compute='_compute_total_interest')
+        'Total Penalty', compute='_compute_total_interest')
     cumulative_balance = fields.Float(
-        compute='_compute_qty_amount', string="Cumulative Principal Balance")
+        compute='_compute_qty_amount', string="Outstanding Principal Balance")
 
 # boolean
     isinterest = fields.Boolean(
@@ -189,7 +196,7 @@ class AccountLoan(models.Model):
     loan_old_ids = fields.One2many(
         'account.loan.renew.schedule', 'acount_loan_id', string="Renewed Schedule")
     penality_range_ids = fields.One2many(
-        'account.loan.penality.range', 'acount_loan_penality_id', string="Penality Range")
+        'account.loan.penality.range', 'acount_loan_penality_id', string="Penalty Range")
     monthly_closing_ids = fields.One2many(
         'droga.monthly.close', 'acount_monthly_closing_id', )
     calculatess = fields.Boolean(
@@ -199,7 +206,7 @@ class AccountLoan(models.Model):
         'res.company', 'Company', index=True,
         default=lambda self: self.env.company)
     account_penality = fields.Many2one(
-        'account.account', 'Penality'
+        'account.account', 'Penalty'
        ,required=True)
    
     account_interest = fields.Many2one(
@@ -346,11 +353,11 @@ class AccountLoan(models.Model):
         rstatdate = cday
         daq = 0
         tern=0
-        starting_days = [[7, 8, 'ሃምሌ'], [8, 7, 'ነሃሴ'], [9, 11, 'መስከረም'], [10, 11, 'ጥቅምት'],
-                         [11, 10, 'ህዳር'], [12, 10, 'ታህሳስ'], [
-                             1, 9, 'ጥር'], [2, 8, 'የካቲት'],
-                         [3, 10, 'መጋቢት'], [4, 9, 'ሚያዚያ'], [5, 9, 'ግንቦት'], [6, 8, 'ሰኔ']]
-
+        starting_days = [[7, 8, 'Hamile'], [8, 7, 'Nehasie'], [9, 11, 'Meskerem'], [10, 11, 'Tikemt'],
+                            [11, 10, 'Hidar'], [12, 10, 'Tahesas'], [
+                                1, 9, 'Tir'], [2, 8, 'Yekatit'],
+                            [3, 10, 'Megabit'], [4, 9, 'Mizia'], [5, 9, 'Ginbot'], [6, 8, 'Senie']]
+   
         acount_loan = self.env['account.loan'].search(
             [('isactive', '=', True)])
 
@@ -436,7 +443,7 @@ class AccountLoan(models.Model):
                     # if acount_int:
                        
                     for penality in predone.loan_repayment_ids:
-                        penality_amount=0
+                        #penality_amount=0
                         ndate = penality.expected_payment_date
                         if ndate:
                             cdate = ndate
@@ -470,6 +477,7 @@ class AccountLoan(models.Model):
                                 if ndate<da:
                                     penality_amount=0
                                     penality_amount = penal*cumulative_balance/100
+                                    break
                                     
                     t=penality_amount
                     if not acount_int :
@@ -486,7 +494,7 @@ class AccountLoan(models.Model):
                         acount_int.daily_interest_rate = day_int
                         acount_int.daily_interest_amount = interst_amount
                         acount_int.daily_penality_amount = penality_amount
-                        if penality_amount>0:
+                        if penality_amount>0 and acount_int.calculate:
                             acount_int.daily_penality_amount = penality_amount
                         acount_int.daily_interest_total = interst_amount+penality_amount
                 da = da + relativedelta(days=1)
@@ -655,8 +663,7 @@ class AccountLoan(models.Model):
             current_date = datetime.today()
             cday = current_date.date()
 
-            if not record.isinterest:
-                record.cumulative_interest = 0.00
+            
 
             itotal = 0.00000000000000000000000000
             value = 0.00000000000000000000000000000
@@ -693,6 +700,8 @@ class AccountLoan(models.Model):
         for record in self:
             
             record.isactive = False
+            record.state="done"
+
 
     @api.depends("anual_interest_rate")
     def _compute_interestdaily(self):

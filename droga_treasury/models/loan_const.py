@@ -15,9 +15,9 @@ class AccountLoanConst(models.Model):
     
     def compute_daily_cron(self):
 
-        interst_amount = 0.000000000000
-        penality_amount = 0.00000000000
-        daily_interest_total = 0.00000000000
+        interst_amount = 0.0000000000000000000
+        penality_amount = 0.00000000000000000000
+        daily_interest_total = 0.0000000000000000
         penal=0.00000000000000000000000000
         current_date = datetime.today()
         cday = current_date.date()
@@ -31,6 +31,21 @@ class AccountLoanConst(models.Model):
             if predone.next_payment_date:
                 predone.remaining_days = (
                     predone.next_payment_date-cday)/timedelta(days=1)
+                if predone.remaining_days <0:
+                    predone.overdue_days=0-predone.remaining_days
+                    
+                    if predone.overdue_days>0 and predone.isactive and predone.interest_start_date:
+                        predone.state="overdue"
+                else:
+                     predone.overdue_days=0
+                # if not predone.isactive and predone.interest_start_date and predone.overdue_days>0:
+                #     predone.state="overdue"
+                if predone.overdue_days==0 and predone.isactive and predone.interest_start_date:
+                    predone.state="active"
+                elif not predone.interest_start_date:
+                    predone.state="draft"
+
+
 
             if predone.cumulative_balance>0:
                 acount_sc = self.env['account.loan.renew.schedule'].search(
@@ -92,10 +107,10 @@ class AccountLoanConst(models.Model):
                                             'daily_interest_amount': interst_amount, 'daily_penality_amount': penality_amount,
                                             'daily_interest_total': interst_amount+penality_amount})
                 
-                starting_days = [[7, 8, 'ሃምሌ'], [8, 7, 'ነሃሴ'], [9, 11, 'መስከረም'], [10, 11, 'ጥቅምት'],
-                            [11, 10, 'ህዳር'], [12, 10, 'ታህሳስ'], [
-                                1, 9, 'ጥር'], [2, 8, 'የካቲት'],
-                            [3, 10, 'መጋቢት'], [4, 9, 'ሚያዚያ'], [5, 9, 'ግንቦት'], [6, 8, 'ሰኔ']]
+                starting_days = [[7, 8, 'Hamile'], [8, 7, 'Nehasie'], [9, 11, 'Meskerem'], [10, 11, 'Tikemt'],
+                            [11, 10, 'Hidar'], [12, 10, 'Tahesas'], [
+                                1, 9, 'Tir'], [2, 8, 'Yekatit'],
+                            [3, 10, 'Megabit'], [4, 9, 'Mizia'], [5, 9, 'Ginbot'], [6, 8, 'Senie']]
         # payment generating fpr calculation if payment day = current day
                 # if predone.loan_schedule_ids:
                 #     if predone.next_payment_date:
