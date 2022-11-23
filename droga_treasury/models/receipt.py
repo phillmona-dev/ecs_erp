@@ -2,7 +2,7 @@ import logging
 import math
 from datetime import datetime
 from xmlrpc.client import boolean
-
+from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
@@ -17,6 +17,7 @@ class AccountLoanReceipt(models.Model):
     posted=fields.Boolean(string="Posted?")
     reference=fields.Char(string='Reference',required=True)
     desc=fields.Char(string='Description',)
+    post=fields.Many2one(string='Account Move',comodel_name='account.move')
    
 
     @api.constrains('value_date')
@@ -38,6 +39,7 @@ class AccountLoanReceipt(models.Model):
 
             cday = current_date.date()
             pday=cday
+            t=0
             acount_recipt = self.env['account.loan'].search([('id', '=', record.acount_loan_id.id)])
               
             journal=record.acount_loan_id.account_jornal.id
@@ -52,7 +54,7 @@ class AccountLoanReceipt(models.Model):
                                     {'date':pday,'journal_id':journal
                                     ,'ref':record.reference,
                                      })                                    
-            if receipt:
+            if receipt and not record.post:
                 t=receipt.id
                 lines_vals_list.append({
                     'move_id': t,                   
@@ -66,6 +68,7 @@ class AccountLoanReceipt(models.Model):
                     'account_id': account_bank 
                  })
                 self.env['account.move.line'].create(lines_vals_list)
+                record.post=t
 
     @api.model
     def write(self, values):

@@ -1,16 +1,12 @@
 <odoo>
     <record id="account_loan_action" model="ir.actions.act_window">
-        <field name="name">Loan Managmet</field>
+        <field name="name">Loan</field>
         <field name="res_model">account.loan</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <!-- menu for Loan anagment -->
-    <menuitem id="loan_menu_root" name="Loan Managment">
-        <menuitem id="bank_loan_menu" name="Treasury">
-            <menuitem id="account_loan_menu_action" action="account_loan_action"/>
-        </menuitem>
-    </menuitem>
+   
 
 
     <!--  tree view of the accoun loan m
@@ -21,14 +17,14 @@ model-->
         <field name="arch" type="xml">
             <tree string="Loan">
                 <field name="name"/>
-                <field name="loan_amount"/>
+                
 
-                <field name="isinterest"/>
-                <field name="cumulative_balance"/>
-
-                <field name="loan_statement_number"/>
+                <field name="loan_type"/>
                 <field name="anual_interest_rate"/>
-                <field name="daily_interest_rate"/>
+                <field name="loan_amount"/>
+                <field name="state" widget="badge" decoration-success="state == 'active'"
+                decoration-info="state == 'draft'" decoration-danger= "state == 'overdue'"
+                />
                 
                  <button  type="object" name="open_monthly" string="Monthly Closings"
                         class="oe_stat_button" icon="fa-file-text"
@@ -49,6 +45,10 @@ model-->
                     <button name="compute_schedule" string="Schedule" type="object" />
                     <button name="compute_renew" string="Renew" type="object" />
                     <button name="compute_done" string="Done" type="object" />
+
+                    <field name="state" widget="statusbar" nolabel="1" 
+                     decoration-success="state == 'active' or state == 'done'" decoration-info="state == 'draft' or state == 'overdue'"
+                    />
 
                 </header>
                 <sheet>
@@ -82,7 +82,7 @@ model-->
                     <notebook>
                         <page string="Setting">
                         <notebook>
-                            <page name="name" string="Period Information">
+                            <page name="name" string="Loan Information">
                                 <group >
                                     <group name="name" string="">
                                     <field name="loan_period_year"/>
@@ -91,34 +91,16 @@ model-->
                                     <field name="anual_interest_rate"/>
                                     </group>
                                    
-                                    <group name ="name" string="Period Calculated">
+                                    <group name ="name" >
                                         <field name="total_number_of_payment"/>
                                         <field name="schedule_numberof_payment"/>
-                                        <field name="remaining_days"/>
+                                        <field name="remaining_days" attrs="{'invisible': [('remaining_days', '&lt;=', '0')]}"/>
+                                        <field name="overdue_days" attrs="{'invisible': [('remaining_days', '&gt;=', '0')]}"/>
                                         <field name="next_payment_date"/>
                                         <field name="daily_interest_rate"/>
                                     </group>
                                 </group>
                                 
-                            </page>
-                            <page name="name" string="Cumulatives">
-                                 <group string="Cumulatives">
-                                    <group >
-                                        <field name="cumulative_balance"/>
-                                        <field name="cumulative_interest"/>
-                                        <field name="total_interest"/>
-                                        <field name="cumulative_penality"/>
-                                        <field name="total_penality"/>
-    
-                                    </group>
-                                    <group>
-                                        <field name="current_cumlative_balace"/>
-                                        <field name="current_cumlative_interest"/>
-                                        <field name="opening_date"/>
-    
-    
-                                    </group>
-                                </group>
                             </page>
                             
                         <page name="droga_renew" string="Penality Range">
@@ -160,6 +142,26 @@ model-->
                            
 
                         </page>
+                        <page name="name" string="Cumulatives">
+                                 <group string="Cumulatives">
+                                    <group >
+                                        <field name="cumulative_balance"/>
+                                        <field name="cumulative_interest"/>
+                                        <field name="total_interest"/>
+                                        <field name="cumulative_penality"/>
+                                        <field name="total_penality"/>
+    
+                                    </group>
+                                    <group>
+                                        <field name="current_cumlative_balace"/>
+                                        <field name="current_cumlative_interest"/>
+                                        <field name="opening_date"/>
+    
+    
+                                    </group>
+                                </group>
+                            </page>
+                            
                        <page string="Receipt">
 
                             <field name="loan_receipt_ids">
@@ -257,10 +259,10 @@ model-->
                         </notebook>
                           </page>
                         <page string="Other">
-                        <group name="name" string="company">
+                        <group name="name" string="company"  invisible='1'>
                             <field name="company_id"/>
                         </group>
-                        <group name="name" string="Accounting">
+                        <group  >
                             <group name="name" string="Accounting With Journal">
                                 <field name="account_penality"/>
                                 <field name="account_interest"/>
@@ -311,9 +313,14 @@ model-->
                 <field name="loan_amount"/>
                 <field name="cumulative_balance"/>
                 <field name="cumulative_interest"/>
-                <!-- <field name=" next_payment_date"/>  -->
-                <field name="remaining_days"/>
                 <field name="payment"/>
+                <!-- <field name=" next_payment_date"/>  -->
+                <field name="remaining_days" attrs="{'invisible': [('remaining_days', '&lt;=', '0')]}"/>
+                <field name="overdue_days" attrs="{'invisible': [('remaining_days', '&gt;=', '0')]}"/>
+                                       
+                <field name="state" widget="badge" decoration-success="state == 'active'"
+                decoration-info="state == 'draft'" decoration-danger= "state == 'overdue'"
+                />
 
 
 
@@ -329,15 +336,7 @@ model-->
         <field name="view_mode">tree</field>
         <field name="view_id" ref="account_loan_view_tree_report"/>
     </record>
-    <menuitem id="loan_report_menu" name="Report" parent="loan_menu_root">
-        <menuitem id="bank_loan_report_menu" name="Status Summary">
-            <menuitem id="account_loan_report_menu_action" action="account_loan_action_report"/>
-
-
-        </menuitem>
-
-
-    </menuitem>
+   
 
 
 
