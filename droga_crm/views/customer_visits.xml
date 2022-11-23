@@ -50,6 +50,11 @@
         <field name="arch" type="xml">
             <form delete="0">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button icon="fa-credit-card-alt"
+                        type="object" string=" Plan analysis"
+                        name="plan_analysis" class="oe_stat_button"/>
+                    </div>
                     <notebook>
                         <page string="Week 1 schedule">
                             <field name="week_1_domain" mode="tree">

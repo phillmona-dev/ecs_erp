@@ -94,8 +94,6 @@ class customer_visit_header(models.Model):
             'type': 'ir.actions.act_window',
             'domain': [('visit_header_id', '=', self.id)],
             'context': {'search_default_group_cust_type':1},
-            #'target':'new',
-            #'res_id': self.id,
         }
 
     def request_approval(self):
@@ -333,5 +331,3 @@ class customer_visit_detail(models.Model):
             res.week_num='Week-5'
 
         return res
-
-

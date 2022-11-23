@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from stdnum import cr
 from stdnum.ch import uid
 
@@ -84,13 +86,38 @@ class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
     wareh=fields.Many2one('stock.warehouse',compute='_get_wh',inverse='_inv_wh')
 
-    @api.depends('product_id')
     def _get_wh(self):
         for rec in self:
-            rec.wareh=rec.product_id.default_warehouse.id
+            rec.wareh= rec.product_id.default_warehouse
 
     def _inv_wh(self):
         pass
+
+    def _prepare_procurement_values(self, group_id=False):
+        """ Prepare specific key for moves or other components that will be created from a stock rule
+        coming from a sale order line. This method could be override in order to add other custom key that could
+        be used in move/po creation.
+        """
+        values = super(cust_sales_no_create_after_invoice, self)._prepare_procurement_values(group_id)
+        self.ensure_one()
+        # Use the delivery date if there is else use date_order and lead time
+        date_deadline = self.order_id.commitment_date or (self.order_id.date_order + timedelta(days=self.customer_lead or 0.0))
+        date_planned = date_deadline - timedelta(days=self.order_id.company_id.security_lead)
+        values.update({
+            'group_id': group_id,
+            'sale_line_id': self.id,
+            'date_planned': date_planned,
+            'date_deadline': date_deadline,
+            'route_ids': self.route_id,
+            'warehouse_id': self.wareh or False,
+            'partner_id': self.order_id.partner_shipping_id.id,
+            'product_description_variants': self.with_context(lang=self.order_id.partner_id.lang)._get_sale_order_line_multiline_description_variants(),
+            'company_id': self.order_id.company_id,
+            'product_packaging_id': self.product_packaging_id,
+            'sequence': self.sequence,
+        })
+        return values
+
     #Restrict multiple sales order invoicing
     @api.model
     def create(self, vals):
