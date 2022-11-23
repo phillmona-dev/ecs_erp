@@ -8,6 +8,7 @@ class droga_location_extension(models.Model):
         ('CONR', 'Consignment vendor location'),
         ('SIF', 'Free sample'),
         ('SIR', 'Sample to be returned'),
+        ('SAP','Sales placement location')
         ], string='Cons/sample Type')
 
 class droga_stock_picking_extension(models.Model):

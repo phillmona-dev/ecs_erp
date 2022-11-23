@@ -1,4 +1,8 @@
+from stdnum import cr
+from stdnum.ch import uid
+
 from odoo import models, fields, api
+from odoo.addons.base.models.ir_model import IrModelData
 from odoo.exceptions import ValidationError
 
 
@@ -30,6 +34,8 @@ class cust_credit_account_move(models.Model):
 class cust_sales_credit_limit(models.Model):
     _inherit = 'sale.order'
     available_amount=fields.Float(string='Credit balance',related='partner_id.available_amount')
+    tender_origin_form = fields.Many2one('droga.tender.master', readonly=True)
+
     @api.model
     def create(self, vals):
         result = super(cust_sales_credit_limit, self).create(vals)
@@ -51,6 +57,28 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("You cannot exceed credit limit!")
         return result
 
+    def store_issue_placement_order(self):
+        return {
+            'name': 'Sample request',
+            'view_type': 'tree',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.inventory.consignment.issue',
+            'views': [
+                [self.env.ref('droga_inventory.droga_inventory_consignment_issue_view_tree_sales').id, 'tree'],
+                [self.env.ref('droga_inventory.droga_inventory_consignment_issue_view_form').id, 'form']],
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_sales_placement_origin_form': self.id,
+                'default_customer': self.partner_id.id,
+                'default_issue_type': 'SAP'
+            },
+            'domain':
+                ([('sales_placement_origin_form', '=', self.id)])
+        }
+
+class inventory_placement_extension(models.Model):
+    _inherit = 'droga.inventory.consignment.issue'
+    sales_placement_origin_form=fields.Many2one('sale.order',readonly=True)
 
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'

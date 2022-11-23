@@ -22,6 +22,17 @@
         </field>
     </record>
 
+    <record id="droga_tender_sample_request_tree" model="ir.ui.view">
+        <field name="name">droga.inventory.consignment.issue.inherited.tree</field>
+        <field name="model">droga.inventory.consignment.issue</field>
+        <field name="inherit_id" ref="droga_inventory.droga_inventory_consignment_issue_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='customer']" position="after">
+                <field string='Tender origin' name="tender_origin_form" attrs="{'invisible': [('tender_origin_form', '=', False)]}"></field>
+            </xpath>
+        </field>
+    </record>
+
     <record id="droga_tender_sales_order" model="ir.ui.view">
         <field name="name">droga.sales.order.inherited</field>
         <field name="model">sale.order</field>
