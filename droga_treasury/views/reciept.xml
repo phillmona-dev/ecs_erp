@@ -57,15 +57,15 @@
         <field name="name">Receipt</field>
         <field name="res_model">account.loan</field>
         <!-- <field name="view_type">form</field> -->
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree</field>
     
     </record>
     
-    <record id="account_loan_reciept_form_action" model="ir.actions.act_window.view">
+    <!-- <record id="account_loan_reciept_form_action" model="ir.actions.act_window.view">
            <field name="view_mode">form</field>
            <field name="view_id" ref="account_loan_reciept_view_form" />
            <field name="act_window_id" ref="account_loan_reciept_action" />
-    </record> 
+    </record>  -->
     <record id="account_loan_reciept_tree_action" model="ir.actions.act_window.view">
            <field name="view_mode">tree</field>
            <field name="view_id" ref="account_loan_reciept_view_tree" />
