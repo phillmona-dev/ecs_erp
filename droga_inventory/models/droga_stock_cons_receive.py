@@ -10,7 +10,7 @@ class droga_stock_cons_receive(models.Model):
 
     name = fields.Char('Name', default='New')
     supplier=fields.Many2one('res.partner',string='Supplier')
-    cons_ref = fields.One2many('stock.picking', 'cons_receive_request')
+    cons_ref = fields.One2many('stock.picking', 'cons_receive_request',string='Store reference')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft

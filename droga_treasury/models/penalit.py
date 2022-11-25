@@ -5,8 +5,8 @@ class AccountLoanPenalityRange(models.Model):
     
     name= fields.Selection( [('upto', 'UPTo'),('morethan', 'Morethan')],string="Range") 
     
-    daily_penality_rate=fields.Float(string="Daily Penality %",required=True,compute="_compute_penalitydaily") 
-    anual_penality_rate=fields.Float(string="Anual Penality %",required=True)
+    daily_penality_rate=fields.Float(string="Daily Penalty %",required=True,compute="_compute_penalitydaily") 
+    anual_penality_rate=fields.Float(string="Anual Penalty %",required=True)
     num_days=fields.Integer(string="Days",required=True)
     acount_loan_penality_id = fields.Many2one(comodel_name='account.loan', string="Parent ID", index=True, ondelete='cascade', required=True)
     
@@ -15,9 +15,9 @@ class AccountLoanPenalityRange(models.Model):
         for loans in self:
            
             if loans.anual_penality_rate<=0 :
-                raise ValidationError("Check The Penality rate")
+                raise ValidationError("Check The Penalty rate")
             if not loans.name:
-                raise ValidationError("Please enter the Range on Penality")
+                raise ValidationError("Please enter the Range on Penalty")
     @api.depends("anual_penality_rate",'name')
     def _compute_penalitydaily(self):
         for record in self:

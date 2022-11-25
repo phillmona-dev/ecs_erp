@@ -2,6 +2,8 @@ from odoo import models,fields
 
 class droga_crm_contacts(models.Model):
     _name='droga.crm.contacts'
+    _rec_name = 'descr'
+    descr=fields.Char('descr',compute='_get_descr')
     parent_customer=fields.Many2one('res.partner',string='Customer Name')
     contact_area=fields.Many2one('droga.crm.settings.city',related='parent_customer.city_name',store=True)
     contact_type = fields.Many2one('droga.cust.type', related='parent_customer.cust_type_ext', store=True)
@@ -24,12 +26,9 @@ class droga_crm_contacts(models.Model):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
                                  state={'done': [('readonly', True)]})
 
-    def name_get(self):
-        result = []
+    def _get_descr(self):
         for record in self:
             name = record.job_position+ ' - ' if record.job_position else ''
             name=name+record.specialty.specialty+ ' - ' if record.specialty.specialty else name
 
-            result.append(
-                (record.id, name+record.contact_name))
-        return result
+            record.descr= name+record.contact_name

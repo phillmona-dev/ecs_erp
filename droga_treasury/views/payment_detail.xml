@@ -16,7 +16,7 @@
                                     
             <field name="is_penality"/>
             <field name="total_payment"/>
-            
+            <field name="post"/>
              <button  type="object" name="compute_postt" string="Post"
                         class="oe_stat_button" icon="fa-file-text"/>
                                     

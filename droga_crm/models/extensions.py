@@ -29,7 +29,7 @@ class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
     plan_id=fields.Many2one('droga.customer.visit.detail')
     contacts_schedule=fields.One2many('droga.crm.contacts.schedule','leads')
-    contacts_schedule_opor = fields.One2many('droga.crm.contacts.schedule', 'leads',domain=([('sales_avail', '=', True)]))
+    contacts_schedule_opor = fields.One2many('droga.crm.contacts.schedule', 'leads',domain=(['|',('sales_avail', '=', True),('sales_closed', '=', True)]))
     date_planned=fields.Datetime('Lead date')
     planned_visit_selection = fields.Selection([
         ('Early Morning', 'Early Morning'),
@@ -38,4 +38,20 @@ class crm_lead_extension(models.Model):
         ('Early Afternoon', 'Early Afternoon'),
         ('Late Afternoon', 'Late Afternoon'),
     ], string='Visit session', default="Early Morning")
+
+    def _convert_opportunity_data(self, customer, team_id=False):
+        upd_values = {
+            'type': 'opportunity',
+            'date_open': self.env.cr.now(),
+            'date_conversion': self.env.cr.now(),
+        }
+        if customer != self.partner_id:
+            upd_values['partner_id'] = customer.id if customer else False
+        if len(self.contacts_schedule.filtered(lambda x: x.sales_closed))>0:
+            upd_values['stage_id'] = self.env['crm.stage'].search([('is_won','=',True)])[0].id
+        else:
+            new_team_id = team_id if team_id else self.team_id.id
+            stage = self._stage_find(team_id=new_team_id)
+            upd_values['stage_id'] = stage.id
+        return upd_values
 

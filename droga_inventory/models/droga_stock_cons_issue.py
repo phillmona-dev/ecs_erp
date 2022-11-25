@@ -21,7 +21,7 @@ class droga_stock_cons_issue(models.Model):
         help=" * Requested: The consignment issue order is sent to warehouse.\n"
              " * Done: The consignment items are issued from warehouse.\n")
 
-    issue_type = fields.Selection([('CONI', 'Consignment'), ('SIF', 'Free sample'),('SIR', 'Sample to be returned')],string='Issue type',requird=True)
+    issue_type = fields.Selection([('CONI', 'Consignment'),('SAP','Sales placement issue'), ('SIF', 'Free sample'),('SIR', 'Sample to be returned')],string='Issue type',requird=True)
     #SIF - Sample issue free        -   This will post under expense account (transfer to sample location)
     #SIR - Sample issue to return   -   This will post under sample receivable
     #CONI - Consignment issue       -   This will post under consignment receivable (transfer to consignment location)
@@ -35,7 +35,7 @@ class droga_stock_cons_issue(models.Model):
                                    state={'draft': [('readonly', False)]})
 
     consignment_reference = fields.Text(string='Order reference', default='', readonly=True)
-    cons_ref=fields.One2many('stock.picking','cons_sample_issue_request',string='Consignment reference')
+    cons_ref=fields.One2many('stock.picking','cons_sample_issue_request',string='Store reference')
 
     @api.model
     def create(self, vals_list):

@@ -7,21 +7,21 @@
     <field name="model">droga.monthly.close</field>
     <field name="arch" type="xml">
         <tree string="Monthly Postings" default_order='closing_day, name, et_year' create="false" edit="false" >
-            <field name="name"/>
             <field name="acount_monthly_closing_id"/>
-            <field name="et_year"/>
+            <field name="name"/>
+            
+            <field name="et_year" options="{'format': 0}"/>
                                    
-            <field name="Principal_payment"/>
-            <field name="Interest_payment"/>
+            <field name="Principal_payment"  invisible='1'/>
+            <field name="Interest_payment"  invisible='1'/>
                                     
             <field name="interest"/>
             <field name="penality"/>
-            <field name="recipt"/>
+            <field name="post"/>
+            <field name="recipt"  invisible='1'/>
              <button  type="object" name="compute_post" string="Post"
                         class="oe_stat_button" icon="fa-file-text"/>
-                         <!-- <button name="compute_post" type="object"class="oe_stat_button" icon="fa-file-text">
-          
-                </button> -->
+                         
             
                                     
         </tree>

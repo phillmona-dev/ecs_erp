@@ -189,14 +189,15 @@ class droga_tender_master(models.Model):
         return {
             'name': 'Payment request',
             'view_type': 'form',
-            'view_mode': 'form',
+            'view_mode': 'tree,form',
             'res_model': 'droga.account.payment.request',
-            'view_id': self.env.ref('droga_finance.droga_account_payment_request_withoutpo_view_form').id,
+            'view_id': False,
             'type': 'ir.actions.act_window',
-
             'context': {
                 'default_tender_origin_form': self.id,
-            }
+            },
+            'domain':
+                ([('tender_origin_form', '=', self.id)])
         }
 
     def order_sales(self):
@@ -221,30 +222,33 @@ class droga_tender_master(models.Model):
             return {
                 'name': 'Sales order',
                 'view_type': 'form',
-                'view_mode': 'form',
+                'view_mode': 'tree,form',
                 'res_model': 'sale.order',
-                'view_id': self.env.ref('sale.view_order_form').id,
+                'view_id': False,
                 'type': 'ir.actions.act_window',
                 'context': {
                     'default_tender_origin_form_tender': self.id,
                     'default_partner_id': self.customer.master_cust_id.id,
                     'default_order_line': order_lines,
-                }
+                },
+                'domain':
+                    ([('tender_origin_form_tender','=', self.id)])
             }
 
-    def pay_sam_open(self):
+    def consignment_open(self):
         return {
             'name': 'Sample request',
-            'view_type': 'form',
-            'view_mode': 'form',
+            'view_type': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'droga.inventory.consignment.issue',
-            'view_id': self.env.ref('droga_inventory.droga_inventory_consignment_issue_view_form').id,
+            'view_id': False,
             'type': 'ir.actions.act_window',
-
             'context': {
                 'default_tender_origin_form': self.id,
                 'default_issue_type': 'SIF'
-            }
+            },
+            'domain':
+                ([('tender_origin_form', '=', self.id)])
         }
 
     def name_get(self):

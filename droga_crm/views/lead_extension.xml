@@ -15,7 +15,7 @@
                         <field name="title" placeholder="Title" domain="[]" options='{"no_open": True}' />
                     </div>-->
                     <field name="date_planned" />
-                    <field name="partner_id" />
+                    <field name="partner_id" required="True"/>
                     <field name="planned_visit_selection" readonly="True"/>
                     <field name="is_blacklisted" invisible="1" />
                     <field name="phone_blacklisted" invisible="1" />
@@ -49,8 +49,11 @@
                                            domain="([('parent_customer','=',custlead)])"
                                            options="{'no_create':True,'no_open':True}"></field>
                             <field name="core_products" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
-                            <field name="co_travel" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
                             <field name="phone_no" />
+                            <field name="co_travel" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
+                            <field name="sales_avail" string="Sales interested?"/>
+                            <field name="sales_closed" string="Sales closed?"/>
+                            <field name="sales_close_descr" string="Remark"/>
                             <field name="custlead" invisible="1" />
                         </tree>
                     </field>

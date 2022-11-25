@@ -34,6 +34,7 @@
         'views/settings/area.xml',
         'views/lead_extension.xml',
         'reports/plan_analysis.xml',
+        'reports/excel_reports/visit_plan.xml',
     ],
 
     # any module necessary for this one to work correctly

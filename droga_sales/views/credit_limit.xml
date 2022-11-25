@@ -8,6 +8,7 @@
             <tree create="0" editable="bottom">
                 <field name="name" readonly="1"></field>
                 <field name="vat" string="Tin No"></field>
+                <field name="city_name" string="City/sub-city"></field>
                 <field name="property_supplier_payment_term_id" string="Payment terms" options="{'no_create':True,'no_open':True}"></field>
                 <field name="cust_credit_limit"></field>
                 <field name="unsettled_amount" readonly="1"></field>
@@ -23,6 +24,7 @@
             <search>
                 <field name="name" ></field>
                 <field name="vat"></field>
+                <field name="city_name" string="City/sub-city"></field>
                 <field name="property_supplier_payment_term_id"></field>
                 <field name="cust_credit_limit"></field>
                 <field name="unsettled_amount"></field>

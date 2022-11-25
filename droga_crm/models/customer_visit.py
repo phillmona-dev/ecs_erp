@@ -13,11 +13,13 @@ from odoo import models, fields, api
 
 class customer_visit_header(models.Model):
     _name='droga.customer.visit.header'
+    _rec_name = 'descr'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
     user_id = fields.Char("Promotor ID", default=lambda self: self.env.user.id, readonly=True, required=True)
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
-    city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city')
+    city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city',required=True)
+    descr=fields.Char('Visit description',compute='_get_descr')
     _order = 'year desc,month desc'
     date_from=fields.Date('Date from')
     date_to = fields.Date('Date to')
@@ -92,8 +94,6 @@ class customer_visit_header(models.Model):
             'type': 'ir.actions.act_window',
             'domain': [('visit_header_id', '=', self.id)],
             'context': {'search_default_group_cust_type':1},
-            #'target':'new',
-            #'res_id': self.id,
         }
 
     def request_approval(self):
@@ -219,12 +219,11 @@ class customer_visit_header(models.Model):
             self.env['droga.customer.visit.detail'].create(p)
         return res
 
-    def name_get(self):
-        result = []
+    def _get_descr(self):
         for record in self:
-            result.append(
-                (record.id, calendar.month_name[int(record.month)] +", "+record.year))
-            return result
+            record.descr= str(record.userid) + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
+                record.year) + ' - ' + record.city_name.city_descr
+
 class customer_visit_detail(models.Model):
     _name='droga.customer.visit.detail'
     _order = 'visit_date'
@@ -332,5 +331,3 @@ class customer_visit_detail(models.Model):
             res.week_num='Week-5'
 
         return res
-
-
