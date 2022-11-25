@@ -27,7 +27,12 @@ class sale_order_line(models.Model):
         compute='_compute_price_unit',
         digits='Product Price',
         store=True, readonly=True, required=True, precompute=True)
+    wareh=fields.Many2one('stock.warehouse')
 
+    @api.onchange('product_id')
+    def _get_wh(self):
+        for rec in self:
+            rec.wareh=rec.product_id.default_warehouse
     def calc_sales_totals(self):
         core_sum=0
         non_core_sum=0
@@ -54,6 +59,8 @@ class sale_order_line(models.Model):
     def _compute_price_unit(self):
 
         for line in self:
+            if not line.wareh:
+                line.wareh=line.product_id.default_warehouse
 
             #Get discounts/additional payments per type
             type_rates = self.env['droga.price.discount.per.type'].search(

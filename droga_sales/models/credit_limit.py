@@ -84,14 +84,6 @@ class inventory_placement_extension(models.Model):
 
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
-    wareh=fields.Many2one('stock.warehouse',compute='_get_wh',inverse='_inv_wh')
-
-    def _get_wh(self):
-        for rec in self:
-            rec.wareh= rec.product_id.default_warehouse
-
-    def _inv_wh(self):
-        pass
 
     def _prepare_procurement_values(self, group_id=False):
         """ Prepare specific key for moves or other components that will be created from a stock rule
