@@ -22,6 +22,15 @@ class purhcase_request(models.Model):
             [('user_id', '=', self.env.uid)], limit=1)
         return employee_rec.department_id
 
+    # compute total purchase amount
+    @api.depends('purhcase_request_lines.total_price')
+    def compute_total_purchase_amount(self):
+        total = 0
+        for record in self.purhcase_request_lines:
+            total += record.total_price
+
+        self.total_amount = total
+
     name = fields.Char('Request Reference', required=True,
                        index=True, copy=False, default='New')
     request_type = fields.Selection(
@@ -83,6 +92,8 @@ class purhcase_request(models.Model):
     branch = fields.Many2one("account.analytic.account", string="Cost Center", domain=[
                              ('plan_id', '=', 'Profit Center')])
 
+    total_amount = fields.Float("Total Amount",compute="compute_total_purchase_amount",store=True)
+
     @api.depends("department")
     def _get_manager_id(self):
         for record in self:
@@ -104,6 +115,13 @@ class purhcase_request(models.Model):
                 'droga.purchase.request.foreign') or '/'
 
         res = super(purhcase_request, self_comp).create(vals)
+
+        return res
+
+    def write(self, vals):
+
+        res = super(purhcase_request, self).write(vals)
+        # calculate total purchase price
 
         return res
 
@@ -307,19 +325,23 @@ class purhcase_request_line(models.Model):
 
     @api.depends('budgetary_position', 'expense_account')
     def _get_remaining_budget(self):
-        date_from = datetime.today().date()
-        if date_from.month > 6:
-            date_to = datetime(date_from.year+1, 7, 7).date()
+
+        now = datetime.today().date()
+
+        if now.month >= 7 and now.day >= 7:
+            date_from = datetime(now.year, 7, 8)
+            date_to = datetime(now.year+1, 7, 7)
         else:
-            date_to = datetime(date_from.year, 7, 7).date()
+            date_from = datetime(now.year-1, 7, 8)
+            date_to = datetime(now.year, 7, 7)
 
         for record in self:
             # get budget from remaining budget
             if record.budgetary_position.id and record.purhcase_request_id.branch.id and record.expense_account.id:
                 self.env.cr.execute("""select distinct b.account,a.general_budget_id,a.analytic_account_id,sum(b.remaining_balance) as remaining_balance from crossovered_budget_lines a 
     inner join crossovered_budget_lines_detail b on a.id=b.budgetary_position_id 
-    where a.general_budget_id=%s and a.analytic_account_id=%s and b.account=%s and (a.date_from>='07/08/2022' and a.date_to<='07/07/2023')
-    group by b.account,a.general_budget_id,a.analytic_account_id """, (record.budgetary_position.id, record.purhcase_request_id.branch.id, record.expense_account.id))
+    where a.general_budget_id=%s and a.analytic_account_id=%s and b.account=%s and (a.date_from>=%s and a.date_to<=%s)
+    group by b.account,a.general_budget_id,a.analytic_account_id """, (record.budgetary_position.id, record.purhcase_request_id.branch.id, record.expense_account.id, date_from, date_to))
                 res = self.env.cr.dictfetchone()
 
                 # update remaining balance

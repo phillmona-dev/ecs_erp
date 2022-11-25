@@ -65,7 +65,7 @@
         <field name="name">Commitment Budget</field>
         <field name="res_model">droga.budget.commitment.budget</field>
         <field name="view_mode">tree</field>
-        <field name="domain">[('document_type','=','PR')]</field>
+        <field name="domain">[('document_type','in','PR')]</field>
         <field name="context">{"search_default_active":1}</field>
         <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_budget_commitment_budget_view_tree')})]"/>
         <field name="help" type="html">
