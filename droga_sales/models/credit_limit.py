@@ -11,26 +11,14 @@ from odoo.exceptions import ValidationError
 class cust_credit_limit(models.Model):
     _inherit='res.partner'
     cust_credit_limit = fields.Float(string='Credit limit',tracking=True)
-    unsettled_amount = fields.Float(string='Unsettled amount')
-    available_amount = fields.Float(string='Credit balance',compute='_compute_cust_unsetlled_amount')
+    unsettled_amount = fields.Monetary(compute='_compute_balance', string='Unsettled amount')
+    available_amount = fields.Float(string='Credit balance',compute='_compute_balance')
 
-    def _compute_cust_unsetlled_amount(self):
-        for rec in self:
-            rec.available_amount = rec.cust_credit_limit-rec.unsettled_amount
-
-class cust_credit_account_move(models.Model):
-    _inherit = 'account.move'
-    def action_post(self):
-        result = super(cust_credit_account_move, self).action_post()
-        for inv in self:
-            for line in inv['line_ids']:
-                if line.account_type=='asset_receivable':
-                    line.partner_id.unsettled_amount+=line.amount_currency
-        return result
-
-    #This is used for forcing reversal to have a draft state
-    def _reverse_moves(self, default_values_list=None, cancel=False):
-        return super(cust_credit_account_move, self)._reverse_moves()
+    @api.depends('debit','credit')
+    def _compute_balance(self):
+        for record in self:
+            record.unsettled_amount = record.credit - record.debit
+            record.available_amount=record.cust_credit_limit-record.unsettled_amount
 
 
 class cust_sales_credit_limit(models.Model):
@@ -86,10 +74,7 @@ class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
 
     def _prepare_procurement_values(self, group_id=False):
-        """ Prepare specific key for moves or other components that will be created from a stock rule
-        coming from a sale order line. This method could be override in order to add other custom key that could
-        be used in move/po creation.
-        """
+
         values = super(cust_sales_no_create_after_invoice, self)._prepare_procurement_values(group_id)
         self.ensure_one()
         # Use the delivery date if there is else use date_order and lead time
@@ -122,4 +107,5 @@ class cust_sales_no_create_after_invoice(models.Model):
 class payment_term_no_credit(models.Model):
     _inherit = 'account.payment.term'
     apply_credit_limit=fields.Boolean(string='Apply credit limit',default=True)
+    deliv_after_payment = fields.Boolean(string='Delivery after payment', default=False)
 

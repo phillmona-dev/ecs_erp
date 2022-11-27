@@ -48,7 +48,7 @@
         id="droga_crm_contacts_model_schedule_area"
         name="Doctors schedule"
         action="droga_crm_doctors_schedule_model_action"
-        parent="menu_vist_log"
+        parent="menu_inq_vist_reports"
         sequence="20"/>
 
 </odoo>

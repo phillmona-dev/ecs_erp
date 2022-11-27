@@ -28,13 +28,19 @@
             id="menu_vist_reports"
             name="Reports"
             parent="crm.crm_menu_root"
+            sequence="19"/>
+
+    <menuitem
+            id="menu_excel_vist_reports"
+            name="Excel reports"
+            parent="menu_vist_reports"
             sequence="25"/>
 
     <menuitem
             id="droga_crm_reports_visit_plan_excel_menu"
             name="Visit plan - Excel"
             action="droga_crm_reports_visit_plan_excel_action"
-            parent="menu_vist_reports"
+            parent="menu_excel_vist_reports"
             groups="crm_user"
             sequence="11"/>
 

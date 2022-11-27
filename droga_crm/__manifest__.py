@@ -23,7 +23,6 @@
         'security/ir.model.access.csv',
         'views/cust_extension.xml',
         'views/customer_visits.xml',
-        'views/doctors_schedule.xml',
         'views/sales_target.xml',
         'views/settings/cust_grade.xml',
         'views/settings/specialty.xml',
@@ -34,7 +33,11 @@
         'views/settings/area.xml',
         'views/lead_extension.xml',
         'reports/plan_analysis.xml',
+        'reports/core_products.xml',
+        'reports/doctors_schedule.xml',
+        'reports/done_activities.xml',
         'reports/excel_reports/visit_plan.xml',
+        'wizards/lead2opp_ext.xml',
     ],
 
     # any module necessary for this one to work correctly

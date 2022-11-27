@@ -48,4 +48,11 @@
         </field>
     </record>
 
+    <menuitem
+            id="droga_crm_core_products_crm_menu"
+            name="Monthly plans"
+            action="droga_crm_core_products_crm_action"
+            parent="menu_inq_vist_reports"
+            groups="crm_user"
+            sequence="10"/>
 </odoo>

@@ -9,14 +9,9 @@
 
             <xpath expr="//form/sheet/group/group[@name='lead_info']" position="replace">
                 <group name="lead_info" attrs="{'invisible': [('type', '=', 'opportunity')]}">
-                    <!--<label for="contact_name" />
-                    <div class="o_row">
-                        <field name="contact_name" required="True" />
-                        <field name="title" placeholder="Title" domain="[]" options='{"no_open": True}' />
-                    </div>-->
-                    <field name="date_planned" />
-                    <field name="partner_id" required="True"/>
-                    <field name="planned_visit_selection" readonly="True"/>
+
+
+                    <field name="priority" widget="priority"/>
                     <field name="is_blacklisted" invisible="1" />
                     <field name="phone_blacklisted" invisible="1" />
                     <field name="email_state" invisible="1" />
@@ -25,6 +20,7 @@
                     <field name="partner_phone_update" invisible="1" />
 
                 </group>
+
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='internal_notes']" position="replace">
@@ -74,7 +70,21 @@
             </xpath>
 
             <xpath expr="//form/sheet/group/group[@name='lead_partner']" position="replace">
+                <group name="lead_partner" attrs="{'invisible': [('type', '=', 'opportunity')]}">
 
+                    <field name="date_planned" />
+                    <field name="partner_id" required="True"/>
+                    <field name="planned_visit_selection" readonly="True"/>
+
+                </group>
+            </xpath>
+
+            <xpath expr="//form/sheet/field[@name='lead_properties']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/div/h2/div/div[@class='o_row']" position="attributes">
+                <attribute name="invisible">True</attribute>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='priority']" position="attributes">

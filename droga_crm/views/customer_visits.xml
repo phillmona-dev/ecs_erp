@@ -217,7 +217,7 @@
             id="menu_vist_log"
             name="Visit plan and target"
             parent="crm.crm_menu_root"
-            sequence="25"/>
+            sequence="24"/>
 
     <menuitem
             id="droga_crm_customer_visit"

@@ -48,8 +48,9 @@
             <xpath expr="//form/sheet/field[@name='display_on_invoice']" position="after">
                     <label for="apply_credit_limit"/>
                         <field name="apply_credit_limit"/>
+                    <label for="deliv_after_payment"/>
+                        <field name="deliv_after_payment"/>
             </xpath>
-
         </field>
     </record>
 

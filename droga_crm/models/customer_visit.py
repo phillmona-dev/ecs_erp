@@ -116,6 +116,7 @@ class customer_visit_header(models.Model):
                 'company_id': self.env.company.id,
                 'type': 'lead',
                 'stage_id': 1,
+                'plan_id':det.id,
                 'expected_revenue': 0,  # Fix me
                 'date_planned': det['visit_date'],
                 'partner_id': det['visit_client'].id,
