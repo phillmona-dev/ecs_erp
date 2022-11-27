@@ -21,6 +21,8 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'reports/excel_reports/visit_plan.xml',
+        'reports/core_products.xml',
         'views/cust_extension.xml',
         'views/customer_visits.xml',
         'views/sales_target.xml',
@@ -33,10 +35,8 @@
         'views/settings/area.xml',
         'views/lead_extension.xml',
         'reports/plan_analysis.xml',
-        'reports/core_products.xml',
         'reports/doctors_schedule.xml',
         'reports/done_activities.xml',
-        'reports/excel_reports/visit_plan.xml',
         'wizards/lead2opp_ext.xml',
     ],
 
