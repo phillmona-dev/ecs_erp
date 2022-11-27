@@ -164,6 +164,10 @@ class Rfq(models.Model):
             sta = self.env['droga.purchase.foregin.status'].create(status)
 
     def pick_winner(self):
+
+        # validate rfq lines
+        self.validae_rfq_lines()
+
         # update all record to no
         partners = self.env['droga.purhcase.request.rfq.line'].search(
             [('rfq_id', '=', self.id)])
@@ -195,14 +199,24 @@ class Rfq(models.Model):
 
         return True
 
+    def validae_rfq_lines(self):
+        for record in self.rfq_lines:
+            if record.unit_price == 0:
+                raise ValidationError("Unit price can't be zero")
+            elif record.unit_price < 0:
+                raise ValidationError("Unit price can't be less than zero")
+            elif record.product_qty == 0:
+                raise ValidationError("Quantity can't be zero")
+            elif record.product_qty < 0:
+                raise ValidationError("Quantity can't be less than zero")
+
     def create_purchase_orders_automatically(self):
 
         bank = ""
         bank_branch = ""
         approved_date = ""
 
-
-        if self.request_type!="Local":
+        if self.request_type != "Local":
             message = self.check_documents()
             if message != '':
                 return {
@@ -254,7 +268,7 @@ class Rfq(models.Model):
                 }
 
             # copy approved currency request details
-            
+
             for record11 in self.currency_requests:
                 if record11.state == "Approved":
                     bank = record11.bank
