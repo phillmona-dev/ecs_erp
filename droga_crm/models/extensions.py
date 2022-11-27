@@ -31,6 +31,7 @@ class crm_lead_extension(models.Model):
     contacts_schedule=fields.One2many('droga.crm.contacts.schedule','leads')
     contacts_schedule_opor = fields.One2many('droga.crm.contacts.schedule', 'leads',domain=(['|',('sales_avail', '=', True),('sales_closed', '=', True)]))
     date_planned=fields.Datetime('Lead date')
+    origin_user_id=fields.Many2one('res.users')
     planned_visit_selection = fields.Selection([
         ('Early Morning', 'Early Morning'),
         ('Late Morning', 'Late Morning'),

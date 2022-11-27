@@ -10,8 +10,8 @@ class droga_sales_invoice_payment(models.Model):
             sp=self.env['stock.picking'].sudo().search([('origin','=',invoice[0]['invoice_origin'])])
             if len(sp)>0:
                 for rec in sp:
-                    rec.write({'delivery_order_show':True})
-                    rec.action_assign()
-
+                    if not rec.delivery_order_show:
+                        rec.write({'delivery_order_show': True})
+                        rec.action_assign()
         return res
 

@@ -250,7 +250,7 @@ class droga_stock_office_supplies(models.Model):
                 'branch': self.branch.id,
                 'request_by': self.requested_by.id,
                 'department': self.department.id,
-                'request_date': datetime.now(),
+                'request_date': self.env.cr.now(),
                 'store_request_id': self.id,
                 'company_id': self.company_id.id,
 
