@@ -109,6 +109,7 @@ class WitholdingReport(models.TransientModel):
             'fg_color': '#F6F5F5'})
 
         # search RFQ
+        
         account_moves = self.env['account.move'].search(
             [('date', '>=', self.date_from), ('date', '<=', self.date_to), ('company_id', '=', self.company_id.id)])
 
