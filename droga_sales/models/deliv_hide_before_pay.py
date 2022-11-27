@@ -11,7 +11,7 @@ class droga_sales_invoice_payment(models.Model):
             if len(sp)>0:
                 for rec in sp:
                     rec.write({'delivery_order_show':True})
-                    rec._action_assign()
+                    rec.action_assign()
 
         return res
 

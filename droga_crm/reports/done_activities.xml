@@ -15,7 +15,7 @@
                 <field name="state" decoration-success="state == 'Done'" decoration-info="state == 'Open'" decoration-danger="state == 'Cancelled'" widget="badge"/>
                 <field name="feedback"/>
                 <field name="from_visit_plan"/>
-                <field name="act_note" widget="html"/>
+                <field name="act_note" widget="html" optional="hide"/>
             </tree>
         </field>
     </record>
@@ -46,6 +46,11 @@
                 <filter string="Last week activities" name="last_week"
                     domain="[('activity_date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=-1)).strftime('%Y-%m-%d'))),
                     ('activity_date', '&gt;=', ((context_today()-relativedelta(weeks=2, weekday=0)).strftime('%Y-%m-%d')))]"/>
+
+                <separator />
+
+                <filter name="unplanned" string="Unplanned Act." domain="[('from_visit_plan', '=', False)]" />
+                <filter name="planned" string="Planned Act." domain="[('from_visit_plan', '=', True)]" />
 
             </search>
         </field>

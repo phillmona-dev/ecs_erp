@@ -73,7 +73,7 @@
                                     
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
-                                    <field name="remark"></field>
+                                    <field name="remark" string='comment'></field>
                                 </tree>
                             </field>
                         </page>
@@ -94,7 +94,7 @@
                                     
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
-                                    <field name="remark"></field>
+                                    <field name="remark" string='comment'></field>
                                 </tree>
                             </field>
                         </page>
@@ -115,7 +115,7 @@
                                     
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
-                                    <field name="remark"></field>
+                                    <field name="remark" string='comment'></field>
                                 </tree>
                             </field>
                         </page>
@@ -136,7 +136,7 @@
                                     
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
-                                    <field name="remark"></field>
+                                    <field name="remark" string='comment'></field>
                                 </tree>
                             </field>
                         </page>
@@ -157,7 +157,7 @@
                                     
                                     <field name="visit_date"></field>
                                     <field name="planned_visit_selection"></field>
-                                    <field name="remark"></field>
+                                    <field name="remark" string='comment'></field>
                                 </tree>
                             </field>
                         </page>
@@ -177,8 +177,9 @@
                                             name="visit_schedule_open" class="oe_stat_button"/>
                                     
                                     <field name="visit_date"></field>
+                                    <field name="week_num"></field>
                                     <field name="planned_visit_selection"></field>
-                                    <field name="remark"></field>
+                                    <field name="remark" string='comment'></field>
                                 </tree>
                             </field>
                         </page>

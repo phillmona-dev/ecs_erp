@@ -25,7 +25,7 @@
     </record>
 
     <menuitem
-            id="menu_vist_reports"
+            id="menu_visit_reports"
             name="Reports"
             parent="crm.crm_menu_root"
             sequence="19"/>
@@ -33,7 +33,7 @@
     <menuitem
             id="menu_excel_vist_reports"
             name="Excel reports"
-            parent="menu_vist_reports"
+            parent="menu_visit_reports"
             sequence="25"/>
 
     <menuitem
@@ -43,5 +43,4 @@
             parent="menu_excel_vist_reports"
             groups="crm_user"
             sequence="11"/>
-
 </odoo>

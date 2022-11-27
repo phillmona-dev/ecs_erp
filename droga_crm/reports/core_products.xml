@@ -40,7 +40,7 @@
     <menuitem
             id="menu_inq_vist_reports"
             name="Inquiries"
-            parent="menu_vist_reports"
+            parent="menu_visit_reports"
             sequence="24"/>
 
     <menuitem
