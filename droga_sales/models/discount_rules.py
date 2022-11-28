@@ -27,6 +27,7 @@ class sale_order_line(models.Model):
         compute='_compute_price_unit',
         digits='Product Price',
         store=True, readonly=True, required=True, precompute=True)
+    price_unit_before_discount=fields.Float('')
     wareh=fields.Many2one('stock.warehouse')
 
     @api.onchange('product_id')
@@ -36,6 +37,7 @@ class sale_order_line(models.Model):
     def calc_sales_totals(self):
         core_sum=0
         non_core_sum=0
+        total_before_discount=0
         try:
             order_lines_core = self.order_id.order_line.filtered(
                 lambda x: not x.display_type and x.product_id.is_core_product and x.id.ref != None)
@@ -49,12 +51,15 @@ class sale_order_line(models.Model):
 
         for cs in order_lines_core:
             core_sum = core_sum + (cs.product_uom_qty * cs.price_unit)
+            total_before_discount=total_before_discount+(cs.product_uom_qty * cs.price_unit_before_discount)
 
         for ncs in order_lines_non_core:
             non_core_sum = non_core_sum + (ncs.product_uom_qty * ncs.price_unit)
+            total_before_discount = total_before_discount + (ncs.product_uom_qty * ncs.price_unit_before_discount)
 
         self.order_id.core_sum = core_sum
         self.order_id.non_core_sum = non_core_sum
+        self.order_id.total_discount=total_before_discount-(core_sum+non_core_sum)
     @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id')
     def _compute_price_unit(self):
 
@@ -96,6 +101,8 @@ class sale_order_line(models.Model):
                     product_currency=line.currency_id
                 )*((1+((core_rate+all_rate)/100)) if line.product_id.is_core_product else (1+((non_core_rate+all_rate)/100)))
 
+            line.price_unit_before_discount=line.price_unit
+
         self.calc_sales_totals()
 
         core_sum = self.order_id.core_sum
@@ -136,6 +143,8 @@ class sale_order_ext(models.Model):
     _inherit='sale.order'
     core_sum=fields.Float('Core total',compute='_get_sub_totals')
     non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
+
+    total_discount = fields.Float('Total discount')
 
     payment_term_id = fields.Many2one(
         comodel_name='account.payment.term',
