@@ -58,7 +58,7 @@ class droga_stock_cons_issue(models.Model):
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=',self.issue_type), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=','CONI'), ('warehouse_id', '=', wh.id)]).id
             cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
             if not pick_type_id :
                 raise UserError("Picking type is not configured for one of the warehouses.")
@@ -70,7 +70,7 @@ class droga_stock_cons_issue(models.Model):
             #Get picking type for issue type per warehouse.
             #Issue type will be configured per warehouse.
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=',self.issue_type), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=','CONI'), ('warehouse_id', '=', wh.id)]).id
             #Get default location for the warehouse
             def_loc_id = self.env['stock.location'].search(
                 [('complete_name', 'like', wh.code + '/Stock%'), ('usage', '=', 'internal')])[0].id
