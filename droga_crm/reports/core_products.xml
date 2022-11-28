@@ -24,6 +24,7 @@
                 <field name="list_price"></field>
                 <field name="default_warehouse"></field>
                 <field name="average_month_consumption"></field>
+                <filter name="core_products" string="Core products" domain="[('is_core_product', '=', True)]" />
             </search>
         </field>
     </record>
@@ -35,6 +36,7 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_crm_core_products_crm_tree')})]"/>
         <field name="search_view_id" ref="droga_crm_core_products_crm_search"></field>
+        <field name="context">{"search_default_core_products":1}</field>
     </record>
 
     <menuitem
