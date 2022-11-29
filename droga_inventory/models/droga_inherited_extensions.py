@@ -37,6 +37,14 @@ class droga_stock_picking_extension(models.Model):
     cons_receive_request = fields.Many2one('droga.inventory.consignment.receive','Consignment receive request')
     state = fields.Selection(selection_add=[('processed', 'Processed')])
     delivery_order_show=fields.Boolean(default=True)
+    from_wh=fields.Many2one('stock.warehouse',compute='_compute_from_to_warehouse')
+    to_wh =fields.Many2one('stock.warehouse',compute='_compute_from_to_warehouse')
+    from_whc=fields.Char(related='from_wh.code')
+    to_whc = fields.Char(related='to_wh.code')
+    def _compute_from_to_warehouse(self):
+        for rec in self:
+            rec.from_wh=self.env['stock.warehouse'].search([('code','=',rec.location_id.location_id.complete_name)]) if (rec.location_id.usage=='internal' and len(self.env['stock.warehouse'].search([('code','=',rec.location_id.location_id.complete_name)]))>0) else None
+            rec.to_wh = self.env['stock.warehouse'].search([('code', '=', rec.location_dest_id.location_id.complete_name)]) if (rec.location_dest_id.usage == 'internal' and len(self.env['stock.warehouse'].search([('code', '=', rec.location_dest_id.location_id.complete_name)]))>0) else None
 
     @api.model
     def create(self, vals_list):
