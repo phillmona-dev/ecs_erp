@@ -112,8 +112,8 @@ class droga_stock_transfer_custom(models.Model):
                 'location_dest_id': self.location_dest_id.id,
                 #'auto_generated': True,
                 'origin': self.name,
-                #'state': 'draft',
-                'state': 'confirmed',
+                'state': 'draft',
+                #'state': 'confirmed',
                 'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
             }
@@ -136,8 +136,9 @@ class droga_stock_transfer_custom(models.Model):
                         'product_uom_qty': rec['product_uom_qty'],
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
-                        #'state': 'draft',
-                        'state': 'confirmed',
+                        #'state': 'waiting',
+                        'state': 'draft',
+                        #'state': 'confirmed',
                         'company_id': self.company_id.id
                     }
 
@@ -146,8 +147,8 @@ class droga_stock_transfer_custom(models.Model):
         self.state = 'waiting'
 
     def action_receive(self):
-        for record in self.transfer_picking:
-            record.button_validate();
+        #for record in self.transfer_picking:
+        #    record.button_validate();
         self.state = 'done'
 
 class droga_stock_transfer_custom_detail(models.Model):

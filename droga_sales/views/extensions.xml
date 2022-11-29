@@ -8,7 +8,6 @@
         <field name="arch" type="xml">
             <xpath expr = "//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_uom_readonly']" position = "after">
                 <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
-                <field name="is_bought_locally" string="Warehouse" invisible="1"/>
             </xpath>
 
             <xpath expr = "//form/sheet/notebook/page/group/group/field[@name='note']" position = "replace">
