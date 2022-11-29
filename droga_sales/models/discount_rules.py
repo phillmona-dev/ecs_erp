@@ -26,7 +26,7 @@ class sale_order_line(models.Model):
         string="Unit Price",
         compute='_compute_price_unit',
         digits='Product Price',
-        store=True, readonly=True, required=True, precompute=True)
+        store=True, readonly=True, required=True)
     price_unit_before_discount=fields.Float('')
     wareh=fields.Many2one('stock.warehouse')
 

@@ -21,7 +21,7 @@
                 <field name="gender"></field>
                 <field name="cont_grade"></field>
                 <field name="contact_area" invisible="1"></field>
-                <field name="days"></field>
+                <field name="days" widget="many2many_tags"></field>
             </tree>
         </field>
     </record>
