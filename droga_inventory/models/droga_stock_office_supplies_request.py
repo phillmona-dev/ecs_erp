@@ -162,7 +162,7 @@ class droga_stock_office_supplies(models.Model):
                 # 'auto_generated': True,
                 'origin': self.name,
                 # 'state': 'draft',
-                'state': 'draft',
+                'state': 'waiting',
                 'office_request': self.id,
                 'scheduled_date': self.request_date
             }
@@ -185,7 +185,7 @@ class droga_stock_office_supplies(models.Model):
                     'location_id': def_location_id,
                     'location_dest_id': def_dest_id[0].id,
                     # 'state': 'draft',          Confirmed is waiting status
-                    'state': 'draft',
+                    'state': 'waiting',
                     'company_id': self.company_id.id
                 }
 
@@ -245,7 +245,7 @@ class droga_stock_office_supplies(models.Model):
             # create purchase request
             vals = {
                 'name': 'New',
-                'state': 'Draft',
+                'state': 'waiting',
                 'request_type': 'Local',
                 'branch': self.branch.id,
                 'request_by': self.requested_by.id,

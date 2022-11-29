@@ -112,7 +112,7 @@ class droga_stock_transfer_custom(models.Model):
                 'location_dest_id': self.location_dest_id.id,
                 #'auto_generated': True,
                 'origin': self.name,
-                'state': 'draft',
+                'state': 'waiting',
                 #'state': 'confirmed',
                 'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
@@ -137,7 +137,7 @@ class droga_stock_transfer_custom(models.Model):
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
                         #'state': 'waiting',
-                        'state': 'draft',
+                        'state': 'waiting',
                         #'state': 'confirmed',
                         'company_id': self.company_id.id
                     }

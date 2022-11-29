@@ -73,7 +73,7 @@ class droga_stock_cons_receive(models.Model):
                 'cons_receive_request': self.id,
                 #'auto_generated': True,
                 'origin': self.name,
-                'state': 'draft',
+                'state': 'waiting',
                 'scheduled_date': self.receipt_date
             }
             picking_id = self.env['stock.picking'].sudo().create(picking_vals)
@@ -96,7 +96,7 @@ class droga_stock_cons_receive(models.Model):
                         'price_unit': rec['price_unit'],
                         'location_id': cons_vendor,
                         'location_dest_id': def_loc_id,
-                        'state': 'draft',
+                        'state': 'waiting',
                         'company_id': self.company_id.id
                     }
 
