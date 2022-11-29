@@ -60,9 +60,9 @@ class mail_activity_extension(models.Model):
                 if feedback:
                     to_update.write({'feedback': feedback})
 
-                    visits_remark_dto_update=self.env['droga.crm.contacts.schedule'].search([('leads.id','=',to_update.source_id)])
-                    for visit in visits_remark_dto_update:
-                        if not visit.sales_close_descr:
-                            visit.sales_close_descr=feedback
+                    #visits_remark_dto_update=self.env['droga.crm.contacts.schedule'].search([('leads.id','=',to_update.source_id)])
+                    #for visit in visits_remark_dto_update:
+                    #    if not visit.sales_close_descr:
+                    #        visit.sales_close_descr=feedback
 
         return super(mail_activity_extension, self).action_feedback(feedback=False, attachment_ids=None)

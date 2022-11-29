@@ -13,7 +13,7 @@ class droga_crm_contacts(models.Model):
     gender = fields.Selection(
         [('Male', 'Male'), ('Female', 'Female')],
         string='Gender')
-    specialty=fields.Many2one('droga.cust.specialty',string='Specialty')
+    specialty=fields.Many2one('droga.cust.specialty',string='Specialty',required=True)
     job_position = fields.Many2one('droga.cust.job.position', string='Job position')
 
     contact_tobe_accessed_by = fields.Selection(
@@ -28,7 +28,7 @@ class droga_crm_contacts(models.Model):
 
     def _get_descr(self):
         for record in self:
-            name = record.job_position+ ' - ' if record.job_position else ''
+            name = record.job_position.job_position+ ' - ' if record.job_position else ''
             name=name+record.specialty.specialty+ ' - ' if record.specialty.specialty else name
 
             record.descr= name+record.contact_name

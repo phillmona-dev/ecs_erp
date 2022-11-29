@@ -110,42 +110,78 @@ class customer_visit_header(models.Model):
             descr = descr + ' - ' + det['visit_location'].name if det['visit_location'] else descr
             if descr=='' or not descr:
                 continue
-            lead = {
-                'name': descr,
-                'origin_user_id': self.user_id,
-                'user_id': self.user_id,
-                'team_id': 0,  # Fix me
-                'company_id': self.env.company.id,
-                'type': 'lead',
-                'stage_id': 1,
-                'plan_id':det.id,
-                'expected_revenue': 0,  # Fix me
-                'date_planned': det['visit_date'],
-                'partner_id': det['visit_client'].id,
-                'planned_visit_selection':det['planned_visit_selection']
-                #'contact_name': det['visit_contact'].name,
-            }
-            lead_created=self.env['crm.lead'].sudo().create(lead)
+            if len(det['contacts_schedule'])<1:
+                lead = {
+                    'name': descr,
+                    'origin_user_id': self.user_id,
+                    'user_id': self.user_id,
+                    'team_id': 0,  # Fix me
+                    'company_id': self.env.company.id,
+                    'type': 'lead',
+                    'stage_id': 1,
+                    'plan_id':det.id,
+                    'expected_revenue': 0,  # Fix me
+                    'date_planned': det['visit_date'],
+                    'partner_id': det['visit_client'].id,
+                    'planned_visit_selection':det['planned_visit_selection']
+                    #'contact_name': det['visit_contact'].name,
+                }
+                lead_created=self.env['crm.lead'].sudo().create(lead)
 
-            for contdet in det['contacts_schedule']:
-                cont={
-                    'contact_custom':contdet['contact_custom'].id,
-                    'leads':lead_created.id,
-                    'core_products':contdet['core_products'],
-                    'co_travel':contdet['co_travel'],
-                 }
-                self.env['droga.crm.contacts.schedule'].sudo().create(cont)
+                self.env['mail.activity'].sudo().create({
+                    'res_model_id': self.env.ref('crm.model_crm_lead').id,
+                    'res_name': descr,
+                    'res_id': lead_created.id,
+                    'user_id': self.user_id,
+                    'date_deadline': det['visit_date'],
+                    'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
+                    'summary': 'Visit ' + descr,
+                    'note': descr
+                })
+            else:
+                for contdet in det['contacts_schedule']:
 
-            self.env['mail.activity'].sudo().create({
-                'res_model_id': self.env.ref('crm.model_crm_lead').id,
-                'res_name':descr,
-                'res_id': lead_created.id,
-                'user_id': self.user_id,
-                'date_deadline':det['visit_date'],
-                'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
-                'summary': 'Visit '+descr,
-                'note': descr
-            })
+                    descr = det['visit_client'].name + (' - '+contdet['contact_custom']['specialty']['specialty']+' '+contdet['contact_custom']['contact_name'] if contdet['contact_custom'] else '')+ (' : ' +prods if prods else '')
+                    descr = descr + ' - ' + det['visit_location'].name if det['visit_location'] else descr
+                    lead = {
+                        'name': descr,
+                        'origin_user_id': self.user_id,
+                        'user_id': self.user_id,
+                        'team_id': 0,  # Fix me
+                        'phone':contdet['contact_custom']['mobile'] if contdet['contact_custom'] else None,
+                        'company_id': self.env.company.id,
+                        'type': 'lead',
+                        'stage_id': 1,
+                        'plan_id': det.id,
+                        'core_products': contdet['core_products'],
+                        'co_travel': contdet['co_travel'],
+                        'contact_custom':contdet['contact_custom'].id,
+                        'expected_revenue': 0,  # Fix me
+                        'date_planned': det['visit_date'],
+                        'partner_id': det['visit_client'].id,
+                        'planned_visit_selection': det['planned_visit_selection']
+                        # 'contact_name': det['visit_contact'].name,
+                    }
+                    lead_created = self.env['crm.lead'].sudo().create(lead)
+
+                    #cont={
+                        #'contact_custom':contdet['contact_custom'].id,
+                        #'leads':lead_created.id,
+                       # 'core_products':contdet['core_products'],
+                      #  'co_travel':contdet['co_travel'],
+                     #}
+                    #self.env['droga.crm.contacts.schedule'].sudo().create(cont)
+
+                    self.env['mail.activity'].sudo().create({
+                        'res_model_id': self.env.ref('crm.model_crm_lead').id,
+                        'res_name':descr,
+                        'res_id': lead_created.id,
+                        'user_id': self.user_id,
+                        'date_deadline':det['visit_date'],
+                        'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
+                        'summary': 'Visit '+descr,
+                        'note': descr
+                    })
 
             det['status'] = 'scheduled'
 
@@ -273,7 +309,7 @@ class customer_visit_detail(models.Model):
         for rec in self:
             descr=''
             for sched in rec.contacts_schedule:
-                descr=descr+(sched['contact_custom']['job_position'] +' - ' if sched['contact_custom']['job_position'] else '')+(sched['contact_custom']['specialty']['specialty']+' - ' if sched['contact_custom']['specialty']['specialty'] else '')+sched['contact_custom']['contact_name']+' : ' if sched['contact_custom']['contact_name'] else ' '
+                descr=descr+(sched['contact_custom']['job_position']['job_position'] +' - ' if sched['contact_custom']['job_position'] else '')+(sched['contact_custom']['specialty']['specialty']+' - ' if sched['contact_custom']['specialty']['specialty'] else '')+sched['contact_custom']['contact_name']+' : ' if sched['contact_custom']['contact_name'] else ' '
 
                 for id, prod in enumerate(sched['core_products']):
                     descr = descr + prod.name if id == 0 else descr + ', ' + prod['name']

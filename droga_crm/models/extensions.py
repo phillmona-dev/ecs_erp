@@ -28,8 +28,14 @@ class sales_team_extension(models.Model):
 class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
     plan_id=fields.Many2one('droga.customer.visit.detail')
-    contacts_schedule=fields.One2many('droga.crm.contacts.schedule','leads')
-    contacts_schedule_opor = fields.One2many('droga.crm.contacts.schedule', 'leads',domain=(['|',('sales_avail', '=', True),('sales_closed', '=', True)]))
+    #contacts_schedule=fields.One2many('droga.crm.contacts.schedule','leads')
+    #contacts_schedule_opor = fields.One2many('droga.crm.contacts.schedule', 'leads',domain=(['|',('sales_avail', '=', True),('sales_closed', '=', True)]))
+    contacts_schedule_single = fields.Many2one('droga.crm.contacts.schedule')
+    contact_custom=fields.Many2one('droga.crm.contacts',domain="[('parent_customer','=',partner_id)]")
+    city_name= fields.Many2one('droga.crm.settings.city',related='partner_id.city_name')
+    core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])
+    closed_sales=fields.Boolean('Sales is closed')
+    co_travel = fields.Many2many('hr.employee', string='Co-travelers')
     date_planned=fields.Datetime('Lead date')
     origin_user_id=fields.Many2one('res.users')
     planned_visit_selection = fields.Selection([
@@ -39,6 +45,10 @@ class crm_lead_extension(models.Model):
         ('Early Afternoon', 'Early Afternoon'),
         ('Late Afternoon', 'Late Afternoon'),
     ], string='Visit session', default="Early Morning")
+    specialty = fields.Many2one('droga.cust.specialty', string='Specialty',related='contact_custom.specialty')
+    phone = fields.Char(
+        'Phone', tracking=50,
+        compute='_compute_phone', inverse='_inverse_phone', readonly=False, store=True)
 
     def _convert_opportunity_data(self, customer, team_id=False):
         upd_values = {
@@ -48,11 +58,21 @@ class crm_lead_extension(models.Model):
         }
         if customer != self.partner_id:
             upd_values['partner_id'] = customer.id if customer else False
-        if len(self.contacts_schedule.filtered(lambda x: x.sales_closed))>0:
-            upd_values['stage_id'] = self.env['crm.stage'].search([('is_won','=',True)])[0].id
+
+        if self.closed_sales:
+            upd_values['stage_id'] = self.env['crm.stage'].search([('is_won', '=', True)])[0].id
         else:
             new_team_id = team_id if team_id else self.team_id.id
             stage = self._stage_find(team_id=new_team_id)
             upd_values['stage_id'] = stage.id
         return upd_values
 
+    @api.depends('contact_custom.mobile')
+    def _compute_phone(self):
+        for lead in self:
+            if lead.contact_custom.mobile and not lead.phone:
+                lead.phone = lead.contact_custom.mobile
+
+    def _inverse_phone(self):
+        for lead in self:
+            lead.contact_custom.mobile = lead.phone
