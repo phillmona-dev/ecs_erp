@@ -39,7 +39,7 @@
             id="droga_account_loan_reports_xls_menu"
             name="Loan Amortization - Excel"
             action="droga_account_loan_reports_xls_action"
-            parent="bank_loan_menu"
+            parent="loan_report_menu"
             
             sequence="19"/>
 </odoo>

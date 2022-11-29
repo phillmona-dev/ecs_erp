@@ -112,7 +112,7 @@ class droga_account_loan_reports_xls(models.TransientModel):
             'text_wrap': 1,
             'fg_color': '#F6F5F5'})
 
-        sheet.merge_range('A' + str(row_start + 1) + ':O' + str(row_start + 1), self.loan_id.company_id.id, header_format)
+        sheet.merge_range('A' + str(row_start + 1) + ':O' + str(row_start + 1), self.loan_id.company_id.name, header_format)
         sheet.merge_range('A' + str(row_start + 2) + ':O' + str(row_start + 2), "LOAN AMORTIZATION", header_format)
         sheet.merge_range('K' + str(row_start + 3) + ':L' + str(row_start + 3), "BANK", )
         sheet.merge_range('M' + str(row_start + 3) + ':M' + str(row_start + 3), self.loan_id['name'].name, )
@@ -153,7 +153,7 @@ class droga_account_loan_reports_xls(models.TransientModel):
       
         #sheet.merge_range('A' + str(row_start + 11) + ':C' + str(row_start + 7), "Contract Date",)
         
-        sheet.merge_range('A' + str(row_start + 3) + ':G' + str(row_start + 3), 'Loan Amount',main_title_format)
+        #sheet.merge_range('A' + str(row_start + 3) + ':G' + str(row_start + 3), 'Loan Amount',main_title_format)
         
         sheet.write(row_start+12, 0, 'Year',title_format)
         sheet.write(row_start + 12, 1, 'Month', title_format)
