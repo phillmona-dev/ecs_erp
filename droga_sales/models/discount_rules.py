@@ -24,11 +24,17 @@ class sale_order_line(models.Model):
 
     price_unit = fields.Float(
         string="Unit Price",
-        compute='_compute_price_unit',
+        compute='_compute_price_unit', inverse='_inverse_price_unit',
         digits='Product Price',
-        store=True, readonly=True, required=True)
+        store=True, required=True)
     price_unit_before_discount=fields.Float('')
     wareh=fields.Many2one('stock.warehouse')
+    is_bought_locally=fields.Boolean(related='product_id.is_bought_locally')
+    price_edited=fields.Boolean('Line edited',default=False)
+
+    def _inverse_price_unit(self):
+        for line in self:
+            line.price_edited=True
 
     @api.onchange('product_id')
     def _get_wh(self):
@@ -64,6 +70,8 @@ class sale_order_line(models.Model):
     def _compute_price_unit(self):
 
         for line in self:
+            if line.price_edited:
+                continue
             if not line.wareh:
                 line.wareh=line.product_id.default_warehouse
 
@@ -126,11 +134,15 @@ class sale_order_line(models.Model):
         if core_rate+all_rate!=0 and not self.order_id.tender_origin_form_tender:
             for lin in self.order_id.order_line.filtered(
                     lambda x: x.product_id.is_core_product ):
+                if lin.price_edited:
+                    continue
                 lin.price_unit=lin.price_unit*(1+((core_rate+all_rate)/100))
 
         if non_core_rate+all_rate!=0 and not self.order_id.tender_origin_form_tender:
             for lin in self.order_id.order_line.filtered(
                 lambda x: not x.product_id.is_core_product ):
+                if lin.price_edited:
+                    continue
                 lin.price_unit = lin.price_unit * (1 + ((non_core_rate + all_rate) / 100))
 
         #self.order_id._get_sub_totals()

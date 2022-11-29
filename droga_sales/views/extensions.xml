@@ -8,7 +8,9 @@
         <field name="arch" type="xml">
             <xpath expr = "//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_uom_readonly']" position = "after">
                 <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
+                <field name="is_bought_locally" string="Warehouse" invisible="1"/>
             </xpath>
+
             <xpath expr = "//form/sheet/notebook/page/group/group/field[@name='note']" position = "replace">
                 <field name="core_sum" string="Core sum" readonly="1"/>
                 <field name="non_core_sum" string="Non-core sum" readonly="1"/>
@@ -17,6 +19,11 @@
             <xpath expr = "//form/header/button[@name='action_draft']" position="after">
                 <button name="store_issue_placement_order" type="object"
                         string="Store placement issue"/>
+            </xpath>
+            <xpath expr = "//form/sheet/group/group/field[@name='partner_id']" position = "after">
+                <field name="pay_type" invisible="1"/>
+                <field name="cash_upfront" attrs="{'invisible': [('pay_type', '=', False)],'readonly': [('state','!=', 'draft')]}"/>
+                <field name="available_amount" attrs="{'invisible': [('pay_type', '=', False)]}" string="Credit balance" options="{'no_create': True}"/>
             </xpath>
         </field>
     </record>

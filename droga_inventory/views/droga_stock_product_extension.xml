@@ -121,6 +121,7 @@
                     <field name="product_variant_id" invisible="1"/>
 
                     <field name="taxes_id" widget="many2many_tags"/>
+                    <field name="is_bought_locally"/>
 
                 </group>
             </xpath>

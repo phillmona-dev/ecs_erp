@@ -94,6 +94,11 @@ class purchase_request_extension(models.Model):
 
 class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
+    list_price = fields.Float(
+        'Sales Price', default=1.0,
+        digits='Product Price',tracking=True,
+        help="Price at which the product is sold to customers.",
+    )
     categ_id = fields.Many2one(
         'product.category', 'Product Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
@@ -132,6 +137,7 @@ class droga_stock_product_extension(models.Model):
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
     is_core_product = fields.Boolean('Is core product for promoters',tracking=True)
+    is_bought_locally = fields.Boolean('Is bought locally', tracking=True,default=False)
     def _get_avg_monthly_consumption(self):
         for rec in self:
             rec.average_month_consumption=0

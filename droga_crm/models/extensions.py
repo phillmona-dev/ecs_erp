@@ -1,5 +1,5 @@
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class cust_contact_extension(models.Model):
@@ -76,3 +76,6 @@ class crm_lead_extension(models.Model):
     def _inverse_phone(self):
         for lead in self:
             lead.contact_custom.mobile = lead.phone
+
+    def unlink(self):
+        raise UserError("You can not delete the record. Please mark it as lost instead.")

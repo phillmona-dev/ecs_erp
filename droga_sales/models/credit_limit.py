@@ -25,12 +25,17 @@ class cust_sales_credit_limit(models.Model):
     _inherit = 'sale.order'
     available_amount=fields.Float(string='Credit balance',related='partner_id.available_amount')
     tender_origin_form = fields.Many2one('droga.tender.master', readonly=True)
+    cash_upfront=fields.Float(string='Cash upfront')
+    pay_type=fields.Boolean(related='payment_term_id.apply_credit_limit')
 
     @api.model
     def create(self, vals):
+
         result = super(cust_sales_credit_limit, self).create(vals)
         for so in result:
-            if so.partner_id.available_amount <so.amount_total and so.payment_term_id.apply_credit_limit:
+            if not so.partner_id.vat:
+                raise ValidationError("Vat must be registered for customer!")
+            if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
         return result
 
@@ -43,7 +48,9 @@ class cust_sales_credit_limit(models.Model):
         result = super(cust_sales_credit_limit, self).action_confirm()
 
         for so in self:
-            if so.partner_id.available_amount <so.amount_total and so.payment_term_id.apply_credit_limit:
+            if not so.partner_id.vat:
+                raise ValidationError("Vat must be registered for customer!")
+            if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
         return result
 
