@@ -12,6 +12,8 @@
              'views/menus.xml',
              'views/reciept.xml',
              'views/payment.xml',
+             
+             'report/loan_amortization.xml',
              'data/crron_interest.xml'],
 
     'installable': True,

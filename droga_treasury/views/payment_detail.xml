@@ -7,18 +7,19 @@
     <field name="model">account.loan.repayment.detail</field>
     <field name="arch" type="xml">
         <tree string="Monthly Postings" editable="bottom" >
-            <field name="reference"/>
             
-            <field name="desc"/>
-            <field name="value_date"/>
-            <field name="principal_repayment"/>
-            <field name="is_interest"/>
+            
+            <field name="desc" width="12"/>
+            <field name="reference" width="11"/>
+            <field name="value_date"  width="11"/>
+            <field name="principal_repayment"  width="11"/>
+            <field name="is_interest"  width="11"/>
                                     
-            <field name="is_penality"/>
-            <field name="total_payment"/>
-            <field name="post"/>
+            <field name="is_penality"  width="11"/>
+            <field name="total_payment"  width="11"/>
+            <field name="post"  width="11"/>
              <button  type="object" name="compute_postt" string="Post"
-                        class="oe_stat_button" icon="fa-file-text"/>
+                        class="oe_stat_button" icon="fa-file-text" />
                                     
         </tree>
     </field>

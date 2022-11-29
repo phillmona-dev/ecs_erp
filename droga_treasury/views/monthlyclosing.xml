@@ -10,7 +10,7 @@
             <field name="acount_monthly_closing_id"/>
             <field name="name"/>
             
-            <field name="et_year" options="{'format': 0}"/>
+            <field name="et_year" />
                                    
             <field name="Principal_payment"  invisible='1'/>
             <field name="Interest_payment"  invisible='1'/>

@@ -40,7 +40,7 @@ class AccountLoan(models.Model):
             current_date = datetime.today()
 
             cday = current_date.date()
-            pe = 0.000000
+            pe = 0.000000000000000
             if record.payment_month:
                 pe = 12/record.payment_month
             record.schedule_numberof_payment = pe
@@ -57,7 +57,7 @@ class AccountLoan(models.Model):
     # @api.depends("payment_month","total_number_of_payment","payment","payment_start_date")
     def compute_schedule(self):
         for record in self:
-            nloop = 0.00
+            nloop = 0.00000000000000
             inte = 0
             dayint = 0.000
             ipay = 0.00000
@@ -132,7 +132,7 @@ class AccountLoan(models.Model):
 
 # Date
     next_payment_date = fields.Date(string="Next Payment Date", readonly=True)
-    payment_start_date = fields.Date("Payment Start Date", required=True,readonly=True)
+    payment_start_date = fields.Date("Payment Start Date",readonly=True)
     interest_renew_date = fields.Date(
         "Interst Renew Date", compute="compute_renew")
     interest_start_date = fields.Date("Interst Start Date", readonly=True)
@@ -153,16 +153,16 @@ class AccountLoan(models.Model):
         'Payments Per Year', compute="_compute_yearr")
     total_number_of_payment = fields.Float(
         'Total Number Of Payments', compute="_compute_yearr")
-    anual_interest_rate = fields.Float('Anual Interst Rate %', required=True)
+    anual_interest_rate = fields.Float('Anual Interst Rate %', required=True,digits=(12, 15))
     daily_interest_rate = fields.Float(
-        'Daily Interst Rate %', compute="_compute_interestdaily", digits=(12, 6))
+        'Daily Interst Rate %', compute="_compute_interestdaily", digits=(12, 15))
 
     current_cumlative_balace = fields.Float('Start Outstanding Balance')
     current_cumlative_interest = fields.Float('Start Outstanding Interest')
     current_interest_total = fields.Float('Current Interest Total')
-    anual_penalit_rate = fields.Float('Anual Penalty Rate %')
+    anual_penalit_rate = fields.Float('Anual Penalty Rate %',digits=(12, 15))
     daily_penalit_rate = fields.Float(
-        'Daily Penalty Rate %', compute="_compute_penalitydaily", digits=(12, 6))
+        'Daily Penalty Rate %', compute="_compute_penalitydaily", digits=(12, 15))
     # schedule_payment_=fields.Float('Schedule Payment')
     grace_period = fields.Float('Grace Period')
     total_interest = fields.Float(
@@ -340,14 +340,14 @@ class AccountLoan(models.Model):
      
     def compute_daily_crons(self):
 
-        interst_amount = 0.000000000000
-        penality_amount = 0.00000000000
-        daily_interest_total = 0.00000000000
+        interst_amount = 0.00000000000000000
+        penality_amount = 0.0000000000000000
+        daily_interest_total = 0.0000000000000000
         
         num = 0
-        rint = 0.00000
-        rpint = 0.00000
-        penal = 0.000000
+        rint = 0.00000000000000000000000
+        rpint = 0.000000000000000000000
+        penal = 0.000000000000000000000
         current_date = datetime.today()
         cday = current_date.date()
         rstatdate = cday
@@ -494,8 +494,8 @@ class AccountLoan(models.Model):
                         acount_int.daily_interest_rate = day_int
                         acount_int.daily_interest_amount = interst_amount
                         acount_int.daily_penality_amount = penality_amount
-                        if penality_amount>0 and acount_int.calculate:
-                            acount_int.daily_penality_amount = penality_amount
+                        #if penality_amount>0 and acount_int.calculate:
+                        #    acount_int.daily_penality_amount = penality_amount
                         acount_int.daily_interest_total = interst_amount+penality_amount
                 da = da + relativedelta(days=1)
 
@@ -678,13 +678,12 @@ class AccountLoan(models.Model):
 
             record.total_interest = itotal+record.current_interest_total
             record.total_penality=ptotal
-            if not record.isinterest:
-                for repay in record.loan_repayment_ids:
+            for repay in record.loan_repayment_ids:
                     # if repay.is_interest:
                     
-                    repaymenti += repay.is_interest
-                    repaymentp+=repay.is_penality
-                ctotal = itotal
+                repaymenti += repay.is_interest
+                repaymentp+=repay.is_penality
+            ctotal = itotal
             value = ctotal-repaymenti
             pctotal=ptotal-repaymentp
 

@@ -30,20 +30,16 @@
 
                             <field name="loan_receipt_ids">
                                 <tree editable="top" edit="1">
-                                    <field name="receipt"/>
-                                    <field name="value_date"/>
-                                    <field name="reference"/>
-                                    <field name="desc"/>
+                                    
+                                    
+                                    <field name="desc"/><field name="reference"/><field name="value_date"/>
+                                    <field name="receipt" />
                                     <field name="post"/>
                                     <button  type="object" name="compute_postt" string="Post"
                                         class="oe_stat_button" icon="fa-file-text"/>
                                 </tree>
                             </field>
-                             <button  type="object" name="compute_daily_crons" string="Calculate Interest"
-                        class="oe_stat_button" icon="fa-file-text"
-                        context="{'default_acount_monthly_closing_id':active_id}"
                        
-                 />
    </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" groups="base.group_user"/>
