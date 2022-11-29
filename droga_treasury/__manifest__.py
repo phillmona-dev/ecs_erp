@@ -12,7 +12,7 @@
              'views/menus.xml',
              'views/reciept.xml',
              'views/payment.xml',
-             
+             'views/loan_closing.xml',
              'report/loan_amortization.xml',
              'data/crron_interest.xml'],
 

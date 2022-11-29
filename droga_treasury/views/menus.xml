@@ -14,11 +14,12 @@
       
     </menuitem>
      <menuitem id="loan_report_menu" name="Report" parent="loan_menu_root" sequence="3">
-        <menuitem id="bank_loan_report_menu" name="Status Summary">
-            <menuitem id="account_loan_report_menu_action" action="account_loan_action_report"/>
-
+        
 
         </menuitem>
+        <menuitem id="bank_loan_report_menu" name="Status Summary" parent="loan_report_menu" sequence="3">
+            <menuitem id="account_loan_report_menu_action" action="account_loan_action_report"/>
+
 
 
     </menuitem>
