@@ -19,7 +19,7 @@ class AccountLoanRepayment(models.Model):
     value_date = fields.Date(string="Value Date")
     
     principal_repayment=fields.Float('Principal Repayment')
-    cumulative_interest  =fields.Float('Cumulative interest',related='acount_loan_id.cumulative_interest')
+    cumulative_interest  =fields.Float('Cumulative Interest',related='acount_loan_id.cumulative_interest')
     is_interest= fields.Float(string='Interest',)
     is_penality= fields.Float(string='Penalty',)
     total_payment= fields.Float(string='Total Payment')

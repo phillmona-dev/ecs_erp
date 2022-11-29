@@ -20,7 +20,8 @@ class AccountLoanConst(models.Model):
         daily_interest_total = 0.0000000000000000
         penal=0.00000000000000000000000000
         current_date = datetime.today()
-        cday = current_date.date()
+        cday = current_date.date()-relativedelta(days=1)
+        curentday=current_date.date
         num=0
         nyear = cday.year
         tern=0
@@ -30,7 +31,7 @@ class AccountLoanConst(models.Model):
         for predone in acount_loan:
             if predone.next_payment_date:
                 predone.remaining_days = (
-                    predone.next_payment_date-cday)/timedelta(days=1)
+                    predone.next_payment_date-curentday)/timedelta(days=1)
                 if predone.remaining_days <0:
                     predone.overdue_days=0-predone.remaining_days
                     
@@ -57,6 +58,10 @@ class AccountLoanConst(models.Model):
                         num = data.id
                 if cday>= predone.interest_start_date:
                     interst_amount=predone.cumulative_balance*predone.anual_interest_rate/36500
+                if predone.isinterest:
+                    amount=predone.cumulative_balance+predone.cumulative_interest+predone.cumulative_penality
+                    interst_amount=amount*predone.anual_interest_rate/36500
+                                
                     if num:
                         renew = self.env['account.loan.renew'].search(
                         [('id', '=', num),('acount_loan_id','=',predone.id)])
@@ -64,6 +69,10 @@ class AccountLoanConst(models.Model):
                             if cday >= renew.renew_start_date:
                                 interst_amount=predone.cumulative_balance*renew.anual_interest_rate/36500
                                 rstatdate = renew.renew_start_date
+                            if predone.isinterest:
+                                amount=predone.cumulative_balance+predone.cumulative_interest+predone.cumulative_penality
+                                interst_amount=amount*renew.anual_interest_rate/36500
+                           
                 penality_amount=0 
                 penality_range = self.env['account.loan.penality.range'].search(
                                     [('id', '>', 0), ('acount_loan_penality_id', '=', predone.id)], order='id')
@@ -257,10 +266,10 @@ class AccountLoanConst(models.Model):
 
             
 
-            # if isinstance(record.id, models.NewId):
-            if loans.contract_date > loans.payment_start_date:
-                raise ValidationError(
-                    "The Payment start date cannot be set in the past of the contract date")
+            if loans.payment_start_date:
+                if loans.contract_date > loans.payment_start_date:
+                    raise ValidationError(
+                        "The Payment start date cannot be set in the past of the contract date")
 
             # if not loans.interest_start_date:
                 #raise ValidationError("Please insert the first receipt")

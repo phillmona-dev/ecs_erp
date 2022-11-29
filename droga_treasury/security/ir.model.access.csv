@@ -11,3 +11,6 @@ access_account_loan_renew,account.loan.renew,model_account_loan_renew,account.gr
 access_account_loan_renews,account.loan.renews,model_account_loan_renews,account.group_account_manager,1,1,1,1
 access_account_loan_penality_range,account.loan.penality.range,model_account_loan_penality_range,account.group_account_manager,1,1,1,1
 access_account_loan_repayment_detail,account.loan.repayment.detail,model_account_loan_repayment_detail,account.group_account_manager,1,1,1,1
+access_droga_account_loan_reports_xls_detail,droga.account.loan.reports.xls,model_droga_account_loan_reports_xls,account.group_account_manager,1,1,1,1
+access_droga_loan_daily_report,droga.loan.daily.report,model_droga_loan_daily_report,account.group_account_manager,1,1,1,1
+

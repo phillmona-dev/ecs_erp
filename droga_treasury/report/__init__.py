@@ -1,0 +1,1 @@
+from . import loan_daily_report,loan_amortization

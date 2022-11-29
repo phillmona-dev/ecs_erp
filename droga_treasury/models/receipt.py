@@ -11,8 +11,8 @@ class AccountLoanReceipt(models.Model):
     _name = 'account.loan.receipt'
     
     receipt=fields.Float('Receipt')
-    cumulative_total = fields.Float(string="Total Receipt")
-    value_date= fields.Date(string="Receipt Date")
+    cumulative_total = fields.Float(string="Tota")
+    value_date= fields.Date(string="Date")
     acount_loan_id = fields.Many2one(comodel_name='account.loan', string="Parent ID")
     posted=fields.Boolean(string="Posted?")
     reference=fields.Char(string='Reference',required=True)
