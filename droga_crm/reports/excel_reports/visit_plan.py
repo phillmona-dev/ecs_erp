@@ -1,4 +1,6 @@
+import base64
 import calendar
+import io
 
 from odoo import api, fields, models
 from io import BytesIO
@@ -36,7 +38,7 @@ class crm_visit_plan_report(models.TransientModel):
         file_io.close()
 
         #The file name is stored under filename
-        datetime_string = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        datetime_string = self.env.cr.now().strftime("%Y%m%d_%H%M%S")
         filename = '%s%s_%s' % ('Visit plan for ',self.visit.descr, datetime_string)
         filename += '%2Exlsx'
 
@@ -116,8 +118,12 @@ class crm_visit_plan_report(models.TransientModel):
             'text_wrap': 1,
             'fg_color': '#F6F5F5'})
 
-        sheet.merge_range('A' + str(row_start + 1) + ':F' + str(row_start + 1), 'Droga Pharma PLC - Daily activity plan', header_format)
-        sheet.merge_range('D' + str(row_start + 2) + ':F' + str(row_start + 2), str(self.visit.userid) + ' : ' + self.visit.city_name.city_descr,main_title_format)
+        if self.env.company.logo_web:
+            company_image=io.BytesIO(base64.b64decode(self.env.company.logo_web))
+            sheet.insert_image(1,5,"test_image.png",{'image_data':company_image,'y_scale':0.7,'y_offset':3})
+
+        sheet.merge_range('A' + str(row_start + 1) + ':F' + str(row_start + 1), 'Droga Pharma P.L.C - Activity plan', header_format)
+        sheet.merge_range('B' + str(row_start + 2) + ':D' + str(row_start + 2), str(self.visit.userid) + ' : ' + self.visit.city_name.city_descr,main_title_format)
         #sheet.merge_range('C' + str(row_start + 3) + ':C' + str(row_start + 3), 'Role...... ',main_title_format)
 
         descr=''
@@ -145,7 +151,7 @@ class crm_visit_plan_report(models.TransientModel):
             descr='Month: '+calendar.month_name[int(self.visit.month)]+', '+self.visit.year
             childs = self.visit.plan_detail
 
-        sheet.merge_range('D' + str(row_start + 3) + ':F' + str(row_start + 3), descr,main_title_format)
+        sheet.merge_range('B' + str(row_start + 3) + ':D' + str(row_start + 3), descr,main_title_format)
 
         sheet.write(row_start + 3, 0, 'Day',title_format)
         sheet.write(row_start + 3, 1, 'Customer', title_format)
@@ -170,11 +176,13 @@ class crm_visit_plan_report(models.TransientModel):
                         count+=1
                     else:
                         count=count+len(c.contacts_schedule)
+                if count>1:
+                    sheet.merge_range('A' + str(row_start + 1) + ':A' + str(row_start + count),
+                                      rec.day_and_date, center_middle_aligned_bold)
+                else:
+                    sheet.write(row_start, 0, rec.day_and_date, center_middle_aligned_bold)
 
-                sheet.merge_range('A' + str(row_start + 1) + ':A' + str(row_start + count),
-                                  rec.day_and_date, center_middle_aligned_bold)
-
-            if len(rec.contacts_schedule)>0:
+            if len(rec.contacts_schedule)>1:
                 sheet.merge_range('B' + str(row_start + 1) + ':B' + str(row_start + (len(rec.contacts_schedule) if len(rec.contacts_schedule)>0 else 1)),
                                   (rec.visit_client.name if rec.visit_client.name else '')+(' - '+rec.visit_client.area.area_name if rec.visit_client.area else ''), center_middle_aligned)
                 sheet.merge_range('C' + str(row_start + 1) + ':C' + str(

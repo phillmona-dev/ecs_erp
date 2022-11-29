@@ -100,6 +100,7 @@ class customer_visit_header(models.Model):
         self.state='requested'
 
     def approve(self):
+        self.ensure_one()
         for det in self.plan_detail:
 
             prods=''
@@ -111,11 +112,13 @@ class customer_visit_header(models.Model):
                 continue
             lead = {
                 'name': descr,
-                'user_id': self.env.user.id,
+                'origin_user_id': self.user_id,
+                'user_id': self.user_id,
                 'team_id': 0,  # Fix me
                 'company_id': self.env.company.id,
                 'type': 'lead',
                 'stage_id': 1,
+                'plan_id':det.id,
                 'expected_revenue': 0,  # Fix me
                 'date_planned': det['visit_date'],
                 'partner_id': det['visit_client'].id,
@@ -137,10 +140,10 @@ class customer_visit_header(models.Model):
                 'res_model_id': self.env.ref('crm.model_crm_lead').id,
                 'res_name':descr,
                 'res_id': lead_created.id,
-                'user_id': self.env.user.id,
+                'user_id': self.user_id,
                 'date_deadline':det['visit_date'],
                 'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
-                'summary': descr,
+                'summary': 'Visit '+descr,
                 'note': descr
             })
 

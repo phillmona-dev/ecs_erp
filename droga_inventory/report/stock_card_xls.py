@@ -42,7 +42,7 @@ class inventory_stock_card_xls(models.TransientModel):
         file_io.close()
 
         #The file name is stored under filename
-        datetime_string = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        datetime_string = self.env.cr.now().strftime("%Y%m%d_%H%M%S")
         filename = '%s_%s_%s' % ('Stock card',self.warehouse.name, datetime_string)
         filename += '%2Exlsx'
 
@@ -181,7 +181,7 @@ class inventory_stock_card_xls(models.TransientModel):
         sheet.set_row(row_start, 30)
         sheet.set_row(row_start+1, 30)
 
-        sheet.merge_range('A'+str(row_start+1)+':L'+str(row_start+1), 'DROGA PHARMA PLC', header_format)
+        sheet.merge_range('A'+str(row_start+1)+':L'+str(row_start+1), 'DROGA PHARMA P.L.C', header_format)
         sheet.merge_range('A'+str(row_start+2)+':L'+str(row_start+2), 'Stock record card', main_title_format)
         sheet.merge_range('A'+str(row_start+3)+':L'+str(row_start+3), 'Product name, strength and dosage form : '+prod.name, parameter_format)
 

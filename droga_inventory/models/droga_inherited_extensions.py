@@ -11,6 +11,23 @@ class droga_location_extension(models.Model):
         ('SAP','Sales placement location')
         ], string='Cons/sample Type')
 
+class droga_stock_picking_type_extension(models.Model):
+    _inherit = 'stock.picking.type'
+    warehouse_code=fields.Char(related='warehouse_id.code')
+
+class droga_stock_move_extension(models.Model):
+    _inherit = 'stock.move'
+
+
+    def createt(self, vals_list):
+        res=super(droga_stock_move_extension, self).create(vals_list)
+
+        so = self.env['sale.order'].search([('name', '=', res.origin)])
+        show = so[0].payment_term_id.deliv_after_payment if len(so) > 0 else False
+        if show:
+            res._do_unreserve()
+        return res
+
 class droga_stock_picking_extension(models.Model):
     _inherit = 'stock.picking'
 
@@ -19,6 +36,17 @@ class droga_stock_picking_extension(models.Model):
     cons_sample_issue_request = fields.Many2one('droga.inventory.consignment.issue','Cons/sample issue request')
     cons_receive_request = fields.Many2one('droga.inventory.consignment.receive','Consignment receive request')
     state = fields.Selection(selection_add=[('processed', 'Processed')])
+    delivery_order_show=fields.Boolean(default=True)
+
+    @api.model
+    def create(self, vals_list):
+        res=super(droga_stock_picking_extension, self).create(vals_list)
+        so=self.env['sale.order'].search([('name','=',res.origin)])
+        show=so[0].payment_term_id.deliv_after_payment if len(so)>0 else False
+        res.do_unreserve()
+        if show:
+            res.delivery_order_show=False
+        return res
 
     def action_purchase_request(self):
         return {
@@ -103,7 +131,7 @@ class droga_stock_product_extension(models.Model):
     emergency_order_point=fields.Float('Emergency order point')
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
-    is_core_product = fields.Boolean('Is core product for promoters')
+    is_core_product = fields.Boolean('Is core product for promoters',tracking=True)
     def _get_avg_monthly_consumption(self):
         for rec in self:
             rec.average_month_consumption=0

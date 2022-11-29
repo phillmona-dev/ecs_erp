@@ -100,7 +100,7 @@
     </record>
 
     <record id = "inventory_of_warehouse_all_read_access" model = "ir.rule">
-        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "name"> Office supplies store can be read from all branches </field>
         <field name = "model_id" search="[('model','=','stock.warehouse')]" />
         <field name = "groups" eval = "[(4, ref ('base.group_user'))]" />
         <field name = "perm_read" eval = "True" />
@@ -113,6 +113,8 @@
 
 
 
+
+
     <record id = "inventory_ms_picking_type_access" model = "ir.rule">
         <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
         <field name = "model_id" search="[('model','=','stock.picking.type')]"/>
@@ -121,7 +123,7 @@
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> [('warehouse_id', '=', 'Medical Supplies Store'),	('name','!=','Operation Manager')] </field>
+        <field name = "domain_force"> [('warehouse_code', '=', 'MS'),	('name','!=','Operation Manager')] </field>
     </record>
 
     <record id = "inventory_li_picking_type_access" model = "ir.rule">
@@ -132,7 +134,7 @@
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> [('warehouse_id', '=', 'Laboratory and Instruments Store'),	('name','!=','Operation Manager')] </field>
+        <field name = "domain_force"> [('warehouse_code', '=', 'LI'),	('name','!=','Operation Manager')] </field>
     </record>
 
     <record id = "inventory_me_picking_type_access" model = "ir.rule">
@@ -143,7 +145,7 @@
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> [('warehouse_id', '=', 'Medical Equipments Store'),	('name','!=','Operation Manager')] </field>
+        <field name = "domain_force"> [('warehouse_code', '=', 'ME'),	('name','!=','Operation Manager')] </field>
     </record>
 
     <record id = "inventory_os_picking_type_access" model = "ir.rule">
@@ -154,7 +156,7 @@
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> [('warehouse_id', '=', 'Orthopedics and SMI Store'),	('name','!=','Operation Manager')] </field>
+        <field name = "domain_force"> [('warehouse_code', '=', 'OS'),	('name','!=','Operation Manager')] </field>
     </record>
 
     <record id = "inventory_md_picking_type_access" model = "ir.rule">
@@ -165,7 +167,7 @@
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> [('warehouse_id', '=', 'Medicine Store'),	('name','!=','Operation Manager')] </field>
+        <field name = "domain_force"> [('warehouse_code', '=', 'MD'),	('name','!=','Operation Manager')] </field>
     </record>
 
     <record id = "inventory_ws_picking_type_access" model = "ir.rule">
@@ -176,7 +178,7 @@
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> [('warehouse_id', '=', 'Wholesale Store'),	('name','!=','Operation Manager')] </field>
+        <field name = "domain_force"> [('warehouse_code', '=', 'WS'),	('name','!=','Operation Manager')] </field>
     </record>
 
     <record id = "inventory_of_picking_type_access" model = "ir.rule">
@@ -187,7 +189,7 @@
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> [('warehouse_id', '=', 'Office supplies Store'),	('name','!=','Operation Manager')] </field>
+        <field name = "domain_force"> [('warehouse_code', '=', 'OF'),	('name','!=','Operation Manager')] </field>
     </record>
 
     <record id = "inventory_om_picking_type_access" model = "ir.rule">
@@ -202,6 +204,21 @@
     </record>
 
 
+
+
+
+
+
+    <record id = "delivery_order_unpaid_hide" model = "ir.rule">
+        <field name = "name"> Delivery orders with deliver_order_show parameter set to false will be hidden </field>
+        <field name = "model_id" search="[('model','=','stock.picking')]"/>
+        <field name = "groups" eval = "[(4, ref ('base.group_user'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('delivery_order_show', '=', True)] </field>
+    </record>
 
 
 </odoo>

@@ -1,3 +1,6 @@
+import base64
+import io
+
 from odoo import api, fields, models
 from io import BytesIO
 import xlsxwriter
@@ -34,7 +37,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         file_io.close()
 
         #The file name is stored under filename
-        datetime_string = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        datetime_string = self.env.cr.now().strftime("%Y%m%d_%H%M%S")
         filename = '%s_%s_%s' % ('Financial proposal ',self.tender_id['ten_name'], datetime_string)
         filename += '%2Exlsx'
 
@@ -56,7 +59,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         sheet.set_column('E:E', 18)
         sheet.set_column('F:F', 18)
         sheet.set_column('G:G', 16)
-        row_start=0
+        row_start=12
         date_format = workbook.add_format({'num_format': 'd mmm yyyy', 'border': 7})
         num_format = workbook.add_format({'num_format': 43, 'border': 7})
         cent_format = workbook.add_format({'num_format': 41, 'border': 7})
@@ -64,10 +67,29 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         bold = workbook.add_format({'bold': True})
         header_format = workbook.add_format({
             'bold': 1,
-            'border': 0,
+            'border': 7,
             'align': 'center',
             'valign': 'vcenter',
             'font_size': 22})
+        medium_header_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 23})
+        big_header_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'left',
+            'valign': 'vcenter',
+            'fg_color': '#d5d5dd',
+            'font_size': 36})
+        small_header_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 16})
         main_title_format = workbook.add_format({
             'bold': 1,
             'border': 0,
@@ -108,6 +130,36 @@ class tender_financial_proposal_master_xls(models.TransientModel):
             'text_wrap': 1,
             'fg_color': '#F6F5F5'})
 
+        if self.env.company.logo_web:
+            company_image=io.BytesIO(base64.b64decode(self.env.company.logo_web))
+            sheet.insert_image(0,5,"test_image.png",{'image_data':company_image,'y_scale':0.4,'y_offset':3})
+
+        sheet.merge_range('A1:G1' ,'Droga Pharma P.L.C',big_header_format)
+        sheet.merge_range('A2:C2', 'Importer and Distributor  For:', medium_header_format)
+
+        sheet.merge_range('A3:C3', 'Medicines', small_header_format)
+        sheet.merge_range('A4:C4', 'Medical Supplies', small_header_format)
+        sheet.merge_range('A5:C5', 'Medical devices', small_header_format)
+        sheet.merge_range('A6:C6', 'Medical Equipments', small_header_format)
+        sheet.merge_range('A7:C7', 'Laboratory Reagents and supplies', small_header_format)
+        sheet.merge_range('A8:C8', 'Laboratory device and equipements', small_header_format)
+        sheet.merge_range('A9:C9', 'Chemicals', small_header_format)
+        sheet.merge_range('A10:C10', 'Preventive healthcare materials', small_header_format)
+
+        sheet.merge_range('A12:C12', 'Ref No:__________________________', small_header_format)
+
+        sheet.merge_range('E2:G2', 'Addis Ketema subcity,Wo 6,H.No:133', small_header_format)
+        sheet.merge_range('E3:G3', 'Office:+251-112-73-45-54', small_header_format)
+        sheet.merge_range('E4:G4', 'Mobile:+2519-13-66-75-37', small_header_format)
+        sheet.merge_range('E5:G5', '             :+2519-29-90-85-65/66', small_header_format)
+        sheet.merge_range('E6:G6', 'Fax:(+251)112-73-52-71', small_header_format)
+        sheet.merge_range('E7:G7', 'E-mail: pharmadroga@gmail.com', small_header_format)
+        sheet.merge_range('E8:G8', '           :contact@drogapharma.com', small_header_format)
+        sheet.merge_range('E9:G9', 'Website:www.drogapharma.com', small_header_format)
+        sheet.merge_range('E10:G10', 'Addis Ababa, Ethiopia', small_header_format)
+
+        sheet.merge_range('E12:G12', 'Date - '+self.env.cr.now().strftime("%B %d,%Y"), small_header_format)
+
         sheet.merge_range('A' + str(row_start + 1) + ':G' + str(row_start + 1), self.tender_id['customer'].name, header_format)
         sheet.merge_range('A' + str(row_start + 2) + ':G' + str(row_start + 2), self.tender_id['procurement_title'],header_format)
         sheet.merge_range('A' + str(row_start + 3) + ':G' + str(row_start + 3), 'Financial proposal',main_title_format)
@@ -119,7 +171,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         sheet.write(row_start + 4, 4, 'Unit price', title_format)
         sheet.write(row_start + 4, 5, 'Total price', title_format)
         sheet.write(row_start + 4, 6, 'Remark', title_format)
-        row_start=5
+        row_start=row_start+5
 
         tot_amount=0
 

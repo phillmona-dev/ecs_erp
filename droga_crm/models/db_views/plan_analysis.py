@@ -10,6 +10,9 @@ class droga_crm_grade_vs_schedule(models.Model):
     user_id = fields.Char('User ID')
     city_descr=fields.Char('City description')
     month=fields.Char('Month')
+    month_des = fields.Char('Month')
+    date_from=fields.Date('Date from')
+    date_to = fields.Date('Date to')
     year=fields.Char('Year')
     state = fields.Char('State')
     cust_name = fields.Char('Customer name')
@@ -45,11 +48,11 @@ class droga_crm_grade_vs_schedule(models.Model):
            create or replace view droga_crm_grade_vs_schedule_view as 
            (
                 select row_number() over () as id,g.* from (
-                select z.userid,y.city_descr,z.month,z.year,z.state,y.name as cust_name,z.id as visit_header_id,y.grade,y.visit_times_per_month as required_visits,(select count(m.*) from droga_customer_visit_detail m where m.visit_header=z.id and m.visit_client=y.id) as planned_visits,y.full_name as customer_type,y.cust_type,y.id as cust_id,z.user_id,(select count(m.*) from droga_customer_visit_detail m where m.visit_header=z.id and m.visit_client=y.id)-y.visit_times_per_month as diff from droga_customer_visit_header z join 
-                (select a.name,b.grade,b.visit_times_per_month,c.full_name,d.city_descr,a.city_name,'Customer' as cust_type,a.id,a.company_id from res_partner a left join droga_cust_grade b on a.cust_grade=b.id left join droga_cust_type c on a.cust_type_ext=c.id left join droga_crm_settings_city d on a.city_name=d.id where a.is_company=true and a.city_name is not null and a.cust_grade is not null) y on y.city_name=z.city_name
+                select z.userid,y.city_descr,z.month,z.year,z.state,y.name as cust_name,z.id as visit_header_id,y.grade,y.visit_times_per_month as required_visits,(select count(m.*) from droga_customer_visit_detail m where m.visit_header=z.id and m.visit_client=y.id) as planned_visits,y.full_name as customer_type,y.cust_type,y.id as cust_id,z.user_id,(select count(m.*) from droga_customer_visit_detail m where m.visit_header=z.id and m.visit_client=y.id)-y.visit_times_per_month as diff,z.date_from as date_from,z.date_to as date_to,TO_CHAR(TO_TIMESTAMP (z.month::text, 'MM'), 'Month') as month_des from droga_customer_visit_header z join 
+                (select a.name,b.grade,b.visit_times_per_month,c.full_name,d.city_descr,a.city_name,'Customer' as cust_type,a.id,a.company_id from res_partner a left join droga_cust_grade b on a.cust_grade=b.id left join droga_cust_type c on a.cust_type_ext=c.id left join droga_crm_settings_city d on a.city_name=d.id where a.is_company=true and a.city_name is not null) y on y.city_name=z.city_name
                 union
-                select z.userid,y.city_descr,z.month,z.year,z.state,y.contact_name as cust_name,z.id as visit_header_id,y.grade,y.visit_times_per_month as required_visits,(select count(m.*) from droga_crm_contacts_schedule m where m.visits_header=z.id and m.contact_custom=y.id) as planned_visits,y.full_name as customer_type,y.cust_type,y.id as cust_id,z.user_id,(select count(m.*) from droga_crm_contacts_schedule m where m.visits_header=z.id and m.contact_custom=y.id)-y.visit_times_per_month as diff from droga_customer_visit_header z join 
-                (select a.parent_name||' - '||a.contact_name as contact_name,b.grade,b.visit_times_per_month,c.full_name,d.city_descr,a.contact_area,'Contact' as cust_type,a.id,a.company_id from droga_crm_contacts a left join droga_cust_grade b on a.cont_grade=b.id left join droga_cust_type c on a.contact_type=c.id left join droga_crm_settings_city d on a.contact_area=d.id where a.contact_area is not null and a.cont_grade is not null) y on y.contact_area=z.city_name) g
+                select z.userid,y.city_descr,z.month,z.year,z.state,y.contact_name as cust_name,z.id as visit_header_id,y.grade,y.visit_times_per_month as required_visits,(select count(m.*) from droga_crm_contacts_schedule m where m.visits_header=z.id and m.contact_custom=y.id) as planned_visits,y.full_name as customer_type,y.cust_type,y.id as cust_id,z.user_id,(select count(m.*) from droga_crm_contacts_schedule m where m.visits_header=z.id and m.contact_custom=y.id)-y.visit_times_per_month as diff,z.date_from as date_from,z.date_to as date_to,TO_CHAR(TO_TIMESTAMP (z.month::text, 'MM'), 'Month') as month_des from droga_customer_visit_header z join 
+                (select a.parent_name||' - '||a.contact_name as contact_name,b.grade,b.visit_times_per_month,c.full_name,d.city_descr,a.contact_area,'Contact' as cust_type,a.id,a.company_id from droga_crm_contacts a left join droga_cust_grade b on a.cont_grade=b.id left join droga_cust_type c on a.contact_type=c.id left join droga_crm_settings_city d on a.contact_area=d.id where a.contact_area is not null) y on y.contact_area=z.city_name) g
 
            )
         """)

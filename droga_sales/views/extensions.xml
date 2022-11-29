@@ -12,6 +12,7 @@
             <xpath expr = "//form/sheet/notebook/page/group/group/field[@name='note']" position = "replace">
                 <field name="core_sum" string="Core sum" readonly="1"/>
                 <field name="non_core_sum" string="Non-core sum" readonly="1"/>
+                <field name="total_discount" string="Total discount" readonly="1"/>
             </xpath>
             <xpath expr = "//form/header/button[@name='action_draft']" position="after">
                 <button name="store_issue_placement_order" type="object"

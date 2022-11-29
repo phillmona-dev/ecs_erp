@@ -401,13 +401,58 @@
                             </tbody>
                         </table>
 
+
+                        <t t-if="o.request_type=='Foregin'">
+                            <div class="row">
+                                <h3>Terms and Conditions</h3>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 bm-2">
+                                    <ol>
+                                        <li>Products should have minimum 80% of its shelf life on arrival at Addis Ababa/Port of entry.</li>
+                                        <li>Language used for writing label, leaflet and other documents shall be English.</li>
+                                        <li>All packing should be suitable for road, air and sea transport under tropical conditions.</li>
+                                        <li>The label of the immediate container should at least include:-
+                                            <ul>
+                                                <li>The name of the product, brand and Generic/INN</li>
+                                                <li>Pharmaceutical dosage form and route of administration.</li>
+                                                <li>Qualitative and quantitative composition of active ingredients</li>
+                                                <li>Quantity in container, Technical directions for use.</li>
+                                                <li>Handling and storage requirements</li>
+                                                <li>Batch number, manufacturing and Expiry dates</li>
+                                                <li>Name and address of the manufacturer</li>
+                                            </ul>
+
+                                        </li>
+                                        <li>Name and address of the manufacturer</li>
+                                        <li>A leaflet in its immediate container should accompany every product.
+                    A leaflet must bear adequate information for use and it should at least include:
+                                            <ul>
+                                                <li>The name of the product: brand and generic/INN</li>
+                                                <li>Description appearance, pharmaceutical dosage form and route of administration.</li>
+                                                <li>Qualitative and quantitative composition of active ingredients</li>
+                                                <li>Clinical pharmacology, indication(s), warnings, precautions, contraindications.</li>
+                                                <li>Adverse reactions/side effects.</li>
+                                                <li>Dosage and administration (directions for use)</li>
+                                                <li>Over dosage, withdrawal time, storage instruction, package quantity, Name and address of Manufacturer.</li>
+                                            </ul>
+                                        </li>
+                                        <li>This purchase order is valid for 90 days shipment and presentation of document from ---------------onwards.</li>
+
+
+                                    </ol>
+                                </div>
+                            </div>
+                        </t>
+
+
                     </div>
                 </t>
             </t>
         </t>
     </template>
 
-    
+
 
 
 

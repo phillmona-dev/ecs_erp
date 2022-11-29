@@ -1,14 +1,16 @@
 import json
 from operator import mod
 from odoo import fields, models, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools.view_validation import READONLY
 from datetime import datetime
 
 
 class droga_stock_office_supplies(models.Model):
     _name = 'droga.inventory.office.supplies.request'
+    _description = "Store Requisition"
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = "name desc"
 
     def _get_employee_id(self):
         # assigning the related employee of the logged in user
@@ -30,6 +32,9 @@ class droga_stock_office_supplies(models.Model):
                                    state={'draft': [('readonly', False)]})
     department = fields.Many2one(
         "hr.department", string="Department", required=True, default=_get_department_id)
+
+    warehouse = fields.Many2one('stock.warehouse')
+
     purpose = fields.Char("Purpose")
 
     detail_entries = fields.One2many(
@@ -40,7 +45,7 @@ class droga_stock_office_supplies(models.Model):
     currency_id = fields.Many2one(
         "res.currency", string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
 
-    #request_reference = fields.Text(string='Request reference', readonly=True)
+    # request_reference = fields.Text(string='Request reference', readonly=True)
     request_picking = fields.One2many('stock.picking', 'office_request')
 
     approvals = fields.One2many(
@@ -56,11 +61,16 @@ class droga_stock_office_supplies(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('cancel', 'Cancelled'),  # When requester cancels it from draft
-        ('waiting', 'Requested'),  # When request is waiting for approval/response
-        ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
+
+        # when the user the submitted the draft request
+        ("submit", "Submitted"),
+        ("verify", "Verified"),  # when the department manger approved it
+        # when the budget department approved the budget
+        ("Budget Approval", "Budget Approved"),
+         ('waiting', 'Waiting'),  # When request is processed
         ('processed', 'Processed'),  # When request is processed
         ('done', 'Received'),  # When request is received
+        ('cancel', 'Cancelled'),  # When requester cancels it from draft
     ], string='Status', default="draft", readonly=True, tracking=True,
         help=" * Requested: The transfer is requested to the sending warehouse.\n"
              " * Done: The transfer is approved and processed.\n")
@@ -79,8 +89,39 @@ class droga_stock_office_supplies(models.Model):
             vals_list['name'] = _name
         return super(droga_stock_office_supplies, self).create(vals_list)
 
+    # submit action
+    def action_submit(self):
+        self.state = "submit"
+
+    # verify request
+    def action_verify(self):
+        self.state = "verify"
+
+    # cancel request
     def action_cancel(self):  # If there is reserved items, cancel them
         self.state = 'cancel'
+
+    # rejet request
+    def action_reject(self):
+        self.state = 'draft'
+
+    # budget checked
+    def action_budget_check(self):
+        # check for budgetary position and expense account
+        for record in self.detail_entries:
+            if not record.budgetary_position.ids or not record.expense_account.ids:
+                return {
+                    'type': 'ir.actions.client',
+                            'tag': 'display_notification',
+                            'params': {
+                                'message': 'Budget category or expense account can''t be empty',
+                                'type': 'danger',
+                                'sticky': False
+                            }
+                }
+
+        self.state = 'Budget Approval'
+        return True
 
     def action_request(self):
 
@@ -105,20 +146,27 @@ class droga_stock_office_supplies(models.Model):
         if not def_dest_id:
             raise UserError(
                 "Default expense location 'Office supplies expense' is not configured for office supplies.")
-        picking_vals = {
-            'partner_id': self.company_id.partner_id.id,
-            'company_id': self.company_id.id,
-            'picking_type_id': pick_type_id,
-            'location_id': def_location_id,
-            'location_dest_id': def_dest_id[0].id,
-            # 'auto_generated': True,
-            'origin': self.name,
-            # 'state': 'draft',
-            'state': 'draft',
-            'office_request': self.id,
-            'scheduled_date': self.request_date
-        }
-        picking_id = self.env['stock.picking'].sudo().create(picking_vals)
+
+        item_lines_available = 0
+        for rec in self.detail_entries:
+            if rec.avaliable_qty != 0:
+                item_lines_available += 1
+
+        if item_lines_available != 0:
+            picking_vals = {
+                'partner_id': self.company_id.partner_id.id,
+                'company_id': self.company_id.id,
+                'picking_type_id': pick_type_id,
+                'location_id': def_location_id,
+                'location_dest_id': def_dest_id[0].id,
+                # 'auto_generated': True,
+                'origin': self.name,
+                # 'state': 'draft',
+                'state': 'draft',
+                'office_request': self.id,
+                'scheduled_date': self.request_date
+            }
+            picking_id = self.env['stock.picking'].sudo().create(picking_vals)
 
         # if not self.request_reference:
         #    self.request_reference = picking_id.name + '\n'
@@ -126,26 +174,116 @@ class droga_stock_office_supplies(models.Model):
         #    self.request_reference = self.request_reference + picking_id.name + '\n'
 
         for rec in self.detail_entries:
-            move_vals = {
-                'picking_id': picking_id.id,
-                'picking_type_id': pick_type_id,
-                'name': picking_id.name,
-                'product_id': rec['product_id'].id,
-                'product_uom': rec['product_uom'].id,
-                'product_uom_qty': rec['product_uom_qty'],
-                'location_id': def_location_id,
-                'location_dest_id': def_dest_id[0].id,
-                # 'state': 'draft',          Confirmed is waiting status
-                'state': 'draft',
-                'company_id': self.company_id.id
-            }
+            if rec['avaliable_qty'] != 0:
+                move_vals = {
+                    'picking_id': picking_id.id,
+                    'picking_type_id': pick_type_id,
+                    'name': picking_id.name,
+                    'product_id': rec['product_id'].id,
+                    'product_uom': rec['product_uom'].id,
+                    'product_uom_qty': rec['avaliable_qty'],
+                    'location_id': def_location_id,
+                    'location_dest_id': def_dest_id[0].id,
+                    # 'state': 'draft',          Confirmed is waiting status
+                    'state': 'draft',
+                    'company_id': self.company_id.id
+                }
 
-            self.env['stock.move'].sudo().create(move_vals)
+                self.env['stock.move'].sudo().create(move_vals)
 
-        self.state = 'waiting'
+        if picking_id.ids:
+           self.state = 'waiting'
 
     def action_receive(self):
         self.state = 'done'
+
+    def action_create_purchase_request(self):
+        if self.state != 'waiting':
+
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                        'message': "You can't create purchase request before the request approved",
+                        'type': 'danger',
+                        'sticky': False
+                }
+            }
+        else:
+            # check if there is no purchase related with the rfq
+            puchase_requests = self.env['droga.purhcase.request'].search(
+                [('store_request_id', '=', self.id), ('state', '!=', 'Cancel')])
+
+            if puchase_requests.ids:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'message': 'Purchase request for the current Store Requisition is already created',
+                        'type': 'danger',
+                        'sticky': False
+                    }
+                }
+
+        items_for_purchase_request = 0
+        for record in self.detail_entries:
+            if record.unavilable_qty != 0:
+                items_for_purchase_request += 1
+
+        if items_for_purchase_request == 0:
+
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                        'message': 'All items are issued, you can’t create purchase requests for issued items',
+                        'type': 'danger',
+                        'sticky': False
+                }
+            }
+        else:
+            # create purchase request
+            vals = {
+                'name': 'New',
+                'state': 'Draft',
+                'request_type': 'Local',
+                'branch': self.branch.id,
+                'request_by': self.requested_by.id,
+                'department': self.department.id,
+                'request_date': self.env.cr.now(),
+                'store_request_id': self.id,
+                'company_id': self.company_id.id,
+
+
+            }
+            vals['purhcase_request_lines'] = []
+
+            for line in self.detail_entries:
+                if line.unavilable_qty != 0:
+                    order_line_vals = (0, 0, {
+                        'product_id': line.product_id.id,
+                        'product_qty': line.unavilable_qty,
+                        'product_uom': line.product_uom.id,
+                        'unit_price': line.unit_price,
+                        'budgetary_position': line.budgetary_position.id,
+                        'expense_account': line.expense_account.id
+
+                    })
+
+                    vals['purhcase_request_lines'].append(order_line_vals)
+
+            # create purchase request
+            purchase_request = self.env['droga.purhcase.request'].create(vals)
+            if purchase_request.ids:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'message': 'Purchase Request created sucessfully!',
+                        'type': 'success',
+                        'sticky': False
+                    }
+                }
 
 
 class droga_stock_transfer_office_supplies_request_detail(models.Model):
@@ -164,7 +302,7 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
         'Request',
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True, state={'done': [('readonly', True)]})
-    #available_qty = fields.Float('Available', readonly=True, compute="get_count")
+    # available_qty = fields.Float('Available', readonly=True, compute="get_count")
 
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
                                   domain="[('category_id', '=', product_uom_category_id)]")
@@ -176,10 +314,21 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     total_price = fields.Float(
         'Total Price', compute="_compute_total", store=True)
 
+    budgetary_position = fields.Many2one("account.budget.post")
+    expense_account = fields.Many2one("account.account")
+
+    remaining_budget = fields.Float(
+        "Remaining Budget", compute="_get_remaining_budget", store=True)
+
+    avaliable_qty = fields.Float("Available Qty")
+    unavilable_qty = fields.Float(
+        "Unavilable Qty", compute="compute_unavilable_qty")
+
     @api.depends('product_uom_qty', 'unit_price')
     def _compute_total(self):
         for record in self:
             record.total_price = record.unit_price*record.product_uom_qty
+            record.avaliable_qty = record.product_uom_qty
 
     # @api.depends( 'product_uom_qty', 'product_id', 'product_uom')
     def get_count(self):
@@ -200,3 +349,38 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
 
     def set_uom(self):
         pass
+
+    @api.onchange('budgetary_position', 'expense_account')
+    def _load_budgetary_position_accounts(self):
+        accounts = self.budgetary_position.account_ids.ids
+        return {'domain': {'expense_account': [('id', 'in', (accounts))]}}
+
+    @api.depends('budgetary_position', 'expense_account')
+    def _get_remaining_budget(self):
+
+        now = datetime.today().date()
+
+        if now.month >= 7 and now.day >= 7:
+            date_from = datetime(now.year, 7, 8)
+            date_to = datetime(now.year+1, 7, 7)
+        else:
+            date_from = datetime(now.year-1, 7, 8)
+            date_to = datetime(now.year, 7, 7)
+
+        for record in self:
+            # get budget from remaining budget
+            if record.budgetary_position.id and record.request_header.branch.id and record.expense_account.id:
+                self.env.cr.execute("""select distinct b.account,a.general_budget_id,a.analytic_account_id,sum(b.remaining_balance) as remaining_balance from crossovered_budget_lines a 
+    inner join crossovered_budget_lines_detail b on a.id=b.budgetary_position_id 
+    where a.general_budget_id=%s and a.analytic_account_id=%s and b.account=%s and (a.date_from>=%s and a.date_to<=%s)
+    group by b.account,a.general_budget_id,a.analytic_account_id """, (record.budgetary_position.id, record.request_header.branch.id, record.expense_account.id, date_from, date_to))
+                res = self.env.cr.dictfetchone()
+
+                # update remaining balance
+                if res != None:
+                    record.remaining_budget = res['remaining_balance']
+
+    @api.depends('avaliable_qty')
+    def compute_unavilable_qty(self):
+        for record in self:
+            record.unavilable_qty = record.product_uom_qty-record.avaliable_qty
