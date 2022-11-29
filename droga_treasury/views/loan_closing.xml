@@ -70,11 +70,11 @@
     
     </record>
     
-    <!-- <record id="account_loan_closing_form_action" model="ir.actions.act_window.view">
+    <record id="account_loan_closing_form_action" model="ir.actions.act_window.view">
            <field name="view_mode">form</field>
            <field name="view_id" ref="account_loan_closing_view_form" />
            <field name="act_window_id" ref="account_loan_closingt_action" />
-    </record>  -->
+    </record> 
     <record id="account_loan_closing_tree_action" model="ir.actions.act_window.view">
            <field name="view_mode">tree</field>
            <field name="view_id" ref="account_loan_closing_view_tree" />
