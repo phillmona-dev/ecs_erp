@@ -10,6 +10,7 @@ class droga_location_extension(models.Model):
         ('SIR', 'Sample to be returned'),
         ('SAP','Sales placement location')
         ], string='Cons/sample Type')
+    wcode=fields.Char(related='warehouse_id.code')
 
 class droga_stock_picking_type_extension(models.Model):
     _inherit = 'stock.picking.type'
@@ -39,12 +40,14 @@ class droga_stock_picking_extension(models.Model):
     delivery_order_show=fields.Boolean(default=True)
     from_wh=fields.Many2one('stock.warehouse',compute='_compute_from_to_warehouse')
     to_wh =fields.Many2one('stock.warehouse',compute='_compute_from_to_warehouse')
-    from_whc=fields.Char(related='from_wh.code')
-    to_whc = fields.Char(related='to_wh.code')
+    from_whc=fields.Char(related='location_id.warehouse_id.code',store=True)
+    to_whc = fields.Char(related='location_dest_id.warehouse_id.code',store=True)
     def _compute_from_to_warehouse(self):
         for rec in self:
             rec.from_wh=self.env['stock.warehouse'].search([('code','=',rec.location_id.location_id.complete_name)]) if (rec.location_id.usage=='internal' and len(self.env['stock.warehouse'].search([('code','=',rec.location_id.location_id.complete_name)]))>0) else None
+            rec.from_whc=rec.from_wh.code
             rec.to_wh = self.env['stock.warehouse'].search([('code', '=', rec.location_dest_id.location_id.complete_name)]) if (rec.location_dest_id.usage == 'internal' and len(self.env['stock.warehouse'].search([('code', '=', rec.location_dest_id.location_id.complete_name)]))>0) else None
+            rec.to_whc = rec.to_wh.code
 
     @api.model
     def create(self, vals_list):

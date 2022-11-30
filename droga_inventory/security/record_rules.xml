@@ -206,97 +206,100 @@
 
 
 
-    
-    
-    
-    
-    
-    
-    
-    <record id = "inventory_ms_picking_type_wh_access" model = "ir.rule">
-        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
-        <field name = "model_id" search="[('model','=','stock.picking')]"/>
+
+
+
+
+
+    <record id = "inventory_ms_warehouse_location_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.location')]"/>
         <field name = "groups" eval = "[(4, ref ('inventory_ms'))]" />
         <field name = "perm_read" eval = "True" />
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> ['|',('from_whc', '=', 'MS'),	('to_whc','=','MS')] </field>
+        <field name = "domain_force"> [('wcode', '=', 'MS')] </field>
     </record>
 
-    <record id = "inventory_li_picking_type_wh_access" model = "ir.rule">
-        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
-        <field name = "model_id" search="[('model','=','stock.picking')]" />
+    <record id = "inventory_li_warehouse_location_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.location')]" />
         <field name = "groups" eval = "[(4, ref ('inventory_li'))]" />
         <field name = "perm_read" eval = "True" />
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> ['|',('from_whc', '=', 'LI'),	('to_whc','=','LI')] </field>
+        <field name = "domain_force"> [('wcode', '=', 'LI')] </field>
     </record>
 
-    <record id = "inventory_me_picking_type_wh_access" model = "ir.rule">
-        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
-        <field name = "model_id" search="[('model','=','stock.picking')]" />
+    <record id = "inventory_me_warehouse_location_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.location')]" />
         <field name = "groups" eval = "[(4, ref ('inventory_me'))]" />
         <field name = "perm_read" eval = "True" />
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> ['|',('from_whc', '=', 'ME'),	('to_whc','=','ME')] </field>
+        <field name = "domain_force"> [('wcode', '=', 'ME')] </field>
     </record>
 
-    <record id = "inventory_os_picking_type_wh_access" model = "ir.rule">
-        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
-        <field name = "model_id" search="[('model','=','stock.picking')]" />
+    <record id = "inventory_os_warehouse_location_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.location')]" />
         <field name = "groups" eval = "[(4, ref ('inventory_os'))]" />
         <field name = "perm_read" eval = "True" />
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> ['|',('from_whc', '=', 'OS'),	('to_whc','=','OS')] </field>
+        <field name = "domain_force"> [('wcode', '=', 'OS')] </field>
     </record>
 
-    <record id = "inventory_md_picking_type_wh_access" model = "ir.rule">
-        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
-        <field name = "model_id" search="[('model','=','stock.picking')]" />
+    <record id = "inventory_md_warehouse_location_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.location')]" />
         <field name = "groups" eval = "[(4, ref ('inventory_md'))]" />
         <field name = "perm_read" eval = "True" />
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> ['|',('from_whc', '=', 'MD'),	('to_whc','=','MD')] </field>
+        <field name = "domain_force"> [('wcode', '=', 'MD')] </field>
     </record>
 
-    <record id = "inventory_ws_picking_type_wh_access" model = "ir.rule">
-        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
-        <field name = "model_id" search="[('model','=','stock.picking')]" />
-        <field name = "groups" eval = "[(4, ref ('inventory_ws'))]" />
-        <field name = "perm_read" eval = "True" />
-        <field name = "perm_write" eval = "True" />
-        <field name = "perm_create" eval = "True" />
-        <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> ['|',('from_whc', '=', 'WS'),	('to_whc','=','WS')] </field>
-    </record>
-
-    <record id = "inventory_of_picking_type_wh_access" model = "ir.rule">
-        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
-        <field name = "model_id" search="[('model','=','stock.picking')]" />
+    <record id = "inventory_of_warehouse_location_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.location')]" />
         <field name = "groups" eval = "[(4, ref ('inventory_of'))]" />
         <field name = "perm_read" eval = "True" />
         <field name = "perm_write" eval = "True" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
-        <field name = "domain_force"> ['|',('from_whc', '=', 'OF'),	('to_whc','=','OF')] </field>
+        <field name = "domain_force"> [('wcode', '=', 'OF')] </field>
+    </record>
+
+    <record id = "inventory_ws_warehouse_location_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.location')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_ws'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('wcode', '=', 'WS')] </field>
     </record>
 
 
-
-
-
     
-    
-    
+    <record id = "inventory_non_internal_warehouse_location_access" model = "ir.rule">
+        <field name = "name"> Delivery orders with deliver_order_show parameter set to false will be hidden </field>
+        <field name = "model_id" search="[('model','=','stock.location')]"/>
+        <field name = "groups" eval = "[(4, ref ('base.group_user'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('usage', 'not in', ['view','internal'])] </field>
+    </record>
     
     
     
@@ -313,6 +316,4 @@
         <field name = "perm_unlink" eval = "True" />
         <field name = "domain_force"> [('delivery_order_show', '=', True)] </field>
     </record>
-
-
 </odoo>

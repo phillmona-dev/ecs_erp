@@ -10,6 +10,14 @@
                 <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
             </xpath>
 
+            <xpath expr = "//form/sheet/div/button[@name='action_preview_sale_order']" position = "before">
+
+                    <button icon="fa-credit-card-alt"
+                        type="object" string=" 1 Matured invoice"
+                        name="action_view_invoice" class="oe_stat_button"/>
+
+            </xpath>
+
             <xpath expr = "//form/sheet/notebook/page/group/group/field[@name='note']" position = "replace">
                 <field name="core_sum" string="Core sum" readonly="1"/>
                 <field name="non_core_sum" string="Non-core sum" readonly="1"/>
