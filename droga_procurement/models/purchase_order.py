@@ -64,20 +64,20 @@ class purchase_order(models.Model):
 
     # shipment
     shipment_date = fields.Date("Estimated Shipment Date")
-    production_completion_date = fields.Date("Estimaed Production Date")
+    production_completion_date = fields.Date("Estimaed Production Completion Date")
 
     # shipment document
-    shipment_scan_copy_doc_recived_date = fields.Date("Scan Copy Recived Date")
+    shipment_scan_copy_doc_recived_date = fields.Date("Shipment Document Scan Copy Recived Date")
     shipment_original_copy_doc_recived_date = fields.Date(
-        "Original Recived Date")
+        "Shipment Document Original Recived Date")
 
     shipment_doc_original_sent_from_supplier = fields.Date(
-        "Original Document Sent from Supplier to Applicant Bank")
+        "Date Original Document Sent from Supplier to Applicant Bank")
     shipment_doc_original_sent_from_supplier_courier = fields.Date(
-        "Original Document Sent from Supplier to Applicant Bank By Courier")
+        "Date Original Document Sent from Supplier to Applicant Bank By Courier")
     document_tracking_number = fields.Char("Courier Tracking No")
     shipment_doc_original_recived_by_applicant_bank = fields.Date(
-        "Original Document Recived by Applicant Bank")
+        "Date Original Document Recived by Applicant Bank")
 
     # shipment lc amount
     exchange_rate_lc_settlement = fields.Float("Exchange Rate", digits=(12, 4))
@@ -85,9 +85,9 @@ class purchase_order(models.Model):
 
     lc_settlement_deposited = fields.Date("LC Settlement Deposited Date")
     shipment_doc_collected_from_applicant_bank = fields.Date(
-        "Original Document Collected from Applicant Bank")
+        "Date Original Document Collected from Applicant Bank")
     shipment_doc_handed_to_finance = fields.Date(
-        "Original Document Handed to Finance")
+        "Date Original Document Handed to Finance")
 
     document_tracking_date = fields.Date("Document Tracking Date")
 
@@ -102,7 +102,7 @@ class purchase_order(models.Model):
     goods_arrival_date_final_destination = fields.Date(
         "Good Arrival Date to Final Destination", help="Good Arrival Date to Final Destination")
 
-    mode_of_transport = fields.Selection([('Air', 'Air'), ('Sea', 'Sea')])
+    mode_of_transport = fields.Selection(related='rfq_id.mod_of_shipment')
     ports = fields.One2many(
         'droga.purchase.arrival.ports', 'purchase_order_id')
 
@@ -148,20 +148,20 @@ class purchase_order(models.Model):
         "Packing List Shared Date to Inventory")
     goods_arrival_date = fields.Date("Goods Arrival Date to Warehouse")
     grn_reconcilation_form_recived_date = fields.Date(
-        "GRN and Reconciliation For Received Date")
+        "GRN and Reconciliation Form Received Date")
     reconcilation_discrepancy = fields.Boolean("Reconciliation Discrepancy")
     discrepancy_comment = fields.Html("Discrepancy Comment")
     discrepancy_action = fields.Html("Discrepancy Action")
     grn_submitted_to_finance = fields.Date("GRN Submission Date to Finance")
     stamped_declaration_recived_date = fields.Date(
         "Final Custom Stamped Invoice & Declaration Recived Date")
-    delinquent_settlement_date = fields.Date("Delinquent Settlement Date")
+    delinquent_settlement_date = fields.Date("NBE Delinquent Settlement Date")
     transistor_service_payment_Amount = fields.Float(
-        "Transistor Service Payment Amount")
+        "Transitor Service Payment Amount")
     container_deposit_reimbursed_date = fields.Date(
         "Container Deposit Reimbursed Date")
     transistor_service_payment_done_date = fields.Date(
-        "Transistor Service Payment Done Date")
+        "Transitor Service Payment Done Date")
 
     # bank
     bank = fields.Many2one("res.bank")
