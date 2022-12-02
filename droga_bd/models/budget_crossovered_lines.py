@@ -63,6 +63,11 @@ class CrossoveredBudgetLines(models.Model):
                             'budget_amount': line[2]['budget_amount']
                         }
                         self.env['crossovered.budget.lines.detail'].create(x)
+
+                # call remaining budget calculator
+                self.env['crossovered.budget.lines.detail'].calculate_remaining_budget_detail(
+                )
+
             else:
                 for account in accounts.account_ids:
                     x = {
@@ -116,6 +121,8 @@ class CrossoveredBudgetLines(models.Model):
 class CrossoveredBudgetLinesDetail(models.Model):
 
     _name = 'crossovered.budget.lines.detail'
+
+    _order = 'account asc'
 
     budgetary_position_id = fields.Many2one('crossovered.budget.lines')
 

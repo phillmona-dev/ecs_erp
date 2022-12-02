@@ -34,6 +34,12 @@
         </field>
     </record>
 
+    <record id="action_import_budget_details" model="ir.actions.client">
+        <field name="name">Budget Import</field>
+        <field name="tag">import</field>
+        <field name="params">{ 'model': 'crossovered.budget.lines'}</field>
+    </record>
+
     <record id="droga_budget_category_detail_action" model="ir.actions.act_window">
         <field name="name">Budget Category</field>
         <field name="res_model">crossovered.budget.lines</field>
@@ -59,6 +65,7 @@
 
             <xpath expr="//div[@class='oe_title']" position="before">
                 <div class="oe_button_box" name="button_box">
+                    <button name="%(action_import_budget_details)d" type="action" string="Import" class="oe_stat_button" icon="fa-list" data-hotkey="v" />
                     <button name="%(droga_budget_category_detail_action)d" type="action" string="Budget" id="budget_category" class="oe_stat_button" icon="fa-list" data-hotkey="v" context="{'default_date_from': date_from,'default_date_to': date_to}"/>
                 </div>
             </xpath>
@@ -165,7 +172,7 @@
                         <page name="name" string="Detail Budget">
                             <field name="budget_line_details" mode="tree">
                                 <tree editable="bottom" >
-                                    <field name="account" width="20" />
+                                    <field name="account" width="20" options="{'no_create':True,'no_open':True}"/>
                                     <field name="budget_amount" width="15" sum="Total"/>
                                     <field name="commitment_budget" width="15" sum="Total" readonly="1"/>
                                     <field name="reallaocation" width="15" sum="Total" readonly="1"/>
