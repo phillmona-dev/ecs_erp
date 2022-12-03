@@ -101,7 +101,6 @@
                     <field name="partner_phone_update" invisible="1"/>
                     <!--<field name="partner_name" string="Opportunity Descr." />-->
                     <field name="phone" string="Mobile" widget="phone"/>
-                    <field name="sales_finished" />
                     <label for="email_from" class="oe_inline"/>
                     <div class="o_row o_row_readonly" invisible="1">
                         <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger"
@@ -165,7 +164,6 @@
             <xpath expr="//kanban" position="attributes">
                 <attribute name="quick_create">False</attribute>
             </xpath>
-
         </field>
     </record>
 
