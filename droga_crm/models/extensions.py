@@ -38,6 +38,7 @@ class crm_lead_extension(models.Model):
     co_travel = fields.Many2many('hr.employee', string='Co-travelers')
     date_planned=fields.Datetime('Lead date')
     origin_user_id=fields.Many2one('res.users')
+    sales_finished=fields.Boolean('Sales finished')
     planned_visit_selection = fields.Selection([
         ('Early Morning', 'Early Morning'),
         ('Late Morning', 'Late Morning'),
