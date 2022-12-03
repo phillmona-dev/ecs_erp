@@ -32,4 +32,3 @@ class droga_crm_contacts(models.Model):
             name=name+record.specialty.specialty+ ' - ' if record.specialty.specialty else name
 
             record.descr= name+record.contact_name
-            

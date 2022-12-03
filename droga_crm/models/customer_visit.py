@@ -1,9 +1,6 @@
 import calendar
 import datetime
 
-from odoo import http
-from odoo.http import request
-
 from odoo.exceptions import ValidationError
 from datetime import timedelta
 
@@ -71,10 +68,6 @@ class customer_visit_header(models.Model):
                                     domain=([('week_num', '=', 'Week-4')]))
     week_5_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
                                     domain=([('week_num', '=', 'Week-5')]))
-    week_5_count=fields.Integer(compute='_get_wk5_count')
-    def _get_wk5_count(self):
-        for rec in self:
-            rec.week_5_count=len(rec.week_5_domain)
 
     def visit_detail_open(self):
         return {
@@ -221,7 +214,6 @@ class customer_visit_header(models.Model):
     @api.model
     def create(self, vals_list):
         res=super().create(vals_list)
-
 
         #custs['cust_grade']['visit_times_per_month']
 

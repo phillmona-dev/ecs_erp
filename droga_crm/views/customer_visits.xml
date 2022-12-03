@@ -57,11 +57,6 @@
                     </div>
                     <notebook>
                         <page string="Week 1 schedule">
-                            <div>
-                                <field name="wk1_from" readonly="1"></field>
-                                    -
-                                <field name="wk1_to" readonly="1"></field>
-                            </div>
                             <field name="week_1_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
@@ -83,11 +78,6 @@
                             </field>
                         </page>
                         <page string="Week 2 schedule">
-                            <div>
-                                <field name="wk2_from" readonly="1"></field>
-                                    -
-                                <field name="wk2_to" readonly="1"></field>
-                            </div>
                             <field name="week_2_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
@@ -109,11 +99,6 @@
                             </field>
                         </page>
                         <page string="Week 3 schedule">
-                            <div>
-                                <field name="wk3_from" readonly="1"></field>
-                                    -
-                                <field name="wk3_to" readonly="1"></field>
-                            </div>
                             <field name="week_3_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
@@ -135,11 +120,6 @@
                             </field>
                         </page>
                         <page string="Week 4 schedule">
-                            <div>
-                                <field name="wk4_from" readonly="1"></field>
-                                    -
-                                <field name="wk4_to" readonly="1"></field>
-                            </div>
                             <field name="week_4_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
@@ -160,13 +140,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <field name="week_5_count" invisible="1"/>
-                        <page string="Week 5 schedule" attrs="{'invisible': [('week_5_count', '=', 0)]}">
-                            <div>
-                                <field name="wk5_from" readonly="1"></field>
-                                    -
-                                <field name="wk5_to" readonly="1"></field>
-                            </div>
+                        <page string="Week 5 schedule">
                             <field name="week_5_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
