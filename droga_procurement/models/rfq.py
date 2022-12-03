@@ -89,14 +89,9 @@ class Rfq(models.Model):
     @api.model
     def create(self, vals):
 
-        request_type = self._context['request_type']
-
-        company_id = vals.get('company_id', self.default_get(
-            ['company_id'])['company_id'])
         # get sequence number for each company
-        self_comp = self.with_company(company_id)
-
-        if request_type == 'Local':
+        self_comp = self.with_company(self.company_id)
+        if self.purhcase_request_id.request_type == 'Local':
             vals['name'] = self_comp.env['ir.sequence'].next_by_code(
                 'droga.purchase.request.rfq.local') or '/'
         else:
@@ -106,9 +101,8 @@ class Rfq(models.Model):
         res = super(Rfq, self_comp).create(vals)
 
         # create status tracking record
-        if request_type == 'Foregin':
-            self.load_items_from_pr(res)
-            self.load_rfq_status(res.id)
+        self.load_items_from_pr(res)
+        self.load_rfq_status(res.id)
 
         return res
 
@@ -700,11 +694,6 @@ class Rfq_Detail(models.Model):
             for record in self:
                 # update suplier
                 record.supplier_id = self.rfq_id.supplier_id
-
-    @api.onchange('product_id')
-    def set_unit(self):
-        for record in self:
-            record.product_uom = record.product_id.uom_id
 
 
 class rfq_foregin_status(models.Model):

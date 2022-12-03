@@ -12,6 +12,7 @@ class BudgetaryPosition(models.Model):
     def create(self, vals):
         return super(BudgetaryPosition, self).create(vals)
 
+    @api.model
     def write(self, vals):
         return super(BudgetaryPosition, self).write(vals)
 
