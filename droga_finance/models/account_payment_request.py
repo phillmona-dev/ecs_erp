@@ -86,6 +86,10 @@ class PaymentRequest(models.Model):
         self.write({'state': 'Approved'})
         return True
 
+    def reject_request(self):
+        self.write({'state': 'Draft'})
+        return True
+
     def cancel_request(self):
         self.write({'state': 'Cancelled'})
         return True

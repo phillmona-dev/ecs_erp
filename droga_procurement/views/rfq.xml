@@ -45,6 +45,20 @@
         </field>
     </record>
 
+    <record id="droga_foreign_currency_request_action1" model="ir.actions.act_window">
+        <field name="name">Currency Request</field>
+        <field name="res_model">droga.account.foreign.currency.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="target">current</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Foreign Currency Request
+            </p>
+        </field>
+    </record>
+
     <!-- tree view -->
     <record id="droga_purhcase_request_rfq_view_tree" model="ir.ui.view">
         <field name="name">droga_purhcase_request_rfq.view.tree</field>

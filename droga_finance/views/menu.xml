@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--actions -->
-    <menuitem id="droag_account_request_froms" name="Request Forms" sequence="30" parent="account_accountant.menu_accounting" groups="droga_finance.self_service_group">
-        <menuitem id="droag_account_payment_request_froms" name="Payment Request" sequence="1" groups="droga_finance.self_service_group">
+    <menuitem id="droag_account_request_froms" name="Request Forms" sequence="30" parent="account_accountant.menu_accounting" groups="account.group_account_manager">
+        <menuitem id="droag_account_payment_request_froms" name="Payment Request" sequence="1" groups="account.group_account_manager">
 
-            <menuitem id="droga_account_payment_request_menu" name="Payment Request" action="droga_account_payment_request_action" groups="droga_finance.self_service_group" sequence="1"/>
-            <menuitem id="droga_account_payment_request_urgent_menu" name="Payment Request Urgent" action="droga_account_payment_request_urgent_action" groups="droga_finance.self_service_group" sequence="2"/>
-            <menuitem id="droga_account_payment_request_withoutpo_menu" name="Payment Request Without PO" action="droga_account_payment_request_withoutpo_action" groups="droga_finance.self_service_group" sequence="3"/>
-            
+            <menuitem id="droga_account_payment_request_menu" name="Payment Request" action="droga_account_payment_request_action" groups="account.group_account_manager" sequence="1"/>
+            <menuitem id="droga_account_payment_request_urgent_menu" name="Payment Request Urgent" action="droga_account_payment_request_urgent_action" groups="account.group_account_manager" sequence="2"/>
+            <menuitem id="droga_account_payment_request_withoutpo_menu" name="Payment Request Without PO" action="droga_account_payment_request_withoutpo_action" groups="account.group_account_manager" sequence="3"/>
+            <menuitem id="droga_account_foreign_currency_request_menu" name="Foreign Currency Request" action="droga_procurement.droga_foreign_currency_request_action1" groups="account.group_account_manager" sequence="6"/>
 
         </menuitem>
     </menuitem>
 
 
     <menuitem id="droga_account_check_followup_menu" name="Check Followup" action="droga_account_check_followup_action" groups="account.group_account_manager" parent="account_accountant.menu_accounting" sequence="10"/>
-    <menuitem id="droga_account_withholding_report_menu" name="Witholding Report" action="droga_finance_reports_withholding_excel_action" groups="account.group_account_manager" parent="account_accountant.menu_accounting" sequence="11"/>
+    <menuitem id="droga_account_transaction_type_menu" name="Transaction Type" action="account_transaction_type_action" groups="account.group_account_manager" parent="account.account_account_menu" sequence="1"/>
+
+
+    <menuitem id="droga_account_withholding_report" parent="account.menu_finance_reports" name="Witholding" groups="account.group_account_manager">
+        <menuitem id="droga_account_withholding_report_menu" name="Witholding Report" action="droga_finance_reports_withholding_excel_action" groups="account.group_account_manager" sequence="1"/>
+    </menuitem>
 </odoo>

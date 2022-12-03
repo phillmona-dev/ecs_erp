@@ -20,8 +20,9 @@ class AccountLoanConst(models.Model):
         daily_interest_total = 0.0000000000000000
         penal=0.00000000000000000000000000
         current_date = datetime.today()
+        cday = current_date.date()#-relativedelta(days=1)
+        curtday=cday
         cday = current_date.date()-relativedelta(days=1)
-        curentday=current_date.date
         num=0
         nyear = cday.year
         tern=0
@@ -29,9 +30,9 @@ class AccountLoanConst(models.Model):
             [('isactive', '=', True)])
 
         for predone in acount_loan:
-            if predone.next_payment_date:
+            if predone.next_payment_date and  predone.isactive==True:
                 predone.remaining_days = (
-                    predone.next_payment_date-curentday)/timedelta(days=1)
+                    predone.next_payment_date-curtday)/timedelta(days=1)
                 if predone.remaining_days <0:
                     predone.overdue_days=0-predone.remaining_days
                     
@@ -48,7 +49,7 @@ class AccountLoanConst(models.Model):
 
 
 
-            if predone.cumulative_balance>0:
+            if predone.cumulative_balance>0 and  predone.isactive==True:
                 acount_sc = self.env['account.loan.renew.schedule'].search(
                     [('id', '>', 0), ('acount_loan_id', '=', predone.id)])
                 acount_renew = self.env['account.loan.renew'].search(
