@@ -59,7 +59,7 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_request_rfq_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}" context="{'request_type':'Local'}"/>
+                        <button name="%(droga_purchase_request_rfq_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Purchase Requistion</span>
@@ -97,7 +97,7 @@
                                     <field name="budgetary_position" required="1" options="{'no_create':True,'no_open':True}" string="Budget Category"/>
                                     <field name="expense_account" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"/>
                                     <field name="remaining_budget" attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}" decoration-danger="total_price &gt; remaining_budget" decoration-success="total_price &lt;= remaining_budget" widget="badge"/>
-                                    <field name="remark" invisible="1"/>
+                                    <field name="remark"/>
                                 </tree>
 
                             </field>
@@ -201,7 +201,7 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_request_rfq_foregin_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-list" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}" context="{'default_currency_id': currency_id,'default_exchange_rate':exchange_rate,'request_type':'Foregin'}"/>
+                        <button name="%(droga_purchase_request_rfq_foregin_action)d" string="RFQ" type="action" class="oe_stat_button" icon="fa-list" attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}" context="{'default_currency_id': currency_id,'default_exchange_rate':exchange_rate}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Purchase Requistion</span>

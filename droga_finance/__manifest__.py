@@ -26,10 +26,8 @@
     'data': [
         'security/account_security.xml',
         'security/ir.model.access.csv',
-        'views/account_payment.xml',
-        'views/account_transaction_type.xml',
-        'views/account.move.xml',
         'views/payment_request.xml',
+        'views/account_payment.xml',
         'report/payment_request.xml',
         'report/account_move.xml',
         'report/withholding_report.xml',

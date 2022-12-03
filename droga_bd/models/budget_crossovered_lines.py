@@ -1,29 +1,4 @@
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
-
-
-class CrossoveredBudget(models.Model):
-    _inherit = "crossovered.budget"
-
-    @api.model
-    def create(self, vals):
-        return super(CrossoveredBudget, self).create(vals)
-
-    def write(self, vals):
-        return super(CrossoveredBudget, self).write(vals)
-
-    def unlink(self):
-        non_zero_lines = 0
-        for record in self:
-            for line in record.crossovered_budget_line:
-                if line.planned_amount != 0 or line.reallaocation_addition != 0 or line.addition != 0:
-                    non_zero_lines += 1
-
-        if non_zero_lines == 0 or self.state == 'cancel':
-            return super(CrossoveredBudget, self).unlink()
-        else:
-            raise ValidationError(
-                "You can't delete budget record, it conatins budget data")
 
 
 class CrossoveredBudgetLines(models.Model):
@@ -42,41 +17,20 @@ class CrossoveredBudgetLines(models.Model):
     @api.model
     def create(self, vals):
         if vals:
-            # validate
-            if 'budget_line_details' in vals:
-                self.validate_budget_lines(vals)
-
             res = super(CrossoveredBudgetLines, self).create(vals)
 
             # get account linked with budgetary position
-
             accounts = self.env['account.budget.post'].search(
                 [('id', '=', vals['general_budget_id'])])
 
-            # when data imported from excel
-            if 'budget_line_details' in vals:
-                for line in vals['budget_line_details']:
-                    if line[2]['account'] not in accounts.account_ids.ids:
-                        x = {
-                            'budgetary_position_id': res.id,
-                            'account': line[2]['account'],
-                            'budget_amount': line[2]['budget_amount']
-                        }
-                        self.env['crossovered.budget.lines.detail'].create(x)
+            for account in accounts.account_ids:
+                x = {
+                    'budgetary_position_id': res.id,
+                    'account': account.id,
+                    'budget_amount': 0
+                }
 
-                # call remaining budget calculator
-                self.env['crossovered.budget.lines.detail'].calculate_remaining_budget_detail(
-                )
-
-            else:
-                for account in accounts.account_ids:
-                    x = {
-                        'budgetary_position_id': res.id,
-                        'account': account.id,
-                        'budget_amount': 0
-                    }
-
-                    self.env['crossovered.budget.lines.detail'].create(x)
+                self.env['crossovered.budget.lines.detail'].create(x)
 
         return res
 
@@ -85,7 +39,7 @@ class CrossoveredBudgetLines(models.Model):
             'droga_bd.crossovered_budget_lines_view_form')
 
         return {
-            'name': 'Budget Detail',
+            'name': 'RFQ',
             'view_mode': 'form',
             'res_model': 'crossovered.budget.lines',
             'view_id': view.id,
@@ -96,33 +50,10 @@ class CrossoveredBudgetLines(models.Model):
 
         }
 
-    def unlink(self):
-        non_zero_lines = 0
-        for record in self:
-            if record.planned_amount != 0 or record.reallaocation_addition != 0 or record.addition != 0:
-                non_zero_lines += 1
-
-        if non_zero_lines == 0:
-            return super(CrossoveredBudgetLines, self).unlink()
-        else:
-            raise ValidationError(
-                "You can't delete budget record, it conatins budget data")
-
-    def validate_budget_lines(self, vals):
-        accounts = self.env['account.budget.post'].search(
-            [('id', '=', vals['general_budget_id'])])
-
-        for line in vals['budget_line_details']:
-            if line[2]['account'] not in accounts.account_ids.ids:
-                raise ValidationError(
-                    "Budget line not found in budget category defination")
-
 
 class CrossoveredBudgetLinesDetail(models.Model):
 
     _name = 'crossovered.budget.lines.detail'
-
-    _order = 'account asc'
 
     budgetary_position_id = fields.Many2one('crossovered.budget.lines')
 
@@ -184,18 +115,6 @@ class CrossoveredBudgetLinesDetail(models.Model):
         # self.calculate_remaining_budget()
         return res
 
-    def unlink(self):
-        non_zero_lines = 0
-        for record in self:
-            if record.budget_amount != 0 or record.reallaocation != 0 or record.addition != 0:
-                non_zero_lines += 1
-
-        if non_zero_lines == 0:
-            return super(CrossoveredBudgetLinesDetail, self).unlink()
-        else:
-            raise ValidationError(
-                "You can't delete budget record, it conatins budget data")
-
     def load_commitment_budget(self):
         budget_lines = self.env['crossovered.budget.lines'].search(
             [('crossovered_budget_state', '!=', 'cancel')])
@@ -222,7 +141,7 @@ class CrossoveredBudgetLinesDetail(models.Model):
                     line.write(
                         {'commitment_budget': account_commitment_budget})
 
-    # to calculate crossovered.budget.lines
+     # to calculate crossovered.budget.lines
 
     def calculate_remaining_budget(self):
 
@@ -337,9 +256,3 @@ class CrossoveredBudgetLinesDetail(models.Model):
                 record.remaining_balance = record.revised_budget-record.actual
             else:
                 record.remaining_balance = record.revised_budget-record.actual
-
-    @api.onchange('account')
-    def on_account_change(self):
-        for record in self:
-            accounts = record.general_budget_id.account_ids.ids
-            return {'domain': {'account': [('id', 'in', (accounts))]}}
