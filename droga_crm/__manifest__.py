@@ -38,6 +38,8 @@
         'reports/doctors_schedule.xml',
         'reports/done_activities.xml',
         'wizards/lead2opp_ext.xml',
+        'views/settings/promotor_sales_master.xml',
+        'views/settings/pro_sales_entry.xml'
     ],
 
     # any module necessary for this one to work correctly
