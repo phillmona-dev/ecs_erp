@@ -22,7 +22,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
-        
+
         'views/credit_limit.xml',
         'views/sales_discount_rules.xml',
         'views/extensions.xml'
