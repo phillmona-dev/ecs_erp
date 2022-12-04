@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
-
+from odoo.http import request
 
 class cust_contact_extension(models.Model):
     _inherit = 'res.partner'

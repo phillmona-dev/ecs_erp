@@ -89,6 +89,6 @@
             name="Monthly plans"
             action="droga_crm_required_vs_planned_menu"
             parent="menu_inq_vist_reports"
-            groups="crm_user"
+            groups="crm_pr"
             sequence="10"/>
 </odoo>

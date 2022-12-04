@@ -41,6 +41,6 @@
             name="Visit plan - Excel"
             action="droga_crm_reports_visit_plan_excel_action"
             parent="menu_excel_vist_reports"
-            groups="crm_user"
+            groups="crm_pr"
             sequence="11"/>
 </odoo>

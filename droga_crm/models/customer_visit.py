@@ -18,6 +18,36 @@ class customer_visit_header(models.Model):
     _name='droga.customer.visit.header'
     _rec_name = 'descr'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    def _get_pr_sales_logged(self):
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        return False if len(ses)==0 else ses[0].pro_id.ids[0]
+
+    pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True)
+    #pr_sales_stored = fields.Many2one('droga.pro.sales.master', string="Promotor ID sto",store=False, compute="_get_pr_sales_logged")
+    pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
+
+    @api.depends('pr_sales_logged')
+    def _is_record_owner(self):
+       for rec in self:
+           if rec.pr_sales==rec.pr_sales_logged:
+               rec.is_record_owner=True
+           else:
+               rec.is_record_owner=False
+
+    is_record_owner=fields.Boolean('Show plan',store=False,compute="_is_record_owner",search="_search_field")
+
+    def _search_field(self, operator, value):
+        if operator=='=':
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            if len(ses)==0:
+                return [('id','in',[])]
+            else:
+                is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
+                is_rec_inside_self=self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
+                return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+        else:
+            return [('id','in',[])]
+
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
     user_id = fields.Char("Promotor ID", default=lambda self: self.env.user.id, readonly=True, required=True)
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
@@ -49,7 +79,7 @@ class customer_visit_header(models.Model):
          ('08', 'August'), ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')], string='Month',required=True)
 
     _sql_constraints = [
-        ('user_month_year_uniq', 'unique (userid,year,month)', 'The combination month/year type already exists!')
+        ('user_month_year_uniq', 'unique (pr_sales,year,month)', 'The combination month/year type for user already exists!')
     ]
 
     def get_years(self):
@@ -86,7 +116,7 @@ class customer_visit_header(models.Model):
             'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_header_view_form').id,
             'type': 'ir.actions.act_window',
             #'context': {'search_default_group_week_no':1,'default_visit_header':self.id},
-            #'domain': [('visit_header', '=', self.id)],
+            #'domain': [('pr_sales', '=', self.pr_sales)],
             #'target': 'new',
             'res_id': self.id,
         }
@@ -220,8 +250,20 @@ class customer_visit_header(models.Model):
 
     @api.model
     def create(self, vals_list):
-        res=super().create(vals_list)
 
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+
+        if len(ses) > 0:
+            if 'pr_sales' in vals_list:
+                vals_list['pr_sales'] = ses[0].pro_id.ids[0]
+            else:
+                vals_list['pr_sales'] = ses[0].pro_id.ids[0]
+        else:
+            raise ValidationError("Promotor/sales must enter to prepare plan.")
+
+        res = super().create(vals_list)
+
+        res.pr_sales=vals_list['pr_sales']
 
         #custs['cust_grade']['visit_times_per_month']
 
@@ -268,7 +310,7 @@ class customer_visit_header(models.Model):
 
     def _get_descr(self):
         for record in self:
-            record.descr= str(record.userid) + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
+            record.descr= record.pr_sales.p_name + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
                 record.year) + ' - ' + record.city_name.city_descr
 
 class customer_visit_detail(models.Model):

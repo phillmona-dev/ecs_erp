@@ -11,8 +11,10 @@
         <field name="name">droga.customer.visit.header.view.tree</field>
         <field name="model">droga.customer.visit.header</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
-                <field name="userid"></field>
+            <tree string="" editable="top" >
+                <field name="pr_sales"></field>
+                <field name="pr_sales_logged" invisible="False"></field>
+                <field name="is_record_owner" invisible="False"/>
                 <field name="month"></field>
                 <field name="year"></field>
                 <field name="city_name" options="{'no_create':True,'no_open':True}"></field>
