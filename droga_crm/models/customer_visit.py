@@ -23,7 +23,6 @@ class customer_visit_header(models.Model):
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
 
     pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True)
-    #pr_sales_stored = fields.Many2one('droga.pro.sales.master', string="Promotor ID sto",store=False, compute="_get_pr_sales_logged")
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
 
     @api.depends('pr_sales_logged')
