@@ -12,12 +12,13 @@ class droga_promotors_sales_master(models.Model):
     p_id = fields.Char('Promotor/Sales ID', required=True)
     type = fields.Selection([('Promotor', 'Promotor'), ('Sales rep', 'Sales rep'), ('Area manager', 'Area manager')],
                             required=True)
+    employee_access_users=fields.Many2one('res.users',string='Login user')
 
 
 
 class droga_promotors_sales_detail_visit(models.Model):
     _name = 'droga.pro.sales.master.visit'
-    pro_id = fields.Many2one('droga_pro_sales_master', string='Promotor/Sales full name')
+    pro_id = fields.Many2one('droga.pro.sales.master', string='Promotor/Sales full name')
     s_id = fields.Char('Session ID')
 
 

@@ -48,7 +48,7 @@ class customer_visit_header(models.Model):
             return [('id','in',[])]
 
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
-    user_id = fields.Char("Promotor ID", default=lambda self: self.env.user.id, readonly=True, required=True)
+    user_id = fields.Char("P.ID", default=lambda self: self.env.user.id, readonly=True, required=True)
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
     city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city',required=True)
     descr=fields.Char('Visit description',compute='_get_descr')
@@ -56,16 +56,16 @@ class customer_visit_header(models.Model):
     date_from=fields.Date('Date from')
     date_to = fields.Date('Date to')
 
-    wk1_from = fields.Date('wk from')
-    wk1_to = fields.Date('wk to')
-    wk2_from = fields.Date('wk from')
-    wk2_to = fields.Date('wk to')
-    wk3_from = fields.Date('wk from')
-    wk3_to = fields.Date('wk to')
-    wk4_from = fields.Date('wk from')
-    wk4_to = fields.Date('wk to')
-    wk5_from = fields.Date('wk from')
-    wk5_to = fields.Date('wk to')
+    wk1_from = fields.Date('wk1 from')
+    wk1_to = fields.Date('wk1 to')
+    wk2_from = fields.Date('wk2 from')
+    wk2_to = fields.Date('wk2 to')
+    wk3_from = fields.Date('wk3 from')
+    wk3_to = fields.Date('wk3 to')
+    wk4_from = fields.Date('wk4 from')
+    wk4_to = fields.Date('wk4 to')
+    wk5_from = fields.Date('wk5 from')
+    wk5_to = fields.Date('wk5 to')
     #state=fields.Selection([('new','New'),('draft','Draft'),('requested','Requested')('approved','Approved')],readonly=True,default='new',string='State')
     state = fields.Selection([
         ('draft', 'Draft'),

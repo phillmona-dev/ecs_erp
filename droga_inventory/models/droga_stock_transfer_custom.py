@@ -23,8 +23,7 @@ class droga_stock_transfer_custom(models.Model):
     cons_ref = fields.One2many('stock.picking', 'trans_issue_request')
     detail_entries = fields.One2many('droga.inventory.transfer.custom.detail', 'transfer_header')
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     location_dest_id = fields.Many2one(
         'stock.location', "Destination location",
@@ -155,8 +154,7 @@ class droga_stock_transfer_custom_detail(models.Model):
     _name = 'droga.inventory.transfer.custom.detail'
     transfer_header = fields.Many2one('droga.inventory.transfer.custom', required=True)
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     location_source_id = fields.Many2one(
         'stock.location', "Source location",
         check_company=True,

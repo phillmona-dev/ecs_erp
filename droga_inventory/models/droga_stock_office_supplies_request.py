@@ -40,8 +40,7 @@ class droga_stock_office_supplies(models.Model):
     detail_entries = fields.One2many(
         'droga.inventory.office.supplies.request.detail', 'request_header')
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     currency_id = fields.Many2one(
         "res.currency", string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
 
@@ -291,8 +290,7 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     request_header = fields.Many2one(
         'droga.inventory.office.supplies.request', required=True)
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     product_id = fields.Many2one(
         'product.product', 'Product',
         check_company=True,

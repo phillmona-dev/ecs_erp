@@ -24,8 +24,7 @@ class ModelName(models.Model):
     competitor=fields.Many2one('droga.tender.settings.competitor',string='Competitor')
     currency=fields.Many2one('res.currency',string='Currency')
     submission_id = fields.Many2one('droga.tender.submission.detail')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
 
     #selection fields

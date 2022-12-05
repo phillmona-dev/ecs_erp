@@ -14,6 +14,7 @@
             <tree string="" editable="top">
                 <field name="p_name"></field>
                 <field name="s_name"></field>
+                <field name="employee_access_users"></field>
                 <field name="p_id"></field>
                 <field name="type"></field>
             </tree>

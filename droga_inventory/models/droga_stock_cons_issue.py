@@ -21,15 +21,14 @@ class droga_stock_cons_issue(models.Model):
         help=" * Requested: The consignment issue order is sent to warehouse.\n"
              " * Done: The consignment items are issued from warehouse.\n")
 
-    issue_type = fields.Selection([('CONI', 'Consignment'),('SAP','Sales placement issue'), ('SIF', 'Free sample'),('SIR', 'Sample to be returned')],string='Issue type',requird=True)
+    issue_type = fields.Selection([('CONI', 'Consignment'),('SAP','Sales placement issue'), ('SIF', 'Free sample'),('SIR', 'Sample to be returned')],string='Issue type', required=True)
     #SIF - Sample issue free        -   This will post under expense account (transfer to sample location)
     #SIR - Sample issue to return   -   This will post under sample receivable
     #CONI - Consignment issue       -   This will post under consignment receivable (transfer to consignment location)
 
     detail_entries = fields.One2many('droga.inventory.cons.issue.detail', 'cons_header')
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     issue_date = fields.Datetime('Issue Date', default=fields.Datetime.now,
                                    state={'draft': [('readonly', False)]})
@@ -131,8 +130,7 @@ class droga_stock_cons_issue_detail(models.Model):
         ('done', 'Processed'),  # When request is processed
     ], string='Status', default="draft", related='cons_header.state')
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     warehouse_id = fields.Many2one(
         'stock.warehouse', "Issuer warehouse",
         required=True, check_company=True,

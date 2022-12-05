@@ -47,8 +47,7 @@ class droga_tender_submission_detail(models.Model):
     incoterm=fields.Many2one('droga.tender.settings.incoterm','Incoterm')
     tender_specs=fields.One2many('droga.tender.specs.detail','submission_detail')
     competi_id = fields.One2many('droga.tender.competitors', 'submission_id')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     detail_performance = fields.One2many('droga.tender.performance.evaluation', 'parent_tender_performance_detail')
 
     # Date fields

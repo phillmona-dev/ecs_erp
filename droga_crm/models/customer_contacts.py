@@ -23,8 +23,7 @@ class droga_crm_contacts(models.Model):
     cont_grade = fields.Many2one('droga.cust.grade', string='Contact grade')
 
     days=fields.Many2many('droga.crm.settings.day',string='Day')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     def _get_descr(self):
         for record in self:

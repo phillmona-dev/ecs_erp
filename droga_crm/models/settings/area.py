@@ -9,8 +9,7 @@ class droga_crm_settings_area(models.Model):
     area_name = fields.Char("Area name",required=True)
     area_descr = fields.Char("Area description",required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     def name_get(self):
         result = []
