@@ -92,7 +92,8 @@ class purhcase_request(models.Model):
     branch = fields.Many2one("account.analytic.account", string="Cost Center", domain=[
                              ('plan_id', '=', 'Profit Center')])
 
-    total_amount = fields.Float("Total Amount",compute="compute_total_purchase_amount",store=True)
+    total_amount = fields.Float(
+        "Total Amount", compute="compute_total_purchase_amount", store=True)
 
     @api.depends("department")
     def _get_manager_id(self):
@@ -311,8 +312,9 @@ class purhcase_request_line(models.Model):
 
     @api.onchange('budgetary_position', 'expense_account')
     def _load_budgetary_position_accounts(self):
-        accounts = self.budgetary_position.account_ids.ids
-        return {'domain': {'expense_account': [('id', 'in', (accounts))]}}
+        for record in self:
+            accounts = record.budgetary_position.account_ids.ids
+            return {'domain': {'expense_account': [('id', 'in', (accounts))]}}
 
     @api.depends('product_qty', 'expected_average_mon_cons', 'current_stock_balance')
     def _consumption_total(self):

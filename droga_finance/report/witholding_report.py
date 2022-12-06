@@ -48,16 +48,16 @@ class WitholdingReport(models.TransientModel):
     def generate_xlsx_report(self, workbook):
         sheet = workbook.add_worksheet('Witholding Report')
 
-        sheet.set_column('A:A', 30)
-        sheet.set_column('B:B', 30)
+        sheet.set_column('A:A', 25)
+        sheet.set_column('B:B', 15)
         sheet.set_column('C:C', 30)
-        sheet.set_column('D:D', 30)
-        sheet.set_column('E:E', 30)
-        sheet.set_column('F:F', 30)
-        sheet.set_column('G:G', 30)
+        sheet.set_column('D:D', 15)
+        sheet.set_column('E:E', 15)
+        sheet.set_column('F:F', 20)
+        sheet.set_column('G:G', 20)
         row_start = 0
         date_format = workbook.add_format(
-            {'num_format': 'd mmm yyyy', 'border': 7})
+            {'num_format': 'dd/mm/yyyy', 'border': 7})
         num_format = workbook.add_format({'num_format': 43, 'border': 7})
         cent_format = workbook.add_format({'num_format': 41, 'border': 7})
         border = workbook.add_format({'border': 7})
@@ -109,12 +109,12 @@ class WitholdingReport(models.TransientModel):
             'fg_color': '#F6F5F5'})
 
         # search RFQ
-        
+
         account_moves = self.env['account.move'].search(
             [('date', '>=', self.date_from), ('date', '<=', self.date_to), ('company_id', '=', self.company_id.id)])
 
         accounts = self.env['account.account'].search(
-            [('code', 'in', ('214003','214004'))])
+            [('code', 'in', ('214003', '214004'))])
 
         withholdings = account_moves.line_ids.search(
             [('account_id', 'in', accounts.ids)])
@@ -124,16 +124,21 @@ class WitholdingReport(models.TransientModel):
         sheet.write(row_start, 2, 'Withholdee''s Name', title_format)
         sheet.write(row_start, 3, 'Receipt No', title_format)
         sheet.write(row_start, 4, 'Receipt Date', title_format)
-        sheet.write(row_start, 5, 'Taxable Amount', num_format)
-        sheet.write(row_start, 6, 'Tax Withheld', num_format)
+        sheet.write(row_start, 5, 'Taxable Amount', title_format)
+        sheet.write(row_start, 6, 'Tax Withheld', title_format)
         row_start += 1
 
         for record in withholdings:
+            # get witholde name and tin no
+            witholdee_name = record.partner_id.name if record.partner_id.vat else ''
+            witholdee_tin = record.partner_id.vat if record.partner_id.vat else ''
+            reciept_no = record.ref if record.ref else ''
+
             sheet.write(row_start, 0, "9063340002")
-            sheet.write(row_start, 1, "XXXXXXXXXXX")
-            sheet.write(row_start, 2, "Droga")
-            sheet.write(row_start, 3, record.move_name, border)
-            sheet.write(row_start, 4, record.date, border)
-            sheet.write(row_start, 5, record.tax_base_amount, border)
-            sheet.write(row_start, 6, record.balance, border)
+            sheet.write(row_start, 1, witholdee_tin)
+            sheet.write(row_start, 2, witholdee_name)
+            sheet.write(row_start, 3, reciept_no, border)
+            sheet.write(row_start, 4, record.date, date_format)
+            sheet.write(row_start, 5, record.tax_base_amount, num_format)
+            sheet.write(row_start, 6, record.balance, num_format)
             row_start += 1
