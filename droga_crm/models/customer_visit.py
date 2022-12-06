@@ -1,6 +1,9 @@
 import calendar
 import datetime
 
+from odoo import http
+from odoo.http import request
+
 from odoo.exceptions import ValidationError
 from datetime import timedelta
 
@@ -15,8 +18,39 @@ class customer_visit_header(models.Model):
     _name='droga.customer.visit.header'
     _rec_name = 'descr'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    def _get_pr_sales_logged(self):
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        return False if len(ses)==0 else ses[0].pro_id.ids[0]
+
+    pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True)
+    pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
+    pr_avail_areas=fields.Many2many(related='pr_sales.p_regions')
+
+
+    @api.depends('pr_sales_logged')
+    def _is_record_owner(self):
+       for rec in self:
+           if rec.pr_sales==rec.pr_sales_logged:
+               rec.is_record_owner=True
+           else:
+               rec.is_record_owner=False
+
+    is_record_owner=fields.Boolean('Show plan',store=False,compute="_is_record_owner",search="_search_field")
+
+    def _search_field(self, operator, value):
+        if operator=='=':
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            if len(ses)==0:
+                return [('id','in',[])]
+            else:
+                is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
+                is_rec_inside_self=self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
+                return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+        else:
+            return [('id','in',[])]
+
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
-    user_id = fields.Char("Promotor ID", default=lambda self: self.env.user.id, readonly=True, required=True)
+    user_id = fields.Char("P.ID", default=lambda self: self.env.user.id, readonly=True, required=True)
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
     city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city',required=True)
     descr=fields.Char('Visit description',compute='_get_descr')
@@ -24,16 +58,16 @@ class customer_visit_header(models.Model):
     date_from=fields.Date('Date from')
     date_to = fields.Date('Date to')
 
-    wk1_from = fields.Date('wk from')
-    wk1_to = fields.Date('wk to')
-    wk2_from = fields.Date('wk from')
-    wk2_to = fields.Date('wk to')
-    wk3_from = fields.Date('wk from')
-    wk3_to = fields.Date('wk to')
-    wk4_from = fields.Date('wk from')
-    wk4_to = fields.Date('wk to')
-    wk5_from = fields.Date('wk from')
-    wk5_to = fields.Date('wk to')
+    wk1_from = fields.Date('wk1 from')
+    wk1_to = fields.Date('wk1 to')
+    wk2_from = fields.Date('wk2 from')
+    wk2_to = fields.Date('wk2 to')
+    wk3_from = fields.Date('wk3 from')
+    wk3_to = fields.Date('wk3 to')
+    wk4_from = fields.Date('wk4 from')
+    wk4_to = fields.Date('wk4 to')
+    wk5_from = fields.Date('wk5 from')
+    wk5_to = fields.Date('wk5 to')
     #state=fields.Selection([('new','New'),('draft','Draft'),('requested','Requested')('approved','Approved')],readonly=True,default='new',string='State')
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -46,7 +80,7 @@ class customer_visit_header(models.Model):
          ('08', 'August'), ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')], string='Month',required=True)
 
     _sql_constraints = [
-        ('user_month_year_uniq', 'unique (userid,year,month)', 'The combination month/year type already exists!')
+        ('user_month_year_uniq', 'unique (pr_sales,year,month)', 'The combination month/year type for user already exists!')
     ]
 
     def get_years(self):
@@ -68,6 +102,10 @@ class customer_visit_header(models.Model):
                                     domain=([('week_num', '=', 'Week-4')]))
     week_5_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
                                     domain=([('week_num', '=', 'Week-5')]))
+    week_5_count=fields.Integer(compute='_get_wk5_count')
+    def _get_wk5_count(self):
+        for rec in self:
+            rec.week_5_count=len(rec.week_5_domain)
 
     def visit_detail_open(self):
         return {
@@ -79,7 +117,7 @@ class customer_visit_header(models.Model):
             'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_header_view_form').id,
             'type': 'ir.actions.act_window',
             #'context': {'search_default_group_week_no':1,'default_visit_header':self.id},
-            #'domain': [('visit_header', '=', self.id)],
+            #'domain': [('pr_sales', '=', self.pr_sales)],
             #'target': 'new',
             'res_id': self.id,
         }
@@ -113,6 +151,7 @@ class customer_visit_header(models.Model):
             if len(det['contacts_schedule'])<1:
                 lead = {
                     'name': descr,
+                    'pr_sales':self.pr_sales.id,
                     'origin_user_id': self.user_id,
                     'user_id': self.user_id,
                     'team_id': 0,  # Fix me
@@ -147,6 +186,7 @@ class customer_visit_header(models.Model):
                         'name': descr,
                         'origin_user_id': self.user_id,
                         'user_id': self.user_id,
+                        'pr_sales': self.pr_sales.id,
                         'team_id': 0,  # Fix me
                         'phone':contdet['contact_custom']['mobile'] if contdet['contact_custom'] else None,
                         'company_id': self.env.company.id,
@@ -213,7 +253,20 @@ class customer_visit_header(models.Model):
 
     @api.model
     def create(self, vals_list):
-        res=super().create(vals_list)
+
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+
+        if len(ses) > 0:
+            if 'pr_sales' in vals_list:
+                vals_list['pr_sales'] = ses[0].pro_id.ids[0]
+            else:
+                vals_list['pr_sales'] = ses[0].pro_id.ids[0]
+        else:
+            raise ValidationError("Promotor/sales must enter to prepare plan.")
+
+        res = super().create(vals_list)
+
+        res.pr_sales=vals_list['pr_sales']
 
         #custs['cust_grade']['visit_times_per_month']
 
@@ -260,7 +313,7 @@ class customer_visit_header(models.Model):
 
     def _get_descr(self):
         for record in self:
-            record.descr= str(record.userid) + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
+            record.descr= record.pr_sales.p_name + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
                 record.year) + ' - ' + record.city_name.city_descr
 
 class customer_visit_detail(models.Model):

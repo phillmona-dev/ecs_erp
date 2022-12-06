@@ -20,8 +20,7 @@ class droga_tender_master(models.Model):
     name=fields.Char(related='parent_tender_contract.ten_id')
     performance_security = fields.One2many('droga.tender.security.detail', 'performance_security')
     advance_security = fields.One2many('droga.tender.security.detail', 'advance_security')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     #date fields
     signing_date = fields.Date("Signing date GRE")

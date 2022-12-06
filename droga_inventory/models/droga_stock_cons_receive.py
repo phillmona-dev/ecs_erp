@@ -23,8 +23,7 @@ class droga_stock_cons_receive(models.Model):
 
     detail_entries = fields.One2many('droga.inventory.cons.receive.detail', 'cons_header')
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     receipt_date = fields.Datetime('Receipt Date', default=fields.Datetime.now,
                                    state={'draft': [('readonly', False)]})
@@ -113,8 +112,7 @@ class droga_stock_cons_receive(models.Model):
 class droga_stock_cons_receive_detail(models.Model):
     _name = 'droga.inventory.cons.receive.detail'
     cons_header = fields.Many2one('droga.inventory.consignment.receive', required=True)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     warehouse_id = fields.Many2one(
         'stock.warehouse', "Receipt warehouse",
         required=True, check_company=True,

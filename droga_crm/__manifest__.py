@@ -21,6 +21,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'security/record_rules.xml',
         'reports/excel_reports/visit_plan.xml',
         'reports/core_products.xml',
         'views/cust_extension.xml',
@@ -38,12 +39,14 @@
         'reports/doctors_schedule.xml',
         'reports/done_activities.xml',
         'wizards/lead2opp_ext.xml',
+        'views/settings/promotor_sales_master.xml',
+        'views/settings/pro_sales_entry.xml'
     ],
 
     # any module necessary for this one to work correctly
 
     'depends': ['base','hr',
-                'mail','stock',
+                'mail','stock','http_routing','sale',
                 'resource','stock','droga_inventory',
                 'web', 'crm'],
     "license": "AGPL-3",

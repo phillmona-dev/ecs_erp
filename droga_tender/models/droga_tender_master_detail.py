@@ -12,8 +12,7 @@ class droga_tender_master_detail(models.Model):
     # relational fields
     type_item = fields.Many2many('droga.tender.settings.type.item', string='Type or items')
     parent_tender=fields.Many2one('droga.tender.master',required=True)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     def bid_detail(self):
         return {

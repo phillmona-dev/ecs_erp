@@ -15,8 +15,7 @@ class ModelName(models.Model):
     security_type=fields.Many2one('droga.tender.settings.sec.type','Security Type')
     security_for=fields.Char('Security for')
     bank = fields.Many2one('res.bank', 'Bank')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     #date fields
     issue_date=fields.Date('Issue date')

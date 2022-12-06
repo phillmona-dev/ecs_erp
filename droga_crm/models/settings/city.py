@@ -10,8 +10,7 @@ class droga_crm_settings_city(models.Model):
     city_name = fields.Char("City/sub-city name",required=True)
     city_descr = fields.Char("City/sub-city description",required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
-                                 state={'done': [('readonly', True)]})
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     def name_get(self):
         result = []

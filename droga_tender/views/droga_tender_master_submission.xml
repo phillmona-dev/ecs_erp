@@ -75,7 +75,7 @@
                                         <field name="quantity"/>
                                         <field name="supplier_new"/>
                                         <field name="brand_model"/>
-                                        <field name="country" options="{'no_create':True,'no_open':True}"/>
+                                        <field name="country" string="Country" options="{'no_create':True,'no_open':True}"/>
                                         <field name="expiry_date"/>
                                         <field name="deliv_period_text"/>
                                         <field name="tech_result"/>
@@ -128,7 +128,7 @@
                                         <field name="type_item" options="{'no_create':True,'no_open':True}"/>
                                         <field name="item_pro"/>
                                         <field name="droga_product"/>
-                                        <button icon="fa-edit" type="object" attrs="{'invisible': [('droga_product', '!=', False)]}"
+                                        <button icon="fa-edit" string="" type="object" attrs="{'invisible': [('droga_product', '!=', False)]}"
                                                 name="reg_products" class="oe_stat_button"/>
                                         <field name="ordered_qty"/>
                                         <field name="delivered_qty"/>
