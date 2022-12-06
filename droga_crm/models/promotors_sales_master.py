@@ -13,6 +13,7 @@ class droga_promotors_sales_master(models.Model):
     p_regions =fields.Many2many('droga.crm.settings.city', required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],
                             required=True)
+    is_pr_sales=fields.Boolean('Is PR/Sales')
     employee_access_users=fields.Many2one('res.users',string='Login user',required=True)
 
 

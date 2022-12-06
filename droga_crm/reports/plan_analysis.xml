@@ -9,7 +9,7 @@
             <tree string="" expand="1" create="0">
                 <field name="cust_type"></field>
                 <field name="visit_header_id" invisible="1"></field>
-                <field name="userid" invisible="1"></field>
+                <field name="pr_sales" invisible="1"></field>
                 <field name="cust_name"></field>
                 <field name="customer_type"></field>
                 <field name="grade"></field>
@@ -30,7 +30,7 @@
             <tree string="" expand="1" create="0">
                 <field name="cust_type"></field>
                 <field name="visit_header_id" invisible="1"></field>
-                <field name="userid"></field>
+                <field name="pr_sales"></field>
                 <field name="cust_name"></field>
                 <field name="month" invisible="1"></field>
                 <field name="date_from"></field>
@@ -55,6 +55,7 @@
             <search>
                 <field name="cust_type"></field>
                 <field name="cust_name"></field>
+                <field name="pr_sales"></field>
                 <field name="customer_type"></field>
                 <field name="grade"></field>
                 <field name="required_visits"></field>

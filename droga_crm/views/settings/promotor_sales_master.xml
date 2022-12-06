@@ -17,6 +17,7 @@
                 <field name="employee_access_users" options="{'no_create':True,'no_open':True}"></field>
                 <field name="p_regions" widget="many2many_tags" string="City/sub-city" options="{'no_create':True,'no_open':True}"></field>
                 <field name="p_id"></field>
+                <field name="is_pr_sales"></field>
                 <field name="status"></field>
             </tree>
         </field>

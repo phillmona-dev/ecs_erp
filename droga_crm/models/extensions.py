@@ -57,7 +57,8 @@ class crm_lead_extension(models.Model):
     def _get_pr_sales_logged(self):
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
-    pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True)
+    pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True,tracking=True)
+    pr_lead = fields.Many2one('droga.pro.sales.master',default=_get_pr_sales_logged)
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     def _get_areas(self):
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])

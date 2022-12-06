@@ -22,3 +22,4 @@ access_droga_crm_reports_visit_log,droga_crm.droga_crm_reports_visit_log,model_d
 access_droga_crm_done_activity,droga_crm.droga_crm_done_activity,model_droga_crm_done_activity,droga_crm.crm_pr,1,1,1,1
 access_droga_pro_sales_master_entry_visit,droga_crm.droga_pro_sales_master_entry_visit,model_droga_pro_sales_master_entry_visit,droga_crm.crm_pr,1,1,1,1
 access_droga_sale_order,sale.sale_order,sale.model_sale_order,droga_crm.crm_pr,1,1,1,1
+access_droga_lead2oppo,crm.lead2opportunity_partner,crm.model_crm_lead2opportunity_partner,droga_crm.crm_pr,1,1,1,1
