@@ -45,7 +45,7 @@
             <form string="Purhcase Request" delete="0">
                 <header>
                     <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request" data-hotkey="v"/>
-                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v" attrs="{'invisible': [('department_manager_user_id', '!=', uid)]}"/>
                     <button name="budget_checked_request" type="object" states="Verified" string="Budget Approved" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
                     <button name="approve_request" type="object" states="Budget Approved" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v"/>
 
@@ -72,6 +72,7 @@
                             <field name="request_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="department_manager" readonly="1" invisible="1"/>
+                            <field name="department_manager_user_id" invisible="1"/>
                             <field name="branch" options="{'no_create':True,'no_open':True}" required="1" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="request_type" invisible="1"/>
                         </group>
@@ -132,6 +133,8 @@
             </form>
         </field>
     </record>
+
+
 
     <!-- search view -->
     <record id="droga_purhcase_reques_view_search" model="ir.ui.view">

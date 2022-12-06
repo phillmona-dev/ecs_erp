@@ -17,7 +17,7 @@
 
         <record id="commitment_budget_update_cron" model="ir.cron">
             <field name="name">Update Commitment Budget</field>
-            <field name="model_id" ref="model_crossovered_budget_lines"/>
+            <field name="model_id" ref="model_crossovered_budget_lines_detail"/>
             <field name="state">code</field>
             <field name="code">model.calculate_remaining_budget()</field>
             <field name="user_id" ref="base.user_root"/>

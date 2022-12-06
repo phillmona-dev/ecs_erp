@@ -5,6 +5,8 @@ from odoo.exceptions import ValidationError
 class CrossoveredBudget(models.Model):
     _inherit = "crossovered.budget"
 
+    fiscal_year = fields.Many2one("account.fiscal.year")
+
     @api.model
     def create(self, vals):
         return super(CrossoveredBudget, self).create(vals)
@@ -25,11 +27,21 @@ class CrossoveredBudget(models.Model):
             raise ValidationError(
                 "You can't delete budget record, it conatins budget data")
 
+    @api.onchange("fiscal_year")
+    def _on_change_fiscal_year(self):
+        for record in self:
+            # set date from to date to
+            record.date_from = record.fiscal_year.date_from
+            record.date_to = record.fiscal_year.date_to
+
 
 class CrossoveredBudgetLines(models.Model):
 
     _inherit = "crossovered.budget.lines"
 
+    fiscal_year = fields.Many2one(related="crossovered_budget_id.fiscal_year")
+    period = fields.Many2one("account.fiscal.year.period",
+                             required=True, domain="[('fiscal_year_id', '=', fiscal_year)]")
     commitment_budget = fields.Float('Commitment')
     remaining_balance = fields.Float('Remaining')
     reallaocation_addition = fields.Float('Reallocation +')
@@ -117,6 +129,13 @@ class CrossoveredBudgetLines(models.Model):
                 raise ValidationError(
                     "Budget line not found in budget category defination")
 
+    @api.onchange("period")
+    def _on_change_fiscal_year(self):
+        for record in self:
+            # set date from to date to
+            record.date_from = record.period.date_from
+            record.date_to = record.period.date_to
+
 
 class CrossoveredBudgetLinesDetail(models.Model):
 
@@ -182,6 +201,7 @@ class CrossoveredBudgetLinesDetail(models.Model):
 
         # self.load_commitment_budget()
         # self.calculate_remaining_budget()
+        
         return res
 
     def unlink(self):

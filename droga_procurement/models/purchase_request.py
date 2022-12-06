@@ -128,6 +128,17 @@ class purhcase_request(models.Model):
 
     # submit request
     def submit_request(self):
+        if len(self.purhcase_request_lines) == 0:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'message': 'At least one product must be requested to submit the request.',
+                               'type': 'danger',
+                               'sticky': False
+                }
+            }
+
         self.write({'state': 'Submitted'})
         return True
 

@@ -6,6 +6,8 @@ from odoo.exceptions import UserError, ValidationError
 class BudgetReallocation(models.Model):
     _name = 'droga.budget.reallocation'
 
+    _order = "name desc"
+
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
 
     name = fields.Char('Request Reference', required=True,
@@ -46,7 +48,9 @@ class BudgetReallocation(models.Model):
     def approve_request(self):
         self.write({'state': 'Approved'})
         self.new_reallocation_addition()
-        self.calculate_reallocation_addition()
+        self.transfer_addition_reallocation()
+        self.env['crossovered.budget.lines.detail'].calculate_remaining_budget()
+        self.env['crossovered.budget.lines.detail'].calculate_remaining_budget_detail()
         return True
 
     def cancel_request(self):
@@ -117,22 +121,93 @@ class BudgetReallocation(models.Model):
             for line1 in reallocation.budget_additions:
 
                 addition_line_from = self.env['crossovered.budget.lines.detail'].search([('crossovered_budget_id', '=', reallocation.budget_id.id),
-                                                                                         ('date_from', '>=', line1.date_from), ('date_to', '<=', line1.date_to), 
+                                                                                         ('date_from', '>=', line1.date_from), (
+                                                                                             'date_to', '<=', line1.date_to),
                                                                                          ('general_budget_id', '=', line1.bdugetary_position.id)])
 
                 addition_amount = 0
                 for addition in addition_line_from:
-                    if addition.account.id == line1.account.id and addition.budgetary_position_id.analytic_account_id.id==line1.budget_addition_id.analytic_account.id:
+                    if addition.account.id == line1.account.id and addition.budgetary_position_id.analytic_account_id.id == line1.budget_addition_id.analytic_account.id:
                         addition_amount += line1.addition_amount
 
                 if addition_line_from:
                     for addition in addition_line_from:
-                        if addition.account.id == line1.account.id and addition.budgetary_position_id.analytic_account_id.id==line1.budget_addition_id.analytic_account.id:
+                        if addition.account.id == line1.account.id and addition.budgetary_position_id.analytic_account_id.id == line1.budget_addition_id.analytic_account.id:
                             addition.write(
                                 {'addition': addition_amount})
 
             # change status transfered reallocation to done
             reallocation.write({'reallocation_status': 'Done'})
+
+    def transfer_addition_reallocation(self):
+        additions = self.env['droga.budget.reallocation'].search([
+            ('reallocation_status', '=', 'Draft'), ('state', '=', 'Approved')])
+
+        for addition in additions.budget_additions:
+            # search addition line
+            addition_lines = self.env['crossovered.budget.lines'].search([('crossovered_budget_id', '=', addition.budget_addition_id.budget_id.id),
+                                                                          ('analytic_account_id', '=', addition.budget_addition_id.analytic_account.id),
+                                                                         ('date_from', '>=',
+                                                                          addition.date_from),
+                                                                         ('date_to', '<=',
+                                                                          addition.date_to),
+                                                                         ('general_budget_id', '=',
+                                                                          addition.bdugetary_position.id),
+                                                                          ])
+            for addition_line in addition_lines.budget_line_details:
+                if addition.account.id == addition_line.account.id:
+                    # get all adition amount linked to this specific account
+                    self.env.cr.execute("""select coalesce(sum(addition_amount),0) as addition from droga_budget_reallocation a inner join droga_budget_addition_line b on a.id=b.budget_addition_id 
+                                            where a.budget_id=%s and a.analytic_account=%s and date_from>=%s and date_to<=%s and bdugetary_position=%s and a.state='Approved'""",
+                                        (addition.budget_addition_id.budget_id.id, addition.budget_addition_id.analytic_account.id, addition.date_from, addition.date_to, addition.bdugetary_position.id))
+                    res = self.env.cr.dictfetchone()
+                    # update addition field on budget line detail
+                    addition_line.write({'addition': res['addition']})
+
+        for reallocation in additions.budget_reallocations:
+            # deduct from transfer from
+            transfer_lines = self.env['crossovered.budget.lines'].search([('crossovered_budget_id', '=', reallocation.budget_reallocation_id.budget_id.id),
+                                                                          ('analytic_account_id', '=', reallocation.budget_reallocation_id.analytic_account.id),
+                                                                         ('date_from', '>=',
+                                                                          reallocation.date_from),
+                                                                         ('date_to', '<=',
+                                                                          reallocation.date_to),
+                                                                         ('general_budget_id', '=',
+                                                                          reallocation.from_budgetary_position.id),
+                                                                          ])
+            for transfer_line in transfer_lines.budget_line_details:
+                if reallocation.account_from.id == transfer_line.account.id:
+                    self.env.cr.execute(""" select coalesce(sum(transfer_amount),0) as reallocation_amount from droga_budget_reallocation a inner join droga_budget_reallocation_line b on a.id=b.budget_reallocation_id
+                                            where a.budget_id=%s and a.analytic_account=%s and b.date_from>=%s and b.date_to<=%s and b.from_budgetary_position=%s and a.state='Approved'""",
+                                        (reallocation.budget_reallocation_id.budget_id.id, reallocation.budget_reallocation_id.analytic_account.id, reallocation.date_from, reallocation.date_to, reallocation.from_budgetary_position.id))
+
+                    res = self.env.cr.dictfetchone()
+                    reallocation_amount = res['reallocation_amount']*-1
+                    # update
+                    transfer_line.write({'reallaocation': reallocation_amount})
+
+            recived_lines = self.env['crossovered.budget.lines'].search([('crossovered_budget_id', '=', reallocation.budget_reallocation_id.budget_id.id),
+                                                                         ('analytic_account_id', '=', reallocation.budget_reallocation_id.analytic_account.id),
+                                                                         ('date_from', '>=',
+                                                                          reallocation.period_to_date_from),
+                                                                         ('date_to', '<=',
+                                                                          reallocation.period_to_date_to),
+                                                                         ('general_budget_id', '=',
+                                                                          reallocation.to_budgetary_position.id),
+                                                                         ])
+            for recived_line in recived_lines.budget_line_details:
+                if reallocation.account_to.id == recived_line.account.id:
+                    self.env.cr.execute(""" select coalesce(sum(transfer_amount),0) as reallocation_amount from droga_budget_reallocation a inner join droga_budget_reallocation_line b on a.id=b.budget_reallocation_id
+                                            where a.budget_id=%s and a.analytic_account=%s and b.period_to_date_from>=%s and b.period_to_date_to<=%s and b.from_budgetary_position=%s and a.state='Approved'""",
+                                        (reallocation.budget_reallocation_id.budget_id.id, reallocation.budget_reallocation_id.analytic_account.id, reallocation.period_to_date_from, reallocation.period_to_date_to, reallocation.from_budgetary_position.id))
+
+                    res = self.env.cr.dictfetchone()
+                    reallocation_amount = res['reallocation_amount']*1
+                    # update
+                    recived_line.write({'reallaocation': reallocation_amount})
+
+        for record in additions:
+            record.write({'reallocation_status': 'Done'})
 
     def new_reallocation_addition(self):
         for record in self:
@@ -142,7 +217,7 @@ class BudgetReallocation(models.Model):
                     [('crossovered_budget_id', '=', record.budget_id.id),
                      ('general_budget_id', '=', line.to_budgetary_position.id),
                      ('analytic_account_id', '=', record.analytic_account.id),
-                     ('date_from', '>=', line.date_from), ('date_to', '<=', line.date_to)])
+                     ('date_from', '>=', line.period_to_date_from), ('date_to', '<=', line.period_to_date_to)])
 
                 if not budget_line.ids:
                     # add new budget category line
@@ -150,13 +225,14 @@ class BudgetReallocation(models.Model):
                         'crossovered_budget_id': record.budget_id.id,
                         'general_budget_id': line.to_budgetary_position.id,
                         'analytic_account_id': record.analytic_account.id,
-                        'date_from': line.date_from,
-                        'date_to': line.date_to,
+                        'period': line.period_to.id,
+                        'date_from': line.period_to_date_from,
+                        'date_to': line.period_to_date_to,
                         'planned_amount': 0
 
                     }
 
-                    self.env['crossovered.budget.lines'].create(vals)
+                    res = self.env['crossovered.budget.lines'].create(vals)
 
             for line in record.budget_additions:
                 # check if the budget reallocation line not found in the budget
@@ -172,13 +248,20 @@ class BudgetReallocation(models.Model):
                         'crossovered_budget_id': record.budget_id.id,
                         'general_budget_id': line.bdugetary_position.id,
                         'analytic_account_id': record.analytic_account.id,
+                        'period': line.period.id,
                         'date_from': line.date_from,
                         'date_to': line.date_to,
                         'planned_amount': 0
 
                     }
 
-                    self.env['crossovered.budget.lines'].create(vals)
+                    res = self.env['crossovered.budget.lines'].create(vals)
+
+                    for line1 in res.budget_line_details:
+                        if line.account.id == line1.account.id:
+                            # update the addition amount
+                            line1.write(
+                                {'addition': line.addition_amount})
 
 
 class BudgetReallocationDetail(models.Model):
@@ -189,8 +272,18 @@ class BudgetReallocationDetail(models.Model):
     to_budgetary_position = fields.Many2one("account.budget.post")
     account_from = fields.Many2one("account.account")
     account_to = fields.Many2one("account.account")
+    fiscal_year = fields.Many2one(
+        related='budget_reallocation_id.budget_id.fiscal_year', store=True)
+    period = fields.Many2one("account.fiscal.year.period",
+                             domain="[('fiscal_year_id', '=', fiscal_year)]")
     date_from = fields.Date("Date From")
     date_to = fields.Date("Date To")
+
+    period_to = fields.Many2one("account.fiscal.year.period",
+                                domain="[('fiscal_year_id', '=', fiscal_year)]")
+    period_to_date_from = fields.Date("Date From")
+    period_to_date_to = fields.Date("Date To")
+
     remaining_amount = fields.Float(
         "Remaining Amount", compute="_calculate_remaining_amount", store=True)
     transfer_amount = fields.Float("Transfer Amount")
@@ -271,7 +364,14 @@ class BudgetReallocationDetail(models.Model):
                     raise ValidationError(
                         "You can't reallocate budget to diffrenet account categories")
 
-    # if the transfer budget category not found add line
+    @api.onchange("period", "period_to")
+    def _on_change_fiscal_year(self):
+        for record in self:
+            # set date from to date to
+            record.date_from = record.period.date_from
+            record.date_to = record.period.date_to
+            record.period_to_date_from = record.period_to.date_from
+            record.period_to_date_to = record.period_to.date_to
 
 
 class BudgetAdditionDetail(models.Model):
@@ -281,6 +381,10 @@ class BudgetAdditionDetail(models.Model):
     bdugetary_position = fields.Many2one("account.budget.post")
     account = fields.Many2one(
         "account.account")
+    fiscal_year = fields.Many2one(
+        related='budget_addition_id.budget_id.fiscal_year', store=True)
+    period = fields.Many2one("account.fiscal.year.period",
+                             domain="[('fiscal_year_id', '=', fiscal_year)]")
     date_from = fields.Date("Date From")
     date_to = fields.Date("Date To")
     addition_amount = fields.Float("Addition Amount")
@@ -289,3 +393,10 @@ class BudgetAdditionDetail(models.Model):
     def _load_budgetary_position_accounts(self):
         accounts = self.bdugetary_position.account_ids.ids
         return {'domain': {'account': [('id', 'in', (accounts))]}}
+
+    @api.onchange("period")
+    def _on_change_fiscal_year(self):
+        for record in self:
+            # set date from to date to
+            record.date_from = record.period.date_from
+            record.date_to = record.period.date_to

@@ -30,6 +30,7 @@
         'views/account_transaction_type.xml',
         'views/account.move.xml',
         'views/payment_request.xml',
+        'views/account_fiscal_year.xml',
         'report/payment_request.xml',
         'report/account_move.xml',
         'report/withholding_report.xml',

@@ -78,11 +78,9 @@
                                             Analytics
                                     </th>
                                     <th class="small">
-                                            Start Date
+                                            Period
                                     </th>
-                                    <th class="small">
-                                            End Date
-                                    </th>
+
                                     <th class="small text-end">
                                             Budget
                                     </th>
@@ -127,11 +125,9 @@
                                             <t t-esc="budget_line.analytic_account_id.name"/>
                                         </td>
                                         <td class="small">
-                                            <t t-esc="budget_line.date_from"/>
+                                            <t t-esc="budget_line.period.description"/>
                                         </td>
-                                        <td class="small">
-                                            <t t-esc="budget_line.date_to"/>
-                                        </td>
+
                                         <td class="small text-end">
                                             <t t-esc="budget_line.planned_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                         </td>
@@ -158,11 +154,11 @@
 
                                 </t>
                                 <tr>
-                                    <td colspan="5"></td>
+                                    <td colspan="4"></td>
                                     <td class="small text-end">
                                         <strong t-esc="budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
-                                   
+
                                     <td class="small text-end">
                                         <strong t-esc="reallocation" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
@@ -242,11 +238,9 @@
                                             Analytics
                                     </th>
                                     <th class="small">
-                                            Start Date
+                                           Period
                                     </th>
-                                    <th class="small">
-                                            End Date
-                                    </th>
+
                                     <th class="small text-end">
                                             Budget
                                     </th>
@@ -291,11 +285,9 @@
                                             <strong t-esc="budget_line.analytic_account_id.name"/>
                                         </td>
                                         <td class="small">
-                                            <strong t-esc="budget_line.date_from"/>
+                                            <strong t-esc="budget_line.period.description"/>
                                         </td>
-                                        <td class="small">
-                                            <strong t-esc="budget_line.date_to"/>
-                                        </td>
+
                                         <td class="small text-end">
                                             <strong t-esc="budget_line.planned_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                         </td>
@@ -328,7 +320,7 @@
                                             <td class="small">
                                                 <t t-esc="budget_line_detail.account.code"/>
                                             </td>
-                                            <td class="small" colspan="3">
+                                            <td class="small" colspan="2">
                                                 <t t-esc="budget_line_detail.account.name"/>
                                             </td>
                                             <td class="small text-end">
@@ -358,7 +350,7 @@
 
                                 </t>
                                 <tr>
-                                    <td colspan="5"></td>
+                                    <td colspan="4"></td>
                                     <td class=" text-end">
                                         <strong t-esc="budget" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                                     </td>
