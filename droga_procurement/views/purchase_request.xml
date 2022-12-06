@@ -45,7 +45,7 @@
             <form string="Purhcase Request" delete="0">
                 <header>
                     <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request" data-hotkey="v"/>
-                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v" attrs="{'invisible': [('department_manager_user_id', '!=', uid)]}"/>
+                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v" />
                     <button name="budget_checked_request" type="object" states="Verified" string="Budget Approved" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
                     <button name="approve_request" type="object" states="Budget Approved" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v"/>
 
@@ -103,26 +103,7 @@
 
                             </field>
                         </page>
-                        <!--<page string="Other Information" invisible="1">
-                            <group>
-                                <group>
-                                    <field name="company_id" options="{'no_create':True,'no_open':True}"/>
-                                </group>
-                            </group>
-                        </page>
-                        <page string="Buying Method" attrs="{'invisible': [('state', 'not in', ('Approved'))]}">
-                            <group>
-                                <field name="buying_method"/>
 
-                            </group>
-                            <field name="rfqs" mode="tree" attrs="{'invisible': [('buying_method', 'in', ('Bid'))]}">
-                                <tree>
-                                    <field name="name"/>
-                                    <field name="date"/>
-                                </tree>
-                            </field>
-
-                        </page>-->
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
@@ -133,8 +114,6 @@
             </form>
         </field>
     </record>
-
-
 
     <!-- search view -->
     <record id="droga_purhcase_reques_view_search" model="ir.ui.view">

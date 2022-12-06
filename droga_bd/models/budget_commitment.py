@@ -5,6 +5,17 @@ class BudgetCommitment(models.Model):
     _name = 'droga.budget.commitment.budget'
     _description = 'Commitement Budget'
 
+    @api.depends('purchase_request_id', 'purchase_order_id')
+    def _compute_amount(self):
+        for record in self:
+            record.amount = record.purchase_request_total_amount + \
+                record.purchase_order_total_amount
+
+            if record.purchase_request_id:
+                record.refrence_no = record.purchase_request_id.name
+            else:
+                record.refrence_no = record.purchase_order_id.name
+
     document_type = fields.Selection(
         [("PR", "Purchase Request"), ("PO", "Purchase Order")])
     purchase_request_id = fields.Many2one("droga.purhcase.request")
@@ -23,6 +34,10 @@ class BudgetCommitment(models.Model):
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
     state = fields.Selection([("Active", "Active"), ("Closed", "Closed")])
+
+    #
+    amount = fields.Float("amount", compute="_compute_amount")
+    refrence_no = fields.Char("Refrence No", compute="_compute_amount")
 
     @api.depends('purchase_order_total_amount', 'paid_amount')
     def _compute_remaining_amount(self):
