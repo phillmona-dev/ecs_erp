@@ -14,9 +14,10 @@
             <tree string="" editable="top">
                 <field name="p_name"></field>
                 <field name="s_name"></field>
-                <field name="employee_access_users"></field>
+                <field name="employee_access_users" options="{'no_create':True,'no_open':True}"></field>
+                <field name="p_regions" widget="many2many_tags" string="City/sub-city" options="{'no_create':True,'no_open':True}"></field>
                 <field name="p_id"></field>
-                <field name="type"></field>
+                <field name="status"></field>
             </tree>
         </field>
     </record>

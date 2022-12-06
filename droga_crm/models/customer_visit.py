@@ -24,6 +24,8 @@ class customer_visit_header(models.Model):
 
     pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True)
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
+    pr_avail_areas=fields.Many2many(related='pr_sales.p_regions')
+
 
     @api.depends('pr_sales_logged')
     def _is_record_owner(self):
@@ -149,6 +151,7 @@ class customer_visit_header(models.Model):
             if len(det['contacts_schedule'])<1:
                 lead = {
                     'name': descr,
+                    'pr_sales':self.pr_sales.id,
                     'origin_user_id': self.user_id,
                     'user_id': self.user_id,
                     'team_id': 0,  # Fix me
@@ -183,6 +186,7 @@ class customer_visit_header(models.Model):
                         'name': descr,
                         'origin_user_id': self.user_id,
                         'user_id': self.user_id,
+                        'pr_sales': self.pr_sales.id,
                         'team_id': 0,  # Fix me
                         'phone':contdet['contact_custom']['mobile'] if contdet['contact_custom'] else None,
                         'company_id': self.env.company.id,

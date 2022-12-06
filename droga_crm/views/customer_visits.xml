@@ -13,11 +13,12 @@
         <field name="arch" type="xml">
             <tree string="" editable="top" >
                 <field name="pr_sales"></field>
-                <field name="pr_sales_logged" invisible="False"></field>
-                <field name="is_record_owner" invisible="False"/>
+                <field name="pr_sales_logged" invisible="1"></field>
+                <field name="is_record_owner" invisible="1"/>
                 <field name="month"></field>
                 <field name="year"></field>
-                <field name="city_name" options="{'no_create':True,'no_open':True}"></field>
+                <field name="pr_avail_areas" invisible="1"/>
+                <field name="city_name" domain="[('id', 'in',pr_avail_areas)]" options="{'no_create':True,'no_open':True}"></field>
                 <field name="state"></field>
 
                 <button icon="fa-credit-card-alt"

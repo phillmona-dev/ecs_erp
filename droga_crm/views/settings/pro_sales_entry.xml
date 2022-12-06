@@ -13,7 +13,7 @@
         <field name="arch" type="xml">
             <form string="">
                 <group>
-                    <field name="pro_id" options="{'no_create':True,'no_open':True}"></field>
+                    <field name="pro_id" domain="([('employee_access_users','=',uid)])" options="{'no_create':True,'no_open':True}"></field>
                     <field name="p_id"></field>
                 </group>
                 <footer>
@@ -27,7 +27,7 @@
             id="droga_pro_sales_master_entry_visit_menu"
             name="Promotor/sales entry"
             action="droga_pro_sales_master_entry_visit_action"
-            parent="crm.crm_menu_config"
+            parent="menu_vist_log"
             groups="crm_pr"
-            sequence="16"/>
+            sequence="19"/>
 </odoo>

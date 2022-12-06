@@ -10,10 +10,10 @@ class droga_promotors_sales_master(models.Model):
     p_name = fields.Char('Promotor/Sales full name', required=True)
     s_name = fields.Char('Promotor/Sales short name', required=True)
     p_id = fields.Char('Promotor/Sales ID', required=True)
-    type = fields.Selection([('Promotor', 'Promotor'), ('Sales rep', 'Sales rep'), ('Area manager', 'Area manager')],
+    p_regions =fields.Many2many('droga.crm.settings.city', required=True)
+    status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],
                             required=True)
-    employee_access_users=fields.Many2one('res.users',string='Login user')
-
+    employee_access_users=fields.Many2one('res.users',string='Login user',required=True)
 
 
 class droga_promotors_sales_detail_visit(models.Model):
@@ -25,14 +25,10 @@ class droga_promotors_sales_detail_visit(models.Model):
 class droga_promotors_sales_detail_entry_visit(models.TransientModel):
     _name = 'droga.pro.sales.master.entry.visit'
 
-    pro_id = fields.Many2one('droga.pro.sales.master', string='Promotor/Sales full name')
-    p_id = fields.Char('Promotor/Sales ID')
+    pro_id = fields.Many2one('droga.pro.sales.master', string='Promotor/Sales full name',required=True)
+    p_id = fields.Char('Promotor/Sales ID',required=True)
 
     def action_enter(self):
-        if not self.pro_id:
-            raise UserError("Promotor/sales must be selected.")
-        if not self.p_id:
-            raise UserError("Promotor/sales id must be provided.")
 
         if len(self.env['droga.pro.sales.master'].search([('id', '=', self.pro_id.id), ('p_id', '=', self.p_id)])) > 0:
             if len(self.env['droga.pro.sales.master.visit'].search([('s_id','=',request.session.sid)]))>0:
