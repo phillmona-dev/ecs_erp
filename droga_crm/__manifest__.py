@@ -21,8 +21,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
-        'security/record_rules.xml',
-        'security/report_record_rules.xml',
+
         'reports/excel_reports/visit_plan.xml',
         'reports/core_products.xml',
         'views/cust_extension.xml',
