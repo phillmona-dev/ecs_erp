@@ -1,4 +1,6 @@
 from odoo import models,fields,api
+from odoo.http import request
+
 
 class lead2opp_inherit(models.TransientModel):
     _inherit = 'crm.lead2opportunity.partner'
@@ -12,6 +14,22 @@ class lead2opp_inherit(models.TransientModel):
         ('nothing', 'Do not link to a customer')
     ], string='Related Customer', compute='_compute_action', readonly=False, store=True, compute_sudo=False)
 
+    def _get_pr_sales_logged(self):
+        if not request:
+            return False
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        logged_user= False if len(ses) == 0 else ses[0].pro_id[0]
+        if logged_user:
+            location_pr=self.env['droga.pro.sales.master'].search([('p_regions','in',logged_user.p_regions.ids),('is_pr_sales','=',True),('is_pr_sales','=',True)])
+            if len(location_pr)>0:
+                return location_pr[0].id
+            else:
+                return False
+        else:
+            return False
+
+    pr_sales = fields.Many2one('droga.pro.sales.master', string="Sales rep",
+                               default=_get_pr_sales_logged, required=True)
 
     @api.depends('duplicated_lead_ids')
     def _compute_name(self):
@@ -23,3 +41,20 @@ class lead2opp_inherit(models.TransientModel):
     def _compute_action(self):
         for convert in self:
             convert.action = 'exist'
+
+    def action_apply(self):
+        res=super(lead2opp_inherit, self).action_apply()
+        for rec in self.env['crm.lead'].browse(self._context.get('active_ids', [])):
+            rec.write({'pr_sales': self.pr_sales})
+        return res
+
+    def _convert_and_allocate(self, leads, user_ids, team_id=False):
+        self.ensure_one()
+
+        for lead in leads:
+            if lead.active and self.action != 'nothing':
+                self._convert_handle_partner(
+                    lead, self.action, self.partner_id.id or lead.partner_id.id)
+
+            lead.convert_opportunity(lead.partner_id, user_ids=False, team_id=False)
+

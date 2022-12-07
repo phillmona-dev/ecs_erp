@@ -19,6 +19,8 @@ class customer_visit_header(models.Model):
     _rec_name = 'descr'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     def _get_pr_sales_logged(self):
+        if not request:
+            return False
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
 
@@ -152,6 +154,7 @@ class customer_visit_header(models.Model):
                 lead = {
                     'name': descr,
                     'pr_sales':self.pr_sales.id,
+                    'pr_lead':self.pr_sales.id,
                     'origin_user_id': self.user_id,
                     'user_id': self.user_id,
                     'team_id': 0,  # Fix me
@@ -187,6 +190,7 @@ class customer_visit_header(models.Model):
                         'origin_user_id': self.user_id,
                         'user_id': self.user_id,
                         'pr_sales': self.pr_sales.id,
+                        'pr_lead': self.pr_sales.id,
                         'team_id': 0,  # Fix me
                         'phone':contdet['contact_custom']['mobile'] if contdet['contact_custom'] else None,
                         'company_id': self.env.company.id,
