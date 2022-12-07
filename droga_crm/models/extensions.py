@@ -55,6 +55,8 @@ class crm_lead_extension(models.Model):
 
 
     def _get_pr_sales_logged(self):
+        if not request:
+            return False
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
     pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True,tracking=True)
@@ -68,6 +70,7 @@ class crm_lead_extension(models.Model):
         'res.partner', string='Customer', check_company=True, index=True, tracking=10,
         domain="['&',('city_name', 'in',pr_avail_areas),'|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
+    is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
     @api.depends('pr_sales_logged')
     def _is_record_owner(self):
        for rec in self:
@@ -75,15 +78,16 @@ class crm_lead_extension(models.Model):
                rec.is_record_owner=True
            else:
                rec.is_record_owner=False
-    is_record_owner=fields.Boolean('Show plan',store=False,compute="_is_record_owner",search="_search_field")
     def _search_field(self, operator, value):
         if operator=='=':
-            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            if not request:
+                return [('id', 'in', [])]
+            ses = self.env['droga.pro.sales.master.visit'].sudo().search([('s_id', '=', request.session.sid)])
             if len(ses)==0:
                 return [('id','in',[])]
             else:
                 is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
-                is_rec_inside_self=self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
+                is_rec_inside_self=self.sudo().search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
                 return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
         else:
             return [('id','in',[])]

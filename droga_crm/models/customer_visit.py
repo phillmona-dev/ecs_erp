@@ -19,6 +19,8 @@ class customer_visit_header(models.Model):
     _rec_name = 'descr'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     def _get_pr_sales_logged(self):
+        if not request:
+            return False
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
 

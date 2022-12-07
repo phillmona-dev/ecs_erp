@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.addons.mail.models.mail_thread import MailThread
 from odoo.exceptions import UserError
 
 class droga_tender_sale_line_extension(models.Model):
@@ -50,10 +51,12 @@ class droga_tender_master(models.Model):
     parent_tender_performance = fields.Many2one('droga.tender.master', required=True)
     parent_tender_performance_detail = fields.Many2one('droga.tender.submission.detail')
     type_item = fields.Many2one('droga.tender.settings.type.item', string='Type or items',related='parent_tender_performance_detail.type_item')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True,
+    company_id = fields.Many2one('res.company', string='Company', required=True,
                                  state={'done': [('readonly', True)]},related='parent_tender_performance_detail.company_id')
 
     def reg_products(self):
+        if not self.item_pro:
+            return
         channels = self.env['mail.channel'].search([('name', '=', 'Tender buisness development')])
 
         message = "Please register product titled '" + self.item_pro + "'."
@@ -67,6 +70,18 @@ class droga_tender_master(models.Model):
                 author_id=self.env.user.id,
             )
 
+        #Search this model using namea and send message
+        #chat = self.env['mail.channel'].with_user(self.env.user).browse(8)
+
+        #chat.message_post(body="Another one", message_type='comment', subtype_xmlid='mail.mt_comment')
+
+
+
+
+        chat = self.env['mail.channel'].search(['&',('channel_type','=','chat'),'|',('name','=','CRMSALES_REP, Administrator'),
+                                                ('name','=','Administrator, CRMSALES_REP')])
+        for rec in chat:
+            rec.message_post(body="Another oneeee", message_type='comment', subtype_xmlid='mail.mt_comment')
 
     @api.model
     def create(self, vals_list):

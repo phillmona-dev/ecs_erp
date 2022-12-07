@@ -32,6 +32,8 @@ class droga_crm_grade_vs_schedule(models.Model):
     pr_sales=fields.Char('User ID')
 
     def _get_pr_sales_logged(self):
+        if not request:
+            return False
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         return False if len(ses) == 0 else ses[0].pro_id[0].p_name
 
