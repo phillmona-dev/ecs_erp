@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from odoo import models,fields,api
 from odoo.http import request
 
@@ -179,6 +181,7 @@ class sale_order_ext(models.Model):
                 return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
         else:
             return [('id','in',[])]
+
 
     payment_term_id = fields.Many2one(
         comodel_name='account.payment.term',

@@ -1,3 +1,5 @@
+from datetime import timedelta,datetime
+
 from odoo import models, fields, api
 
 
@@ -18,16 +20,27 @@ class droga_stock_picking_type_extension(models.Model):
 
 class droga_stock_move_extension(models.Model):
     _inherit = 'stock.move'
+    reservation_discard_time=fields.Datetime(string='Reservation discard time',compute='_compute_res_discard',inverse='_inverse_res_discard')
+    def _inverse_res_discard(self):
+        pass
 
+    def _compute_res_discard(self):
+        for rec in self:
+            rec.reservation_discard_time=rec.date+timedelta(hours=rec.product_id.categ_id.reservation_period)
 
-    def createt(self, vals_list):
+    def create(self, vals_list):
         res=super(droga_stock_move_extension, self).create(vals_list)
 
         so = self.env['sale.order'].search([('name', '=', res.origin)])
         show = so[0].payment_term_id.deliv_after_payment if len(so) > 0 else False
         if show:
-            res._do_unreserve()
+            res.do_unreserve()
         return res
+
+    def unreserve_discarded_entries(self):
+        moves=self.env['stock.move'].search([('state','!=','done'),('reservation_discard_time','<',datetime.now()),('reserved_availability','>',0.0)])
+        for move in moves:
+            move._do_unreserve()
 
 class droga_stock_picking_extension(models.Model):
     _inherit = 'stock.picking'
@@ -157,3 +170,4 @@ class product_selection_field(models.Model):
     _inherit = 'product.category'
     avail_in_product_master=fields.Boolean('Available in product master file',default=False)
     off_supplies=fields.Boolean('Office supplies group',default=False)
+    reservation_period=fields.Float('Reservation period in Hrs',default=0)

@@ -48,11 +48,22 @@
         <field name="inherit_id" ref="product.product_category_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/field[@name='parent_id']" position="after">
-                <field name="avail_in_product_master" ></field>
-                <field name="off_supplies" ></field>
+                <field name="avail_in_product_master"></field>
+                <field name="off_supplies"></field>
+                <field name="reservation_period"></field>
             </xpath>
         </field>
     </record>
 
-
+    <record id="stock_move_tree_extension" model="ir.ui.view">
+        <field name="name">droga.stock.move.tree.inherited</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='product_uom_qty']" position="before">
+                <field name="reservation_discard_time"></field>
+                <field name="reserved_availability" sum="Total Quantity"></field>
+            </xpath>
+        </field>
+    </record>
 </odoo>

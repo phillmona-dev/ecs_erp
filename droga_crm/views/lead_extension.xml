@@ -140,6 +140,9 @@
             <xpath expr="//form/sheet/group/group/field[@name='tag_ids']" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
+            <xpath expr="//form/sheet/div/h2" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
 
             <xpath expr="//form/sheet/group/group[@name='lead_priority']/field[@name='tag_ids']" position="attributes">
                 <attribute name="invisible">True</attribute>

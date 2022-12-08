@@ -1,3 +1,4 @@
+from datetime import datetime
 from datetime import timedelta
 
 from stdnum import cr
@@ -27,7 +28,18 @@ class cust_sales_credit_limit(models.Model):
     tender_origin_form = fields.Many2one('droga.tender.master', readonly=True)
     cash_upfront=fields.Float(string='Cash upfront')
     pay_type=fields.Boolean(related='payment_term_id.apply_credit_limit')
+    matured_amount=fields.Float('Matured amount',compute='_get_matured_amount')
+    show_invoice_button=fields.Boolean(compute='_get_matured_amount')
 
+    @api.depends('partner_id')
+    def _get_matured_amount(self):
+        for rec in self:
+            matured_invoices=self.env['account.move'].search([('state', '=', 'posted'),('invoice_date_due','<',datetime.now()),('payment_state','=','not_paid'),('partner_id','=',rec.partner_id.id)])
+            tot_amount=0
+            for mi in matured_invoices:
+                tot_amount=tot_amount+mi['amount_total_signed']
+            rec.matured_amount=tot_amount
+            rec.show_invoice_button=False if tot_amount==0 else True
     @api.model
     def create(self, vals):
 
@@ -37,6 +49,8 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
+            if so.matured_amount>0:
+                raise ValidationError("Please settle matured amounts before initiating another sales!")
         return result
 
     def action_confirm(self):
@@ -52,8 +66,25 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
+            if so.matured_amount>0:
+                raise ValidationError("Please settle matured amounts before initiating another sales!")
         return result
 
+    def action_view_matured(self):
+        return{
+            'name': 'Sample request',
+            'view_type': 'tree',
+            'view_mode': 'tree,form',
+            'res_model': 'account.move',
+            'views': [
+                [self.env.ref('account.view_out_invoice_tree').id, 'tree'],
+                [self.env.ref('account.view_move_form').id, 'form']],
+            'type': 'ir.actions.act_window',
+            'domain':
+                (
+                    [('invoice_date_due', '<', datetime.now()), ('payment_state', '=', 'not_paid'),
+                     ('state', '=', 'posted'),('partner_id', '=', self.partner_id.id)])
+        }
     def store_issue_placement_order(self):
         return {
             'name': 'Sample request',

@@ -11,11 +11,16 @@
             </xpath>
 
             <xpath expr = "//form/sheet/div/button[@name='action_preview_sale_order']" position = "before">
+                    <field name="show_invoice_button" invisible="1"></field>
+                    <button icon="fa-credit-card-alt" attrs="{'invisible': [('show_invoice_button', '=', False)]}"
+                        type="object" string=" Matured invoices"
+                        name="action_view_matured" class="oe_stat_button"/>
 
-                    <button icon="fa-credit-card-alt"
-                        type="object" string=" 1 Matured invoice"
-                        name="action_view_invoice" class="oe_stat_button"/>
+            </xpath>
 
+            <xpath expr = "//form/sheet/group/group/field[@name='payment_term_id']" position="after">
+                <field name="show_invoice_button" invisible="1"></field>
+                <field name="matured_amount" attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
             </xpath>
 
             <xpath expr = "//form/sheet/notebook/page/group/group/field[@name='note']" position = "replace">
