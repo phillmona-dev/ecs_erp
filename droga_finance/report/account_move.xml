@@ -60,6 +60,10 @@
 
                                 <br></br>
                                 <strong>Amount in Words:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total_word" class="m-0"/>
+
+                                </u>
 
                             </div>
                             <div class="col-3 bm-2">
@@ -234,6 +238,10 @@
 
                                 <br></br>
                                 <strong>Amount in Words:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total_word" class="m-0"/>
+
+                                </u>
 
                             </div>
                             <div class="col-3 bm-2">
@@ -408,6 +416,10 @@
 
                                 <br></br>
                                 <strong>Amount in Words:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total_word" class="m-0"/>
+
+                                </u>
 
                             </div>
                             <div class="col-3 bm-2">
@@ -535,7 +547,7 @@
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a5" />
         <field name="binding_type">report</field>
-       
+
     </record>
 
     <template id="droga_account_cash_reciept_voucher_report" name="Cash Reciept Voucher">
@@ -587,6 +599,10 @@
 
                                 <br></br>
                                 <strong>Amount in Words:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total_word" class="m-0"/>
+                                    
+                                </u>
 
                             </div>
                             <div class="col-3 bm-2">
