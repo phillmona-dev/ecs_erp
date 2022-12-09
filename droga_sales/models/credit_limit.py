@@ -49,8 +49,6 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
-            if so.matured_amount>0:
-                raise ValidationError("Please settle matured amounts before initiating another sales!")
         return result
 
     def action_confirm(self):

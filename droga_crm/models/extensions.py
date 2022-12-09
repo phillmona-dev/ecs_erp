@@ -31,6 +31,7 @@ class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
     plan_id=fields.Many2one('droga.customer.visit.detail')
     contacts_schedule_single = fields.Many2one('droga.crm.contacts.schedule')
+    ordered_prods=fields.One2many('droga.lead.ordered.products','leads')
     contact_custom=fields.Many2one('droga.crm.contacts',domain="[('parent_customer','=',partner_id)]")
     city_name= fields.Many2one('droga.crm.settings.city',related='partner_id.city_name')
     core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])

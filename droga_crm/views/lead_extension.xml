@@ -27,8 +27,13 @@
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='internal_notes']" position="replace">
-                <page string="Notes" name="contact_list">
-
+                <page string="Ordred qty" name="ord_qty">
+                    <field name="ordered_prods" mode="tree">
+                        <tree editable="bottom">
+                            <field name="prod" options="{'no_create':True,'no_open':True}"/>
+                            <field name="qty" />
+                        </tree>
+                    </field>
                     <field name="description" string="Notes" placeholder="Add a description..."
                            options="{'collaborative': true}"/>
                 </page>

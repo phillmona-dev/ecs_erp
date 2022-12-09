@@ -24,3 +24,9 @@ class contacts_schedule(models.Model):
     #            rec.cust = rec.leads['partner_id']
     #        else:
     #            rec.cust=None
+
+class lead_ordred_products(models.Model):
+    _name='droga.lead.ordered.products'
+    leads=fields.Many2one('crm.lead')
+    prod=fields.Many2one('product.template',string='Product')
+    qty=fields.Float('Quantity')
