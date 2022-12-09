@@ -28,7 +28,7 @@ class droga_stock_move_extension(models.Model):
         for rec in self:
             rec.reservation_discard_time=rec.date+timedelta(hours=rec.product_id.categ_id.reservation_period)
 
-    def create(self, vals_list):
+    def create_dont_run(self, vals_list):
         res=super(droga_stock_move_extension, self).create(vals_list)
 
         so = self.env['sale.order'].search([('name', '=', res.origin)])
@@ -62,8 +62,8 @@ class droga_stock_picking_extension(models.Model):
             rec.to_wh = self.env['stock.warehouse'].search([('code', '=', rec.location_dest_id.location_id.complete_name)]) if (rec.location_dest_id.usage == 'internal' and len(self.env['stock.warehouse'].search([('code', '=', rec.location_dest_id.location_id.complete_name)]))>0) else None
             rec.to_whc = rec.to_wh.code
 
-#    @api.model
-    def create_dont_run_check_it(self, vals_list):
+    @api.model
+    def create(self, vals_list):
         res=super(droga_stock_picking_extension, self).create(vals_list)
         so=self.env['sale.order'].search([('name','=',res.origin)])
         show=so[0].payment_term_id.deliv_after_payment if len(so)>0 else False
