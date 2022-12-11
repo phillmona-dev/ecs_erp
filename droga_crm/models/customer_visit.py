@@ -28,6 +28,31 @@ class customer_visit_header(models.Model):
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     pr_avail_areas=fields.Many2many(related='pr_sales.p_regions')
 
+    def _get_approver(self):
+        if not request:
+            return False
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        pr_sales_loc=None
+        if len(ses)==0:
+            return False
+        else:
+            pr_sales_loc=ses[0].pro_id[0]
+
+        approver_login=''
+        if pr_sales_loc.employee_access_users.name=='CRM_MR' or pr_sales_loc.employee_access_users.name=='CRM_SR':
+            approver_login='CRM_RSM'
+        elif pr_sales_loc.employee_access_users.name=='CRM_RSM':
+            approver_login = 'CRM_NSM'
+        elif pr_sales_loc.employee_access_users.name=='CRM_PM':
+            approver_login = 'CRM_PM_NSM'
+        else:
+            approver_login = '-'
+
+        approvers=self.env['droga.pro.sales.master'].search([('employee_access_users.name','=',approver_login),('p_regions','in',pr_sales_loc.p_regions.ids)])
+        return approvers[0] if len(approvers)>0 else False
+
+    approver=fields.Many2one('droga.pro.sales.master',default=_get_approver,store=True,required=True)
+
 
     @api.depends('pr_sales_logged')
     def _is_record_owner(self):
@@ -37,7 +62,12 @@ class customer_visit_header(models.Model):
            else:
                rec.is_record_owner=False
 
+           rec.is_approver=True if rec.approver==rec.pr_sales_logged else False
+
     is_record_owner=fields.Boolean('Show plan',store=False,compute="_is_record_owner",search="_search_field")
+
+
+    is_approver=fields.Boolean('Is approver',store=False,compute="_is_record_owner",search="_search_field_app")
 
     def _search_field(self, operator, value):
         if operator=='=':
@@ -47,6 +77,18 @@ class customer_visit_header(models.Model):
             else:
                 is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
                 is_rec_inside_self=self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
+                return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+        else:
+            return [('id','in',[])]
+
+    def _search_field_app(self, operator, value):
+        if operator=='=':
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            if len(ses)==0:
+                return [('id','in',[])]
+            else:
+                is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('approver','=',ses[0].pro_id.ids[0])])
+                is_rec_inside_self=self.search([]).filtered(lambda x: x.approver == ses[0].pro_id)
                 return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
         else:
             return [('id','in',[])]
@@ -82,7 +124,7 @@ class customer_visit_header(models.Model):
          ('08', 'August'), ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')], string='Month',required=True)
 
     _sql_constraints = [
-        ('user_month_year_uniq', 'unique (pr_sales,year,month)', 'The combination month/year type for user already exists!')
+        ('user_month_year_cityname_uniq', 'unique (pr_sales,city_name,year,month)', 'The combination month/year/city type for user already exists!')
     ]
 
     def get_years(self):
@@ -138,6 +180,9 @@ class customer_visit_header(models.Model):
 
     def request_approval(self):
         self.state='requested'
+
+    def revise(self):
+        self.state = 'draft'
 
     def approve(self):
         self.ensure_one()
@@ -198,7 +243,7 @@ class customer_visit_header(models.Model):
                         'stage_id': 1,
                         'plan_id': det.id,
                         'core_products': contdet['core_products'],
-                        'co_travel': contdet['co_travel'],
+                        'co_travel_crm': contdet['co_travel_crm'],
                         'contact_custom':contdet['contact_custom'].id,
                         'expected_revenue': 0,  # Fix me
                         'date_planned': det['visit_date'],
@@ -212,7 +257,7 @@ class customer_visit_header(models.Model):
                         #'contact_custom':contdet['contact_custom'].id,
                         #'leads':lead_created.id,
                        # 'core_products':contdet['core_products'],
-                      #  'co_travel':contdet['co_travel'],
+                      #  'co_travel_crm':contdet['co_travel'],
                      #}
                     #self.env['droga.crm.contacts.schedule'].sudo().create(cont)
 

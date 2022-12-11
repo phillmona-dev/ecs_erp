@@ -8,7 +8,7 @@ class contacts_schedule(models.Model):
     sales_close_descr=fields.Char(string='Sales closed?')
     sales_avail=fields.Boolean('Sales available?',default=False)
     sales_closed = fields.Boolean('Sales Closed?', default=False)
-    co_travel=fields.Many2many('hr.employee',string='Co-travelers')
+    co_travel_crm = fields.Many2many('droga.pro.sales.master', string='Co-travelers')
     #leads=fields.Many2one('crm.lead','contacts_schedule')
     visits=fields.Many2one('droga.customer.visit.detail','contacts_schedule')
     visits_header = fields.Many2one(related='visits.visit_header',store=True)

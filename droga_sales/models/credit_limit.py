@@ -70,7 +70,7 @@ class cust_sales_credit_limit(models.Model):
 
     def action_view_matured(self):
         return{
-            'name': 'Sample request',
+            'name': 'Matured entries',
             'view_type': 'tree',
             'view_mode': 'tree,form',
             'res_model': 'account.move',

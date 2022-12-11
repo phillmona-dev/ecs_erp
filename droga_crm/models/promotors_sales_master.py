@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo import http
 from odoo.http import request
@@ -8,13 +8,14 @@ class droga_promotors_sales_master(models.Model):
     _name = 'droga.pro.sales.master'
     _rec_name = 'p_name'
     p_name = fields.Char('Promotor/Sales full name', required=True)
-    s_name = fields.Char('Promotor/Sales short name', required=True)
+    s_name = fields.Char('Promotor/Sales short name')
     p_id = fields.Char('Promotor/Sales ID', required=True)
     p_regions =fields.Many2many('droga.crm.settings.city', required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],
                             required=True)
     is_pr_sales=fields.Boolean('Is PR/Sales')
     employee_access_users=fields.Many2one('res.users',string='Login user',required=True)
+    res_user_name=fields.Char(related=employee_access_users.name)
 
 
 class droga_promotors_sales_detail_visit(models.Model):
@@ -26,14 +27,34 @@ class droga_promotors_sales_detail_visit(models.Model):
 class droga_promotors_sales_detail_entry_visit(models.TransientModel):
     _name = 'droga.pro.sales.master.entry.visit'
 
-    pro_id = fields.Many2one('droga.pro.sales.master', string='Promotor/Sales full name',required=True)
-    p_id = fields.Char('Promotor/Sales ID',required=True)
+    def _get_un(self):
+        if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])) > 0:
+            return self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id.id
+        else:
+            return False
+
+    pro_id = fields.Many2one('droga.pro.sales.master',default=_get_un, string='Promotor/Sales full name',required=True)
+    def _get_pw(self):
+        if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])) > 0:
+            return self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id.p_id
+        else:
+            return False
+
+    p_id = fields.Char('Promotor/Sales ID',default=_get_pw,required=True)
+
+    @api.model
+    def _fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        ret=super(droga_promotors_sales_detail_entry_visit, self)._fields_view_get(view_id=None, view_type='form', toolbar=False, submenu=False)
+
 
     def action_enter(self):
 
         if len(self.env['droga.pro.sales.master'].search([('id', '=', self.pro_id.id), ('p_id', '=', self.p_id)])) > 0:
             if len(self.env['droga.pro.sales.master.visit'].search([('s_id','=',request.session.sid)]))>0:
-                raise UserError("Session already occupied. Please exit and enter again.")
+                if self.env['droga.pro.sales.master.visit'].search([('s_id','=',request.session.sid)])[0].pro_id.id == self.pro_id.id:
+                    return {'type': 'ir.actions.act_window_close'}
+                else:
+                    raise UserError("Session already occupied. Please exit and enter again.")
             vals = {
                 's_id': request.session.sid,
                 'pro_id': self.pro_id.id

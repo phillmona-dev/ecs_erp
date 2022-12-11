@@ -5,24 +5,24 @@
         <field name="sequence">20</field>
     </record>
 
-    <record id="crm_pr" model="res.groups">
-        <field name="name">CRM PR User</field>
+    <record id="crm_mr" model="res.groups">
+        <field name="name">CRM medical representative</field>
         <field name="category_id" ref="crm_management"/>
     </record>
-    <record id="crm_sales_rep" model="res.groups">
-        <field name="name">CRM Sales rep</field>
+    <record id="crm_sr" model="res.groups">
+        <field name="name">CRM sales rep</field>
         <field name="category_id" ref="crm_management"/>
-        <field name="implied_ids" eval="[(4, ref('crm_pr'))]"/>
+        <field name="implied_ids" eval="[(4, ref('crm_mr'))]"/>
     </record>
-    <record id="crm_sales_area_manager" model="res.groups">
-        <field name="name">CRM/Sales area manager</field>
+    <record id="crm_rsm" model="res.groups">
+        <field name="name">CRM or Sales regional area manager</field>
         <field name="category_id" ref="crm_management"/>
-        <field name="implied_ids" eval="[(4, ref('crm_sales_rep'))]"/>
+        <field name="implied_ids" eval="[(4, ref('crm_sr'))]"/>
     </record>
-    <record id="crm_sales_admin" model="res.groups">
-        <field name="name">CRM/Sales administrator</field>
+    <record id="crm_nsm" model="res.groups">
+        <field name="name">CRM or Sales national sales manager</field>
         <field name="category_id" ref="crm_management"/>
-        <field name="implied_ids" eval="[(4, ref('crm_sales_area_manager'))]"/>
+        <field name="implied_ids" eval="[(4, ref('crm_rsm'))]"/>
     </record>
 </odoo>
 

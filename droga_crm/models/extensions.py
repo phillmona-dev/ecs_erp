@@ -36,7 +36,8 @@ class crm_lead_extension(models.Model):
     city_name= fields.Many2one('droga.crm.settings.city',related='partner_id.city_name')
     core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])
     closed_sales=fields.Boolean('Sales is closed')
-    co_travel = fields.Many2many('hr.employee', string='Co-travelers')
+    #co_travel_crm = fields.Many2many('hr.employee', string='Co-travelers')
+    co_travel_crm = fields.Many2many('droga.pro.sales.master', string='Co-travelers')
     date_planned=fields.Datetime('Lead date')
     origin_user_id=fields.Many2one('res.users')
     sales_finished=fields.Boolean('Sales finished')
@@ -52,7 +53,7 @@ class crm_lead_extension(models.Model):
         'Phone', tracking=50,
         compute='_compute_phone', inverse='_inverse_phone', readonly=False, store=True)
 
-
+    to_update=fields.Boolean(default=False)
 
 
     def _get_pr_sales_logged(self):
@@ -62,6 +63,8 @@ class crm_lead_extension(models.Model):
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
     pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True,tracking=True)
     pr_lead = fields.Many2one('droga.pro.sales.master',default=_get_pr_sales_logged)
+    #pr_temp is used for updating
+    pr_temp = fields.Many2one('droga.pro.sales.master')
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     def _get_areas(self):
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
@@ -87,6 +90,14 @@ class crm_lead_extension(models.Model):
             if len(ses)==0:
                 return [('id','in',[])]
             else:
+
+
+                leads = self.env['crm.lead'].search(
+                    [('to_update', '=', True), ('pr_temp', '=', ses[0].pro_id.ids[0])])
+                for lead in leads:
+                    lead.sudo().write({'to_update': False,
+                                       'pr_sales': ses[0].pro_id.ids[0]})
+
                 is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
                 is_rec_inside_self=self.sudo().search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
                 return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]

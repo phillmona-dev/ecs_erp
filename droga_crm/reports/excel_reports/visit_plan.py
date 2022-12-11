@@ -199,14 +199,14 @@ class crm_visit_plan_report(models.TransientModel):
 
             for cont in rec.contacts_schedule:
                 sheet.write(row_start, 3, cont.contact_custom.descr if cont.contact_custom else '', border)
-                if len(cont.co_travel)>1:
+                if len(cont.co_travel_crm)>1:
                     name=''
-                    for con in cont.co_travel:
+                    for con in cont.co_travel_crm:
                         name=name+', '+con.name
 
                     sheet.write(row_start, 4, name[2:], num_format)
                 else:
-                    sheet.write(row_start, 4, cont.co_travel.name if cont.co_travel else '', num_format)
+                    sheet.write(row_start, 4, cont.co_travel_crm.p_name if cont.co_travel_crm else '', num_format)
                 row_start += 1
             if len(rec.contacts_schedule)==0:
                 row_start += 1

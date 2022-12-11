@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id = "CRM_PR_Own_access_only" model = "ir.rule">
-        <field name = "name"> CRM PR can only access his or her own plan only </field>
+    <record id = "crm_mr_own_access_only" model = "ir.rule">
+        <field name = "name"> CRM MR can only access his or her own plan only </field>
         <field name = "model_id" search="[('model','=','droga.customer.visit.header')]"/>
-        <field name = "groups" eval = "[(4, ref ('crm_pr'))]" />
+        <field name = "groups" eval = "[(4, ref ('crm_mr'))]" />
         <field name = "perm_read" eval = "True" />
         <field name = "perm_unlink" eval = "True" />
         <field name = "perm_create" eval = "False" />
         <field name = "perm_write" eval = "False" />
-        <field name = "domain_force"> [('is_record_owner', '=', True)] </field>
+        <field name = "domain_force"> ['|',('is_approver','=',True),('is_record_owner', '=', True)] </field>
     </record>
 
-    <record id = "CRM_PR_create_access" model = "ir.rule">
-        <field name = "name"> Everyone can create its own plan.</field>
+    <record id = "crm_mr_create_access" model = "ir.rule">
+        <field name = "name"> Everyone can create and update its own plan.</field>
         <field name = "model_id" search="[('model','=','droga.customer.visit.header')]"/>
-        <field name = "groups" eval = "[(4, ref ('crm_pr'))]" />
+        <field name = "groups" eval = "[(4, ref ('crm_mr'))]" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_write" eval = "True" />
         <field name = "perm_read" eval = "False" />
@@ -25,25 +25,25 @@
 
 
 
-    <record id = "CRM_PR_Own_lead_access_only" model = "ir.rule">
-        <field name = "name"> CRM PR can only access his or her own lead only </field>
+    <record id = "crm_mr_own_lead_access_only" model = "ir.rule">
+        <field name = "name"> CRM MR can only access his or her own lead only </field>
         <field name = "model_id" search="[('model','=','crm.lead')]"/>
-        <field name = "groups" eval = "[(4, ref ('crm_pr'))]" />
+        <field name = "groups" eval = "[(4, ref ('crm_mr'))]" />
         <field name = "perm_read" eval = "True" />
-        <field name = "perm_unlink" eval = "True" />
+        <field name = "perm_unlink" eval = "False" />
         <field name = "perm_create" eval = "False" />
         <field name = "perm_write" eval = "False" />
         <field name = "domain_force"> [('is_record_owner', '=', True)] </field>
     </record>
 
-    <record id = "CRM_PR_lead_create_access" model = "ir.rule">
+    <record id = "crm_mr_lead_create_access" model = "ir.rule">
         <field name = "name"> Everyone can create its own lead.</field>
         <field name = "model_id" search="[('model','=','crm.lead')]"/>
-        <field name = "groups" eval = "[(4, ref ('crm_pr'))]" />
+        <field name = "groups" eval = "[(4, ref ('crm_mr'))]" />
         <field name = "perm_create" eval = "True" />
         <field name = "perm_write" eval = "True" />
         <field name = "perm_read" eval = "False" />
-        <field name = "perm_unlink" eval = "False" />
+        <field name = "perm_unlink" eval = "True" />
         <field name = "domain_force"> [(1, '=', 1)] </field>
     </record>
 
@@ -52,12 +52,12 @@
 
     <menuitem name="CRM"
             id="crm.crm_menu_root"
-            groups="sales_team.group_sale_salesman,sales_team.group_sale_manager,crm_pr"
+            groups="sales_team.group_sale_salesman,sales_team.group_sale_manager,crm_mr"
             sequence="25"/>
     <menuitem
         id="crm.crm_menu_sales"
         name="Sales"
         parent="crm.crm_menu_root"
-        groups="crm_sales_rep"
+        groups="crm_sr"
         sequence="1"/>
 </odoo>

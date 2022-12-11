@@ -3,6 +3,8 @@
     'author': 'Afomsoft Technologies',
     'category': 'Accounting',
     'version': '1.0',
+    'author': "Afomsoft Technologies",
+    'website': "https://afomsoft.com",
     'depends': ['base', 'web_studio'],
     'data': ['security/ir.model.access.csv',
              'views/account_loan.xml',

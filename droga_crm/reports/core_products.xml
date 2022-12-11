@@ -53,6 +53,6 @@
             name="Core products"
             action="droga_crm_core_products_crm_action"
             parent="menu_inq_vist_reports"
-            groups="crm_pr"
+            groups="crm_mr"
             sequence="10"/>
 </odoo>
