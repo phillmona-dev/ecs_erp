@@ -1,7 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_droga_crm_sales_target_header,droga_crm.droga_crm_sales_target_header,model_droga_crm_sales_target_header,droga_crm.crm_sr,1,1,1,1
 access_droga_crm_sales_target_detail,droga_crm.droga_crm_sales_target_detail,model_droga_crm_sales_target_detail,droga_crm.crm_sr,1,1,1,1
-
+access_droga_tender_settings_customers,droga_tender.droga_tender_settings_customers,droga_tender.model_droga_tender_settings_customers,droga_crm.crm_sr,1,1,1,1
 
 access_droga_cust_specialty,droga_crm.droga_cust_specialty,model_droga_cust_specialty,droga_crm.crm_mr,1,1,1,1
 access_droga_cust_job_position,droga_crm.droga_cust_job_position,model_droga_cust_job_position,droga_crm.crm_mr,1,1,1,1
