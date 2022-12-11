@@ -1,6 +1,7 @@
 {
 'name':'Droga Project Addtion',
-'author':'Nathan Endrias',
+'author': "Afomsoft Technologies",
+    'website': "https://afomsoft.com",
 'category': 'Project',
 'version':'1.0',
 'depends':['project'],
