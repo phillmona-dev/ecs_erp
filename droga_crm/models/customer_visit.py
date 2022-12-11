@@ -365,6 +365,7 @@ class customer_visit_header(models.Model):
             record.descr= record.pr_sales.p_name + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
                 record.year) + ' - ' + record.city_name.city_descr
 
+
 class customer_visit_detail(models.Model):
     _name='droga.customer.visit.detail'
     _order = 'visit_date'
