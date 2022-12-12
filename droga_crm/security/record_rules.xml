@@ -60,4 +60,12 @@
         parent="crm.crm_menu_root"
         groups="crm_sr"
         sequence="1"/>
+
+        <menuitem
+        id="res_partner_menu_customer"
+        name="Customers"
+        parent="crm.crm_menu_root"
+        action="base.action_partner_form"
+        groups="crm_mr"
+        sequence="5"/>
 </odoo>
