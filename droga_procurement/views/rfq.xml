@@ -98,6 +98,8 @@
                         <button name="%(droga_purchase_rfq_order_action)d" string="List PO" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
                         <button name="create_purchase_orders_automatically" string="Create PO" type="object" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
                         <button name="pick_winner" string="Pick Winner" type="object" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}" confirm="Are you sure that all the necessary information is filed?"/>
+                        <button name="generate_analysis_sheet" string="Analysis Sheet" type="object" class="oe_stat_button" icon="fa-arrows-v" confirm="Are you sure that all the necessary information is filed?"/>
+                        <button name="open_rfq" string="Open RFQ" type="object" class="oe_stat_button" icon="fa-arrows-v" />
 
                     </div>
 
@@ -113,13 +115,14 @@
                             <field name="date" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
 
                             <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="0"/>
-                            <field name="procurement_committee" widget="many2many_tags" string="Committee"/>
+                            <field name="procurement_committee" widget="many2many_tags" string="Committee" options="{'no_create':True,'no_open':True}"/>
 
                         </group>
                         <group>
                             <field name="remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="technical_remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="total_winner_amount" invisible="1"/>
+                            <field name="suppliers" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
                         </group>
                     </group>
 
@@ -128,7 +131,7 @@
                         <page string="Products">
                             <field name="rfq_lines" mode="tree" attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
                                 <tree editable="bottom">
-                                    <field name="supplier_id"/>
+                                    <field name="supplier_id" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product_qty"/>
@@ -150,6 +153,19 @@
                     <field name="message_ids"/>
                 </div>
             </form>
+        </field>
+    </record>
+
+    <!-- grid view -->
+    <record id="timesheet_view_grid_by_project" model="ir.ui.view">
+        <field name="name">Grid </field>
+        <field name="model">droga.purhcase.request.rfq.line</field>
+        <field name="arch" type="xml">
+            <grid string="Offer Analysis" adjustment="object" adjust_name="adjust_grid">
+                <field name="supplier_id" type="row" section="1"/>
+                <field name="product_id" type="col"/>
+                <field name="unit_price" type="measure" />
+            </grid>
         </field>
     </record>
 

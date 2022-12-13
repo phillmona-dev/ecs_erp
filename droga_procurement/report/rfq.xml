@@ -219,7 +219,9 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <t t-if="line.winner=='Yes'">
-                                                        <span t-esc="line.winner" class="small  badge badge-success"/>
+                                                        <span t-esc="line.winner" class="small"/>
+                                                        <i class="fas fa-check"></i>
+
                                                     </t>
 
                                                     <t t-else="">

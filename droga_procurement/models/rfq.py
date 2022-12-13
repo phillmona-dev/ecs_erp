@@ -25,6 +25,9 @@ class Rfq(models.Model):
     rfq_lines = fields.One2many(
         'droga.purhcase.request.rfq.line', 'rfq_id', required=True)
 
+    suppliers = fields.Many2many(
+        'res.partner', string='Suppliers', domain="[('supplier_rank','!=', 0)]")
+
     rfq_lines_expected_cost = fields.One2many(
         'droga.purhcase.request.rfq.line', 'rfq_id', required=True)
 
@@ -156,6 +159,33 @@ class Rfq(models.Model):
     def cancel_request(self):
         self.write({'state': 'Cancel'})
         return True
+
+    def generate_analysis_sheet(self):
+
+        # get invited suppliers list
+        suppliers = self.suppliers
+        products = self.purhcase_request_id.purhcase_request_lines
+
+        if suppliers.ids:
+            for supplier in suppliers:
+                # search supplier in rfq line
+                rfq_lines = self.rfq_lines.search(
+                    [('rfq_id', '=', self.id), ('supplier_id', '=', supplier.id)])
+
+                if not rfq_lines.ids:
+                    # genertare record with each supplier and product
+                    for product in products:
+                        # create rfq line
+                        rfq_line = {
+                            'rfq_id': self.id,
+                            'supplier_id': supplier.id,
+                            'product_id': product.product_id.id,
+                            'product_uom': product.product_uom.id,
+                            'unit_price': 0
+                        }
+                        # create rfq line
+                        self.env['droga.purhcase.request.rfq.line'].create(
+                            rfq_line)
 
     def load_foregin_rfq_status(self):
         # get phase 1 or request for quotation steps
@@ -412,7 +442,7 @@ class Rfq(models.Model):
         data_record = self.env['droga.purchase.rfq.excel.report'].action_get_xls(
             self.id)
 
-        #data_record = base64.encodebytes(("%s" % json_record).encode())
+        # data_record = base64.encodebytes(("%s" % json_record).encode())
 
         filename = '%s %s' % ('Request for Quotation', self.name)
 
@@ -434,10 +464,10 @@ class Rfq(models.Model):
         if attachment_ids:
             template.write({'attachment_ids': [(6, 0, attachment_ids)]})
 
-        #template.attachment_ids = [(6,0, [data_id.id])]
-        #template.send_mail(self.id, force_send=True)
+        # template.attachment_ids = [(6,0, [data_id.id])]
+        # template.send_mail(self.id, force_send=True)
         # unlink the attachement
-        #template.attachment_ids = [(3, data_id.id)]
+        # template.attachment_ids = [(3, data_id.id)]
 
         ctx = dict(self.env.context or {})
         ctx.update({
@@ -566,6 +596,17 @@ class Rfq(models.Model):
 
         return True
 
+    def open_rfq(self):
+        return {
+            'name': _('Customer Invoice'),
+            'view_mode': 'grid',
+            'view_id': self.env.ref('droga_procurement.timesheet_view_grid_by_project').id,
+            'res_model': 'droga.purhcase.request.rfq.line',
+            'context': "{''}",
+            'type': 'ir.actions.act_window',
+            'res_id': self.id
+        }
+
     @api.constrains('proforma_invoice_no')
     def _check_proforma_invoice_no_unique(self):
         counts = self.search_count(
@@ -590,7 +631,8 @@ class Rfq_Detail(models.Model):
     purhcase_request_lines = fields.One2many(
         related='purhcase_request_id.purhcase_request_lines')
 
-    supplier_id = fields.Many2one('res.partner', string='Supplier')
+    supplier_id = fields.Many2one(
+        'res.partner', string='Supplier', domain="[('supplier_rank','!=', 0)]")
     supplier_name = fields.Char(related="supplier_id.name", store=True)
     product_id = fields.Many2one('product.product', string='Product', domain=[
                                  ('purchase_ok', '=', True)], change_default=True)

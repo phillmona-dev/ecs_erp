@@ -197,7 +197,7 @@ class droga_stock_office_supplies(models.Model):
         self.state = 'done'
 
     def action_create_purchase_request(self):
-        if self.state != 'waiting':
+        if self.state != 'processed':
 
             return {
                 'type': 'ir.actions.client',
