@@ -11,7 +11,7 @@ class cust_contact_extension(models.Model):
                                     compute='_compute_company_type', inverse='_write_company_type',default='company')
     cust_grade=fields.Many2one('droga.cust.grade',string='Customer grade')
     cust_type_ext=fields.Many2one('droga.cust.type',string='Customer type')
-    contact_tobe_accessed_by=fields.Selection([('Promotors', 'Promotors'),('Sales reps', 'Sales reps'), ('Both', 'Both')], required=True,string='Contact used by')
+    contact_tobe_accessed_by=fields.Selection([('Promotors', 'Promotors'),('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
 
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
@@ -19,6 +19,47 @@ class cust_contact_extension(models.Model):
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
+
+    def _get_pr_sales_logged(self):
+        if not request:
+            return False
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        return False if len(ses)==0 else ses[0].pro_id.ids[0]
+
+    pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
+    pr_avail_areas=fields.Many2many(related='pr_sales_logged.p_regions')
+
+
+    def _is_cust_loc_avail(self):
+        if not self.env.user.name.startswith('CRM'):
+            for rec in self:
+                rec.is_cust_available = True
+        else:
+            for rec in self:
+                if rec.city_name in rec.pr_avail_areas or not rec.city_name:
+                    rec.is_cust_available = True
+                else:
+                    rec.is_cust_available = False
+
+    is_cust_available = fields.Boolean('Show cust', store=False, compute="_is_cust_loc_avail", search="_search_cust_avail")
+
+    def _search_cust_avail(self, operator, value):
+        if not self.env.user.name.startswith('CRM') :
+            return [('id', 'in', [x.id for x in self.env['res.partner'].search([(1,'=',1)])] )]
+        if not request:
+            return [('id', 'in', [x.id for x in self.env['res.partner'].search(
+                [('city_name', '=', False)])])]
+        if operator=='=':
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            if len(ses)==0:
+                return [('id', 'in', [x.id for x in self.env['res.partner'].search(
+                [('city_name', '=', False)])])]
+            else:
+                is_cust_avail=self.env['res.partner'].sudo().search(['|',('city_name','in',ses[0].pro_id[0].p_regions.ids),('city_name','=',False)])
+                return [('id', 'in', [x.id for x in is_cust_avail] if is_cust_avail else False)]
+        else:
+            return [('id', 'in', [x.id for x in self.env['res.partner'].search(
+                [('city_name', '=', False)])])]
 
 
 class sales_team_extension(models.Model):
@@ -133,3 +174,8 @@ class crm_lead_extension(models.Model):
 
     def unlink(self):
         raise UserError("You can not delete the record. Please mark it as lost instead.")
+
+
+class crm_prod_template_extension(models.Model):
+    _inherit = 'product.template'
+    crm_group=fields.Many2one('droga.crm.settings.prod_group',string='CRM Group')

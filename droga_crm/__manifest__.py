@@ -33,6 +33,7 @@
         'views/settings/job_position.xml',
         'views/settings/cust_type.xml',
         'views/settings/region.xml',
+        'views/settings/crm_prod_group.xml',
         'views/settings/city.xml',
         'views/settings/area.xml',
         'views/lead_extension.xml',

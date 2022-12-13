@@ -11,8 +11,9 @@ class droga_promotors_sales_master(models.Model):
     s_name = fields.Char('Promotor/Sales short name')
     p_id = fields.Char('Promotor/Sales ID', required=True)
     p_regions =fields.Many2many('droga.crm.settings.city', required=True)
+    p_groups=fields.Many2many('droga.crm.settings.prod_group',required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],
-                            required=True)
+                            required=True,default='Active')
     is_pr_sales=fields.Boolean('Is PR/Sales')
     employee_access_users=fields.Many2one('res.users',string='Login user',required=True)
     res_user_name=fields.Char(related=employee_access_users.name)
@@ -41,11 +42,6 @@ class droga_promotors_sales_detail_entry_visit(models.TransientModel):
             return False
 
     p_id = fields.Char('Promotor/Sales ID',default=_get_pw,required=True)
-
-    @api.model
-    def _fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
-        ret=super(droga_promotors_sales_detail_entry_visit, self)._fields_view_get(view_id=None, view_type='form', toolbar=False, submenu=False)
-
 
     def action_enter(self):
 

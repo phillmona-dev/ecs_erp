@@ -54,7 +54,7 @@
     'depends': ['base','hr','account',
                 'mail','droga_crm','hr','droga_finance','droga_inventory',
                 'resource','stock','sale',
-                'web','report_xlsx'],
+                'web'],
     "license": "AGPL-3",
     # only loaded in demonstration mode
     'installable': True,
