@@ -244,7 +244,7 @@ class droga_stock_office_supplies(models.Model):
             # create purchase request
             vals = {
                 'name': 'New',
-                'state': 'waiting',
+                'state': 'Budget Approved',
                 'request_type': 'Local',
                 'branch': self.branch.id,
                 'request_by': self.requested_by.id,
