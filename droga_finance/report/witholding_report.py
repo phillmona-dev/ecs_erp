@@ -217,7 +217,7 @@ class WitholdingReport(models.TransientModel):
             [('date', '>=', self.date_from), ('date', '<=', self.date_to), ('company_id', '=', self.company_id.id)])
 
         accounts = self.env['account.account'].search(
-            [('code', 'in', ('116001', '116001'))])
+            [('code', 'in', ('116001', '116002'))])
 
         withholdings = account_moves.line_ids.search(
             [('account_id', 'in', accounts.ids)])
