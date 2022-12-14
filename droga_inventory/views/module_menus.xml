@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Stock.picking.type default filter per warehouse access -->
+    <record id="stock.stock_picking_type_action" model="ir.actions.act_window">
+        <field name="domain">[('has_access','=',True)]</field>
+    </record>
+
+</odoo>

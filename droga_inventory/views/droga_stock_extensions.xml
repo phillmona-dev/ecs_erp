@@ -28,6 +28,8 @@
                 <field name="cons_receive_request" readonly="1" attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
                 <field name="products_availability_state"/>
             </xpath>
+
+
         </field>
     </record>
 

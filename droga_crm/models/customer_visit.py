@@ -48,7 +48,7 @@ class customer_visit_header(models.Model):
         else:
             approver_login = '-'
 
-        approvers=self.env['droga.pro.sales.master'].search([('employee_access_users.name','=',approver_login),('p_regions','in',pr_sales_loc.p_regions.ids)])
+        approvers=self.env['droga.pro.sales.master'].sudo().search([('employee_access_users.name','=',approver_login),('p_regions','in',pr_sales_loc.p_regions.ids)])
         return approvers[0] if len(approvers)>0 else False
 
     approver=fields.Many2one('droga.pro.sales.master',default=_get_approver,store=True,required=True)

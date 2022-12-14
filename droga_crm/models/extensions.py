@@ -12,6 +12,19 @@ class cust_contact_extension(models.Model):
     cust_grade=fields.Many2one('droga.cust.grade',string='Customer grade')
     cust_type_ext=fields.Many2one('droga.cust.type',string='Customer type')
     contact_tobe_accessed_by=fields.Selection([('Promotors', 'Promotors'),('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
+    type = fields.Selection(
+        [('contact', 'Contact'),
+         ('invoice', 'Invoice Address'),
+         ('delivery', 'Delivery Address'),
+         ('private', 'Private Address'),
+         ('other', 'Other Address'),
+         ], string='Address Type',
+        default='private',
+        help="- Contact: Use this to organize the contact details of employees of a given company (e.g. CEO, CFO, ...).\n"
+             "- Invoice Address : Preferred address for all invoices. Selected by default when you invoice an order that belongs to this company.\n"
+             "- Delivery Address : Preferred address for all deliveries. Selected by default when you deliver an order that belongs to this company.\n"
+             "- Private: Private addresses are only visible by authorized users and contain sensitive data (employee home addresses, ...).\n"
+             "- Other: Other address for the company (e.g. subsidiary, ...)")
 
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
@@ -29,37 +42,30 @@ class cust_contact_extension(models.Model):
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     pr_avail_areas=fields.Many2many(related='pr_sales_logged.p_regions')
 
-
     def _is_cust_loc_avail(self):
         if not self.env.user.name.startswith('CRM'):
             for rec in self:
                 rec.is_cust_available = True
         else:
             for rec in self:
-                if rec.city_name in rec.pr_avail_areas or not rec.city_name:
+                if rec.city_name in rec.pr_avail_areas:
                     rec.is_cust_available = True
                 else:
                     rec.is_cust_available = False
 
     is_cust_available = fields.Boolean('Show cust', store=False, compute="_is_cust_loc_avail", search="_search_cust_avail")
 
+
     def _search_cust_avail(self, operator, value):
         if not self.env.user.name.startswith('CRM') :
             return [('id', 'in', [x.id for x in self.env['res.partner'].search([(1,'=',1)])] )]
-        if not request:
-            return [('id', 'in', [x.id for x in self.env['res.partner'].search(
-                [('city_name', '=', False)])])]
-        if operator=='=':
-            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
-            if len(ses)==0:
-                return [('id', 'in', [x.id for x in self.env['res.partner'].search(
-                [('city_name', '=', False)])])]
-            else:
-                is_cust_avail=self.env['res.partner'].sudo().search(['|',('city_name','in',ses[0].pro_id[0].p_regions.ids),('city_name','=',False)])
-                return [('id', 'in', [x.id for x in is_cust_avail] if is_cust_avail else False)]
-        else:
-            return [('id', 'in', [x.id for x in self.env['res.partner'].search(
-                [('city_name', '=', False)])])]
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        if not request or len(ses)==0:
+            return [('id', 'in', [])]
+        is_cust_avail = self.env['res.partner'].sudo().search(
+            [('city_name', 'in', ses[0].pro_id[0].p_regions.ids)])
+        return [('id', 'in', [x.id for x in is_cust_avail] if is_cust_avail else False)]
+
 
 
 class sales_team_extension(models.Model):
@@ -115,7 +121,7 @@ class crm_lead_extension(models.Model):
         'res.partner', string='Customer', check_company=True, index=True, tracking=10,
         domain="['&',('city_name', 'in',pr_avail_areas),'|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
-    is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
+    is_record_owner = fields.Boolean('Show lead', store=False, compute="_is_record_owner", search="_search_field")
     @api.depends('pr_sales_logged')
     def _is_record_owner(self):
        for rec in self:
@@ -131,17 +137,15 @@ class crm_lead_extension(models.Model):
             if len(ses)==0:
                 return [('id','in',[])]
             else:
-
-
                 leads = self.env['crm.lead'].search(
                     [('to_update', '=', True), ('pr_temp', '=', ses[0].pro_id.ids[0])])
                 for lead in leads:
                     lead.sudo().write({'to_update': False,
-                                       'pr_sales': ses[0].pro_id.ids[0]})
+                                       'pr_sales': lead.pr_temp})
 
-                is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
-                is_rec_inside_self=self.sudo().search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
-                return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+                is_rec_owner=self.env['crm.lead'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
+                #is_rec_inside_self=self.sudo().search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
+                return [('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False)]
         else:
             return [('id','in',[])]
 

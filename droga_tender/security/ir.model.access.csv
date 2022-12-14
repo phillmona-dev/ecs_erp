@@ -7,6 +7,8 @@ access_tender_settings_sec_type,droga.tender.settings.sec.type,model_droga_tende
 access_tender_settings_submission_place,droga.tender.settings.submission.place,model_droga_tender_settings_submission_place,droga_tender.tender_manager,1,1,1,1
 access_tender_settings_customer,droga.tender.settings.customers,model_droga_tender_settings_customers,droga_tender.tender_manager,1,1,1,1
 
+access_droga_inv_prods,droga_tender.droga_inv_prod,stock.model_product_template,droga_crm.crm_nsm,1,1,1,1
+
 access_tender_competitors,droga.tender.competitors,model_droga_tender_competitors,droga_tender.tender_user,1,1,1,1
 access_tender_specs,droga.tender.specs.detail,model_droga_tender_specs_detail,droga_tender.tender_user,1,1,1,1
 access_tender_contract,droga.tender.contract,model_droga_tender_contract,droga_tender.tender_user,1,1,1,1

@@ -13,10 +13,87 @@ class droga_location_extension(models.Model):
         ('SAP','Sales placement location')
         ], string='Cons/sample Type')
     wcode=fields.Char(related='warehouse_id.code')
+    has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
+                                search='_search_has_access')
+
+    def _search_has_access(self, operator, value):
+
+        compiled_wh_domain = []
+        user_groups_list = self.env.user.groups_id
+        for user_group in user_groups_list:
+            given_ules = user_group.rule_groups
+            for rule in given_ules:
+                if 'Warehouse' in rule.model_id.name:
+                    compiled_wh_domain.append(
+                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+
+        if operator == '=':
+            if len(compiled_wh_domain) == 0:
+                return [('id', 'in', [])]
+            else:
+                has_access = self.env['stock.location'].sudo().search(
+                    [('wcode', 'in', compiled_wh_domain)])
+                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+        else:
+            return [('id', 'in', [])]
+
+    def _compute_has_access(self):
+        compiled_wh_domain = []
+        user_groups_list = self.env.user.groups_id
+        for user_group in user_groups_list:
+            given_ules = user_group.rule_groups
+            for rule in given_ules:
+                if 'Warehouse' in rule.model_id.name:
+                    compiled_wh_domain.append(
+                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+
+        for rec in self:
+            if rec.wcode in compiled_wh_domain:
+                rec.has_access = True
+            else:
+                rec.has_access = False
 
 class droga_stock_picking_type_extension(models.Model):
     _inherit = 'stock.picking.type'
-    warehouse_code=fields.Char(related='warehouse_id.code')
+    warehouse_code=fields.Char(related='warehouse_id.code',store=True)
+
+    has_access=fields.Boolean('is_type_accessible',default=False,compute='_compute_has_access',search='_search_has_access')
+
+    def _search_has_access(self, operator, value):
+
+        compiled_wh_domain = []
+        user_groups_list = self.env.user.groups_id
+        for user_group in user_groups_list:
+            given_ules = user_group.rule_groups
+            for rule in given_ules:
+                if 'Warehouse' in rule.model_id.name:
+                    compiled_wh_domain.append(
+                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+
+        if operator=='=':
+            if len(compiled_wh_domain)==0:
+                return [('id','in',[])]
+            else:
+                has_access=self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain)])
+                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+        else:
+            return [('id','in',[])]
+
+    def _compute_has_access(self):
+        compiled_wh_domain = []
+        user_groups_list = self.env.user.groups_id
+        for user_group in user_groups_list:
+            given_ules = user_group.rule_groups
+            for rule in given_ules:
+                if 'Warehouse' in rule.model_id.name:
+                    compiled_wh_domain.append(
+                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+
+        for rec in self:
+            if rec.warehouse_code in compiled_wh_domain:
+                rec.has_access=True
+            else:
+                rec.has_access=False
 
 class droga_stock_move_extension(models.Model):
     _inherit = 'stock.move'
@@ -55,6 +132,7 @@ class droga_stock_picking_extension(models.Model):
     to_wh =fields.Many2one('stock.warehouse',compute='_compute_from_to_warehouse')
     from_whc=fields.Char(related='location_id.warehouse_id.code',store=True)
     to_whc = fields.Char(related='location_dest_id.warehouse_id.code',store=True)
+    warehouse_list=fields.Many2many('stock.warehouse')
     def _compute_from_to_warehouse(self):
         for rec in self:
             rec.from_wh=self.env['stock.warehouse'].search([('code','=',rec.location_id.location_id.complete_name)]) if (rec.location_id.usage=='internal' and len(self.env['stock.warehouse'].search([('code','=',rec.location_id.location_id.complete_name)]))>0) else None
@@ -164,6 +242,46 @@ class droga_stock_product_extension(models.Model):
     def _get_avg_monthly_consumption(self):
         for rec in self:
             rec.average_month_consumption=0
+
+    has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
+                                search='_search_has_access')
+
+    def _search_has_access(self, operator, value):
+
+        compiled_wh_domain = []
+        user_groups_list = self.env.user.groups_id
+        for user_group in user_groups_list:
+            given_ules = user_group.rule_groups
+            for rule in given_ules:
+                if 'Warehouse' in rule.model_id.name:
+                    compiled_wh_domain.append(
+                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+
+        if operator == '=':
+            if len(compiled_wh_domain) == 0:
+                return [('id', 'in', [])]
+            else:
+                has_access = self.env['stock.warehouse'].sudo().search(
+                    [('code', 'in', compiled_wh_domain)])
+                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+        else:
+            return [('id', 'in', [])]
+
+    def _compute_has_access(self):
+        compiled_wh_domain = []
+        user_groups_list = self.env.user.groups_id
+        for user_group in user_groups_list:
+            given_ules = user_group.rule_groups
+            for rule in given_ules:
+                if 'Warehouse' in rule.model_id.name:
+                    compiled_wh_domain.append(
+                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+
+        for rec in self:
+            if rec.code in compiled_wh_domain:
+                rec.has_access = True
+            else:
+                rec.has_access = False
 
 
 class product_selection_field(models.Model):

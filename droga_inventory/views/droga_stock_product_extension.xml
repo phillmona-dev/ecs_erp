@@ -30,7 +30,7 @@
 
             <!--> Hide purchase page -->
             <xpath expr="//form/sheet/notebook/page[@name='purchase']" position="attributes">
-                <attribute name="invisible">True</attribute>
+                <attribute name="invisible">False</attribute>
             </xpath>
 
             <!--> Hide inventory page -->
