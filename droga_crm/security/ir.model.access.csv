@@ -3,6 +3,8 @@ access_droga_crm_sales_target_header,droga_crm.droga_crm_sales_target_header,mod
 access_droga_crm_sales_target_detail,droga_crm.droga_crm_sales_target_detail,model_droga_crm_sales_target_detail,droga_crm.crm_sr,1,1,1,1
 access_droga_tender_settings_customers,droga_tender.droga_tender_settings_customers,droga_tender.model_droga_tender_settings_customers,droga_crm.crm_sr,1,1,1,1
 
+access_droga_inv_prods,droga_tender.droga_inv_prod,stock.model_product_template,droga_crm.crm_nsm,1,1,1,1
+
 access_droga_cust_specialty,droga_crm.droga_cust_specialty,model_droga_cust_specialty,droga_crm.crm_mr,1,1,1,1
 access_droga_cust_job_position,droga_crm.droga_cust_job_position,model_droga_cust_job_position,droga_crm.crm_mr,1,1,1,1
 access_droga_crm_settings_area,droga_crm.droga_crm_settings_area,model_droga_crm_settings_area,droga_crm.crm_mr,1,1,1,1
@@ -24,5 +26,7 @@ access_droga_crm_done_activity,droga_crm.droga_crm_done_activity,model_droga_crm
 access_droga_pro_sales_master_entry_visit,droga_crm.droga_pro_sales_master_entry_visit,model_droga_pro_sales_master_entry_visit,droga_crm.crm_mr,1,1,1,1
 access_droga_sale_order,sale.sale_order,sale.model_sale_order,droga_crm.crm_mr,1,1,1,1
 access_droga_lead2oppo,crm.lead2opportunity_partner,crm.model_crm_lead2opportunity_partner,droga_crm.crm_mr,1,1,1,1
+access_droga_res_partner,crm.res_partner,base.model_res_partner,droga_crm.crm_mr,1,1,1,1
 access_droga_ordered_prod,droga_lead_ordered_products,model_droga_lead_ordered_products,droga_crm.crm_mr,1,1,1,1
+access_droga_crm_settings_prod_group,droga_crm.droga_crm_settings_prod_group,model_droga_crm_settings_prod_group,droga_crm.crm_mr,1,1,1,1
 

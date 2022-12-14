@@ -4,7 +4,7 @@ from odoo import models,fields
 #My point is to have a transient model inherit the report.report_xlsx.abstract and immplement all logic and use interface from here as well
 class tender_master_xls(models.TransientModel):
     _name='report.droga_tender.tender_master_xls_rep'
-    _inherit = 'report.report_xlsx.abstract'
+    #_inherit = 'report.report_xlsx.abstract'
 
     posted_date_from=fields.Date('Posted date from')
     posted_date_to = fields.Date('Posted date to')

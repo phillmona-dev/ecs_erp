@@ -41,7 +41,9 @@
                            string="Customer grade" domain="([('status','=','Active')])"></field>
                     <field name="cust_type_ext" domain="([('status','=','Active')])" attrs="{'required': True}" options="{'no_create':True,'no_open':True}"
                            string="Customer type"></field>
-                    <field name="city_name" domain="([('status','=','Active')])" options="{'no_create':True,'no_open':True}"
+                    <field name="pr_avail_areas" invisible="1"></field>
+                    <field name="pr_sales_logged" invisible="1"></field>
+                    <field name="city_name" domain="([('id', 'in',pr_avail_areas),('status','=','Active')])" options="{'no_create':True,'no_open':True}"
                            string="City/sub-city team"></field>
                     <field name="area" options="{'no_create':True,'no_open':True}" string="Area"
                            domain="([('parent_id','=',city_name),('status','=','Active')])"></field>
