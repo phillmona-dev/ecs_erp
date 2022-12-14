@@ -24,6 +24,15 @@ class droga_stock_office_supplies(models.Model):
             [('user_id', '=', self.env.uid)], limit=1)
         return employee_rec.department_id
 
+    # compute total purchase amount
+    @api.depends('detail_entries.total_price')
+    def compute_total_purchase_amount(self):
+        total = 0
+        for record in self.detail_entries:
+            total += record.total_price
+
+        self.total_amount = total
+
     name = fields.Char('Name', default='New')
 
     requested_by = fields.Many2one(
@@ -40,7 +49,8 @@ class droga_stock_office_supplies(models.Model):
     detail_entries = fields.One2many(
         'droga.inventory.office.supplies.request.detail', 'request_header')
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
+    company_id = fields.Many2one(
+        'res.company', string='Company', default=lambda self: self.env.company, required=True)
     currency_id = fields.Many2one(
         "res.currency", string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
 
@@ -58,6 +68,9 @@ class droga_stock_office_supplies(models.Model):
     branch = fields.Many2one("account.analytic.account", string="Cost Center", domain=[
                              ('plan_id', '=', 'Profit Center')])
 
+    total_amount = fields.Float(
+        "Total Amount", compute="compute_total_purchase_amount", store=True)
+
     state = fields.Selection([
         ('draft', 'Draft'),
 
@@ -66,7 +79,7 @@ class droga_stock_office_supplies(models.Model):
         ("verify", "Verified"),  # when the department manger approved it
         # when the budget department approved the budget
         ("Budget Approval", "Budget Approved"),
-         ('waiting', 'Waiting'),  # When request is processed
+        ('waiting', 'Waiting'),  # When request is processed
         ('processed', 'Processed'),  # When request is processed
         ('done', 'Received'),  # When request is received
         ('cancel', 'Cancelled'),  # When requester cancels it from draft
@@ -191,7 +204,7 @@ class droga_stock_office_supplies(models.Model):
                 self.env['stock.move'].sudo().create(move_vals)
 
         if picking_id.ids:
-           self.state = 'waiting'
+            self.state = 'waiting'
 
     def action_receive(self):
         self.state = 'done'
@@ -246,6 +259,7 @@ class droga_stock_office_supplies(models.Model):
                 'name': 'New',
                 'state': 'Budget Approved',
                 'request_type': 'Local',
+                'purpose': self.purpose,
                 'branch': self.branch.id,
                 'request_by': self.requested_by.id,
                 'department': self.department.id,
@@ -290,7 +304,8 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     request_header = fields.Many2one(
         'droga.inventory.office.supplies.request', required=True)
 
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
+    company_id = fields.Many2one(
+        'res.company', string='Company', default=lambda self: self.env.company, required=True)
     product_id = fields.Many2one(
         'product.product', 'Product',
         check_company=True,
@@ -321,6 +336,9 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     avaliable_qty = fields.Float("Available Qty")
     unavilable_qty = fields.Float(
         "Unavilable Qty", compute="compute_unavilable_qty")
+
+    stock_balance = fields.Float(
+        "Stock Balance", compute='_compute_current_stock_balance', store=True)
 
     @api.depends('product_uom_qty', 'unit_price')
     def _compute_total(self):
@@ -382,3 +400,8 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     def compute_unavilable_qty(self):
         for record in self:
             record.unavilable_qty = record.product_uom_qty-record.avaliable_qty
+
+    @api.depends('product_id')
+    def _compute_current_stock_balance(self):
+        for record in self:
+            record.stock_balance = record.product_id.free_qty

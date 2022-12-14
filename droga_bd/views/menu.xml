@@ -21,6 +21,25 @@
         </field>
     </record>
 
+    <!-- action for approval store requisition -->
+    <record id="droga_budget_store_request_for_approval_action" model="ir.actions.act_window">
+        <field name="name">Store Requisition</field>
+        <field name="res_model">droga.inventory.office.supplies.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_inventory.droga_inventory_office_supplies_request_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_inventory.droga_inventory_office_supplies_request_form')})]" />
+        <field name="domain">[]</field>
+        <field name="context">{'edit': 0,'create': 0}</field>
+        <field name="domain">[('state', 'not in', ('Draft','Draft'))]</field>
+        <field name="context">{'search_default_verified':1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No Store requsition found for approval 
+            </p>
+        </field>
+    </record>
+
     <!-- action for approval Foregin purcjase request -->
     <record id="droga_budget_request_foregin_for_approval_action" model="ir.actions.act_window">
         <field name="name">Purhcase Request</field>
@@ -46,15 +65,11 @@
         <menuitem id="droga_budget_menu" name="Budgets" action="account_budget.act_crossovered_budget_view" groups="droga_finance.account_risk_treasury_manager_group" sequence="1"/>
         <menuitem id="droga_budget_reallocation_menu" name="Reallocation and Addition" action="droga_budget_reallocation_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="2"/>
         <menuitem id="droga_commitment_budget_menu" name="Commitment" action="droga_budget_commitment_budget_purchase_order_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="3"/>
-        <!--<menuitem id="droga_commitment_budget_purchase_order_menu" name="Commitment Budget Purchase Order" action="droga_budget_commitment_budget_purchase_order_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="4"/>-->
-        <menuitem id="droga_budget_purchae_request_approval_local_menu" name="Purchase Request" action="droga_budget_request_for_approval_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="5"/>
 
-
-
-        <!-- <menuitem id="droga_budget_purchase_request" name="Purchase Request" groups="droga_finance.account_risk_treasury_manager_group" sequence="5">
-            <menuitem id="droga_budget_purchae_request_approval_foreign_menu" name="Foreign" action="droga_budget_request_foregin_for_approval_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="1"/>
-
-        </menuitem>-->
+        <menuitem id="droga_budget_approval" name="Budget Approval" groups="droga_finance.account_risk_treasury_manager_group" sequence="5">
+            <menuitem id="droga_budget_store_request_approval_local_menu" name="Store Requisition" action="droga_budget_store_request_for_approval_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="1"/>
+            <menuitem id="droga_budget_purchae_request_approval_local_menu" name="Purchase Request" action="droga_budget_request_for_approval_action" groups="droga_finance.account_risk_treasury_manager_group" sequence="2"/>
+        </menuitem>
 
         <menuitem id="droga_budget_configuartion" name="Configurations" groups="droga_finance.account_risk_treasury_manager_group" sequence="6">
             <menuitem id="droga_budget_budgetary_position" name="Budget Category" action="account_budget.open_budget_post_form" groups="droga_finance.account_risk_treasury_manager_group" sequence="1"/>

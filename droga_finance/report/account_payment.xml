@@ -51,8 +51,14 @@
                                 <h6>From
                                     
                                 </h6>
-                                <h6>አድራሻ/ክልል፦አ.አ<span style="padding-left: 10px;">ክ.ከ፦አ/ከተማ</span><span style="padding-left: 10px;">ወ፦06</span><span style="padding-left: 10px;">ቤ.ቁ፦133</span></h6>
-                                <h6>Address Region<span style="padding-left: 8px;">K/K</span><span style="padding-left: 15px;">W.</span><span style="padding-left: 15px;">H.No.</span></h6>
+                                <h6>አድራሻ/ክልል፦አ.አ                                    <span style="padding-left: 10px;">ክ.ከ፦አ/ከተማ</span>
+                                    <span style="padding-left: 10px;">ወ፦06</span>
+                                    <span style="padding-left: 10px;">ቤ.ቁ፦133</span>
+                                </h6>
+                                <h6>Address Region<span style="padding-left: 8px;">K/K</span>
+                                    <span style="padding-left: 15px;">W.</span>
+                                    <span style="padding-left: 15px;">H.No.</span>
+                                </h6>
                                 <h6>የታክስ ከፋይ መ.ቁ፦&#160;&#160;<u>0045080232</u>
                                 </h6>
                                 <h6>Supplier's TIN No.</h6>
@@ -89,16 +95,19 @@
                             </div>
                         </div>
                         <div id="informations" class="row mt32 mb32">
-                            <div class="col-4 bm-2">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6>ብር</h6>
-                                        <h6>Birr:____________________
-                                           
-                                        </h6>
+                            <span class="pull-right">
+                                <div class="col-4 bm-2">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6>ብር</h6>
+                                            <h6>Birr:____________________
+                                               
+                                            </h6>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </span>
+
                         </div>
 
                         <div id="informations" class="row mt32 mb32">

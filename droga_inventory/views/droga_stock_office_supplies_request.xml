@@ -3,7 +3,7 @@
     <record id="droga_inventory_office_supplies_request_action" model="ir.actions.act_window">
         <field name="name">Store Requsition</field>
         <field name="res_model">droga.inventory.office.supplies.request</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,kanban</field>
     </record>
 
     <!-- action for purchase request -->
@@ -37,6 +37,77 @@
                 <field name="purpose"/>
                 <field name="state" decoration-warning="state in('submit')" decoration-info="state in('submit','verify','Budget Approval','waiting','processed')" decoration-danger="state == 'cancel'" decoration-success="state == 'done'" widget="badge"/>
             </tree>
+        </field>
+    </record>
+
+     <!-- kanban view  procurement -->
+     <record id="droga_inventory_office_supplies_request_kanban" model="ir.ui.view">
+        <field name="name">Store Requisition</field>
+        <field name="model">droga.inventory.office.supplies.request</field>
+        <field name="arch" type="xml">
+            <kanban quick_create="false" create="true" edit="false" delete="false">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top mb16">
+                                <!--<field name="priority" widget="priority"/>-->
+                                <div class="o_kanban_record_headings ms-1">
+                                    <strong class="o_kanban_record_title">
+                                        <span>
+                                            <field name="name"/>
+
+                                        </span>
+                                    </strong>
+                                </div>
+                                <strong>
+                                    <field name="total_amount" widget="monetary"/>
+                                </strong>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <span>
+                                        <field name="requested_by"/>
+                                        <field name="request_date"/>
+                                    </span>
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="state" widget="label_selection" options="{'classes': {'Approved': 'success', 'Draft': 'warning'}}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- search view -->
+    <record id="droga_inventory_office_supplies_request_search" model="ir.ui.view">
+        <field name="name">droga.inventory.office.supplies.request.view.search</field>
+        <field name="model">droga.inventory.office.supplies.request</field>
+        <field name="arch" type="xml">
+            <search string="">
+                <field name="name"/>
+                <field name="requested_by"/>
+                <field name="request_date"/>
+                <field name="department"/>
+                <field name="purpose"/>
+                <field name="state"/>
+                <separator/>
+                <filter name="submitted" string="Submitted" domain="[('state', '=', 'submit')]" />
+                <filter name="verified" string="Verified" domain="[('state', '=', 'verify')]" />
+                <filter name="budget" string="Budget Approved" domain="[('state', '=', 'Budget Approval')]" />
+                <filter name="approved" string="Approved" domain="[('state', '=', 'done')]" />
+                <filter name="canceled" string="Canceled" domain="[('state', '=', 'cancel')]" />
+                <separator />
+                <filter name="request_date" string="Request Date" date="request_date"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="department" domain="[]" context="{'group_by': 'department'}"/>
+                    <filter string="Request Date" name="request_date" domain="[]" context="{'group_by': 'request_date'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -76,10 +147,11 @@
                             <field name="branch" options="{'no_create':True,'no_open':True}" required="1" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
                         </group>
                         <group>
-                            <field name="warehouse" attrs="{'readonly': [('state', 'not in', ('draft'))]}"  options="{'no_create':True,'no_open':True}" required="1"/>
+                            <field name="warehouse" attrs="{'readonly': [('state', 'not in', ('draft'))]}" options="{'no_create':True,'no_open':True}" invisible="1"/>
                             <field name="request_date" attrs="{'readonly': [('state', 'not in', ('draft'))]}"></field>
                             <field name="purpose" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
-                            <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}" invisible="1"/>
+                            <field name="total_amount" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -95,8 +167,9 @@
                                     <field name="unit_price" width="10" attrs="{'readonly': [('parent.state', 'not in', ('draft'))]}"/>
                                     <field name="total_price" width="10" attrs="{'readonly': [('parent.state', 'not in', ('draft'))]}"/>
                                     <field name="budgetary_position" width="10" required="1" options="{'no_create':True,'no_open':True}" string="Budget Category" />
-                                    <field name="expense_account" width="10" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('verify'))]}" />
+                                    <field name="expense_account" width="10" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('verify'))]}" string="GL Account"/>
                                     <field name="remaining_budget" width="10" attrs="{'column_invisible': [('parent.state', 'not in', ('verify'))]}" decoration-danger="total_price &gt; remaining_budget" decoration-success="total_price &lt;= remaining_budget" widget="badge"/>
+                                    <field name="stock_balance" readonly="1" string="Stock" width="10"/>
                                     <field name="avaliable_qty" width="10" attrs="{'column_invisible': [('parent.state', 'not in', ('Budget Approval'))]}"/>
                                     <field name="unavilable_qty" invisible="1"/>
 

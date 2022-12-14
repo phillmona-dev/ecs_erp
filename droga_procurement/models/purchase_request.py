@@ -62,7 +62,10 @@ class purhcase_request(models.Model):
         "droga.purhcase.request.line", "purhcase_request_id")
 
     state = fields.Selection(
-        [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Approved", "Budget Approved"), ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
+        [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Approved", "Budget Approved"), ("Procurement Manager", "PR Manager Approved"), ("Approved", "Ceo Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
+
+    wf_state = fields.Selection(
+        [('On Progress', 'On Progress'), ('Approved', 'Approved')], default="On Progress")
 
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
@@ -186,9 +189,16 @@ class purhcase_request(models.Model):
         self.record_commitment_budget()
         return True
 
+    def approve_request_pr_manager(self):
+        self.write({'state': 'Procurement Manager'})
+        if self.total_amount <= 100000:
+            self.write({'wf_state': 'Approved'})
+        return True
+
     # approve request
     def approve_request(self):
         self.write({'state': 'Approved'})
+        self.write({'wf_state': 'Approved'})
         # record commitment budget
         return True
 
