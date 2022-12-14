@@ -7,6 +7,7 @@ class AccountPayment(models.Model):
 
     transaction_type = fields.Many2one("account.transaction.type")
     payment_request_id = fields.Many2one("droga.account.payment.request")
+    purpose = fields.Char("Purpose")
 
     @api.model
     def create(self, vals):

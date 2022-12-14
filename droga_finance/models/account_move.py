@@ -7,6 +7,8 @@ class AccountMove(models.Model):
 
     _inherit = "account.move"
 
+    purpose = fields.Char("Purpose")
+
     @api.depends("amount_total")
     def _compute_amount_word(self):
         for record in self:
@@ -47,7 +49,6 @@ class AccountMove(models.Model):
         compute='_comput_witholding_amount', store=True)
     withholding_thirty_percent = fields.Float(
         compute='_comput_witholding_amount', store=True)
-    
 
     @api.model
     def create(self, vals):
