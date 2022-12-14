@@ -48,6 +48,11 @@
                 <field name="transaction_type" options="{'no_create':True,'no_open':True}" required="1"/>
                 <field name="payment_request_id" options="{'no_create':True}" readonly="1"/>
             </xpath>
+
+            <xpath expr = "//field[@name='ref']" position = "after">
+                <field name="purpose" />
+            </xpath>
+
         </field>
     </record>
 

@@ -87,11 +87,14 @@
                                 <t t-esc="o.partner_id.vat"/>
                             </b>
                         </h6>
-                        <h6>አድራሻ</h6>
-                        <h6>Address</h6>
+
                     </div>
                 </div>
                 <div id="informations" class="row mt32 mb32">
+                    <div class="col-2 bm-2">
+                        <h6>አድራሻ</h6>
+                        <h6>Address</h6>
+                    </div>
                     <div class="col-3 bm-2">
                         <h6>ክልል</h6>
                         <h6>Region:
@@ -101,6 +104,7 @@
                         </h6>
                     </div>
                     <div class="col-3 bm-2">
+
                         <h6>ክፍለ ከተማ</h6>
                         <h6>Sub-City:
                             <b>
@@ -108,14 +112,14 @@
                             </b>
                         </h6>
                     </div>
-                    <div class="col-3 bm-2">
+                    <div class="col-2 bm-2">
                         <h6>ቀበሌ</h6>
                         <h6>Kebele:
                             <b>
                             </b>
                         </h6>
                     </div>
-                    <div class="col-3 bm-2">
+                    <div class="col-2 bm-2">
                         <h6>የቤት ቁጥር</h6>
                         <h6>House No:-
                             <b>
@@ -190,19 +194,16 @@
                     <h6>Bank Voucher</h6>
                 </div>
                 <div class="col-6 bm-2">
-                    <h6>የቼክ ቁጥር</h6>
-                    <h6>Check No</h6>
+                    <h6>የሽያጭ ደረሰኝ ቁጥር</h6>
+                    <h6>Sales Invoice No</h6>
                 </div>
             </div>
             <div id="informations" class="row mt32 mb32">
                 <div class="col-6 bm-2">
-                    <h6>የባንክ ሰነድ ቁጥር</h6>
-                    <h6>Bank Voucher</h6>
+                    <h6>የቼክ ቁጥር</h6>
+                    <h6>Check No</h6>
                 </div>
-                <div class="col-6 bm-2">
-                    <h6>የሽያጭ ደረሰኝ ቁጥር</h6>
-                    <h6>Sales Invoice No</h6>
-                </div>
+
             </div>
             <br></br>
             <div id="informations" class="row mt32 mb32">
@@ -215,7 +216,7 @@
                     <h6>We have withold from the above named Taxpayer <b>
 
                         <t t-if="o.withholding_two_percent!=0">
-                            <t t-esc="o.amount_tax_signed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                            <u><t t-esc="o.withholding_two_percent" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></u>
                         </t>
 
                     </b>representing 2% tax payable to the Tax Authority as per the article 92/1 of the income tax proclamtion No.979/2008 </h6>
@@ -231,7 +232,7 @@
                 <h6>We have withold from the above named Taxpayer 
                     <b>
                         <t t-if="o.withholding_thirty_percent!=0">
-                            <t t-esc="o.amount_tax_signed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                        <u> <t t-esc="o.withholding_thirty_percent" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></u>
                         </t>
                     </b>
                     representing 30% tax payable to the Tax Authority as per the article 92/1 of the income tax proclamtion No.979/2008 </h6>
@@ -239,21 +240,29 @@
         </div>
         <br></br>
         <div id="informations" class="row mt32 mb32">
-            <div class="col-3 bm-2">
+            <div class="col-6 bm-2">
                 <h6>ስም</h6>
                 <h6>Name</h6>
             </div>
-            <div class="col-3 bm-2">
+            <div class="col-6 bm-2">
                 <h6>የስራ ሃላፊነት</h6>
                 <h6>Position</h6>
             </div>
-            <div class="col-3 bm-2">
+
+        </div>
+        <div id="informations" class="row mt32 mb32">
+            <div class="col-6 bm-2">
                 <h6>ፊርማ</h6>
                 <h6>Siganature</h6>
             </div>
-            <div class="col-3 bm-2">
-                <h6>ማህተም</h6>
-                <h6>Seal</h6>
+            <div class="col-6 bm-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h6>ማህተም</h6>
+                        <h6>Seal</h6>
+                    </div>
+                </div>
+
             </div>
         </div>
     </t>
