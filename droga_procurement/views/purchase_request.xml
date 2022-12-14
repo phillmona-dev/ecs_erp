@@ -53,7 +53,7 @@
 
                     <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request" data-hotkey="v" invisible="1"/>
 
-                    <button name="reject_request" type="object" states="Submitted,Verified,Budget Approved,Procurement Manager" string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
+                    <button name="reject_request" type="object" string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?" attrs="{'invisible':['|',('state','in',('Draft')),('wf_state', 'in', ('Approved'))]}"/>
                     <button name="cancel_request" type="object" string="Cancel" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="oe_highlight btn-danger" attrs="{'invisible':[('wf_state', 'in', ('On Progress'))]}"/>
 
                     <field name="state" widget="statusbar"/>
