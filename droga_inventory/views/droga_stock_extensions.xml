@@ -29,6 +29,13 @@
                 <field name="products_availability_state"/>
             </xpath>
 
+            <xpath expr="//form/sheet/group/group/field[@name='location_id'][2]" position="replace">
+                <field name="location_id" domain="[('has_access', '=', True),('usage','=','internal')]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/field[@name='location_dest_id'][2]" position="replace">
+                <field name="location_dest_id" domain="[('usage','=','internal')]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"/>
+            </xpath>
 
         </field>
     </record>
