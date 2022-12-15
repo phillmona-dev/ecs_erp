@@ -4,8 +4,70 @@
     <record id="droga_crm_doctors_schedule_model_action" model="ir.actions.act_window">
         <field name="name">Doctors schedule</field>
         <field name="res_model">droga.crm.contacts</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">tree,kanban</field>
         <field name="context">{'search_default_group_cust_name': 1}</field>
+    </record>
+
+    <record id="droga_crm_doctors_schedule_view_kanban" model="ir.ui.view">
+        <field name="name">droga.crm.contacts.kanban</field>
+        <field name="model">droga.crm.contacts</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="parent_customer"></field>
+                <field name="specialty"></field>
+                <field name="job_position"></field>
+                <field name="contact_name"></field>
+                <field name="mobile"></field>
+                <field name="gender"></field>
+                <field name="cont_grade"></field>
+                <field name="contact_area" invisible="1"></field>
+                <field name="days" widget="many2many_tags"></field>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li>
+                                        <strong class="o_kanban_record_title">Customer:
+                                            <field name="parent_customer"></field>
+                                        </strong>
+                                    </li>
+                                    <li>
+                                        Specialty:
+                                        <field name="specialty"></field>
+                                        <span></span>
+                                        Job Position
+                                        <field name="job_position"></field>
+                                    </li>
+                                    <li>
+                                        Contact name:
+                                        <field name="contact_name"></field>
+                                    </li>
+                                    <li>
+                                        Mobile:
+                                        <field name="mobile"></field>
+                                    </li>
+                                    <li>
+                                        Day:
+                                        <field name="days"></field>
+                                    </li>
+
+                                    <li>
+                                        Gender:
+                                        <field name="gender"></field>
+                                    </li>
+
+                                    <li>
+                                        Grade:
+                                        <field name="cont_grade"></field>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
     </record>
 
     <record id="droga_crm_doctors_schedule_view_tree" model="ir.ui.view">
@@ -45,10 +107,10 @@
     </record>
 
     <menuitem
-        id="droga_crm_contacts_model_schedule_area"
-        name="Doctors schedule"
-        action="droga_crm_doctors_schedule_model_action"
-        parent="menu_inq_vist_reports"
-        sequence="20"/>
+            id="droga_crm_contacts_model_schedule_area"
+            name="Doctors schedule"
+            action="droga_crm_doctors_schedule_model_action"
+            parent="menu_inq_vist_reports"
+            sequence="20"/>
 
 </odoo>

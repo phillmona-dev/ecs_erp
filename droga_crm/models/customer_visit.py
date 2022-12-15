@@ -31,7 +31,7 @@ class customer_visit_header(models.Model):
     def _get_approver(self):
         if not request:
             return False
-        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        ses = self.env['droga.pro.sales.master.visit'].sudo().search([('s_id', '=', request.session.sid)])
         pr_sales_loc=None
         if len(ses)==0:
             return False
@@ -172,7 +172,8 @@ class customer_visit_header(models.Model):
             'view_mode': 'tree',
             'view_type': 'form',
             'res_model': 'droga.crm.grade.vs.schedule.view',
-            'view_id': self.env.ref('droga_crm.droga_crm_required_vs_planned_tree').id,
+            'views': [[self.env.ref('droga_crm.droga_crm_required_vs_planned_tree').id, 'tree'],
+                      [self.env.ref('droga_crm.droga_crm_grade_vs_schedule_view_view_kanban').id, 'kanban']],
             'type': 'ir.actions.act_window',
             'domain': [('visit_header_id', '=', self.id)],
             'context': {'search_default_group_cust_type':1},
@@ -430,7 +431,8 @@ class customer_visit_detail(models.Model):
             'view_type': 'form',
             'res_model': 'droga.crm.contacts',
             'context': "{'search_default_group_cust_name':1}",
-            'view_id': self.env.ref('droga_crm.droga_crm_doctors_schedule_view_tree').id,
+            'views': [[self.env.ref('droga_crm.droga_crm_doctors_schedule_view_tree').id, 'tree'],
+                      [self.env.ref('droga_crm.droga_crm_doctors_schedule_view_kanban').id, 'kanban']],
             'type': 'ir.actions.act_window',
             'domain': [('days', '=', self.visit_date.strftime("%A")),('contact_area.id','=',self.city_name.ids)],
             'target': 'new',

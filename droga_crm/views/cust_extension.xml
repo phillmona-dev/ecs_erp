@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/notebook/page[@name='contact_addresses']" position="replace">
                 <page string="Contacts">
-                    <field name="contacts" mode="tree">
+                    <field name="contacts" mode="tree,kanban">
                         <tree editable="1" create="1">
                             <field name="specialty" domain="([('status','=','Active')])" options="{'no_create':True,'no_open':True}"/>
                             <field name="contact_name"/>
@@ -18,6 +18,55 @@
                             <field name="cont_grade" options="{'no_create':True,'no_open':True}" domain="([('status','=','Active'),('cont_include','=',True)])"/>
                             <field name="days" widget="many2many_tags"/>
                         </tree>
+                        <form >
+                            <group>
+                            <field name="specialty" domain="([('status','=','Active')])" options="{'no_create':True,'no_open':True}"/>
+                            <field name="contact_name"/>
+                            <field name="job_position"/>
+                            <field name="gender"/>
+                            <field name="mobile"/>
+                            <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
+                            <field name="cont_grade" options="{'no_create':True,'no_open':True}" domain="([('status','=','Active'),('cont_include','=',True)])"/>
+                            <field name="days" widget="many2many_tags"/>
+                            </group>
+                        </form>
+                        <kanban class="o_kanban_mobile">
+                            <field name="specialty" domain="([('status','=','Active')])" options="{'no_create':True,'no_open':True}"/>
+                            <field name="contact_name"/>
+                            <field name="job_position"/>
+                            <field name="gender"/>
+                            <field name="mobile"/>
+                            <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
+                            <field name="cont_grade" options="{'no_create':True,'no_open':True}" domain="([('status','=','Active'),('cont_include','=',True)])"/>
+                            <field name="days" widget="many2many_tags"/>
+                            <templates>
+                                    <t t-name="kanban-box">
+                                        <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
+                                            <div class="oe_kanban_details">
+                                                <ul>
+                                                    <li>
+                                                        Specialty:<field name="specialty"></field>
+                                                    </li>
+                                                    <li>
+                                                        Job Position: <field name="job_position"></field>
+                                                    </li>
+                                                    <li>
+                                                        Gender:<field name="gender"></field>
+                                                        <span> </span>-<span> </span>
+                                                        Mobile:<field name="mobile"></field>
+                                                    </li>
+
+
+
+
+                                                </ul>
+
+                                            </div>
+                                        </div>
+                                    </t>
+                        </templates>
+
+                        </kanban>
                     </field>
                 </page>
             </xpath>
@@ -70,5 +119,4 @@
 
         </field>
     </record>
-
 </odoo>
