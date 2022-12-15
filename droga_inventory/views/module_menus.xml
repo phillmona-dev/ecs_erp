@@ -6,4 +6,9 @@
         <field name="domain">[('has_access','=',True)]</field>
     </record>
 
+    <!-- Stock transfers default filter per warehouse access -->
+    <record id="stock.action_picking_tree_all" model="ir.actions.act_window">
+        <field name="domain">[('has_access','=',True)]</field>
+    </record>
+
 </odoo>

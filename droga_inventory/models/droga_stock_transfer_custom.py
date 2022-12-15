@@ -86,10 +86,6 @@ class droga_stock_transfer_custom(models.Model):
         self.state='cancel'
 
     def action_request(self):
-        loc_list=self.detail_entries['location_source_id']
-        warehouse_ini_list=[]
-        for loc in loc_list:
-            warehouse_ini_list.append(self.env['stock.location'].search([('id','=',loc.id)]).warehouse_id)
         warehouse_list=self.detail_entries['warehouse_id']
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
@@ -100,7 +96,7 @@ class droga_stock_transfer_custom(models.Model):
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
-            def_location_id=self.env['stock.location'].search([('usage','=','internal')])[0].id
+            def_location_id=self.env['stock.location'].search([('usage','=','internal'),('wcode','=',wh.code)])[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")
             picking_vals = {
@@ -111,8 +107,8 @@ class droga_stock_transfer_custom(models.Model):
                 'location_dest_id': self.location_dest_id.id,
                 #'auto_generated': True,
                 'origin': self.name,
-                #'state': 'waiting',
-                'state': 'confirmed',
+                'state': 'waiting',
+                #'state': 'confirmed',
                 'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
             }
@@ -135,8 +131,8 @@ class droga_stock_transfer_custom(models.Model):
                         'product_uom_qty': rec['product_uom_qty'],
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
-                        #'state': 'waiting',
-                        'state': 'confirmed',
+                        'state': 'waiting',
+                        #'state': 'confirmed',
                         'company_id': self.company_id.id
                     }
 
