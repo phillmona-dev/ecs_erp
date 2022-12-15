@@ -903,27 +903,28 @@
                                         <field name="approver"></field>
                                     </li>
 
-                                    <div>
+                                    <table>
+                                        <tr>
+                                            <th>
+                                                <button type="object" class="btn btn-primary btn-sm"
+                                                        name="visit_detail_open">Visit detail
+                                                </button>
+                                            </th>
+                                            <th>
+                                                <button type="object" class="btn btn-primary btn-sm"
+                                                        attrs="{'invisible': ['|',('is_record_owner','=',False),('state', '!=', ('draft'))]}"
+                                                        name="request_approval">Request approval
+                                                </button>
+                                            </th>
+                                            <th>
+                                                <button type="object" class="btn btn-primary btn-sm"
+                                                        name="plan_analysis" style="top-margin:3px">Plan analysis
+                                                </button>
+                                            </th>
+                                        </tr>
+                                    </table>
 
-                                        <div style="text-align:left">
-                                            <button type="object" class="btn btn-primary btn-sm"
-                                                    name="visit_detail_open">Visit detail
-                                            </button>
-                                        </div>
 
-                                        <div style="text-align:center">
-                                            <button type="object" class="btn btn-primary btn-sm"
-                                                    attrs="{'invisible': ['|',('is_record_owner','=',False),('state', '!=', ('draft'))]}"
-                                                    name="request_approval">Request approval
-                                            </button>
-                                        </div>
-
-                                        <div style="text-align:right">
-                                            <button type="object" class="btn btn-primary btn-sm"
-                                                    name="plan_analysis" style="top-margin:3px">Plan analysis
-                                            </button>
-                                        </div>
-                                    </div>
                                 </ul>
                             </div>
                         </div>
