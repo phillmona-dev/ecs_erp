@@ -71,7 +71,7 @@ class droga_stock_cons_receive(models.Model):
                 'location_dest_id': def_loc_id,
                 'cons_receive_request': self.id,
                 #'auto_generated': True,
-                'origin': self.name,
+                #'origin': self.name,
                 'state': 'waiting',
                 'scheduled_date': self.receipt_date
             }

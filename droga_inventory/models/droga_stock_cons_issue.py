@@ -80,7 +80,7 @@ class droga_stock_cons_issue(models.Model):
                 'picking_type_id': pick_type_id,
                 'location_id': def_loc_id,
                 'location_dest_id': cust_locat,
-                'origin': self.name,
+                #'origin': self.name,
                 'cons_sample_issue_request': self.id,
                 'state': 'waiting',
                 'scheduled_date': self.issue_date
