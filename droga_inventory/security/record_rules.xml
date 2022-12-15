@@ -93,7 +93,97 @@
 
 
 
+    
+    
+    
+    
+    
+    
+    <record id = "inventory_ms_warehouse_access_om" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]"/>
+        <field name = "groups" eval = "[(4, ref ('inventory_om'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('code', '=', 'MS')] </field>
+    </record>
 
+    <record id = "inventory_li_warehouse_access_om" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_om'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('code', '=', 'LI')] </field>
+    </record>
+
+    <record id = "inventory_me_warehouse_access_om" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_om'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('code', '=', 'ME')] </field>
+    </record>
+
+    <record id = "inventory_os_warehouse_access_om" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_om'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('code', '=', 'OS')] </field>
+    </record>
+
+    <record id = "inventory_md_warehouse_access_om" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_om'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('code', '=', 'MD')] </field>
+    </record>
+
+    <record id = "inventory_of_warehouse_access_om" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_om'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('code', '=', 'OF')] </field>
+    </record>
+
+    <record id = "inventory_ws_warehouse_access_om" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_om'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('code', '=', 'WS')] </field>
+    </record>
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 
 
