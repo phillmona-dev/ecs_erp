@@ -89,4 +89,123 @@
     </record>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <record id = "inventory_ms_picking_type_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
+        <field name = "model_id" search="[('model','=','stock.picking.type')]"/>
+        <field name = "groups" eval = "[(4, ref ('inventory_ms'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [	('name','!=','Delivery and distribution manager')] </field>
+    </record>
+
+    <record id = "inventory_li_picking_type_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
+        <field name = "model_id" search="[('model','=','stock.picking.type')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_li'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [	('name','!=','Delivery and distribution manager')] </field>
+    </record>
+
+    <record id = "inventory_me_picking_type_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
+        <field name = "model_id" search="[('model','=','stock.picking.type')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_me'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [	('name','!=','Delivery and distribution manager')] </field>
+    </record>
+
+    <record id = "inventory_os_picking_type_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
+        <field name = "model_id" search="[('model','=','stock.picking.type')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_os'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('name','!=','Delivery and distribution manager')] </field>
+    </record>
+
+    <record id = "inventory_md_picking_type_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
+        <field name = "model_id" search="[('model','=','stock.picking.type')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_md'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('name','!=','Delivery and distribution manager')] </field>
+    </record>
+
+    <record id = "inventory_ws_picking_type_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
+        <field name = "model_id" search="[('model','=','stock.picking.type')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_ws'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('name','!=','Delivery and distribution manager')] </field>
+    </record>
+
+    <record id = "inventory_of_picking_type_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse transactions only </field>
+        <field name = "model_id" search="[('model','=','stock.picking.type')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_of'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('name','!=','Delivery and distribution manager')] </field>
+    </record>
+
+    <record id = "inventory_om_picking_type_access" model = "ir.rule">
+        <field name = "name"> Operation manager can access all dispatch transactions of all warehouses. </field>
+        <field name = "model_id" search="[('model','=','stock.picking.type')]" />
+        <field name = "groups" eval = "[(4, ref ('inventory_om'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('name','=','Delivery and distribution manager')] </field>
+    </record>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </odoo>
