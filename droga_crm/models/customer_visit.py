@@ -412,14 +412,17 @@ class customer_visit_detail(models.Model):
     def _compute_contact_plan(self):
         for rec in self:
             descr=''
-            for sched in rec.contacts_schedule:
-                descr=descr+(sched['contact_custom']['job_position']['job_position'] +' - ' if sched['contact_custom']['job_position'] else '')+(sched['contact_custom']['specialty']['specialty']+' - ' if sched['contact_custom']['specialty']['specialty'] else '')+sched['contact_custom']['contact_name']+' : ' if sched['contact_custom']['contact_name'] else ' '
+            try:
+                for sched in rec.contacts_schedule:
+                    descr=descr+(sched['contact_custom']['job_position']['job_position'] +' - ' if sched['contact_custom']['job_position'] else '')+(sched['contact_custom']['specialty']['specialty']+' - ' if sched['contact_custom']['specialty']['specialty'] else '')+sched['contact_custom']['contact_name']+' : ' if sched['contact_custom']['contact_name'] else ' '
 
-                for id, prod in enumerate(sched['core_products']):
-                    descr = descr + prod.name if id == 0 else descr + ', ' + prod['name']
-                descr=descr+'\n'
+                    for id, prod in enumerate(sched['core_products']):
+                        descr = descr + prod.name if id == 0 else descr + ', ' + prod['name']
+                    descr=descr+'\n'
 
-            rec.cont_plan_des=descr
+                rec.cont_plan_des=descr
+            except:
+                rec.cont_plan_des = sched['contact_custom']['contact_name'] if sched['contact_custom']['contact_name'] else ' '
     def _get_visit_date_and_day(self):
         for rec in self:
             rec.day_and_date=rec.visit_date_descr+'-'+rec.visit_date.strftime("%B %d,%Y")
