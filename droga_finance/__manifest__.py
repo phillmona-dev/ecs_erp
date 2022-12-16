@@ -35,6 +35,7 @@
         'report/account_move.xml',
         'report/withholding_report.xml',
         'report/account_payment.xml',
+        'report/account_payment_check_printout.xml',
         'views/menu.xml',
     ],
     # only loaded in demonstration mode

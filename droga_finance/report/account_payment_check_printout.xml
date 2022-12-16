@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="droga_account_check_printout_cbe_action" model="ir.actions.report">
+        <field name="name">CBE Check</field>
+        <field name="model">account.payment</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_finance.account_payment_check_printout_report</field>
+        <field name="report_file">droga_finance.account_payment_check_printout_report</field>
+        <field name="print_report_name">'CBE Check'</field>
+         <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a4"/>
+        <field name="binding_model_id" ref="model_account_payment"/>
+        <field name="binding_type">report</field>
+    </record>
+    <template id="account_payment_check_printout_report">
+        <t t-call="web.html_container">
+         <div id="non-printable">
+                <button class="btn btn-primary btn-sm o_report_print" onclick="window.print();">Print Preview
+                </button>
+            </div>
+            <br></br>
+            <style type="text/css">
+    
+                        /* Default left, right, top, bottom margin is 2cm */
+                        @page {
+                        size: A4 portrait;
+                        margin: 0cm;
+                        }
+    
+                        @media print
+                        {
+                        #non-printable { visibility: hidden; }
+                        #wrapwrap { visibility: visible; }
+                        }
+                </style>
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                     <t t-foreach="docs" t-as="o">
+                     <div class="page" t-attf-style="background-image:url('/droga_finance/static/description/1.png'); background-size:195mm 282mm; width:195mm; height:282mm;">
+
+                         <div class="position-absolute" style="padding-left :112.094mm;padding-top:10.018mm"> **<t t-esc="o.date" t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>**</div>
+                         <div class="position-absolute" style="padding-left :22.908mm; padding-top:45.34mm"> **<t t-esc="o.partner_id.name" />**</div>
+                         <div  class="position-absolute" style="padding-left :20.908mm; padding-top:56.34mm"> **<t t-esc="o.amount_total_word" />**</div>
+                         <div  class="position-absolute" style="padding-left :120.908mm; padding-top:56.34mm"> **<t  t-esc="'{0:,.2f}'.format(o.amount)"/>**</div>
+
+
+                    </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
