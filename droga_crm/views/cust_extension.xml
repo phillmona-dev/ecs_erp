@@ -45,9 +45,11 @@
                                             <div class="oe_kanban_details">
                                                 <ul>
                                                     <li>
-                                                        Specialty:<field name="specialty"></field>
+                                                        <field name="contact_name"></field>
                                                     </li>
                                                     <li>
+                                                        Specialty:<field name="specialty"></field>
+                                                        <span> </span>-<span> </span>
                                                         Job Position: <field name="job_position"></field>
                                                     </li>
                                                     <li>
