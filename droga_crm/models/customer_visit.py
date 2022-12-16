@@ -363,10 +363,11 @@ class customer_visit_header(models.Model):
 
     def _get_descr(self):
         for record in self:
-            record.descr= record.pr_sales.p_name + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
-                record.year) + ' - ' + record.city_name.city_descr
-
-
+            try:
+                record.descr= record.pr_sales.p_name + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
+                    record.year) + ' - ' + record.city_name.city_descr
+            except:
+                record.descr=record.pr_sales.p_name if record.pr_sales.p_name else '-'
 class customer_visit_detail(models.Model):
     _name='droga.customer.visit.detail'
     _order = 'visit_date'
