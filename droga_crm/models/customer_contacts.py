@@ -27,8 +27,11 @@ class droga_crm_contacts(models.Model):
 
     def _get_descr(self):
         for record in self:
-            name = (record.job_position.job_position+ ' - ') if record.job_position else ''
-            name=(name+record.specialty.specialty+ ' - ') if record.specialty.specialty else name
+            try:
+                name = (record.job_position.job_position+ ' - ') if record.job_position else ''
+                name=(name+record.specialty.specialty+ ' - ') if record.specialty.specialty else name
 
-            record.descr= name+record.contact_name
+                record.descr= name+record.contact_name
+            except:
+                record.descr=''
             
