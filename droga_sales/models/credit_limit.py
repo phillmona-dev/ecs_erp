@@ -30,6 +30,7 @@ class cust_sales_credit_limit(models.Model):
     pay_type=fields.Boolean(related='payment_term_id.apply_credit_limit')
     matured_amount=fields.Float('Matured amount',compute='_get_matured_amount')
     show_invoice_button=fields.Boolean(compute='_get_matured_amount')
+    manual_price=fields.Boolean('Manual price',default=False)
 
     @api.depends('partner_id')
     def _get_matured_amount(self):
@@ -108,7 +109,7 @@ class inventory_placement_extension(models.Model):
 
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
-
+    manual_price=fields.Boolean(related='order_id.manual_price')
     def _prepare_procurement_values(self, group_id=False):
 
         values = super(cust_sales_no_create_after_invoice, self)._prepare_procurement_values(group_id)
