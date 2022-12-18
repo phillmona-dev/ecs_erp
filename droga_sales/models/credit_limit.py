@@ -28,18 +28,18 @@ class cust_sales_credit_limit(models.Model):
     tender_origin_form = fields.Many2one('droga.tender.master', readonly=True)
     cash_upfront=fields.Float(string='Down payment')
     pay_type=fields.Boolean(related='payment_term_id.apply_credit_limit')
-    mature_amount = fields.Monetary('Matured amount', related='partner_id.unsettled_amount')
+    mature_amount = fields.Monetary('Matured amount', compute='_get_mature_amount')
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
     manual_price=fields.Boolean('Manual price',default=False)
 
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
-            #matured_invoices=self.env['account.move'].search([('state', '=', 'posted'),('invoice_date_due','<',datetime.now()),('payment_state','=','not_paid'),('partner_id','=',rec.partner_id.id)])
-            #tot_amount=0
-            #for mi in matured_invoices:
-            #    tot_amount=tot_amount+mi['amount_total_signed']
-            #rec.mature_amount=tot_amount
+            matured_invoices=self.env['account.move'].search([('state', '=', 'posted'),('journal_id.type','=','sale'),('invoice_date_due','<',datetime.now()),('payment_state','in',['not_paid','partial']),('partner_id','=',rec.partner_id.id)])
+            tot_amount=0
+            for mi in matured_invoices:
+                tot_amount=tot_amount+mi['amount_total_signed']
+            rec.mature_amount=tot_amount
             rec.show_invoice_button=False if self.partner_id.unsettled_amount==0 else True
     @api.model
     def create(self, vals):
