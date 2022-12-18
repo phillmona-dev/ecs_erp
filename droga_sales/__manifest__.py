@@ -25,7 +25,8 @@
         #'views/account_move.xml',
         'views/credit_limit.xml',
         'views/sales_discount_rules.xml',
-        'views/extensions.xml'
+        'views/extensions.xml',
+        'views/module_menus.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

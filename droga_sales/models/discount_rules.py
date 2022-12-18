@@ -69,6 +69,7 @@ class sale_order_line(models.Model):
         self.order_id.core_sum = core_sum
         self.order_id.non_core_sum = non_core_sum
         self.order_id.total_discount=total_before_discount-(core_sum+non_core_sum)
+        self.order_id.total_added=(core_sum+non_core_sum)-total_before_discount
     @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id','manual_price')
     def _compute_price_unit(self):
 
@@ -171,6 +172,7 @@ class sale_order_ext(models.Model):
     non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
 
     total_discount = fields.Float('Total discount')
+    total_added = fields.Float('Total accrual')
 
     def _get_pr_sales_logged(self):
         if not request:
