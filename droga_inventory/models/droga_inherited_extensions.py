@@ -249,7 +249,7 @@ class droga_stock_product_extension(models.Model):
     detailed_type = fields.Selection(selection=[
         ('consu','Consumables'),
         ('product', 'Storable Product'),
-        ('service', 'Service')], string='Product Type', default='product', required=True,store=True,compute='_get_type',
+        ('service', 'Service')], string='Product type_', default='product', required=True,store=True,compute='_get_type',
         help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
              'A service is a non-material product you provide.')
     detailed_type_cus = fields.Selection(selection=[
@@ -260,7 +260,7 @@ class droga_stock_product_extension(models.Model):
     @api.depends('detailed_type_cus')
     def _get_type(self):
         for rec in self:
-            rec.detailed_type=rec.detailed_type
+            rec.detailed_type=rec.detailed_type_cus
     sub_categ_id=fields.Many2one(
         'product.category', 'Product Sub-Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
