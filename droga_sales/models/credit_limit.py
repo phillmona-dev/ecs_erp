@@ -21,7 +21,6 @@ class cust_credit_limit(models.Model):
             record.unsettled_amount = record.credit - record.debit
             record.available_amount=record.cust_credit_limit-record.unsettled_amount
 
-
 class cust_sales_credit_limit(models.Model):
     _inherit = 'sale.order'
     available_amount=fields.Float(string='Credit balance',related='partner_id.available_amount')

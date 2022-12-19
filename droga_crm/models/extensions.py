@@ -25,7 +25,7 @@ class cust_contact_extension(models.Model):
              "- Delivery Address : Preferred address for all deliveries. Selected by default when you deliver an order that belongs to this company.\n"
              "- Private: Private addresses are only visible by authorized users and contain sensitive data (employee home addresses, ...).\n"
              "- Other: Other address for the company (e.g. subsidiary, ...)")
-
+    is_customer=fields.Boolean(default=False)
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
     city_name = fields.Many2one('droga.crm.settings.city')
@@ -66,6 +66,15 @@ class cust_contact_extension(models.Model):
             [('city_name', 'in', ses[0].pro_id[0].p_regions.ids)])
         return [('id', 'in', [x.id for x in is_cust_avail] if is_cust_avail else False)]
 
+
+class account_move_pr_sales(models.Model):
+    _inherit = "account.move"
+    def _get_pr_sales_logged(self):
+        sale=self.env['sale.order'].search([('name','=',self.invoice_origin)])
+        return False if len(sale)==0 else sale[0].pr_sales
+
+    pr_sales = fields.Many2one('droga.pro.sales.master', readonly=True, store=True, string="Promotor ID",
+                               default=_get_pr_sales_logged, required=True)
 
 
 class sales_team_extension(models.Model):
