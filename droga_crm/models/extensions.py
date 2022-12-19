@@ -25,7 +25,6 @@ class cust_contact_extension(models.Model):
              "- Delivery Address : Preferred address for all deliveries. Selected by default when you deliver an order that belongs to this company.\n"
              "- Private: Private addresses are only visible by authorized users and contain sensitive data (employee home addresses, ...).\n"
              "- Other: Other address for the company (e.g. subsidiary, ...)")
-    is_customer=fields.Boolean(default=False)
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
     city_name = fields.Many2one('droga.crm.settings.city')
