@@ -262,7 +262,7 @@ class droga_stock_product_extension(models.Model):
         for rec in self:
             rec.detailed_type=rec.detailed_type
     sub_categ_id=fields.Many2one(
-        'product.category', 'Product Category',
+        'product.category', 'Product Sub-Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
          help="Select sub-category for the current product")
     default_code = fields.Char('Internal Reference',compute='_compute_default_code',
