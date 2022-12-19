@@ -247,9 +247,9 @@ class droga_stock_product_extension(models.Model):
         change_default=True, default='', group_expand='_read_group_categ_id',
         required=True, help="Select category for the current product")
     detailed_type = fields.Selection(selection=[
-        ('consu','Consumables'),
         ('product', 'Storable Product'),
-        ('service', 'Service')], string='Product type_', default='product', required=True,store=True,
+        ('consu','Consumables'),
+        ('service', 'Service')], string='Product Type', default='product', required=True,store=True,
         help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
              'A service is a non-material product you provide.')
 
