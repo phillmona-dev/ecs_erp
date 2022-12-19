@@ -53,8 +53,7 @@
 
                     <field name="active" invisible="1"/>
                     <group col="1">
-                        <field name="detailed_type_cus"/>
-                        <field name="detailed_type" invisible="1"/>
+                        <field name="detailed_type"/>
 
                         <field name="emergency_order_point"/>
 
