@@ -148,6 +148,7 @@ class droga_stock_picking_extension(models.Model):
             else:
                 rec.lacation_id_readonly = False
                 rec.lacation_dest_id_readonly=True
+                
 
     def _search_has_access(self, operator, value):
 
