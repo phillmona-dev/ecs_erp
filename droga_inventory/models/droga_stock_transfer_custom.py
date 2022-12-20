@@ -48,7 +48,7 @@ class droga_stock_transfer_custom(models.Model):
         elif len(compiled_domain)==1:
             #User has access to 1 warehouse, it will return internal locations under that warehouse
             #my_domain = json.dumps([('usage', '=', 'internal'),('complete_name',"like",+"'"+compiled_domain[0]+"/Stock%'")])
-            my_domain = json.dumps([('usage', '=', 'production'), ('complete_name', 'like', compiled_domain[0]+' Receive transit')])
+            my_domain = json.dumps([('usage', '=', 'production'),('con_type','=','SRL'), ('complete_name', 'like', compiled_domain[0]+' Receive transit')])
         else:
             dom=''
             for wh in compiled_domain:

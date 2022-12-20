@@ -30,11 +30,13 @@
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='location_id'][2]" position="replace">
-                <field name="location_id" domain="[('has_access', '=', True),('usage','=','internal')]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/>
+                <field name="lacation_id_readonly" invisible="1"></field>
+                <field name="location_id" domain="[('usage','=','internal'),('has_access', '=', True)]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'incoming')],'readonly':[('lacation_id_readonly','=',True)]}"/>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='location_dest_id'][2]" position="replace">
-                <field name="location_dest_id" domain="[('usage','=','internal')]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"/>
+                <field name="lacation_dest_id_readonly" invisible="1"></field>
+                <field name="location_dest_id" domain="[('usage','=','internal'),('has_access', '=', True)]" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')],'readonly':[('lacation_dest_id_readonly','=',True)]}"/>
             </xpath>
 
         </field>

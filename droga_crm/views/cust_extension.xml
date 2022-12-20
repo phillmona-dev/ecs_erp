@@ -153,6 +153,9 @@
                 <field name="invoice_date_due" position="after">
                     <field name="pr_sales" string='Sales person' optional="show"/>
                 </field>
+                <field name="name" position="after">
+                    <field name="invoice_partner_display_name" string='Customer' optional="show"/>
+                </field>
             </field>
         </record>
 </odoo>
