@@ -33,6 +33,11 @@ class droga_stock_office_supplies(models.Model):
 
         self.total_amount = total
 
+    # set default warehouse
+    def _default_warehouse(self):
+        # get office supplies tore
+        return self.env['stock.warehouse'].search([('code', '=', 'OF')], limit=1).id
+
     name = fields.Char('Name', default='New')
 
     requested_by = fields.Many2one(
@@ -42,7 +47,10 @@ class droga_stock_office_supplies(models.Model):
     department = fields.Many2one(
         "hr.department", string="Department", required=True, default=_get_department_id)
 
-    warehouse = fields.Many2one('stock.warehouse')
+    warehouse = fields.Many2one('stock.warehouse', default=_default_warehouse)
+
+    product_type = fields.Selection([('Technical', 'Technical'), ('Non Technical', 'Non Technical')],
+                                    default='Non Technical')
 
     purpose = fields.Char("Purpose")
 
@@ -52,7 +60,8 @@ class droga_stock_office_supplies(models.Model):
     company_id = fields.Many2one(
         'res.company', string='Company', default=lambda self: self.env.company, required=True)
     currency_id = fields.Many2one(
-        "res.currency", string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
+        "res.currency", string="Currency", required=True,
+        default=lambda self: self.env.ref('base.main_company').currency_id)
 
     # request_reference = fields.Text(string='Request reference', readonly=True)
     request_picking = fields.One2many('stock.picking', 'office_request')
@@ -66,7 +75,7 @@ class droga_stock_office_supplies(models.Model):
         related="department_manager.user_id", store=True)
 
     branch = fields.Many2one("account.analytic.account", string="Cost Center", domain=[
-                             ('plan_id', '=', 'Profit Center')])
+        ('plan_id', '=', 'Profit Center')])
 
     total_amount = fields.Float(
         "Total Amount", compute="compute_total_purchase_amount", store=True)
@@ -124,18 +133,23 @@ class droga_stock_office_supplies(models.Model):
             if not record.budgetary_position.ids or not record.expense_account.ids:
                 return {
                     'type': 'ir.actions.client',
-                            'tag': 'display_notification',
-                            'params': {
-                                'message': 'Budget category or expense account can''t be empty',
-                                'type': 'danger',
-                                'sticky': False
-                            }
+                    'tag': 'display_notification',
+                    'params': {
+                        'message': 'Budget category or expense account can''t be empty',
+                        'type': 'danger',
+                        'sticky': False
+                    }
                 }
 
         self.state = 'Budget Approval'
         return True
 
     def action_request(self):
+
+        # validate issue quantity
+        self.validate_issue_qty()
+
+        picking_id = None
 
         wh = self.env['stock.warehouse'].search([('code', '=', 'OF')])
 
@@ -148,7 +162,7 @@ class droga_stock_office_supplies(models.Model):
         pick_type_id = self.env['stock.picking.type'].sudo().search(
             [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
         def_location_id = self.env['stock.location'].search(
-            [('complete_name', 'like', wh.code+'/Stock%'), ('usage', '=', 'internal')])[0].id
+            [('complete_name', 'like', wh.code + '/Stock%'), ('usage', '=', 'internal')])[0].id
         def_dest_id = self.env['stock.location'].search(
             [('name', 'like', 'Office supplies expense')])
 
@@ -205,28 +219,48 @@ class droga_stock_office_supplies(models.Model):
 
         if picking_id.ids:
             self.state = 'waiting'
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'message': "You can't create stoke if there is no available quantity in the stock",
+                    'type': 'danger',
+                    'sticky': False
+                }
+            }
+
+    def validate_issue_qty(self):
+        for record in self.detail_entries:
+            if record.avaliable_qty > record.stock_balance or record.avaliable_qty > record.product_uom_qty:
+                raise UserError(
+                    "Issue quantity can’t be greater than the requested quantity or stock balance available")
+            elif record.avaliable_qty <= 0:
+                raise UserError(
+                    "Issue can't be zero or less than zero")
 
     def action_receive(self):
         self.state = 'done'
 
     def action_create_purchase_request(self):
-        if self.state != 'processed':
+        states = ['Budget Approval', 'waiting', 'processed']
+        if self.state not in states:
 
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                        'message': "You can't create purchase request before the request approved",
-                        'type': 'danger',
-                        'sticky': False
+                    'message': "You can't create purchase request before the request approved",
+                    'type': 'danger',
+                    'sticky': False
                 }
             }
         else:
             # check if there is no purchase related with the rfq
-            puchase_requests = self.env['droga.purhcase.request'].search(
+            purchase_requests = self.env['droga.purchase.request.local'].search(
                 [('store_request_id', '=', self.id), ('state', '!=', 'Cancel')])
 
-            if puchase_requests.ids:
+            if purchase_requests.ids:
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
@@ -248,9 +282,9 @@ class droga_stock_office_supplies(models.Model):
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                        'message': 'All items are issued, you can’t create purchase requests for issued items',
-                        'type': 'danger',
-                        'sticky': False
+                    'message': 'All items are issued, you can’t create purchase requests for issued items',
+                    'type': 'danger',
+                    'sticky': False
                 }
             }
         else:
@@ -267,9 +301,8 @@ class droga_stock_office_supplies(models.Model):
                 'store_request_id': self.id,
                 'company_id': self.company_id.id,
 
-
             }
-            vals['purhcase_request_lines'] = []
+            vals['purchase_request_lines'] = []
 
             for line in self.detail_entries:
                 if line.unavilable_qty != 0:
@@ -283,16 +316,16 @@ class droga_stock_office_supplies(models.Model):
 
                     })
 
-                    vals['purhcase_request_lines'].append(order_line_vals)
+                    vals['purchase_request_lines'].append(order_line_vals)
 
             # create purchase request
-            purchase_request = self.env['droga.purhcase.request'].create(vals)
+            purchase_request = self.env['droga.purchase.request.local'].create(vals)
             if purchase_request.ids:
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
-                        'message': 'Purchase Request created sucessfully!',
+                        'message': 'Purchase Request created successfully!',
                         'type': 'success',
                         'sticky': False
                     }
@@ -307,7 +340,7 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     company_id = fields.Many2one(
         'res.company', string='Company', default=lambda self: self.env.company, required=True)
     product_id = fields.Many2one(
-        'product.product', 'Product',
+        'product.template', 'Product',
         check_company=True,
         index=True, required=True,
         state={'done': [('readonly', True)]})
@@ -343,7 +376,7 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     @api.depends('product_uom_qty', 'unit_price')
     def _compute_total(self):
         for record in self:
-            record.total_price = record.unit_price*record.product_uom_qty
+            record.total_price = record.unit_price * record.product_uom_qty
             record.avaliable_qty = record.product_uom_qty
 
     # @api.depends( 'product_uom_qty', 'product_id', 'product_uom')
@@ -358,10 +391,18 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
             except Exception as e:
                 rec.available_qty = 0
 
-    @api.depends('product_id')
+    @api.onchange('product_id')
     def get_uom(self):
         for rec in self:
             rec.product_uom = rec.product_id.uom_id
+
+            # display only non-technical items
+            if rec.request_header.product_type == 'Technical':
+                product_categories = self.env['product.category'].search([('off_supplies', '=', False)]).ids
+            else:
+                product_categories = self.env['product.category'].search([('off_supplies', '=', True)]).ids
+
+            return {'domain': {'product_id': [('categ_id', 'in', (product_categories))]}}
 
     def set_uom(self):
         pass
@@ -378,9 +419,9 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
 
         if now.month >= 7 and now.day >= 7:
             date_from = datetime(now.year, 7, 8)
-            date_to = datetime(now.year+1, 7, 7)
+            date_to = datetime(now.year + 1, 7, 7)
         else:
-            date_from = datetime(now.year-1, 7, 8)
+            date_from = datetime(now.year - 1, 7, 8)
             date_to = datetime(now.year, 7, 7)
 
         for record in self:
@@ -389,7 +430,9 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
                 self.env.cr.execute("""select distinct b.account,a.general_budget_id,a.analytic_account_id,sum(b.remaining_balance) as remaining_balance from crossovered_budget_lines a 
     inner join crossovered_budget_lines_detail b on a.id=b.budgetary_position_id 
     where a.general_budget_id=%s and a.analytic_account_id=%s and b.account=%s and (a.date_from>=%s and a.date_to<=%s)
-    group by b.account,a.general_budget_id,a.analytic_account_id """, (record.budgetary_position.id, record.request_header.branch.id, record.expense_account.id, date_from, date_to))
+    group by b.account,a.general_budget_id,a.analytic_account_id """, (
+                    record.budgetary_position.id, record.request_header.branch.id, record.expense_account.id, date_from,
+                    date_to))
                 res = self.env.cr.dictfetchone()
 
                 # update remaining balance
@@ -399,9 +442,14 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     @api.depends('avaliable_qty')
     def compute_unavilable_qty(self):
         for record in self:
-            record.unavilable_qty = record.product_uom_qty-record.avaliable_qty
+            record.unavilable_qty = record.product_uom_qty - record.avaliable_qty
 
-    @api.depends('product_id')
+    @api.depends('product_id', 'request_header.warehouse')
     def _compute_current_stock_balance(self):
         for record in self:
-            record.stock_balance = record.product_id.free_qty
+            # search available quantity
+            available_quantity = self.env['stock.quant'].search(
+                [('location_id', '=', record.request_header.warehouse.lot_stock_id.id),
+                 ('product_tmpl_id', '=', record.product_id.id)],
+                limit=1).available_quantity
+            record.stock_balance = available_quantity

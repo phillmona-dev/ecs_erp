@@ -13,6 +13,7 @@ class purchase_order(models.Model):
         self.amount_total_usd = total
 
     rfq_id = fields.Many2one("droga.purhcase.request.rfq")
+    rfq_local_id = fields.Many2one("droga.purchase.request.rfq.local")
     purchase_request_id = fields.Many2one("droga.purhcase.request")
     shipping_reconcilations = fields.One2many(
         'droga.purchase.shipping.reconcilation', 'purchase_order_id')
@@ -22,7 +23,7 @@ class purchase_order(models.Model):
         "Total Amount USD", compute="compute_usd_total_amount", store=True)
     # copy foregin currency request
 
-   # phases
+    # phases
     order_phase_status = fields.One2many(
         'droga.purchase.po.foregin.status', 'purchase_order_id')
     shipment_phase_status = fields.One2many(
@@ -88,6 +89,7 @@ class purchase_order(models.Model):
         "Date Original Document Collected from Applicant Bank")
     shipment_doc_handed_to_finance = fields.Date(
         "Date Original Document Handed to Finance")
+    supplier_payment_date=fields.Date("Supplier Payment Date")
 
     document_tracking_date = fields.Date("Document Tracking Date")
 
@@ -262,11 +264,11 @@ class purchase_order(models.Model):
     @api.onchange('margin', 'exchange_rate_lc_settlement')
     def lc_margin_amount(self):
         for record in self:
-            record.deposit_amount = (record.margin*record.amount_total)/100
+            record.deposit_amount = (record.margin * record.amount_total) / 100
             # remaining margin percent
-            rem_margin_percent = (100-record.margin)/100
+            rem_margin_percent = (100 - record.margin) / 100
             record.shipment_lc_amount = (
-                record.amount_total_usd*record.exchange_rate_lc_settlement)*rem_margin_percent
+                                                record.amount_total_usd * record.exchange_rate_lc_settlement) * rem_margin_percent
 
 
 class purchase_order_line(models.Model):
@@ -279,7 +281,7 @@ class purchase_order_line(models.Model):
     @api.depends('unit_price_foregin')
     def _compute_total(self):
         for record in self:
-            record.total_price_foregin = record.unit_price_foregin*record.product_qty
+            record.total_price_foregin = record.unit_price_foregin * record.product_qty
 
 
 # arrival ports
@@ -304,7 +306,7 @@ class po_foregin_status(models.Model):
     step = fields.Char(related="phase.step")
     order = fields.Integer(related="phase.order")
     status = fields.Selection(
-        [("Not Started", "Not Started"), ("On Progress", "On Progress"),  ("Done", "Done")])
+        [("Not Started", "Not Started"), ("On Progress", "On Progress"), ("Done", "Done")])
     done_date = fields.Date("Done Date")
     remark = fields.Char("Remark")
 
@@ -320,7 +322,7 @@ class po_shipment_foregin_status(models.Model):
     step = fields.Char(related="phase.step")
     order = fields.Integer(related="phase.order")
     status = fields.Selection(
-        [("Not Started", "Not Started"), ("On Progress", "On Progress"),  ("Done", "Done")])
+        [("Not Started", "Not Started"), ("On Progress", "On Progress"), ("Done", "Done")])
     done_date = fields.Date("Done Date")
     remark = fields.Char("Remark")
 
@@ -336,7 +338,7 @@ class po_clearance_foregin_status(models.Model):
     step = fields.Char(related="phase.step")
     order = fields.Integer(related="phase.order")
     status = fields.Selection(
-        [("Not Started", "Not Started"), ("On Progress", "On Progress"),  ("Done", "Done")])
+        [("Not Started", "Not Started"), ("On Progress", "On Progress"), ("Done", "Done")])
     done_date = fields.Date("Done Date")
     remark = fields.Char("Remark")
 
@@ -352,9 +354,10 @@ class po_post_clerance_foregin_status(models.Model):
     step = fields.Char(related="phase.step")
     order = fields.Integer(related="phase.order")
     status = fields.Selection(
-        [("Not Started", "Not Started"), ("On Progress", "On Progress"),  ("Done", "Done")])
+        [("Not Started", "Not Started"), ("On Progress", "On Progress"), ("Done", "Done")])
     done_date = fields.Date("Done Date")
     remark = fields.Char("Remark")
+
 
 # documents
 

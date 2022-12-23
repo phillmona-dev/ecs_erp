@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-
     <!-- action for status tracking -->
     <record id="droga_purchase_foregin_status_tracking_action" model="ir.actions.act_window">
         <field name="name">Status Tracking</field>

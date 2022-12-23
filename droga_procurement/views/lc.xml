@@ -75,14 +75,15 @@
 
                     </group>
                     <group>
-                        <group name="name" string="Approved Dates">
-                            <field name="lc_send_date_to_supplier" />
-                            <field name="lc_recived_date_from_supplier" />
-                            
-                        </group>
+
                         <group string="Approved Dates">
                             <field name="draft_lc_approved_date" />
                             <field name="draft_lc_approved_date_supplier" />
+                        </group>
+                         <group name="name" string="Approved Dates">
+                            <field name="lc_send_date_to_supplier" />
+                            <field name="lc_recived_date_from_supplier" />
+
                         </group>
                     </group>
 
