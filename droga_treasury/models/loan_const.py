@@ -21,7 +21,7 @@ class AccountLoanConst(models.Model):
         penal=0.00000000000000000000000000
         current_date = datetime.today()
         cday = current_date.date()-relativedelta(days=1)
-        curentday=current_date.date
+        curentday=current_date.date()
         num=0
         nyear = cday.year
         tern=0

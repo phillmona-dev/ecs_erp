@@ -20,7 +20,7 @@
     # always loaded
     'data': [
         'security/security.xml',
-
+        'security/record_rules.xml',
         'views/module_menus.xml',
         'data/droga_inv_sequence.xml',
         'security/ir.model.access.csv',

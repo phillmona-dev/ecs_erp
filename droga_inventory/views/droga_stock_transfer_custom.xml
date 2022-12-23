@@ -40,7 +40,7 @@
                     <group>
                         <group>
                             <field name="location_filter" invisible="1"></field>
-                            <field name="location_dest_id" options="{'no_create':True,'no_open':True}" domain="location_filter" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="location_dest_id" options="{'no_create':True,'no_open':True}" domain="([('has_access','=',True),('con_type','=','SRL')])" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
                             <field name="transfer_picking" readonly="1" widget="many2many_tags" attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
                         </group>
                         <group>

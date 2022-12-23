@@ -29,11 +29,15 @@ class sale_order_line(models.Model):
     price_unit = fields.Float(
         string="Unit Price",
         compute='_compute_price_unit',
+        inverse='_inverse_price',
         digits='Product Price',
         store=True, required=True)
     price_unit_before_discount=fields.Float('')
     wareh=fields.Many2one('stock.warehouse')
+    std_unit_price=fields.Float(readonly=True,string='UP Default')
 
+    def _inverse_price(self):
+        pass
 
     @api.onchange('product_id')
     def _get_wh(self):
@@ -65,7 +69,8 @@ class sale_order_line(models.Model):
         self.order_id.core_sum = core_sum
         self.order_id.non_core_sum = non_core_sum
         self.order_id.total_discount=total_before_discount-(core_sum+non_core_sum)
-    @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id')
+        self.order_id.total_added=(core_sum+non_core_sum)-total_before_discount
+    @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id','manual_price')
     def _compute_price_unit(self):
 
         for line in self:
@@ -94,19 +99,32 @@ class sale_order_line(models.Model):
                 continue
             if not line.product_uom or not line.product_id or not line.order_id.pricelist_id:
                 line.price_unit = 0.0
-            elif not line.tender_origin_form_tender:
+                line.std_unit_price = 0.0
+            else:
                 price = line.with_company(line.company_id)._get_display_price()
-                line.price_unit = line.product_id._get_tax_included_unit_price(
-                    line.company_id,
-                    line.order_id.currency_id,
-                    line.order_id.date_order,
-                    'sale',
-                    fiscal_position=line.order_id.fiscal_position_id,
-                    product_price_unit=price,
-                    product_currency=line.currency_id
-                )*((1+((core_rate+all_rate)/100)) if line.product_id.is_core_product else (1+((non_core_rate+all_rate)/100)))
+                if not line.tender_origin_form_tender and not line.manual_price:
+                    line.price_unit = line.product_id._get_tax_included_unit_price(
+                        line.company_id,
+                        line.order_id.currency_id,
+                        line.order_id.date_order,
+                        'sale',
+                        fiscal_position=line.order_id.fiscal_position_id,
+                        product_price_unit=price,
+                        product_currency=line.currency_id
+                    )*((1+((core_rate+all_rate)/100)) if line.product_id.is_core_product else (1+((non_core_rate+all_rate)/100)))
 
-            line.price_unit_before_discount=line.price_unit
+                line.std_unit_price=line.product_id._get_tax_included_unit_price(
+                        line.company_id,
+                        line.order_id.currency_id,
+                        line.order_id.date_order,
+                        'sale',
+                        fiscal_position=line.order_id.fiscal_position_id,
+                        product_price_unit=price,
+                        product_currency=line.currency_id
+                    )*((1+((core_rate+all_rate)/100)) if line.product_id.is_core_product else (1+((non_core_rate+all_rate)/100)))
+
+
+            line.price_unit_before_discount=line.std_unit_price
 
         self.calc_sales_totals()
 
@@ -128,15 +146,19 @@ class sale_order_line(models.Model):
                 all_rate = all_rate + rate['percent']
 
 
-        if core_rate+all_rate!=0 and not self.order_id.tender_origin_form_tender:
-            for lin in self.order_id.order_line.filtered(
-                    lambda x: x.product_id.is_core_product ):
-                lin.price_unit=lin.price_unit*(1+((core_rate+all_rate)/100))
 
-        if non_core_rate+all_rate!=0 and not self.order_id.tender_origin_form_tender:
-            for lin in self.order_id.order_line.filtered(
-                lambda x: not x.product_id.is_core_product ):
+        for lin in self.order_id.order_line.filtered(
+                lambda x: x.product_id.is_core_product ):
+            if core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
+                lin.price_unit=lin.price_unit*(1+((core_rate+all_rate)/100))
+            lin.std_unit_price=lin.std_unit_price*(1+((core_rate+all_rate)/100))
+
+
+        for lin in self.order_id.order_line.filtered(
+            lambda x: not x.product_id.is_core_product ):
+            if non_core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
                 lin.price_unit = lin.price_unit * (1 + ((non_core_rate + all_rate) / 100))
+            lin.std_unit_price = lin.std_unit_price * (1 + ((non_core_rate + all_rate) / 100))
 
         #self.order_id._get_sub_totals()
         super(sale_order_line, self)._compute_amount()
@@ -150,6 +172,7 @@ class sale_order_ext(models.Model):
     non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
 
     total_discount = fields.Float('Total discount')
+    total_added = fields.Float('Total accrual')
 
     def _get_pr_sales_logged(self):
         if not request:

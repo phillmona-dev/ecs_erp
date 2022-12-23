@@ -6,7 +6,10 @@ class droga_sales_invoice_payment(models.Model):
     @api.model
     def create(self,vals):
         res=super(droga_sales_invoice_payment, self).create(vals)
-        invoice=self.env['account.move'].search([('name','=',vals[0]['ref'])])
+        try:
+            invoice=self.env['account.move'].search([('name','=',vals['ref'])])
+        except:
+            return res
         if len(invoice)>0:
             sp=self.env['stock.picking'].sudo().search([('origin','=',invoice[0]['invoice_origin'])])
             if len(sp)>0:

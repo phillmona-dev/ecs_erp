@@ -10,23 +10,22 @@
                 <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
             </xpath>
 
+
             <xpath expr = "//form/sheet/div/button[@name='action_preview_sale_order']" position = "before">
                     <field name="show_invoice_button" invisible="1"></field>
-                    <button icon="fa-credit-card-alt" attrs="{'invisible': [('show_invoice_button', '=', False)]}"
-                        type="object" string=" Matured invoices"
-                        name="action_view_matured" class="oe_stat_button"/>
-
             </xpath>
 
             <xpath expr = "//form/sheet/group/group/field[@name='payment_term_id']" position="after">
                 <field name="show_invoice_button" invisible="1"></field>
-                <field name="matured_amount" attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
+                <field name="mature_amount" style="color:red" attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
+                <field name="manual_price"></field>
             </xpath>
 
             <xpath expr = "//form/sheet/notebook/page/group/group/field[@name='note']" position = "replace">
                 <field name="core_sum" string="Core sum" readonly="1"/>
                 <field name="non_core_sum" string="Non-core sum" readonly="1"/>
-                <field name="total_discount" string="Total discount" readonly="1"/>
+                <field name="total_discount" attrs="{'invisible': ['|',('total_discount', '&lt;', 0),('total_discount', '=', 0)]}" string="Total discount" invisible="" readonly="1"/>
+                <field name="total_added" attrs="{'invisible': ['|',('total_added', '&lt;', 0),('total_added', '=', 0)]}" string="Total increase" invisible="" readonly="1"/>
             </xpath>
             <xpath expr = "//form/header/button[@name='action_draft']" position="after">
                 <button name="store_issue_placement_order" type="object"

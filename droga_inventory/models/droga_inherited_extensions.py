@@ -10,7 +10,8 @@ class droga_location_extension(models.Model):
         ('CONR', 'Consignment vendor location'),
         ('SIF', 'Free sample'),
         ('SIR', 'Sample to be returned'),
-        ('SAP','Sales placement location')
+        ('SAP','Sales placement location'),
+        ('SRL', 'Inter-store receive transit location'),
         ], string='Cons/sample Type')
     wcode=fields.Char(related='warehouse_id.code')
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
@@ -135,6 +136,19 @@ class droga_stock_picking_extension(models.Model):
     warehouse_list=fields.Many2many('stock.warehouse')
     has_access = fields.Boolean('is_pick_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
+    lacation_id_readonly=fields.Boolean(_compute='_get_readonly')
+    lacation_dest_id_readonly = fields.Boolean(_compute='_get_readonly')
+
+    @api.depends('location_id','location_dest_id')
+    def _get_readonly(self):
+        for rec in self:
+            if rec.location_id.con_type=='SRL':
+                rec.lacation_id_readonly=True
+                rec.lacation_dest_id_readonly=False
+            else:
+                rec.lacation_id_readonly = False
+                rec.lacation_dest_id_readonly=True
+                
 
     def _search_has_access(self, operator, value):
 
@@ -247,22 +261,14 @@ class droga_stock_product_extension(models.Model):
         change_default=True, default='', group_expand='_read_group_categ_id',
         required=True, help="Select category for the current product")
     detailed_type = fields.Selection(selection=[
+        ('product', 'Storable Product'),
         ('consu','Consumables'),
-        ('product', 'Storable Product'),
-        ('service', 'Service')], string='Product Type', default='product', required=True,store=True,compute='_get_type',
+        ('service', 'Service')], string='Product Type', default='product', required=True,store=True,
         help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
              'A service is a non-material product you provide.')
-    detailed_type_cus = fields.Selection(selection=[
-        ('product', 'Storable Product'),
-        ('service', 'Service')], string='Product Type', default='product', required=True, store=True,
-        help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
-             'A service is a non-material product you provide.')
-    @api.depends('detailed_type_cus')
-    def _get_type(self):
-        for rec in self:
-            rec.detailed_type=rec.detailed_type
+
     sub_categ_id=fields.Many2one(
-        'product.category', 'Product Category',
+        'product.category', 'Product Sub-Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
          help="Select sub-category for the current product")
     default_code = fields.Char('Internal Reference',compute='_compute_default_code',
