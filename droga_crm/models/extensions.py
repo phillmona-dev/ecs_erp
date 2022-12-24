@@ -31,6 +31,13 @@ class cust_contact_extension(models.Model):
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
+    street = fields.Char(compute='_get_add')
+
+    @api.depends('location','area')
+    def _get_add(self):
+        for rec in self:
+            rec.street=((rec.area.area_name+' - ') if rec.area else '')+rec.location if rec.location else ''
+
 
     def _get_pr_sales_logged(self):
         if not request:

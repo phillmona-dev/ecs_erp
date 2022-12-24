@@ -270,19 +270,8 @@ class droga_tender_master(models.Model):
         vals_list['ten_id'] = self.env['ir.sequence'].next_by_code(
             'droga.tender.master.custom.sequence')
 
-        res = super().create(vals_list)
-        to_create_bid_security = {
-            "bid_security": res.id,
-            "tender_id": res.id,
-            "security_amount": vals_list["bid_security_amount"],
-            "security_period_in_days": vals_list["security_period_in_days"],
-            "security_for": 'Bid security'
-        }
-        if vals_list["bid_security_amount"]>100:
-            self.env["droga.tender.security.detail"].create(to_create_bid_security)
-        else:
-            vals_list["bid_security_pct"]=vals_list["bid_security_amount"]
-        return res
+        return super().create(vals_list)
+
 
     def action_set_archive(self):
         for rec in self:

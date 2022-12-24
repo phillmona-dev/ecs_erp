@@ -10,7 +10,7 @@
                     <field name="posted_date_gre" string="Floated date"></field>
                     <field name="item_types"></field>
                     <field name="closing_date_gre" string="Closing date"></field>
-                    <field name="bid_security_amount"></field>
+                    <field name="bid_security_amount_char"></field>
                     <field name="bid_doc_purch_price"></field>
                     <field name="phone_add"></field>
                 </tree>

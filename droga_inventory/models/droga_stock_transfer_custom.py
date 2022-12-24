@@ -22,9 +22,9 @@ class droga_stock_transfer_custom(models.Model):
              " * Done: The transfer is approved and processed.\n")
     cons_ref = fields.One2many('stock.picking', 'trans_issue_request')
     detail_entries = fields.One2many('droga.inventory.transfer.custom.detail', 'transfer_header')
-
+    user_id = fields.Many2one('res.users', default=lambda self: self.env.user.id)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
-
+    remark=fields.Char('Remark')
     location_dest_id = fields.Many2one(
         'stock.location', "Destination location",
         required=True,

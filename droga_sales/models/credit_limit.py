@@ -14,6 +14,8 @@ class cust_credit_limit(models.Model):
     cust_credit_limit = fields.Float(string='Credit limit',tracking=True)
     unsettled_amount = fields.Monetary(compute='_compute_balance', string='Unsettled amount')
     available_amount = fields.Float(string='Credit balance',compute='_compute_balance')
+    vat = fields.Char(string='Tin No', index=True,
+                      help="The Tax Identification Number. Complete it if the contact is subjected to government taxes. Used in some legal statements.")
 
     @api.depends('debit','credit')
     def _compute_balance(self):
@@ -30,7 +32,7 @@ class cust_sales_credit_limit(models.Model):
     mature_amount = fields.Monetary('Matured amount', compute='_get_mature_amount')
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
     manual_price=fields.Boolean('Manual price',default=False)
-
+    Vat_no=fields.Char(related='partner_id.vat',readonly=False)
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:

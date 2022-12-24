@@ -16,7 +16,8 @@ class droga_stock_cons_issue(models.Model):
         ('stmg', 'Store manager'),  #Issue sent to store manager for warehouse allocation
         ('waiting', 'Requested'),   #When consignment is waiting for storekeeper to issue at warehouse
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
-        ('done', 'Processed'),      #When request is processed
+        ('processed', 'Processed'),  # When request is processed
+        ('done', 'Received'),  # When request is received
     ], string='Status', default="draft", readonly=True, tracking=True,
         help=" * Requested: The consignment issue order is sent to warehouse.\n"
              " * Done: The consignment items are issued from warehouse.\n")
@@ -29,7 +30,8 @@ class droga_stock_cons_issue(models.Model):
     detail_entries = fields.One2many('droga.inventory.cons.issue.detail', 'cons_header')
 
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
-
+    user_id=fields.Many2one('res.users',default=lambda self: self.env.user.id)
+    remark = fields.Char('Remark')
     issue_date = fields.Datetime('Issue Date', default=fields.Datetime.now,
                                    state={'draft': [('readonly', False)]})
 
@@ -50,6 +52,8 @@ class droga_stock_cons_issue(models.Model):
     def action_cancel(self):
         self.state='cancel'
 
+    def action_receive(self):
+        self.state = 'done'
     def action_send_to_store_manager(self):
         self.state = 'stmg'
     def action_send_to_store(self):
