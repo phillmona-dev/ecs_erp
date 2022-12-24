@@ -64,15 +64,15 @@
         <field name="name">Repayment</field>
         <field name="res_model">account.loan</field>
         <!-- <field name="view_type">form</field> -->
-        <field name="view_mode">tree</field>
+        <field name="view_mode">tree,form</field>
     
     </record>
     
-    <!-- <record id="account_loan_repayment_form_action" model="ir.actions.act_window.view">
+    <record id="account_loan_repayment_form_action" model="ir.actions.act_window.view">
            <field name="view_mode">form</field>
            <field name="view_id" ref="account_loan_repaymen_view_form" />
            <field name="act_window_id" ref="account_loan_repayment_action" />
-    </record>  -->
+    </record> 
     <record id="account_loan_repayment_tree_action" model="ir.actions.act_window.view">
            <field name="view_mode">tree</field>
            <field name="view_id" ref="account_loan_repayment_view_tree" />
