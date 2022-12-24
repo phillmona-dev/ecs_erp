@@ -14,7 +14,7 @@
             <form string="">
                 <group>
                     <group>
-                        <field name="warehouse"></field>
+                        <field name="warehouse" domain="[('has_access','=',True)]"></field>
                         <field name="date_from"></field>
                     </group>
                     <group>
@@ -36,5 +36,5 @@
             action="droga_inventory_reports_excel_action"
             parent="stock.menu_warehouse_report"
             groups="stock.group_stock_user"
-            sequence="13"/>
+            sequence="10000"/>
 </odoo>

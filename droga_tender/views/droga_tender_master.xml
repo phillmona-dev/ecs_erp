@@ -83,7 +83,7 @@
                                 <field name="bid_type"></field>
                                 <field name="bid_doc_purch_price" widget='monetary'></field>
                                 <field name="security_period_in_days"></field>
-                                <field name="bid_security_amount" widget='monetary'></field>
+                                <field name="bid_security_amount_char"></field>
                                 <field name="posted_date_eth"></field>
                                 <field name="bid_submit_place" options="{'no_create':True,'no_open':True}"
                                        domain="[('status', '=', 'Active')]"></field>

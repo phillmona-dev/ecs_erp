@@ -76,7 +76,7 @@
                                         <field name="supplier_new"/>
                                         <field name="brand_model"/>
                                         <field name="country" string="Country" options="{'no_create':True,'no_open':True}"/>
-                                        <field name="expiry_date"/>
+                                        <field name="expiry_date_char"/>
                                         <field name="deliv_period_text"/>
                                         <field name="tech_result"/>
                                         <field name="id"/>

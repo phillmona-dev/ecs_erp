@@ -54,6 +54,7 @@ class droga_tender_submission_detail(models.Model):
     fin_open = fields.Datetime("Financial opening GRE")
     st_date = fields.Date("Status date GRE")
     expiry_date = fields.Date("Expiry date")
+    expiry_date_char = fields.Char("Expiry date")
 
     def competitors_open(self):
         return {
@@ -131,6 +132,21 @@ class droga_tender_submission_detail(models.Model):
         if 'quantity' in vals:
             if vals["quantity"]==0:
                 raise UserError("Quantity can not be zero.")
+
+        if 'incoterm' in vals:
+            # Select and update values here
+            pass
+
+        if 'award_fold_num' in vals:
+            # Select and update values here
+            pass
+
+        if 'currency' in vals:
+            # Select and update values here
+            pass
+
+
+
         if 'status' not in vals:
             return super().write(vals)
         if vals["status"]=="awarded":

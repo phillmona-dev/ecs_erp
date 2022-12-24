@@ -4,6 +4,7 @@
         <field name="name">Store consignment receipt order</field>
         <field name="res_model">droga.inventory.consignment.receive</field>
         <field name="view_mode">tree,form</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
     </record>
 
     <record id="droga_inventory_consignment_receive_view_tree" model="ir.ui.view">
@@ -70,10 +71,5 @@
         </field>
     </record>
 
-    <menuitem
-            id="droga_stock_cons_receive_menu"
-            name="Store consignment receipt order"
-            action="droga_inventory_consignment_receipt_action"
-            groups="inventory_li,inventory_me,inventory_md,inventory_ms,inventory_os"
-            parent="stock.menu_stock_warehouse_mgmt"/>
+
 </odoo>

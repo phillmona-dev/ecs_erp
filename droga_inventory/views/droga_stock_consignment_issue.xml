@@ -42,6 +42,9 @@
                     <button name="action_cancel"
                             attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done')),('id','=',None)]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_receive"
+                            attrs="{'invisible': ['|',('state', '!=', 'processed'),('id','=',None)]}"
+                            string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
@@ -53,6 +56,7 @@
                         <group>
                             <field name="issue_date" attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
                             <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}" widget="many2many_tags" readonly="1"></field>
+                            <field name="remark"></field>
                         </group>
                     </group>
                     <notebook>
@@ -86,6 +90,7 @@
         <field name="name">Store consignment issue order</field>
         <field name="res_model">droga.inventory.consignment.issue</field>
         <field name="view_mode">tree,form</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
     </record>
 
     <record id="droga_inventory_consignment_issue_action_sales" model="ir.actions.act_window">
@@ -95,12 +100,8 @@
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_inventory_consignment_issue_view_tree_sales')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('droga_inventory_consignment_issue_view_form')})]"/>
         <field name="context">{'default_issue_type': 'SIF'}</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
     </record>
 
-    <menuitem
-            id="droga_stock_cons_issue_menu"
-            name="Store consignment/sample issue order"
-            action="droga_inventory_consignment_issue_action"
-            groups="inventory_li,inventory_me,inventory_md,inventory_ms,inventory_os"
-            parent="stock.menu_stock_warehouse_mgmt"/>
+
 </odoo>

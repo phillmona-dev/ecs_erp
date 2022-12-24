@@ -4,6 +4,7 @@
         <field name="name">Store transfer request</field>
         <field name="res_model">droga.inventory.transfer.custom</field>
         <field name="view_mode">tree,form</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
     </record>
 
     <record id="droga_inventory_transfer_custom_view_tree" model="ir.ui.view">

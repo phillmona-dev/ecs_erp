@@ -545,7 +545,7 @@
         <field name="print_report_name">'Cash Reciept Voucher - %s' % (object.name)
         </field>
         <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a5" />
+
         <field name="binding_type">report</field>
 
     </record>

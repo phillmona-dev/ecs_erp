@@ -30,13 +30,13 @@
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='location_id'][2]" position="replace">
-                <field name="lacation_id_readonly" invisible="1"></field>
-                <field name="location_id" domain="[('usage','=','internal'),('has_access', '=', True)]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'incoming')],'readonly':[('lacation_id_readonly','=',True)]}"/>
+                <field name="location_id_type" invisible="1"></field>
+                <field name="location_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'incoming')],'readonly':[('location_id_type','=','SRL')]}"/>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='location_dest_id'][2]" position="replace">
-                <field name="lacation_dest_id_readonly" invisible="1"></field>
-                <field name="location_dest_id" domain="[('usage','=','internal'),('has_access', '=', True)]" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')],'readonly':[('lacation_dest_id_readonly','=',True)]}"/>
+                <field name="location_dest_id_type" invisible="1"></field>
+                <field name="location_dest_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')],'readonly':[('location_dest_id_type','=','SRL')]}"/>
             </xpath>
 
         </field>
@@ -49,6 +49,17 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='purpose']" position="after">
                 <field string='Store origin' name="store_origin_form" attrs="{'invisible': [('store_origin_form', '=', False)]}"></field>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="uom_extension" model="ir.ui.view">
+        <field name="name">droga.uom.category.inherited</field>
+        <field name="model">uom.category</field>
+        <field name="inherit_id" ref="uom.product_uom_categ_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='name']" position="after">
+                <field name="uom_title" ></field>
             </xpath>
         </field>
     </record>

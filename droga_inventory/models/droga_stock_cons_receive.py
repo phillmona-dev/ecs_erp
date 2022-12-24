@@ -24,7 +24,8 @@ class droga_stock_cons_receive(models.Model):
     detail_entries = fields.One2many('droga.inventory.cons.receive.detail', 'cons_header')
 
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
-
+    user_id = fields.Many2one('res.users', default=lambda self: self.env.user.id)
+    remark = fields.Char('Remark')
     receipt_date = fields.Datetime('Receipt Date', default=fields.Datetime.now,
                                    state={'draft': [('readonly', False)]})
 

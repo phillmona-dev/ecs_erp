@@ -16,7 +16,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account','resource','stock','sale','sale_stock','droga_crm'],
+    'depends': ['base','account','resource','stock','sale','sale_stock','droga_crm','droga_inventory'],
 
     # always loaded
     'data': [

@@ -6,7 +6,7 @@ class droga_tender_master_related(models.Model):
     _inherit='droga.tender.master'
     cus_type = fields.Many2one(related='customer.customer_type', string='Customer type',store=True)
     phone_add = fields.Char(related='customer.master_cust_id.phone', string='Phone number')
-    bid_security_amount = fields.Float('Security amount', required=True,compute='_compute_bid_sec_amt',inverse='_compute_bid_sec_amt')
+    bid_security_amount_char = fields.Char('Security amount', required=True)
     bid_security_pct = fields.Float('Security percent')
     awarded_amt_total=fields.Float('Awarded total amount',compute='_compute_awarded_amt_total',store=True)          #Total tender awarded
     tender_amt_participated = fields.Float('Total Quotation', compute='_compute_awarded_amt_total', store=True)     #Total tender participated
@@ -36,11 +36,7 @@ class droga_tender_master_related(models.Model):
             rec.tender_amt_participated=amt_participated
             rec.performance_pct = (float(
                 rec.awarded_amt_total / rec.tender_amt_participated)) * 100 if rec.tender_amt_participated != 0 else 0
-
-    def _compute_bid_sec_amt(self):
-        for rec in self:
-            if rec.bid_security_pct>0:
-                rec.bid_security_amount=rec.tender_amt_participated*rec.bid_security_pct
+    
 
     @api.depends('detail_performance.amount', 'detail_performance.award_cost')
     def _compute_amt_performance(self):

@@ -11,4 +11,59 @@
         <field name="domain">[('has_access','=',True)]</field>
     </record>
 
+    <!-- Location report filter per warehouse access -->
+    <record model="ir.actions.act_window" id="stock.dashboard_open_quants">
+        <field name="domain">[('has_access','=',True)]</field>
+        <field name="name">Stock on hand</field>
+    </record>
+
+    <!-- Location report filter per warehouse access -->
+    <record model="ir.actions.act_window" id="stock.location_open_quants">
+        <field name="domain">[('has_access','=',True)]</field>
+        <field name="name">Stock on hand</field>
+    </record>
+
+    <!-- Move lines history filter per warehouse access -->
+    <record id="stock.stock_move_action" model="ir.actions.act_window">
+        <field name="domain">[('has_access','=',True)]</field>
+        <field name="name">Stock summary by reference</field>
+    </record>
+
+    <!-- Move history rename -->
+    <record id="stock.stock_move_line_action" model="ir.actions.act_window">
+        <field name="name">Stock report by item</field>
+    </record>
+
+    <!-- Stock report on product.product admin only -->
+    <menuitem id="stock.menu_product_stock" name="Stock" action="stock.action_product_stock_view"
+        parent="stock.menu_warehouse_report" groups="stock.group_stock_manager" sequence="5"/>
+
+    <!--- Inventory adjustment for administrators only -->
+    <menuitem id="stock.menu_action_inventory_tree"
+              name="Inventory Adjustments"
+              parent="stock.menu_stock_warehouse_mgmt"
+              groups="stock.group_stock_manager"
+              sequence="10" action="stock.action_view_inventory_tree" />
+
+    <!--- Inventory adjustment for administrators only -->
+    <menuitem id="stock.menu_stock_inventory_control" name="Products" parent="stock.menu_stock_root" sequence="5" groups="stock.group_stock_manager"/>
+
+    <!--- Inventory reporting menu avail for all -->
+    <menuitem id="stock.menu_warehouse_report" name="Reporting" sequence="99" parent="stock.menu_stock_root" groups="stock.group_stock_user"/>
+
+
+
+
+
+    <!-- Menu custom names -->
+    <menuitem id="stock.menu_valuation" name="Stock on hand"
+              parent="stock.menu_warehouse_report" sequence="150"
+              action="stock.action_view_quants" groups="stock.group_stock_multi_locations,stock.group_tracking_owner,base.group_no_one"/>
+
+    <menuitem
+        action="stock.stock_move_line_action"
+        id="stock.stock_move_line_menu" name="Stock report by item"
+        parent="stock.menu_warehouse_report" sequence="200"/>
+
+    <menuitem action="stock.stock_move_action" name="Stock summary by reference" id="stock.stock_move_menu" parent="stock.menu_warehouse_report" sequence="230" groups="stock.group_stock_manager"/>
 </odoo>
