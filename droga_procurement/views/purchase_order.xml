@@ -11,7 +11,7 @@
         <field name="context">{'default_rfq_id': active_id}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            Purchase order from Request for Quotation
+                Purchase order from Request for Quotation
             </p>
         </field>
     </record>
@@ -24,7 +24,7 @@
         <field name="context">{'default_purchase_request_id': active_id}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            Purchase order from Purchase Request for Foregin Purchases
+                Purchase order from Purchase Request for Foregin Purchases
             </p>
         </field>
     </record>
@@ -33,38 +33,49 @@
     <record id="inherit_for_purchase_order_form" model="ir.ui.view">
         <field name="name">Purchase Order</field>
         <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="purchase.purchase_order_form" />
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
 
-            <xpath expr = "//field[@name='partner_ref']" position = "after">
-                <field name="rfq_id" options="{'no_create':True}" readonly="1" string="Request for Quotation" />
-                <field name="purchase_request_id" options="{'no_create':True}" readonly="1" string="Purchase Request" invisible="1"/>
-                <field name="request_type" required="1" />
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="rfq_id" options="{'no_create':True}" readonly="1" string="Request for Quotation" attrs="{'invisible': [('request_type', '==', 'Local')]}"/>
+                <field name="rfq_local_id" options="{'no_create':True}" readonly="1" string="Request for Quotation" attrs="{'invisible': [('request_type', '==', 'Foregin')]}"/>
+
+                <field name="purchase_request_id" options="{'no_create':True}" readonly="1" string="Purchase Request"
+                       invisible="1"/>
+                <field name="request_type" required="1"/>
                 <field name="amount_total_usd" invisible="1"/>
-                <field name="bank" invisible="1" />
-                <field name="branch" invisible="1" />
-                <field name="currency_approved_date" invisible="1" />
+                <field name="bank" invisible="1"/>
+                <field name="branch" invisible="1"/>
+                <field name="currency_approved_date" invisible="1"/>
+                <field name="amount_total" invisible="1"/>
             </xpath>
 
-            <xpath expr = "//button[@name='action_view_invoice']" position = "after">
-                <button name="%(droga_finance.droga_account_payment_request1_action)d" type="action" string="Payment Request" states="purchase" class="oe_stat_button" icon="fa-file-text" data-hotkey="l"/>
-                <button name="%(droga_finance.droga_account_payment_request_urgent1_action)d" type="action" string="Payment Request-U" states="purchase" class="oe_stat_button" icon="fa-file-text" data-hotkey="l"/>
+            <xpath expr="//button[@name='action_view_invoice']" position="after">
+                <button name="%(droga_finance.droga_account_payment_request1_action)d" type="action"
+                        string="Payment Request" states="purchase" class="oe_stat_button" icon="fa-file-text"
+                        data-hotkey="l" context="{'default_pay_to': partner_id,'default_total_amount':amount_total}"/>
+                <button name="%(droga_finance.droga_account_payment_request_urgent1_action)d" type="action"
+                        string="Payment Request-U" states="purchase" class="oe_stat_button" icon="fa-file-text"
+                        data-hotkey="l" context="{'default_pay_to': partner_id,'default_total_amount':amount_total}"/>
 
             </xpath>
 
-            <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']" position="after">
+            <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']"
+                   position="after">
 
-                <field name="unit_price_foregin" string="Unit Price USD" attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
-                <field name="total_price_foregin" string="Total Price USD" sum="Total" attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
+                <field name="unit_price_foregin" string="Unit Price USD"
+                       attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
+                <field name="total_price_foregin" string="Total Price USD" sum="Total"
+                       attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
             </xpath>
 
-            <xpath expr = "//page[@name='purchase_delivery_invoice']" position = "after">
+            <xpath expr="//page[@name='purchase_delivery_invoice']" position="after">
 
 
                 <page string="Ordering" attrs="{'invisible': [('request_type', '==', 'Local')]}">
                     <group>
                         <group>
-                            <field name="import_permit_no" />
+                            <field name="import_permit_no"/>
                         </group>
                     </group>
                     <notebook>
@@ -72,20 +83,20 @@
                         <page string="Import Permit and Insurance">
                             <group>
                                 <group string="Insurance Detail">
-                                    <field name="insurance_policy_no" />
-                                    <field name="insurance_name" />
-                                    <field name="insurance_date" />
-                                    <field name="insurance_premium_cost" />
+                                    <field name="insurance_policy_no"/>
+                                    <field name="insurance_name" string="Insurer Name"/>
+                                    <field name="insurance_date"/>
+                                    <field name="insurance_premium_cost"/>
                                 </group>
                                 <group string="Import Permit Detail">
-                                    <field name="import_permit_no" />
-                                    <field name="import_permit_date" />
-                                    <field name="import_permit_approved" />
-                                    <field name="lpco_number" />
-                                    <field name="margin" />
-                                    <field name="deposit_amount" />
-                                    <field name="deposit_date" />
-                                    <field name="bank_service_charge" />
+                                    <field name="import_permit_no"/>
+                                    <field name="import_permit_date"/>
+                                    <field name="import_permit_approved"/>
+                                    <field name="lpco_number"/>
+                                    <field name="margin"/>
+                                    <field name="deposit_amount"/>
+                                    <field name="deposit_date"/>
+                                    <field name="bank_service_charge"/>
                                 </group>
                             </group>
                         </page>
@@ -93,26 +104,27 @@
                         <page name="lc" string="LC">
 
 
-
-                            <field name="lcs" mode="tree" context="{'default_purchase_order_id':active_id,'default_bank':bank,'default_branch':branch,'default_request_approved_date':currency_approved_date}">
+                            <field name="lcs" mode="tree"
+                                   context="{'default_purchase_order_id':active_id,'default_bank':bank,'default_branch':branch,'default_request_approved_date':currency_approved_date}">
                                 <tree>
-                                    <field name="name" />
-                                    <field name="bank_name" />
-                                    <field name="branch" />
+                                    <field name="name"/>
+                                    <field name="bank_name"/>
+                                    <field name="branch"/>
                                     <field name="start_date"/>
                                     <field name="count_days"/>
-                                    <field name="state" />
-                                    <button name="open_lc_detail" string="LC Reconciliation" type="object" class="oe_stat_button" icon="fa-file-text" />
+                                    <field name="state"/>
+                                    <button name="open_lc_detail" string="LC Reconciliation" type="object"
+                                            class="oe_stat_button" icon="fa-file-text"/>
 
                                 </tree>
                             </field>
                         </page>
-                        <page string="Status Tracking">
+                        <page string="Status Tracking" invisible="1">
                             <field name="order_phase_status" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
                                     <field name="step" width="30" readonly="1"/>
-                                    <field name="status" width="15" />
+                                    <field name="status" width="15"/>
                                     <field name="done_date" width="10" string="Date"/>
                                     <field name="remark" width="30"/>
                                 </tree>
@@ -124,7 +136,7 @@
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
                                     <field name="document" width="30" readonly="1"/>
-                                    <field name="done" width="15" />
+                                    <field name="done" width="15"/>
                                     <field name="done_date" width="10" string="Date"/>
                                     <field name="remark" width="30"/>
                                 </tree>
@@ -142,7 +154,7 @@
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
                                     <field name="step" width="30" readonly="1"/>
-                                    <field name="status" width="15" />
+                                    <field name="status" width="15"/>
                                     <field name="done_date" width="10" string="Date"/>
                                     <field name="remark" width="30"/>
                                 </tree>
@@ -154,43 +166,46 @@
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
                                     <field name="document" width="30" readonly="1"/>
-                                    <field name="done" width="15" />
+                                    <field name="done" width="15"/>
                                     <field name="done_date" width="10" string="Date"/>
                                     <field name="remark" width="30"/>
                                 </tree>
                             </field>
                         </page>
-                        
+
                         <page string="Other Information">
                             <group>
                                 <group string="Shipment Document">
                                     <field name="shipment_date" string="Estimated Shipment Date"/>
-                                    <field name="production_completion_date" string="Estimated Production Completion Date"/>
+                                    <field name="production_completion_date"
+                                           string="Estimated Production Completion Date"/>
 
-                                    <field name="shipment_scan_copy_doc_recived_date" />
-                                    <field name="shipment_original_copy_doc_recived_date" />
-                                    <field name="shipment_doc_original_sent_from_supplier" />
+                                    <field name="shipment_scan_copy_doc_recived_date"/>
+                                    <field name="shipment_original_copy_doc_recived_date"/>
+                                    <field name="shipment_doc_original_sent_from_supplier"/>
 
 
                                 </group>
                                 <group string="Shipment Document">
-                                    <field name="shipment_doc_original_sent_from_supplier_courier" />
-                                    <field name="document_tracking_number" />
-                                    <field name="shipment_doc_original_recived_by_applicant_bank" />
+                                    <field name="shipment_doc_original_sent_from_supplier_courier"/>
+                                    <field name="document_tracking_number"/>
+                                    <field name="shipment_doc_original_recived_by_applicant_bank"/>
 
                                     <field name="discrepancy"/>
-                                    <field name="accept_discrepancy" attrs="{'invisible': [('discrepancy', '!=', 'Yes')]}"/>
-                                    <field name="discrepancy_comment" attrs="{'invisible': ['|',('accept_discrepancy', '!=', True),('discrepancy', '!=', 'Yes')]}"/>
+                                    <field name="accept_discrepancy"
+                                           attrs="{'invisible': [('discrepancy', '!=', 'Yes')]}"/>
+                                    <field name="discrepancy_comment"
+                                           attrs="{'invisible': ['|',('accept_discrepancy', '!=', True),('discrepancy', '!=', 'Yes')]}"/>
 
 
                                     <field name="shipment_doc_collected_from_applicant_bank"/>
-                                    <field name="exchange_rate_lc_settlement" />
-                                    <field name="shipment_lc_amount" />
-                                    <field name="lc_settlement_deposited" />
+                                    <field name="exchange_rate_lc_settlement"/>
+                                    <field name="shipment_lc_amount"/>
+                                    <field name="lc_settlement_deposited"/>
 
-                                    <field name="shipment_doc_handed_to_finance" />
+                                    <field name="shipment_doc_handed_to_finance"/>
+                                    <field name="supplier_payment_date"/>
                                 </group>
-
 
 
                             </group>
@@ -219,7 +234,7 @@
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
                                     <field name="step" width="30" readonly="1"/>
-                                    <field name="status" width="15" />
+                                    <field name="status" width="15"/>
                                     <field name="done_date" width="10" string="Date"/>
                                     <field name="remark" width="30"/>
                                 </tree>
@@ -231,7 +246,7 @@
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
                                     <field name="document" width="30" readonly="1"/>
-                                    <field name="done" width="15" />
+                                    <field name="done" width="15"/>
                                     <field name="done_date" width="10" string="Date"/>
                                     <field name="remark" width="30"/>
                                 </tree>
@@ -240,37 +255,42 @@
                         <page string="Other Information">
                             <group>
                                 <group string="Freight Payment">
-                                    <field name="mode_of_transport" />
+                                    <field name="mode_of_transport"/>
                                     <field name="goods_arrival_date" invisible="1"/>
-                                    <field name="goods_arrival_date_final_destination" />
+                                    <field name="goods_arrival_date_final_destination"/>
 
-                                    <field name="freight_payment_by_air" attrs="{'invisible': [('mode_of_transport', '!=', 'Air')]}"/>
-                                    <field name="freight_payment_by_sea" attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
-                                    <field name="freight_payment_by_sea_dg" attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
-                                    <field name="freight_payment_by_sea_gp" attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
-                                    <field name="freight_paid_date" />
-                                    <field name="freight_settlement_advice_to_finance" />
-                                    <field name="container_deposit_amount" />
-                                    <field name="shipping_doc_to_transitor" />
+                                    <field name="freight_payment_by_air"
+                                           attrs="{'invisible': [('mode_of_transport', '!=', 'Air')]}"/>
+                                    <field name="freight_payment_by_sea"
+                                           attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
+                                    <field name="freight_payment_by_sea_dg"
+                                           attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
+                                    <field name="freight_payment_by_sea_gp"
+                                           attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
+                                    <field name="freight_paid_date"/>
+                                    <field name="freight_settlement_advice_to_finance"/>
+                                    <field name="container_deposit_amount"/>
+                                    <field name="shipping_doc_to_transitor"/>
 
-                                    <field name="declaration_number" />
-                                    <field name="custom_duty_tax_amount" />
-                                    <field name="custom_duty_tax_paid_date" />
-                                    <field name="custom_tax_acceptance" />
-                                    <field name="custom_duty_tax_additional_amount" attrs="{'invisible': [('custom_tax_acceptance', '==', True)]}"/>
+                                    <field name="declaration_number"/>
+                                    <field name="custom_duty_tax_amount"/>
+                                    <field name="custom_duty_tax_paid_date"/>
+                                    <field name="custom_tax_acceptance"/>
+                                    <field name="custom_duty_tax_additional_amount"
+                                           attrs="{'invisible': [('custom_tax_acceptance', '==', True)]}"/>
 
 
                                 </group>
                                 <group string="Additional Info">
 
 
-                                    <field name="release_permit_applied_to_fda" />
-                                    <field name="release_permit_received_from_fda" />
-                                    <field name="storage_cost" />
-                                    <field name="demurrage_cost" />
-                                    <field name="local_transport_cost" />
-                                    <field name="loading_unloading_cost" />
-                                    <field name="release_date_from_customs_delivery" />
+                                    <field name="release_permit_applied_to_fda"/>
+                                    <field name="release_permit_received_from_fda"/>
+                                    <field name="storage_cost"/>
+                                    <field name="demurrage_cost"/>
+                                    <field name="local_transport_cost"/>
+                                    <field name="loading_unloading_cost"/>
+                                    <field name="release_date_from_customs_delivery"/>
                                 </group>
 
                             </group>
@@ -288,12 +308,12 @@
 
                 <page string="Post Clearance" attrs="{'invisible': [('request_type', '==', 'Local')]}">
                     <notebook>
-                        <page string="Status Tracking">
+                        <page string="Status Tracking" invisible="1">
                             <field name="post_clearance_phase_status" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
                                     <field name="step" width="30" readonly="1"/>
-                                    <field name="status" width="15" />
+                                    <field name="status" width="15"/>
                                     <field name="done_date" width="10" string="Date"/>
                                     <field name="remark" width="30"/>
                                 </tree>
@@ -305,7 +325,7 @@
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
                                     <field name="document" width="30" readonly="1"/>
-                                    <field name="done" width="15" />
+                                    <field name="done" width="15"/>
                                     <field name="done_date" width="10" string="Date"/>
                                     <field name="remark" width="30"/>
                                 </tree>
@@ -314,22 +334,24 @@
                         <page string="Other Information">
                             <group>
                                 <group string="Inventory">
-                                    <field name="packing_list_shared_with_inventory" />
-                                    <field name="goods_arrival_date" />
-                                    <field name="grn_reconcilation_form_recived_date" />
-                                    <field name="reconcilation_discrepancy" />
-                                    <field name="discrepancy_comment" attrs="{'invisible': [('reconcilation_discrepancy', '!=', True)]}"/>
-                                    <field name="discrepancy_action" attrs="{'invisible': [('reconcilation_discrepancy', '!=', True)]}"/>
+                                    <field name="packing_list_shared_with_inventory"/>
+                                    <field name="goods_arrival_date"/>
+                                    <field name="grn_reconcilation_form_recived_date"/>
+                                    <field name="reconcilation_discrepancy"/>
+                                    <field name="discrepancy_comment"
+                                           attrs="{'invisible': [('reconcilation_discrepancy', '!=', True)]}"/>
+                                    <field name="discrepancy_action"
+                                           attrs="{'invisible': [('reconcilation_discrepancy', '!=', True)]}"/>
 
 
                                 </group>
                                 <group string="Additional Info">
-                                    <field name="grn_submitted_to_finance" />
-                                    <field name="stamped_declaration_recived_date" />
-                                    <field name="delinquent_settlement_date" />
-                                    <field name="transistor_service_payment_Amount" />
-                                    <field name="container_deposit_reimbursed_date" />
-                                    <field name="transistor_service_payment_done_date" />
+                                    <field name="grn_submitted_to_finance"/>
+                                    <field name="stamped_declaration_recived_date"/>
+                                    <field name="delinquent_settlement_date"/>
+                                    <field name="transistor_service_payment_Amount"/>
+                                    <field name="container_deposit_reimbursed_date"/>
+                                    <field name="transistor_service_payment_done_date"/>
                                 </group>
                             </group>
 
@@ -337,8 +359,6 @@
                     </notebook>
                 </page>
             </xpath>
-
-
 
 
         </field>
@@ -358,10 +378,11 @@
         <field name="context">{}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No purchase order found. Let's create one!
+                No purchase order found. Let's create one!
             </p>
             <p>
-            Once you ordered your products to your supplier, confirm your request for quotation and it will turn into a purchase order.
+                Once you ordered your products to your supplier, confirm your request for quotation and it will turn
+                into a purchase order.
             </p>
         </field>
     </record>
@@ -380,10 +401,11 @@
         <field name="context">{}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No purchase order found. Let's create one!
+                No purchase order found. Let's create one!
             </p>
             <p>
-            Once you ordered your products to your supplier, confirm your request for quotation and it will turn into a purchase order.
+                Once you ordered your products to your supplier, confirm your request for quotation and it will turn
+                into a purchase order.
             </p>
         </field>
     </record>

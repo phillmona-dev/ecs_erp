@@ -61,6 +61,7 @@ class purchase_request_link(models.Model):
             'res_id': self.id,
         }
 
+
 # Market analysis class for purchase request
 class purchase_request_market_analysis(models.Model):
     _name = 'droga.purhcase.request.market.analysis'
@@ -76,6 +77,7 @@ class purchase_request_market_analysis(models.Model):
     local_man_status = fields.Char('Local manufacturers stock and RM status')
     remark = fields.Char('Remark')
 
+
 # Our foreign suppliers list for each purchase order line
 class purchase_order_foreign_droga_suppliers_list(models.Model):
     _name = 'droga.purhcase.order.foreign.suppliers.list'
@@ -86,6 +88,7 @@ class purchase_order_foreign_droga_suppliers_list(models.Model):
     unit_price = fields.Float('Unit price')
     shelf_life = fields.Float('Shelf life')
     is_sup_regsitered = fields.Boolean('Is supplier registered?', default=True)
+
 
 # Our foreign suppliers competitors list for each purchase order line
 class purhcase_order_foreign_competitors_comparative(models.Model):
@@ -123,13 +126,14 @@ class purchase_request_expected_costs(models.Model):
     unassembled_form = fields.Boolean(
         "Can the product imported in unassembled form")
 
+
 # new class the replaced the above classes
 class purchase_request_analysis_line(models.Model):
     _inherit = 'droga.purhcase.request.line'
 
     # market analysis
-    importer_name = fields.Char('Importer')
-    manufacturer = fields.Char('Manufacturer')
+    importer_name = fields.Many2one('droga.tender.settings.competitor', string="Importer")
+    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]")
     unit = fields.Many2one('uom.uom', string='UoM')
     avail_stock = fields.Float('Available Stock')
     sell_up = fields.Float('Selling Unit Price')

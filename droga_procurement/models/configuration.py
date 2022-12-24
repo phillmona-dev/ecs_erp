@@ -48,7 +48,7 @@ class PortOfLoading(models.Model):
     country = fields.Many2one('res.country', required=True)
 
     port_type = fields.Selection(
-        [('Loading', 'Loading'), ('Discharge', 'Discharge')], required=True)
-    shipment_type = fields.Selection([('Air', 'Air'),('Sea', 'Sea')], required=True)
+        [('Loading', 'Loading'), ('Discharge', 'Discharge'), ('Final Destination', 'Final Destination')], required=True)
+    shipment_type = fields.Selection([('Air', 'Air'), ('Sea', 'Sea')], required=True)
     state = fields.Selection(
         [('Active', 'Active'), ('Closed', 'Closed')], default="Active")

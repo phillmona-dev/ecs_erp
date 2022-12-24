@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Droga Finance",
+    'name': "Droga Self Service",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -16,31 +16,23 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    'category': 'Droga Finance',
+    'category': 'Droga Self Service',
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'purchase', 'hr', 'resource'],
+    'depends': ['base','droga_procurement','droga_inventory'],
 
     # always loaded
     'data': [
-        'security/account_security.xml',
+        'security/self_service_security.xml',
         'security/ir.model.access.csv',
-        'views/account_payment.xml',
-        'views/account_transaction_type.xml',
-        'views/account.move.xml',
-        'views/payment_request.xml',
-        'views/account_fiscal_year.xml',
-        'report/payment_request.xml',
-        'report/account_move.xml',
-        'report/withholding_report.xml',
-        'report/account_payment.xml',
-        'report/account_payment_check_printout.xml',
+        'views/actions.xml',
         'views/menu.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [
-        'demo/demo.xml',
+
     ],
     'installable': True,
     'application': True,

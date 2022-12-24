@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="droga_inventory_office_supplies_request_action" model="ir.actions.act_window">
-        <field name="name">Store Requsition</field>
+        <field name="name">Store Requisition</field>
         <field name="res_model">droga.inventory.office.supplies.request</field>
         <field name="view_mode">tree,form,kanban</field>
     </record>
@@ -9,11 +9,11 @@
     <!-- action for purchase request -->
     <record id="droga_purchase_request_store_requsition_action" model="ir.actions.act_window">
         <field name="name">Purchase Request</field>
-        <field name="res_model">droga.purhcase.request</field>
+        <field name="res_model">droga.purchase.request.local</field>
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_procurement.droga_purhcase_request_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_procurement.droga_purhcase_request_view_form')})]"/>
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_procurement.droga_purchase_request_local_view_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_procurement.droga_purchase_request_local_view_form')})]"/>
         <field name="domain">[('store_request_id', '=', active_id)]</field>
         <field name="context">{'default_store_request_id': active_id}</field>
         <field name="target">current</field>
@@ -111,6 +111,7 @@
         </field>
     </record>
 
+    <!-- store requisition form user -->
     <record id="droga_inventory_office_supplies_request_form" model="ir.ui.view">
         <field name="name">droga.inventory.office.supplies.request.form</field>
         <field name="model">droga.inventory.office.supplies.request</field>
@@ -120,7 +121,7 @@
                     <button name="action_submit" states="draft" string="Submit" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_verify" states="submit" string="Verify" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_budget_check" type="object" states="verify" string="Budget Approved" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
-                    <button name="action_request" type="object" states="Budget Approval" string="Request" id="action_request" class="oe_highlight" data-hotkey="v"/>
+                    <!--<button name="action_request" type="object" states="Budget Approval" string="Issue" id="action_request" class="oe_highlight" data-hotkey="v"/>-->
                     <!--<button name="action_receive" attrs="{'invisible': [('id','=',None)]}" states="draft" string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>-->
 
                     <button name="action_cancel" states="draft" string="Cancel" type="object" class="oe_highlight btn-danger" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" />
@@ -147,8 +148,9 @@
                             <field name="branch" options="{'no_create':True,'no_open':True}" required="1" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
                         </group>
                         <group>
-                            <field name="warehouse" attrs="{'readonly': [('state', 'not in', ('draft'))]}" options="{'no_create':True,'no_open':True}" invisible="1"/>
+                            <field name="warehouse" attrs="{'readonly': [('state', 'not in', ('draft'))]}" options="{'no_create':True,'no_open':True}" readonly="0" required="1"/>
                             <field name="request_date" attrs="{'readonly': [('state', 'not in', ('draft'))]}"></field>
+                            <field name="product_type" attrs="{'readonly': [('state', 'not in', ('draft'))]}" required="1"/>
                             <field name="purpose" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
                             <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}" invisible="1"/>
                             <field name="total_amount" invisible="1"/>
@@ -169,8 +171,90 @@
                                     <field name="budgetary_position" width="10" required="1" options="{'no_create':True,'no_open':True}" string="Budget Category" />
                                     <field name="expense_account" width="10" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('verify'))]}" string="GL Account"/>
                                     <field name="remaining_budget" width="10" attrs="{'column_invisible': [('parent.state', 'not in', ('verify'))]}" decoration-danger="total_price &gt; remaining_budget" decoration-success="total_price &lt;= remaining_budget" widget="badge"/>
-                                    <field name="stock_balance" readonly="1" string="Stock" width="10"/>
-                                    <field name="avaliable_qty" width="10" attrs="{'column_invisible': [('parent.state', 'not in', ('Budget Approval'))]}"/>
+                                    <field name="stock_balance" readonly="1" string="Stock Balance" width="10"/>
+                                    <field name="avaliable_qty" width="10" attrs="{'column_invisible': [('parent.state', 'not in', ('Budget Approval'))]}" string="Issue Qty"/>
+                                    <field name="unavilable_qty" invisible="1"/>
+
+                                    <!--
+                                    <field name="location_source_id" domain="([('usage','=','internal')])" string="Source location"/>
+                                    -->
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+     <!-- store requisition form for warehouse manager -->
+    <record id="droga_inventory_office_supplies_request_warehouse_form" model="ir.ui.view">
+        <field name="name">droga.inventory.office.supplies.request.form</field>
+        <field name="model">droga.inventory.office.supplies.request</field>
+        <field name="arch" type="xml">
+            <form string="Office supplies request" delete="0" duplicate="0">
+                <header>
+                    <button name="action_submit" states="draft" string="Submit" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_verify" states="submit" string="Verify" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_budget_check" type="object" states="verify" string="Budget Approved" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_request" type="object" states="Budget Approval" string="Issue" id="action_request" class="oe_highlight" data-hotkey="v"/>
+                    <!--<button name="action_receive" attrs="{'invisible': [('id','=',None)]}" states="draft" string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>-->
+
+                    <button name="action_cancel" states="draft" string="Cancel" type="object" class="oe_highlight btn-danger" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" />
+                    <button name="action_reject" type="object" states="submit,verify,Budget Approval" string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_create_purchase_request" string="Create PR" type="object" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Budget Approval','waiting','processed','done'))]}"/>
+                        <button name="%(droga_purchase_request_store_requsition_action)d" string="View PR" type="action" class="oe_stat_button" icon="fa-list" attrs="{'invisible': [('state', 'not in', ('Budget Approval','waiting','processed','done'))]}"/>
+                    </div>
+                    <div class="oe_title">
+                        <span class="o_form_label">Store Requistion No</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="requested_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}"></field>
+                            <field name="request_picking" string="Request id" widget="many2many_tags" readonly="1" invisible="1"/>
+                            <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                            <field name="department_manager" readonly="1" invisible="1"/>
+                            <field name="branch" options="{'no_create':True,'no_open':True}" required="1" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                        </group>
+                        <group>
+                            <field name="warehouse" attrs="{'readonly': [('state', 'not in', ('draft'))]}" options="{'no_create':True,'no_open':True}" readonly="0" required="1"/>
+                            <field name="request_date" attrs="{'readonly': [('state', 'not in', ('draft'))]}"></field>
+                            <field name="product_type" attrs="{'readonly': [('state', 'not in', ('draft'))]}" required="1"/>
+                            <field name="purpose" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}" invisible="1"/>
+                            <field name="total_amount" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Product Details">
+                            <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
+                                <tree editable="bottom">
+                                    <field name="company_id" invisible="1" />
+                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" width="40" context="{'default_detailed_type': 'product'}" attrs="{'readonly': [('parent.state', 'not in', ('draft'))]}"/>
+                                    <field name="product_uom" width="10" attrs="{'readonly': [('parent.state', 'not in', ('draft'))]}"/>
+                                    <field name="product_uom_category_id" invisible="1" attrs="{'readonly': [('parent.state', 'not in', ('draft'))]}"/>
+                                    <field name="product_uom_qty" string="Qty" help="Quantity" width="10" attrs="{'readonly': [('parent.state', 'not in', ('draft'))]}"/>
+
+                                    <field name="unit_price" width="10" attrs="{'readonly': [('parent.state', 'not in', ('draft'))]}"/>
+                                    <field name="total_price" width="10" attrs="{'readonly': [('parent.state', 'not in', ('draft'))]}"/>
+                                    <field name="budgetary_position" width="10" required="1" options="{'no_create':True,'no_open':True}" string="Budget Category" />
+                                    <field name="expense_account" width="10" options="{'no_create':True,'no_open':True}" attrs="{'column_invisible': [('parent.state', 'not in', ('verify'))]}" string="GL Account"/>
+                                    <field name="remaining_budget" width="10" attrs="{'column_invisible': [('parent.state', 'not in', ('verify'))]}" decoration-danger="total_price &gt; remaining_budget" decoration-success="total_price &lt;= remaining_budget" widget="badge"/>
+                                    <field name="stock_balance" readonly="1" string="Stock Balance" width="10"/>
+                                    <field name="avaliable_qty" width="10" attrs="{'column_invisible': [('parent.state', 'not in', ('Budget Approval'))]}" string="Issue Qty"/>
                                     <field name="unavilable_qty" invisible="1"/>
 
                                     <!--
@@ -199,7 +283,28 @@
         </field>
     </record>
 
-    <menuitem id="droga_stock_office_supplies_request_menu" name="Store Requistion" action="droga_inventory_office_supplies_request_action" groups="base.group_user" parent="stock.menu_stock_warehouse_mgmt"/>
-    <menuitem id="droga_stock_office_supplies_request_procurement_menu" name="Store Requistion" action="droga_inventory_office_supplies_request_action" groups="base.group_user" parent="droga_procurement.droag_procurement_local" sequence="0"/>
+    <!--action for store manager -->
+    <record id="droga_inventory_office_supplies_request_warehouse_action" model="ir.actions.act_window">
+        <field name="name">Store Requisition</field>
+        <field name="res_model">droga.inventory.office.supplies.request</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_inventory_office_supplies_request_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_inventory_office_supplies_request_warehouse_form')}),
+         (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_inventory_office_supplies_request_kanban')})]"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Store requisition found!
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="droga_stock_office_supplies_request_menu" name="Store Requisition" action="droga_inventory_office_supplies_request_warehouse_action" groups="base.group_user" parent="stock.menu_stock_warehouse_mgmt"/>
+
+    <menuitem id="droga_stock_office_supplies_request_procurement_menu" name="Store Requisition" action="droga_inventory_office_supplies_request_warehouse_action" groups="base.group_user" parent="droga_procurement.droag_procurement_local" sequence="0"/>
 
 </odoo>

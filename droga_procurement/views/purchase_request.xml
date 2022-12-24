@@ -45,7 +45,7 @@
             <form string="Purchase Request" delete="0">
                 <header>
                     <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request" data-hotkey="v"/>
-                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v" />
+                    <button name="verify_request" type="object"  string="Verify" id="draft_request" class="oe_highlight" data-hotkey="v"  attrs="{'invisible':['|',('state','!=','Submitted'),('is_department_manager','=',False)]}"/>
                     <button name="budget_checked_request" type="object" states="Verified" string="Budget Approved" id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
                     <button name="approve_request_pr_manager" type="object" states="Budget Approved" string="PR Manager" id="approve_request_pr_manager" class="oe_highlight" data-hotkey="v"/>
                     <button name="approve_request" type="object" string="Approve" id="approve_request" class="oe_highlight" data-hotkey="v" attrs="{'invisible':['|',('state','!=','Procurement Manager'), ('wf_state', 'in', ('Approved'))]}"/>
@@ -71,10 +71,11 @@
                     </div>
                     <group>
                         <group>
+                            <field name="is_department_manager" invisible="1"/>
                             <field name="request_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="department_manager" readonly="1" invisible="1"/>
-                            <field name="department_manager_user_id" invisible="1"/>
+                            <field name="department_manager_user_id" invisible="0"/>
                             <field name="branch" options="{'no_create':True,'no_open':True}" required="1" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="request_type" invisible="1"/>
                         </group>
@@ -83,7 +84,7 @@
                             <field name="request_date" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
-                            <field name="buying_method" attrs="{'invisible': [('state', 'not in', ('Approved'))]}"/>
+                            <field name="buying_method" attrs="{'invisible': [('wf_state', 'not in', ('Approved'))]}"/>
                             <field name="total_amount" invisible="1"/>
                         </group>
                     </group>
@@ -321,7 +322,7 @@
                         <group>
 
                             <field name="request_date" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
-                            <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                            <field name="request_purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="exchange_rate" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="total_amount" invisible="1"/>
@@ -366,9 +367,10 @@
                                 <tree create="0" delete="0" editable="bottom">
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
                                     <field name="budget_product" width="15" string="Budget Product?"/>
+                                    <field name="is_core_product"/>
                                     <field name="expected_average_mon_cons" width="15" string="Average Monthly Cons"/>
                                     <field name="current_stock_balance" width="15" string="Current Balance"/>
-                                    <field name="selling_price_after_arrival" width="15" string="Selling Price"/>
+                                    <field name="selling_price_after_arrival" width="15" string="Selling Price ETB"/>
                                     <field name="expected_margin" width="15" string="Margin"/>
                                     <field name="arrival_time" width="15" string="Arrival Time"/>
                                 </tree>
@@ -383,7 +385,7 @@
                                     <field name="manufacturer" width="15" />
                                     <field name="unit" width="15" options="{'no_create':True,'no_open':True}"/>
                                     <field name="avail_stock" width="15" />
-                                    <field name="sell_up" width="15" />
+                                    <field name="sell_up" width="15" string="Selling Price ETB"/>
                                     <field name="epss_volume" width="15" />
                                     <field name="local_man_status" width="15" />
                                     <field name="market_analysis_remark" width="15" />

@@ -3,8 +3,8 @@ from odoo import _, api, fields, models
 from datetime import datetime
 
 
-class purhcase_request(models.Model):
-    _name = 'droga.purhcase.request'
+class purchase_request_local(models.Model):
+    _name = 'droga.purchase.request.local'
     _description = 'Purchase Request'
     _order = "name desc"
 
@@ -23,10 +23,10 @@ class purhcase_request(models.Model):
         return employee_rec.department_id
 
     # compute total purchase amount
-    @api.depends('purhcase_request_lines.total_price')
+    @api.depends('purchase_request_lines.total_price')
     def compute_total_purchase_amount(self):
         total = 0
-        for record in self.purhcase_request_lines:
+        for record in self.purchase_request_lines:
             total += record.total_price
 
         self.total_amount = total
@@ -49,7 +49,9 @@ class purhcase_request(models.Model):
     name = fields.Char('Request Reference', required=True,
                        index=True, copy=False, default='New')
     request_type = fields.Selection(
-        [("Local", "Local"), ("Foregin", "Foregin")], default="Local")
+        [("Local", "Local"), ("Foreign", "Foregin")], default="Local")
+    purchase_type = fields.Selection([('product', 'Goods'), ('service', 'Service')],
+                                     default="product")
     request_by = fields.Many2one(
         "hr.employee", string="Requested By", required=True, default=_get_employee_id)
     request_date = fields.Datetime(
@@ -58,25 +60,8 @@ class purhcase_request(models.Model):
         "hr.department", string="Department", required=True, default=_get_department_id)
     purpose = fields.Char("Purpose")
 
-    request_purpose = fields.Selection([('Refill', 'Refill'), ('Tender', 'Tender'), ('Emergency', 'Emergency')])
-
-    purhcase_request_lines = fields.One2many(
-        "droga.purhcase.request.line", "purhcase_request_id", required=True)
-
-    purhcase_request_lines_expectetd = fields.One2many(
-        "droga.purhcase.request.line", "purhcase_request_id", required=True)
-
-    purhcase_request_lines_market_analysis = fields.One2many(
-        "droga.purhcase.request.line", "purhcase_request_id", required=True)
-
-    purhcase_request_lines_foregin_supp_list = fields.One2many(
-        "droga.purhcase.request.line", "purhcase_request_id", required=True)
-
-    purhcase_request_lines_foregin_competitors = fields.One2many(
-        "droga.purhcase.request.line", "purhcase_request_id", required=True)
-
-    purchase_analysis_report = fields.One2many(
-        "droga.purhcase.request.line", "purhcase_request_id")
+    purchase_request_lines = fields.One2many(
+        "droga.purchase.request.line.local", "purchase_request_id", required=True)
 
     state = fields.Selection(
         [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"),
@@ -100,11 +85,7 @@ class purhcase_request(models.Model):
         'studio.approval.entry', 'res_id', string='Approvals')
 
     buying_method = fields.Selection([("RFQ", "RFQ"), ("Bid", "Bid")])
-    rfqs = fields.One2many('droga.purhcase.request.rfq',
-                           'purhcase_request_id', string='RFQ')
-
-    foregin_phase_rfqs = fields.One2many(
-        "droga.purchase.foregin.status", "purchase_request_id_rfq_phase")
+    # rfqs = fields.One2many('droga.purchase.request.rfq.local', 'purchase_request_id', string='RFQ')
 
     # approvers
     department_manager = fields.Many2one(
@@ -138,20 +119,20 @@ class purhcase_request(models.Model):
             vals['name'] = self_comp.env['ir.sequence'].next_by_code(
                 'droga.purchase.request.foreign') or '/'
 
-        res = super(purhcase_request, self_comp).create(vals)
+        res = super(purchase_request_local, self_comp).create(vals)
 
         return res
 
     def write(self, vals):
 
-        res = super(purhcase_request, self).write(vals)
+        res = super(purchase_request_local, self).write(vals)
         # calculate total purchase price
 
         return res
 
     # submit request
     def submit_request(self):
-        if len(self.purhcase_request_lines) == 0:
+        if len(self.purchase_request_lines) == 0:
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
@@ -180,7 +161,7 @@ class purhcase_request(models.Model):
             activity.action_feedback()
         return True
 
-    # rejet request
+    # reject request
     def reject_request(self):
         self.write({'state': 'Draft'})
         return True
@@ -193,7 +174,7 @@ class purhcase_request(models.Model):
     # budget checked
     def budget_checked_request(self):
         # check for budgetary position and expense account
-        for record in self.purhcase_request_lines:
+        for record in self.purchase_request_lines:
             if not record.budgetary_position.ids or not record.expense_account.ids:
                 return {
                     'type': 'ir.actions.client',
@@ -224,28 +205,16 @@ class purhcase_request(models.Model):
 
     def open_rfq(self):
         view = self.env.ref(
-            'droga_procurement.droga_purhcase_request_view_tree')
+            'droga_procurement.droga_purchase_request_rfq_local_view_tree')
 
         return {
             'name': 'RFQ',
             'view_mode': 'tree,form',
-            'res_model': 'droga.purhcase.request.rfq',
+            'res_model': 'droga.purchase.request.rfq.local',
             'view_id': False,
             'type': 'ir.actions.act_window',
             'res_id': self.id
         }
-
-    def load_foregin_purchase_status(self):
-        # get phase 1 or request for quotation steps
-        rfq_steps = self.env["droga.foregin.purchase.phases"].search([])
-
-        for rfq_step in rfq_steps:
-            # create record in rfq step status one2manyobject
-            status = {'purchase_request_id_rfq_phase': self.id,
-                      'phase': rfq_step.id,
-                      'status': 'Not Started'}
-            # create the record in database
-            sta = self.env['droga.purchase.foregin.status'].create(status)
 
     def record_commitment_budget(self):
         # record commitement budget when the budget approves
@@ -253,7 +222,7 @@ class purhcase_request(models.Model):
             if record.state == "Budget Approved":
                 # total purchase amount
                 lines_include_in_total = []
-                for line in record.purhcase_request_lines:
+                for line in record.purchase_request_lines:
                     # create commitment record
                     commitment_budget = {
                         'document_type': 'PR',
@@ -278,52 +247,28 @@ class purhcase_request(models.Model):
             record.write({'state': 'Closed'})
 
 
-class purhcase_request_line(models.Model):
-    _name = "droga.purhcase.request.line"
+class purchase_request_line_local(models.Model):
+    _name = "droga.purchase.request.line.local"
     _description = "Purchase Request Line"
 
-    purhcase_request_id = fields.Many2one("droga.purhcase.request")
-    exchange_rate = fields.Float(
-        related="purhcase_request_id.exchange_rate", store=True)
+    purchase_request_id = fields.Many2one("droga.purchase.request.local")
+
     company_id = fields.Many2one(
-        'res.company', related='purhcase_request_id.company_id', string='Company', store=True, readonly=True)
-    status = fields.Selection(
-        [("Draft", "Draft"), ("Submitted", "Submitted"), ("Verified", "Verified"), ("Budget Checked", "Budget Checked"),
-         ("Approved", "Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True,
-        related='purhcase_request_id.state')
-    product_id = fields.Many2one('product.product', string='Product', domain=[
-        ('purchase_ok', '=', True)], change_default=True)
+        'res.company', related='purchase_request_id.company_id', string='Company', store=True, readonly=True)
+    status = fields.Selection(related='purchase_request_id.state')
+    product_id = fields.Many2one('product.product', string='Product', domain=[('purchase_ok', '=', True)],
+                                 change_default=True)
     product_qty = fields.Float(
         string='Quantity', digits='Product Unit of Measure', required=True, default=1)
 
-    product_tmpl_id = fields.Many2one(related='product_id.product_tmpl_id', store=True)
-
-    is_core_product = fields.Boolean("Core product", compute="_compute_product_values",
-                                     inverse='_inverse_product_values', store=True)
-
     unit_price = fields.Float('Unit Price')
     total_price = fields.Float(
-        'Total Price', compute="_compute_total", store=True)
-
-    unit_price_foregin = fields.Float('Unit Price')
-    total_price_foregin = fields.Float(
         'Total Price', compute="_compute_total", store=True)
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
                                   domain="[('category_id', '=', product_uom_category_id)]", required=True)
     product_uom_category_id = fields.Many2one(
         related='product_id.uom_id.category_id')
-
-    budget_product = fields.Boolean('Budget product?')
-    expected_average_mon_cons = fields.Float(
-        'Expected average monthly consumption')  # Fix me, compute using product master
-    current_stock_balance = fields.Float(
-        'Current balance', compute='_compute_product_values', inverse='_inverse_product_values',
-        store=True)  # Fix me, fetch from inventory
-    selling_price_after_arrival = fields.Float('Arrival selling price')
-    # Fix me, compute using sales price
-    expected_margin = fields.Float('Expected margin')
-    arrival_time = fields.Date('Arrival time')
 
     budgetary_position = fields.Many2one("account.budget.post")
     expense_account = fields.Many2one("account.account")
@@ -333,61 +278,26 @@ class purhcase_request_line(models.Model):
 
     remark = fields.Char("Remark")
 
-    # field for anlysis report
-    four_month_order_qty = fields.Float(
-        "Four Month Qty", compute="_consumption_total", help="Order Quantity times Average Monthly Consumption",
-        store=True)
-    six_month_order_qty = fields.Float(
-        "Six Month Qty", compute="_consumption_total", help="Order Quantity times Average Monthly Consumption",
-        store=True)
-
-    order_qty_and_current_stcok = fields.Float(
-        "Order Qty & Current Stock", compute="_consumption_total", help="Order Quantity Plus Current Stock", store=True)
-
-    @api.depends('product_qty', 'unit_price', 'unit_price_foregin', 'exchange_rate')
+    @api.depends('product_qty', 'unit_price')
     def _compute_total(self):
         for record in self:
-            if record.purhcase_request_id.request_type == 'Local':
-                record.total_price = record.unit_price * record.product_qty
-            else:
-                record.unit_price = record.unit_price_foregin * record.exchange_rate
-                record.total_price = record.unit_price * record.product_qty
-                record.total_price_foregin = record.unit_price_foregin * record.product_qty
+            record.total_price = record.unit_price * record.product_qty
 
     # set unit of measure
     @api.onchange('product_id')
-    def set_unit(self):
+    def set_unit_product(self):
         for record in self:
             record.product_uom = record.product_id.uom_id
-            record.is_core_product = record.product_id.is_core_product
-            record.current_stock_balance = record.product_id.free_qty
+            # get product type
 
-    @api.depends('product_id')
-    def _compute_product_values(self):
-        for record in self:
-            record.is_core_product = record.product_id.is_core_product
-            record.current_stock_balance = record.product_id.free_qty
-
-    def _inverse_product_values(self):
-        for rec in self:
-            for record in self:
-                record.product_id.is_core_product = record.is_core_product
-                record.product_id.free_qty = record.current_stock_balance
+            product_type = record.purchase_request_id.purchase_type
+            return {'domain': {'product_id': [('detailed_type_cus', '=', product_type)]}}
 
     @api.onchange('budgetary_position', 'expense_account')
     def _load_budgetary_position_accounts(self):
         for record in self:
             accounts = record.budgetary_position.account_ids.ids
             return {'domain': {'expense_account': [('id', 'in', (accounts))]}}
-
-    @api.depends('product_qty', 'expected_average_mon_cons', 'current_stock_balance')
-    def _consumption_total(self):
-        for record in self:
-            record.four_month_order_qty = record.expected_average_mon_cons * 4
-            record.six_month_order_qty = record.expected_average_mon_cons * 6
-            record.order_qty_and_current_stcok = record.product_qty + \
-                                                 record.current_stock_balance
-        return True
 
     @api.depends('budgetary_position', 'expense_account')
     def _get_remaining_budget(self):
@@ -403,33 +313,15 @@ class purhcase_request_line(models.Model):
 
         for record in self:
             # get budget from remaining budget
-            if record.budgetary_position.id and record.purhcase_request_id.branch.id and record.expense_account.id:
+            if record.budgetary_position.id and record.purchase_request_id.branch.id and record.expense_account.id:
                 self.env.cr.execute("""select distinct b.account,a.general_budget_id,a.analytic_account_id,sum(b.remaining_balance) as remaining_balance from crossovered_budget_lines a 
     inner join crossovered_budget_lines_detail b on a.id=b.budgetary_position_id 
     where a.general_budget_id=%s and a.analytic_account_id=%s and b.account=%s and (a.date_from>=%s and a.date_to<=%s)
     group by b.account,a.general_budget_id,a.analytic_account_id """, (
-                    record.budgetary_position.id, record.purhcase_request_id.branch.id, record.expense_account.id,
+                    record.budgetary_position.id, record.purchase_request_id.branch.id, record.expense_account.id,
                     date_from, date_to))
                 res = self.env.cr.dictfetchone()
 
                 # update remaining balance
                 if res != None:
                     record.remaining_budget = res['remaining_balance']
-
-
-class purchase_foregin_status(models.Model):
-    _name = "droga.purchase.foregin.status"
-    _description = "Status Tracking for Foregin Purchases"
-
-    purchase_request_id_rfq_phase = fields.Many2one(
-        "droga.purhcase.request", string="Purchase Request")
-
-    rfq_id = fields.Many2one("droga.purhcase.request.rfq")
-
-    phase = fields.Many2one("droga.foregin.purchase.phases")
-    phase_name = fields.Selection(related="phase.phase_name", store=True)
-    step = fields.Char(related="phase.step")
-    status = fields.Selection(
-        [("Not Started", "Not Started"), ("On Progress", "On Progress"), ("Done", "Done")])
-    done_date = fields.Date("Done Date")
-    remark = fields.Char("Remark")

@@ -4,19 +4,18 @@
     <!--actions -->
     <!-- action for approval local purcjase request -->
     <record id="droga_budget_request_for_approval_action" model="ir.actions.act_window">
-        <field name="name">Purhcase Request</field>
+        <field name="name">Purchase Request</field>
         <field name="res_model">droga.purhcase.request</field>
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_procurement.droga_purhcase_request_view_tree')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('droga_procurement.droga_purhcase_request_view_form')})]" />
-        <field name="domain">[]</field>
         <field name="context">{'edit': 0,'create': 0}</field>
         <field name="domain">[('state', 'not in', ('Draft','Draft'))]</field>
-        <field name="context">{'default_request_type': 'Local','search_default_verified':1}</field>view_out_invoice_tree
+        <field name="context">{'default_request_type': 'Local','search_default_verified':1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No purchase requsition found for approval 
+            No purchase requisition found for approval
             </p>
         </field>
     </record>
@@ -35,7 +34,7 @@
         <field name="context">{'search_default_verified':1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No Store requsition found for approval 
+            No Store requisition found for approval
             </p>
         </field>
     </record>

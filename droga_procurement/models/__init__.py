@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from . import purchase_request
+from . import purchase_request_local
 from . import rfq
+from . import rfq_local
 from . import purchase_order
 from . import lc
 from . import pre_import_permit

@@ -5,7 +5,6 @@ from datetime import datetime
 
 
 class Rfq(models.Model):
-
     _name = 'droga.purhcase.request.rfq'
     _description = 'Request for Quotation'
     _order = "name desc"
@@ -58,10 +57,13 @@ class Rfq(models.Model):
         'droga.purhcase.request.rfq.line', 'rfq_id', required=True)
 
     state = fields.Selection(
-        [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"), ("Committee Approval", "Committee Approved"), ("Operation Manager", "Operation Manager"),  ("CEO Approval", "CEO"), ("Cancel", "Canceled")], default="Draft", tracking=True)
+        [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"),
+         ("Committee Approval", "Committee Approved"), ("Operation Manager", "Operation Manager"),
+         ("CEO Approval", "CEO"), ("Cancel", "Canceled")], default="Draft", tracking=True)
 
     state_rfq = fields.Selection(
-        [('Draft', 'Draft'), ('RFQ Sent', 'RFQ Sent'), ('Proforma Invoice', 'Proforma Invoice')], default='Draft', tracking=True)
+        [('Draft', 'Draft'), ('RFQ Sent', 'RFQ Sent'), ('Proforma Invoice', 'Proforma Invoice')], default='Draft',
+        tracking=True)
 
     currency_requests = fields.One2many(
         'droga.account.foreign.currency.request', 'rfq_id')
@@ -75,9 +77,14 @@ class Rfq(models.Model):
     incoterm = fields.Many2one('account.incoterms')
     mod_of_shipment = fields.Selection([('Air', 'Air'), ('Sea', 'Sea')])
     port_of_loading = fields.Many2one(
-        'droga.purchase.port.of.loading', domain="[('shipment_type', '=', mod_of_shipment),('port_type', '=', 'Loading')]", string="Port of Loading")
+        'droga.purchase.port.of.loading',
+        domain="[('shipment_type', '=', mod_of_shipment),('port_type', '=', 'Loading')]", string="Port of Loading")
     port_of_discharge = fields.Many2one(
-        'droga.purchase.port.of.loading', domain="[('shipment_type', '=', mod_of_shipment),('port_type', '=', 'Discharge')]", string="Port of Discharge")
+        'droga.purchase.port.of.loading',
+        domain="[('shipment_type', '=', mod_of_shipment),('port_type', '=', 'Discharge')]", string="Port of Discharge")
+    port_of_final_destination = fields.Many2one('droga.purchase.port.of.loading',
+                                                domain="[('shipment_type', '=', mod_of_shipment),('port_type', '=', 'Final Destination')]",
+                                                string="Port of Final Destination")
     country_of_origin = fields.Many2one('res.country')
     payment_term = fields.Selection(
         [('LC', 'LC'), ('TT', 'TT'), ('CAD', 'CAD')])
@@ -259,9 +266,9 @@ class Rfq(models.Model):
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
-                            'message': message,
-                            'type': 'danger',
-                            'sticky': False
+                        'message': message,
+                        'type': 'danger',
+                        'sticky': False
                     }
                 }
             # check if there is no purchase related with the rfq
@@ -324,14 +331,14 @@ class Rfq(models.Model):
             for supplier in suppliers:
                 vals = {
                     'name': 'New',
-                            'state': 'draft',
-                            'date_order': datetime.now(),
-                            'rfq_id': supplier.rfq_id.id,
-                            'partner_id': supplier.supplier_id.id,
-                            'request_type': self.request_type,
-                            'bank': bank.id if bank else None,
-                            'branch': bank_branch if bank_branch else None,
-                            'currency_approved_date': approved_date if approved_date else None
+                    'state': 'draft',
+                    'date_order': datetime.now(),
+                    'rfq_id': supplier.rfq_id.id,
+                    'partner_id': supplier.supplier_id.id,
+                    'request_type': self.request_type,
+                    'bank': bank.id if bank else None,
+                    'branch': bank_branch if bank_branch else None,
+                    'currency_approved_date': approved_date if approved_date else None
 
                 }
                 vals['order_line'] = []
@@ -339,13 +346,12 @@ class Rfq(models.Model):
                 # get products the supplier won
                 for line in self.rfq_lines:
                     if line.winner == "Yes" and line.supplier_id == supplier.supplier_id:
-
                         order_line_vals = (0, 0, {
                             'date_planned': fields.Date.today(),
                             'name': line.product_id.name,
                             'price_unit': line.unit_price,
                             'product_id': line.product_id.id,
-                            'product_qty':  line.product_qty,
+                            'product_qty': line.product_qty,
                             'product_uom': line.product_uom.id,
                             'unit_price_foregin': line.unit_price_foregin,
                             'taxes_id': [(6, 0, line.tax_id.ids)],
@@ -361,7 +367,8 @@ class Rfq(models.Model):
                 if line.winner == "Yes":
                     # get budgetary position and expense account from purchase request
                     purchase_request = self.env['droga.purhcase.request.line'].search(
-                        [('purhcase_request_id', '=', self.purhcase_request_id.id), ('product_id', '=', line.product_id.id)])
+                        [('purhcase_request_id', '=', self.purhcase_request_id.id),
+                         ('product_id', '=', line.product_id.id)])
 
                     commitment_budget = {
                         'document_type': 'PO',
@@ -410,7 +417,8 @@ class Rfq(models.Model):
 
         for record in records:
             line = {'rfq_id': res.id, 'supplier_id': res.supplier_id.id, 'product_id': record.product_id.id,
-                    'product_qty': record.product_qty, 'product_uom': record.product_uom.id, 'unit_price': 0, 'winner': 'Yes'}
+                    'product_qty': record.product_qty, 'product_uom': record.product_uom.id, 'unit_price': 0,
+                    'winner': 'Yes'}
 
             self.env['droga.purhcase.request.rfq.line'].create(line)
 
@@ -544,9 +552,9 @@ class Rfq(models.Model):
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                        'message': message,
-                        'type': 'danger',
-                        'sticky': False
+                    'message': message,
+                    'type': 'danger',
+                    'sticky': False
                 }
             }
 
@@ -588,6 +596,7 @@ class Rfq(models.Model):
                 break
 
         return message
+
     # constraints
     # Proforma invoice Field to be unique
 
@@ -635,7 +644,7 @@ class Rfq_Detail(models.Model):
         'res.partner', string='Supplier', domain="[('supplier_rank','!=', 0)]")
     supplier_name = fields.Char(related="supplier_id.name", store=True)
     product_id = fields.Many2one('product.product', string='Product', domain=[
-                                 ('purchase_ok', '=', True)], change_default=True)
+        ('purchase_ok', '=', True)], change_default=True)
     product_qty = fields.Float(
         string='Quantity', digits='Product Unit of Measure', required=True, default=1)
     unit_price = fields.Float('Unit Price', required=True)
@@ -687,11 +696,11 @@ class Rfq_Detail(models.Model):
     def _compute_total(self):
         for record in self:
             if record.purhcase_request_id.request_type == "Local":
-                record.total_price = record.unit_price*record.product_qty
+                record.total_price = record.unit_price * record.product_qty
             else:
-                record.unit_price = record.unit_price_foregin*record.exchange_rate
-                record.total_price = record.unit_price*record.product_qty
-                record.total_price_foregin = record.unit_price_foregin*record.product_qty
+                record.unit_price = record.unit_price_foregin * record.exchange_rate
+                record.total_price = record.unit_price * record.product_qty
+                record.total_price_foregin = record.unit_price_foregin * record.product_qty
 
             price = record.unit_price
             taxes = record.tax_id.compute_all(
@@ -714,7 +723,7 @@ class Rfq_Detail(models.Model):
     @api.depends('product_qty', 'unit_price')
     def _compute_total_price(self):
         for record in self:
-            record.total_price = record.product_qty*record.unit_price
+            record.total_price = record.product_qty * record.unit_price
 
     @api.onchange('product_id')
     def onchange_product_id(self):
@@ -731,10 +740,12 @@ class Rfq_Detail(models.Model):
     def check_double_product_supplier_entry(self, vals):
         if self:
             return self.env['droga.purhcase.request.rfq.line'].search_count(
-                [('rfq_id', '=', self.rfq_id.id), ('supplier_id', '=', self.supplier_id.id), ('product_id', '=', self.product_id.id)])
+                [('rfq_id', '=', self.rfq_id.id), ('supplier_id', '=', self.supplier_id.id),
+                 ('product_id', '=', self.product_id.id)])
         else:
             return self.env['droga.purhcase.request.rfq.line'].search_count(
-                [('rfq_id', '=', vals['rfq_id']), ('supplier_id', '=', vals['supplier_id']), ('product_id', '=', vals['product_id'])])
+                [('rfq_id', '=', vals['rfq_id']), ('supplier_id', '=', vals['supplier_id']),
+                 ('product_id', '=', vals['product_id'])])
 
     @api.onchange('supplier_id')
     def _fill_supplier_for_each_item(self):
@@ -760,7 +771,7 @@ class rfq_foregin_status(models.Model):
     step = fields.Char(related="phase.step")
     order = fields.Integer(related="phase.order")
     status = fields.Selection(
-        [("Not Started", "Not Started"), ("On Progress", "On Progress"),  ("Done", "Done")])
+        [("Not Started", "Not Started"), ("On Progress", "On Progress"), ("Done", "Done")])
     done_date = fields.Date("Done Date")
     remark = fields.Char("Remark")
 

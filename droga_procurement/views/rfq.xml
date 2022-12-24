@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-
     <!-- action for status tracking -->
     <record id="droga_purchase_foregin_status_tracking_action" model="ir.actions.act_window">
         <field name="name">Status Tracking</field>
@@ -320,6 +319,7 @@
                                     <field name="mod_of_shipment" />
                                     <field name="port_of_loading" options="{'no_create':True,'no_open':True}"/>
                                     <field name="port_of_discharge" options="{'no_create':True,'no_open':True}"/>
+                                     <field name="port_of_final_destination" options="{'no_create':True,'no_open':True}"/>
                                     <field name="payment_term" />
                                 </group>
                             </group>
