@@ -282,8 +282,6 @@ class purhcase_request_line(models.Model):
     _name = "droga.purhcase.request.line"
     _description = "Purchase Request Line"
 
-
-
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
     exchange_rate = fields.Float(
         related="purhcase_request_id.exchange_rate", store=True)
@@ -300,7 +298,8 @@ class purhcase_request_line(models.Model):
 
     product_tmpl_id = fields.Many2one(related='product_id.product_tmpl_id', store=True)
 
-    is_core_product = fields.Boolean("Core product", store=True)
+    is_core_product = fields.Boolean("Core product", compute="_compute_product_values",
+                                     inverse='_inverse_product_values', store=True)
 
     unit_price = fields.Float('Unit Price')
     total_price = fields.Float(
@@ -319,7 +318,8 @@ class purhcase_request_line(models.Model):
     expected_average_mon_cons = fields.Float(
         'Expected average monthly consumption')  # Fix me, compute using product master
     current_stock_balance = fields.Float(
-        'Current balance')  # Fix me, fetch from inventory
+        'Current balance', compute='_compute_product_values', inverse='_inverse_product_values',
+        store=True)  # Fix me, fetch from inventory
     selling_price_after_arrival = fields.Float('Arrival selling price')
     # Fix me, compute using sales price
     expected_margin = fields.Float('Expected margin')
@@ -360,6 +360,19 @@ class purhcase_request_line(models.Model):
         for record in self:
             record.product_uom = record.product_id.uom_id
             record.is_core_product = record.product_id.is_core_product
+            record.current_stock_balance = record.product_id.free_qty
+
+    @api.depends('product_id')
+    def _compute_product_values(self):
+        for record in self:
+            record.is_core_product = record.product_id.is_core_product
+            record.current_stock_balance = record.product_id.free_qty
+
+    def _inverse_product_values(self):
+        for rec in self:
+            for record in self:
+                record.product_id.is_core_product = record.is_core_product
+                record.product_id.free_qty = record.current_stock_balance
 
     @api.onchange('budgetary_position', 'expense_account')
     def _load_budgetary_position_accounts(self):

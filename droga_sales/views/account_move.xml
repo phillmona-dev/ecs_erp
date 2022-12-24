@@ -5,11 +5,26 @@
     <record id="inherit_for_xml_account_move_form" model="ir.ui.view">
         <field name="name">Account Move XML Generator Button</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
 
-            <xpath expr = "//button[@name='button_draft']" position = "after">
-                <button string = "Print to POS" type = "object" class = "oe_highlight" name = "generate_sales_xml" />
+            <xpath expr="//button[@name='button_draft']" position="after">
+                <button string="Print to POS" type="object" class="oe_highlight" name="generate_sales_xml"/>
+            </xpath>
+
+            <xpath expr="//button[@name='button_draft']" position="after">
+                <button string="PEDS" type="object" class="oe_highlight" name="print_to_pos_peds"/>
+            </xpath>
+
+           <xpath expr="//page[@name='other_info']" position="after">
+                <page string="FS Info">
+                    <group>
+                        <field name="FPMachineID"/>
+                        <field name="FSInvoiceNumber"/>
+                        <field name="EJNumber"/>
+                        <field name="FTimeStamp"/>
+                    </group>
+                </page>
             </xpath>
 
 

@@ -319,6 +319,7 @@
                                     <field name="mod_of_shipment" />
                                     <field name="port_of_loading" options="{'no_create':True,'no_open':True}"/>
                                     <field name="port_of_discharge" options="{'no_create':True,'no_open':True}"/>
+                                     <field name="port_of_final_destination" options="{'no_create':True,'no_open':True}"/>
                                     <field name="payment_term" />
                                 </group>
                             </group>
