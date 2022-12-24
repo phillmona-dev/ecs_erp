@@ -53,16 +53,7 @@
         </field>
     </record>
 
-    <record id="uom_extension" model="ir.ui.view">
-        <field name="name">droga.uom.category.inherited</field>
-        <field name="model">uom.category</field>
-        <field name="inherit_id" ref="uom.product_uom_categ_form_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='name']" position="after">
-                <field name="uom_title" ></field>
-            </xpath>
-        </field>
-    </record>
+ 
 
     <record id="stock_product_category" model="ir.ui.view">
         <field name="name">droga.product.category.inherited</field>
