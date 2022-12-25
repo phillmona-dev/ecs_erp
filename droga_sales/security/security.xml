@@ -7,9 +7,25 @@
 
 
     <record id="sales_admin" model="res.groups">
-        <field name="name">Droga sales Admin</field>
+        <field name="name">Droga sales Admin, discount rate admin</field>
         <field name="category_id" ref="sales_management"/>
     </record>
+
+    <record id="sales_price_change_admin" model="res.groups">
+        <field name="name">Droga price change workflow approver</field>
+        <field name="category_id" ref="sales_management"/>
+    </record>
+
+    <record id="sales_import_approve_admin" model="res.groups">
+        <field name="name">Droga import sales workflow approver</field>
+        <field name="category_id" ref="sales_management"/>
+    </record>
+
+    <record id="sales_wholesale_approve_admin" model="res.groups">
+        <field name="name">Droga wholesale sales workflow approver</field>
+        <field name="category_id" ref="sales_management"/>
+    </record>
+
 </odoo>
 
 
