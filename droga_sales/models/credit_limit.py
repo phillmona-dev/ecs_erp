@@ -31,7 +31,7 @@ class cust_sales_credit_limit(models.Model):
     pay_type=fields.Boolean(related='payment_term_id.apply_credit_limit')
     mature_amount = fields.Monetary('Matured amount', compute='_get_mature_amount')
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
-    manual_price=fields.Boolean('Manual price',default=False)
+    manual_price=fields.Boolean('Manual price',default=False,tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
     @api.depends('partner_id')
     def _get_mature_amount(self):
@@ -49,6 +49,8 @@ class cust_sales_credit_limit(models.Model):
         for so in result:
             if not so.partner_id.vat:
                 raise ValidationError("Tin No must be registered for customer!")
+            if not so.pr_sales and self.env.user.name.startswith('CRM'):
+                raise ValidationError("Please login before registering a sales order!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
         return result
@@ -66,6 +68,8 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
+            if not so.pr_sales and self.env.user.name.startswith('CRM'):
+                raise ValidationError("Please login before registering a sales order!")
             if so.mature_amount>0:
                 raise ValidationError("Please settle matured amounts before initiating another sales!")
         return result

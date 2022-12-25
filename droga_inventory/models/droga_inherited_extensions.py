@@ -204,7 +204,9 @@ class droga_stock_picking_type_extension(models.Model):
             else:
                 rec.has_access=False
 
-
+class droga_stock_uom_extension(models.Model):
+    _inherit='uom.uom'
+    uom_title=fields.Char('UOM invoice name')
 class droga_stock_move_extension(models.Model):
     _inherit = 'stock.move'
     reservation_discard_time=fields.Datetime(string='Reservation discard time',compute='_compute_res_discard',inverse='_inverse_res_discard')
