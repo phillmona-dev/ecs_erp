@@ -388,10 +388,7 @@ class droga_stock_product_extension(models.Model):
          store=True,required=True)
     def _compute_default_code(self):
         pass
-    property_stock_inventory = fields.Many2one(
-        'stock.location', "Inventory Location",
-        company_dependent=True, check_company=True,default='',
-        domain="[('usage', '=', 'internal'), '|', ('company_id', '=', False), ('company_id', '=', allowed_company_ids[0])]")
+
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
