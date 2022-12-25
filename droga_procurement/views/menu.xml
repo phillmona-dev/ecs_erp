@@ -43,7 +43,7 @@
     <menuitem id="droga_purchase_port_of_loading" name="Port of Loading" sequence="104" parent="purchase.menu_purchase_config" action="droga_purchase_port_of_loading_action" groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
 
     <!-- Purchase request menus for finance -->
-    <menuitem id="droga_account_purchase_requests_local_approval_menu" name="Purchase Request - Local" action="droga_purhcase_request_for_approval_action" groups="droga_self_service.self_service_group" sequence="4" parent="droga_finance.droag_account_payment_request_froms"/>
-    <menuitem id="droga_account_purchase_requests_foregin_approval_menu" name="Purchase Request - Foregin" action="droga_purhcase_request_foregin_for_approval_action" groups="droga_self_service.self_service_group" sequence="5" parent="droga_finance.droag_account_payment_request_froms"/>
+    <menuitem id="droga_account_purchase_requests_local_approval_menu" name="Purchase Request - Local" action="droga_purhcase_request_for_approval_action" groups="purchase.group_purchase_user" sequence="4" parent="droga_finance.droag_account_payment_request_froms"/>
+    <menuitem id="droga_account_purchase_requests_foregin_approval_menu" name="Purchase Request - Foregin" action="droga_purhcase_request_foregin_for_approval_action" groups="purchase.group_purchase_user" sequence="5" parent="droga_finance.droag_account_payment_request_froms"/>
 
 </odoo>
