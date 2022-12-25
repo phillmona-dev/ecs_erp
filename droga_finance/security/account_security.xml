@@ -72,12 +72,9 @@
         <field name="name">Account Recivables Cashier Accountant</field>
         <field name="category_id" ref="base.module_category_droga_finance"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">The user will be able to access all modules related to account recivables.</field>        <!---->
+        <field name="comment">The user will be able to access all modules related to account recivables.
+        </field>        <!---->
     </record>
-
-
-
-
 
 
     <!-- risk and treasury manager -->
@@ -108,10 +105,6 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="comment">The user will be able to access all modules related to treasury.</field>
     </record>
-
-
-
-
 
 
     <!-- General Ledger -->
@@ -166,9 +159,12 @@
         <field name="comment">--</field>
     </record>
 
-
-
-
+    <record id="finance_self_service_group" model="res.groups">
+        <field name="name">Finance Self Service</field>
+        <field name="category_id" ref="base.module_category_droga_finance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">--</field>
+    </record>
 
 
 </odoo>
