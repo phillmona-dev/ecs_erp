@@ -180,7 +180,7 @@ class sale_order_ext(models.Model):
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
 
-    pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True)
+    pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged)
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     pr_avail_areas=fields.Many2many(related='pr_sales.p_regions')
 

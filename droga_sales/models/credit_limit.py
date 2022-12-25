@@ -33,6 +33,7 @@ class cust_sales_credit_limit(models.Model):
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
     manual_price=fields.Boolean('Manual price',default=False,tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
+    origin_type=fields.Char('Import or wholesale type')
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
@@ -47,12 +48,15 @@ class cust_sales_credit_limit(models.Model):
 
         result = super(cust_sales_credit_limit, self).create(vals)
         for so in result:
+            if len(set(so.order_line.mapped('wareh.wh_type')))>1:
+                raise ValidationError("Import and wholesale orders should be instantiated separately!")
             if not so.partner_id.vat:
                 raise ValidationError("Tin No must be registered for customer!")
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 raise ValidationError("Please login before registering a sales order!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
+            so.origin_type=so.order_line.mapped('wareh.wh_type')[0] if len(set(so.order_line.mapped('wareh.wh_type')))==1 else False
         return result
 
     def action_confirm(self):
@@ -68,10 +72,14 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
+            if len(set(so.order_line.mapped('wareh.wh_type')))>1:
+                raise ValidationError("Import and wholesale orders should be instantiated separately!")
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 raise ValidationError("Please login before registering a sales order!")
             if so.mature_amount>0:
                 raise ValidationError("Please settle matured amounts before initiating another sales!")
+            so.origin_type = so.order_line.mapped('wareh.wh_type')[0] if len(
+                set(so.order_line.mapped('wareh.wh_type'))) == 1 else False
         return result
 
     def store_issue_placement_order(self):

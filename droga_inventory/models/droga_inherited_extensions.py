@@ -48,6 +48,9 @@ class droga_warehouse_extension(models.Model):
     _inherit = 'stock.warehouse'
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
+    wh_type=fields.Selection([
+        ('IM','Import'),
+        ('WS', 'Wholesale'),], string='Warehouse type.')
 
     def _search_has_access(self, operator, value):
 

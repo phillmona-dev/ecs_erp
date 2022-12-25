@@ -32,6 +32,7 @@ class cust_contact_extension(models.Model):
     location = fields.Char('Location')
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
     street = fields.Char(compute='_get_add')
+    key_account=fields.Boolean('Key account')
 
     @api.depends('location','area')
     def _get_add(self):
