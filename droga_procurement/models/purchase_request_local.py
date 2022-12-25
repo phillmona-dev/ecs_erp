@@ -94,7 +94,7 @@ class purchase_request_local(models.Model):
         related="department_manager.user_id", store=True)
 
     branch = fields.Many2one("account.analytic.account", string="Cost Center", domain=[
-        ('plan_id', '=', 'Profit Center')])
+        ('plan_id', '=', 'Cost Center')])
 
     total_amount = fields.Float(
         "Total Amount", compute="compute_total_purchase_amount", store=True)

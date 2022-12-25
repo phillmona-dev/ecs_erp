@@ -84,7 +84,7 @@ class purchase_order_foreign_droga_suppliers_list(models.Model):
     po_line = fields.Many2one('droga.purhcase.request.line')
     purhcase_request_id = fields.Many2one(
         related='po_line.purhcase_request_id', store=True)
-    manufacturer = fields.Many2one('res.partner', 'Manufacturer')
+    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]")
     unit_price = fields.Float('Unit price')
     shelf_life = fields.Float('Shelf life')
     is_sup_regsitered = fields.Boolean('Is supplier registered?', default=True)
@@ -98,7 +98,7 @@ class purhcase_order_foreign_competitors_comparative(models.Model):
         related='po_line.purhcase_request_id', store=True)
     # Make from settings page if not highly variant
     importer = fields.Char('Importer')
-    manufacturer = fields.Char('Manufacturer')
+    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]")
     unit = fields.Many2one('uom.uom')
     p_up = fields.Float('Private unit price')
     p_qty = fields.Float('Private quantity')
@@ -132,7 +132,7 @@ class purchase_request_analysis_line(models.Model):
     _inherit = 'droga.purhcase.request.line'
 
     # market analysis
-    importer_name = fields.Many2one('droga.tender.settings.competitor', string="Importer")
+    importer_name = fields.Char(string="Importer")
     manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]")
     unit = fields.Many2one('uom.uom', string='UoM')
     avail_stock = fields.Float('Available Stock')
