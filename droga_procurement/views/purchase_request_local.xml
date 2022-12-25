@@ -3,7 +3,7 @@
 
 
     <!-- action for rfq -->
-    <record id="droga_purchase_request_rfq_local_action" model="ir.actions.act_window">
+    <record id="droga_purchase_request_rfq_local1_action" model="ir.actions.act_window">
         <field name="name">Request for Quotation</field>
         <field name="res_model">droga.purchase.request.rfq.local</field>
         <field name="view_mode">tree,form</field>
@@ -78,7 +78,7 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_request_rfq_local_action)d" string="RFQ" type="action"
+                        <button name="%(droga_purchase_request_rfq_local1_action)d" string="RFQ" type="action"
                                 class="oe_stat_button" icon="fa-align-justify"
                                 attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"
                                 context="{'request_type':'Local','default_procurement_committee':department_manager}"/>
