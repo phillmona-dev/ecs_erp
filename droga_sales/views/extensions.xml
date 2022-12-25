@@ -30,7 +30,7 @@
                 <button name="action_confirm" data-hotkey="v"
                     string="Confirm" type="object" context="{'validate_analytic': True}"
                     attrs="{'invisible': True}"/>
-                <button name="action_confirm" type="object"
+                <button name="action_confirm_secondary" type="object"
                         string="Confirme"/>
 
             </xpath>
