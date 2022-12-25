@@ -31,7 +31,7 @@
                     string="Confirm" type="object" context="{'validate_analytic': True}"
                     attrs="{'invisible': True}"/>
                 <button name="action_confirm_secondary" type="object"
-                        string="Confirme"/>
+                        string="Confirm"/>
 
             </xpath>
 

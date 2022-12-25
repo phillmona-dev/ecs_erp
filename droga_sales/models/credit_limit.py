@@ -59,6 +59,9 @@ class cust_sales_credit_limit(models.Model):
             so.origin_type=so.order_line.mapped('wareh.wh_type')[0] if len(set(so.order_line.mapped('wareh.wh_type')))==1 else False
         return result
 
+    def action_confirm_secondary(self):
+        self.action_confirm()
+
     def action_confirm(self):
         order_lines_core = self.order_line.filtered(
             lambda x: not x.wareh)
