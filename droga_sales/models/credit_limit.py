@@ -31,9 +31,9 @@ class cust_sales_credit_limit(models.Model):
     pay_type=fields.Boolean(related='payment_term_id.apply_credit_limit')
     mature_amount = fields.Monetary('Matured amount', compute='_get_mature_amount')
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
-    manual_price=fields.Boolean('Manual price',default=False,tracking=True)
+    manual_price=fields.Boolean('Manual price',tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
-    origin_type=fields.Char('Import or wholesale type')
+    origin_type=fields.Char('Import or wholesale type',store=True)
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
