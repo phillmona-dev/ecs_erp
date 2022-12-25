@@ -17,15 +17,7 @@ class droga_stock_move_line_extension(models.Model):
     has_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
 
-    @api.onchange('result_package_id', 'product_id', 'product_uom_id', 'qty_done')
-    def _onchange_putaway_location(self):
-        if not self.id and self.user_has_groups(
-                'stock.group_stock_multi_locations') and self.product_id and self.qty_done:
-            qty_done = self.product_uom_id._compute_quantity(self.qty_done, self.product_id.uom_id)
-            default_dest_location = self.location_dest_id
-            self.location_dest_id = default_dest_location.with_context(exclude_sml_ids=self.ids)._get_putaway_strategy(
-                self.product_id, quantity=qty_done, package=self.result_package_id,
-                packaging=self.move_id.product_packaging_id)
+
 
     def _search_has_access(self, operator, value):
 
