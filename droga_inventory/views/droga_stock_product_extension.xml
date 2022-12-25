@@ -35,7 +35,7 @@
 
             <!--> Hide inventory page -->
             <xpath expr="//form/sheet/notebook/page[@name='inventory']" position="attributes">
-                <attribute name="invisible">True</attribute>
+                <attribute name="invisible">False</attribute>
             </xpath>
 
             <!--> General info left side -->
