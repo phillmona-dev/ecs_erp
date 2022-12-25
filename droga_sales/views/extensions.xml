@@ -22,6 +22,19 @@
                 <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
             </xpath>
 
+            <xpath expr = "//form/header/button[@name='action_confirm']" position = "attributes">
+                <attribute name="invisble">True</attribute>
+            </xpath>
+
+            <xpath expr = "//form/header/button[@name='action_confirm'][2]" position = "replace">
+                <button name="action_confirm" data-hotkey="v"
+                    string="Confirm" type="object" context="{'validate_analytic': True}"
+                    attrs="{'invisible': True}"/>
+                <button name="action_confirm" type="object"
+                        string="Confirm"/>
+
+            </xpath>
+
             <xpath expr = "//form/sheet/div/button[@name='action_preview_sale_order']" position = "before">
                     <field name="show_invoice_button" invisible="1"></field>
             </xpath>
