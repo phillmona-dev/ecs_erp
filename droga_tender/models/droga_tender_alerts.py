@@ -6,6 +6,7 @@ from odoo import models, fields, api
 class droga_tender_activity_generate(models.Model):
     _name = 'droga_tender_activity'
 
+
     def generate_activity(self):
         # recs = self.env['droga.tender.master'].search([('closing_date_gre','>=','datetime.datetime.combine(context_today(), datetime.time(0,0,0))')])
 
