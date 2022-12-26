@@ -66,7 +66,6 @@ class AccountLoan(models.Model):
             payments = 0.00000
             cpay = 0.00000
             mul = 0
-            # record.isactive = True
             self.env["account.loan.schedule"].search(
                 [('id', '>', 0), ('acount_loan_id', '=', record.id)]).unlink()
 
@@ -139,6 +138,7 @@ class AccountLoan(models.Model):
     interest_start_date = fields.Date("Interst Start Date", readonly=True)
     contract_date = fields.Date('Contract Date',required=True)
     opening_date = fields.Date('Opening Date')
+    opening_payment_date = fields.Date('Payment Start Date')
 # integer
     remaining_days = fields.Integer(string="Remaining Days", readonly=True)
     overdue_days = fields.Integer(string="Overdue", readonly=True)
@@ -424,6 +424,7 @@ class AccountLoan(models.Model):
 
 
             # repayment
+                    
                     if predone.loan_schedule_ids:
                         for schedule in predone.loan_schedule_ids:
                             if schedule.payment_date < da:
@@ -443,8 +444,17 @@ class AccountLoan(models.Model):
                         acount_pint = self.env['account.loan.int'].search(
                             [('value_date', '<', da), ('acount_loan_id', '=', predone.id)])
                         penality_amount=0.0000000000000000000000000000000000000
+                        cumulinterestpenal=0.0000000000000
                         # if acount_int:
-
+                        acount_pinte = self.env['account.loan.int'].search([('value_date', '<=', da),
+                                                                             ('acount_loan_id', '=', predone.id)])
+                    
+                        for inpen in acount_pinte:
+                            cumulinterestpenal += inpen.daily_interest_amount+inpen.daily_penality_amount
+                            
+                        if predone.isinterest:
+                            amount = cumulative_balance + cumulinterestpenal -interst_amount
+                            interst_amount = amount * predone.anual_interest_rate / 36500
                         for penality in predone.loan_repayment_ids:
                             #penality_amount=0
                             ndate = penality.expected_payment_date
@@ -481,6 +491,7 @@ class AccountLoan(models.Model):
                                         penality_amount=0
                                         penality_amount = penal*cumulative_balance/100
                                         break
+                            break
 
                         t=penality_amount
                         if not acount_int :
@@ -500,6 +511,7 @@ class AccountLoan(models.Model):
                             #if penality_amount>0 and acount_int.calculate:
                             #    acount_int.daily_penality_amount = penality_amount
                             acount_int.daily_interest_total = interst_amount+penality_amount
+                        
                     da = da + relativedelta(days=1)
 
     # post data on each month
@@ -607,6 +619,7 @@ class AccountLoan(models.Model):
             reciep = 0.000000000000000000000000000000000000000000
             interest = 0.000000000000000000000000000000000000000
             penality=0.000000000000000000000000000000000000000
+
             recipt = self.env['account.loan.receipt'].search(
                 [('id', '>', 0), ('acount_loan_id', '=', line.id)], order='id', limit=1)
             if recipt:
@@ -614,7 +627,11 @@ class AccountLoan(models.Model):
                 
                 line.payment_start_date=recipt.value_date+relativedelta(months=line.payment_month)-relativedelta(days=1)
                 if line.loan_schedule_ids:
+
                     idddd=0
+            if line.current_cumlative_balace and line.opening_date:
+                line.interest_start_date=line.opening_date
+                line.payment_start_date=line.opening_payment_date
             # if line.interest_start_date:
             #     line.payment_start_date=line.payment_start_date-relativedelta(days=1)
                     
@@ -646,18 +663,18 @@ class AccountLoan(models.Model):
                     repay += repayment.principal_repayment
             else:
                 for repayment in line.loan_repayment_ids.loan_repayment_detail_ids:
-                    
+
                         # if not repayment.is_interest:
                     repay += repayment.principal_repayment
                     acount_int = self.env['account.loan.int'].search(
                             [('value_date', '<=', repayment.value_date), ('acount_loan_id', '=', line.id)])
-                       
+
             # """ calculating total repayment """
             if line.isinterest:
                 for inter in line.loan_interest_ids:
                     interest += inter.daily_interest_total
 
-            balance = reciep+interest-repay
+            balance = reciep+-repay
             line.cumulative_balance = balance+line.current_cumlative_balace
 
     @api.depends('loan_interest_ids', 'loan_repayment_ids', 'current_cumlative_interest')
