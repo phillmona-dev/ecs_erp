@@ -66,6 +66,7 @@ class AccountLoan(models.Model):
             payments = 0.00000
             cpay = 0.00000
             mul = 0
+            # record.isactive = True
             self.env["account.loan.schedule"].search(
                 [('id', '>', 0), ('acount_loan_id', '=', record.id)]).unlink()
 
