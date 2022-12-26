@@ -81,7 +81,7 @@ class account_move_pr_sales(models.Model):
         return False if len(sale)==0 else sale[0].pr_sales
 
     pr_sales = fields.Many2one('droga.pro.sales.master', readonly=True, store=True, string="Promotor ID",
-                               default=_get_pr_sales_logged, required=True)
+                               default=_get_pr_sales_logged)
 
 
 class sales_team_extension(models.Model):
