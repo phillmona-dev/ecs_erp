@@ -15,7 +15,7 @@
 
 
 
-    <record id="droga_sales_credit_limit_action" model="ir.actions.act_window">
+    <record id="droga_sales_matured_customers_action" model="ir.actions.act_window">
         <field name="name">Matured customers</field>
         <field name="res_model">account.move</field>
         <field name="view_mode">tree</field>
