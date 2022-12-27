@@ -64,8 +64,6 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("You cannot exceed credit limit!")
         return result
 
-    def action_confirm_secondary(self):
-        self.action_confirm()
 
     def action_confirm(self):
         order_lines_core = self.order_line.filtered(
@@ -114,6 +112,22 @@ class inventory_placement_extension(models.Model):
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
     manual_price=fields.Boolean(related='order_id.manual_price')
+    expiry_date = fields.Date('Expiration date', compute='_get_expiry')
+    batch = fields.Char('Batch No', compute='_get_expiry')
+    batch_with_qty = fields.Char('Batch No', compute='_get_expiry')
+
+    def _get_expiry(self):
+        for rec in self:
+            try:
+                rec.expiry_date = rec.move_ids[0].lot_ids[0].expiration_date
+                rec.batch = rec.move_ids[0].lot_ids[0].name
+                rec.batch_with_qty = rec.move_ids[0].lot_ids[0].name + ' (' + str(
+                    rec.move_ids[0].move_line_ids[0].qty_done) + ')'
+            except:
+                rec.expiry_date = False
+                rec.batch = False
+                rec.batch_with_qty = False
+
     def _prepare_procurement_values(self, group_id=False):
 
         values = super(cust_sales_no_create_after_invoice, self)._prepare_procurement_values(group_id)
