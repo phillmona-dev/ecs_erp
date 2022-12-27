@@ -37,8 +37,10 @@
         <field name="arch" type="xml">
 
             <xpath expr="//field[@name='partner_ref']" position="after">
-                <field name="rfq_id" options="{'no_create':True}" readonly="1" string="Request for Quotation" attrs="{'invisible': [('request_type', '==', 'Local')]}"/>
-                <field name="rfq_local_id" options="{'no_create':True}" readonly="1" string="Request for Quotation" attrs="{'invisible': [('request_type', '==', 'Foregin')]}"/>
+                <field name="rfq_id" options="{'no_create':True}" readonly="1" string="Request for Quotation"
+                       attrs="{'invisible': [('request_type', '==', 'Local')]}"/>
+                <field name="rfq_local_id" options="{'no_create':True}" readonly="1" string="Request for Quotation"
+                       attrs="{'invisible': [('request_type', '==', 'Foregin')]}"/>
 
                 <field name="purchase_request_id" options="{'no_create':True}" readonly="1" string="Purchase Request"
                        invisible="1"/>
@@ -48,6 +50,10 @@
                 <field name="branch" invisible="1"/>
                 <field name="currency_approved_date" invisible="1"/>
                 <field name="amount_total" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="exchange_rate" attrs="{'invisible': [('request_type', '==', 'Local')]}"/>
             </xpath>
 
             <xpath expr="//button[@name='action_view_invoice']" position="after">
@@ -61,11 +67,11 @@
             </xpath>
 
             <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']"
-                   position="after">
+                   position="before">
 
                 <field name="unit_price_foregin" string="Unit Price USD"
                        attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
-                <field name="total_price_foregin" string="Total Price USD" sum="Total"
+                <field name="total_price_foregin" string="Subtotal USD" sum="Total"
                        attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
             </xpath>
 
@@ -73,11 +79,7 @@
 
 
                 <page string="Ordering" attrs="{'invisible': [('request_type', '==', 'Local')]}">
-                    <group>
-                        <group>
-                            <field name="import_permit_no"/>
-                        </group>
-                    </group>
+
                     <notebook>
 
                         <page string="Import Permit and Insurance">
@@ -130,7 +132,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Documents">
+                        <page string="Documents" invisible="1">
 
                             <field name="order_phase_documents" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
@@ -149,7 +151,7 @@
 
                 <page string="Shipment" attrs="{'invisible': [('request_type', '==', 'Local')]}">
                     <notebook>
-                        <page string="Status Tracking">
+                        <page string="Status Tracking" invisible="1">
                             <field name="shipment_phase_status" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
@@ -160,7 +162,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Documents">
+                        <page string="Documents" invisible="1">
 
                             <field name="shipment_phase_documents" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
@@ -173,63 +175,59 @@
                             </field>
                         </page>
 
-                        <page string="Other Information">
-                            <group>
-                                <group string="Shipment Document">
-                                    <field name="shipment_date" string="Estimated Shipment Date"/>
-                                    <field name="production_completion_date"
-                                           string="Estimated Production Completion Date"/>
-
-                                    <field name="shipment_scan_copy_doc_recived_date"/>
-                                    <field name="shipment_original_copy_doc_recived_date"/>
-                                    <field name="shipment_doc_original_sent_from_supplier"/>
-
-
-                                </group>
-                                <group string="Shipment Document">
-                                    <field name="shipment_doc_original_sent_from_supplier_courier"/>
-                                    <field name="document_tracking_number"/>
-                                    <field name="shipment_doc_original_recived_by_applicant_bank"/>
-
-                                    <field name="discrepancy"/>
-                                    <field name="accept_discrepancy"
-                                           attrs="{'invisible': [('discrepancy', '!=', 'Yes')]}"/>
-                                    <field name="discrepancy_comment"
-                                           attrs="{'invisible': ['|',('accept_discrepancy', '!=', True),('discrepancy', '!=', 'Yes')]}"/>
-
-
-                                    <field name="shipment_doc_collected_from_applicant_bank"/>
-                                    <field name="exchange_rate_lc_settlement"/>
-                                    <field name="shipment_lc_amount"/>
-                                    <field name="lc_settlement_deposited"/>
-
-                                    <field name="shipment_doc_handed_to_finance"/>
-                                    <field name="supplier_payment_date"/>
-                                </group>
-
-
-                            </group>
-                            <br></br>
-                            <group>
-                                <field name="shipping_reconcilations" mode="tree">
-                                    <tree create="0" delete="0" editable="bottom">
-                                        <field name="order"/>
-                                        <field name="name"/>
-                                        <field name="state"/>
-                                        <field name="remark"/>
-                                    </tree>
-                                </field>
-                            </group>
-
-
-                        </page>
 
                     </notebook>
+                    <group>
+                        <group string="Shipment Document">
+                            <field name="shipment_date" string="Estimated Shipment Date"/>
+                            <field name="production_completion_date"
+                                   string="Estimated Production Completion Date"/>
+
+                            <field name="shipment_scan_copy_doc_recived_date"/>
+                            <field name="shipment_original_copy_doc_recived_date"/>
+                            <field name="shipment_doc_original_sent_from_supplier"/>
+
+
+                        </group>
+                        <group string="Shipment Document">
+                            <field name="shipment_doc_original_sent_from_supplier_courier"/>
+                            <field name="document_tracking_number"/>
+                            <field name="shipment_doc_original_recived_by_applicant_bank"/>
+
+                            <field name="discrepancy"/>
+                            <field name="accept_discrepancy"
+                                   attrs="{'invisible': [('discrepancy', '!=', 'Yes')]}"/>
+                            <field name="discrepancy_comment"
+                                   attrs="{'invisible': ['|',('accept_discrepancy', '!=', True),('discrepancy', '!=', 'Yes')]}"/>
+
+
+                            <field name="shipment_doc_collected_from_applicant_bank"/>
+                            <field name="exchange_rate_lc_settlement"/>
+                            <field name="shipment_lc_amount"/>
+                            <field name="lc_settlement_deposited"/>
+
+                            <field name="shipment_doc_handed_to_finance"/>
+                            <field name="supplier_payment_date"/>
+                        </group>
+
+
+                    </group>
+                    <br></br>
+                    <group>
+                        <field name="shipping_reconcilations" mode="tree">
+                            <tree create="0" delete="0" editable="bottom">
+                                <field name="order"/>
+                                <field name="name"/>
+                                <field name="state"/>
+                                <field name="remark"/>
+                            </tree>
+                        </field>
+                    </group>
                 </page>
 
                 <page string="Good Clearance" attrs="{'invisible': [('request_type', '==', 'Local')]}">
                     <notebook>
-                        <page string="Status Tracking">
+                        <page string="Status Tracking" invisible="1">
                             <field name="clearance_phase_status" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="order" width="5" string="Order" readonly="1"/>
@@ -240,7 +238,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Documents">
+                        <page string="Documents" invisible="1">
 
                             <field name="clearance_phase_documents" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
@@ -252,48 +250,8 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Other Information">
-                            <group>
-                                <group string="Freight Payment">
-                                    <field name="mode_of_transport"/>
-                                    <field name="goods_arrival_date" invisible="1"/>
-                                    <field name="goods_arrival_date_final_destination"/>
+                        <page string="Other Information" invisible="1">
 
-                                    <field name="freight_payment_by_air"
-                                           attrs="{'invisible': [('mode_of_transport', '!=', 'Air')]}"/>
-                                    <field name="freight_payment_by_sea"
-                                           attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
-                                    <field name="freight_payment_by_sea_dg"
-                                           attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
-                                    <field name="freight_payment_by_sea_gp"
-                                           attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
-                                    <field name="freight_paid_date"/>
-                                    <field name="freight_settlement_advice_to_finance"/>
-                                    <field name="container_deposit_amount"/>
-                                    <field name="shipping_doc_to_transitor"/>
-
-                                    <field name="declaration_number"/>
-                                    <field name="custom_duty_tax_amount"/>
-                                    <field name="custom_duty_tax_paid_date"/>
-                                    <field name="custom_tax_acceptance"/>
-                                    <field name="custom_duty_tax_additional_amount"
-                                           attrs="{'invisible': [('custom_tax_acceptance', '==', True)]}"/>
-
-
-                                </group>
-                                <group string="Additional Info">
-
-
-                                    <field name="release_permit_applied_to_fda"/>
-                                    <field name="release_permit_received_from_fda"/>
-                                    <field name="storage_cost"/>
-                                    <field name="demurrage_cost"/>
-                                    <field name="local_transport_cost"/>
-                                    <field name="loading_unloading_cost"/>
-                                    <field name="release_date_from_customs_delivery"/>
-                                </group>
-
-                            </group>
                             <br></br>
                             <field name="ports" mode="tree">
                                 <tree editable="bottom">
@@ -303,7 +261,52 @@
                             </field>
 
                         </page>
+
+
                     </notebook>
+
+                    <group>
+                        <group string="Freight Payment">
+                            <field name="mode_of_transport"/>
+                            <field name="goods_arrival_date" invisible="1"/>
+                            <field name="goods_arrival_date_final_destination"/>
+
+                            <field name="freight_payment_by_air"
+                                   attrs="{'invisible': [('mode_of_transport', '!=', 'Air')]}"/>
+                            <field name="freight_payment_by_sea"
+                                   attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
+                            <field name="freight_payment_by_sea_dg"
+                                   attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
+                            <field name="freight_payment_by_sea_gp"
+                                   attrs="{'invisible': [('mode_of_transport', '!=', 'Sea')]}"/>
+                            <field name="freight_paid_date"/>
+                            <field name="freight_settlement_advice_to_finance"/>
+                            <field name="container_deposit_amount"/>
+                            <field name="shipping_doc_to_transitor"/>
+
+                            <field name="declaration_number"/>
+                            <field name="custom_duty_tax_amount"/>
+                            <field name="custom_duty_tax_paid_date"/>
+                            <field name="custom_tax_acceptance"/>
+                            <field name="custom_duty_tax_additional_amount"
+                                   attrs="{'invisible': [('custom_tax_acceptance', '==', True)]}"/>
+
+
+                        </group>
+                        <group string="Additional Info">
+
+
+                            <field name="release_permit_applied_to_fda"/>
+                            <field name="release_permit_received_from_fda"/>
+                            <field name="storage_cost"/>
+                            <field name="demurrage_cost"/>
+                            <field name="local_transport_cost"/>
+                            <field name="loading_unloading_cost"/>
+                            <field name="release_date_from_customs_delivery"/>
+                        </group>
+
+                    </group>
+
                 </page>
 
                 <page string="Post Clearance" attrs="{'invisible': [('request_type', '==', 'Local')]}">
@@ -319,7 +322,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Documents">
+                        <page string="Documents" invisible="1">
 
                             <field name="post_clearance_phase_documents" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
@@ -331,32 +334,34 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Other Information">
-                            <group>
-                                <group string="Inventory">
-                                    <field name="packing_list_shared_with_inventory"/>
-                                    <field name="goods_arrival_date"/>
-                                    <field name="grn_reconcilation_form_recived_date"/>
-                                    <field name="reconcilation_discrepancy"/>
-                                    <field name="discrepancy_comment"
-                                           attrs="{'invisible': [('reconcilation_discrepancy', '!=', True)]}"/>
-                                    <field name="discrepancy_action"
-                                           attrs="{'invisible': [('reconcilation_discrepancy', '!=', True)]}"/>
+                        <page string="Other Information" invisible="1">
 
-
-                                </group>
-                                <group string="Additional Info">
-                                    <field name="grn_submitted_to_finance"/>
-                                    <field name="stamped_declaration_recived_date"/>
-                                    <field name="delinquent_settlement_date"/>
-                                    <field name="transistor_service_payment_Amount"/>
-                                    <field name="container_deposit_reimbursed_date"/>
-                                    <field name="transistor_service_payment_done_date"/>
-                                </group>
-                            </group>
 
                         </page>
                     </notebook>
+
+                    <group>
+                        <group string="Inventory">
+                            <field name="packing_list_shared_with_inventory"/>
+                            <field name="goods_arrival_date"/>
+                            <field name="grn_reconcilation_form_recived_date"/>
+                            <field name="reconcilation_discrepancy"/>
+                            <field name="discrepancy_comment"
+                                   attrs="{'invisible': [('reconcilation_discrepancy', '!=', True)]}"/>
+                            <field name="discrepancy_action"
+                                   attrs="{'invisible': [('reconcilation_discrepancy', '!=', True)]}"/>
+
+
+                        </group>
+                        <group string="Additional Info">
+                            <field name="grn_submitted_to_finance"/>
+                            <field name="stamped_declaration_recived_date"/>
+                            <field name="delinquent_settlement_date"/>
+                            <field name="transistor_service_payment_Amount"/>
+                            <field name="container_deposit_reimbursed_date"/>
+                            <field name="transistor_service_payment_done_date"/>
+                        </group>
+                    </group>
                 </page>
             </xpath>
 
@@ -373,7 +378,7 @@
             (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_view_tree')}),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('purchase.purchase_order_view_kanban_without_dashboard')}),
         ]"/>
-        <field name="domain">[('state','in',('purchase', 'done')),('request_type','=','Local')]</field>
+        <field name="domain">[('request_type','=','Local')]</field>
         <field name="search_view_id" ref="purchase.purchase_order_view_search"/>
         <field name="context">{}</field>
         <field name="help" type="html">
@@ -396,7 +401,7 @@
             (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_view_tree')}),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('purchase.purchase_order_view_kanban_without_dashboard')}),
         ]"/>
-        <field name="domain">[('state','in',('purchase', 'done')),('request_type','=','Foreign')]</field>
+        <field name="domain">[('request_type','=','Foreign')]</field>
         <field name="search_view_id" ref="purchase.purchase_order_view_search"/>
         <field name="context">{}</field>
         <field name="help" type="html">
