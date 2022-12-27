@@ -33,13 +33,10 @@ class cust_sales_credit_limit(models.Model):
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
     manual_price=fields.Boolean('Manual price',tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
-    origin_type=fields.Char('Import or wholesale type',compute='_get_wh')
+    order_type = fields.Selection([
+        ('IM', 'Import'),
+        ('WS', 'Wholesale'), ], string='Order from',required=True)
 
-    @api.depends('order_line.wareh')
-    def _get_wh(self):
-        for rec in self:
-            rec.origin_type = rec.order_line.mapped('wareh.wh_type')[0] if len(
-                set(rec.order_line.mapped('wareh.wh_type'))) == 1 else False
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
@@ -54,8 +51,6 @@ class cust_sales_credit_limit(models.Model):
 
         result = super(cust_sales_credit_limit, self).create(vals)
         for so in result:
-            if len(set(so.order_line.mapped('wareh.wh_type')))>1:
-                raise ValidationError("Import and wholesale orders should be instantiated separately!")
             if not so.partner_id.vat:
                 raise ValidationError("Tin No must be registered for customer!")
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
@@ -78,8 +73,6 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
-            if len(set(so.order_line.mapped('wareh.wh_type')))>1:
-                raise ValidationError("Import and wholesale orders should be instantiated separately!")
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 raise ValidationError("Please login before registering a sales order!")
             if so.mature_amount>0:
@@ -115,9 +108,9 @@ class cust_sales_no_create_after_invoice(models.Model):
     expiry_date_html = fields.Html('Expiration date', compute='_get_expiry')
     batch_html = fields.Html('Batch No', compute='_get_expiry')
 
-    #Added those two lines to avoid studio error, remvoe them after report fix
-    expiry_date = fields.Html('Expiration date', compute='_get_expiry')
-    batch = fields.Html('Expiration date', compute='_get_expiry')
+    order_type=fields.Selection([
+        ('IM', 'Import'),
+        ('WS', 'Wholesale'), ], string='Order from',related='order_id.order_type')
 
     def _get_expiry(self):
         for rec in self:

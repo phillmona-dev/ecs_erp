@@ -143,6 +143,9 @@ class droga_location_extension(models.Model):
 class droga_stock_picking_type_extension(models.Model):
     _inherit = 'stock.picking.type'
     warehouse_code=fields.Char(related='warehouse_id.code',store=True)
+    dispatch_location = fields.Selection([
+        ('IM', 'Import'),
+        ('WS', 'Wholesale'), ], string='Dispatch location.')
 
     has_access=fields.Boolean('is_type_accessible',default=False,compute='_compute_has_access',search='_search_has_access')
 
@@ -186,7 +189,11 @@ class droga_stock_picking_type_extension(models.Model):
             if len(compiled_wh_domain)==0:
                 return [('id','in',[])]
             else:
-                has_access=self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain)])
+                has_access=self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain),('dispatch_location','=',False)])
+                if self.env.user.has_group('droga_inventory.inventory_dmi'):
+                    has_access+=(self.env['stock.picking.type'].sudo().search([('dispatch_location','=','IM')]))
+                if self.env.user.has_group('droga_inventory.inventory_dmw'):
+                    has_access+=(self.env['stock.picking.type'].sudo().search([('dispatch_location', '=', 'WS')]))
                 return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id','in',[])]
@@ -363,6 +370,10 @@ class purchase_request_extension(models.Model):
 
 class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
+    order_type = fields.Selection([
+        ('IM', 'Import'),
+        ('WS', 'Wholesale'),
+        ('BT', 'Both'),], string='Product used under')
     list_price = fields.Float(
         'Sales Price', default=1.0,
         digits='Product Price',tracking=True,
