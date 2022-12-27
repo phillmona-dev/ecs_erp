@@ -112,21 +112,24 @@ class inventory_placement_extension(models.Model):
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
     manual_price=fields.Boolean(related='order_id.manual_price')
-    expiry_date = fields.Date('Expiration date', compute='_get_expiry')
-    batch = fields.Char('Batch No', compute='_get_expiry')
-    batch_with_qty = fields.Char('Batch No', compute='_get_expiry')
+    expiry_date_html = fields.Html('Expiration date', compute='_get_expiry')
+    expiry_date = fields.Html('Expiration date', compute='_get_expiry')
+    batch = fields.Html('Expiration date', compute='_get_expiry')
+    batch_html = fields.Html('Batch No', compute='_get_expiry')
 
     def _get_expiry(self):
         for rec in self:
             try:
-                rec.expiry_date = rec.move_ids[0].lot_ids[0].expiration_date
-                rec.batch = rec.move_ids[0].lot_ids[0].name
-                rec.batch_with_qty = rec.move_ids[0].lot_ids[0].name + ' (' + str(
-                    rec.move_ids[0].move_line_ids[0].qty_done) + ')'
+                for move in rec.move_ids:
+                    for move_line in move.move_line_ids:
+                        rec.expiry_date_html = (rec.expiry_date_html if rec.expiry_date_html else '')+move_line.lot_id.expiration_date.strftime("%B %d,%Y")+'\n'
+                        rec.batch_html = (rec.batch_html if rec.batch_html else '')+ move_line.lot_id.name+ ' (' + str(
+                        move_line.qty_done) + ')'+'\n'
+
             except:
-                rec.expiry_date = False
-                rec.batch = False
-                rec.batch_with_qty = False
+                rec.expiry_date_html = False
+                rec.batch_html = False
+
 
     def _prepare_procurement_values(self, group_id=False):
 

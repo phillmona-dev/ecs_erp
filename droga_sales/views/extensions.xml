@@ -20,7 +20,6 @@
             </xpath>
             <xpath expr = "//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_uom_readonly']" position = "after">
                 <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
-                <field name="batch_with_qty" string="Batch" attrs="{'invisible': [('state', '!=', 'sale')]}" options="{'no_create': True}"/>
             </xpath>
 
             <xpath expr = "//form/sheet/div/button[@name='action_preview_sale_order']" position = "before">
