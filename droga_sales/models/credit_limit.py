@@ -129,8 +129,8 @@ class cust_sales_no_create_after_invoice(models.Model):
                         move_line.qty_done) + ')'+'\n'
 
             except:
-                rec.expiry_date_html = False
-                rec.batch_html = False
+                rec.expiry_date_html = ''
+                rec.batch_html = ''
 
 
     def _prepare_procurement_values(self, group_id=False):
