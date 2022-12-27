@@ -19,6 +19,8 @@ class purchase_order(models.Model):
         'droga.purchase.shipping.reconcilation', 'purchase_order_id')
     lcs = fields.One2many('droga.purchase.lc', 'purchase_order_id')
 
+    exchange_rate = fields.Float("Exchange Rate", digits=(12, 4), default=1)
+
     amount_total_usd = fields.Float(
         "Total Amount USD", compute="compute_usd_total_amount", store=True)
     # copy foregin currency request
@@ -89,7 +91,7 @@ class purchase_order(models.Model):
         "Date Original Document Collected from Applicant Bank")
     shipment_doc_handed_to_finance = fields.Date(
         "Date Original Document Handed to Finance")
-    supplier_payment_date=fields.Date("Supplier Payment Date")
+    supplier_payment_date = fields.Date("Supplier Payment Date")
 
     document_tracking_date = fields.Date("Document Tracking Date")
 
@@ -278,10 +280,11 @@ class purchase_order_line(models.Model):
     total_price_foregin = fields.Float(
         'Total Price', compute="_compute_total", store=True)
 
-    @api.depends('unit_price_foregin')
+    @api.depends('unit_price_foregin','product_qty','order_id.exchange_rate')
     def _compute_total(self):
         for record in self:
             record.total_price_foregin = record.unit_price_foregin * record.product_qty
+            record.price_unit = record.unit_price_foregin * record.order_id.exchange_rate
 
 
 # arrival ports

@@ -68,7 +68,9 @@
                 <field name="name"/>
                 <field name="date"/>
                 <field name="request_type"/>
-                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')" decoration-danger="state == 'Cancel'" decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
+                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')"
+                       decoration-danger="state == 'Cancel'"
+                       decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
                 <field name="company_id"/>
             </tree>
         </field>
@@ -82,23 +84,41 @@
             <form string="" create="0" delete="0" duplicate="0">
                 <header>
 
-                    <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked" data-hotkey="v" class="oe_highlight"/>
-                    <button name="committee_approval" type="object" states="Checked" string="Committee" id="committee_approval" data-hotkey="v" class="oe_highlight"/>
-                    <button name="ceo_approval" type="object" states="Checked" string="CEO Approval" id="ceo_approval" data-hotkey="v" class="oe_highlight"/>
-                    <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request" data-hotkey="v" invisible="1"/>
+                    <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked"
+                            data-hotkey="v" class="oe_highlight"/>
+                    <button name="committee_approval" type="object" states="Checked" string="Committee"
+                            id="committee_approval" data-hotkey="v" class="oe_highlight"/>
+                    <button name="ceo_approval" type="object" states="Checked" string="CEO Approval" id="ceo_approval"
+                            data-hotkey="v" class="oe_highlight"/>
+                    <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request"
+                            data-hotkey="v" invisible="1"/>
 
-                    <button name="reject_request" type="object" states="Winner Picked,Checked" string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
-                    <button name="cancel_request" type="object" states="Draft" string="Cancel" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="oe_highlight btn-danger"/>
+                    <button name="reject_request" type="object" states="Winner Picked,Checked" string="Reject"
+                            id="reject_request" data-hotkey="v" class="oe_highlight btn-warning"
+                            confirm="Are you sure you want to reject the request?"/>
+                    <button name="cancel_request" type="object" states="Draft" string="Cancel" id="cancel_request"
+                            data-hotkey="v"
+                            confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form"
+                            class="oe_highlight btn-danger"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_rfq_order_action)d" string="List PO" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
-                        <button name="create_purchase_orders_automatically" string="Create PO" type="object" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
-                        <button name="pick_winner" string="Pick Winner" type="object" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}" confirm="Are you sure that all the necessary information is filed?"/>
-                        <button name="generate_analysis_sheet" string="Analysis Sheet" type="object" class="oe_stat_button" icon="fa-arrows-v" confirm="Are you sure that all the necessary information is filed?"/>
-                        <button name="open_rfq" string="Open RFQ" type="object" class="oe_stat_button" icon="fa-arrows-v" />
+                        <button name="%(droga_purchase_rfq_order_action)d" string="List PO" type="action"
+                                class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+                        <button name="create_purchase_orders_automatically" string="Create PO" type="object"
+                                class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+                        <button name="pick_winner" string="Pick Winner" type="object" class="oe_stat_button"
+                                icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"
+                                confirm="Are you sure that all the necessary information is filed?"/>
+                        <button name="generate_analysis_sheet" string="Analysis Sheet" type="object"
+                                class="oe_stat_button" icon="fa-arrows-v"
+                                confirm="Are you sure that all the necessary information is filed?"/>
+                        <button name="open_rfq" string="Open RFQ" type="object" class="oe_stat_button"
+                                icon="fa-arrows-v"/>
 
                     </div>
 
@@ -114,14 +134,16 @@
                             <field name="date" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
 
                             <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="0"/>
-                            <field name="procurement_committee" widget="many2many_tags" string="Committee" options="{'no_create':True,'no_open':True}"/>
+                            <field name="procurement_committee" widget="many2many_tags" string="Committee"
+                                   options="{'no_create':True,'no_open':True}"/>
 
                         </group>
                         <group>
                             <field name="remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="technical_remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="total_winner_amount" invisible="1"/>
-                            <field name="suppliers" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
+                            <field name="suppliers" widget="many2many_tags"
+                                   options="{'no_create':True,'no_open':True}"/>
                         </group>
                     </group>
 
@@ -131,14 +153,17 @@
                             <field name="rfq_lines" mode="tree" attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
                                 <tree editable="bottom">
                                     <field name="supplier_id" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}"/>
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}"
+                                           context="{'company_id': parent.company_id}"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product_qty"/>
                                     <field name="unit_price"/>
                                     <field name="tax_id" widget="many2many_tags"/>
                                     <field name="price_tax"/>
-                                    <field name="total_price" decoration-warning="winner == 'No'" decoration-success="winner == 'Yes'" widget="badge"/>
-                                    <field name="winner" decoration-warning="winner == 'No'" decoration-success="winner == 'Yes'" widget="badge"/>
+                                    <field name="total_price" decoration-warning="winner == 'No'"
+                                           decoration-success="winner == 'Yes'" widget="badge"/>
+                                    <field name="winner" decoration-warning="winner == 'No'"
+                                           decoration-success="winner == 'Yes'" widget="badge"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                 </tree>
 
@@ -157,13 +182,13 @@
 
     <!-- grid view -->
     <record id="timesheet_view_grid_by_project" model="ir.ui.view">
-        <field name="name">Grid </field>
+        <field name="name">Grid</field>
         <field name="model">droga.purhcase.request.rfq.line</field>
         <field name="arch" type="xml">
             <grid string="Offer Analysis" adjustment="object" adjust_name="adjust_grid">
                 <field name="supplier_id" type="row" section="1"/>
                 <field name="product_id" type="col"/>
-                <field name="unit_price" type="measure" />
+                <field name="unit_price" type="measure"/>
             </grid>
         </field>
     </record>
@@ -178,7 +203,9 @@
                 <field name="name"/>
                 <field name="date"/>
                 <field name="request_type"/>
-                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')" decoration-danger="state == 'Cancel'" decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
+                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')"
+                       decoration-danger="state == 'Cancel'"
+                       decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
                 <field name="company_id"/>
             </tree>
         </field>
@@ -191,33 +218,53 @@
         <field name="arch" type="xml">
             <form string="" create="0" delete="0" duplicate="0">
                 <header>
-                    <button name="pick_winner" string="Submit" type="object" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ('Draft'))]}" confirm="Are you sure that all the necessary information is filed?"/>
-                    <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked" data-hotkey="v" class="oe_highlight"/>
-                    <button name="operational_approval" type="object" states="Checked" string="Operation" id="operational_approval" data-hotkey="v" class="oe_highlight" />
+                    <button name="pick_winner" string="Submit" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', ('Draft'))]}"
+                            confirm="Are you sure that all the necessary information is filed?"/>
+                    <button name="checked" type="object" states="Winner Picked" string="Checked" id="checked"
+                            data-hotkey="v" class="oe_highlight"/>
+                    <button name="operational_approval" type="object" states="Checked" string="Operation"
+                            id="operational_approval" data-hotkey="v" class="oe_highlight"/>
                     <!--<button name="finance_approval" type="object" states="Operation Manager" string="Finance" id="finance_approval" data-hotkey="v" class="oe_highlight" />-->
-                    <button name="ceo_approval" type="object" states="Operation Manager" string="CEO Approval" id="ceo_approval" data-hotkey="v" class="oe_highlight"/>
+                    <button name="ceo_approval" type="object" states="Operation Manager" string="CEO Approval"
+                            id="ceo_approval" data-hotkey="v" class="oe_highlight"/>
 
-                    <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request" data-hotkey="v" invisible="1"/>
-
-
-                    <button name="reject_request" type="object" states="Winner Picked,Checked,Operation Manager,Finance" string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
-                    <button name="cancel_request" type="object" states="Draft" string="Cancel" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="oe_highlight btn-danger"/>
+                    <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request"
+                            data-hotkey="v" invisible="1"/>
 
 
-                    <field name="state" widget="statusbar" statusbar_visible="Draft,Checked,Operation Manager,Finance,CEO Approval"/>
+                    <button name="reject_request" type="object" states="Winner Picked,Checked,Operation Manager,Finance"
+                            string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning"
+                            confirm="Are you sure you want to reject the request?"/>
+                    <button name="cancel_request" type="object" states="Draft" string="Cancel" id="cancel_request"
+                            data-hotkey="v"
+                            confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form"
+                            class="oe_highlight btn-danger"/>
+
+
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="Draft,Checked,Operation Manager,Finance,CEO Approval"/>
                     <!--<field name="state_rfq" widget="statusbar" />-->
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <!--<button name="load_items_from_pr" string="Load Items" type="object" class="oe_stat_button" icon="fa-list" attrs="{'invisible': [('state', 'not in', ('Draft'))]}"/>-->
-                        <button name="send_rfq" type="object" string="Send RFQ" data-hotkey="v" class="btn-info" icon="fa-envelope" attrs="{'invisible': [('state', 'in', ('Cancel'))]}"/>
+                        <button name="send_rfq" type="object" string="Send RFQ" data-hotkey="v" class="btn-info"
+                                icon="fa-envelope" attrs="{'invisible': [('state', 'in', ('Cancel'))]}"/>
 
 
                         <!--<button name="%(droga_purhcase_request_rfq_line_pre_import_permit_action)d" string="Pre Import Permit" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>
                         <button name="%(droga_purchase_foregin_status_tracking_action)d" string="Status Tracking" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', '!=', 'CEO Approval')]}"/>-->
-                        <button name="foreign_currency_request" string="Currency Request" type="object" class="oe_stat_button" icon="fa-money" attrs="{'invisible': [('state', 'not in', ('CEO Approval'))]}" context="{'default_currency_id':currency_id}"/>
-                        <button name="%(droga_purchase_rfq_order_action)d" string="View PO" type="action" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
-                        <button name="create_purchase_orders_automatically" string="Create PO" type="object" class="oe_stat_button" icon="fa-file-text" attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+                        <button name="foreign_currency_request" string="Currency Request" type="object"
+                                class="oe_stat_button" icon="fa-money"
+                                attrs="{'invisible': [('state', 'not in', ('CEO Approval'))]}"
+                                context="{'default_currency_id':currency_id}"/>
+                        <button name="%(droga_purchase_rfq_order_action)d" string="View PO" type="action"
+                                class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
+                        <button name="create_purchase_orders_automatically" string="Create PO" type="object"
+                                class="oe_stat_button" icon="fa-file-text"
+                                attrs="{'invisible': [('state', 'not in', ('Committee Approval','CEO Approval'))]}"/>
 
                     </div>
 
@@ -232,38 +279,46 @@
                             <field name="purhcase_request_id" readonly="1"/>
 
                             <field name="request_type"/>
-                            <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="1" invisible="1"/>
-                            <field name="currency_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="1"
+                                   invisible="1"/>
+                            <field name="currency_id" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
 
                         </group>
                         <group>
                             <!--<field name="remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                             <field name="technical_remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>-->
                             <!--<field name="procurement_committee" widget="many2many_tags" string="Committee"/>-->
-                            <field name="supplier_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'not in', ('Draft'))]}" required="1"/>
+                            <field name="supplier_id" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'not in', ('Draft'))]}" required="1"/>
                             <field name="date" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
-                            <field name="exchange_rate" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
+                            <field name="exchange_rate"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                         </group>
                     </group>
 
 
                     <notebook>
                         <page string="Products">
-                            <field name="rfq_lines" mode="tree" attrs="{'readonly': [('state', 'not in', ('Draft','Winner Picked'))]}">
+                            <field name="rfq_lines" mode="tree"
+                                   attrs="{'readonly': [('state', 'not in', ('Draft','Winner Picked'))]}">
                                 <tree editable="bottom">
                                     <field name="supplier_id" readonly="1" invisible="1"/>
-                                    <field name="product_id" width="20" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}" />
-                                    <field name="product_uom" width="10" options="{'no_create':True,'no_open':True}" string="UoM"/>
+                                    <field name="product_id" width="20" options="{'no_create':True,'no_open':True}"
+                                           context="{'company_id': parent.company_id}"/>
+                                    <field name="product_uom" width="10" options="{'no_create':True,'no_open':True}"
+                                           string="UoM"/>
                                     <field name="product_qty" width="10" string="Qty"/>
-                                    <field name="unit_price_foregin" width="10" />
+                                    <field name="unit_price_foregin" width="10"/>
                                     <field name="total_price_foregin" width="10" sum="Total"/>
                                     <field name="unit_price" string="Unit Price ETB" width="10" readonly="1"/>
 
-                                    <field name="total_price" width="20" sum="Total" string="Total Price ETB" />
-                                    <field name="winner" width="10" invisible="1" decoration-warning="winner == 'No'" decoration-success="winner == 'Yes'" widget="badge"/>
+                                    <field name="total_price" width="20" sum="Total" string="Total Price ETB"/>
+                                    <field name="winner" width="10" invisible="1" decoration-warning="winner == 'No'"
+                                           decoration-success="winner == 'Yes'" widget="badge"/>
 
                                     <field name="price_tax" invisible="1"/>
-                                    <field name="tax_id" widget="many2many_tags" invisible="1" />
+                                    <field name="tax_id" widget="many2many_tags" invisible="1"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                 </tree>
 
@@ -272,26 +327,29 @@
                         <page name="hscode" string="HS Code">
                             <field name="hs_codes" mode="tree" attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
                                 <tree create="0" delete="0" editable="bottom">
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}" readonly="1"/>
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}"
+                                           context="{'company_id': parent.company_id}" readonly="1"/>
                                     <field name="hs_code"/>
                                     <field name="hs_description"/>
                                 </tree>
                             </field>
 
                         </page>
-
                         <page name="name" string="Standard Cost">
-                            <field name="rfq_lines_expected_cost" mode="tree" attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
+                            <field name="rfq_lines_expected_cost" mode="tree"
+                                   attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
                                 <tree create="0" delete="0" editable="bottom">
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}" context="{'company_id': parent.company_id}" readonly="1"/>
-                                    <field name="tax_amount" width="15" />
-                                    <field name="demurrage_cost" width="15" />
-                                    <field name="estimated_arriving_cost" width="15" />
-                                    <field name="expected_selling_price" width="15" />
-                                    <field name="port_of_loading" width="15" />
-                                    <field name="less_container" width="15" />
-                                    <field name="estimated_arrival_date" width="15" />
-                                    <field name="unassembled_form" width="15" />
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}"
+                                           context="{'company_id': parent.company_id}" readonly="1"/>
+                                    <!--<field name="tax_amount" width="15" invisible="1"/>-->
+                                    <!--<field name="demurrage_cost" width="15" invisible="1"/>-->
+                                    <field name="estimated_arriving_cost" width="15"/>
+                                    <field name="expected_selling_price" width="15"/>
+                                    <field name="port_of_loading" width="15"/>
+                                    <field name="less_container" width="15"/>
+                                    <field name="estimated_arrival_date" width="15"/>
+                                    <field name="unassembled_form" width="15"/>
+                                    <button id="landed_cost" name="landed_cost" string="Landed Cost" type="object"/>
                                 </tree>
                             </field>
                         </page>
@@ -310,17 +368,18 @@
                         <page string="Proforma Invoice">
                             <group>
                                 <group>
-                                    <field name="proforma_invoice_no" />
-                                    <field name="proforma_invoice_date" />
+                                    <field name="proforma_invoice_no"/>
+                                    <field name="proforma_invoice_date"/>
                                     <field name="incoterm" options="{'no_create':True,'no_open':True}"/>
                                     <field name="country_of_origin" options="{'no_create':True,'no_open':True}"/>
                                 </group>
                                 <group>
-                                    <field name="mod_of_shipment" />
+                                    <field name="mod_of_shipment"/>
                                     <field name="port_of_loading" options="{'no_create':True,'no_open':True}"/>
                                     <field name="port_of_discharge" options="{'no_create':True,'no_open':True}"/>
-                                     <field name="port_of_final_destination" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="payment_term" />
+                                    <field name="port_of_final_destination"
+                                           options="{'no_create':True,'no_open':True}"/>
+                                    <field name="payment_term"/>
                                 </group>
                             </group>
 
@@ -347,14 +406,14 @@
                                 </tree>
                             </field>
                         </page>
-
                         <page string="LC" invisible="1">
                             <field name="lcs" mode="tree">
                                 <tree editable="bottom">
                                     <field name="name"/>
                                     <field name="bank_name"/>
                                     <field name="state"/>
-                                    <button name="open_lc_detail" string="LC Reconciliation" type="object" class="oe_stat_button" icon="fa-file-text"/>
+                                    <button name="open_lc_detail" string="LC Reconciliation" type="object"
+                                            class="oe_stat_button" icon="fa-file-text"/>
 
                                 </tree>
                             </field>
@@ -366,6 +425,37 @@
                     <field name="activity_ids"/>
                     <field name="message_ids"/>
                 </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- landed cos form -->
+    <record id="droga_purchase_request_rfq_landed_cost_form" model="ir.ui.view">
+        <field name="name">droga.purchase.request.rfq.landed.cost.form</field>
+        <field name="model">droga.purhcase.request.rfq.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="product_id" options="{'no_create':True,'no_open':True}" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Landed Cost">
+                            <field name="landed_costs" mode="tree">
+                                <tree editable="bottom">
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}" width="30" string="Cost Type"/>
+                                    <field name="currency" options="{'no_create':True,'no_open':True}" width="10"/>
+                                    <field name="amount" width="20"/>
+                                    <field name="exchange_rate" width="20"/>
+                                    <field name="amount_total_etb" width="20" sum="Total"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
             </form>
         </field>
     </record>

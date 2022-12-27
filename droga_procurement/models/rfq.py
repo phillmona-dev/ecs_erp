@@ -610,7 +610,7 @@ class Rfq(models.Model):
             'name': _('Customer Invoice'),
             'view_mode': 'grid',
             'view_id': self.env.ref('droga_procurement.timesheet_view_grid_by_project').id,
-            'res_model': 'droga.purhcase.request.rfq.line',
+            'res_model': 'droga.purchase.request.rfq.landed.cost',
             'context': "{''}",
             'type': 'ir.actions.act_window',
             'res_id': self.id
@@ -621,7 +621,7 @@ class Rfq(models.Model):
         counts = self.search_count(
             [('proforma_invoice_no', '=', self.proforma_invoice_no)])
 
-        if counts > 1:
+        if counts > 1 and self.proforma_invoice_no != '':
             raise ValidationError("Proforma invoice number already exists!")
 
 
@@ -692,6 +692,9 @@ class Rfq_Detail(models.Model):
     hs_code = fields.Char("HS Code")
     hs_description = fields.Char("HS Description")
 
+    # landed cost
+    landed_costs = fields.One2many("droga.purchase.request.rfq.landed.cost", "rfq_id_line")
+
     @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id', 'exchange_rate', 'unit_price_foregin')
     def _compute_total(self):
         for record in self:
@@ -759,6 +762,39 @@ class Rfq_Detail(models.Model):
         for record in self:
             record.product_uom = record.product_id.uom_id
 
+    def landed_cost(self):
+
+        # if landed cost empty populate the table
+        count = self.env['droga.purchase.request.rfq.landed.cost'].search_count([('rfq_id_line', '=', self.id)])
+
+        if count == 0:
+            # create landed cost records
+            # get landed costs from product master file
+            rfq_landed_costs = self.env['product.template'].search(
+                [('landed_cost_ok', '=', True)])
+
+            for record in rfq_landed_costs:
+                vals = {
+                    'rfq_id_line': self.id,
+                    'product_id': record.id,
+                    'amount': 0
+
+                }
+
+                self.env['droga.purchase.request.rfq.landed.cost'].create(vals)
+
+        view_id = self.env.ref('droga_procurement.droga_purchase_request_rfq_landed_cost_form').id
+        return {
+            'name': "Landed Cost",
+            'view_mode': 'form',
+            'view_id': view_id,
+            'res_model': 'droga.purhcase.request.rfq.line',
+            'context': {},
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'res_id': self.id
+        }
+
 
 class rfq_foregin_status(models.Model):
     _name = "droga.purchase.rfq.foregin.status"
@@ -785,3 +821,27 @@ class rfq_proforma_invoice_status(models.Model):
     document = fields.Many2one("droga.purchase.reconciliation.docs")
     order = fields.Integer(related="document.order")
     available = fields.Boolean("Available", default=False)
+
+
+class rfq_landed_cost(models.Model):
+    _name = 'droga.purchase.request.rfq.landed.cost'
+
+    api.model
+
+    def _default_currency(self):
+        id = self.env['res.currency'].search([('name', '=', 'ETB')], limit=1).id
+
+        return id
+
+    rfq_id_line = fields.Many2one("droga.purhcase.request.rfq.line")
+    product_id = fields.Many2one("product.product", domain=[
+        ('landed_cost_ok', '=', True)])
+    currency = fields.Many2one("res.currency", default=_default_currency, required=True)
+    amount = fields.Float("Amount", required=True)
+    exchange_rate = fields.Float("Exchange Rate", default=1, required=True)
+    amount_total_etb = fields.Float("Amount ETB", compute="_compute_amount_etb")
+
+    @api.depends('amount', 'exchange_rate', 'currency')
+    def _compute_amount_etb(self):
+        for record in self:
+            record.amount_total_etb = record.amount * record.exchange_rate
