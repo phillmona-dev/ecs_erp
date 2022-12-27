@@ -291,7 +291,7 @@ class purchase_request_line_local(models.Model):
             # get product type
 
             product_type = record.purchase_request_id.purchase_type
-            return {'domain': {'product_id': [('detailed_type_cus', '=', product_type)]}}
+            return {'domain': {'product_id': [('detailed_type', '=', product_type)]}}
 
     @api.onchange('budgetary_position', 'expense_account')
     def _load_budgetary_position_accounts(self):
