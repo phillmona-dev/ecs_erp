@@ -393,7 +393,7 @@
                             </field>
                         </page>
 
-                        <page string="Potential Competitors">
+                        <page string="Potential Competitors" groups="droga_procurement.group_purchase_procurement_manager_group">
                             <field name="purhcase_request_lines_foregin_competitors" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree create="0" delete="0" editable="bottom">
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
@@ -410,8 +410,7 @@
                             </field>
                         </page>
 
-
-                        <page string="Vendors">
+                        <page string="Vendors" groups="droga_procurement.group_purchase_procurement_manager_group">
                             <field name="purhcase_request_lines_foregin_supp_list" mode="tree" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree create="0" delete="0" editable="bottom">
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
@@ -422,6 +421,7 @@
                                 </tree>
                             </field>
                         </page>
+
                         <page string="Analysis Report">
 
                             <field name="purchase_analysis_report" mode="tree" readonly="1">
