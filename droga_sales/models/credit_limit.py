@@ -33,7 +33,7 @@ class cust_sales_credit_limit(models.Model):
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
     manual_price=fields.Boolean('Manual price',tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
-    origin_type=fields.Char('Import or wholesale type',compute='_get_wh',store=True)
+    origin_type=fields.Char('Import or wholesale type',compute='_get_wh')
 
     @api.depends('order_line.wareh')
     def _get_wh(self):

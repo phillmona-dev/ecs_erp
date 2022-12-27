@@ -76,7 +76,7 @@ class droga_stock_cons_issue(models.Model):
                 [('sequence_code', '=','CONI'), ('warehouse_id', '=', wh.id)]).id
             #Get default location for the warehouse
             def_loc_id = self.env['stock.location'].search(
-                [('complete_name', 'like', wh.code + '/Stock%'), ('usage', '=', 'internal')])[0].id
+                [('complete_name', 'like', wh.code + '/%'), ('usage', '=', 'internal')])[0].id
 
             picking_vals = {
                 'partner_id': self.customer.id,
