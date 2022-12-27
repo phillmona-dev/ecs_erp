@@ -33,7 +33,13 @@ class cust_sales_credit_limit(models.Model):
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
     manual_price=fields.Boolean('Manual price',tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
-    origin_type=fields.Char('Import or wholesale type',store=True)
+    origin_type=fields.Char('Import or wholesale type',compute='_get_wh',store=True)
+
+    @api.depends('order_line.wareh')
+    def _get_wh(self):
+        for rec in self:
+            rec.origin_type = rec.order_line.mapped('wareh.wh_type')[0] if len(
+                set(rec.order_line.mapped('wareh.wh_type'))) == 1 else False
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
@@ -56,7 +62,6 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Please login before registering a sales order!")
             if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
-            so.origin_type=so.order_line.mapped('wareh.wh_type')[0] if len(set(so.order_line.mapped('wareh.wh_type')))==1 else False
         return result
 
     def action_confirm_secondary(self):
@@ -81,8 +86,6 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Please login before registering a sales order!")
             if so.mature_amount>0:
                 raise ValidationError("Please settle matured amounts before initiating another sales!")
-            so.origin_type = so.order_line.mapped('wareh.wh_type')[0] if len(
-                set(so.order_line.mapped('wareh.wh_type'))) == 1 else False
         return result
 
     def store_issue_placement_order(self):
