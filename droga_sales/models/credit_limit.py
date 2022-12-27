@@ -113,8 +113,8 @@ class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
     manual_price=fields.Boolean(related='order_id.manual_price')
     expiry_date_html = fields.Html('Expiration date', compute='_get_expiry')
-    expiry_date = fields.Html('Expiration date', compute='_get_expiry')
-    batch = fields.Html('Expiration date', compute='_get_expiry')
+    
+
     batch_html = fields.Html('Batch No', compute='_get_expiry')
 
     def _get_expiry(self):
