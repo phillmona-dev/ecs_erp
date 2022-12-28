@@ -300,6 +300,15 @@ class droga_stock_picking_extension(models.Model):
             has_access = self.env['stock.picking'].sudo().search(
                 #['|',('location_id.has_access', '=', True),('location_dest_id.has_access', '=', True)])
                 ['|','&', ('location_id.has_access', '=', True),('location_id.con_type', '!=', 'SRL'), '&',('location_dest_id.con_type', '!=', 'SRL'),('location_dest_id.has_access', '=', True)])
+
+            if self.env.user.has_group('droga_inventory.inventory_dmi'):
+                has_access += (self.env['stock.picking'].sudo().search([('picking_type_id.dispatch_location', '=', 'IM')]))
+            if self.env.user.has_group('droga_inventory.inventory_dmw'):
+                has_access += (self.env['stock.picking'].sudo().search([('picking_type_id.dispatch_location', '=', 'WS')]))
+
+
+
+
             return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id', 'in', [])]
