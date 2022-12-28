@@ -7,14 +7,14 @@
         <field name="model">droga.account.payment.request</field>
         <field name="arch" type="xml">
             <tree string="Payment Request">
-                <field name="name" />
-                <field name="payment_type" />
-                <field name="request_by" />
-                <field name="department" />
-                <field name="request_date" />
-                <field name="purpose" />
-                <field name="company_id" />
-                <field name="currency_id" />
+                <field name="name"/>
+                <field name="payment_type"/>
+                <field name="request_by"/>
+                <field name="department"/>
+                <field name="request_date"/>
+                <field name="purpose"/>
+                <field name="company_id"/>
+                <field name="currency_id"/>
                 <field name="state" widget="badge"/>
             </tree>
         </field>
@@ -27,17 +27,31 @@
         <field name="arch" type="xml">
             <form string="Payment Request" create="0" delete="0">
                 <header>
-                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request1" data-hotkey="v"/>
-                    <button name="approve_request" type="object" states="Submitted" string="Approve" class="oe_highlight" id="approve_request1" data-hotkey="v"/>
-                    <button name="cancel_request" type="object" states="Draft,Approved" string="Cancel" id="cancel_request1" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="oe_highlight btn-danger"/>
+                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight"
+                            id="submit_request1" data-hotkey="v"/>
+                    <button name="approve_request" type="object" states="Submitted" string="Approve"
+                            class="oe_highlight" id="approve_request1" data-hotkey="v"/>
+                    <button name="budget_approve_request" type="object" states="Approved" string="Budget Approval"
+                            class="oe_highlight" id="budget_approve3" data-hotkey="v"/>
+                    <button name="authorize_request" type="object" states="Budget Approved" string="Authorize"
+                            class="oe_highlight" id="authorize_request3" data-hotkey="v"/>
+                    <button name="cancel_request" type="object" states="Draft,Authorized" string="Cancel"
+                            id="cancel_request1" data-hotkey="v"
+                            confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form"
+                            class="oe_highlight btn-danger"/>
 
-                    <button name="reject_request" type="object" states="Submitted" string="Reject" id="reject_request1" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
+                    <button name="reject_request" type="object" states="Submitted,Approved,Budget Approved" string="Reject" id="reject_request1"
+                            data-hotkey="v" class="oe_highlight btn-warning"
+                            confirm="Are you sure you want to reject the request?"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_account_payment_action)d" string="Payment" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', '!=', 'Approved')]}" context="{'default_partner_id':pay_to,'default_amount':total_amount_etb}" />
+                        <button name="%(droga_account_payment_action)d" string="Payment" type="action"
+                                class="oe_stat_button" icon="fa-arrows-v"
+                                attrs="{'invisible': [('state', '!=', 'Approved')]}"
+                                context="{'default_partner_id':pay_to,'default_amount':total_amount_etb}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Payment Request</span>
@@ -46,25 +60,34 @@
                         </h1>
                     </div>
                     <group>
-                        <group >
+                        <group>
                             <field name="purchase_order_id" readonly="1"/>
                             <field name="payment_type" readonly="1"/>
-                            <field name="request_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="request_date" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="request_by" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="department" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="request_date"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group>
                             <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="currency_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="currency_id" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group string="Pay To">
-                            <field name="pay_to" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="payment_due_date" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="pay_to" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="payment_due_date"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group string="Amount">
-                            <field name="total_amount" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="exchange_rate" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="total_amount"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="exchange_rate"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="total_amount_etb" readonly="1"/>
                             <field name="amount_in_word" readonly="1"/>
                         </group>
@@ -87,17 +110,30 @@
         <field name="arch" type="xml">
             <form string="Payment Request Urgent" create="0" delete="0">
                 <header>
-                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request2" data-hotkey="v"/>
-                    <button name="approve_request" type="object" states="Submitted" string="Approve" class="oe_highlight" id="approve_request2" data-hotkey="v"/>
-                    <button name="cancel_request" type="object" states="Draft,Approved" string="Cancel" id="cancel_request2" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="oe_highlight btn-danger"/>
+                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight"
+                            id="submit_request2" data-hotkey="v"/>
+                    <button name="approve_request" type="object" states="Submitted" string="Approve"
+                            class="oe_highlight" id="approve_request2" data-hotkey="v"/>
+                    <button name="budget_approve_request" type="object" states="Approved" string="Budget Approval"
+                            class="oe_highlight" id="budget_approve3" data-hotkey="v"/>
+                    <button name="authorize_request" type="object" states="Budget Approved" string="Authorize"
+                            class="oe_highlight" id="authorize_request3" data-hotkey="v"/>
+                    <button name="cancel_request" type="object" states="Draft,Authorized" string="Cancel"
+                            id="cancel_request2" data-hotkey="v"
+                            confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form"
+                            class="oe_highlight btn-danger"/>
 
-                    <button name="reject_request" type="object" states="Submitted" string="Reject" id="reject_request2" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
+                    <button name="reject_request" type="object" states="Submitted,Approved,Budget Approved" string="Reject" id="reject_request2"
+                            data-hotkey="v" class="oe_highlight btn-warning"
+                            confirm="Are you sure you want to reject the request?"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_account_payment_action)d" string="Payment" type="action" class="oe_stat_button" icon="fa-arrows-v"  context="{'default_partner_id':pay_to,'default_amount':total_amount_etb}" />
+                        <button name="%(droga_account_payment_action)d" string="Payment" type="action"
+                                class="oe_stat_button" icon="fa-arrows-v"
+                                context="{'default_partner_id':pay_to,'default_amount':total_amount_etb}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Payment Request</span>
@@ -106,25 +142,34 @@
                         </h1>
                     </div>
                     <group>
-                        <group >
+                        <group>
                             <field name="purchase_order_id" readonly="1"/>
                             <field name="payment_type" readonly="1"/>
-                            <field name="request_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="request_date" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="request_by" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="department" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="request_date"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group>
                             <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="currency_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="currency_id" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group string="Pay To">
-                            <field name="pay_to" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="payment_due_date" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="pay_to" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="payment_due_date"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group string="Amount">
-                            <field name="total_amount" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="exchange_rate" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="total_amount"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="exchange_rate"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="total_amount_etb" readonly="1"/>
                             <field name="amount_in_word" readonly="1"/>
                         </group>
@@ -140,24 +185,38 @@
         </field>
     </record>
 
-    <!-- form view for payment request without without po-->
+    <!-- form view for payment request without po-->
     <record id="droga_account_payment_request_withoutpo_view_form" model="ir.ui.view">
         <field name="name">droga.account.payment.request.withoutpo.view.form</field>
         <field name="model">droga.account.payment.request</field>
         <field name="arch" type="xml">
             <form string="Payment Request Without PO" delete="0">
                 <header>
-                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request3" data-hotkey="v"/>
-                    <button name="approve_request" type="object" states="Submitted" string="Approve" class="oe_highlight" id="approve_request3" data-hotkey="v"/>
-                    <button name="cancel_request" type="object" states="Draft,Approved" string="Cancel" id="cancel_request3" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="oe_highlight btn-danger"/>
+                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight"
+                            id="submit_request3" data-hotkey="v"/>
+                    <button name="approve_request" type="object" states="Submitted" string="Approve"
+                            class="oe_highlight" id="approve_request3" data-hotkey="v"/>
+                    <button name="budget_approve_request" type="object" states="Approved" string="Budget Approval"
+                            class="oe_highlight" id="budget_approve3" data-hotkey="v"/>
+                    <button name="authorize_request" type="object" states="Budget Approved" string="Authorize"
+                            class="oe_highlight" id="authorize_request3" data-hotkey="v"/>
+                    <button name="cancel_request" type="object" states="Draft,Approved" string="Cancel"
+                            id="cancel_request3" data-hotkey="v"
+                            confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form"
+                            class="oe_highlight btn-danger"/>
 
-                    <button name="reject_request" type="object" states="Submitted" string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
+                    <button name="reject_request" type="object" states="Submitted,Approved,Budget Approved" string="Reject" id="reject_request"
+                            data-hotkey="v" class="oe_highlight btn-warning"
+                            confirm="Are you sure you want to reject the request?"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_account_payment_action)d" string="Payment" type="action" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', '!=', 'Approved')]}" context="{'default_partner_id':pay_to,'default_amount':total_amount_etb}" />
+                        <button name="%(droga_account_payment_action)d" string="Payment" type="action"
+                                class="oe_stat_button" icon="fa-arrows-v"
+                                attrs="{'invisible': [('state', '!=', 'Approved')]}"
+                                context="{'default_partner_id':pay_to,'default_amount':total_amount_etb}"/>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Payment Request</span>
@@ -166,24 +225,33 @@
                         </h1>
                     </div>
                     <group>
-                        <group >
+                        <group>
                             <field name="payment_type" readonly="1"/>
-                            <field name="request_by" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="department" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="request_date" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="request_by" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="department" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="request_date"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group>
                             <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="company_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="currency_id" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="currency_id" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group string="Pay To">
-                            <field name="pay_to" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="payment_due_date" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="pay_to" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="payment_due_date"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
                         <group string="Amount">
-                            <field name="total_amount" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="exchange_rate" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="total_amount"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="exchange_rate"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="total_amount_etb" readonly="1"/>
                             <field name="amount_in_word" readonly="1"/>
                         </group>
@@ -200,7 +268,7 @@
     </record>
 
 
-     <!-- search view -->
+    <!-- search view -->
     <record id="droga_payment_request_view_search" model="ir.ui.view">
         <field name="name">droga.account.payment.request.view.search</field>
         <field name="model">droga.account.payment.request</field>
@@ -211,20 +279,23 @@
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
-                <field name="company_id" />
+                <field name="company_id"/>
                 <field name="state"/>
 
                 <separator/>
-                <filter name="draft" string="Draft" domain="[('state', '=', 'Draft')]" />
-                <filter name="submitted" string="Submitted" domain="[('state', '=', 'Submitted')]" />
-                <filter name="approved" string="Approved" domain="[('state', '=', 'Approved')]" />
-                <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'Cancelled')]" />
-                <separator />
+                <filter name="draft" string="Draft" domain="[('state', '=', 'Draft')]"/>
+                <filter name="submitted" string="Submitted" domain="[('state', '=', 'Submitted')]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'Approved')]"/>
+                <filter name="budget_approved" string="Budget Approved" domain="[('state', '=', 'Budget Approved')]"/>
+                <filter name="authorized" string="Authorized" domain="[('state', '=', 'Authorized')]"/>
+                <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'Cancelled')]"/>
+                <separator/>
                 <filter name="request_date" string="Request Date" date="request_date"/>
 
                 <group expand="0" string="Group By">
                     <filter string="Department" name="department" domain="[]" context="{'group_by': 'department'}"/>
-                    <filter string="Request Date" name="request_date" domain="[]" context="{'group_by': 'request_date'}"/>
+                    <filter string="Request Date" name="request_date" domain="[]"
+                            context="{'group_by': 'request_date'}"/>
                 </group>
             </search>
         </field>
@@ -237,7 +308,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_account_payment_request_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_view_form')})]"/>
         <field name="domain">[('payment_type','=','Normal')]</field>
         <field name="context">{'default_payment_type': 'Normal'}</field>
         <field name="help" type="html">
@@ -253,7 +324,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_account_payment_request_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_view_form')})]"/>
         <field name="domain">[('payment_type','=','Normal'),('purchase_order_id','=',active_id)]</field>
         <field name="context">{'default_purchase_order_id': active_id,'default_payment_type': 'Normal'}</field>
         <field name="help" type="html">
@@ -270,7 +341,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_account_payment_request_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_urgent_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_urgent_view_form')})]"/>
         <field name="domain">[('payment_type','=','Urgent')]</field>
         <field name="context">{'default_payment_type': 'Urgent'}</field>
         <field name="help" type="html">
@@ -286,7 +357,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_account_payment_request_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_urgent_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_urgent_view_form')})]"/>
         <field name="domain">[('payment_type','=','Urgent'),('purchase_order_id','=',active_id)]</field>
         <field name="context">{'default_purchase_order_id': active_id,'default_payment_type': 'Urgent'}</field>
         <field name="help" type="html">
@@ -303,7 +374,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_account_payment_request_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_withoutpo_view_form')})]" />
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_withoutpo_view_form')})]"/>
         <field name="domain">[('payment_type','=','Withoutpo')]</field>
         <field name="context">{'default_payment_type': 'Withoutpo'}</field>
         <field name="help" type="html">
