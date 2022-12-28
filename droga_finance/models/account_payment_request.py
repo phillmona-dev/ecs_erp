@@ -52,7 +52,7 @@ class PaymentRequest(models.Model):
     amount_in_word = fields.Char(
         "Amount in Word", compute="_compute_amount_to_word", store=True)
 
-    state = fields.Selection([('Draft', 'Draft'),  ("Submitted", "Submitted"), ('Approved', 'Approved'),
+    state = fields.Selection([('Draft', 'Draft'),  ("Submitted", "Submitted"),
                              ('Approved', 'Approved'), ('Cancelled', 'Cancelled')], default="Draft", tracking=True)
 
     # create methdo

@@ -25,7 +25,7 @@
         <field name="name">droga.account.payment.request.view.form</field>
         <field name="model">droga.account.payment.request</field>
         <field name="arch" type="xml">
-            <form string="Payment Request" create="0">
+            <form string="Payment Request" create="0" delete="0">
                 <header>
                     <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request1" data-hotkey="v"/>
                     <button name="approve_request" type="object" states="Submitted" string="Approve" class="oe_highlight" id="approve_request1" data-hotkey="v"/>
@@ -85,7 +85,7 @@
         <field name="name">droga.account.payment.request.urgent.view.form</field>
         <field name="model">droga.account.payment.request</field>
         <field name="arch" type="xml">
-            <form string="Payment Request Urgent" create="0">
+            <form string="Payment Request Urgent" create="0" delete="0">
                 <header>
                     <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request2" data-hotkey="v"/>
                     <button name="approve_request" type="object" states="Submitted" string="Approve" class="oe_highlight" id="approve_request2" data-hotkey="v"/>
@@ -145,13 +145,13 @@
         <field name="name">droga.account.payment.request.withoutpo.view.form</field>
         <field name="model">droga.account.payment.request</field>
         <field name="arch" type="xml">
-            <form string="Payment Request Without PO">
+            <form string="Payment Request Without PO" delete="0">
                 <header>
                     <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight" id="submit_request3" data-hotkey="v"/>
                     <button name="approve_request" type="object" states="Submitted" string="Approve" class="oe_highlight" id="approve_request3" data-hotkey="v"/>
                     <button name="cancel_request" type="object" states="Draft,Approved" string="Cancel" id="cancel_request3" data-hotkey="v" confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form" class="oe_highlight btn-danger"/>
 
-                    <button name="reject_request3" type="object" states="Submitted" string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
+                    <button name="reject_request" type="object" states="Submitted" string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning" confirm="Are you sure you want to reject the request?"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
@@ -196,6 +196,37 @@
                 </div>
 
             </form>
+        </field>
+    </record>
+
+
+     <!-- search view -->
+    <record id="droga_payment_request_view_search" model="ir.ui.view">
+        <field name="name">droga.account.payment.request.view.search</field>
+        <field name="model">droga.account.payment.request</field>
+        <field name="arch" type="xml">
+            <search string="">
+                <field name="name"/>
+                <field name="request_by"/>
+                <field name="request_date"/>
+                <field name="department"/>
+                <field name="purpose"/>
+                <field name="company_id" />
+                <field name="state"/>
+
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'Draft')]" />
+                <filter name="submitted" string="Submitted" domain="[('state', '=', 'Submitted')]" />
+                <filter name="approved" string="Approved" domain="[('state', '=', 'Approved')]" />
+                <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'Cancelled')]" />
+                <separator />
+                <filter name="request_date" string="Request Date" date="request_date"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="department" domain="[]" context="{'group_by': 'department'}"/>
+                    <filter string="Request Date" name="request_date" domain="[]" context="{'group_by': 'request_date'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
