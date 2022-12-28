@@ -229,6 +229,7 @@ class droga_tender_master(models.Model):
                     'default_tender_origin_form_tender': self.id,
                     'default_partner_id': self.customer.master_cust_id.id,
                     'default_order_line': order_lines,
+                    'default_manual_price':True
                 },
                 'domain':
                     ([('tender_origin_form_tender','=', self.id)])

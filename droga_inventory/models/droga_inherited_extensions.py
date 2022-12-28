@@ -408,7 +408,7 @@ class droga_stock_product_extension(models.Model):
         pass
 
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
-                                      company_dependent=True, check_company=True)
+                                      company_dependent=True, check_company=True,required=True)
     emergency_order_point=fields.Float('Emergency order point')
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
