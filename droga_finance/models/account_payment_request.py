@@ -43,7 +43,8 @@ class PaymentRequest(models.Model):
                                  index=True, default=lambda self: self.env.company.id)
 
     currency_id = fields.Many2one(
-        "res.currency", string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
+        "res.currency", string="Currency", required=True,
+        default=lambda self: self.env.ref('base.main_company').currency_id)
 
     total_amount = fields.Float("Total Amount")
     exchange_rate = fields.Float("Exchange Rate", default=1)
@@ -52,8 +53,9 @@ class PaymentRequest(models.Model):
     amount_in_word = fields.Char(
         "Amount in Word", compute="_compute_amount_to_word", store=True)
 
-    state = fields.Selection([('Draft', 'Draft'),  ("Submitted", "Submitted"),
-                             ('Approved', 'Approved'), ('Cancelled', 'Cancelled')], default="Draft", tracking=True)
+    state = fields.Selection([('Draft', 'Draft'), ("Submitted", "Submitted"),
+                              ('Approved', 'Approved'), ('Budget Approved', 'Budget Approved'),
+                              ('Authorized', 'Authorized'), ('Cancelled', 'Cancelled')], default="Draft", tracking=True)
 
     # create methdo
 
@@ -70,13 +72,13 @@ class PaymentRequest(models.Model):
     # compute total ETB amount
     @api.depends('total_amount', 'exchange_rate')
     def _compute_total(self):
-        self.total_amount_etb = self.total_amount*self.exchange_rate
+        self.total_amount_etb = self.total_amount * self.exchange_rate
 
     @api.depends('total_amount', 'exchange_rate')
     def _compute_amount_to_word(self):
         for record in self:
             record.amount_in_word = str(record.currency_id.amount_to_text(
-                record.total_amount*record.exchange_rate))
+                record.total_amount * record.exchange_rate))
 
     def submit_request(self):
         self.write({'state': 'Submitted'})
@@ -84,6 +86,14 @@ class PaymentRequest(models.Model):
 
     def approve_request(self):
         self.write({'state': 'Approved'})
+        return True
+
+    def budget_approve_request(self):
+        self.write({'state': 'Budget Approved'})
+        return True
+
+    def authorize_request(self):
+        self.write({'state': 'Authorized'})
         return True
 
     def reject_request(self):
