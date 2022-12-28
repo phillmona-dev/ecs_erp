@@ -389,7 +389,7 @@ class droga_stock_product_extension(models.Model):
     categ_id = fields.Many2one(
         'product.category', 'Product Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
-        required=True, help="Select category for the current product")
+        help="Select category for the current product")
     detailed_type = fields.Selection(selection=[
         ('product', 'Storable Product'),
         ('consu','Consumables'),
