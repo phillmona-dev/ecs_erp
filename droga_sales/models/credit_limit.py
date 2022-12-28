@@ -114,6 +114,8 @@ class cust_sales_no_create_after_invoice(models.Model):
 
     def _get_expiry(self):
         for rec in self:
+            rec.expiry_date_html=''
+            rec.batch_html
             try:
                 for move in rec.move_ids:
                     for move_line in move.move_line_ids:
