@@ -59,6 +59,23 @@
     </record>
 
 
+    <!-- action for payment request -->
+    <record id="droga_account_payment_request_budget_approval_action" model="ir.actions.act_window">
+        <field name="name">Payment Request</field>
+        <field name="res_model">droga.account.payment.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_finance.droga_account_payment_request_view_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_finance.droga_account_payment_request_view_form')})]"/>
+        <field name="domain"></field>
+        <field name="context">{"search_default_submitted":1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Payment Request
+            </p>
+        </field>
+    </record>
+
     <menuitem id="droga_commitment_budget_main_menu" name="Budget" sequence="31"
               parent="account_accountant.menu_accounting" groups="droga_finance.account_risk_treasury_manager_group">
 
@@ -83,6 +100,10 @@
 
             <menuitem id="droga_budget_purchase_request_approval_foreign_menu" name="Purchase Request - Foreign"
                       action="droga_budget_request_for_foreign_approval_action"
+                      groups="droga_finance.account_risk_treasury_manager_group" sequence="3"/>
+
+            <menuitem id="droga_payment_request_approval_menu" name="Payment Request"
+                      action="droga_account_payment_request_budget_approval_action"
                       groups="droga_finance.account_risk_treasury_manager_group" sequence="3"/>
 
         </menuitem>

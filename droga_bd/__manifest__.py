@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account_budget' ,'droga_procurement','droga_inventory'],
+    'depends': ['base','account_budget' ,'droga_procurement','droga_inventory','droga_finance'],
 
     # always loaded
     'data': [
