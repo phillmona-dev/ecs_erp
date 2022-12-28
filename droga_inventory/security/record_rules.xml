@@ -11,6 +11,17 @@
         <field name = "domain_force"> [('code', '=', 'MS')] </field>
     </record>
 
+    <record id = "inventory_wsos_warehouse_access" model = "ir.rule">
+        <field name = "name"> Store keeper can only access his/her own warehouse only </field>
+        <field name = "model_id" search="[('model','=','stock.warehouse')]"/>
+        <field name = "groups" eval = "[(4, ref ('inventory_wsos'))]" />
+        <field name = "perm_read" eval = "True" />
+        <field name = "perm_write" eval = "True" />
+        <field name = "perm_create" eval = "True" />
+        <field name = "perm_unlink" eval = "True" />
+        <field name = "domain_force"> [('code', '=', 'WSOS')] </field>
+    </record>
+
     <record id = "inventory_li_warehouse_access" model = "ir.rule">
         <field name = "name"> Store keeper can only access his/her own warehouse only </field>
         <field name = "model_id" search="[('model','=','stock.warehouse')]" />

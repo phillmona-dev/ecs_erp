@@ -307,8 +307,6 @@ class droga_stock_picking_extension(models.Model):
                 has_access += (self.env['stock.picking'].sudo().search([('picking_type_id.dispatch_location', '=', 'WS')]))
 
 
-
-
             return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id', 'in', [])]
