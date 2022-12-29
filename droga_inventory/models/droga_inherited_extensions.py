@@ -226,7 +226,7 @@ class droga_stock_uom_extension(models.Model):
             raise UserError("You can not create a unit of measure. Please contact your supervisor.")
         return super(droga_stock_uom_extension,self).create(vals_list)
 
-    @api.model
+
     def write(self,vals_list):
         if not self.env.user.has_group('droga_inventory.inv_uom_manager'):
             raise UserError("You can not update a unit of measure. Please contact your supervisor.")
@@ -472,7 +472,7 @@ class droga_stock_product_extension(models.Model):
             else:
                 rec.has_access = False
 
-    @api.model
+
     def write(self, vals_list):
         if not self.env.user.has_group('droga_inventory.inv_prod_manager'):
             raise UserError("You can not update a product. Please contact your supervisor.")
