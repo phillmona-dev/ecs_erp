@@ -16,7 +16,7 @@
                 <button string="PEDS" type="object" class="oe_highlight" name="print_to_pos_peds"/>
             </xpath>
 
-           <xpath expr="//page[@name='other_info']" position="after">
+           <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
                 <page string="FS Info">
                     <group>
                         <field name="FPMachineID"/>

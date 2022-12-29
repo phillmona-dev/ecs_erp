@@ -166,8 +166,8 @@ model-->
 
                         </page>
                         <page name="name" string="Cumulatives">
-                                 <group string="Cumulatives">
-                                    <group >
+                                 <group >
+                                    <group string="Cumulatives" width="45">
                                         <field name="cumulative_balance"/>
                                         <field name="cumulative_interest"/>
                                         <field name="total_interest"/>
@@ -175,10 +175,12 @@ model-->
                                         <field name="total_penality"/>
     
                                     </group>
-                                    <group>
+                                    <group string="Opening Balance " width="55">
+
                                         <field name="current_cumlative_balace"/>
                                         <field name="current_cumlative_interest"/>
                                         <field name="opening_date"/>
+                                        <field name="opening_payment_date"/>
     
     
                                     </group>

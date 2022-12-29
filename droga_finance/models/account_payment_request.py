@@ -86,20 +86,40 @@ class PaymentRequest(models.Model):
 
     def approve_request(self):
         self.write({'state': 'Approved'})
+        # set activity done
+        self.set_activity_done()
         return True
 
     def budget_approve_request(self):
         self.write({'state': 'Budget Approved'})
+        self.set_activity_done()
         return True
 
     def authorize_request(self):
         self.write({'state': 'Authorized'})
+        self.set_activity_done()
         return True
 
     def reject_request(self):
         self.write({'state': 'Draft'})
+        self.set_activity_done()
         return True
 
     def cancel_request(self):
         self.write({'state': 'Cancelled'})
         return True
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        if activity:
+            activity.action_feedback()
+
+    def create_activity(self):
+        # create mail activity for the approval
+        todos = dict(res_id=self.id,
+                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.account.payment.request')]).id,
+                     user_id=2, summary='your task title', note='your task message', activity_type_id=4,
+                     date_deadline=datetime.now())
+
+        self.env['mail.activity'].create(todos)

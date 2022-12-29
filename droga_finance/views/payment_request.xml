@@ -310,7 +310,7 @@
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_account_payment_request_view_tree')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('droga_account_payment_request_view_form')})]"/>
-        <field name="domain">[('payment_type','=','Normal')]</field>
+        <field name="domain">[]</field>
         <field name="context">{'default_payment_type': 'Normal'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
