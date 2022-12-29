@@ -31,7 +31,7 @@ class cust_sales_credit_limit(models.Model):
     pay_type=fields.Boolean(related='payment_term_id.apply_credit_limit')
     mature_amount = fields.Monetary('Matured amount', compute='_get_mature_amount')
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
-    manual_price=fields.Boolean('Manual price',tracking=True)
+    manual_price=fields.Boolean('Manual price',default=False,required=True,tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
     order_type = fields.Selection([
         ('IM', 'Import'),
