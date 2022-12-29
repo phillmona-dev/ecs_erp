@@ -9,6 +9,8 @@ class AccountMove(models.Model):
 
     purpose = fields.Char("Purpose")
 
+
+
     @api.depends("amount_total")
     def _compute_amount_word(self):
         for record in self:
