@@ -34,6 +34,7 @@ class sale_order_line(models.Model):
         store=True, required=True)
     price_unit_before_discount=fields.Float('')
     wareh=fields.Many2one('stock.warehouse')
+    store_placement = fields.Boolean('Placement',default=False)
     std_unit_price=fields.Float(readonly=True,string='UP Default')
 
     def _inverse_price(self):
@@ -70,7 +71,7 @@ class sale_order_line(models.Model):
         self.order_id.non_core_sum = non_core_sum
         self.order_id.total_discount=total_before_discount-(core_sum+non_core_sum)
         self.order_id.total_added=(core_sum+non_core_sum)-total_before_discount
-    @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id','manual_price')
+    @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id','manual_price','store_placement')
     def _compute_price_unit(self):
 
         for line in self:
@@ -96,6 +97,9 @@ class sale_order_line(models.Model):
             # check if there is already invoiced amount. if so, the price shouldn't change as it might have been
             # manually edited
             if line.qty_invoiced > 0:
+                continue
+            if line.store_placement:
+                line.price_unit = 0.0
                 continue
             if not line.product_uom or not line.product_id or not line.order_id.pricelist_id:
                 line.price_unit = 0.0
@@ -170,10 +174,35 @@ class sale_order_ext(models.Model):
     _inherit='sale.order'
     core_sum=fields.Float('Core total',compute='_get_sub_totals')
     non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
-
+    state = fields.Selection(
+        selection=[
+            ('draft', "Quotation"),
+            ('sent', "Quotation Sent"),
+            ('price_request', "Price change approval"),
+            ('req', "Operation manager"),
+            ('cancel', "Cancelled"),
+            ('sale', "Sales Order"),
+            ('done', "Locked"),
+        ],
+        string="Status",
+        readonly=True, copy=False, index=True,
+        tracking=3,
+        default='draft')
     total_discount = fields.Float('Total discount')
     total_added = fields.Float('Total accrual')
+    price_change_approver = fields.Many2one('res.users',compute='_get_approvers')
+    operation_approver=fields.Many2one('res.users',compute='_get_approvers')
 
+    def _get_approvers(self):
+        for rec in self:
+            rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.ids[0] if len(
+                self.env.ref("droga_sales.sales_price_change_admin").users.ids) > 0 else None
+            if rec.order_type=='IM':
+                rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.ids[0] if len(
+                    self.env.ref("droga_sales.sales_import_approve_admin").users.ids) > 0 else None
+            else:
+                rec.operation_approver = self.env.ref("droga_sales.sales_wholesale_approve_admin").users.ids[0] if len(
+                    self.env.ref("droga_sales.sales_wholesale_approve_admin").users.ids) > 0 else None
     def _get_pr_sales_logged(self):
         if not request:
             return False
@@ -185,6 +214,35 @@ class sale_order_ext(models.Model):
     pr_avail_areas=fields.Many2many(related='pr_sales.p_regions')
 
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
+
+    def save_request_button(self):
+        self.ensure_one()
+        if self.manual_price:
+            self.state='price_request'
+            #Create activity for users under that role
+        else:
+            self.state='req'
+            if self.order_type=="IM":
+                # Create activity for users under import
+                pass
+            else:
+                # Create activity for users under wholesale
+                pass
+
+    def price_approval(self):
+        self.ensure_one()
+        self.state = 'req'
+        if self.order_type == "IM":
+            # Create activity for users under import
+            pass
+        else:
+            # Create activity for users under wholesale
+            pass
+
+
+    def operation_confirm(self):
+        self.action_confirm()
+
     @api.depends('pr_sales_logged')
     def _is_record_owner(self):
        for rec in self:

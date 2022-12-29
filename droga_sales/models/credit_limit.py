@@ -79,25 +79,6 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Please settle matured amounts before initiating another sales!")
         return result
 
-    def store_issue_placement_order(self):
-        return {
-            'name': 'Sample request',
-            'view_type': 'tree',
-            'view_mode': 'tree,form',
-            'res_model': 'droga.inventory.consignment.issue',
-            'views': [
-                [self.env.ref('droga_inventory.droga_inventory_consignment_issue_view_tree_sales').id, 'tree'],
-                [self.env.ref('droga_inventory.droga_inventory_consignment_issue_view_form').id, 'form']],
-            'type': 'ir.actions.act_window',
-            'context': {
-                'default_sales_placement_origin_form': self.id,
-                'default_customer': self.partner_id.id,
-                'default_issue_type': 'SAP'
-            },
-            'domain':
-                ([('sales_placement_origin_form', '=', self.id)])
-        }
-
 class inventory_placement_extension(models.Model):
     _inherit = 'droga.inventory.consignment.issue'
     sales_placement_origin_form=fields.Many2one('sale.order',readonly=True)

@@ -2,6 +2,8 @@ from ast import literal_eval
 from datetime import timedelta,datetime
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
+
 
 class droga_stock_move_line_extension(models.Model):
     _inherit = 'stock.move.line'
@@ -217,6 +219,19 @@ class droga_stock_picking_type_extension(models.Model):
 class droga_stock_uom_extension(models.Model):
     _inherit='uom.uom'
     uom_title=fields.Char('UOM invoice name')
+
+    @api.model
+    def create(self, vals_list):
+        if not self.env.user.has_group('droga_inventory.inv_uom_manager'):
+            raise UserError("You can not create a unit of measure. Please contact your supervisor.")
+        return super(droga_stock_uom_extension,self).create(vals_list)
+
+    @api.model
+    def write(self,vals_list):
+        if not self.env.user.has_group('droga_inventory.inv_uom_manager'):
+            raise UserError("You can not update a unit of measure. Please contact your supervisor.")
+        return super(droga_stock_uom_extension, self).write(vals_list)
+
 class droga_stock_move_extension(models.Model):
     _inherit = 'stock.move'
     reservation_discard_time=fields.Datetime(string='Reservation discard time',compute='_compute_res_discard',inverse='_inverse_res_discard')
@@ -457,6 +472,17 @@ class droga_stock_product_extension(models.Model):
             else:
                 rec.has_access = False
 
+    @api.model
+    def write(self, vals_list):
+        if not self.env.user.has_group('droga_inventory.inv_prod_manager'):
+            raise UserError("You can not update a product. Please contact your supervisor.")
+        return super(droga_stock_product_extension, self).write(vals_list)
+
+    @api.model
+    def create(self, vals_list):
+        if not self.env.user.has_group('droga_inventory.inv_prod_manager'):
+            raise UserError("You can not create a product. Please contact your supervisor.")
+        return super(droga_stock_product_extension, self).create(vals_list)
 
 class product_selection_field(models.Model):
     _inherit = 'product.category'
