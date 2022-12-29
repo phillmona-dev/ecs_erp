@@ -37,6 +37,7 @@
         'views/lc.xml',
         'views/foreign_currency_request.xml',
         'views/configuration.xml',
+        'views/competitors.xml',
         'report/paper_format.xml',
         'report/purchase_request.xml',
         'report/purchase_request_local.xml',

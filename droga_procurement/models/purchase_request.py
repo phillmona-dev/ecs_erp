@@ -118,6 +118,16 @@ class purhcase_request(models.Model):
     total_amount = fields.Float(
         "Total Amount", compute="compute_total_purchase_amount", store=True)
 
+    is_user_import_operation = fields.Boolean(string="check field", compute='get_import_operation_group')
+
+    @api.depends('is_user_import_operation')
+    def get_import_operation_group(self):
+        res_user = self.env['res.users'].search([('id', '=', self._uid)])
+        if res_user.has_group('droga_procurement.group_purchase_import_operation_group'):
+            self.is_user_import_operation = True
+        else:
+            self.is_user_import_operation = False
+
     @api.depends("department")
     def _get_manager_id(self):
         for record in self:
@@ -281,8 +291,16 @@ class purhcase_request(models.Model):
 class purhcase_request_line(models.Model):
     _name = "droga.purhcase.request.line"
     _description = "Purchase Request Line"
+    _rec_name = 'product_id'
 
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
+    current_market_status = fields.One2many('droga.purchase.request.line.current.market.analysis',
+                                            'purchase_request_line_id')
+    future_market_status = fields.One2many('droga.purchase.request.line.future.market.status',
+                                           'purchase_request_line_id')
+    vendor_list = fields.One2many('droga.purchase.request.line.vendors',
+                                  'purchase_request_line_id')
+
     exchange_rate = fields.Float(
         related="purhcase_request_id.exchange_rate", store=True)
     company_id = fields.Many2one(
@@ -415,6 +433,88 @@ class purhcase_request_line(models.Model):
                 # update remaining balance
                 if res != None:
                     record.remaining_budget = res['remaining_balance']
+
+    def open_detail_market_analysis(self):
+        view = self.env.ref(
+            'droga_procurement.droga_purchase_request_market_analysis_form')
+
+        return {
+            'name': 'Current Market Status',
+            'view_mode': 'form',
+            'res_model': 'droga.purhcase.request.line',
+            'view_id': view.id,
+            'type': 'ir.actions.act_window',
+            'res_id': self.id,
+            'target': 'new',
+        }
+
+    def open_detail_future_market_status(self):
+        view = self.env.ref(
+            'droga_procurement.droga_purchase_request_future_market_status_form')
+
+        return {
+            'name': 'Future Market Status',
+            'view_mode': 'form',
+            'res_model': 'droga.purhcase.request.line',
+            'view_id': view.id,
+            'type': 'ir.actions.act_window',
+            'res_id': self.id,
+            'target': 'new',
+        }
+
+    def open_detail_vendors(self):
+        view = self.env.ref(
+            'droga_procurement.droga_purchase_request_vendor_list_form')
+
+        return {
+            'name': 'Vendors',
+            'view_mode': 'form',
+            'res_model': 'droga.purhcase.request.line',
+            'view_id': view.id,
+            'type': 'ir.actions.act_window',
+            'res_id': self.id,
+            'target': 'new',
+        }
+
+
+class purchase_request_line_current_market_analysis(models.Model):
+    _name = 'droga.purchase.request.line.current.market.analysis'
+
+    purchase_request_line_id = fields.Many2one('droga.purhcase.request.line')
+
+    importer = fields.Many2one("droga.purchase.competitors", string='Importer')
+    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]", string="Manufacturer")
+    unit = fields.Many2one('uom.uom', string='UoM')
+    avail_stock = fields.Float('Available Stock')
+    sell_up = fields.Float('Selling Unit Price')
+    epss_volume = fields.Float('EPSS Stock Volume')
+    local_man_status = fields.Char('Local Manufacturers Stock and RM Status')
+    market_analysis_remark = fields.Char('Remark')
+
+
+class purchase_request_line_future_market_analysis(models.Model):
+    _name = 'droga.purchase.request.line.future.market.status'
+
+    purchase_request_line_id = fields.Many2one('droga.purhcase.request.line')
+    importer = fields.Many2one("droga.purchase.competitors", string='Importer')
+    manufacturer = fields.Char(string='Manufacturer')
+    unit = fields.Many2one('uom.uom', string="UoM")
+    private_unit_price = fields.Float('Private Unit Price')
+    private_unit_quantity = fields.Float('Private Quantity')
+    private_order_date = fields.Date('Private Ordered Date')
+    epss_unit_ = fields.Float('EPSS Unit Price')
+    epss_winner = fields.Char('EPSS Winner Manufacturer')
+
+
+class purchase_request_line_vendors(models.Model):
+    _name = 'droga.purchase.request.line.vendors'
+
+    purchase_request_line_id = fields.Many2one('droga.purhcase.request.line')
+
+    foregin_manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]", string="Manufacturer")
+    foregin_unit_price = fields.Float('Unit Price')
+    foregin_shelf_life = fields.Float('Shelf Life')
+    foregin_is_sup_regsitered = fields.Boolean('Registered?', default=True)
 
 
 class purchase_foregin_status(models.Model):
