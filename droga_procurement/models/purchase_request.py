@@ -406,13 +406,13 @@ class purhcase_request_line(models.Model):
     is_core_product = fields.Boolean("Core product", compute="_compute_product_values",
                                      inverse='_inverse_product_values', store=True)
 
-    unit_price = fields.Float('Unit Price')
+    unit_price = fields.Float('Unit Price', digits=(12, 4))
     total_price = fields.Float(
-        'Total Price', compute="_compute_total", store=True)
+        'Total Price', compute="_compute_total", store=True, digits=(12, 4))
 
-    unit_price_foregin = fields.Float('Unit Price')
+    unit_price_foregin = fields.Float('Unit Price', digits=(12, 4))
     total_price_foregin = fields.Float(
-        'Total Price', compute="_compute_total", store=True)
+        'Total Price', compute="_compute_total", store=True, digits=(12, 4))
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
                                   domain="[('category_id', '=', product_uom_category_id)]", required=True)

@@ -647,13 +647,13 @@ class Rfq_Detail(models.Model):
         ('purchase_ok', '=', True)], change_default=True)
     product_qty = fields.Float(
         string='Quantity', digits='Product Unit of Measure', required=True, default=1)
-    unit_price = fields.Float('Unit Price', required=True)
+    unit_price = fields.Float('Unit Price', digits=(12, 4))
     total_price = fields.Float(
-        'Total Price', compute="_compute_total", store=True)
+        'Total Price', compute="_compute_total", store=True, digits=(12, 4))
 
-    unit_price_foregin = fields.Float('Unit Price')
+    unit_price_foregin = fields.Float('Unit Price', digits=(12, 4))
     total_price_foregin = fields.Float(
-        'Total Price', compute="_compute_total", store=True)
+        'Total Price', compute="_compute_total", store=True, digits=(12, 4))
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
                                   domain="[('category_id', '=', product_uom_category_id)]", required=True)
@@ -661,11 +661,11 @@ class Rfq_Detail(models.Model):
         related='product_id.uom_id.category_id')
 
     price_subtotal = fields.Float(
-        compute='_compute_total', string='Subtotal', readonly=True, store=True)
+        compute='_compute_total', string='Subtotal', readonly=True, store=True, digits=(12, 4))
     price_tax = fields.Float(compute='_compute_total',
-                             string='Taxes', readonly=True, store=True)
+                             string='Taxes', readonly=True, store=True, digits=(12, 4))
     price_total = fields.Float(
-        compute='_compute_total', string='Total', readonly=True, store=True)
+        compute='_compute_total', string='Total', readonly=True, store=True, digits=(12, 4))
 
     tax_id = fields.Many2many('account.tax', string='Taxes',
                               domain=['|', ('active', '=', False), ('active', '=', True)])
@@ -674,7 +674,7 @@ class Rfq_Detail(models.Model):
 
     # expected price
     tax_amount = fields.Float(
-        "Tax Amount", help="Tax Amount based on Invoice value (Birr)")
+        "Tax Amount", help="Tax Amount based on Invoice value (Birr)", digits=(12, 4))
     demurrage_cost = fields.Float("Demurrage Cost", help="Demurrage Cost")
     estimated_arriving_cost = fields.Float(
         "Cost", help="Estimated Arriving Cost")
