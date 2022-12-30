@@ -2,12 +2,14 @@ from odoo import _, api, fields, models
 
 
 class AccountPayment(models.Model):
-
     _inherit = 'account.payment'
 
     transaction_type = fields.Many2one("account.transaction.type")
     payment_request_id = fields.Many2one("droga.account.payment.request")
     purpose = fields.Char("Purpose")
+
+    check_due_date = fields.Date("Check Due Date")
+    vendor_supplier = fields.Char("Vendor/Customer Name")
 
     @api.model
     def create(self, vals):
