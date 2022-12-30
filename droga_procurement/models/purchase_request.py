@@ -1,6 +1,7 @@
 from math import fabs
 from odoo import _, api, fields, models
 from datetime import datetime
+from odoo.exceptions import ValidationError
 
 
 class purhcase_request(models.Model):
@@ -42,6 +43,17 @@ class purhcase_request(models.Model):
                 record.is_department_manager = True
             else:
                 record.is_department_manager = False
+
+    def identify_requester(self):
+        context = self._context
+
+        if context.get('uid') == self.create_uid.id:
+            self.requester = True
+        else:
+            self.requester = False
+
+    # for approvers
+    requester = fields.Boolean('Requester', default=False, compute='identify_requester')
 
     current_uid = fields.Integer(compute='get_current_uid')
     is_department_manager = fields.Boolean(compute='get_current_uid')
@@ -120,7 +132,9 @@ class purhcase_request(models.Model):
 
     is_user_import_operation = fields.Boolean(string="check field", compute='get_import_operation_group')
 
-    @api.depends('is_user_import_operation')
+    reject_message = fields.Char('Reason')
+
+    @api.depends('is_user_import_operation', 'request_by')
     def get_import_operation_group(self):
         res_user = self.env['res.users'].search([('id', '=', self._uid)])
         if res_user.has_group('droga_procurement.group_purchase_import_operation_group'):
@@ -131,7 +145,7 @@ class purhcase_request(models.Model):
     @api.depends("department")
     def _get_manager_id(self):
         for record in self:
-            record.department_manager = record.department.manager_id
+            record.department_manager = record.request_by.parent_id
 
     @api.model
     def create(self, vals):
@@ -172,7 +186,14 @@ class purhcase_request(models.Model):
                 }
             }
 
-        self.write({'state': 'Submitted'})
+        self.write({'state': 'Submitted', 'reject_message': ''})
+        self.set_activity_done()
+        self._get_manager_id()
+        if not self.department_manager:
+            raise ValidationError(
+                "A manager is not set for the requester, please contact HR to set manager for your employee record")
+        # create activity for the approver
+        self.create_activity(self.department_manager_user_id.id)
         return True
 
     # draft request
@@ -184,15 +205,21 @@ class purhcase_request(models.Model):
     def verify_request(self):
         self.write({'state': 'Verified'})
         # mark activity as done
-        activity = self.env["mail.activity"].search(
-            [('res_name', '=', self.name)])
-        if activity:
-            activity.action_feedback()
+        self.set_activity_done()
+
+        # create new activity
+        # get budget accountant
+        users = self.get_users_for_roles('Business Control Specialist')
+        for user in users:
+            self.create_activity(user)
+
         return True
 
     # rejet request
     def reject_request(self):
         self.write({'state': 'Draft'})
+        self.set_activity_done()
+        self.create_reject_activity()
         return True
 
     def cancel_request(self):
@@ -217,6 +244,15 @@ class purhcase_request(models.Model):
 
         self.write({'state': 'Budget Approved'})
         self.record_commitment_budget()
+
+        # activity done
+        self.set_activity_done()
+        # create new activity
+        # get budget accountant
+        users = self.get_users_for_roles('CEO')
+        for user in users:
+            self.create_activity(user)
+
         return True
 
     def approve_request_pr_manager(self):
@@ -230,6 +266,8 @@ class purhcase_request(models.Model):
         self.write({'state': 'Approved'})
         self.write({'wf_state': 'Approved'})
         # record commitment budget
+
+        self.set_activity_done()
         return True
 
     def open_rfq(self):
@@ -286,6 +324,55 @@ class purhcase_request(models.Model):
             [('purchase_request_id', '=', self.id), ('state', '=', 'Active')])
         for record in records:
             record.write({'state': 'Closed'})
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        if activity:
+            activity.sudo().action_done()
+
+    def create_activity(self, user_id):
+        # create mail activity for the approval
+        todos = dict(res_id=self.id,
+                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.purhcase.request')]).id,
+                     user_id=user_id, summary='Grant Approval', note='You have a request to approve',
+                     activity_type_id=4,
+                     date_deadline=datetime.now())
+
+        self.env['mail.activity'].sudo().create(todos)
+
+    def create_reject_activity(self):
+        # create mail activity for the approval
+
+        todos = dict(res_id=self.id,
+                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.purhcase.request')]).id,
+                     user_id=self.create_uid.id, summary='Request Rejected', note=self.reject_message,
+                     activity_type_id=4,
+                     date_deadline=datetime.now())
+
+        self.env['mail.activity'].sudo().create(todos)
+
+    def get_users_for_roles(self, role):
+        users = []
+        roles = self.env['res.groups'].search([('name', '=', role)])
+
+        for user in roles.users:
+            users.append(user.id)
+        return users
+
+    def reject_box(self):
+        view = self.env.ref(
+            'droga_procurement.droga_account_purchase_request_foreign_reject_view_form')
+
+        return {
+            'name': 'Reject',
+            'view_mode': 'form',
+            'res_model': 'droga.purhcase.request',
+            'view_id': view.id,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'res_id': self.id
+        }
 
 
 class purhcase_request_line(models.Model):
@@ -368,9 +455,10 @@ class purhcase_request_line(models.Model):
             if record.purhcase_request_id.request_type == 'Local':
                 record.total_price = record.unit_price * record.product_qty
             else:
-                record.unit_price = record.unit_price_foregin * record.exchange_rate
                 record.total_price = record.unit_price * record.product_qty
-                record.total_price_foregin = record.unit_price_foregin * record.product_qty
+                # record.unit_price = record.unit_price_foregin * record.exchange_rate
+                # record.total_price = record.unit_price * record.product_qty
+                # record.total_price_foregin = record.unit_price_foregin * record.product_qty
 
     # set unit of measure
     @api.onchange('product_id')
@@ -491,6 +579,7 @@ class purchase_request_line_current_market_analysis(models.Model):
     local_man_status = fields.Char('Local Manufacturers Stock and RM Status')
     market_analysis_remark = fields.Char('Remark')
 
+
 class purchase_request_line_future_market_analysis(models.Model):
     _name = 'droga.purchase.request.line.future.market.status'
 
@@ -504,6 +593,7 @@ class purchase_request_line_future_market_analysis(models.Model):
     epss_unit_ = fields.Float('EPSS Unit Price')
     epss_winner = fields.Char('EPSS Winner Manufacturer')
 
+
 class purchase_request_line_vendors(models.Model):
     _name = 'droga.purchase.request.line.vendors'
 
@@ -513,6 +603,7 @@ class purchase_request_line_vendors(models.Model):
     foregin_unit_price = fields.Float('Unit Price')
     foregin_shelf_life = fields.Float('Shelf Life')
     foregin_is_sup_regsitered = fields.Boolean('Registered?', default=True)
+
 
 class purchase_foregin_status(models.Model):
     _name = "droga.purchase.foregin.status"

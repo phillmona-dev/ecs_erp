@@ -334,28 +334,36 @@
     <record id="droga_purhcase_request_foregin_view_form" model="ir.ui.view">
         <field name="name">droga.purhcase.request.foregin.view.form</field>
         <field name="model">droga.purhcase.request</field>
+         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
             <form string="Purchase Request" delete="0">
                 <header>
-                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight"
-                            id="submit_request" data-hotkey="v"/>
-                    <button name="verify_request" type="object" states="Submitted" string="Verify" id="draft_request"
-                            class="oe_highlight" data-hotkey="v"/>
+                    <button name="submit_request" type="object" string="Submit" class="oe_highlight"
+                            id="submit_request" data-hotkey="v"  attrs="{'invisible':['|',('requester','=',False),('state','not in',('Draft'))]}"/>
+
+                    <button name="verify_request" type="object" string="Verify" id="draft_request"
+                            class="oe_highlight" data-hotkey="v"
+                            attrs="{'invisible':['|',('requester','=',True),('state','not in',('Submitted'))]}"/>
+
                     <button name="budget_checked_request" type="object" states="Verified" string="Budget Approved"
                             id="budget_checked_request" class="oe_highlight" data-hotkey="v"/>
+
                     <button name="approve_request" type="object" states="Budget Approved" string="Approve"
                             id="approve_request" class="oe_highlight" data-hotkey="v"/>
+
                     <button name="draft_request" type="object" states="Submitted" string="Draft" id="draft_request"
                             data-hotkey="v" invisible="1"/>
 
 
-                    <button name="reject_request" type="object" states="Submitted,Verified,Budget Approved"
+                    <button name="reject_box" type="object"
                             string="Reject" id="reject_request" data-hotkey="v" class="oe_highlight btn-warning"
-                            confirm="Are you sure you want to reject the request?"/>
-                    <button name="cancel_request" type="object" states="Draft,Approved" string="Cancel"
+
+                            attrs="{'invisible':['|',('requester','=',True),('state','in',('Draft','Approved'))]}"/>
+                    <button name="cancel_request" type="object" string="Cancel"
                             id="cancel_request" data-hotkey="v"
                             confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form"
-                            class="oe_highlight btn-danger"/>
+                            class="oe_highlight btn-danger"
+                            attrs="{'invisible':[('state','not in',('Draft','Approved'))]}"/>
 
                     <field name="state" widget="statusbar"
                            statusbar_visible="Draft,Submitted,Verified,Budget Approved,Approved,Cancel"/>
@@ -397,7 +405,8 @@
                             <field name="company_id" options="{'no_create':True,'no_open':True}"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}"/>
                             <field name="total_amount" invisible="1"/>
-                            <field name="is_user_import_operation" invisible="1"/>
+                            <field name="is_user_import_operation" invisible="0"/>
+                            <field name="requester" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -559,6 +568,28 @@
                     <field name="activity_ids"/>
                     <field name="message_ids"/>
                 </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="droga_account_purchase_request_foreign_reject_view_form" model="ir.ui.view">
+        <field name="name">droga.purhcase.request.reject.view.form</field>
+        <field name="model">droga.purhcase.request</field>
+        <field name="priority" eval="10"/>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+
+                    <field name="reject_message" required="1"/>
+
+                </group>
+                <footer>
+                    <button name="reject_request" type="object"
+                            string="Reject" id="reject_request1"
+                            data-hotkey="v" class="oe_highlight btn-warning"
+                            confirm="Are you sure you want to reject the request?"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
             </form>
         </field>
     </record>

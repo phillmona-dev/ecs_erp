@@ -152,13 +152,14 @@ class PaymentRequest(models.Model):
 
     def cancel_request(self):
         self.write({'state': 'Cancelled'})
+        self.set_activity_done()
         return True
 
     def set_activity_done(self):
         activity = self.env["mail.activity"].search(
             [('res_name', '=', self.name)])
         if activity:
-            activity.action_done()
+            activity.sudo().action_done()
 
     def create_activity(self, user_id):
         # create mail activity for the approval
@@ -168,7 +169,7 @@ class PaymentRequest(models.Model):
                      activity_type_id=4,
                      date_deadline=datetime.now())
 
-        self.env['mail.activity'].create(todos)
+        self.env['mail.activity'].sudo().create(todos)
 
     def create_reject_activity(self):
         # create mail activity for the approval
@@ -179,7 +180,7 @@ class PaymentRequest(models.Model):
                      activity_type_id=4,
                      date_deadline=datetime.now())
 
-        self.env['mail.activity'].create(todos)
+        self.env['mail.activity'].sudo().create(todos)
 
     @api.depends("department")
     def _get_manager_id(self):
