@@ -3,7 +3,7 @@
 <record id="droga_tender_payment_request" model="ir.ui.view">
         <field name="name">droga.account.payment.request.inherited</field>
         <field name="model">droga.account.payment.request</field>
-        <field name="inherit_id" ref="droga_finance.droga_account_payment_request_withoutpo_view_form"/>
+        <field name="inherit_id" ref="droga_finance.droga_account_payment_request_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='currency_id']" position="after">
                 <field string='Tender origin' name="tender_origin_form" attrs="{'invisible': [('tender_origin_form', '=', False)]}"></field>
