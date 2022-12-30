@@ -1,10 +1,13 @@
 from odoo import _, api, fields, models
 from datetime import datetime
+from odoo.exceptions import ValidationError
 
 
 class PaymentRequest(models.Model):
     _name = 'droga.account.payment.request'
     _description = 'Payment Request Form'
+
+    _order = 'name desc'
 
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
 
@@ -20,7 +23,23 @@ class PaymentRequest(models.Model):
             [('user_id', '=', self.env.uid)], limit=1)
         return employee_rec.department_id
 
-    name = fields.Char("Request Number")
+    def get_current_user_id(self):
+        context = self._context
+        return context.get('uid')
+
+    def identify_requester(self):
+        context = self._context
+
+        if context.get('uid') == self.create_uid.id:
+            self.requester = True
+        else:
+            self.requester = False
+
+    # for approvers
+    logged_user_id = fields.Many2one('res.users', default=get_current_user_id)
+    requester = fields.Boolean('Requester', default=False, compute='identify_requester')
+
+    name = fields.Char("Request Number", default='New')
     purchase_order_id = fields.Many2one("purchase.order")
     payment_type = fields.Selection(
         [('Normal', 'Normal'), ('Urgent', 'Urgent'), ('Withoutpo', 'Withoutpo')])
@@ -57,7 +76,14 @@ class PaymentRequest(models.Model):
                               ('Approved', 'Approved'), ('Budget Approved', 'Budget Approved'),
                               ('Authorized', 'Authorized'), ('Cancelled', 'Cancelled')], default="Draft", tracking=True)
 
-    # create methdo
+    department_manager = fields.Many2one(
+        "hr.employee", compute="_get_manager_id", store=True)
+    department_manager_user_id = fields.Many2one(
+        related="department_manager.user_id", store=True)
+
+    current_approver = fields.Many2one('hr.employee')
+
+    reject_message = fields.Char('Reason')
 
     @api.model
     def create(self, vals):
@@ -81,18 +107,36 @@ class PaymentRequest(models.Model):
                 record.total_amount * record.exchange_rate))
 
     def submit_request(self):
-        self.write({'state': 'Submitted'})
+        self.write({'state': 'Submitted', 'reject_message': ''})
+        # check for requester manager
+        self.set_activity_done()
+        self._get_manager_id()
+        if not self.department_manager:
+            raise ValidationError(
+                "A manager is not set for the requester, please contact HR to set manager for your employee record")
+        # create activity for the approver
+        self.create_activity(self.department_manager_user_id.id)
         return True
 
     def approve_request(self):
         self.write({'state': 'Approved'})
         # set activity done
         self.set_activity_done()
+        # create new activity
+        # get budget accountant
+        users = self.get_users_for_roles('Business Control Specialist')
+        for user in users:
+            self.create_activity(user)
         return True
 
     def budget_approve_request(self):
         self.write({'state': 'Budget Approved'})
         self.set_activity_done()
+        # create new activity
+        # get budget accountant
+        users = self.get_users_for_roles('Finance Operation Manager')
+        for user in users:
+            self.create_activity(user)
         return True
 
     def authorize_request(self):
@@ -103,6 +147,7 @@ class PaymentRequest(models.Model):
     def reject_request(self):
         self.write({'state': 'Draft'})
         self.set_activity_done()
+        self.create_reject_activity()
         return True
 
     def cancel_request(self):
@@ -113,13 +158,52 @@ class PaymentRequest(models.Model):
         activity = self.env["mail.activity"].search(
             [('res_name', '=', self.name)])
         if activity:
-            activity.action_feedback()
+            activity.action_done()
 
-    def create_activity(self):
+    def create_activity(self, user_id):
         # create mail activity for the approval
         todos = dict(res_id=self.id,
                      res_model_id=self.env['ir.model'].search([('model', '=', 'droga.account.payment.request')]).id,
-                     user_id=2, summary='your task title', note='your task message', activity_type_id=4,
+                     user_id=user_id, summary='Grant Approval', note='You have a request to approve',
+                     activity_type_id=4,
                      date_deadline=datetime.now())
 
         self.env['mail.activity'].create(todos)
+
+    def create_reject_activity(self):
+        # create mail activity for the approval
+
+        todos = dict(res_id=self.id,
+                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.account.payment.request')]).id,
+                     user_id=self.create_uid.id, summary='Request Rejected', note=self.reject_message,
+                     activity_type_id=4,
+                     date_deadline=datetime.now())
+
+        self.env['mail.activity'].create(todos)
+
+    @api.depends("department")
+    def _get_manager_id(self):
+        for record in self:
+            record.department_manager = record.request_by.parent_id
+
+    def get_users_for_roles(self, role):
+        users = []
+        roles = self.env['res.groups'].search([('name', '=', role)])
+
+        for user in roles.users:
+            users.append(user.id)
+        return users
+
+    def reject_box(self):
+        view = self.env.ref(
+            'droga_finance.droga_account_payment_request_reject_view_form')
+
+        return {
+            'name': 'Reject',
+            'view_mode': 'form',
+            'res_model': 'droga.account.payment.request',
+            'view_id': view.id,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'res_id': self.id
+        }

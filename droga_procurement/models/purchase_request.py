@@ -491,7 +491,6 @@ class purchase_request_line_current_market_analysis(models.Model):
     local_man_status = fields.Char('Local Manufacturers Stock and RM Status')
     market_analysis_remark = fields.Char('Remark')
 
-
 class purchase_request_line_future_market_analysis(models.Model):
     _name = 'droga.purchase.request.line.future.market.status'
 
@@ -505,7 +504,6 @@ class purchase_request_line_future_market_analysis(models.Model):
     epss_unit_ = fields.Float('EPSS Unit Price')
     epss_winner = fields.Char('EPSS Winner Manufacturer')
 
-
 class purchase_request_line_vendors(models.Model):
     _name = 'droga.purchase.request.line.vendors'
 
@@ -515,7 +513,6 @@ class purchase_request_line_vendors(models.Model):
     foregin_unit_price = fields.Float('Unit Price')
     foregin_shelf_life = fields.Float('Shelf Life')
     foregin_is_sup_regsitered = fields.Boolean('Registered?', default=True)
-
 
 class purchase_foregin_status(models.Model):
     _name = "droga.purchase.foregin.status"
