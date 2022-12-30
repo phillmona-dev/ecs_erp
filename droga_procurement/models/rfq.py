@@ -117,7 +117,8 @@ class Rfq(models.Model):
 
         # Calculate Coefficient and total cost
         total_cost = inventory_amount_etb + landed_cost_total
-        coefficient = total_cost / landed_cost_total
+        if landed_cost_total != 0:
+            coefficient = total_cost / landed_cost_total
 
         self.inventory_amount_usd = inventory_amount_usd
         self.inventory_amount_etb = inventory_amount_etb
