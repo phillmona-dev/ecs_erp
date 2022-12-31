@@ -77,9 +77,10 @@
                             <field name="requester" invisible="1"/>
                         </group>
                         <group>
+                            <field name="approve_dept_manger"  attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="company_id" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}" invisible="1"/>
                             <field name="currency_id" options="{'no_create':True,'no_open':True}"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>

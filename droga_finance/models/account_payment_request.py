@@ -81,6 +81,9 @@ class PaymentRequest(models.Model):
     department_manager_user_id = fields.Many2one(
         related="department_manager.user_id", store=True)
 
+    # if the request is approved by department manager check this option
+    approve_dept_manger = fields.Boolean("By Department Manager", default=False)
+
     current_approver = fields.Many2one('hr.employee')
 
     reject_message = fields.Char('Reason')
@@ -111,9 +114,11 @@ class PaymentRequest(models.Model):
         # check for requester manager
         self.set_activity_done()
         self._get_manager_id()
+
         if not self.department_manager:
             raise ValidationError(
-                "A manager is not set for the requester, please contact HR to set manager for your employee record")
+                "A manager is not set for the requester or the department, please contact HR to set manager for your employee record")
+
         # create activity for the approver
         self.create_activity(self.department_manager_user_id.id)
         return True
@@ -185,7 +190,10 @@ class PaymentRequest(models.Model):
     @api.depends("department")
     def _get_manager_id(self):
         for record in self:
-            record.department_manager = record.request_by.parent_id
+            if record.approve_dept_manger:
+                record.department_manager = record.department.manager_id
+            else:
+                record.department_manager = record.request_by.parent_id
 
     def get_users_for_roles(self, role):
         users = []
