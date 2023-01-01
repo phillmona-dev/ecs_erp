@@ -51,9 +51,9 @@
 
     # any module necessary for this one to work correctly
 
-    'depends': ['base','hr','account',
-                'mail','droga_crm','hr','droga_finance','droga_inventory',
-                'resource','stock','sale',
+    'depends': ['base', 'hr', 'account',
+                'mail', 'droga_crm', 'hr', 'droga_finance', 'droga_inventory',
+                'resource', 'stock', 'sale',
                 'web'],
     "license": "AGPL-3",
     # only loaded in demonstration mode

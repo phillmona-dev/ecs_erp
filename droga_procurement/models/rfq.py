@@ -89,6 +89,47 @@ class Rfq(models.Model):
     payment_term = fields.Selection(
         [('LC', 'LC'), ('TT', 'TT'), ('CAD', 'CAD')])
 
+    landed_costs = fields.One2many('droga.purchase.request.rfq.landed.cost.main', 'rfq_id')
+
+    # costs
+    inventory_amount_usd = fields.Float("Inventory Amount USD", compute='_compute_standard_cost', store=True,
+                                        digits=(12, 4))
+    inventory_amount_etb = fields.Float("Inventory Amount ETB", compute='_compute_standard_cost', store=True,
+                                        digits=(12, 4))
+    total_cost = fields.Float("Total Cost", compute='_compute_standard_cost', store=True, digits=(12, 4))
+    coefficient = fields.Float("Coefficient", compute='_compute_standard_cost', store=True, digits=(12, 10), default=1)
+    landed_cost_total = fields.Float("Total Landed Cost", compute='_compute_standard_cost', store=True, digits=(12, 4))
+
+    @api.depends('rfq_lines.product_qty', 'rfq_lines.unit_price', 'rfq_lines.unit_price_foregin', 'landed_costs.amount')
+    def _compute_standard_cost(self):
+        inventory_amount_usd = 0
+        inventory_amount_etb = 0
+        total_cost = 0
+        coefficient = 1
+        landed_cost_total = 0
+
+        for record in self.rfq_lines:
+            inventory_amount_usd += record.total_price_foregin
+            inventory_amount_etb += record.total_price
+
+        for line in self.landed_costs:
+            landed_cost_total += line.amount
+
+        # Calculate Coefficient and total cost
+        total_cost = inventory_amount_etb + landed_cost_total
+        if landed_cost_total != 0:
+            coefficient = total_cost / landed_cost_total
+
+        self.inventory_amount_usd = inventory_amount_usd
+        self.inventory_amount_etb = inventory_amount_etb
+        self.landed_cost_total = landed_cost_total
+        self.total_cost = total_cost
+        self.coefficient = coefficient
+
+        for record in self.rfq_lines:
+            record.total_cost = coefficient * record.total_price
+            record.unit_cost = record.total_cost / record.product_qty
+
     @api.onchange('supplier_id')
     def _fill_supplier_for_each_item(self):
         if self.request_type == "Foregin":
@@ -647,25 +688,25 @@ class Rfq_Detail(models.Model):
         ('purchase_ok', '=', True)], change_default=True)
     product_qty = fields.Float(
         string='Quantity', digits='Product Unit of Measure', required=True, default=1)
-    unit_price = fields.Float('Unit Price', required=True)
+    unit_price = fields.Float('Unit Price', digits=(12, 4))
     total_price = fields.Float(
-        'Total Price', compute="_compute_total", store=True)
+        'Total Price', compute="_compute_total", store=True, digits=(12, 4))
 
-    unit_price_foregin = fields.Float('Unit Price')
+    unit_price_foregin = fields.Float('Unit Price', digits=(12, 4))
     total_price_foregin = fields.Float(
-        'Total Price', compute="_compute_total", store=True)
+        'Total Price', compute="_compute_total", store=True, digits=(12, 4))
 
-    product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
-                                  domain="[('category_id', '=', product_uom_category_id)]", required=True)
     product_uom_category_id = fields.Many2one(
         related='product_id.uom_id.category_id')
+    product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
+                                  domain="[('category_id', '=', product_uom_category_id)]", required=True)
 
     price_subtotal = fields.Float(
-        compute='_compute_total', string='Subtotal', readonly=True, store=True)
+        compute='_compute_total', string='Subtotal', readonly=True, store=True, digits=(12, 4))
     price_tax = fields.Float(compute='_compute_total',
-                             string='Taxes', readonly=True, store=True)
+                             string='Taxes', readonly=True, store=True, digits=(12, 4))
     price_total = fields.Float(
-        compute='_compute_total', string='Total', readonly=True, store=True)
+        compute='_compute_total', string='Total', readonly=True, store=True, digits=(12, 4))
 
     tax_id = fields.Many2many('account.tax', string='Taxes',
                               domain=['|', ('active', '=', False), ('active', '=', True)])
@@ -674,7 +715,7 @@ class Rfq_Detail(models.Model):
 
     # expected price
     tax_amount = fields.Float(
-        "Tax Amount", help="Tax Amount based on Invoice value (Birr)")
+        "Tax Amount", help="Tax Amount based on Invoice value (Birr)", digits=(12, 4))
     demurrage_cost = fields.Float("Demurrage Cost", help="Demurrage Cost")
     estimated_arriving_cost = fields.Float(
         "Cost", help="Estimated Arriving Cost")
@@ -694,6 +735,8 @@ class Rfq_Detail(models.Model):
 
     # landed cost
     landed_costs = fields.One2many("droga.purchase.request.rfq.landed.cost", "rfq_id_line")
+    total_cost = fields.Float("Total Cost", digits=(12, 4))
+    unit_cost = fields.Float("Unit Cost", digits=(12, 4))
 
     @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id', 'exchange_rate', 'unit_price_foregin')
     def _compute_total(self):
@@ -823,6 +866,27 @@ class rfq_proforma_invoice_status(models.Model):
     available = fields.Boolean("Available", default=False)
 
 
+class rfq_landed_cost_main(models.Model):
+    _name = 'droga.purchase.request.rfq.landed.cost.main'
+
+    def _default_currency(self):
+        id = self.env['res.currency'].search([('name', '=', 'ETB')], limit=1).id
+        return id
+
+    rfq_id = fields.Many2one("droga.purhcase.request.rfq")
+    product_id = fields.Many2one("product.product", domain=[
+        ('landed_cost_ok', '=', True)])
+    currency = fields.Many2one("res.currency", default=_default_currency, required=True)
+    amount = fields.Float("Amount", required=True)
+    exchange_rate = fields.Float("Exchange Rate", default=1, required=True)
+    amount_total_etb = fields.Float("Amount ETB", compute="_compute_amount_etb")
+
+    @api.depends('amount', 'exchange_rate', 'currency')
+    def _compute_amount_etb(self):
+        for record in self:
+            record.amount_total_etb = record.amount * record.exchange_rate
+
+
 class rfq_landed_cost(models.Model):
     _name = 'droga.purchase.request.rfq.landed.cost'
 
@@ -830,7 +894,6 @@ class rfq_landed_cost(models.Model):
 
     def _default_currency(self):
         id = self.env['res.currency'].search([('name', '=', 'ETB')], limit=1).id
-
         return id
 
     rfq_id_line = fields.Many2one("droga.purhcase.request.rfq.line")

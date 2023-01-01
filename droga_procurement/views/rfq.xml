@@ -303,6 +303,7 @@
                             <field name="rfq_lines" mode="tree"
                                    attrs="{'readonly': [('state', 'not in', ('Draft','Winner Picked'))]}">
                                 <tree editable="bottom">
+                                    <field name="product_uom_category_id" invisible="1"/>
                                     <field name="supplier_id" readonly="1" invisible="1"/>
                                     <field name="product_id" width="20" options="{'no_create':True,'no_open':True}"
                                            context="{'company_id': parent.company_id}"/>
@@ -319,7 +320,7 @@
 
                                     <field name="price_tax" invisible="1"/>
                                     <field name="tax_id" widget="many2many_tags" invisible="1"/>
-                                    <field name="product_uom_category_id" invisible="1"/>
+
                                 </tree>
 
                             </field>
@@ -336,24 +337,60 @@
 
                         </page>
                         <page name="name" string="Standard Cost">
-                            <field name="rfq_lines_expected_cost" mode="tree"
-                                   attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
-                                <tree create="0" delete="0" editable="bottom">
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}"
-                                           context="{'company_id': parent.company_id}" readonly="1"/>
-                                    <!--<field name="tax_amount" width="15" invisible="1"/>-->
-                                    <!--<field name="demurrage_cost" width="15" invisible="1"/>-->
-                                    <field name="estimated_arriving_cost" width="15"/>
-                                    <field name="expected_selling_price" width="15"/>
-                                    <field name="port_of_loading" width="15"/>
-                                    <field name="less_container" width="15"/>
-                                    <field name="estimated_arrival_date" width="15"/>
-                                    <field name="unassembled_form" width="15"/>
-                                    <button id="landed_cost" name="landed_cost" string="Landed Cost" type="object"/>
-                                </tree>
-                            </field>
+
+                            <notebook>
+
+                                <page string="Estimated Standard Cost">
+                                    <field name="rfq_lines_expected_cost" mode="tree"
+                                           attrs="{'readonly': [('state', 'not in', ('Draft'))]}">
+                                        <tree create="0" delete="0" editable="bottom">
+                                            <field name="product_id" options="{'no_create':True,'no_open':True}"
+                                                   context="{'company_id': parent.company_id}" readonly="1"/>
+                                            <field name="product_uom_category_id" invisible="1"/>
+                                            <field name="product_uom" width="10"
+                                                   options="{'no_create':True,'no_open':True}"
+                                                   string="UoM"/>
+                                            <field name="product_qty" width="10" string="Qty"/>
+                                            <field name="unit_price_foregin" width="10"/>
+                                            <field name="total_price_foregin" width="10" sum="Total"/>
+                                            <field name="unit_price" string="Unit Price ETB" width="10" readonly="1"/>
+
+                                            <field name="total_price" width="20" sum="Total" string="Total Price ETB"/>
+                                            <field name="total_cost" readonly="1"/>
+                                            <field name="unit_cost" readonly="1"/>
+
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page string="Costs ">
+                                    <group>
+                                        <group>
+                                            <field name="inventory_amount_usd"/>
+                                            <field name="inventory_amount_etb"/>
+                                            <field name="landed_cost_total"/>
+                                            <field name="total_cost"/>
+                                            <field name="coefficient"/>
+
+                                        </group>
+                                        <group>
+                                            <field name="landed_costs" mode="tree">
+                                                <tree editable="bottom">
+                                                    <field name="product_id" string="Cost Type"
+                                                           options="{'no_create':True,'no_open':True}"/>
+                                                    <field name="currency" invisible="1"/>
+                                                    <field name="amount" sum="total"/>
+                                                    <field name="exchange_rate" invisible="1"/>
+                                                    <field name="amount_total_etb" invisible="1"/>
+                                                </tree>
+                                            </field>
+                                        </group>
+
+                                    </group>
+                                </page>
+                            </notebook>
+
                         </page>
-                        <page string="Status Tracking">
+                        <page string="Status Tracking" invisible="1">
                             <field name="rfq_status" mode="tree">
                                 <tree create="0" delete="0" editable="bottom">
                                     <field name="order" width="5"/>
@@ -445,7 +482,8 @@
                         <page string="Landed Cost">
                             <field name="landed_costs" mode="tree">
                                 <tree editable="bottom">
-                                    <field name="product_id" options="{'no_create':True,'no_open':True}" width="30" string="Cost Type"/>
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}" width="30"
+                                           string="Cost Type"/>
                                     <field name="currency" options="{'no_create':True,'no_open':True}" width="10"/>
                                     <field name="amount" width="20"/>
                                     <field name="exchange_rate" width="20"/>

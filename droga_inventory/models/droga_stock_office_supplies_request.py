@@ -38,7 +38,18 @@ class droga_stock_office_supplies(models.Model):
         # get office supplies tore
         return self.env['stock.warehouse'].search([('code', '=', 'OF')], limit=1).id
 
+    def identify_requester(self):
+        context = self._context
+
+        if context.get('uid') == self.create_uid.id:
+            self.requester = True
+        else:
+            self.requester = False
+
     name = fields.Char('Name', default='New')
+
+    # for approvers
+    requester = fields.Boolean('Requester', default=False, compute='identify_requester')
 
     requested_by = fields.Many2one(
         "hr.employee", string="Requested By", required=True, default=_get_employee_id)
@@ -113,6 +124,14 @@ class droga_stock_office_supplies(models.Model):
     # submit action
     def action_submit(self):
         self.state = "submit"
+
+        self.set_activity_done()
+        self._get_manager_id()
+        if not self.department_manager:
+            raise ValidationError(
+                "A manager is not set for the requester, please contact HR to set manager for your employee record")
+        # create activity for the approver
+        self.create_activity(self.department_manager_user_id.id)
 
     # verify request
     def action_verify(self):
@@ -330,6 +349,38 @@ class droga_stock_office_supplies(models.Model):
                         'sticky': False
                     }
                 }
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        if activity:
+            activity.sudo().action_done()
+
+    def create_activity(self, user_id):
+        # create mail activity for the approval
+        todos = dict(res_id=self.id,
+                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.inventory.office.supplies.request')]).id,
+                     user_id=user_id, summary='Grant Approval', note='You have a request to approve',
+                     activity_type_id=4,
+                     date_deadline=datetime.now())
+
+        self.env['mail.activity'].sudo().create(todos)
+
+    def create_reject_activity(self):
+        # create mail activity for the approval
+
+        todos = dict(res_id=self.id,
+                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.purhcase.request')]).id,
+                     user_id=self.create_uid.id, summary='Request Rejected', note=self.reject_message,
+                     activity_type_id=4,
+                     date_deadline=datetime.now())
+
+        self.env['mail.activity'].sudo().create(todos)
+
+    @api.depends("department")
+    def _get_manager_id(self):
+        for record in self:
+            record.department_manager = record.requested_by.parent_id
 
 
 class droga_stock_transfer_office_supplies_request_detail(models.Model):

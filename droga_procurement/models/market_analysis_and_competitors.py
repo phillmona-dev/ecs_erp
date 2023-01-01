@@ -69,7 +69,7 @@ class purchase_request_market_analysis(models.Model):
     purhcase_request_id = fields.Many2one(
         related='pr_line.purhcase_request_id', store=True)
     importer_name = fields.Char('Name of importer')
-    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]",string="Manufacturer")
+    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]", string="Manufacturer")
     unit = fields.Many2one('uom.uom')
     avail_stock = fields.Float('Available stock')
     sell_up = fields.Float('Selling unit price')
@@ -98,7 +98,7 @@ class purhcase_order_foreign_competitors_comparative(models.Model):
         related='po_line.purhcase_request_id', store=True)
     # Make from settings page if not highly variant
     importer = fields.Char('Importer')
-    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]",string="Manufacturer")
+    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]", string="Manufacturer")
     unit = fields.Many2one('uom.uom')
     p_up = fields.Float('Private unit price')
     p_qty = fields.Float('Private quantity')
@@ -133,7 +133,7 @@ class purchase_request_analysis_line(models.Model):
 
     # market analysis
     importer_name = fields.Char(string="Importer")
-    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]",string="Manufacturer")
+    manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]", string="Manufacturer")
     unit = fields.Many2one('uom.uom', string='UoM')
     avail_stock = fields.Float('Available Stock')
     sell_up = fields.Float('Selling Unit Price')
@@ -142,14 +142,14 @@ class purchase_request_analysis_line(models.Model):
     market_analysis_remark = fields.Char('Remark')
 
     # foregin supplier list
-    foregin_manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]",string="Manufacturer")
+    foregin_manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]", string="Manufacturer")
     foregin_unit_price = fields.Float('Unit Price')
     foregin_shelf_life = fields.Float('Shelf Life')
     foregin_is_sup_regsitered = fields.Boolean('Registered?', default=True)
 
     # competitors
     comp_importer = fields.Char('Importer')
-    comp_manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]",string="Manufacturer")
+    comp_manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]", string="Manufacturer")
     comp_unit = fields.Many2one('uom.uom', string="UoM")
     comp_p_up = fields.Float('Private Unit Price')
     comp_p_qty = fields.Float('Private Quantity')
