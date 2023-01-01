@@ -32,10 +32,24 @@ class sale_order_line(models.Model):
         inverse='_inverse_price',
         digits='Product Price',
         store=True, required=True)
+    is_prod_available=fields.Boolean(compute='_is_prod_available')
+    available_qty=fields.Float('Available',compute='_is_prod_available')
     price_unit_before_discount=fields.Float('')
     wareh=fields.Many2one('stock.warehouse')
     store_placement = fields.Boolean('Placement',default=False)
     std_unit_price=fields.Float(readonly=True,string='UP Default')
+
+    @api.depends('product_id')
+    def _is_prod_available(self):
+        for rec in self:
+            quants=self.env['stock.quant'].search([('product_tmpl_id','=',rec.product_template_id.id),('location_id.con_type','!=','DIL'),('location_id.usage','=','internal')])
+            rec.available_qty=0
+            for quant in quants:
+                rec.available_qty+=quant.available_quantity
+            if not rec.product_id.bought_locally and rec.available_qty<rec.product_id.emergency_order_point:
+                rec.is_prod_available=False
+            else:
+                rec.is_prod_available = True
 
     def _inverse_price(self):
         pass
@@ -219,26 +233,16 @@ class sale_order_ext(models.Model):
         self.ensure_one()
         if self.manual_price:
             self.state='price_request'
-            #Create activity for users under that role
         else:
             self.state='req'
-            if self.order_type=="IM":
-                # Create activity for users under import
-                pass
-            else:
-                # Create activity for users under wholesale
-                pass
+
+        #self.set_activity_done()
+
 
     def price_approval(self):
         self.ensure_one()
         self.state = 'req'
-        if self.order_type == "IM":
-            # Create activity for users under import
-            pass
-        else:
-            # Create activity for users under wholesale
-            pass
-
+        #self.set_activity_done()
 
     def operation_confirm(self):
         self.action_confirm()
@@ -263,6 +267,11 @@ class sale_order_ext(models.Model):
         else:
             return [('id','in',[])]
 
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        if activity:
+            activity.sudo().action_done()
 
     payment_term_id = fields.Many2one(
         comodel_name='account.payment.term',

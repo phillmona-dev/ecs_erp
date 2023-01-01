@@ -98,6 +98,8 @@ class droga_location_extension(models.Model):
         ('CONR', 'Consignment vendor location'),
         ('SIF', 'Free sample'),
         ('SIR', 'Sample to be returned'),
+        ('DIL', 'Dispatch location'),
+        ('ATL', 'Asset transit location'),
         ('SAP','Sales placement location'),
         ('SRL', 'Inter-store receive transit location'),
         ], string='Cons/sample Type')
@@ -120,8 +122,13 @@ class droga_location_extension(models.Model):
             if len(compiled_wh_domain) == 0:
                 return [('id', 'in', [])]
             else:
+
                 has_access = self.env['stock.location'].sudo().search(
-                    [('wcode', 'in', compiled_wh_domain)])
+                    [('wcode', 'in', compiled_wh_domain) ,('con_type','!=','DIL')])
+                if self.env.user.has_group('droga_inventory.inventory_dmw') or self.env.user.has_group(
+                        'droga_inventory.inventory_dmi'):
+                    has_access+= self.env['stock.location'].sudo().search(
+                        [('wcode', 'in', compiled_wh_domain), ('con_type', '=', 'DIL')])
                 return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id', 'in', [])]
@@ -137,7 +144,7 @@ class droga_location_extension(models.Model):
                         rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
 
         for rec in self:
-            if rec.wcode in compiled_wh_domain:
+            if rec.wcode in compiled_wh_domain and ((self.env.user.has_group('droga_inventory.inventory_dmi') or self.env.user.has_group('droga_inventory.inventory_dmw')) or rec.con_type!='DIL'):
                 rec.has_access = True
             else:
                 rec.has_access = False
@@ -289,6 +296,8 @@ class droga_stock_picking_extension(models.Model):
     state = fields.Selection(selection_add=[('processed', 'Processed')])
     delivery_order_show=fields.Boolean(default=True)
     warehouse_list=fields.Many2many('stock.warehouse')
+    from_wh = fields.Char('From location',compute='_get_loc_descr')
+    to_wh = fields.Char('To location',compute='_get_loc_descr')
     has_access = fields.Boolean('is_pick_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     location_id_type=fields.Selection([
@@ -308,6 +317,10 @@ class droga_stock_picking_extension(models.Model):
         ('SRL', 'Inter-store receive transit location'),
         ], string='Cons/sample Type',related='location_dest_id.con_type')
 
+    def _get_loc_descr(self):
+        for rec in self:
+            rec.from_wh=rec.location_id.warehouse_id.name if rec.location_id.warehouse_id else rec.location_id.name
+            rec.to_wh = rec.location_dest_id.warehouse_id.name if rec.location_dest_id.warehouse_id else rec.location_dest_id.name
 
     def _search_has_access(self, operator, value):
 
@@ -396,6 +409,7 @@ class droga_stock_product_extension(models.Model):
         ('IM', 'Import'),
         ('WS', 'Wholesale'),
         ('BT', 'Both'),], string='Product used under')
+    bought_locally=fields.Boolean('Bought Locally',default=False)
     list_price = fields.Float(
         'Sales Price', default=1.0,
         digits='Product Price',tracking=True,
@@ -419,8 +433,16 @@ class droga_stock_product_extension(models.Model):
     default_code = fields.Char('Internal Reference',compute='_compute_default_code',
         inverse='_compute_default_code',
          store=True,required=True)
+    prod_read_only=fields.Boolean(compute='is_prod_readonly')
     def _compute_default_code(self):
         pass
+
+    def  is_prod_readonly(self):
+        for rec in self:
+            if len(self.env['product.template'].search([('default_code', '=', rec.default_code)])) > 0:
+                rec.prod_read_only=True
+            else:
+                rec.prod_read_only = False
 
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True,required=True)
@@ -472,14 +494,18 @@ class droga_stock_product_extension(models.Model):
             else:
                 rec.has_access = False
 
-
     def write(self, vals_list):
+
         if not self.env.user.has_group('droga_inventory.inv_prod_manager'):
             raise UserError("You can not update a product. Please contact your supervisor.")
         return super(droga_stock_product_extension, self).write(vals_list)
 
     @api.model
     def create(self, vals_list):
+
+        if len(self.env['product.template'].search([('default_code','=',vals_list['default_code'])])) > 0:
+            raise UserError("Default code must be unique.")
+
         if not self.env.user.has_group('droga_inventory.inv_prod_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
         return super(droga_stock_product_extension, self).create(vals_list)

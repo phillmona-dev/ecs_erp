@@ -42,8 +42,12 @@
     <menuitem id="stock.menu_action_inventory_tree"
               name="Inventory Adjustments"
               parent="stock.menu_stock_warehouse_mgmt"
-              groups="stock.group_stock_manager"
+              groups="droga_inventory.fin_inv_admin"
               sequence="10" action="stock.action_view_inventory_tree" />
+
+    <!--- Transfers menu avail for no one -->
+    <menuitem id="stock.all_picking" name="Transfers" parent="stock.menu_stock_warehouse_mgmt" sequence="20"
+              action="stock.action_picking_tree_all" groups="droga_inventory.inv_prod_noone"/>
 
     <!--- Inventory adjustment for administrators only -->
     <menuitem id="stock.menu_stock_inventory_control" name="Products" parent="stock.menu_stock_root" sequence="5" groups="stock.group_stock_manager"/>

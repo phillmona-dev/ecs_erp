@@ -28,7 +28,7 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/header/button[@name='action_cancel']" position="after">
-                <button name="action_purchase_request" attrs="{'invisible': [('state', '=','draft')]}" string="Purchas request" groups="base.group_user" type="object"/>
+                <button name="action_purchase_request" attrs="{'invisible': [('state', '=','draft')]}" string="Purchase request" groups="base.group_user" type="object"/>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='origin']" position="replace">
@@ -37,17 +37,18 @@
                 <field name="office_request" readonly="1" attrs="{'invisible': [('office_request', '=', False)]}"></field>
                 <field name="cons_sample_issue_request" readonly="1" attrs="{'invisible': [('cons_sample_issue_request', '=', False)]}"></field>
                 <field name="cons_receive_request" readonly="1" attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
-                <field name="products_availability_state"/>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='location_id'][2]" position="replace">
                 <field name="location_id_type" invisible="1"></field>
-                <field name="location_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'incoming')],'readonly':[('location_id_type','=','SRL')]}"/>
+                <field name="location_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible':True,'readonly':True}"/>
+                <field name="from_wh" readonly="1"></field>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='location_dest_id'][2]" position="replace">
                 <field name="location_dest_id_type" invisible="1"></field>
-                <field name="location_dest_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')],'readonly':[('location_dest_id_type','=','SRL')]}"/>
+                <field name="location_dest_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" groups="stock.group_stock_multi_locations" attrs="{'invisible': True,'readonly':True}"/>
+                <field name="to_wh" readonly="1"></field>
             </xpath>
 
         </field>
@@ -60,6 +61,20 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='purpose']" position="after">
                 <field string='Store origin' name="store_origin_form" attrs="{'invisible': [('store_origin_form', '=', False)]}"></field>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_operations_inherit_location_domain" model="ir.ui.view">
+        <field name="name">stock.move.line.operations.inherit</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_operation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='location_id'][2]" position="replace">
+                <field string='From' name="location_id" options="{'no_create': True}" attrs="{'readonly': ['&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}" domain="[('has_access','=',True),'|',('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]" invisible="not context.get('show_source_location')" />
+            </xpath>
+            <xpath expr="//tree/field[@name='location_dest_id'][2]" position="replace">
+                <field name="location_dest_id" attrs="{'readonly': ['&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}" invisible="not context.get('show_destination_location')" domain="[('has_access','=',True), '|',('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
             </xpath>
         </field>
     </record>
