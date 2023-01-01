@@ -77,10 +77,11 @@
                             <field name="requester" invisible="1"/>
                         </group>
                         <group>
-                            <field name="approve_dept_manger"  attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="approve_dept_manger"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="company_id" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}" invisible="1"/>
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}" invisible="0"/>
                             <field name="currency_id" options="{'no_create':True,'no_open':True}"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                         </group>
@@ -97,6 +98,10 @@
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
                             <field name="total_amount_etb" readonly="1"/>
                             <field name="amount_in_word" readonly="1"/>
+                        </group>
+                        <group string="Budget Category">
+                            <field name="budgetary_position" options="{'no_create':True,'no_open':True}"/>
+                            <field name="budget_account" options="{'no_create':True,'no_open':True}"/>
                         </group>
                     </group>
                 </sheet>
@@ -239,6 +244,15 @@
                 Payment Request Without Purchase Order
             </p>
         </field>
+    </record>
+
+
+    <!-- rule for filtering data specific data -->
+    <record model="ir.rule" id="droga_payment_request_rule">
+        <field name="name">Payment Request multi-company</field>
+        <field name="model_id" ref="model_droga_account_payment_request"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
 </odoo>

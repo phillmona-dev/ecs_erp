@@ -424,7 +424,7 @@
                                     <field name="unit_price_foregin" width="10" invisible="1"/>
                                     <field name="total_price_foregin" width="10" invisible="1"/>
                                     <field name="unit_price" width="10" string="Unit Price" readonly="0"/>
-                                    <field name="total_price" width="10" string="Total Price"/>
+                                    <field name="total_price" width="10" string="Total Price" sum="total"/>
                                     <field name="product_uom_category_id" invisible="1"/>
 
 

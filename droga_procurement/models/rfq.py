@@ -97,7 +97,7 @@ class Rfq(models.Model):
     inventory_amount_etb = fields.Float("Inventory Amount ETB", compute='_compute_standard_cost', store=True,
                                         digits=(12, 4))
     total_cost = fields.Float("Total Cost", compute='_compute_standard_cost', store=True, digits=(12, 4))
-    coefficient = fields.Float("Coefficient", compute='_compute_standard_cost', store=True, digits=(12, 10))
+    coefficient = fields.Float("Coefficient", compute='_compute_standard_cost', store=True, digits=(12, 10), default=1)
     landed_cost_total = fields.Float("Total Landed Cost", compute='_compute_standard_cost', store=True, digits=(12, 4))
 
     @api.depends('rfq_lines.product_qty', 'rfq_lines.unit_price', 'rfq_lines.unit_price_foregin', 'landed_costs.amount')
@@ -105,7 +105,7 @@ class Rfq(models.Model):
         inventory_amount_usd = 0
         inventory_amount_etb = 0
         total_cost = 0
-        coefficient = 0
+        coefficient = 1
         landed_cost_total = 0
 
         for record in self.rfq_lines:

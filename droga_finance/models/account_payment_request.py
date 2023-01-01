@@ -82,20 +82,32 @@ class PaymentRequest(models.Model):
         related="department_manager.user_id", store=True)
 
     # if the request is approved by department manager check this option
-    approve_dept_manger = fields.Boolean("By Department Manager", default=False)
+    approve_dept_manger = fields.Boolean("By Department", default=False,
+                                         help="The request will be approved by the department manager")
 
     current_approver = fields.Many2one('hr.employee')
+    budgetary_position = fields.Many2one("account.budget.post")
+    budget_account = fields.Many2one("account.account")
 
     reject_message = fields.Char('Reason')
 
     @api.model
     def create(self, vals):
+
+        self.input_validation(vals)
+
         # get sequence number for each company
         self_comp = self.with_company(self.company_id)
         vals['name'] = self_comp.env['ir.sequence'].next_by_code(
             'droga.account.payment.request') or '/'
         res = super(PaymentRequest, self_comp).create(vals)
 
+        return res
+
+    def write(self, vals):
+
+        self.input_validation(vals)
+        res = super(PaymentRequest, self).write(vals)
         return res
 
     # compute total ETB amount
@@ -135,6 +147,7 @@ class PaymentRequest(models.Model):
         return True
 
     def budget_approve_request(self):
+        self.input_validation('validation')
         self.write({'state': 'Budget Approved'})
         self.set_activity_done()
         # create new activity
@@ -216,3 +229,12 @@ class PaymentRequest(models.Model):
             'target': 'new',
             'res_id': self.id
         }
+
+    def input_validation(self, vals):
+        if 'total_amount' in vals:
+            if vals['total_amount'] <= 0:
+                raise ValidationError("Amount can't be zero or less than zero")
+
+        if self.state == 'Approved':
+            if not self.budgetary_position or not self.budget_account:
+                raise ValidationError("Budget category and account must be filled")
