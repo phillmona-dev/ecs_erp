@@ -39,17 +39,7 @@
                 <field name="cons_receive_request" readonly="1" attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
             </xpath>
 
-            <xpath expr="//form/sheet/group/group/field[@name='location_id'][2]" position="replace">
-                <field name="location_id_type" invisible="1"></field>
-                <field name="location_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" options="{'no_create': True}" groups="stock.group_stock_multi_locations" attrs="{'invisible':True,'readonly':True}"/>
-                <field name="from_wh" readonly="1"></field>
-            </xpath>
-
-            <xpath expr="//form/sheet/group/group/field[@name='location_dest_id'][2]" position="replace">
-                <field name="location_dest_id_type" invisible="1"></field>
-                <field name="location_dest_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" groups="stock.group_stock_multi_locations" attrs="{'invisible': True,'readonly':True}"/>
-                <field name="to_wh" readonly="1"></field>
-            </xpath>
+            
 
         </field>
     </record>

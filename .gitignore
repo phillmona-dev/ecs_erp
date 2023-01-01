@@ -52,3 +52,4 @@ Thumbs.db
 *.py[co]
 __pycache__/
 *.pyc
+*.pyc
