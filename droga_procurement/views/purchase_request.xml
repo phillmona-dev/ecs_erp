@@ -494,7 +494,7 @@
                         </page>
 
                         <page string="Future Market Status"
-                              groups="droga_procurement.group_purchase_procurement_manager_group,droga_procurement.group_purchase_procurement_officer_group,droga_self_service.ceo_group">
+                              groups="droga_procurement.group_purchase_procurement_manager_group,droga_procurement.group_purchase_procurement_officer_group,droga_self_service.ceo_group,droga_procurement.group_purchase_import_operation_group">
                             <field name="purhcase_request_lines_foregin_competitors" mode="tree"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
                                 <tree create="0" delete="0" editable="bottom">
