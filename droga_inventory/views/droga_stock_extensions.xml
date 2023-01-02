@@ -50,7 +50,6 @@
                 <field name="location_dest_id" domain="[('usage','=','internal'),('con_type','!=','SRL'),('has_access', '=', True)]" groups="stock.group_stock_multi_locations" attrs="{'invisible': True,'readonly':True}"/>
                 <field name="to_wh" readonly="1"></field>
             </xpath>
-
         </field>
     </record>
 

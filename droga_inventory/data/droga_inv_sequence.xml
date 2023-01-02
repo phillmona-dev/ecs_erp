@@ -61,6 +61,16 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <record id="seq_transfer_request_wsos" model="ir.sequence">
+            <field name="name">Transfer request WSOS store</field>
+            <field name="code">droga.inventory.transfer.custom.sequence.wsos</field>
+            <field name="prefix">MTIV/WSOS/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
         <record id="seq_transfer_request_of" model="ir.sequence">
             <field name="name">Transfer request OF store</field>
             <field name="code">droga.inventory.transfer.custom.sequence.of</field>
@@ -138,6 +148,16 @@
             <field name="name">Transfer issue WS store</field>
             <field name="code">droga.inventory.transfer.issue.sequence.ws</field>
             <field name="prefix">MTOV/WS/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_transfer_issue_wsos" model="ir.sequence">
+            <field name="name">Transfer issue WSOS store</field>
+            <field name="code">droga.inventory.transfer.issue.sequence.wsos</field>
+            <field name="prefix">MTOV/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="number_increment">1</field>
             <field name="padding">5</field>

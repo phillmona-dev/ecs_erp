@@ -238,6 +238,9 @@ class sale_order_ext(models.Model):
 
         #self.set_activity_done()
 
+    def reject_order(self):
+        self.ensure_one()
+        self.state = 'draft'
 
     def price_approval(self):
         self.ensure_one()

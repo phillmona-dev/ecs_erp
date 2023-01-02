@@ -76,6 +76,11 @@
                         type="action" class="btn-primary" data-hotkey="q" groups="droga_sales.sales_import_invoicer,droga_sales.sales_wholesale_invoicer"
                         attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
             </xpath>
+
+            <xpath expr="//form/header/button[@name='action_cancel']" position="replace">
+                <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible': ['|', ('state', 'not in', ['draft', 'sent','sale']), ('id', '=', False)]}" groups="droga_sales.sales_price_change_admin" data-hotkey="z"/>
+            </xpath>
+
             <xpath expr="//form/header/button[@name='payment_action_capture']" position="after">
                 <button name="save_request_button" type="object" class="btn-primary"
                         attrs="{'invisible': [('state', 'not in', ['draft'])]}"
@@ -86,6 +91,9 @@
                 <button name="operation_confirm" type="object" class="btn-primary"
                         attrs="{'invisible': [('state', 'not in', ['req'])]}" groups="droga_sales.sales_import_approve_admin,droga_sales.sales_wholesale_approve_admin"
                         string="Confirm"/>
+                <button name="reject_order" type="object" class="oe_highlight btn-warning"
+                        attrs="{'invisible': [('state', 'not in', ['price_request','req'])]}" groups="droga_sales.sales_price_change_admin"
+                        string="Reject"/>
             </xpath>
             <xpath expr="//form/header/button[@name='action_quotation_send']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -122,6 +130,10 @@
 
             <xpath expr="//form/sheet/notebook/page/field/form/group/group[2]" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form/header" position="attributes">
+                <attribute name="readonly">1</attribute>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="after">
