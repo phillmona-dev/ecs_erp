@@ -111,6 +111,27 @@
                 <field name="available_amount" attrs="{'invisible': [('pay_type', '=', False)]}" string="Credit balance"
                        options="{'no_create': True}"/>
             </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/form/div[@name='invoice_lines']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/form/div[@name='invoice_lines']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/form/group/group[2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="after">
+                <field name="store_placement"></field>
+                <field name="wareh" string="Warehouse"></field>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+            </xpath>
         </field>
     </record>
 
