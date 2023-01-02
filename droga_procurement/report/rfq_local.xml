@@ -248,7 +248,7 @@
 
                             <div class="col-3 bm-2">
                                 <strong>Chceked By:</strong>
-                                <p t-field="o.create_uid.name" class="m-0"/>
+                                <!--<p t-field="o.create_uid.name" class="m-0"/>-->
                             </div>
 
                         </div>
@@ -304,12 +304,12 @@
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-3 bm-2">
                                 <strong>Approved By:</strong>
-                                <p t-field="o.create_uid.name" class="m-0"/>
+                                <!--<p t-field="o.create_uid.name" class="m-0"/>-->
                             </div>
 
                             <div class="col-3 bm-2">
                                 <strong>Authorized By:</strong>
-                                <p t-field="o.create_uid.name" class="m-0"/>
+                                <!--<p t-field="o.create_uid.name" class="m-0"/>-->
                             </div>
 
                         </div>

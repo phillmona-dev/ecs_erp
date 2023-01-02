@@ -40,7 +40,7 @@ class Rfq_Local(models.Model):
     procurement_committee = fields.Many2many("hr.employee", default=_default_user_team_committee)
     state = fields.Selection(
         [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"),
-         ("Committee Approval", "Committee Approved"), ("Operation Manager", "Operation Manager"),
+         ("Committee Approval", "Committee Approved"),
          ("CEO Approval", "CEO"), ("Cancel", "Canceled")], default="Draft", tracking=True)
 
     # total winner amount
