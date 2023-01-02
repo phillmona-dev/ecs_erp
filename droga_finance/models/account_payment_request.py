@@ -235,6 +235,6 @@ class PaymentRequest(models.Model):
             if vals['total_amount'] <= 0:
                 raise ValidationError("Amount can't be zero or less than zero")
 
-        if self.state == 'Approved':
-            if not self.budgetary_position or not self.budget_account:
-                raise ValidationError("Budget category and account must be filled")
+        # if self.state == 'Approved':
+        # not self.budgetary_position or not self.budget_account:
+        # raise ValidationError("Budget category and account must be filled")
