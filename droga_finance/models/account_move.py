@@ -4,12 +4,10 @@ from datetime import datetime
 
 
 class AccountMove(models.Model):
-
     _inherit = "account.move"
 
     purpose = fields.Char("Purpose")
-
-
+    vendor_customer_name = fields.Char("Customer/Vendor Name")
 
     @api.depends("amount_total")
     def _compute_amount_word(self):
@@ -113,5 +111,5 @@ class AccountMove(models.Model):
                         raise ValidationError(
                             "Sequence is not defined for the transaction type")
         # else:
-            #raise ValidationError("Transaction type is not selected")
+        # raise ValidationError("Transaction type is not selected")
         return super(AccountMove, self).write(vals)
