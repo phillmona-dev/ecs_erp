@@ -237,6 +237,16 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <record id="seq_goods_return_wsos" model="ir.sequence">
+            <field name="name">Goods return WSOS store</field>
+            <field name="code">droga.inventory.goods.return.sequence.wsos</field>
+            <field name="prefix">WGR/WSOS/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
          <record id="seq_goods_return_of" model="ir.sequence">
             <field name="name">Goods return OF store</field>
             <field name="code">droga.inventory.goods.return.sequence.of</field>
@@ -305,6 +315,16 @@
             <field name="name">Stock adjustement WS store</field>
             <field name="code">droga.inventory.stock.adjustement.sequence.ws</field>
             <field name="prefix">ADJ/WS/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_stock_adjustement_wsos" model="ir.sequence">
+            <field name="name">Stock adjustement WSOS store</field>
+            <field name="code">droga.inventory.stock.adjustement.sequence.wsos</field>
+            <field name="prefix">ADJ/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="number_increment">1</field>
             <field name="padding">5</field>
@@ -385,6 +405,16 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <record id="seq_local_purchase_wsos" model="ir.sequence">
+            <field name="name">Local purchase WSOS store</field>
+            <field name="code">droga.inventory.local.purchase.sequence.wsos</field>
+            <field name="prefix">GRN/WSOS/LP/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
          <record id="seq_local_purchase_of" model="ir.sequence">
             <field name="name">Local purchase OF store</field>
             <field name="code">droga.inventory.local.purchase.sequence.of</field>
@@ -457,6 +487,16 @@
             <field name="name">Foreign purchase WS store</field>
             <field name="code">droga.inventory.foreign.purchase.sequence.ws</field>
             <field name="prefix">GRN/WS/FP/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_foreign_purchase_wsos" model="ir.sequence">
+            <field name="name">Foreign purchase WSOS store</field>
+            <field name="code">droga.inventory.foreign.purchase.sequence.wsos</field>
+            <field name="prefix">GRN/WSOS/FP/%(y)s/</field>
             <field name="suffix"></field>
             <field name="number_increment">1</field>
             <field name="padding">5</field>
@@ -560,6 +600,16 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <record id="seq_consignment_receipt_wsos" model="ir.sequence">
+            <field name="name">Consignment receipt WSOS store</field>
+            <field name="code">droga.inventory.consignment.receipt.sequence.wsos</field>
+            <field name="prefix">COR/WSOS/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
          <record id="seq_consignment_receipt_of" model="ir.sequence">
             <field name="name">Consignment receipt OF store</field>
             <field name="code">droga.inventory.consignment.receipt.sequence.of</field>
@@ -632,6 +682,16 @@
             <field name="name">Consignment issue WS store</field>
             <field name="code">droga.inventory.consignment.issue.sequence.ws</field>
             <field name="prefix">COI/WS/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_consignment_issue_wsos" model="ir.sequence">
+            <field name="name">Consignment issue WSOS store</field>
+            <field name="code">droga.inventory.consignment.issue.sequence.wsos</field>
+            <field name="prefix">COI/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="number_increment">1</field>
             <field name="padding">5</field>
