@@ -60,25 +60,6 @@ class cust_sales_credit_limit(models.Model):
         return result
 
 
-    def action_confirm(self):
-        order_lines_core = self.order_line.filtered(
-            lambda x: not x.wareh)
-        if (len(order_lines_core) > 0):
-            raise ValidationError("Warehouse must be filled for each order line.")
-
-        result = super(cust_sales_credit_limit, self).action_confirm()
-
-        for so in self:
-            if not so.partner_id.vat:
-                raise ValidationError("Tin No must be registered for customer!")
-            if so.partner_id.available_amount+so.cash_upfront <so.amount_total and so.payment_term_id.apply_credit_limit:
-                raise ValidationError("You cannot exceed credit limit!")
-            if not so.pr_sales and self.env.user.name.startswith('CRM'):
-                raise ValidationError("Please login before registering a sales order!")
-            if so.mature_amount>0:
-                raise ValidationError("Please settle matured amounts before initiating another sales!")
-        return result
-
 class inventory_placement_extension(models.Model):
     _inherit = 'droga.inventory.consignment.issue'
     sales_placement_origin_form=fields.Many2one('sale.order',readonly=True)

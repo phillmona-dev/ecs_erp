@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from odoo import models,fields,api
+from odoo.exceptions import ValidationError
 from odoo.http import request
 
 
@@ -227,6 +228,28 @@ class sale_order_ext(models.Model):
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
 
     def save_request_button(self):
+        order_lines_nowareh = self.order_line.filtered(
+            lambda x: not x.wareh)
+        if (len(order_lines_nowareh) > 0):
+            raise ValidationError("Warehouse must be filled for each order line.")
+
+        order_lines_negative = self.order_line.filtered(
+            lambda x: not x.is_prod_available)
+        if (len(order_lines_negative) > 0):
+            products=''
+            for lin in order_lines_negative:
+                products+=lin.product_template_id.default_code + ', '
+            raise ValidationError("Product quantity is out of stock for "+products)
+
+        for so in self:
+            if not so.partner_id.vat:
+                raise ValidationError("Tin No must be registered for customer!")
+            if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
+                raise ValidationError("You cannot exceed credit limit!")
+            if not so.pr_sales and self.env.user.name.startswith('CRM'):
+                raise ValidationError("Please login before registering a sales order!")
+            if so.mature_amount > 0:
+                raise ValidationError("Please settle matured amounts before initiating another sales!")
         self.ensure_one()
         if self.manual_price:
             self.state='price_request'
