@@ -35,6 +35,8 @@ class droga_stock_cons_receive(models.Model):
     consignment_reference = fields.Char(string='Order reference', default='', readonly=True)
     cons_ref = fields.One2many('stock.picking', 'cons_receive_request', string='Consignment reference')
 
+    issue_type = fields.Selection([('CONR', 'Consignment recieve'), ('SAR', 'Sample return')],
+                                  string='Issue type', required=True)
     marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
     store_manager = fields.Many2one('res.users', compute='_get_approvers')
 
@@ -79,7 +81,7 @@ class droga_stock_cons_receive(models.Model):
             if not pick_type_id :
                 raise UserError("Picking type is not configured for one of the warehouses.")
 
-        cons_vendor=self.env['stock.location'].search([('con_type', '=', 'CONR')]).id
+        cons_vendor=self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
 
         if not cons_vendor:
             raise UserError("Consignment vendor location not set. Please configure accordingly.")
@@ -87,8 +89,10 @@ class droga_stock_cons_receive(models.Model):
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=','CONR'), ('warehouse_id', '=', wh.id)]).id
-            def_loc_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'CONR'),('con_type', '!=', 'DIL'), ('warehouse_id', '=', wh.id)]).default_location_dest_id.id
+            def_loc_id = self.env['stock.location'].search(
+                [('complete_name', 'like', wh.code + '/%'), ('con_type', '!=', 'DIL'), ('usage', '=', 'internal')])[
+                0].id
+
             picking_vals = {
                 'partner_id': self.supplier.id,
                 'company_id': self.company_id.id,
