@@ -13,6 +13,7 @@ class droga_stock_cons_issue(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
+        ('mtmg', 'Marketing manager'),  # Issue sent to marketing manager for approval
         ('stmg', 'Store manager'),  #Issue sent to store manager for warehouse allocation
         ('waiting', 'Requested'),   #When consignment is waiting for storekeeper to issue at warehouse
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
@@ -37,6 +38,15 @@ class droga_stock_cons_issue(models.Model):
 
     consignment_reference = fields.Text(string='Order reference', default='', readonly=True)
     cons_ref=fields.One2many('stock.picking','cons_sample_issue_request',string='Store reference')
+    marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
+    store_manager = fields.Many2one('res.users', compute='_get_approvers')
+
+    def _get_approvers(self):
+        for rec in self:
+            rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.ids[0] if len(
+                self.env.ref("droga_inventory.marketing_manager").users.ids) > 0 else None
+            rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
@@ -52,31 +62,40 @@ class droga_stock_cons_issue(models.Model):
     def action_cancel(self):
         self.state='cancel'
 
-    def action_receive(self):
-        self.state = 'done'
-    def action_send_to_store_manager(self):
-        self.state = 'stmg'
-    def action_send_to_store(self):
-        warehouse_list=set(self.detail_entries['warehouse_id'])
+    def request(self):
+        self.ensure_one()
+        self.state = 'mtmg'
+
+    def mtmg_approve(self):
+        self.ensure_one()
+        self.state='stmg'
+
+    def amend(self):
+        self.ensure_one()
+        self.state = 'draft'
+
+    def stmg_approve(self):
+        warehouse_list = set(self.detail_entries['warehouse_id'])
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=','CONI'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'CONI'), ('warehouse_id', '=', wh.id)]).id
             cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
-            if not pick_type_id :
+            if not pick_type_id:
                 raise UserError("Picking type is not configured for one of the warehouses.")
             if not cust_locat:
-                raise UserError("Customer location for type "+self.issue_type+" not set. Please configure accordingly.")
-
+                raise UserError(
+                    "Customer location for type " + self.issue_type + " not set. Please configure accordingly.")
 
         for wh in warehouse_list:
-            #Get picking type for issue type per warehouse.
-            #Issue type will be configured per warehouse.
+            # Get picking type for issue type per warehouse.
+            # Issue type will be configured per warehouse.
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=','CONI'), ('warehouse_id', '=', wh.id)]).id
-            #Get default location for the warehouse
+                [('sequence_code', '=', 'CONI'), ('warehouse_id', '=', wh.id)]).id
+            # Get default location for the warehouse
             def_loc_id = self.env['stock.location'].search(
-                [('complete_name', 'like', wh.code + '/%'), ('usage', '=', 'internal')])[0].id
+                [('complete_name', 'like', wh.code + '/%'), ('con_type', '!=', 'DIL'), ('usage', '=', 'internal')])[
+                0].id
 
             picking_vals = {
                 'partner_id': self.customer.id,
@@ -84,9 +103,9 @@ class droga_stock_cons_issue(models.Model):
                 'picking_type_id': pick_type_id,
                 'location_id': def_loc_id,
                 'location_dest_id': cust_locat,
-                #'origin': self.name,
+                # 'origin': self.name,
                 'cons_sample_issue_request': self.id,
-                'state': 'waiting',
+                'state': 'confirmed',
                 'scheduled_date': self.issue_date
             }
             picking_id = self.env['stock.picking'].sudo().create(picking_vals)
@@ -98,7 +117,7 @@ class droga_stock_cons_issue(models.Model):
 
             for rec in self.detail_entries:
 
-                if(rec['warehouse_id']==wh):
+                if (rec['warehouse_id'] == wh):
                     move_vals = {
                         'picking_id': picking_id.id,
                         'picking_type_id': pick_type_id,
@@ -108,18 +127,16 @@ class droga_stock_cons_issue(models.Model):
                         'product_uom_qty': rec['product_uom_qty'],
                         'location_id': def_loc_id,
                         'location_dest_id': cust_locat,
-                        'state': 'waiting',
+                        'state': 'confirmed',
                         'company_id': self.company_id.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)
 
-            #picking_id.sudo().action_confirm()
-            #picking_id.sudo().action_assign()
+            # picking_id.sudo().action_confirm()
+            # picking_id.sudo().action_assign()
 
         self.state = 'waiting'
-
-
 
 
 class droga_stock_cons_issue_detail(models.Model):

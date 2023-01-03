@@ -26,16 +26,19 @@
         <field name="arch" type="xml">
             <form string="Transfers">
                 <header>
-                    <button name="action_request"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','processed')),('id','=',None)]}"
+                    <button name="request"
+                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="action_receive"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','reject','cancel','done','draft')),('id','=',None)]}"
-                            string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="stmg_approve"
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="amend"
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager"
+                            string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done','processed')),('id','=',None)]}"
+                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,processed,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
                     <group>

@@ -33,19 +33,23 @@
         <field name="arch" type="xml">
             <form string="Consignment issue">
                 <header>
-                    <button name="action_send_to_store_manager"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','stmg','reject','cancel','done')),('id','=',None)]}"
-                            string="Send to store manager" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="action_send_to_store"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','draft','reject','cancel','done')),('id','=',None)]}"
-                            string="Send to store" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="request"
+                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
+                            string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="mtmg_approve"
+                            attrs="{'invisible': [('state', 'not in', ('mtmg'))]}" groups="droga_inventory.marketing_manager"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="stmg_approve"
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="amend"
+                            attrs="{'invisible': [('state', 'not in', ('stmg','mtmg'))]}" groups="droga_inventory.stores_manager,droga_inventory.marketing_manager"
+                            string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
-                            attrs="{'invisible': ['|',('state', 'in', ('waiting','cancel','reject','done')),('id','=',None)]}"
+                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="action_receive"
-                            attrs="{'invisible': ['|',('state', '!=', 'processed'),('id','=',None)]}"
-                            string="Receive" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,mtmg,stmg,waiting,done"/>
                 </header>
                 <sheet>
                     <group>

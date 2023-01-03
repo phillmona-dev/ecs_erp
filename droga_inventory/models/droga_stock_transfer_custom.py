@@ -13,6 +13,7 @@ class droga_stock_transfer_custom(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
+        ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
         ('waiting', 'Requested'),   #When request is waiting for approval/response
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
@@ -31,6 +32,12 @@ class droga_stock_transfer_custom(models.Model):
         state={'draft': [('readonly', False)]})
 
     location_filter = fields.Char(compute='_filter_location_access',readonly=True,store=False)
+    store_manager = fields.Many2one('res.users', compute='_get_approvers')
+
+    def _get_approvers(self):
+        for rec in self:
+            rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
     @api.depends('request_date')
     def _filter_location_access(self):
@@ -85,7 +92,15 @@ class droga_stock_transfer_custom(models.Model):
     def action_cancel(self):
         self.state='cancel'
 
-    def action_request(self):
+    def amend(self):
+        self.ensure_one()
+        self.state = 'draft'
+
+    def request(self):
+        self.ensure_one()
+        self.state = 'stmg'
+
+    def stmg_approve(self):
         warehouse_list=self.detail_entries['warehouse_id']
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
@@ -96,7 +111,7 @@ class droga_stock_transfer_custom(models.Model):
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
-            def_location_id=self.env['stock.location'].search([('usage','=','internal'),('wcode','=',wh.code)])[0].id
+            def_location_id=self.env['stock.location'].search([('usage','=','internal'),('con_type', '!=', 'DIL'),('wcode','=',wh.code)])[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")
             picking_vals = {
@@ -107,8 +122,8 @@ class droga_stock_transfer_custom(models.Model):
                 'location_dest_id': self.location_dest_id.id,
                 #'auto_generated': True,
                 #'origin': self.name,
-                'state': 'waiting',
-                #'state': 'confirmed',
+                #'state': 'waiting',
+                'state': 'confirmed',
                 'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
             }
@@ -131,8 +146,8 @@ class droga_stock_transfer_custom(models.Model):
                         'product_uom_qty': rec['product_uom_qty'],
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
-                        'state': 'waiting',
-                        #'state': 'confirmed',
+                        #'state': 'waiting',
+                        'state': 'confirmed',
                         'company_id': self.company_id.id
                     }
 

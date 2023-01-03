@@ -13,13 +13,16 @@ class droga_stock_cons_receive(models.Model):
     cons_ref = fields.One2many('stock.picking', 'cons_receive_request',string='Store reference')
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('cancel', 'Cancelled'),    #When requester cancels it from draft
-        ('waiting', 'Requested'),   #When consignment is waiting for receipt at warehouse
-        ('reject', 'Rejected'),     #When request is rejected by reciever store keeper
-        ('done', 'Processed'),      #When request is processed
+        ('cancel', 'Cancelled'),  # When requester cancels it from draft
+        ('mtmg', 'Marketing manager'),  # Issue sent to marketing manager for approval
+        ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
+        ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
+        ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
+        ('processed', 'Processed'),  # When request is processed
+        ('done', 'Received'),  # When request is received
     ], string='Status', default="draft", readonly=True, tracking=True,
-        help=" * Requested: The consignment order is sent to warehouse.\n"
-             " * Done: The consignment is sent to receipt under warehouse.\n")
+        help=" * Requested: The consignment receive order is sent to warehouse.\n"
+             " * Done: The consignment items are received by warehouse.\n")
 
     detail_entries = fields.One2many('droga.inventory.cons.receive.detail', 'cons_header')
 
@@ -31,6 +34,16 @@ class droga_stock_cons_receive(models.Model):
 
     consignment_reference = fields.Char(string='Order reference', default='', readonly=True)
     cons_ref = fields.One2many('stock.picking', 'cons_receive_request', string='Consignment reference')
+
+    marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
+    store_manager = fields.Many2one('res.users', compute='_get_approvers')
+
+    def _get_approvers(self):
+        for rec in self:
+            rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.ids[0] if len(
+                self.env.ref("droga_inventory.marketing_manager").users.ids) > 0 else None
+            rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
@@ -44,9 +57,21 @@ class droga_stock_cons_receive(models.Model):
         return super(droga_stock_cons_receive, self).create(vals_list)
 
     def action_cancel(self):
-        self.state='cancel'
+        self.state = 'cancel'
 
-    def action_send_to_store(self):
+    def request(self):
+        self.ensure_one()
+        self.state = 'mtmg'
+
+    def mtmg_approve(self):
+        self.ensure_one()
+        self.state = 'stmg'
+
+    def amend(self):
+        self.ensure_one()
+        self.state = 'draft'
+
+    def stmg_approve(self):
         warehouse_list=set(self.detail_entries['warehouse_id'])
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
@@ -63,7 +88,7 @@ class droga_stock_cons_receive(models.Model):
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=','CONR'), ('warehouse_id', '=', wh.id)]).id
             def_loc_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'CONR'), ('warehouse_id', '=', wh.id)]).default_location_dest_id.id
+                [('sequence_code', '=', 'CONR'),('con_type', '!=', 'DIL'), ('warehouse_id', '=', wh.id)]).default_location_dest_id.id
             picking_vals = {
                 'partner_id': self.supplier.id,
                 'company_id': self.company_id.id,
@@ -73,7 +98,7 @@ class droga_stock_cons_receive(models.Model):
                 'cons_receive_request': self.id,
                 #'auto_generated': True,
                 #'origin': self.name,
-                'state': 'waiting',
+                'state': 'confirmed',
                 'scheduled_date': self.receipt_date
             }
             picking_id = self.env['stock.picking'].sudo().create(picking_vals)
@@ -96,7 +121,7 @@ class droga_stock_cons_receive(models.Model):
                         'price_unit': rec['price_unit'],
                         'location_id': cons_vendor,
                         'location_dest_id': def_loc_id,
-                        'state': 'waiting',
+                        'state': 'confirmed',
                         'company_id': self.company_id.id
                     }
 
