@@ -42,10 +42,7 @@ class sale_order_line(models.Model):
     @api.depends('product_id')
     def _is_prod_available(self):
         for rec in self:
-            quants=self.env['stock.quant'].search([('product_tmpl_id','=',rec.product_template_id.id),('location_id.con_type','!=','DIL'),('location_id.usage','=','internal')])
-            rec.available_qty=0
-            for quant in quants:
-                rec.available_qty+=quant.available_quantity
+            rec.available_qty=rec.product_id.free_qty-rec.product_id.outgoing_qty
             if not rec.product_id.bought_locally and rec.available_qty<rec.product_id.emergency_order_point:
                 rec.is_prod_available=False
             else:
