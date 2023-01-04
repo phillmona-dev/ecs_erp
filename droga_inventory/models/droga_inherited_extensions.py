@@ -507,9 +507,6 @@ class droga_stock_product_extension(models.Model):
     @api.model
     def create(self, vals_list):
 
-        if len(self.env['product.template'].search([('default_code','=',vals_list['default_code'])])) > 0:
-            raise UserError("Default code must be unique.")
-
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
         return super(droga_stock_product_extension, self).create(vals_list)
