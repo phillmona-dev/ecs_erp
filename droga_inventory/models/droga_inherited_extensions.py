@@ -411,7 +411,8 @@ class droga_stock_product_extension(models.Model):
     order_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'),
-        ('BT', 'Both'),], string='Product used under')
+        ('BT', 'Import and wholesale'),
+    ('PT', 'Physiotherapy')], string='Product used under')
     bought_locally=fields.Boolean('Bought Locally',default=False)
     list_price = fields.Float(
         'Sales Price', default=1.0,

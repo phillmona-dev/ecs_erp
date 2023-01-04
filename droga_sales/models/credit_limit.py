@@ -35,7 +35,7 @@ class cust_sales_credit_limit(models.Model):
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
     order_type = fields.Selection([
         ('IM', 'Import'),
-        ('WS', 'Wholesale'), ], string='Order from',required=True)
+        ('WS', 'Wholesale'),('PT', 'Physiotherapy') ], string='Order from',required=True)
 
     @api.depends('partner_id')
     def _get_mature_amount(self):
@@ -72,7 +72,7 @@ class cust_sales_no_create_after_invoice(models.Model):
 
     order_type=fields.Selection([
         ('IM', 'Import'),
-        ('WS', 'Wholesale'), ], string='Order from',related='order_id.order_type')
+        ('WS', 'Wholesale'),('PT', 'Physiotherapy') ], string='Order from',related='order_id.order_type')
 
     def _get_expiry(self):
         for rec in self:
