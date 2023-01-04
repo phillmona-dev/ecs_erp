@@ -112,7 +112,7 @@
                 <field name="state" widget="statusbar" statusbar_visible="draft,req,sale"/>
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="after">
-                <field name="Vat_no" string="Tin No" }"></field>
+                <field name="Vat_no" string="Tin No" attrs="{'readonly':['|',('Vat_no','!=','')('Vat_no','!=',False)]}"></field>
                 <field name="pay_type" invisible="1"/>
                 <field name="cash_upfront"
                        attrs="{'invisible': [('pay_type', '=', False)],'readonly': [('state','!=', 'draft')]}"/>
