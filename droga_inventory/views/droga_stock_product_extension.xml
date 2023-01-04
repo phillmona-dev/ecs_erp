@@ -127,11 +127,11 @@
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page/group/group/field[@name='taxes_id']" position="before">
-                <field name="categ_id" string="Product Category mi" options="{'no_create':True,'no_open':True}"
+                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
                        domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','MI')]" groups="droga_inventory.inv_prod_mi_manager"/>
-                <field name="categ_id" string="Product Category sc" options="{'no_create':True,'no_open':True}"
+                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
                        domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','SC')]" groups="droga_inventory.inv_prod_sc_manager"/>
-                <field name="categ_id" string="Product Category os" options="{'no_create':True,'no_open':True}"
+                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
                        domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','OS')]" groups="droga_inventory.inv_prod_os_manager"/>
                 <field name="sub_categ_id" string="Product sub-category" options="{'no_create':True,'no_open':True}"
                        domain="[('complete_name','not like','All%'),('parent_id','=',categ_id)]"/>
