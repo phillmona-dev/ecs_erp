@@ -5,20 +5,26 @@ class BudgetCommitment(models.Model):
     _name = 'droga.budget.commitment.budget'
     _description = 'Commitement Budget'
 
-    @api.depends('purchase_request_id', 'purchase_order_id')
+    @api.depends('purchase_request_id', 'purchase_order_id', 'purchase_request_local_id')
     def _compute_amount(self):
         for record in self:
             record.amount = record.purchase_request_total_amount + \
-                record.purchase_order_total_amount
+                            record.purchase_order_total_amount
 
             if record.purchase_request_id:
                 record.refrence_no = record.purchase_request_id.name
+            elif record.purchase_request_local_id:
+                record.refrence_no = record.purchase_request_local_id.name
+            elif record.payment_request_id:
+                record.refrence_no = record.payment_request_id.name
             else:
                 record.refrence_no = record.purchase_order_id.name
 
     document_type = fields.Selection(
-        [("PR", "Purchase Request"), ("PO", "Purchase Order")])
+        [("PR", "Purchase Request"), ("PO", "Purchase Order"), ("PMR", "Payment Request")])
     purchase_request_id = fields.Many2one("droga.purhcase.request")
+    purchase_request_local_id = fields.Many2one("droga.purchase.request.local")
+    payment_request_id=fields.Many2one("droga.account.payment.request")
     purchase_request_total_amount = fields.Float(
         "Purhcase Request Total Amount", default=0)
     purchase_order_id = fields.Many2one('purchase.order')
@@ -42,7 +48,7 @@ class BudgetCommitment(models.Model):
     @api.depends('purchase_order_total_amount', 'paid_amount')
     def _compute_remaining_amount(self):
         for record in self:
-            record.remaining_amount = record.purchase_order_total_amount-record.paid_amount
+            record.remaining_amount = record.purchase_order_total_amount - record.paid_amount
 
     # method for updating the paid amount
 
@@ -69,7 +75,7 @@ class BudgetCommitment(models.Model):
                 if record.remaining_amount <= 0:
                     record.write({'state': 'Closed'})
 
-     # load accounts related with budgetary position
+    # load accounts related with budgetary position
     @api.onchange('budgetary_position')
     def _load_budgetary_position_accounts(self):
         accounts = self.budgetary_position.account_ids.ids

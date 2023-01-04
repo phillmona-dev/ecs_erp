@@ -51,6 +51,9 @@ class PaymentRequest(models.Model):
     department = fields.Many2one(
         "hr.department", string="Department", required=True, default=_get_department_id)
 
+    costc = fields.Many2one("account.analytic.account", string="Cost Center", domain=[
+        ('plan_id', '=', 'Cost Center')])
+
     purpose = fields.Char("Purpose")
 
     pay_to = fields.Many2one("res.partner")
@@ -113,7 +116,8 @@ class PaymentRequest(models.Model):
     # compute total ETB amount
     @api.depends('total_amount', 'exchange_rate')
     def _compute_total(self):
-        self.total_amount_etb = self.total_amount * self.exchange_rate
+        for record in self:
+            record.total_amount_etb = record.total_amount * record.exchange_rate
 
     @api.depends('total_amount', 'exchange_rate')
     def _compute_amount_to_word(self):
@@ -133,7 +137,7 @@ class PaymentRequest(models.Model):
 
         # create activity for the approver
         self.create_activity(self.department_manager_user_id.id)
-        return True
+        self.return_to_tree_view()
 
     def approve_request(self):
         self.write({'state': 'Approved'})
@@ -144,33 +148,41 @@ class PaymentRequest(models.Model):
         users = self.get_users_for_roles('Business Control Specialist')
         for user in users:
             self.create_activity(user)
+
+        self.return_to_tree_view()
         return True
 
     def budget_approve_request(self):
         self.input_validation('validation')
         self.write({'state': 'Budget Approved'})
+        self.record_commitment_budget()
         self.set_activity_done()
         # create new activity
         # get budget accountant
         users = self.get_users_for_roles('Finance Operation Manager')
         for user in users:
             self.create_activity(user)
+        self.return_to_tree_view()
         return True
 
     def authorize_request(self):
         self.write({'state': 'Authorized'})
         self.set_activity_done()
+        self.return_to_tree_view()
         return True
 
     def reject_request(self):
         self.write({'state': 'Draft'})
         self.set_activity_done()
         self.create_reject_activity()
+        self.return_to_tree_view()
         return True
 
     def cancel_request(self):
         self.write({'state': 'Cancelled'})
+        self.cancel_commitment_budget()
         self.set_activity_done()
+        self.return_to_tree_view()
         return True
 
     def set_activity_done(self):
@@ -238,3 +250,49 @@ class PaymentRequest(models.Model):
         # if self.state == 'Approved':
         # not self.budgetary_position or not self.budget_account:
         # raise ValidationError("Budget category and account must be filled")
+
+    def record_commitment_budget(self):
+        # record commitment budget when the budget approves
+        for record in self:
+            if record.state == "Budget Approved":
+                # total purchase amount
+                # create commitment record
+                commitment_budget = {
+                    'document_type': 'PMR',
+                    'payment_request_id': record.id,
+                    'purchase_request_total_amount': record.total_amount_etb,
+                    'budget_date': record.request_date,
+                    'budgetary_position': record.budgetary_position.id,
+                    'expense_account': record.budget_account.id,
+                    'analytic_account_id': record.costc.id,
+                    'company_id': record.company_id.id,
+                    'state': 'Active'
+                }
+
+                # persist to database
+                self.env['droga.budget.commitment.budget'].create(
+                    commitment_budget)
+
+    @api.onchange('budgetary_position', 'budget_account')
+    def _load_budgetary_position_accounts(self):
+        for record in self:
+            accounts = record.budgetary_position.account_ids.ids
+            return {'domain': {'budget_account': [('id', 'in', (accounts))]}}
+
+    def cancel_commitment_budget(self):
+        records = self.env['droga.budget.commitment.budget'].search(
+            [('payment_request_id', '=', self.id), ('state', '=', 'Active')])
+        for record in records:
+            record.write({'state': 'Closed'})
+
+    def return_to_tree_view(self):
+        view = self.env.ref('droga_finance.droga_account_payment_request_view_tree')
+        return {
+            'name': _('test'),
+            'view_mode': 'tree',
+            'view_id': view.id,
+            'res_model': 'droga.account.payment.request',
+            'context': {},
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+        }

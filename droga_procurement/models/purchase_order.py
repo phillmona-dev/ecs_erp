@@ -199,6 +199,9 @@ class purchase_order(models.Model):
         if vals['request_type'] == 'Foregin':
             vals['name'] = self_comp.env['ir.sequence'].next_by_code(
                 'purchase.order.foreign') or '/'
+        elif vals['request_type'] == 'Local':
+            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+                'purchase.order.local') or '/'
 
         res = super(purchase_order, self_comp).create(vals)
 
@@ -280,11 +283,12 @@ class purchase_order_line(models.Model):
     total_price_foregin = fields.Float(
         'Total Price', compute="_compute_total", store=True)
 
-    @api.depends('unit_price_foregin','product_qty','order_id.exchange_rate')
+    @api.depends('unit_price_foregin', 'product_qty', 'order_id.exchange_rate')
     def _compute_total(self):
         for record in self:
-            record.total_price_foregin = record.unit_price_foregin * record.product_qty
-            record.price_unit = record.unit_price_foregin * record.order_id.exchange_rate
+            if record.order_id.request_type == 'Foregin':
+                record.total_price_foregin = record.unit_price_foregin * record.product_qty
+                record.price_unit = record.unit_price_foregin * record.order_id.exchange_rate
 
 
 # arrival ports

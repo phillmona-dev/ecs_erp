@@ -401,7 +401,7 @@
             (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_view_tree')}),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('purchase.purchase_order_view_kanban_without_dashboard')}),
         ]"/>
-        <field name="domain">[('request_type','=','Foreign')]</field>
+        <field name="domain">[('request_type','=','Foregin')]</field>
         <field name="search_view_id" ref="purchase.purchase_order_view_search"/>
         <field name="context">{}</field>
         <field name="help" type="html">
