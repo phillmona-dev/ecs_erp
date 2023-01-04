@@ -36,9 +36,6 @@
                     <button name="request"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="mtmg_approve"
-                            attrs="{'invisible': [('state', 'not in', ('mtmg'))]}" groups="droga_inventory.marketing_manager"
-                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="stmg_approve"
                             attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
@@ -49,7 +46,7 @@
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
 
-                    <field name="state" widget="statusbar" statusbar_visible="draft,mtmg,stmg,waiting,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
                     <group>

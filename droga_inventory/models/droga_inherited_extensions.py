@@ -499,7 +499,7 @@ class droga_stock_product_extension(models.Model):
 
     def write(self, vals_list):
 
-        if not self.env.user.has_group('droga_inventory.inv_prod_manager'):
+        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager'):
             raise UserError("You can not update a product. Please contact your supervisor.")
         return super(droga_stock_product_extension, self).write(vals_list)
 
@@ -509,7 +509,7 @@ class droga_stock_product_extension(models.Model):
         if len(self.env['product.template'].search([('default_code','=',vals_list['default_code'])])) > 0:
             raise UserError("Default code must be unique.")
 
-        if not self.env.user.has_group('droga_inventory.inv_prod_manager'):
+        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
         return super(droga_stock_product_extension, self).create(vals_list)
 
@@ -517,4 +517,8 @@ class product_selection_field(models.Model):
     _inherit = 'product.category'
     avail_in_product_master=fields.Boolean('Available in product master file',default=False)
     off_supplies=fields.Boolean('Office supplies group',default=False)
+    group_type=fields.Selection([
+        ('MI','Medical items'),
+        ('SC', 'Services'),
+    ('OS', 'Office supplies')], string='Group type.')
     reservation_period=fields.Float('Reservation period in Hrs',default=0)

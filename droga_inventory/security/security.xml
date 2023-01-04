@@ -56,10 +56,22 @@
         <field name="name">Unit of measure manager</field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
     </record>
-    <record id="inv_prod_manager" model="res.groups">
-        <field name="name">Product register access</field>
+
+
+    <record id="inv_prod_mi_manager" model="res.groups">
+        <field name="name">Product register access medical items</field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
     </record>
+    <record id="inv_prod_sc_manager" model="res.groups">
+        <field name="name">Product register access services</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+    </record>
+    <record id="inv_prod_os_manager" model="res.groups">
+        <field name="name">Product register access office supplies</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+    </record>
+
+
     <record id="inv_prod_noone" model="res.groups">
         <field name="name">No one access</field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>

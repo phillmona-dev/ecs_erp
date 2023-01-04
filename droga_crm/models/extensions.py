@@ -6,6 +6,8 @@ from odoo.http import request
 
 class cust_contact_extension(models.Model):
     _inherit = 'res.partner'
+    name = fields.Char(index=True, default_export_compatible=True,tracking=True)
+    display_name = fields.Char(compute='_compute_display_name', recursive=True, store=True, index=True,tracking=True)
     company_type = fields.Selection(string='Company Type',
                                     selection=[('company', 'Company'),('person', 'Individual')],
                                     compute='_compute_company_type', inverse='_write_company_type',default='company')

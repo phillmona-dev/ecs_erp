@@ -109,6 +109,7 @@
             <xpath expr="//form/sheet/group/field[@name='parent_id']" position="after">
                 <field name="avail_in_product_master"></field>
                 <field name="off_supplies"></field>
+                <field name="group_type"></field>
                 <field name="reservation_period"></field>
             </xpath>
         </field>

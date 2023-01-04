@@ -204,6 +204,13 @@ class sale_order_ext(models.Model):
     total_added = fields.Float('Total accrual')
     price_change_approver = fields.Many2one('res.users',compute='_get_approvers')
     operation_approver=fields.Many2one('res.users',compute='_get_approvers')
+    out_of_stock_items=fields.Char('Stock out items',compute='_get_stock_out')
+
+    @api.depends('order_line.product_template_id')
+    def _get_stock_out(self):
+        for rec in self:
+            rec.out_of_stock_items=''
+
 
     def _get_approvers(self):
         for rec in self:

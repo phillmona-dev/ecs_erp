@@ -14,7 +14,6 @@ class droga_stock_cons_receive(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),  # When requester cancels it from draft
-        ('mtmg', 'Marketing manager'),  # Issue sent to marketing manager for approval
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
         ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
         ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
@@ -62,10 +61,6 @@ class droga_stock_cons_receive(models.Model):
         self.state = 'cancel'
 
     def request(self):
-        self.ensure_one()
-        self.state = 'mtmg'
-
-    def mtmg_approve(self):
         self.ensure_one()
         self.state = 'stmg'
 
