@@ -258,7 +258,9 @@ class sale_order_ext(models.Model):
             if so.mature_amount > 0:
                 raise ValidationError("Please settle matured amounts before initiating another sales!")
         self.ensure_one()
-        if self.manual_price:
+        if self.order_type=='PT':
+            self.action_confirm()
+        elif self.manual_price:
             self.state='price_request'
         else:
             self.state='req'
