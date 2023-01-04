@@ -150,7 +150,7 @@
 
 
             <field name="default_code" position="replace">
-                <field name="default_code" attrs="{'invisible': [('product_variant_count', '>', 1)],'readonly':[('default_code','!=',False)]}"/>
+                <field name="default_code" attrs="{'invisible': [('product_variant_count', '>', 1)],'readonly':[('default_code','!=',''),('default_code','!=',False)]}"/>
             </field>
 
 
