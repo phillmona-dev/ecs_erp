@@ -29,7 +29,7 @@ class cust_contact_extension(models.Model):
              "- Other: Other address for the company (e.g. subsidiary, ...)")
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
-    city_name = fields.Many2one('droga.crm.settings.city')
+    city_name = fields.Many2one('droga.crm.settings.city',tracking=True)
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
