@@ -24,6 +24,11 @@
         <field name="category_id" ref="crm_management"/>
         <field name="implied_ids" eval="[(4, ref('crm_rsm'))]"/>
     </record>
+
+    <record id="crm_cust" model="res.groups">
+        <field name="name">CRM customer admin</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
 </odoo>
 
 

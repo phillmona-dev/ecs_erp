@@ -109,10 +109,10 @@
                     <field name="cust_type_ext" domain="([('status','=','Active')])" attrs="{'required': [('supplier_rank', '=', 0)]}"
                            options="{'no_create':True,'no_open':True}"
                            string="Customer type"></field>
-                    <field name="pr_avail_areas" invisible="1"></field>
+                    <field name="pr_avail_area" invisible="1"></field>
                     <field name="pr_sales_logged" invisible="1"></field>
                     <field name="city_name" attrs="{'required': [('supplier_rank', '=', 0)]}"
-                           domain="([('id', 'in',pr_avail_areas),('status','=','Active')])"
+                           domain="([('id', 'in',pr_avail_area),('status','=','Active')])"
                            options="{'no_create':True,'no_open':True}"
                            string="City/sub-city team"></field>
                     <field name="area" options="{'no_create':True,'no_open':True}" string="Area"
@@ -124,8 +124,7 @@
 
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="after">
-                <field name="vat" invisible="1"/>
-                <field name="vat" attrs="{'invisible': [('supplier_rank', '>', 0)],'readonly':[('vat','!=',False)]}" string="Tin No"></field>
+                <field name="vat" attrs="{'invisible': [('supplier_rank', '>', 0)]}" string="Tin No"></field>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="attributes">

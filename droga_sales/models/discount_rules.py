@@ -205,6 +205,38 @@ class sale_order_ext(models.Model):
     price_change_approver = fields.Many2one('res.users',compute='_get_approvers')
     operation_approver=fields.Many2one('res.users',compute='_get_approvers')
     out_of_stock_items=fields.Char('Stock out items',compute='_get_stock_out')
+    has_access = fields.Boolean(default=False,search='_has_access',compute='_compute_has_access')
+
+    def _compute_has_access(self):
+        if self.env.user.has_group('droga_crm.crm_cust'):
+            for rec in self:
+                rec.has_access=True
+        elif not self.env.user.name.startswith('CRM'):
+            for rec in self:
+                if self.env.user.id==rec.user.id:
+                    rec.has_access=True
+        else:
+            for rec in self:
+                ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+                if ses[0].pro_id==rec.pr_sales:
+                    rec.has_access=True
+    def _has_access(self, operator, value):
+        if operator=='=':
+            if self.env.user.has_group('droga_crm.crm_cust'):
+                sales = self.env['sale.order'].sudo().search([(1, '=', 1)])
+                return [('id', 'in', [x.id for x in sales])]
+            if not self.env.user.name.startswith('CRM'):
+                sales = self.env['sale.order'].sudo().search([('user_id', '=', self.env.user.id)])
+                return [ ('id', 'in', [x.id for x in sales])]
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            if len(ses)==0:
+                return [('id','in',[])]
+            else:
+                is_rec_owner=self.env['sale.order'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
+                is_rec_inside_self=self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
+                return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+        else:
+            return [('id','in',[])]
 
     @api.depends('order_line.product_template_id')
     def _get_stock_out(self):

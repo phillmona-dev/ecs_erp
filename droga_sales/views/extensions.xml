@@ -37,7 +37,7 @@
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_uom_readonly']"
                    position="after">
-                <field name="available_qty" groups="droga_sales.sales_price_change_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_import_approve_admin"></field>
+                <field name="available_qty" decoration-danger="available_qty &lt;= 0" widget="badge" groups="droga_sales.sales_price_change_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_import_approve_admin"></field>
                 <field name="store_placement"></field>
                 <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
             </xpath>

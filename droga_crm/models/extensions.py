@@ -49,7 +49,13 @@ class cust_contact_extension(models.Model):
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
 
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
-    pr_avail_areas=fields.Many2many(related='pr_sales_logged.p_regions')
+    def _get_areas(self):
+        if self.env.user.has_group('droga_crm.crm_cust'):
+            return self.env['droga.crm.settings.city'].search([(1,'=',1)])
+        else:
+            return self.pr_sales_logged.p_regions
+    pr_avail_area=fields.Many2many('droga.crm.settings.city',default=_get_areas)
+
 
     def _is_cust_loc_avail(self):
         if not self.env.user.name.startswith('CRM'):
