@@ -45,9 +45,14 @@
               groups="droga_inventory.fin_inv_admin"
               sequence="10" action="stock.action_view_inventory_tree" />
 
-    <!--- Transfers menu avail for no one -->
-    <menuitem id="stock.all_picking" name="Transfers" parent="stock.menu_stock_warehouse_mgmt" sequence="20"
-              action="stock.action_picking_tree_all" groups="droga_inventory.inv_prod_noone"/>
+    <!--- Transfers menu avail for finance reconcile only -->
+    <menuitem id="stock.all_picking" name="Inventory correction" parent="account.menu_finance_entries_accounting_miscellaneous" sequence="20"
+              action="stock.action_picking_tree_all" groups="droga_inventory.inv_prod_fin"/>
+
+    <!--- Pass context for reconciliation form -->
+    <record id="stock.action_picking_tree_all" model="ir.actions.act_window">
+            <field name="context">{'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0],'default_from_reconcile_menu':True}</field>
+        </record>
 
     <!--- Inventory adjustment for administrators only -->
     <menuitem id="stock.menu_stock_inventory_control" name="Products" parent="stock.menu_stock_root" sequence="5" groups="stock.group_stock_manager"/>

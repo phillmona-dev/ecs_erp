@@ -301,6 +301,11 @@ class droga_stock_picking_extension(models.Model):
     to_wh = fields.Char('To location',compute='_get_loc_descr')
     has_access = fields.Boolean('is_pick_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
+    from_reconcile_menu=fields.Boolean('Menu is opened from reconciliation menu',default=False)
+    to_correct_ref=fields.Char('To correct reference')
+    to_correct_pick = fields.Many2one('stock.picking',string='To correct reference')
+    request_no=fields.Char('Request No')
+    remark = fields.Char('Remark')
     location_id_type=fields.Selection([
         ('CONI', 'Consignment customer location'),
         ('CONR', 'Consignment vendor location'),
