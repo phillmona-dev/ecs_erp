@@ -11,8 +11,14 @@ class Rfq_Local(models.Model):
 
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
 
+    @api.model
     def _default_user_team_committee(self):
-        return self.purchase_request_id.department_manager.id
+        if 'default_purchase_request_id' in self._context:
+            purchase_request_id = self._context['default_purchase_request_id']
+            purchase_request = self.env['droga.purchase.request.local'].search([('id', '=', purchase_request_id)])
+
+            if purchase_request:
+                return purchase_request.department_manager.ids
 
     name = fields.Char('Request Reference', required=True,
                        index=True, copy=False, default='New')
@@ -115,6 +121,11 @@ class Rfq_Local(models.Model):
 
     def generate_analysis_sheet(self):
 
+        # validate current data
+        if len(self.rfq_lines) != 0:
+            raise ValidationError(
+                "There are items in the RFQ please remove them if you to generate a new analysis sheet")
+
         # get invited suppliers list
         suppliers = self.suppliers
         products = self.purchase_request_id.purchase_request_lines
@@ -134,6 +145,7 @@ class Rfq_Local(models.Model):
                             'supplier_id': supplier.id,
                             'product_id': product.product_id.id,
                             'product_uom': product.product_uom.id,
+                            'product_qty': product.product_qty,
                             'unit_price': 0
                         }
                         # create rfq line
@@ -202,7 +214,7 @@ class Rfq_Local(models.Model):
             for supplier in suppliers:
                 vals = {'name': 'New', 'state': 'draft', 'date_order': datetime.now(),
                         'rfq_local_id': supplier.rfq_id.id,
-                        'partner_id': supplier.supplier_id.id, 'request_type': self.request_type, 'order_line': []}
+                        'partner_id': supplier.supplier_id.id, 'request_type': 'Local', 'order_line': []}
 
                 # get products the supplier won
                 for line in self.rfq_lines:
@@ -387,3 +399,24 @@ class Rfq_Detail_local(models.Model):
     def set_unit(self):
         for record in self:
             record.product_uom = record.product_id.uom_id
+
+    def offer_detail(self):
+        view = self.env.ref('droga_procurement.droga_purchase_request_rfq_line_local_view_tree')
+
+        return {
+            'name': 'Offer',
+            'view_mode': 'tree',
+            'res_model': 'droga.purchase.request.rfq.line.local',
+            'view_id': view.id,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'res_id': self.id,
+
+            'domain':
+                ([('supplier_id', '=', self.supplier_id.id)]),
+
+            'context': {
+                'default_supplier_id': self.supplier_id.id
+            }
+
+        }

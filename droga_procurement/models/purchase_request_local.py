@@ -226,7 +226,7 @@ class purchase_request_local(models.Model):
                     # create commitment record
                     commitment_budget = {
                         'document_type': 'PR',
-                        'purchase_request_id': record.id,
+                        'purchase_request_local_id': record.id,
                         'purchase_request_total_amount': line.total_price,
                         'budget_date': record.request_date,
                         'budgetary_position': line.budgetary_position.id,

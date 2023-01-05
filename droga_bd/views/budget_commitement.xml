@@ -31,7 +31,7 @@
                 <field name="purchase_request_id" readonly="1" string="PR No" invisible="1"/>
                 <field name="purchase_order_id" readonly="1" string="PO No" invisible="1"/>
                 <field name="budget_date" />
-                <field name="analytic_account_id" options="{'no_create':True,'no_open':True}" string="Branch"/>
+                <field name="analytic_account_id" options="{'no_create':True,'no_open':True}" string="Cost Center"/>
                 <field name="budgetary_position" options="{'no_create':True,'no_open':True}"/>
                 <field name="expense_account" options="{'no_create':True,'no_open':True}"/>
                 <field name="company_id" readonly="1" invisible="1"/>
@@ -85,7 +85,7 @@
         <field name="name">Commitment Budget</field>
         <field name="res_model">droga.budget.commitment.budget</field>
         <field name="view_mode">tree</field>
-        <field name="domain">[('document_type','in',('PR','PO'))]</field>
+        <field name="domain">[('document_type','in',('PR','PO','PMR'))]</field>
         <field name="context">{"search_default_active":1,"search_default_group_document_type": 1}</field>
         <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_budget_commitment_budget_purchase_order_view_tree')})]"/>
         <field name="help" type="html">
