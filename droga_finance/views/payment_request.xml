@@ -30,7 +30,7 @@
                 <header>
                     <button name="submit_request" type="object" string="Submit" class="oe_highlight"
                             id="submit_request1" data-hotkey="v"
-                            attrs="{'invisible':['|',('requester','=',False),('state','not in',('Draft'))]}"/>
+                            attrs="{'invisible':[('state','not in',('Draft'))]}"/>
                     <button name="approve_request" type="object" states="Submitted" string="Approve"
                             class="oe_highlight" id="approve_request1" data-hotkey="v"/>
                     <button name="budget_approve_request" type="object" states="Approved" string="Budget Approval"
