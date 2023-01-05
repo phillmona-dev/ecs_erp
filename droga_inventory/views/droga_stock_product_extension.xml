@@ -141,22 +141,6 @@
         </field>
     </record>
 
-    <record id="product_template_default_code_inventory_extension" model="ir.ui.view">
-        <field name="name">product.template.product.inventory.default_code.extension.form</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_only_form_view"/>
-        <field name="priority" eval="100000000"/>
-        <field name="arch" type="xml">
-
-
-            <field name="default_code" position="replace">
-                <field name="default_code" attrs="{'invisible': [('product_variant_count', '>', 1)],'readonly':[('default_code','!=',''),('default_code','!=',False)]}"/>
-            </field>
-
-
-        </field>
-    </record>
-
 </odoo>
 
 
