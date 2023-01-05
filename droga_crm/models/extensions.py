@@ -53,12 +53,14 @@ class cust_contact_extension(models.Model):
         if self.env.user.has_group('droga_crm.crm_cust'):
             return self.env['droga.crm.settings.city'].search([(1,'=',1)])
         else:
-            return self.pr_sales_logged.p_regions
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            return ses[0].pro_id[0].p_regions.ids if len(ses[0].pro_id)>0 else False
+            #return self.pr_sales_logged.p_regions
     pr_avail_area=fields.Many2many('droga.crm.settings.city',default=_get_areas)
 
 
     def _is_cust_loc_avail(self):
-        if not self.env.user.name.startswith('CRM'):
+        if not self.env.user.name.upper().startswith('CRM'):
             for rec in self:
                 rec.is_cust_available = True
         else:
@@ -72,7 +74,7 @@ class cust_contact_extension(models.Model):
 
 
     def _search_cust_avail(self, operator, value):
-        if not self.env.user.name.startswith('CRM') :
+        if not self.env.user.name.upper().startswith('CRM') :
             return [('id', 'in', [x.id for x in self.env['res.partner'].search([(1,'=',1)])] )]
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         if not request or len(ses)==0:
