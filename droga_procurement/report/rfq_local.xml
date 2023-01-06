@@ -154,20 +154,20 @@
                                             <t t-set="supplier_empty" t-value="supplier_count-supplier_offer_count"/>
 
                                             <t t-foreach="range(supplier_empty)" t-as="l">
-                                                <td t-att-style="style">
-                                                    -
+                                                <td>
+                                                    <span class="small">-</span>
                                                 </td>
-                                                <td t-att-style="style">
-                                                    -
+                                                <td>
+                                                    <span class="small">-</span>
                                                 </td>
-                                                <td t-att-style="style">
-                                                    -
+                                                <td>
+                                                    <span class="small">-</span>
                                                 </td>
                                             </t>
 
                                         </t>
 
-                                       
+
                                     </tr>
                                 </t>
                             </tbody>
