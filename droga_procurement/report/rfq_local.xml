@@ -42,6 +42,8 @@
                     <t t-set="products" t-value="set(o.rfq_lines.mapped('product_id'))"/>
                     <t t-set="supplier_orders" t-value="[]"/>
 
+                    <t t-set="supplier_count" t-value="len(suppliers)"/>
+
 
                     <div class="page">
                         <div class="oe_structure"/>
@@ -110,8 +112,16 @@
                                             <span t-esc="product.name" class="small"/>
                                         </td>
 
+
+                                        <t t-set="supplier_offer_count" t-value="0"/>
+
                                         <t t-foreach="o.rfq_lines" t-as="line">
+
+
                                             <div t-if="line.product_id.id == product.id">
+
+                                                <t t-set="supplier_offer_count" t-value="supplier_offer_count + 1"/>
+
 
                                                 <t t-if="line.winner=='Yes'">
                                                     <t t-set="style"
@@ -134,13 +144,35 @@
                                                           class="small float-left"/>
                                                 </td>
                                             </div>
+                                        </t>
 
+
+                                        <!-- if there is a suppliers not submitted an offer for the item fill the row with empty data -->
+                                        <t t-if="supplier_offer_count!=supplier_count">
+
+                                            <!--get the difference-->
+                                            <t t-set="supplier_empty" t-value="supplier_count-supplier_offer_count"/>
+
+                                            <t t-foreach="range(supplier_empty)" t-as="l">
+                                                <td t-att-style="style">
+                                                    -
+                                                </td>
+                                                <td t-att-style="style">
+                                                    -
+                                                </td>
+                                                <td t-att-style="style">
+                                                    -
+                                                </td>
+                                            </t>
 
                                         </t>
+
+                                       
                                     </tr>
                                 </t>
                             </tbody>
                         </table>
+
 
                         <br></br>
                         <div id="informations" class="row mt32 mb32">
