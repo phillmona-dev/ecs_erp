@@ -129,6 +129,11 @@
 
                             </field>
                         </page>
+                        <page string="Approver">
+                            <field name="approvals">
+
+                            </field>
+                        </page>
 
                     </notebook>
                 </sheet>

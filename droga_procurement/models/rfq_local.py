@@ -53,6 +53,9 @@ class Rfq_Local(models.Model):
     total_winner_amount = fields.Float(
         "Total Winner Amount", compute="_compute_total_winner_amount", store=True, default=0)
 
+    approvals = fields.One2many(
+        'studio.approval.entry', 'res_id', string='Approvals')
+
     @api.model
     def create(self, vals):
 
@@ -413,7 +416,7 @@ class Rfq_Detail_local(models.Model):
             'res_id': self.id,
 
             'domain':
-                ([('supplier_id', '=', self.supplier_id.id)]),
+                ([('supplier_id', '=', self.supplier_id.id), ('rfq_id', '=', self.rfq_id.id)]),
 
             'context': {
                 'default_supplier_id': self.supplier_id.id
