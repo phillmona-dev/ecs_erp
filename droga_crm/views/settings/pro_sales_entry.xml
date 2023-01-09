@@ -25,8 +25,9 @@
 
     <menuitem
             id="droga_pro_sales_master_entry_visit_menu"
-            name="Promotor/sales entry"
+            name="User account"
             action="droga_pro_sales_master_entry_visit_action"
             groups="crm_mr"
+            web_icon="droga_crm,static/description/icon.png"
             sequence="19"/>
 </odoo>
