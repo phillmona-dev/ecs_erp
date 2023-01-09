@@ -33,7 +33,7 @@ class cust_sales_credit_limit(models.Model):
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
     manual_price=fields.Boolean('Manual price',default=False,required=True,tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
-    sales_type=fields.Char('Sales order type',compute='_get_so_type')
+    sales_type=fields.Char('Sales order type',compute='_get_so_type',store=True)
 
     order_type = fields.Selection([
         ('IM', 'Import'),
