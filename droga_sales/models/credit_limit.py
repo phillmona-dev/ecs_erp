@@ -33,12 +33,21 @@ class cust_sales_credit_limit(models.Model):
     show_invoice_button=fields.Boolean(compute='_get_mature_amount')
     manual_price=fields.Boolean('Manual price',default=False,required=True,tracking=True)
     Vat_no=fields.Char(related='partner_id.vat',readonly=False)
-
+    sales_type=fields.Char('Sales order type',compute='_get_so_type')
 
     order_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'),('PT', 'Physiotherapy') ], string='Order from',required=True)
 
+    @api.depends('payment_term_id')
+    def _get_so_type(self):
+        for rec in self:
+            if rec.payment_term_id.apply_credit_limit:
+                rec.sales_type='cr'
+            elif rec.payment_term_id.name=='Sales return':
+                rec.sales_type = 'sr'
+            else:
+                rec.sales_type = 'cs'
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:

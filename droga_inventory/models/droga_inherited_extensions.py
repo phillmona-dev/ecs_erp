@@ -242,6 +242,7 @@ class droga_stock_uom_extension(models.Model):
 
 class droga_stock_move_extension(models.Model):
     _inherit = 'stock.move'
+    from_reconcile_menu=fields.Boolean(related='picking_id.from_reconcile_menu')
     reservation_discard_time=fields.Datetime(string='Reservation discard time',compute='_compute_res_discard',inverse='_inverse_res_discard')
     def _inverse_res_discard(self):
         pass

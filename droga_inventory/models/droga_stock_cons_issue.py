@@ -6,6 +6,7 @@ from odoo.tools.view_validation import READONLY
 
 class droga_stock_cons_issue(models.Model):
     _name = 'droga.inventory.consignment.issue'
+    _description = 'Store Issue'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char('Name', default='New')
@@ -22,7 +23,7 @@ class droga_stock_cons_issue(models.Model):
         help=" * Requested: The consignment issue order is sent to warehouse.\n"
              " * Done: The consignment items are issued from warehouse.\n")
 
-    issue_type = fields.Selection([('CONI', 'Consignment'), ('SIF', 'Free sample'),('SIR', 'Sample issue to be returned')],string='Issue type', required=True)
+    issue_type = fields.Selection([('CONI', 'Consignment'),('INC','Internal consumption'), ('SIF', 'Free sample'),('SIR', 'Sample issue to be returned')],string='Issue type', required=True)
     #SIF - Sample issue free        -   This will post under expense account (transfer to sample location)
     #SIR - Sample issue to return   -   This will post under sample receivable
     #CONI - Consignment issue       -   This will post under consignment receivable (transfer to consignment location)
@@ -62,14 +63,17 @@ class droga_stock_cons_issue(models.Model):
         self.state='cancel'
 
     def request(self):
+        self.set_activity_done()
         self.ensure_one()
         self.state = 'stmg'
 
     def amend(self):
+        self.set_activity_done()
         self.ensure_one()
         self.state = 'draft'
 
     def stmg_approve(self):
+        self.set_activity_done()
         warehouse_list = set(self.detail_entries['warehouse_id'])
 
         for wh in warehouse_list:
@@ -132,6 +136,12 @@ class droga_stock_cons_issue(models.Model):
             # picking_id.sudo().action_assign()
 
         self.state = 'waiting'
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        for act in activity:
+            act.sudo().action_done()
 
 
 class droga_stock_cons_issue_detail(models.Model):

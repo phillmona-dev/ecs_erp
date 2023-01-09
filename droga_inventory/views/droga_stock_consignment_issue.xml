@@ -66,12 +66,12 @@
                             <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
                                 <tree editable="bottom">
                                     <field name="company_id" invisible="1"/>
-                                    <field name="product_id" required="1" context="{'default_detailed_type': 'product'}"/>
-                                    <field name="product_uom"/>
+                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
+                                    <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="product_uom_qty" string="Quantity"/>
-                                    <field name="warehouse_id" attrs="{'required': [('state', '!=','draft')]}" string="Issuer warehouse"/>
+                                    <field name="warehouse_id" attrs="{'required': [('state', '!=','draft')]}" string="Issuer warehouse" options="{'no_create':True,'no_open':True}"/>
                                 </tree>
                             </field>
                         </page>
@@ -88,7 +88,7 @@
     </record>
 
     <record id="droga_inventory_consignment_issue_action" model="ir.actions.act_window">
-        <field name="name">Store consignment issue order</field>
+        <field name="name">Store issue order</field>
         <field name="res_model">droga.inventory.consignment.issue</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('create_uid','=',uid)]</field>

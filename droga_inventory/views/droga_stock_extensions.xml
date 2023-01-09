@@ -28,8 +28,29 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="priority">100000</field>
         <field name="arch" type="xml">
-            <xpath expr="//form/header/button[@name='action_cancel']" position="replace">
-                <button name="action_cancel" attrs="{'invisible': [('state', 'not in', ('assigned', 'confirmed', 'draft', 'waiting'))]}" string="Cancel" groups="droga_inventory.inv_prod_fin" type="object" data-hotkey="z"/>
+            <xpath expr="//form/header/button[@name='action_cancel']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/header/button[@name='action_open_label_type']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/header/button[@name='%(stock.act_stock_return_picking)d']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/header/button[@name='action_toggle_is_locked']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/header/button[@name='action_toggle_is_locked'][2]" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="before">
+                <field name="location_id" attrs="{'column_invisible':[('parent.from_reconcile_menu', '=', False)]}"></field>
+                <field name="location_dest_id" attrs="{'column_invisible':[('parent.from_reconcile_menu', '=', False)]}"></field>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='origin']" position="replace">

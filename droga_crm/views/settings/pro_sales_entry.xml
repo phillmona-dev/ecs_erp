@@ -27,7 +27,6 @@
             id="droga_pro_sales_master_entry_visit_menu"
             name="Promotor/sales entry"
             action="droga_pro_sales_master_entry_visit_action"
-            parent="menu_vist_log"
             groups="crm_mr"
             sequence="19"/>
 </odoo>

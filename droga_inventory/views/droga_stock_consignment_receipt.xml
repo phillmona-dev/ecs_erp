@@ -56,13 +56,13 @@
                             <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
                                 <tree editable="bottom">
                                     <field name="company_id" invisible="1"/>
-                                    <field name="product_id" required="1" context="{'default_detailed_type': 'product'}"/>
-                                    <field name="product_uom"/>
+                                    <field name="product_id" options="{'no_create':True,'no_open':True}" required="1" context="{'default_detailed_type': 'product'}"/>
+                                    <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom_qty" string="Quantity"/>
                                     <field name="price_unit"/>
                                     <field name="amount" sum="Total"/>
-                                    <field name="warehouse_id" string="Receipt warehouse"/>
+                                    <field name="warehouse_id" options="{'no_create':True,'no_open':True}" string="Receipt warehouse"/>
                                 </tree>
                             </field>
                         </page>

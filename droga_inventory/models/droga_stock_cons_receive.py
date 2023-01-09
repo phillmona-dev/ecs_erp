@@ -6,6 +6,7 @@ from odoo.tools.view_validation import READONLY
 
 class droga_stock_cons_receive(models.Model):
     _name = 'droga.inventory.consignment.receive'
+    _description = 'Store Receive'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char('Name', default='New')
@@ -61,6 +62,7 @@ class droga_stock_cons_receive(models.Model):
         self.state = 'cancel'
 
     def request(self):
+        self.set_activity_done()
         self.ensure_one()
         self.state = 'stmg'
 
@@ -69,6 +71,7 @@ class droga_stock_cons_receive(models.Model):
         self.state = 'draft'
 
     def stmg_approve(self):
+        self.set_activity_done()
         warehouse_list=set(self.detail_entries['warehouse_id'])
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
@@ -131,7 +134,11 @@ class droga_stock_cons_receive(models.Model):
 
         self.state = 'waiting'
 
-
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        for act in activity:
+            act.sudo().action_done()
 
 
 class droga_stock_cons_receive_detail(models.Model):

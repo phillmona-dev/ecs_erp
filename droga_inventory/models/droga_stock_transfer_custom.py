@@ -7,6 +7,7 @@ from odoo.tools.view_validation import READONLY
 
 class droga_stock_transfer_custom(models.Model):
     _name = 'droga.inventory.transfer.custom'
+    _description = 'Store Transfer'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char('Name', default='New')
@@ -101,6 +102,7 @@ class droga_stock_transfer_custom(models.Model):
         self.state = 'stmg'
 
     def stmg_approve(self):
+        self.set_activity_done()
         warehouse_list=self.detail_entries['warehouse_id']
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
@@ -162,6 +164,11 @@ class droga_stock_transfer_custom(models.Model):
         #    record.button_validate();
         self.state = 'done'
 
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        for act in activity:
+            act.sudo().action_done()
 class droga_stock_transfer_custom_detail(models.Model):
     _name = 'droga.inventory.transfer.custom.detail'
     transfer_header = fields.Many2one('droga.inventory.transfer.custom', required=True)

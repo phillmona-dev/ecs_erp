@@ -86,6 +86,25 @@ class cust_contact_extension(models.Model):
 
 class account_move_pr_sales(models.Model):
     _inherit = "account.move"
+
+    @api.model
+    def create(self, vals_list):
+        rec=super(account_move_pr_sales, self).create(vals_list)
+        if rec.invoice_origin.startswith('SO') and len(self.env['sale.order'].search([('name', '=', rec.invoice_origin)]))>0:
+            sale = self.env['sale.order'].search([('name', '=', rec.invoice_origin)])[0]
+            if sale.sales_type=='cs':
+                _name = self.env['ir.sequence'].next_by_code('cash.sales.invoice')
+            elif sale.sales_type == 'cr':
+                _name = self.env['ir.sequence'].next_by_code('credit.sales.invoice')
+            elif sale.sales_type == 'sr':
+                _name = self.env['ir.sequence'].next_by_code('sales.return.invoice')
+
+            if not _name:
+                raise UserError("Invoice sequence not found.")
+            vals_list['name'] = _name
+            rec['name']=_name
+        return rec
+
     def _get_pr_sales_logged(self):
         sale=self.env['sale.order'].search([('name','=',self.invoice_origin)])
         return False if len(sale)==0 else sale[0].pr_sales
