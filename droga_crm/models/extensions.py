@@ -91,7 +91,7 @@ class account_move_pr_sales(models.Model):
     def create(self, vals_list):
         rec=super(account_move_pr_sales, self).create(vals_list)
         try:
-            if rec.invoice_origin.startswith('SO') and len(self.env['sale.order'].search([('name', '=', rec.invoice_origin)]))>0:
+            if rec.invoice_origin.startswith('SOD-23') and len(self.env['sale.order'].search([('name', '=', rec.invoice_origin)]))>0:
                 sale = self.env['sale.order'].search([('name', '=', rec.invoice_origin)])[0]
                 if sale.sales_type=='cs':
                     _name = self.env['ir.sequence'].next_by_code('cash.sales.invoice')
