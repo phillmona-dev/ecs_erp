@@ -12,7 +12,6 @@
         <field name="report_file">droga_procurement.droga_purchase_offer_analysis_local_report</field>
         <field name="print_report_name">'Offer Analysis Report - %s' % (object.name)
         </field>
-        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a4"/>
         <field name="binding_model_id" ref="model_droga_purchase_request_rfq_local"/>
         <field name="binding_type">report</field>
     </record>
@@ -25,7 +24,6 @@
         <field name="report_file">droga_procurement.droga_purchase_offer_analysis1_local_report</field>
         <field name="print_report_name">'Offer Analysis Report - %s' % (object.name)
         </field>
-        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a4"/>
         <field name="binding_model_id" ref="model_droga_purchase_request_rfq_local"/>
         <field name="binding_type">report</field>
     </record>

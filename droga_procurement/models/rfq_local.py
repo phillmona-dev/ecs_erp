@@ -110,7 +110,7 @@ class Rfq_Local(models.Model):
     # ceo approval
     def ceo_approval(self):
         self.write({'state': 'CEO Approval'})
-        self.load_foregin_rfq_status()
+        #self.load_foregin_rfq_status()
         return True
 
     # reject request
