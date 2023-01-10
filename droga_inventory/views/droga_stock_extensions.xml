@@ -36,10 +36,6 @@
                 <attribute name="invisible">True</attribute>
             </xpath>
 
-            <xpath expr="//form/header/button[9]" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
-
             <xpath expr="//form/header/button[@name='action_toggle_is_locked']" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
