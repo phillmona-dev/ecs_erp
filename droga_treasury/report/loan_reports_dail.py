@@ -3,10 +3,10 @@ import imp
 
 from odoo import _, api, fields, models
 from odoo import models, fields, tools
-class AccountLoanDailyReport(models.Model):
+class AccountLoanDailyReports(models.Model):
 
     _inherit = 'account.loan'
-    _name="account.loan.report"
+    _name="account.loan.reports"
     _description = "Loanreport "
     
     daily_report_ids = fields.One2many(

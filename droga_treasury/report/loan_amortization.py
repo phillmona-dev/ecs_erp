@@ -71,7 +71,7 @@ class droga_account_loan_reports_xls(models.TransientModel):
             'border': 0,
             'align': 'left',
             'valign': 'vcenter',
-            'font_size': 18})
+            'font_size': 14})
         main_title_format = workbook.add_format({
             'bold': 1,
             'border': 0,
@@ -84,7 +84,8 @@ class droga_account_loan_reports_xls(models.TransientModel):
             'align': 'left',
             'valign': 'vcenter',
             'font_size': 12,
-            'fg_color': '#F6F5F5'})
+            'fg_color': '#FFFF00'})
+
 
         separator_format = workbook.add_format({
             'bold': 1,
@@ -93,85 +94,92 @@ class droga_account_loan_reports_xls(models.TransientModel):
             'valign': 'vcenter',
             'font_size': 12,
             'fg_color': '#D9D9D9'})
+        num_formats = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 10})
 
         title_format = workbook.add_format({
             'bold': 1,
             'border': 1,
-            'align': 'center',
+            'align': 'left',
             'valign': 'vcenter',
             'font_size': 11,
             'text_wrap': 1,
-            'fg_color': '#F6F5F5'})
+            'fg_color': '#FFFF00'})
         title_format_num= workbook.add_format({
             'bold': 1,
             'border': 1,
-            'num_format': 43,
-            'align': 'center',
+            
+            'align': 'left',
             'valign': 'vcenter',
             'font_size': 11,
             'text_wrap': 1,
             'fg_color': '#F6F5F5'})
-
+        # daily_loans = self.env['droga.loan.daily.report'].search(
+        #     [('acount_loan_id', '=', self.loan_id.id), ], order='value_date')
         sheet.merge_range('A' + str(row_start + 1) + ':O' + str(row_start + 1), self.loan_id.company_id.name, header_format)
         sheet.merge_range('A' + str(row_start + 2) + ':O' + str(row_start + 2), "LOAN AMORTIZATION", header_format)
-        sheet.merge_range('K' + str(row_start + 3) + ':L' + str(row_start + 3), "BANK", )
-        sheet.merge_range('M' + str(row_start + 3) + ':M' + str(row_start + 3), self.loan_id['name'].name, )
+        sheet.merge_range('K' + str(row_start + 3) + ':L' + str(row_start + 3), "BANK",title_format_num )
+        sheet.merge_range('M' + str(row_start + 3) + ':M' + str(row_start + 3), self.loan_id['name'].name, title_format_num)
         contractdate= self.loan_id['contract_date'].strftime("%Y/%m/%d")
-        sheet.merge_range('K' + str(row_start + 4) + ':L' + str(row_start + 4), "Loan Type", )
-        sheet.merge_range('M' + str(row_start + 4) + ':M' + str(row_start + 4), self.loan_id['loan_type'].name, )
-        sheet.merge_range('K' + str(row_start + 5) + ':L' + str(row_start + 5), "Statment Number", )
-        sheet.merge_range('M' + str(row_start + 5) + ':M' + str(row_start + 5), self.loan_id['loan_statement_number'], )
-        sheet.write(row_start+2, 12, self.loan_id['name'].name,)
-        sheet.write(row_start + 3, 12, self.loan_id['loan_type'].name)
-        sheet.write(row_start + 4, 12, self.loan_id['loan_statement_number'])
+        sheet.merge_range('K' + str(row_start + 4) + ':L' + str(row_start + 4), "Loan Type", title_format_num)
+        sheet.merge_range('M' + str(row_start + 4) + ':M' + str(row_start + 4), self.loan_id['loan_type'].name,title_format_num )
+        sheet.merge_range('K' + str(row_start + 5) + ':L' + str(row_start + 5), "Statment Number",title_format_num )
+        sheet.merge_range('M' + str(row_start + 5) + ':M' + str(row_start + 5), self.loan_id['loan_statement_number'], title_format_num)
+        sheet.write(row_start+2, 12, self.loan_id['name'].name,title_format_num)
+        sheet.write(row_start + 3, 12, self.loan_id['loan_type'].name,title_format_num)
+        sheet.write(row_start + 4, 12, self.loan_id['loan_statement_number'],title_format_num)
         #sheet.write(row_start + 5, 13, contractdate)#
-        sheet.merge_range('K' + str(row_start + 7) + ':L' + str(row_start + 7), "Schedule Payment", )
-        sheet.merge_range('K' + str(row_start + 8) + ':L' + str(row_start + 8), "Schedule Number of Payments", )
-        sheet.merge_range('K' + str(row_start + 9) + ':L' + str(row_start + 9), "Grace Period", )
-        sheet.merge_range('K' + str(row_start + 10) + ':L' + str(row_start + 10), "Total Interest", )
-        sheet.merge_range('K' + str(row_start + 11) + ':L' + str(row_start + 11), "Contract Date", )
-        sheet.write(row_start + 6, 12, self.loan_id.payment)
-        sheet.write(row_start + 7, 12, self.loan_id.schedule_numberof_payment)
-        sheet.write(row_start + 8, 12, '')
-        sheet.write(row_start + 9, 12, self.loan_id.total_interest+self.loan_id.total_penality)
-        sheet.write(row_start + 10, 12, contractdate)
+        sheet.merge_range('K' + str(row_start + 7) + ':L' + str(row_start + 7), "Schedule Payment",title_format_num )
+        sheet.merge_range('K' + str(row_start + 8) + ':L' + str(row_start + 8), "Schedule Number of Payments", title_format_num)
+        sheet.merge_range('K' + str(row_start + 9) + ':L' + str(row_start + 9), "Grace Period",title_format_num )
+        sheet.merge_range('K' + str(row_start + 10) + ':L' + str(row_start + 10), "Total Interest",title_format_num )
+        sheet.merge_range('K' + str(row_start + 11) + ':L' + str(row_start + 11), "Contract Date",title_format_num )
+        sheet.write(row_start + 6, 12, self.loan_id.payment,title_format_num)
+        sheet.write(row_start + 7, 12, self.loan_id.schedule_numberof_payment,title_format_num)
+        sheet.write(row_start + 8, 12, '-',title_format_num)
+        sheet.write(row_start + 9, 12, self.loan_id.total_interest+self.loan_id.total_penality,title_format_num)
+        sheet.write(row_start + 10, 12, contractdate,title_format_num)
         
         
         
         
-        sheet.merge_range('A' + str(row_start + 7) + ':C' + str(row_start + 7), "Loan Amount",)
-        sheet.merge_range('A' + str(row_start +8) + ':C' + str(row_start + 8), "Anual Interest Rate",)
-        sheet.merge_range('A' + str(row_start + 9) + ':C' + str(row_start + 9), "Loan Period In Years",)
-        sheet.merge_range('A' + str(row_start + 10) + ':C' + str(row_start + 10), "Number Of Payment per Yeart",)
-        sheet.merge_range('A' + str(row_start + 11) + ':C' + str(row_start + 11), "Daily Interest Rate",)
-        sheet.write(row_start + 6,3, self.loan_id.loan_amount)
-        sheet.write(row_start + 7,3, self.loan_id.anual_interest_rate)
-        sheet.write(row_start + 8, 3, self.loan_id.loan_period_year)
-        sheet.write(row_start + 9, 3, self.loan_id.total_number_of_payment)
-        sheet.write(row_start + 10, 3, self.loan_id.daily_interest_rate)
+        sheet.merge_range('A' + str(row_start + 7) + ':C' + str(row_start + 7), "Loan Amount",title_format_num)
+        sheet.merge_range('A' + str(row_start +8) + ':C' + str(row_start + 8), "Anual Interest Rate",title_format_num)
+        sheet.merge_range('A' + str(row_start + 9) + ':C' + str(row_start + 9), "Loan Period In Years",title_format_num)
+        sheet.merge_range('A' + str(row_start + 10) + ':C' + str(row_start + 10), "Number Of Payment per Yeart",title_format_num)
+        sheet.merge_range('A' + str(row_start + 11) + ':C' + str(row_start + 11), "Daily Interest Rate",title_format_num)
+        sheet.write(row_start + 6,3, self.loan_id.loan_amount,title_format_num)
+        sheet.write(row_start + 7,3, self.loan_id.anual_interest_rate,title_format_num)
+        sheet.write(row_start + 8, 3, self.loan_id.loan_period_year,title_format_num)
+        sheet.write(row_start + 9, 3, self.loan_id.total_number_of_payment,title_format_num)
+        sheet.write(row_start + 10, 3, self.loan_id.daily_interest_rate,title_format_num)
         
       
         #sheet.merge_range('A' + str(row_start + 11) + ':C' + str(row_start + 7), "Contract Date",)
         
         #sheet.merge_range('A' + str(row_start + 3) + ':G' + str(row_start + 3), 'Loan Amount',main_title_format)
         
-        sheet.write(row_start+12, 0, 'Year',title_format)
-        sheet.write(row_start + 12, 1, 'Month', title_format)
-        sheet.write(row_start + 12, 2, 'Value Date', title_format)
-        sheet.write(row_start + 12, 3, 'Description', title_format)
-        sheet.write(row_start + 12, 4, 'Receipt', title_format)
-        sheet.write(row_start + 12, 5, 'Repayment', title_format)
-        sheet.write(row_start + 12, 6, 'Cumulative Balance', title_format)
-        sheet.write(row_start + 12, 7, 'Interest on Unpaied Princpal', title_format)
-        sheet.write(row_start + 12, 8, 'Penalty Interest', title_format)
-        sheet.write(row_start + 12, 9, 'Penalty Payment', title_format)
-        sheet.write(row_start + 12, 10, 'Repayment', title_format)
-        sheet.write(row_start + 12, 11, 'Cumulative Balance', title_format)
-        sheet.write(row_start + 12, 12, 'Total Outstanding Balance', title_format)
-        sheet.merge_range('D' + str(row_start + 12) + ':G' + str(row_start + 12), "Principal",title_format)
-        sheet.merge_range('H' + str(row_start + 12) + ':L' + str(row_start + 12), "Interest",title_format)
-        row_start=13
-        daily_loan = self.env['droga.loan.daily.report'].search(
+        sheet.merge_range('A' + str(row_start + 13) + ':A' + str(row_start + 14), 'Year',title_format)
+        sheet.merge_range('B' + str(row_start + 13) + ':B' + str(row_start + 14), 'Month', title_format)
+        sheet.merge_range('C' + str(row_start + 13) + ':C' + str(row_start + 14), 'Value Date', title_format)
+        sheet.write(row_start + 13, 3, 'Description', title_format)
+        sheet.write(row_start + 13, 4, 'Receipt', title_format)
+        sheet.write(row_start + 13, 5, 'Repayment', title_format)
+        sheet.write(row_start + 13, 6, 'Cumulative Balance', title_format)
+        sheet.write(row_start + 13, 7, 'Interest on Unpaied Princpal', title_format)
+        sheet.write(row_start + 13, 8, 'Penalty Interest', title_format)
+        sheet.write(row_start + 13, 9, 'Penalty Payment', title_format)
+        sheet.write(row_start + 13, 10, 'Repayment', title_format)
+        sheet.write(row_start + 13, 11, 'Cumulative Balance', title_format)
+        sheet.write(row_start + 13, 12, 'Total Outstanding Balance', title_format)
+        sheet.merge_range('D' + str(row_start + 13) + ':G' + str(row_start + 13), "Principal",title_format)
+        sheet.merge_range('H' + str(row_start + 13) + ':L' + str(row_start + 13), "Interest",title_format)
+        row_start=15
+        daily_loane = self.env['droga.loan.daily.report'].search(
             [('id', 'in', self.loan_id.ids)])
         balance=0
         recipt=0
@@ -180,34 +188,43 @@ class droga_account_loan_reports_xls(models.TransientModel):
         ipayment=0
         ppayment=0
         pealitypay=0
+        ccint=0
         cinterest=0
+        ccint=self.loan_id.current_cumlative_interest
+        balance=self.loan_id.current_cumlative_balace
+        # idd=self.loan_id
+        ids=self.loan_id.id 
+        aa=self.id
         daily_loan = self.env['droga.loan.daily.report'].search(
-            [('acount_loan_id', '=', self.loan_id.id), ],order='value_date')
+            [('acount_loan_id', '=',ids ), ],order='value_date')
         datee=self.loan_id.contract_date
 
         for daily in daily_loan:
             if datee!=daily.value_date:
+
                 datee=daily.value_date
-                sheet.write(row_start, 0, daily['value_date'].year,border)
-                sheet.write(row_start, 1, daily['value_date'].month,border)
-                sheet.write(row_start, 2, daily['value_date'].strftime("%Y/%m/%d"),border)
+                if datee:
+                    sheet.write(row_start, 0, daily['value_date'].year,)
+                    sheet.write(row_start, 1, daily['value_date'].month,)
+                    sheet.write(row_start, 2, daily['value_date'].strftime("%Y/%m/%d"),)
+                
                 # sheet.write(row_start, 2, 'ABCD',border)
                 sheet.write(row_start, 3,  ' ')
                 inte+= daily['daily_interest_amount']
                 penality+=daily['daily_penality_amount']
                
             
-                sheet.write(row_start, 7, daily['daily_interest_amount'],border)
+                sheet.write(row_start, 7, daily['daily_interest_amount'],)
                 daily_reciept= self.env['droga.loan.daily.report'].search(
             [('acount_loan_id', '=', self.loan_id.id),('date','=',daily.value_date) ],order='value_date')
                 
                 for recie in daily_reciept :
                         if recie['date']==daily['value_date']:
                             recipt+= recie['receipt']
-                            sheet.write(row_start, 4, recie['receipt'],border)
+                            sheet.write(row_start, 4, recie['receipt'],)
                             break
                         else:
-                            sheet.write(row_start, 4, ' ',border)
+                            sheet.write(row_start, 4, ' ',)
                 # daily_repay= self.env['droga.loan.daily.report'].search(
                 #      [('acount_loan_id', '=', self.loan_id.id),('pdate','=',daily.value_date) ],order='value_date')
                 daily_repay= self.env['droga.loan.daily.report'].search(
@@ -219,14 +236,14 @@ class droga_account_loan_reports_xls(models.TransientModel):
                            ipayment+=repay.interst_payment
 
 
-                           sheet.write(row_start, 5,repay.principal_repayment,border)
-                           sheet.write(row_start, 9,repay.is_penality,border)
-                           sheet.write(row_start, 10,repay.interst_payment,border)
+                           sheet.write(row_start, 5,repay.principal_repayment,)
+                           sheet.write(row_start, 9,repay.is_penality,)
+                           sheet.write(row_start, 10,repay.interst_payment,)
                            pealitypay+=repay.is_penality
                            break
-                cumu=recipt-ppayment
-                sheet.write(row_start, 6,recipt-ppayment, )
-                cinterest=penality+inte- ipayment-pealitypay
+                cumu=balance+recipt-ppayment
+                sheet.write(row_start, 6,cumu, )
+                cinterest=ccint+penality+inte- ipayment-pealitypay
                 sheet.write(row_start, 11, cinterest, )
                 sheet.write(row_start, 12, cinterest+cumu, )
                 

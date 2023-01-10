@@ -117,8 +117,7 @@ class AccountLoanConst(models.Model):
                                             'daily_interest_total': interst_amount+penality_amount})
                 
                 starting_days = [[7, 8, 'Hamile'], [8, 7, 'Nehasie'], [9, 11, 'Meskerem'], [10, 11, 'Tikemt'],
-                            [11, 10, 'Hidar'], [12, 10, 'Tahesas'], [
-                                1, 9, 'Tir'], [2, 8, 'Yekatit'],
+                            [11, 10, 'Hidar'], [12, 10, 'Tahesas'], [1, 9, 'Tir'], [2, 8, 'Yekatit'],
                             [3, 10, 'Megabit'], [4, 9, 'Mizia'], [5, 9, 'Ginbot'], [6, 8, 'Senie']]
         # payment generating fpr calculation if payment day = current day
                 # if predone.loan_schedule_ids:
@@ -147,6 +146,8 @@ class AccountLoanConst(models.Model):
                 ayear = 0
                 for start_day in starting_days:
                         add_day = 30
+                        if cday.month==1 and start_day==[12, 10, 'Tahesas']:
+                            nyear = cday.year-1
                         ayear = nyear
 
                         stday = date(ayear, start_day[0], start_day[1])
@@ -274,9 +275,12 @@ class AccountLoanConst(models.Model):
             # if not loans.interest_start_date:
                 #raise ValidationError("Please insert the first receipt")
             if loans.current_cumlative_balace>0:
-                if not loans.opening_date:
+                if not loans.opening_date :
                      raise ValidationError(
                         "Please enter The Opening Date")
+                # if loans.opening_date and not loans.opening_payment_date:
+                #      raise ValidationError(
+                #         "Please enter The Opening Payment start Date")
               
             if loans.interest_start_date:
                 if loans.contract_date > loans.interest_start_date:
