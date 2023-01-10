@@ -36,7 +36,7 @@
                 <attribute name="invisible">True</attribute>
             </xpath>
 
-            <xpath expr="//form/header/button[@name='%(stock.act_stock_return_picking)d']" position="attributes">
+            <xpath expr="//form/header/button[9]" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
 
