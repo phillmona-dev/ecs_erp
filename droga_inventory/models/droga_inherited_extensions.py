@@ -506,7 +506,7 @@ class droga_stock_product_extension(models.Model):
 
     def write(self, vals_list):
 
-        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager'):
+        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and 'seller_ids' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
         return super(droga_stock_product_extension, self).write(vals_list)
 
