@@ -35,7 +35,7 @@ class droga_stock_cons_receive(models.Model):
     consignment_reference = fields.Char(string='Order reference', default='', readonly=True)
     cons_ref = fields.One2many('stock.picking', 'cons_receive_request', string='Consignment reference')
 
-    issue_type = fields.Selection([('CONR', 'Consignment recieve'), ('SAR', 'Sample return')],
+    issue_type = fields.Selection([('CONR', 'Consignment recieve'), ('SIR', 'Sample return')],
                                   string='Issue type', required=True)
     marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
     store_manager = fields.Many2one('res.users', compute='_get_approvers')
