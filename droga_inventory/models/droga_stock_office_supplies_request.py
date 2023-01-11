@@ -107,6 +107,10 @@ class droga_stock_office_supplies(models.Model):
         help=" * Requested: The transfer is requested to the sending warehouse.\n"
              " * Done: The transfer is approved and processed.\n")
 
+    # if the request is approved by department manager check this option
+    approve_dept_manger = fields.Boolean("By Department", default=False,
+                                         help="The request will be approved by the department manager")
+
     @api.model
     def create(self, vals_list):
         if vals_list.get('name', 'New') == 'New':
@@ -359,7 +363,8 @@ class droga_stock_office_supplies(models.Model):
     def create_activity(self, user_id):
         # create mail activity for the approval
         todos = dict(res_id=self.id,
-                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.inventory.office.supplies.request')]).id,
+                     res_model_id=self.env['ir.model'].search(
+                         [('model', '=', 'droga.inventory.office.supplies.request')]).id,
                      user_id=user_id, summary='Grant Approval', note='You have a request to approve',
                      activity_type_id=4,
                      date_deadline=datetime.now())
@@ -380,8 +385,10 @@ class droga_stock_office_supplies(models.Model):
     @api.depends("department")
     def _get_manager_id(self):
         for record in self:
-            record.department_manager = record.requested_by.parent_id
-
+            if record.approve_dept_manger:
+                record.department_manager = record.department.manager_id
+            else:
+                record.department_manager = record.requested_by.parent_id
 
 class droga_stock_transfer_office_supplies_request_detail(models.Model):
     _name = 'droga.inventory.office.supplies.request.detail'
