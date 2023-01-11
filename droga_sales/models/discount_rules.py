@@ -43,7 +43,7 @@ class sale_order_line(models.Model):
     @api.depends('product_id')
     def _is_prod_available(self):
         for rec in self:
-            rec.available_qty=rec.product_id.free_qty-rec.product_id.outgoing_qty
+            rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
             if not rec.product_id.bought_locally and rec.available_qty<rec.product_id.emergency_order_point:
                 rec.is_prod_available=False
             else:
