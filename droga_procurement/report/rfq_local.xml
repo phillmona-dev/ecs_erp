@@ -248,7 +248,17 @@
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-3 bm-2">
                                 <strong>Approved By:</strong>
-                                <!--<p t-field="o.create_uid.name" class="m-0"/>-->
+                                <t t-foreach="o.approvals" t-as="approver">
+                                    <t t-if="approver.rule_id.method=='ceo_approval'">
+                                        <tr>
+                                            <td height="35">
+                                                <span t-esc="approver.user_id.name"/>
+
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </t>
+                                </t>
                             </div>
 
                             <div class="col-3 bm-2">
