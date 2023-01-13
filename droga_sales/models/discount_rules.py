@@ -3,8 +3,6 @@ from datetime import datetime
 from odoo import models,fields,api
 from odoo.exceptions import ValidationError
 from odoo.http import request
-from lxml import etree
-import simplejson
 
 
 class droga_price_discount_per_type(models.Model):
