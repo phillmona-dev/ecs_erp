@@ -3,6 +3,8 @@ from datetime import datetime
 from odoo import models,fields,api
 from odoo.exceptions import ValidationError
 from odoo.http import request
+from lxml import etree
+import simplejson
 
 
 class droga_price_discount_per_type(models.Model):
@@ -44,7 +46,7 @@ class sale_order_line(models.Model):
     def _is_prod_available(self):
         for rec in self:
             rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
-            if not rec.product_id.bought_locally and rec.available_qty<rec.product_id.emergency_order_point:
+            if not rec.product_id.bought_locally and rec.available_qty<=rec.product_id.emergency_order_point:
                 rec.is_prod_available=False
             else:
                 rec.is_prod_available = True
@@ -371,3 +373,10 @@ class sale_order_ext(models.Model):
         self['non_core_sum'] = non_core_sum
         self.order_line._compute_price_unit()
 
+    @api.model
+    def get_view_no_run(self, view_id=None, view_type='form', **options):
+
+        result = super(sale_order_ext, self).get_view(self,view_id=None, view_type='form', **options)
+
+
+        return result

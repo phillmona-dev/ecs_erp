@@ -76,10 +76,6 @@
         <field name="name">Finance inventory controller</field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
     </record>
-    <record id="fin_inv_admin" model="res.groups">
-        <field name="name"> Finance inventory administrator</field>
-        <field name="category_id" ref="base.module_category_inventory_inventory"/>
-    </record>
     <record id="marketing_manager" model="res.groups">
         <field name="name">Droga Marketing manager (samples approver)</field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>

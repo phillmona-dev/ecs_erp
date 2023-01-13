@@ -38,13 +38,6 @@
     <menuitem id="stock.menu_product_stock" name="Stock" action="stock.action_product_stock_view"
         parent="stock.menu_warehouse_report" groups="stock.group_stock_manager" sequence="5"/>
 
-    <!--- Inventory adjustment for administrators only -->
-    <menuitem id="stock.menu_action_inventory_tree"
-              name="Inventory Adjustments"
-              parent="stock.menu_stock_warehouse_mgmt"
-              groups="droga_inventory.fin_inv_admin"
-              sequence="10" action="stock.action_view_inventory_tree" />
-
     <!--- Transfers menu avail for finance reconcile only -->
     <menuitem id="stock.all_picking" name="Inventory correction" parent="account.menu_finance_entries_accounting_miscellaneous" sequence="20"
               action="stock.action_picking_tree_all" groups="droga_inventory.inv_prod_fin"/>
