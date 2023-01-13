@@ -6,7 +6,7 @@
     </record>
 
     <record id="crm_mr" model="res.groups">
-        <field name="name">CRM medical representative</field>
+        <field name="name">CRM MR/PM</field>
         <field name="category_id" ref="crm_management"/>
     </record>
     <record id="crm_sr" model="res.groups">
@@ -27,6 +27,11 @@
 
     <record id="crm_cust" model="res.groups">
         <field name="name">CRM admin</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
+
+    <record id="cust_manager" model="res.groups">
+        <field name="name">Customer administrator</field>
         <field name="category_id" ref="crm_management"/>
     </record>
 </odoo>

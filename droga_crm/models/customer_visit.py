@@ -39,16 +39,16 @@ class customer_visit_header(models.Model):
             pr_sales_loc=ses[0].pro_id[0]
 
         approver_login=''
-        if pr_sales_loc.employee_access_users.name=='CRM_MR' or pr_sales_loc.employee_access_users.name=='CRM_SR':
-            approver_login='CRM_RSM'
-        elif pr_sales_loc.employee_access_users.name=='CRM_RSM':
-            approver_login = 'CRM_NSM'
-        elif pr_sales_loc.employee_access_users.name=='CRM_PM':
-            approver_login = 'CRM_PM_NSM'
+        if pr_sales_loc.employee_access_users.login.upper().startswith('CRM_MR')  or pr_sales_loc.employee_access_users.login.upper().startswith('CRM_SR'):
+            approver_login='crm_rsm@drogapharma.com'
+        elif pr_sales_loc.employee_access_users.login.upper().startswith('CRM_RSM'):
+            approver_login = 'crm_nsm@drogapharma.com'
+        elif pr_sales_loc.employee_access_users.login.upper().startswith('CRM_PM'):
+            approver_login = 'crm_pm_nsm@drogapharma.com'
         else:
             approver_login = '-'
 
-        approvers=self.env['droga.pro.sales.master'].sudo().search([('employee_access_users.name','=',approver_login),('p_regions','in',pr_sales_loc.p_regions.ids)])
+        approvers=self.env['droga.pro.sales.master'].sudo().search([('employee_access_users.login','=',approver_login),('p_regions','in',pr_sales_loc.p_regions.ids)])
         return approvers[0] if len(approvers)>0 else False
 
     approver=fields.Many2one('droga.pro.sales.master',default=_get_approver,store=True,required=True)

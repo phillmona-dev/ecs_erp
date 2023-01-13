@@ -60,7 +60,7 @@ class cust_contact_extension(models.Model):
 
 
     def _is_cust_loc_avail(self):
-        if not self.env.user.name.upper().startswith('CRM'):
+        if not self.env.user.name.upper().startswith('CRM') and self.env.user.has_group('droga_crm.cust_manager'):
             for rec in self:
                 rec.is_cust_available = True
         else:
@@ -74,7 +74,7 @@ class cust_contact_extension(models.Model):
 
 
     def _search_cust_avail(self, operator, value):
-        if not self.env.user.name.upper().startswith('CRM') :
+        if not self.env.user.name.upper().startswith('CRM') and self.env.user.has_group('droga_crm.cust_manager'):
             return [('id', 'in', [x.id for x in self.env['res.partner'].search([(1,'=',1)])] )]
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         if not request or len(ses)==0:

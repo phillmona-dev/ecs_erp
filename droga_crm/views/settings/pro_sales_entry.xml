@@ -18,6 +18,7 @@
                 </group>
                 <footer>
                     <button name="action_enter" string="Enter" type="object" class="btn-primary"/>
+                    <button name="action_change" string="Change Password" type="object"/>
                 </footer>
             </form>
         </field>
@@ -30,4 +31,24 @@
             groups="crm_mr"
             web_icon="droga_crm,static/description/icon.png"
             sequence="19"/>
+
+    <record id="droga_pro_sales_master_entry_visit_form_pop_pup" model="ir.ui.view">
+        <field name="name">droga.pro.sales.master.entry.visit.form.pop.pip</field>
+        <field name="model">droga.pro.sales.master.entry.visit</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <group>
+                    <field name="pro_id" domain="([('employee_access_users','=',uid),('status','=','Active')])"
+                           options="{'no_create':True,'no_open':True}"/>
+                    <field name="pre_pass" string="Previous ID"/>
+                    <field name="new_pass" string="New ID"/>
+                    <field name="confirm_pass" string="Confirm New ID"/>
+                </group>
+                <footer>
+                    <button name="action_reset" class="btn-primary" string="Reset ID" type="object"/>
+                    <button name="action_cancel_reset" string="Cancel" type="object"/>
+                </footer>
+            </form>
+        </field>
+    </record>
 </odoo>
