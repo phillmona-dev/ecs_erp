@@ -135,8 +135,8 @@ class droga_stock_office_supplies(models.Model):
             raise ValidationError(
                 "A manager is not set for the requester, please contact HR to set manager for your employee record")
         # create activity for the approver
-        self.create_activity(self.department_manager_user_id.id)
-
+        #self.create_activity(self.department_manager_user_id.id)
+        self.create_activity(self.requested_by.parent_id.id)
     # verify request
     def action_verify(self):
         self.state = "verify"
