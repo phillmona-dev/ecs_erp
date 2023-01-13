@@ -25,7 +25,7 @@ class WitholdingReport(models.TransientModel):
 
     def action_get_xls(self):
 
-        # This generates our excel file
+        # This generates our Excel file
         file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
         if self.report == 'Payable':
@@ -62,7 +62,7 @@ class WitholdingReport(models.TransientModel):
         sheet.set_column('G:G', 20)
         row_start = 0
         date_format = workbook.add_format(
-            {'num_format': 'dd/mm/yyyy', 'border': 7})
+            {'num_format': 'mm/dd/yyyy', 'border': 7})
         num_format = workbook.add_format({'num_format': 43, 'border': 7})
         cent_format = workbook.add_format({'num_format': 41, 'border': 7})
         border = workbook.add_format({'border': 7})
@@ -135,8 +135,8 @@ class WitholdingReport(models.TransientModel):
 
         for record in withholdings:
             # get witholde name and tin no
-            witholdee_name = record.partner_id.name if record.partner_id.vat else ''
-            witholdee_tin = record.partner_id.vat if record.partner_id.vat else ''
+            witholdee_name = record.move_id.partner_id.name if record.move_id.partner_id.name else ''
+            witholdee_tin = record.move_id.partner_id.vat if record.move_id.partner_id.vat else ''
             reciept_no = record.ref if record.ref else ''
 
             sheet.write(row_start, 0, "9063340002", border)
@@ -233,8 +233,8 @@ class WitholdingReport(models.TransientModel):
 
         for record in withholdings:
             # get witholde name and tin no
-            witholdee_name = record.partner_id.name if record.partner_id.vat else ''
-            witholdee_tin = record.partner_id.vat if record.partner_id.vat else ''
+            witholdee_name = record.move_id.partner_id.name if record.move_id.partner_id.name else ''
+            witholdee_tin = record.move_id.partner_id.vat if record.move_id.partner_id.vat else ''
             reciept_no = record.ref if record.ref else ''
 
             sheet.write(row_start, 0, "9063340002", border)

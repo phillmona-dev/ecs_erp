@@ -330,7 +330,7 @@ class droga_stock_office_supplies(models.Model):
             for line in self.detail_entries:
                 if line.unavilable_qty != 0:
                     order_line_vals = (0, 0, {
-                        'product_id': line.product_id.id,
+                        'product_id': line.product_id.product_variant_id.id,
                         'product_qty': line.unavilable_qty,
                         'product_uom': line.product_uom.id,
                         'unit_price': line.unit_price,
