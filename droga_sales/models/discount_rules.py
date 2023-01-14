@@ -85,6 +85,8 @@ class sale_order_line(models.Model):
         self.order_id.total_added=(core_sum+non_core_sum)-total_before_discount
     @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id','manual_price','store_placement')
     def _compute_price_unit(self):
+        if self.order_id.state in ('sale','cancel','done'):
+            return
 
         for line in self:
             if not line.wareh:
