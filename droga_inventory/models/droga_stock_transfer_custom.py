@@ -126,7 +126,7 @@ class droga_stock_transfer_custom(models.Model):
                 #'origin': self.name,
                 #'state': 'waiting',
                 #'state': 'confirmed',
-                'state': 'assigned',
+                'state': 'draft',
                 'trans_issue_request':self.id,
                 'scheduled_date': self.request_date
             }
@@ -151,12 +151,13 @@ class droga_stock_transfer_custom(models.Model):
                         'location_dest_id': self.location_dest_id.id,
                         #'state': 'waiting',
                         #'state': 'confirmed',
-                        'state': 'assigned',
+                        'state': 'draft',
                         'company_id': self.company_id.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)
-
+            picking_id.action_assign()
+            picking_id.state='assigned'
         self.state = 'waiting'
 
     def action_receive(self):

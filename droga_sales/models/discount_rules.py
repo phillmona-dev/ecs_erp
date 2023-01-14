@@ -108,10 +108,6 @@ class sale_order_line(models.Model):
                 elif rate['core_products_or_all'] == 'All':
                     all_rate = all_rate + rate['percent']
 
-            # check if there is already invoiced amount. if so, the price shouldn't change as it might have been
-            # manually edited
-            if line.qty_invoiced > 0:
-                continue
             if line.store_placement:
                 line.price_unit = 0.0
                 continue
