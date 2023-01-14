@@ -124,8 +124,8 @@
 
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="after">
-                <field name="is_tin_read_only" invisible="1"></field>
-                <field name="vat" attrs="{'invisible': [('supplier_rank', '>', 0)],'readonly': [('is_tin_read_only', '=', True)]}" string="Tin No"></field>
+                <field name="vat" invisible="1"></field>
+                <field name="vat" attrs="{'invisible': [('supplier_rank', '>', 0)],'readonly': [('vat', '!=', False)]}" string="Tin No"></field>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="attributes">
