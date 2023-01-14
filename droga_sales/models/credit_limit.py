@@ -56,7 +56,7 @@ class cust_sales_credit_limit(models.Model):
             for mi in matured_invoices:
                 tot_amount=tot_amount+(mi['amount_total_signed'] if mi['amount_residual']==0 else mi['amount_residual'])
             rec.mature_amount=tot_amount
-            rec.show_invoice_button=False if self.partner_id.unsettled_amount==0 else True
+            rec.show_invoice_button=False if rec.mature_amount==0 else True
     @api.model
     def create(self, vals):
 
