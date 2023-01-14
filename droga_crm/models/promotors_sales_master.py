@@ -102,14 +102,7 @@ class droga_promotors_sales_detail_entry_visit(models.TransientModel):
             uname.sudo().write(valus)
         else:
             raise UserError("Please check your previous ID!.")
-        return {
-            'name': 'Promotor/sales entry',
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': 'droga.pro.sales.master.entry.visit',
-            'view_id': self.env.ref('droga_crm.droga_pro_sales_master_entry_visit_form').id,
-            'target': 'new'
-        }
+        
 
     def action_cancel_reset(self):
         return {

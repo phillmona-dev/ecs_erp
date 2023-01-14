@@ -24,8 +24,9 @@ access_droga_crm_done_activity_all,droga_crm.droga_crm_done_activity,model_droga
 access_droga_pro_sales_master_entry_visit,droga_crm.droga_pro_sales_master_entry_visit,model_droga_pro_sales_master_entry_visit,droga_crm.crm_mr,1,1,1,1
 access_droga_sale_order,sale.sale_order,sale.model_sale_order,droga_crm.crm_mr,1,1,1,1
 access_droga_lead2oppo,crm.lead2opportunity_partner,crm.model_crm_lead2opportunity_partner,droga_crm.crm_mr,1,1,1,1
-access_droga_res_partner,crm.res_partner,base.model_res_partner,droga_crm.crm_mr,1,1,1,1
 access_droga_ordered_prod,droga_lead_ordered_products,model_droga_lead_ordered_products,droga_crm.crm_mr,1,1,1,1
 access_droga_crm_settings_prod_group,droga_crm.droga_crm_settings_prod_group,model_droga_crm_settings_prod_group,droga_crm.crm_mr,1,1,1,1
 access_droga_decimal_precision_config,droga_crm.decimal.precision.configuration,base.model_decimal_precision,droga_crm.crm_sr,1,1,0,0
 
+access_droga_res_partner,crm.res_partner,base.model_res_partner,droga_crm.crm_sr,1,1,1,1
+access_droga_res_partner_readonly,crm.res_partner_read,base.model_res_partner,base.group_user,1,0,0,0
