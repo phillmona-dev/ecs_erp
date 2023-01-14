@@ -30,7 +30,7 @@ class cust_contact_extension(models.Model):
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
     city_name = fields.Many2one('droga.crm.settings.city',tracking=True)
-    
+    is_tin_read_only=fields.Boolean('Is tin read only',compute='_is_tin_read_comp',search='_is_tin_read_search')
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
@@ -42,6 +42,17 @@ class cust_contact_extension(models.Model):
         for rec in self:
             rec.street=((rec.area.area_name+' - ') if rec.area else '')+rec.location if rec.location else ''
 
+    def _is_tin_read_comp(self):
+        for rec in self:
+            if rec.vat:
+                rec.is_tin_read_only=True
+            else:
+                rec.is_tin_read_only=False
+
+    def _is_tin_read_search(self):
+        is_tin_registered = self.env['res.partner'].sudo().search(
+            [('vat', '!=', False)])
+        return [('id', 'in', [x.id for x in is_tin_registered] if is_tin_registered else False)]
 
     def _get_pr_sales_logged(self):
         if not request:
