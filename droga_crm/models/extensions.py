@@ -30,6 +30,7 @@ class cust_contact_extension(models.Model):
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
     city_name = fields.Many2one('droga.crm.settings.city',tracking=True)
+    is_tin_read_only=fields.Boolean()
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
@@ -50,7 +51,7 @@ class cust_contact_extension(models.Model):
 
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     def _get_areas(self):
-        if self.env.user.has_group('droga_crm.cust_manager'):
+        if self.env.user.has_group('droga_crm.crm_cust'):
             return self.env['droga.crm.settings.city'].search([(1,'=',1)]).ids
         else:
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
@@ -60,7 +61,7 @@ class cust_contact_extension(models.Model):
 
 
     def _is_cust_loc_avail(self):
-        if not self.env.user.name.upper().startswith('CRM') and self.env.user.has_group('droga_crm.cust_manager'):
+        if not self.env.user.name.upper().startswith('CRM') and self.env.user.has_group('droga_crm.crm_cust'):
             for rec in self:
                 rec.is_cust_available = True
         else:
@@ -74,7 +75,7 @@ class cust_contact_extension(models.Model):
 
 
     def _search_cust_avail(self, operator, value):
-        if not self.env.user.name.upper().startswith('CRM') and self.env.user.has_group('droga_crm.cust_manager'):
+        if not self.env.user.name.upper().startswith('CRM') and self.env.user.has_group('droga_crm.crm_cust'):
             return [('id', 'in', [x.id for x in self.env['res.partner'].search([(1,'=',1)])] )]
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         if not request or len(ses)==0:
