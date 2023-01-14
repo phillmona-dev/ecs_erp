@@ -30,7 +30,7 @@ class cust_contact_extension(models.Model):
     #region = fields.Many2one('droga.crm.settings.region')
     #city_custom = fields.Many2one('droga.crm.settings.city')
     city_name = fields.Many2one('droga.crm.settings.city',tracking=True)
-    is_tin_read_only=fields.Boolean()
+    
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
