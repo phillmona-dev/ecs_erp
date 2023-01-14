@@ -102,7 +102,7 @@ class droga_promotors_sales_detail_entry_visit(models.TransientModel):
             uname.sudo().write(valus)
         else:
             raise UserError("Please check your previous ID!.")
-        
+
 
     def action_cancel_reset(self):
         return {
@@ -115,6 +115,4 @@ class droga_promotors_sales_detail_entry_visit(models.TransientModel):
             'target': 'new'
         }
 
-    def action_cancel(self):
-        raise UserError("Testing.")
 

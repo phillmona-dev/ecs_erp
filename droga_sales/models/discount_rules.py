@@ -206,7 +206,14 @@ class sale_order_ext(models.Model):
     operation_approver=fields.Many2one('res.users',compute='_get_approvers')
     out_of_stock_items=fields.Char('Stock out items',compute='_get_stock_out')
     has_access = fields.Boolean(default=False,search='_has_access',compute='_compute_has_access')
+    sales_initiator=fields.Char('Sales person',compute='_get_sales_init')
 
+    def _get_sales_init(self):
+        for rec in self:
+            if rec.user_id.name.startswith('CRM'):
+                rec.sales_initiator='SR-'+rec.pr_sales.p_name
+            else:
+                rec.sales_initiator = rec.user_id.name
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
             for rec in self:

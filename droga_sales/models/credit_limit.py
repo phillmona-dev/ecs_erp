@@ -43,11 +43,11 @@ class cust_sales_credit_limit(models.Model):
     def _get_so_type(self):
         for rec in self:
             if rec.payment_term_id.apply_credit_limit:
-                rec.sales_type='cr'
+                rec.sales_type='Credit sales'
             elif rec.payment_term_id.name=='Sales return':
-                rec.sales_type = 'sr'
+                rec.sales_type = 'Sales return'
             else:
-                rec.sales_type = 'cs'
+                rec.sales_type = 'Cash sales'
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
