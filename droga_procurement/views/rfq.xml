@@ -180,6 +180,29 @@
         </field>
     </record>
 
+    <record id="droga_purchase_rfq_foreign_view_search" model="ir.ui.view">
+        <field name="name">droga_purhcase_rfq.view.search</field>
+        <field name="model">droga.purhcase.request.rfq</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="RFQ No"/>
+                <field name="purhcase_request_id" string="Purchase Request No"/>
+                <field name="date"/>
+                <field name="rfq_lines"  filter_domain="[('rfq_lines.product_id', 'ilike', self)]" string="Product"/>
+                <field name="company_id"/>
+                <field name="state"/>
+                <separator/>
+                <filter name="Checked" string="Checked" domain="[('state', '=', 'Checked')]"/>
+                <filter name="Operation Manager" string="Operation Manager"
+                        domain="[('state', '=', 'Operation Manager')]"/>
+                <filter name="CEO Approval" string="CEO Approval" domain="[('state', '=', 'CEO Approval')]"/>
+
+            </search>
+        </field>
+
+
+    </record>
+
     <!-- grid view -->
     <record id="timesheet_view_grid_by_project" model="ir.ui.view">
         <field name="name">Grid</field>

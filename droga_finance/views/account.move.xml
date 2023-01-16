@@ -3,39 +3,50 @@
 
 
     <!-- inherited for view of purchase.order -->
-    <record id="inherit_for_account_move_form" model="ir.ui.view">
+    <record id="inherit_for_account_move_form1" model="ir.ui.view">
         <field name="name">Account Move</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="priority" eval="1"/>
+        <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-             <xpath expr = "//field[@name='partner_id']" position = "after">
-                 <field name="vendor_customer_name" string="Name"/>
-             </xpath>
 
-            <xpath expr = "//field[@name='ref']" position = "after">
-                <field name="transaction_type" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('transaction_no', '!=', 'New')],'invisible': [('move_type', 'in', ('in_invoice', 'in_refund', 'in_receipt','out_invoice'))]}" />
-                <field name="transaction_no" readonly="1" attrs="{'invisible': [('move_type', 'in', ('in_invoice', 'in_refund', 'in_receipt','out_invoice'))]}"/>
+            <xpath expr="//field[@name='ref']" position="attributes">
+                <attribute name="string">Check No/Bank Ref</attribute>
+            </xpath>
 
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="vendor_customer_name" string="Name"/>
+            </xpath>
+
+
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="transaction_type" options="{'no_create':True,'no_open':True}"
+                       attrs="{'readonly': [('transaction_no', '!=', 'New')],'invisible': [('move_type', 'in', ('in_invoice', 'in_refund', 'in_receipt','out_invoice'))]}"/>
+                <field name="transaction_no" readonly="1"
+                       attrs="{'invisible': [('move_type', 'in', ('in_invoice', 'in_refund', 'in_receipt','out_invoice'))]}"/>
+                <field name="withholding_no"/>
                 <field name="purpose"/>
             </xpath>
-            <xpath expr = "//field[@name='partner_bank_id']" position = "attributes">
+            <xpath expr="//field[@name='partner_bank_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr = "//field[@name='purchase_vendor_bill_id']" position = "attributes">
+
+            <!--<xpath expr="//field[@name='purchase_vendor_bill_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
-            </xpath>
+            </xpath>-->
+
+
         </field>
     </record>
-
 
 
     <record id="inherit_for_account_move_tree" model="ir.ui.view">
         <field name="name">Account Move</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_tree" />
+        <field name="inherit_id" ref="account.view_move_tree"/>
         <field name="arch" type="xml">
-            <xpath expr = "//field[@name='name']" position = "after">
-                <field name="transaction_type" />
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="transaction_type"/>
                 <field name="transaction_no"/>
             </xpath>
         </field>
