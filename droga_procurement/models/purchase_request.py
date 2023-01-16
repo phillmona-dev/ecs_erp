@@ -574,7 +574,7 @@ class purchase_request_line_current_market_analysis(models.Model):
     manufacturer = fields.Many2one('res.partner', domain="[('supplier_rank','!=', 0)]", string="Manufacturer")
     unit = fields.Many2one('uom.uom', string='UoM')
     avail_stock = fields.Float('Available Stock')
-    sell_up = fields.Float('Selling Unit Price')
+    sell_up = fields.Float('Selling Unit Price', digits=(12, 4))
     epss_volume = fields.Float('EPSS Stock Volume')
     local_man_status = fields.Char('Local Manufacturers Stock and RM Status')
     market_analysis_remark = fields.Char('Remark')
@@ -587,10 +587,10 @@ class purchase_request_line_future_market_analysis(models.Model):
     importer = fields.Many2one("droga.purchase.competitors", string='Importer')
     manufacturer = fields.Char(string='Manufacturer')
     unit = fields.Many2one('uom.uom', string="UoM")
-    private_unit_price = fields.Float('Private Unit Price')
+    private_unit_price = fields.Float('Private Unit Price', digits=(12, 4))
     private_unit_quantity = fields.Float('Private Quantity')
     private_order_date = fields.Date('Private Ordered Date')
-    epss_unit_ = fields.Float('EPSS Unit Price')
+    epss_unit_ = fields.Float('EPSS Unit Price', digits=(12, 4))
     epss_winner = fields.Char('EPSS Winner Manufacturer')
 
 

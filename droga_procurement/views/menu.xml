@@ -38,6 +38,12 @@
         <menuitem id="droga_purchase_order_foreign_menu" name="Purchase Order" sequence="3"
                   action="purchase_form_foreign_action"
                   groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+
+        <menuitem id="droga_account_foreign_currency_request_procurement_menu" name="Foreign Currency Request"
+                  action="droga_procurement.droga_foreign_currency_request_action1"
+                  groups="account.group_account_manager"
+                  sequence="4"/>
+
     </menuitem>
 
     <!-- reporting -->

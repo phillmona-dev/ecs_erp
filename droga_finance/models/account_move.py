@@ -8,6 +8,7 @@ class AccountMove(models.Model):
 
     purpose = fields.Char("Purpose")
     vendor_customer_name = fields.Char("Customer/Vendor Name")
+    withholding_no = fields.Char("Withholding Ref")
 
     @api.depends("amount_total")
     def _compute_amount_word(self):
@@ -84,32 +85,32 @@ class AccountMove(models.Model):
         return super(AccountMove, self).create(vals)
 
     def write(self, vals):
-        if 'transaction_type' in vals:
-            if vals['transaction_type'] != '':
-                # get sequence code for the current fisacl year
-                # get current discal year
-                now = datetime.today().date()
-                fisacl_year = self.env['account.fiscal.year'].search(
-                    [('date_from', '<=', now), ('date_to', '>=', now)])
+        if self.transaction_type:
 
-                sequence = None
-                if fisacl_year:
-                    # get transaction type
-                    transaction_type = self.env["account.transaction.type"].search(
-                        [('id', '=', vals['transaction_type'])])
-                    for record in transaction_type.posting_cycles:
-                        if record.fiscal_year.id == fisacl_year.id:
-                            # get sequence
-                            sequence = record.sequence
+            # get sequence code for the current fisacl year
+            # get current discal year
+            now = datetime.today().date()
+            fiscal_year = self.env['account.fiscal.year'].search(
+                [('date_from', '<=', now), ('date_to', '>=', now)], ('company_id', '=', self.company_id.id))
 
-                    if sequence:
-                        # generate new sequence
-                        # get sequence number for each company
-                        vals['transaction_no'] = self.env['ir.sequence'].next_by_code(
-                            sequence.code) or '/'
-                    else:
-                        raise ValidationError(
-                            "Sequence is not defined for the transaction type")
+            sequence = None
+            if fiscal_year:
+                # get transaction type
+                transaction_type = self.env["account.transaction.type"].search(
+                    [('id', '=', vals['transaction_type']), ('company_id', '=', self.company_id.id)])
+                for record in transaction_type.posting_cycles:
+                    if record.fiscal_year.id == fiscal_year.id:
+                        # get sequence
+                        sequence = record.sequence
+
+                if sequence:
+                    # generate new sequence
+                    # get sequence number for each company
+                    vals['transaction_no'] = self.env['ir.sequence'].next_by_code(
+                        sequence.code) or '/'
+                else:
+                    raise ValidationError(
+                        "Sequence is not defined for the transaction type")
         # else:
         # raise ValidationError("Transaction type is not selected")
         return super(AccountMove, self).write(vals)

@@ -288,6 +288,7 @@
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
+                <field name="purhcase_request_lines" filter_domain="[('purhcase_request_lines.product_id', 'ilike', self)]"  string="Product"/>
                 <field name="company_id"/>
                 <field name="state"/>
                 <separator/>
