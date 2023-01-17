@@ -85,6 +85,7 @@ class AccountMove(models.Model):
         return super(AccountMove, self).create(vals)
 
     def write(self, vals):
+        """
         if self.transaction_type:
 
             # get sequence code for the current fisacl year
@@ -113,4 +114,5 @@ class AccountMove(models.Model):
                         "Sequence is not defined for the transaction type")
         # else:
         # raise ValidationError("Transaction type is not selected")
+        """
         return super(AccountMove, self).write(vals)
