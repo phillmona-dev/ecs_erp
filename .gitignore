@@ -53,3 +53,5 @@ Thumbs.db
 __pycache__/
 *.pyc
 *.pyc
+*.pyc
+droga_export/models/__pycache__/droga_product.cpython-37.pyc

@@ -1,6 +1,7 @@
 from operator import mod
 from odoo import fields, models, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+
 
 class droga_stock_update_status(models.Model):
     _inherit = 'stock.picking'
@@ -32,3 +33,7 @@ class droga_stock_update_status(models.Model):
             to_update['state'] = 'processed'
 
         return super(droga_stock_update_status,self).button_validate()
+
+    def unlink(self):
+        raise ValidationError(
+            "You can't delete inventory transaction, either cancel it or pass a correcting entry.")

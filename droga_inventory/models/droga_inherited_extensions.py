@@ -1,8 +1,14 @@
 from ast import literal_eval
+from collections import defaultdict
 from datetime import timedelta,datetime
 
+import simplejson
+from lxml import etree
+from pkg_resources import _
+
 from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_is_zero, OrderedSet, float_compare
 
 
 class droga_stock_move_line_extension(models.Model):
@@ -288,6 +294,18 @@ class droga_stock_move_extension(models.Model):
             else:
                 rec.has_access = False
 
+
+    def unlink(self):
+        raise ValidationError(
+            "You can't delete inventory transaction, either cancel it or pass a correcting entry.")
+
+    def _search_picking_for_assignation(self):
+        if self.location_id.con_type=='SRL' or  self.location_dest_id.con_type=='SRL':
+            return False
+        else:
+            return super(droga_stock_move_extension,self)._search_picking_for_assignation()
+
+
 class droga_stock_picking_extension(models.Model):
     _inherit = 'stock.picking'
 
@@ -407,6 +425,25 @@ class droga_stock_picking_extension(models.Model):
             self.cons_receive_request.write({'state': 'done'})
 
         return super(droga_stock_picking_extension, self).button_validate()
+
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+
+        res = super().get_view(view_id, view_type, **options)
+
+        doc = etree.XML(res['arch'])
+
+        if view_type == 'form':
+
+            for node in doc.xpath("//field"):
+                if node.get("modifiers") is None or node.get("name") in ('name'):
+                    continue
+                modifiers = simplejson.loads(node.get("modifiers"))
+                modifiers['readonly'] = [['state', 'not in', ('draft', 'waiting', 'confirmed','assigned')]]
+                node.set('modifiers', simplejson.dumps(modifiers))
+            res['arch'] = etree.tostring(doc)
+
+        return res
 
 class purchase_request_extension(models.Model):
     _inherit = 'droga.purhcase.request'

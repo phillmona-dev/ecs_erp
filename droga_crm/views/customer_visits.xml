@@ -13,8 +13,6 @@
                 <field name="month"></field>
                 <field name="year"></field>
                 <field name="pr_avail_areas" invisible="1"/>
-                <field name="city_name" domain="[('id', 'in',pr_avail_areas)]"
-                       options="{'no_create':True,'no_open':True}"></field>
                 <field name="state"></field>
                 <field name="approver" readonly="True" required="True"></field>
                 <field name="is_record_owner" invisible="True"></field>
@@ -199,7 +197,7 @@
                             <field name="week_1_domain" mode="tree,kanban" widget="visit_header_one2many">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -219,8 +217,7 @@
 
 
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                               domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"></field>
                                         <field name="cont_plan_des"></field>
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Plan"
@@ -240,7 +237,7 @@
 
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -259,7 +256,8 @@
                                                     <ul>
                                                         <li>
                                                             <strong class="o_kanban_record_title">Customer:
-                                                                <field name="visit_client"></field>
+                                                                <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                                             </strong>
                                                         </li>
                                                         <li>
@@ -300,7 +298,7 @@
                             <field name="week_2_domain" mode="kanban,tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -338,7 +336,7 @@
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -357,7 +355,8 @@
                                                     <ul>
                                                         <li>
                                                             <strong class="o_kanban_record_title">Customer:
-                                                                <field name="visit_client"></field>
+                                                                <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                                             </strong>
                                                         </li>
                                                         <li>
@@ -398,7 +397,7 @@
                             <field name="week_3_domain" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -436,7 +435,7 @@
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -455,7 +454,8 @@
                                                     <ul>
                                                         <li>
                                                             <strong class="o_kanban_record_title">Customer:
-                                                                <field name="visit_client"></field>
+                                                                <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                                             </strong>
                                                         </li>
                                                         <li>
@@ -516,7 +516,7 @@
 
                                     <group>
                                         <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                               domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                               domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                         <field name="cont_plan_des"></field>
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Plan"
@@ -534,7 +534,7 @@
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -553,7 +553,8 @@
                                                     <ul>
                                                         <li>
                                                             <strong class="o_kanban_record_title">Customer:
-                                                                <field name="visit_client"></field>
+                                                                <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                                             </strong>
                                                         </li>
                                                         <li>
@@ -615,7 +616,7 @@
 
                                     <group>
                                         <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                               domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                               domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                         <field name="cont_plan_des"></field>
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Plan"
@@ -633,7 +634,7 @@
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -652,7 +653,8 @@
                                                     <ul>
                                                         <li>
                                                             <strong class="o_kanban_record_title">Customer:
-                                                                <field name="visit_client"></field>
+                                                                <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                                             </strong>
                                                         </li>
                                                         <li>
@@ -688,7 +690,7 @@
                             <field name="plan_detail" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -727,7 +729,7 @@
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -746,7 +748,8 @@
                                                     <ul>
                                                         <li>
                                                             <strong class="o_kanban_record_title">Customer:
-                                                                <field name="visit_client"></field>
+                                                                <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                                             </strong>
                                                         </li>
                                                         <li>
@@ -945,7 +948,6 @@
         <field name="domain">[('is_record_owner','=',True)]</field>
     </record>
 
-
     <record id="droga_crm_customer_visit_view_approve_tree" model="ir.ui.view">
         <field name="name">droga.customer.visit.header.approve.view.tree</field>
         <field name="model">droga.customer.visit.header</field>
@@ -957,8 +959,6 @@
                 <field readonly="True" name="month"></field>
                 <field readonly="True" name="year"></field>
                 <field readonly="True" name="pr_avail_areas" invisible="1"/>
-                <field readonly="True" name="city_name" domain="[('id', 'in',pr_avail_areas)]"
-                       options="{'no_create':True,'no_open':True}"></field>
                 <field readonly="True" name="state"></field>
                 <field readonly="True" name="approver" required="True"></field>
                 <field readonly="True" name="is_record_owner" invisible="True"></field>
@@ -1009,8 +1009,7 @@
                             <field readonly="True" name="week_1_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
                                     <field readonly="True" name="visit_client"
-                                           options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           options="{'no_create':True,'no_open':True}"></field>
                                     <field readonly="True" name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -1037,9 +1036,8 @@
                             </div>
                             <field readonly="True" name="week_2_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field readonly="True" name="visit_client"
-                                           options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field readonly="True" name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -1064,9 +1062,8 @@
                             </div>
                             <field readonly="True" name="week_3_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field readonly="True" name="visit_client"
-                                           options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field readonly="True" name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -1091,9 +1088,8 @@
                             </div>
                             <field readonly="True" name="week_4_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field readonly="True" name="visit_client"
-                                           options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field readonly="True" name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -1120,9 +1116,8 @@
                             </div>
                             <field readonly="True" name="week_5_domain" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field readonly="True" name="visit_client"
-                                           options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field readonly="True" name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -1142,9 +1137,8 @@
                         <page delete="0" create="0" string="All weeks">
                             <field readonly="True" name="plan_detail" mode="tree">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field readonly="True" name="visit_client"
-                                           options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field readonly="True" name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Plan"
@@ -1196,7 +1190,6 @@
         </field>
     </record>
 
-
     <record id="droga_crm_customer_visit_to_approve_action" model="ir.actions.act_window">
         <field name="name">Customers visit log approve book</field>
         <field name="res_model">droga.customer.visit.header</field>
@@ -1223,7 +1216,6 @@
             parent="menu_vist_log"
             groups="crm_mr"
             sequence="18"/>
-
 
     <menuitem
             id="droga_crm_customer_visit_to_approve_menu"

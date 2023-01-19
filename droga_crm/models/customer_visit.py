@@ -96,7 +96,7 @@ class customer_visit_header(models.Model):
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
     user_id = fields.Char("P.ID", default=lambda self: self.env.user.id, readonly=True, required=True)
     year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
-    city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city',required=True)
+    city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city',required=False)
     descr=fields.Char('Visit description',compute='_get_descr')
     _order = 'year desc,month desc'
     date_from=fields.Date('Date from')

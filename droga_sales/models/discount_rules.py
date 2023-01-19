@@ -1,5 +1,8 @@
 from datetime import datetime
 
+import simplejson
+from lxml import etree
+
 from odoo import models,fields,api
 from odoo.exceptions import ValidationError
 from odoo.http import request
@@ -206,6 +209,10 @@ class sale_order_ext(models.Model):
     has_access = fields.Boolean(default=False,search='_has_access',compute='_compute_has_access')
     sales_initiator=fields.Char('Sales person',compute='_get_sales_init')
 
+    def unlink(self):
+        raise ValidationError(
+            "You can't delete sales transaction, either cancel it or pass a correcting entry.")
+
     def _get_sales_init(self):
         for rec in self:
             if rec.user_id.name.startswith('CRM'):
@@ -376,10 +383,22 @@ class sale_order_ext(models.Model):
         self['non_core_sum'] = non_core_sum
         self.order_line._compute_price_unit()
 
+
     @api.model
-    def get_view_no_run(self, view_id=None, view_type='form', **options):
+    def get_view(self, view_id=None, view_type='form', **options):
 
-        result = super(sale_order_ext, self).get_view(self,view_id=None, view_type='form', **options)
+        res = super().get_view(view_id, view_type, **options)
 
+        doc = etree.XML(res['arch'])
 
-        return result
+        if view_type == 'form':
+
+            for node in doc.xpath("//field"):
+                if node.get("modifiers") is None or node.get("name") in ('name'):
+                    continue
+                modifiers = simplejson.loads(node.get("modifiers"))
+                modifiers['readonly'] = [['state','not in', ('draft','req','price_request')]]
+                node.set('modifiers', simplejson.dumps(modifiers))
+            res['arch'] = etree.tostring(doc)
+
+        return res
