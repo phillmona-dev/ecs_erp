@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="action_print_to_pos_peds" model="ir.actions.client">
+        <field name="name">Peds POS</field>
+        <field name="tag">peds_pos</field>
+        <field name="res_model">account.move</field>
+    </record>
+
     <!-- inherited for view of account.move -->
     <record id="inherit_for_xml_account_move_form" model="ir.ui.view">
         <field name="name">Account Move XML Generator Button</field>
@@ -9,29 +15,35 @@
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
 
-            <!-- <xpath expr="//button[@name='button_draft']" position="after">
-                 <button string="Print to POS" type="object" class="oe_highlight" name="generate_sales_xml"/>
-             </xpath>
+            <form position="attributes">
+                <attribute name="js_class">pos_form_view</attribute>
+            </form>
 
-             <xpath expr="//button[@name='button_draft']" position="after">
-                 <button string="PEDS" type="object" class="oe_highlight" name="print_to_pos_peds"/>
-             </xpath>-->
 
             <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
                 <page string="FS Info">
                     <group>
                         <group>
+
                             <field name="FSInvoiceNumber" string="FS Number"/>
-                            <field name="FTimeStamp" string="Timestamp"/>
+                            <field name="FTimeStamp" string="Timestamp" readonly="1"/>
                         </group>
                         <group>
                             <field name="FPMachineID" string="MachineID" readonly="1"/>
-                            <field name="EJNumber" string="EJ Number"/>
+                            <field name="EJNumber" string="EJ Number" readonly="1"/>
+                            <field name="tin_no" invisible="1"/>
+                            <field name="is_invoice_printed_pos" invisible="1"/>
+                            <field name="sales_type" invisible="1"/>
+                            <field name="pos_device_ip_address" invisible="1"/>
                         </group>
                     </group>
                 </page>
             </xpath>
 
+            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='price_total']"
+                   position="after">
+                <field name="item_code" invisisble="1"/>
+            </xpath>
 
         </field>
     </record>

@@ -22,12 +22,47 @@ class account_move(models.Model):
         context = self._context
         return context.get('uid')
 
+    @api.depends("partner_id")
+    def get_tin_no(self):
+        for record in self:
+            record.tin_no = record.partner_id.vat
+
+    @api.depends('invoice_payment_term_id')
+    def _get_so_type(self):
+        for rec in self:
+            if rec.invoice_payment_term_id.apply_credit_limit:
+                rec.sales_type = 'Credit'
+            elif rec.invoice_payment_term_id.name == 'Sales return':
+                rec.sales_type = 'Sales return'
+            else:
+                rec.sales_type = 'Cash'
+
+    @api.depends("partner_id")
+    def get_pos_address(self):
+        employee_rec = self.env['hr.employee'].search(
+            [('user_id', '=', self.env.uid)], limit=1)
+
+        # set pos ip address
+        self.pos_device_ip_address = employee_rec.pos_device_ip_address
+
     logged_user_id = fields.Many2one('res.users', default=get_current_user_id)
 
-    FPMachineID = fields.Char("FPMachineID")
-    FSInvoiceNumber = fields.Char("FSInvoiceNumber")
-    EJNumber = fields.Char("EJNumber")
-    FTimeStamp = fields.Datetime("FTimeStamp")
+    FPMachineID = fields.Char("Machine ID")
+    FSInvoiceNumber = fields.Char("FS Invoice Number")
+    EJNumber = fields.Char("EJ Number")
+    FTimeStamp = fields.Datetime("TimeStamp")
+    is_invoice_printed_pos = fields.Boolean("Invoice Printed POS", default=False)
+    tin_no = fields.Char(compute="get_tin_no", string="Tin No", store=True)
+    sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
+
+    pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
+
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+        return super().get_view(view_id, view_type, **options)
+
+    def view_init(self):
+        pass
 
     def generate_sales_xml(self):
 
@@ -127,7 +162,7 @@ class account_move(models.Model):
                 tax_percent = 0
                 # get tax id
                 for tax_id in line.tax_ids:
-                    if tax_id.type_tax_use == "sale":# and tax_id.real_amount == 15:
+                    if tax_id.type_tax_use == "sale":  # and tax_id.real_amount == 15:
                         tax_percent = tax_id.real_amount
 
                 line_item = {
@@ -150,11 +185,22 @@ class account_move(models.Model):
 
         json_string = json.dumps(header)
 
-
-
-        headers = {'ApiKey': 'b904ea3c8a3446a0894aeec285e774b7','Content-Type': 'application/json'}
+        headers = {'ApiKey': 'b904ea3c8a3446a0894aeec285e774b7', 'Content-Type': 'application/json'}
         request = requests.post('http://192.168.10.64:8545/pedsfpsrv/api/SalesInvoice/PrintInvoice?printCopy=false',
                                 data=json_string, headers=headers)
 
-
         return True
+
+    def test_button(self):
+        return "TEST"
+
+
+class account_move_line(models.Model):
+    _inherit = "account.move.line"
+
+    @api.depends("product_id")
+    def get_item_code(self):
+        for record in self:
+            record.item_code = record.product_id.product_tmpl_id.default_code
+
+    item_code = fields.Char(compute="get_item_code", string="Item Code", store=True)

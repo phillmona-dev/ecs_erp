@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- action for Sales Attachment -->
+    <record id="droga_sales_pos_attachment_action" model="ir.actions.report">
+        <field name="name">Sales Attachment</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_sales.droga_sales_pos_attachment_report</field>
+        <field name="report_file">droga_sales.droga_sales_pos_attachment_report</field>
+        <field name="print_report_name">'Sales Attachment - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" ref="model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="droga_sales_pos_attachment_report" name="Sales Attachment">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <!-- Store and Sales Represnetataives -->
+                        <t t-set="store" t-value=""/>
+                        <t t-set="sales_representative" t-value=""/>
+
+
+                        <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
+                           t-as="sale_order">
+                            <t t-set="sales_representative" t-value="sale_order.sales_initiator"/>
+                            <t t-set="store" t-value="sale_order.order_type"/>
+                        </t>
+
+                        <div class="row text-center">
+                            <div class="col-xs-12">
+                            <strong>
+                                    <h1>
+                                        Cash Sales Attachment
+                                    </h1>
+                                </strong>
+                            </div>
+                        </div>
+
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-4 bm-2">
+                                <strong>Shop/Store:</strong>
+                                <span t-esc="store"/>
+
+                            </div>
+                            <div class="col-8 bm-2">
+                                <strong>Sales Agent/Representative:</strong>
+                                <span t-esc="sales_representative"/>
+
+                            </div>
+
+
+                        </div>
+                        <br></br>
+                        <div class="table-responsive">
+
+
+                            <table class="table table-sm table-bordered">
+                                <tr>
+                                    <td>
+                                        <strong>Date:</strong>
+                                        <span class="small" t-esc="o.FTimeStamp"/>
+                                    </td>
+                                    <td>
+                                        <strong>Fs No.:</strong>
+                                        <span class="small" t-esc="o.FSInvoiceNumber"/>
+                                    </td>
+                                    <td>
+                                        <strong>Invoice No.:</strong>
+                                        <span class="small" t-esc="o.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <strong>Customer Information</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <strong>Customer Name:</strong>
+                                        <span class="small" t-esc="o.partner_id.name"/>
+                                    </td>
+                                    <td>
+                                        <strong>TIN.:</strong>
+                                        <span class="small" t-esc="o.partner_id.vat"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>ID No.:</strong>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Address:</strong>
+                                        <span t-esc="o.partner_id.street"/>
+                                    </td>
+                                    <td colspan="2">
+                                        <strong>City:</strong>
+                                        <span t-esc="o.partner_id.city"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table class="table table-sm table-bordered">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col" class="text-start">Item Description</th>
+                                        <th scope="col" class="text-start">Code</th>
+                                        <th scope="col">Batch #</th>
+                                        <th scope="col">Expiry Date</th>
+                                        <th scope="col" class="text-center">UoM</th>
+                                        <th scope="col" class="text-center">Qty</th>
+                                        <th scope="col" class="text-end">Unit Price</th>
+                                        <th scope="col" class="text-end">Total Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="o.invoice_line_ids" t-as="line">
+                                        <!-- get batch no and expiry date -->
+                                        <t t-set="batch_no" t-value=""/>
+                                        <t t-set="expiry_date" t-value=""/>
+
+                                        <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
+                                           t-as="sale_order">
+                                            <t t-foreach="sale_order.order_line" t-as="sale_order_line">
+                                                <t t-if="sale_order_line.product_id.id==line.product_id.id">
+                                                    <t t-set="batch_no" t-value="sale_order_line.batch_html"/>
+                                                    <t t-set="expiry_date" t-value="sale_order_line.expiry_date_html"/>
+                                                </t>
+                                            </t>
+                                        </t>
+                                        <tr>
+                                            <td>
+                                                <span class="small" t-esc="line.product_id.name"/>
+                                            </td>
+                                            <td class="text-start">
+                                                <span class="small"
+                                                      t-esc="line.product_id.product_tmpl_id.default_code"/>
+                                            </td>
+                                            <td>
+                                                <span class="small" t-esc="batch_no"/>
+                                            </td>
+                                            <td>
+                                                <span class="small" t-esc="expiry_date"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="small" t-esc="line.product_uom_id.name"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="small" t-esc="line.quantity"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-esc="'{0:,.2f}'.format(line.price_unit)"
+                                                      class="small"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"
+                                                      class="small"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                        <div id="subtotal" class="row mt32 mb32">
+                            <div class="col-10 bm-2 text-end" style="padding-right: 15px;">
+                                <strong>Sub Total</strong>
+                            </div>
+                            <div class="col-2 bm-2 text-end border">
+                                <strong>
+                                    <span t-esc="'{0:,.2f}'.format(o.amount_total)"
+                                          class="small"/>
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div id="tax" class="row mt32 mb32">
+                            <div class="col-10 bm-2 text-end" style="padding-right: 15px;">
+                                <strong>Non Tax (%)</strong>
+                            </div>
+                            <div class="col-2 bm-2 text-end border">
+                                <strong>
+                                    <span class="small">0.00</span>
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div id="grandtotal" class="row mt32 mb32">
+                            <div class="col-10 bm-2 text-end" style="padding-right: 15px;">
+                                <strong>Grand Total</strong>
+                            </div>
+                            <div class="col-2 bm-2 text-end border">
+                                <strong>
+                                    <span t-esc="'{0:,.2f}'.format(o.amount_total)"
+                                          class="small"/>
+                                </strong>
+                            </div>
+                        </div>
+
+                        <br/>
+                        <br/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>Total Amount in Words:</strong>
+                                <span t-esc="o.amount_total_word"/>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <strong>I received the above goods/services in good
+                                    condition._______________________________
+                                </strong>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <span>Memo / Note:</span>
+                            </div>
+                        </div>
+                        <hr></hr>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-6 bm-2">
+                                <span>Prepared By :</span>
+                                <u t-esc="o.create_uid.name"/>
+                            </div>
+                            <div class="col-6 bm-2">
+                                <span>Checked By :________________________</span>
+                            </div>
+                        </div>
+                        <br/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-6 bm-2">
+                                <span>Approved By :________________________</span>
+                            </div>
+                            <div class="col-6 bm-2">
+                                <span>Approved By :________________________</span>
+                            </div>
+                        </div>
+                        <br/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-6 bm-2">
+                                <span>Signature :___________________________</span>
+                            </div>
+
+                        </div>
+                        <hr></hr>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2 text-center">
+                                <strong>This receipt is not valid unless the fiscal receipt is attached!</strong>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+</odoo>
