@@ -97,7 +97,6 @@ class cust_sales_no_create_after_invoice(models.Model):
                         rec.batch_html = (rec.batch_html if rec.batch_html else '')+ move_line.lot_id.name+ ' (' + str(
                         move_line.qty_done) + ')'+('\n' if id < count else '')
 
-
             except:
                 rec.expiry_date_html = ''
                 rec.batch_html = ''
