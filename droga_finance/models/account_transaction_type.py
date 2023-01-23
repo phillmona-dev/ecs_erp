@@ -7,7 +7,7 @@ class TransactionType(models.Model):
 
     name = fields.Char("Short Code", required=True)
     transaction_type = fields.Selection(
-        [('Payment', 'Payment'), ('Reciept', 'Reciept'), ('Miscellaneous', 'Miscellaneous')])
+        [('Payment', 'Payment'), ('Receipt', 'Receipt'), ('Miscellaneous', 'Miscellaneous')])
     payment_method = fields.Selection(
         [('Cash', 'Cash'), ('Bank', 'Bank'), ('Miscellaneous', 'Miscellaneous')])
     assignment = fields.Selection(

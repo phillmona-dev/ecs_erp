@@ -19,7 +19,7 @@
         <field name="name">droga.price.discount.per.type.form</field>
         <field name="model">droga.price.discount.per.type</field>
         <field name="arch" type="xml">
-            <form>
+            <form >
                 <sheet>
                     <group>
                         <field name="cust_type" options="{'no_create':True,'no_open':True}"></field>

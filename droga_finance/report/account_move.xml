@@ -70,6 +70,7 @@
                                 <strong>Check No:-</strong>
                                 <br></br>
                                 <strong>Bank Account:-</strong>
+                                <span t-field="o.journal_id"></span>
                             </div>
                         </div>
                         <br></br>
@@ -246,9 +247,11 @@
 
                             </div>
                             <div class="col-3 bm-2">
-                                <strong>Check No:-</strong><span t-field="o.ref"></span>
+                                <strong>Check No:-</strong>
+                                <span t-field="o.ref"></span>
                                 <br></br>
-                                <strong>Bank Account:-</strong><span t-field="o.journal_id"></span>
+                                <strong>Bank Account:-</strong>
+                                <span t-field="o.journal_id"></span>
                             </div>
                         </div>
                         <br></br>
