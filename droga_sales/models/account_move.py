@@ -38,7 +38,7 @@ class account_move(models.Model):
             [('user_id', '=', self.env.uid)], limit=1)
 
         # set pos ip address
-        self.pos_device_ip_address = employee_rec.pos_device_ip_address
+        # self.pos_device_ip_address = employee_rec.pos_device_ip_address
 
     logged_user_id = fields.Many2one('res.users', default=get_current_user_id)
 
