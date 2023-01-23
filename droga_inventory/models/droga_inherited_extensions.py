@@ -295,7 +295,7 @@ class droga_stock_move_extension(models.Model):
                 rec.has_access = False
 
 
-    def unlink(self):
+    def unlink_(self):
         raise ValidationError(
             "You can't delete inventory transaction, either cancel it or pass a correcting entry.")
 
@@ -427,7 +427,7 @@ class droga_stock_picking_extension(models.Model):
         return super(droga_stock_picking_extension, self).button_validate()
 
     @api.model
-    def get_view(self, view_id=None, view_type='form', **options):
+    def get_view_(self, view_id=None, view_type='form', **options):
 
         res = super().get_view(view_id, view_type, **options)
 
@@ -545,6 +545,8 @@ class droga_stock_product_extension(models.Model):
 
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and 'seller_ids' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
+        if 'default_code' in vals_list:
+            raise UserError("Internal reference of a product can not be updated.")
         return super(droga_stock_product_extension, self).write(vals_list)
 
     @api.model
