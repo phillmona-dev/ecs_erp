@@ -4,7 +4,7 @@ from datetime import timedelta,datetime
 
 import simplejson
 from lxml import etree
-from pkg_resources import _
+#from pkg_resources import _
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError

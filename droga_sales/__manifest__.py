@@ -16,7 +16,8 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'resource', 'stock', 'sale', 'sale_stock', 'droga_crm', 'droga_inventory', 'uom'],
+    'depends': ['base', 'account', 'resource', 'stock', 'sale', 'sale_stock', 'droga_crm', 'droga_inventory', 'uom',
+                'hr'],
 
     # always loaded
     'data': [
@@ -28,8 +29,7 @@
         'views/credit_limit.xml',
         'views/sales_discount_rules.xml',
         'views/extensions.xml',
-        # 'views/pos_report.xml',
-        # 'views/employee.xml',
+        'views/employee.xml',
         'reports/sales_attachment.xml',
         'views/module_menus.xml',
     ],

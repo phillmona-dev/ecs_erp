@@ -22,6 +22,7 @@
 
             <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
                 <page string="FS Info">
+                    <button type="object" name="print_sales_attachment" string="Sales Attachement"/>
                     <group>
                         <group>
 

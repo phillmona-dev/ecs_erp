@@ -7,12 +7,7 @@ from datetime import datetime
 import requests
 from json import JSONEncoder
 
-from odoo.exceptions import UserError
-
-
-class MyEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
+from odoo.exceptions import UserError, ValidationError
 
 
 class account_move(models.Model):
@@ -43,7 +38,7 @@ class account_move(models.Model):
             [('user_id', '=', self.env.uid)], limit=1)
 
         # set pos ip address
-        self.pos_device_ip_address = employee_rec.pos_device_ip_address
+        self.pos_device_ip_address = ""
 
     logged_user_id = fields.Many2one('res.users', default=get_current_user_id)
 
@@ -191,8 +186,9 @@ class account_move(models.Model):
 
         return True
 
-    def test_button(self):
-        return "TEST"
+    def print_sales_attachment(self):
+        res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_action').report_action(self)
+        return res1
 
 
 class account_move_line(models.Model):
