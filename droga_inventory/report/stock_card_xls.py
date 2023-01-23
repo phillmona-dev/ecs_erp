@@ -71,10 +71,59 @@ class inventory_stock_card_xls(models.TransientModel):
         for prod in stock_products:
             self.get_droga_stockcard_sheet_with_header(sheet, workbook, prod,row_start)
             row_start+=11
+            date_format = workbook.add_format({'num_format': 'd mmm yyyy', 'border': 7})
+            num_format = workbook.add_format({'num_format': 43, 'border': 7})
+            cent_format = workbook.add_format({'num_format': 41, 'border': 7})
+            border = workbook.add_format({'border': 7})
+            balance = 0
             #self.generate_stockcard_per_item(sheet,workbook,row_start,stock_move_data.sorted(key=lambda r: r.move_id.date),loc_ids_under_wh)
             for move_line in stock_move_data:
                 if move_line['product_id'].id==prod.id:
-                    self.generate_stockcard_per_item(sheet,workbook,row_start,move_line,loc_ids_under_wh)
+                    sheet.write(row_start, 0, move_line['move_id'].date, date_format)
+                    sheet.write(row_start, 1,
+                                move_line['origin'] if move_line['origin'] else move_line['reference'])
+                    # This avoids internal transfers from printed in the system
+                    if move_line['location_id'].id in loc_ids_under_wh.ids and move_line[
+                        'location_dest_id'].id in loc_ids_under_wh.ids:
+                        continue
+                    if move_line['location_id'] in loc_ids_under_wh:
+                        sheet.write(row_start, 2, move_line.move_id.sale_line_id.order_id.partner_id.name if move_line.move_id.sale_line_id else move_line['location_dest_id'].complete_name)
+                    else:
+                        sheet.write(row_start, 2, move_line['location_id'].complete_name)
+
+                    if move_line['location_id'] in loc_ids_under_wh:
+                        if move_line['location_dest_id'].usage == 'inventory':
+                            sheet.write(row_start, 5, move_line['qty_done'] * -1, num_format)
+                            balance -= move_line['qty_done']
+                            sheet.write(row_start, 3, 0, num_format)
+                            sheet.write(row_start, 4, 0, num_format)
+                        else:
+                            sheet.write(row_start, 4, move_line['qty_done'], num_format)
+                            balance -= move_line['qty_done']
+                            sheet.write(row_start, 3, 0, num_format)
+                            sheet.write(row_start, 5, 0, num_format)
+                    else:
+                        if move_line['location_id'].usage == 'inventory':
+                            sheet.write(row_start, 5, move_line['qty_done'], num_format)
+                            balance += move_line['qty_done']
+                            sheet.write(row_start, 4, 0, num_format)
+                            sheet.write(row_start, 3, 0, num_format)
+                        else:
+                            sheet.write(row_start, 3, move_line['qty_done'], num_format)
+                            balance += move_line['qty_done']
+                            sheet.write(row_start, 4, 0, num_format)
+                            sheet.write(row_start, 5, 0, num_format)
+
+                    sheet.write(row_start, 6, balance, num_format)
+
+                    sheet.write(row_start, 7, int(move_line['product_id'].list_price), num_format)
+                    sheet.write(row_start, 8, (move_line['product_id'].list_price - int(
+                        move_line['product_id'].list_price)) * 100, cent_format)
+                    if move_line['lot_id'].name:
+                        sheet.write(row_start, 9, move_line['lot_id'].name)
+                    if move_line['expiration_date']:
+                        sheet.write(row_start, 10, move_line['expiration_date'], date_format)
+                    row_start+=1
             row_start+=5
 
 
@@ -87,9 +136,9 @@ class inventory_stock_card_xls(models.TransientModel):
 
         for stock_move in stock_move_data:
             sheet.write(row_start, 0, stock_move['move_id'].date,date_format)
-            sheet.write(row_start, 1, stock_move['reference'])
+            sheet.write(row_start, 1, stock_move['origin'] if stock_move['origin'] else stock_move['reference'])
             #This avoids internal transfers from printed in the system
-            if stock_move['location_id'] in loc_ids and stock_move['location_dest_id'] in loc_ids.ids:
+            if stock_move['location_id'].id in loc_ids.ids and stock_move['location_dest_id'].id in loc_ids.ids:
                 continue
             if stock_move['location_id'] in loc_ids:
                 sheet.write(row_start, 2, stock_move['location_dest_id'].complete_name)
@@ -127,8 +176,8 @@ class inventory_stock_card_xls(models.TransientModel):
                 sheet.write(row_start, 9, stock_move['lot_id'].name)
             if stock_move['expiration_date']:
                 sheet.write(row_start, 10, stock_move['expiration_date'], date_format)
-            row_start+=1
-        pass
+
+        return 1
 
     def get_droga_stockcard_sheet_with_header(self, sheet,workbook,prod,row_start):
 

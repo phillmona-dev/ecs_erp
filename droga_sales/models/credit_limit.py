@@ -91,10 +91,12 @@ class cust_sales_no_create_after_invoice(models.Model):
             rec.batch_html
             try:
                 for move in rec.move_ids:
-                    for move_line in move.move_line_ids:
-                        rec.expiry_date_html = (rec.expiry_date_html if rec.expiry_date_html else '')+move_line.lot_id.expiration_date.strftime("%B %d,%Y")+'\n'
+                    count = len(move.move_line_ids) - 1
+                    for id,move_line in enumerate(move.move_line_ids):
+                        rec.expiry_date_html = (rec.expiry_date_html if rec.expiry_date_html else '')+move_line.lot_id.expiration_date.strftime("%B %d,%Y")+('\n' if id < count else '')
                         rec.batch_html = (rec.batch_html if rec.batch_html else '')+ move_line.lot_id.name+ ' (' + str(
-                        move_line.qty_done) + ')'+'\n'
+                        move_line.qty_done) + ')'+('\n' if id < count else '')
+
 
             except:
                 rec.expiry_date_html = ''

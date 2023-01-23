@@ -18,7 +18,7 @@
                 </group>
                 <footer>
                     <button name="action_enter" string="Enter" type="object" class="btn-primary"/>
-                    <button name="action_change" string="Change Password" type="object"/>
+                    <button name="action_change" string="Change ID" type="object"/>
                 </footer>
             </form>
         </field>

@@ -34,6 +34,6 @@ class droga_stock_update_status(models.Model):
 
         return super(droga_stock_update_status,self).button_validate()
 
-    def unlink(self):
+    def unlink_(self):
         raise ValidationError(
             "You can't delete inventory transaction, either cancel it or pass a correcting entry.")
