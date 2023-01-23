@@ -16,7 +16,8 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'resource', 'stock', 'sale', 'sale_stock', 'droga_crm', 'droga_inventory', 'uom'],
+    'depends': ['base', 'account', 'resource', 'stock', 'sale', 'sale_stock', 'droga_crm', 'droga_inventory', 'uom',
+                'hr'],
 
     # always loaded
     'data': [
@@ -38,8 +39,8 @@
 
     "assets": {
         "web.assets_backend": [
-            #'droga_sales/static/src/js/*.js',
-            #'droga_sales/static/src/xml/*.xml',
+            # 'droga_sales/static/src/js/*.js',
+            # 'droga_sales/static/src/xml/*.xml',
         ],
 
     },
