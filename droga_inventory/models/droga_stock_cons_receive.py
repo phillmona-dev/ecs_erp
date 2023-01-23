@@ -88,8 +88,10 @@ class droga_stock_cons_receive(models.Model):
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=','CONR'), ('warehouse_id', '=', wh.id)]).id
             def_loc_id = self.env['stock.location'].search(
-                [('complete_name', 'like', wh.code + '/%'), ('con_type', '!=', 'DIL'), ('usage', '=', 'internal')])[
+                [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False), ('usage', '=', 'internal')])[
                 0].id
+            if not def_loc_id:
+                raise UserError("Store location not set for receiver warehouse. Please configure accordingly.")
 
             picking_vals = {
                 'partner_id': self.supplier.id,

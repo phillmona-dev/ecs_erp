@@ -317,10 +317,13 @@ class sale_order_ext(models.Model):
 
     def price_approval(self):
         self.ensure_one()
+        self.set_activity_done()
         self.state = 'req'
         #self.set_activity_done()
 
     def operation_confirm(self):
+        self.ensure_one()
+        self.set_activity_done()
         self.action_confirm()
 
     @api.depends('pr_sales_logged')
@@ -346,8 +349,8 @@ class sale_order_ext(models.Model):
     def set_activity_done(self):
         activity = self.env["mail.activity"].search(
             [('res_name', '=', self.name)])
-        if activity:
-            activity.sudo().action_done()
+        for act in activity:
+            act.sudo().action_done()
 
     payment_term_id = fields.Many2one(
         comodel_name='account.payment.term',
