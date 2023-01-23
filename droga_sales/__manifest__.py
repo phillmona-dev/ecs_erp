@@ -28,8 +28,7 @@
         'views/credit_limit.xml',
         'views/sales_discount_rules.xml',
         'views/extensions.xml',
-        # 'views/pos_report.xml',
-        # 'views/employee.xml',
+        'views/employee.xml',
         'reports/sales_attachment.xml',
         'views/module_menus.xml',
     ],
@@ -39,8 +38,8 @@
 
     "assets": {
         "web.assets_backend": [
-            # 'droga_sales/static/src/js/*.js',
-            # 'droga_sales/static/src/xml/*.xml',
+            #'droga_sales/static/src/js/*.js',
+            #'droga_sales/static/src/xml/*.xml',
         ],
 
     },

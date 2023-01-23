@@ -19,26 +19,24 @@
             <t t-call="web.external_layout">
 
                 <t t-foreach="docs" t-as="o">
+
+                    <!-- Store and Sales Represnetataives -->
+                    <t t-set="store" t-value=""/>
+                    <t t-set="sales_representative" t-value=""/>
+
+
+                    <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
+                       t-as="sale_order">
+                        <t t-set="sales_representative" t-value="sale_order.sales_initiator"/>
+                        <t t-set="store" t-value="sale_order.order_type"/>
+                    </t>
+
                     <div class="page">
                         <div class="oe_structure"/>
-                        <!-- Store and Sales Represnetataives -->
-                        <t t-set="store" t-value=""/>
-                        <t t-set="sales_representative" t-value=""/>
 
-
-                        <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
-                           t-as="sale_order">
-                            <t t-set="sales_representative" t-value="sale_order.sales_initiator"/>
-                            <t t-set="store" t-value="sale_order.order_type"/>
-                        </t>
-
-                        <div class="row text-center">
-                            <div class="col-xs-12">
-                            <strong>
-                                    <h1>
-                                        Cash Sales Attachment
-                                    </h1>
-                                </strong>
+                        <div id="informations" class="row mt32 mb32 text-center">
+                            <div class="col-12 bm-2">
+                                <h2>Cash Sales Attachment</h2>
                             </div>
                         </div>
 
@@ -109,7 +107,7 @@
                                 </tr>
                             </table>
 
-                            <table class="table table-sm table-bordered">
+                            <table class="table table-bordered table-sm">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th scope="col" class="text-start">Item Description</th>

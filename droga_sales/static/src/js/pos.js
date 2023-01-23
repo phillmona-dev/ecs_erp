@@ -26,6 +26,18 @@ export class PosFormController extends FormController {
 
     PrintToPos() {
 
+        ajax.jsonRpc('/web/action/load', 'call', {
+            'model': 'account.move', 'method': 'print_sales_attachment', 'args': [{'action_id': 1}], 'kwargs': {
+                'context': {},
+            }
+        }).then(function (data) {
+            // Do something here
+            console.log(data);
+        });
+
+
+        return;
+
         console.log(this.model.root.data.pos_device_ip_address);
         if (this.model.root.data.is_invoice_printed_pos === true) {
             Dialog.alert(this, _t("The current invoice has already been printed!"));
