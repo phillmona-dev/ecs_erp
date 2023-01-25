@@ -46,11 +46,31 @@ class sale_order_line(models.Model):
     @api.depends('product_id')
     def _is_prod_available(self):
         for rec in self:
-            rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
+            rec.available_qty=0
+            for wh in self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)]):
+                rec.available_qty=rec.available_qty+self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh)
+
+            #rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
+
             if not rec.product_id.bought_locally and rec.available_qty<=rec.product_id.emergency_order_point:
                 rec.is_prod_available=False
             else:
                 rec.is_prod_available = True
+
+    def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
+        self = self.sudo()
+        moves=self.env['stock.move'].search(
+                [('product_id','=',product_id.id),('location_id.warehouse_id', '=', warehouse_id.id),('reserve_indef','=',False), ('location_id.usage', '=', 'internal'),('location_dest_id.usage', '!=', 'internal'),('state','not in',['done','cancel','draft'])])
+        return sum(moves.mapped('reserved_qty'))
+
+    def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):
+
+        self = self.sudo()
+        tot_quantity=0.0
+        for location_id in self.env['stock.location'].search([('warehouse_id','=',warehouse_id.id),('usage','=','internal')]):
+            quants = self.env['stock.quant'].search([('product_id','=',product_id.id),('location_id','=',location_id.id)])
+            tot_quantity  =tot_quantity+ sum(quants.mapped('quantity'))
+        return tot_quantity
 
     def _inverse_price(self):
         pass

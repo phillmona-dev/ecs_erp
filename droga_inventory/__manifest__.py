@@ -30,6 +30,7 @@
         'views/droga_stock_extensions.xml',
         'views/droga_stock_product_extension.xml',
         'views/droga_stock_office_supplies_request.xml',
+        'views/reservation_list.xml',
         'report/report_tree_extension.xml',
         'report/xls_stock_card.xml',
         'report/store_request.xml',
