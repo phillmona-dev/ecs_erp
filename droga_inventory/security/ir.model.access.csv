@@ -12,3 +12,4 @@ access_droga_inventory_office_supplies_request,droga.inventory.office.supplies.r
 access_droga_inventory_office_supplies_request_detail,droga.inventory.office.supplies.request.detail,model_droga_inventory_office_supplies_request_detail,base.group_user,1,1,1,1
 
 access_inventory_stock_report,droga.inventory.reports.sc.excel,model_droga_inventory_reports_sc_excel,stock.group_stock_user,1,1,1,1
+access_inventory_stock_report_cost,droga.inventory.update.cost,model_update_cost,stock.group_stock_user,1,1,1,1
