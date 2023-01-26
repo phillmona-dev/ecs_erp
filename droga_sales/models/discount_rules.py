@@ -110,10 +110,6 @@ class sale_order_line(models.Model):
         for line in self:
             if not line.wareh and line.product_id.default_warehouse.wh_type==self.order_id.order_type:
                 line.wareh=line.product_id.default_warehouse
-            elif not line.wareh:
-                line.wareh=self.env['stock.warehouse'].search(
-                    [('wh_type', '=', self.order_id.order_type)], limit=1,
-                    order="id asc")
 
             #Get discounts/additional payments per type
             type_rates = self.env['droga.price.discount.per.type'].search(
