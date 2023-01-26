@@ -246,13 +246,31 @@ class droga_stock_uom_extension(models.Model):
             raise UserError("You can not update a unit of measure. Please contact your supervisor.")
         return super(droga_stock_uom_extension, self).write(vals_list)
 
+class stock_move_mail_added(models.Model):
+    _name = "stock.move"
+    _inherit = ['stock.move','mail.thread', 'mail.activity.mixin', 'image.mixin']
+
 class droga_stock_move_extension(models.Model):
     _inherit = 'stock.move'
     from_reconcile_menu=fields.Boolean(related='picking_id.from_reconcile_menu')
     reservation_discard_time=fields.Datetime(string='Reservation cancel time',compute='_compute_res_discard',inverse='_inverse_res_discard')
-    reserve_indef=fields.Boolean('Reserve indefinitely',default=False)
+    reserve_indef=fields.Boolean('Reserve indefinitely',default=False,tracking=True)
+    source_wh=fields.Char(related='location_id.warehouse_id.name')
     def _inverse_res_discard(self):
         pass
+
+    def view_reg_hist(self):
+        return {
+            'name': 'Reservation log',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'stock.move',
+            'view_id': self.env.ref('droga_inventory.droga_inventory_stock_move_reservation_form').id,
+            'type': 'ir.actions.act_window',
+
+            # This will pass the detail ID if a record is present
+            'res_id': self.id,
+        }
 
     def _compute_res_discard(self):
         for rec in self:
@@ -280,12 +298,20 @@ class droga_stock_move_extension(models.Model):
     def _search_has_access(self, operator, value):
 
         if operator == '=':
-
             has_access = self.env['stock.move'].sudo().search(
-                ['|', ('location_id.has_access', '=', True), ('location_dest_id.has_access', '=', True)])
+                #['|',('location_id.has_access', '=', True),('location_dest_id.has_access', '=', True)])
+                ['|','&', ('location_id.has_access', '=', True),('location_id.con_type', '!=', 'SRL'), '&',('location_dest_id.con_type', '!=', 'SRL'),('location_dest_id.has_access', '=', True)])
+
+            if self.env.user.has_group('droga_inventory.inventory_dmi'):
+                has_access += (self.env['stock.move'].sudo().search([('picking_type_id.dispatch_location', '=', 'IM')]))
+            if self.env.user.has_group('droga_inventory.inventory_dmw'):
+                has_access += (self.env['stock.move'].sudo().search([('picking_type_id.dispatch_location', '=', 'WS')]))
+
+
             return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id', 'in', [])]
+
 
     def _compute_has_access(self):
         for rec in self:
