@@ -1,6 +1,7 @@
 from odoo import _, api, fields, models
 from datetime import datetime
 from odoo.exceptions import ValidationError
+from odoo.custom_addons.droga.droga_utility.utility import convert_to_word
 
 
 class PaymentRequest(models.Model):
@@ -73,11 +74,12 @@ class PaymentRequest(models.Model):
     total_amount_etb = fields.Float(
         "Total Amount ETB", compute="_compute_total", required=True)
     amount_in_word = fields.Char(
-        "Amount in Word", compute="_compute_amount_to_word", store=True)
+        "Amount in Word", compute="_compute_amount_to_word")
 
     state = fields.Selection([('Draft', 'Draft'), ("Submitted", "Submitted"),
                               ('Approved', 'Approved'), ('Budget Approved', 'Budget Approved'),
                               ('Authorized', 'Authorized'), ('Cancelled', 'Cancelled')], default="Draft", tracking=True)
+    paid_status = fields.Selection([('Not Paid', 'Not Paid'), ('Paid', 'Paid')], default="Not Paid")
 
     department_manager = fields.Many2one(
         "hr.employee", compute="_get_manager_id", store=True)
@@ -93,6 +95,9 @@ class PaymentRequest(models.Model):
     budget_account = fields.Many2one("account.account")
 
     reject_message = fields.Char('Reason')
+
+    approvals = fields.One2many(
+        'studio.approval.entry', 'res_id', string='Approvals')
 
     @api.model
     def create(self, vals):
@@ -119,10 +124,10 @@ class PaymentRequest(models.Model):
         for record in self:
             record.total_amount_etb = record.total_amount * record.exchange_rate
 
-    @api.depends('total_amount', 'exchange_rate')
+    # @api.depends('total_amount', 'exchange_rate')
     def _compute_amount_to_word(self):
         for record in self:
-            record.amount_in_word = str(record.currency_id.amount_to_text(
+            record.amount_in_word = str(convert_to_word(
                 record.total_amount * record.exchange_rate))
 
     def submit_request(self):
@@ -184,6 +189,12 @@ class PaymentRequest(models.Model):
         self.set_activity_done()
         self.return_to_tree_view()
         return True
+
+    def set_paid_status(self):
+        if self.paid_status == "Not Paid":
+            self.write({'paid_status': 'Paid'})
+        else:
+            self.write({'paid_status': 'Not Paid'})
 
     def set_activity_done(self):
         activity = self.env["mail.activity"].search(

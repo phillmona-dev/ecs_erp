@@ -39,8 +39,8 @@
 
     "assets": {
         "web.assets_backend": [
-            # 'droga_sales/static/src/js/*.js',
-            # 'droga_sales/static/src/xml/*.xml',
+             'droga_sales/static/src/js/*.js',
+             'droga_sales/static/src/xml/*.xml',
         ],
 
     },

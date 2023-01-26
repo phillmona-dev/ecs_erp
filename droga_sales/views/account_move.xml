@@ -19,10 +19,13 @@
                 <attribute name="js_class">pos_form_view</attribute>
             </form>
 
+            <xpath expr="//button[@name='button_set_checked']" position="after">
+                <button type="object" name="print_sales_attachment" string="Sales Attachement" attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}"/>
+            </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
                 <page string="FS Info">
-                    <button type="object" name="print_sales_attachment" string="Sales Attachement"/>
+
                     <group>
                         <group>
 
@@ -36,6 +39,7 @@
                             <field name="is_invoice_printed_pos" invisible="1"/>
                             <field name="sales_type" invisible="1"/>
                             <field name="pos_device_ip_address" invisible="1"/>
+                            <field name="total_amount_word" invisible="1"/>
                         </group>
                     </group>
                 </page>
@@ -43,7 +47,7 @@
 
             <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='price_total']"
                    position="after">
-                <field name="item_code" invisisble="1"/>
+                <field name="item_code" invisible="1"/>
             </xpath>
 
         </field>

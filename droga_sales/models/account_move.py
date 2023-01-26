@@ -1,13 +1,11 @@
-from odoo import _, api, fields, models
-import xml.etree.cElementTree as ET
-import xml.dom.minidom
-import os.path
 import json
+import os.path
+import xml.dom.minidom
+import xml.etree.cElementTree as ET
 from datetime import datetime
 import requests
-from json import JSONEncoder
-
-from odoo.exceptions import UserError, ValidationError
+from odoo import api, fields, models
+from odoo.custom_addons.droga.droga_utility.utility import convert_to_word
 
 
 class account_move(models.Model):
@@ -16,29 +14,6 @@ class account_move(models.Model):
     def get_current_user_id(self):
         context = self._context
         return context.get('uid')
-
-    @api.depends("partner_id")
-    def get_tin_no(self):
-        for record in self:
-            record.tin_no = record.partner_id.vat
-
-    @api.depends('invoice_payment_term_id')
-    def _get_so_type(self):
-        for rec in self:
-            if rec.invoice_payment_term_id.apply_credit_limit:
-                rec.sales_type = 'Credit'
-            elif rec.invoice_payment_term_id.name == 'Sales return':
-                rec.sales_type = 'Sales return'
-            else:
-                rec.sales_type = 'Cash'
-
-    @api.depends("partner_id")
-    def get_pos_address(self):
-        employee_rec = self.env['hr.employee'].search(
-            [('user_id', '=', self.env.uid)], limit=1)
-
-        # set pos ip address
-        self.pos_device_ip_address = ""
 
     logged_user_id = fields.Many2one('res.users', default=get_current_user_id)
 
@@ -51,6 +26,36 @@ class account_move(models.Model):
     sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
 
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
+    total_amount_word = fields.Char(compute="_get_total_amount_word")
+
+    def _get_total_amount_word(self):
+        for record in self:
+            # convert amount to word
+            record.total_amount_word = convert_to_word(record.amount_total)
+
+    @api.depends("partner_id")
+    def get_tin_no(self):
+        for record in self:
+            record.tin_no = record.partner_id.vat
+            # convert amount to word
+            record.amount_total_word = convert_to_word(record.amount_total)
+
+    @api.depends('invoice_payment_term_id')
+    def _get_so_type(self):
+        for rec in self:
+            if rec.invoice_payment_term_id.apply_credit_limit:
+                rec.sales_type = 'Credit'
+            elif rec.invoice_payment_term_id.name == 'Sales return':
+                rec.sales_type = 'Sales return'
+            else:
+                rec.sales_type = 'Cash'
+
+    def get_pos_address(self):
+        employee_rec = self.env['hr.employee'].sudo().search(
+            [('user_id', '=', self.env.uid)], limit=1)
+
+        # set pos ip address
+        self.pos_device_ip_address = employee_rec.pos_device_ip_address
 
     @api.model
     def get_view(self, view_id=None, view_type='form', **options):

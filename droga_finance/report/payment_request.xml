@@ -20,16 +20,19 @@
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
                         <div class="oe_structure"/>
-                        <h2>Payment Request #<span t-field="o.name"/>
+
+
+                        <h2>Payment Request #
+                            <span t-field="o.name"/>
                         </h2>
 
                         <div id="informations" class="row mt32 mb32">
 
-                            <div class="col-3 bm-2">
+                            <div class="col-2 bm-2">
                                 <strong>Department:</strong>
                                 <p t-field="o.department" class="m-0"/>
                             </div>
-                            <div class="col-3 bm-2">
+                            <div class="col-2 bm-2">
                                 <strong>Request Type:</strong>
                                 <p t-field="o.payment_type" class="m-0"/>
                             </div>
@@ -43,6 +46,13 @@
                                 <strong>Due Date:</strong>
                                 <p t-field="o.payment_due_date" class="m-0"/>
                             </div>
+
+                            <div class="col-2 bm-2">
+                                <strong>Print Date:</strong>
+                                <p class="m-0"
+                                   t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                            </div>
+
 
                         </div>
                         <br></br>
@@ -83,10 +93,10 @@
                                         <span t-field="o.currency_id" class="m-0"/>
                                     </td>
                                     <td t-if="o.currency_id=='ETB'">
-                                        <span t-field="o.total_amount" class="m-0" />
+                                        <span t-field="o.total_amount" class="m-0"/>
                                     </td>
                                     <td t-if="o.currency_id=='ETB'">
-                                        <span t-field="o.exchange_rate" class="m-0" />
+                                        <span t-field="o.exchange_rate" class="m-0"/>
                                     </td>
                                     <td>
                                         <span t-field="o.total_amount_etb" class="m-0"/>
@@ -102,7 +112,7 @@
                                 <strong>Amount In word:</strong>
                                 <p t-field="o.amount_in_word" class="m-0"/>
                             </div>
-                            
+
                         </div>
 
                         <br></br>
@@ -110,17 +120,36 @@
                         <br></br>
                         <br></br>
                         <div id="informations" class="row mt32 mb32">
-                            <div class="col-4 bm-2">
+                            <div class="col-3 bm-2">
                                 <strong>Prepared By:</strong>
                                 <p t-field="o.request_by" class="m-0"/>
                             </div>
-                            <div class="col-4 bm-2">
-                                <strong>Checked By:</strong>
-                                <p t-field="o.request_by" class="m-0"/>
-                            </div>
-                            <div class="col-4 bm-2">
+                            <div class="col-3 bm-2">
                                 <strong>Approved By:</strong>
-                                <p t-field="o.request_by" class="m-0"/>
+                                <t t-foreach="o.approvals" t-as="approver">
+                                    <t t-if="approver.rule_id.method=='approve_request'">
+                                        <p t-esc="approver.user_id.name" class="m-0"/>
+
+                                    </t>
+
+                                </t>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Budget Checked By:</strong>
+
+                                <t t-set="budget_approver"
+                                   t-value="request.env['droga.approver.name'].sudo().get_approver(o.id,'droga.account.payment.request','Budget Approved')"/>
+
+                                <p t-esc="budget_approver" class="m-0"/>
+
+                            </div>
+                            <div class="col-3 bm-2">
+                                <strong>Authorized By:</strong>
+                                <t t-foreach="o.approvals" t-as="approver">
+                                    <t t-if="approver.rule_id.method=='authorize_request'">
+                                        <p t-esc="approver.user_id.name" class="m-0"/>
+                                    </t>
+                                </t>
                             </div>
                         </div>
 
@@ -129,7 +158,6 @@
             </t>
         </t>
     </template>
-
 
 
 </odoo>

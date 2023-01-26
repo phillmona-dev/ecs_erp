@@ -15,7 +15,12 @@
                 <field name="purpose"/>
                 <field name="company_id"/>
                 <field name="currency_id"/>
-                <field name="state" widget="badge"/>
+                <field name="total_amount_etb" string="Amount"/>
+                <field name="state" widget="badge" decoration-success="state == 'Authorized'"
+                       decoration-danger="state == 'Cancelled'"
+                       decoration-warning="state in('Draft','Submitted','Budget Approved','Approved')"/>
+                <field name="paid_status" widget="badge" decoration-success="paid_status == 'Paid'"
+                       decoration-danger="paid_status == 'Not Paid'"/>
             </tree>
         </field>
     </record>
@@ -49,7 +54,22 @@
                             attrs="{'invisible':['|',('requester','=',True),('state','in',('Draft','Authorized'))]}"
                     />
 
+                    <button name="set_paid_status" type="object"
+                            confirm="Are you sure you?"
+                            string="Paid" id="paid_status"
+                            data-hotkey="v" class="oe_highlight"
+                            attrs="{'invisible':['|',('paid_status','=','Paid'),('state','not in',('Authorized'))]}"
+                    />
+
+                    <button name="set_paid_status" type="object"
+                            confirm="Are you sure you?"
+                            string="Unpaid" id="not_paid_status"
+                            data-hotkey="v" class="oe_highlight"
+                            attrs="{'invisible':['|',('paid_status','=','Not Paid'),('state','not in',('Authorized'))]}"
+                    />
+
                     <field name="state" widget="statusbar"/>
+                    <field name="paid_status" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -66,6 +86,7 @@
                     </div>
                     <group>
                         <group>
+                            <field name="paid_status" invisible="1"/>
                             <field name="purchase_order_id" readonly="1"/>
                             <field name="payment_type" readonly="0" required="1"/>
                             <field name="request_by" options="{'no_create':True,'no_open':True}"
@@ -103,8 +124,10 @@
                             <field name="amount_in_word" readonly="1"/>
                         </group>
                         <group string="Budget Category">
-                            <field name="budgetary_position" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
-                            <field name="budget_account" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                            <field name="budgetary_position" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                            <field name="budget_account" options="{'no_create':True,'no_open':True}"
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
                         </group>
                     </group>
                 </sheet>
@@ -156,6 +179,9 @@
                 <field name="company_id"/>
                 <field name="state"/>
 
+                <separator/>
+                <filter name="Not Paid" string="Not Paid" domain="[('paid_status', '=', 'Not Paid')]"/>
+                <filter name="Paid" string="Paid" domain="[('paid_status', '=', 'Paid')]"/>
                 <separator/>
                 <filter name="draft" string="Draft" domain="[('state', '=', 'Draft')]"/>
                 <filter name="submitted" string="Submitted" domain="[('state', '=', 'Submitted')]"/>

@@ -17,7 +17,7 @@
             <form string="">
                 <group>
                     <group>
-                        <field name="report" required='1' />
+                        <field name="report" required='1'/>
                         <field name="date_from" required='1'/>
                         <field name="date_to" required='1'/>
                         <field name="company_id" options="{'no_create':True,'no_open':True}"></field>
@@ -36,9 +36,9 @@
         <field name="name">Withholding Printout</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-html</field>
-        <field name="report_name">droga_finance.droga_account_withholding_printout_report</field>
-        <field name="report_file">droga_finance.droga_account_withholding_printout_report</field>
-        <field name="print_report_name">'Witholding Printout - %s' % (object.name)
+        <field name="report_name">droga_finance.droga_account_withholding_printout_table_report</field>
+        <field name="report_file">droga_finance.droga_account_withholding_printout_table_report</field>
+        <field name="print_report_name">'Withholding Printout - %s' % (object.name)
         </field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
@@ -55,18 +55,18 @@
 
 
                 <style type="text/css">
-    
-                        /* Default left, right, top, bottom margin is 2cm */
-                        @page {
-                        size: A4 portrait;
-                        margin: 1cm;
-                        }
-    
-                        @media print
-                        {
-                        #non-printable { visibility: hidden; }
-                        #wrapwrap { visibility: visible; }
-                        }
+
+                    /* Default left, right, top, bottom margin is 2cm */
+                    @page {
+                    size: A4 portrait;
+                    margin: 1cm;
+                    }
+
+                    @media print
+                    {
+                    #non-printable { visibility: hidden; }
+                    #wrapwrap { visibility: visible; }
+                    }
                 </style>
 
                 <t t-foreach="docs" t-as="o">
@@ -78,196 +78,481 @@
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
                                 <h6>የተቀነሰበት ግብር ከፋይ</h6>
-                                <h6>Tax Payer's Name:-<b>
-                                    <t t-esc="o.partner_id.name"/>
-                                </b>
-                            </h6>
-                            <h6>የግብር መለያ ቁጥር</h6>
-                            <h6>Tax Payer Identifcation No:-<b>
-                                <t t-esc="o.partner_id.vat"/>
-                            </b>
-                        </h6>
-
-                    </div>
-                </div>
-                <div id="informations" class="row mt32 mb32">
-                    <div class="col-2 bm-2">
-                        <h6>አድራሻ</h6>
-                        <h6>Address</h6>
-                    </div>
-                    <div class="col-3 bm-2">
-                        <h6>ክልል</h6>
-                        <h6>Region:
-                            <b>
-                                <t t-esc="o.partner_id.state_id.name"/>
-                            </b>
-                        </h6>
-                    </div>
-                    <div class="col-3 bm-2">
-
-                        <h6>ክፍለ ከተማ</h6>
-                        <h6>Sub-City:
-                            <b>
-                                <t t-esc="o.partner_id.city"/>
-                            </b>
-                        </h6>
-                    </div>
-                    <div class="col-2 bm-2">
-                        <h6>ቀበሌ</h6>
-                        <h6>Kebele:
-                            <b>
-                            </b>
-                        </h6>
-                    </div>
-                    <div class="col-2 bm-2">
-                        <h6>የቤት ቁጥር</h6>
-                        <h6>House No:-
-                            <b>
-                            </b>
-                        </h6>
-                    </div>
-                </div>
-
-                <div id="informations" class="row mt32 mb32">
-                    <div class="col-12 bm-2">
-                        <h6>የግብይት አይነት</h6>
-                        <h6>Type of Transaction</h6>
-                    </div>
-
-                </div>
-
-                <div id="informations" class="row mt32 mb32">
-                    <div class="col-8 bm-2">
-                        <h6>የግብይት መጠን</h6>
-                        <h6>Amount:-
-                            <b>
-                                <t t-esc="o.untaxed_amount_word"/>
-                            </b>
-                        </h6>
-                    </div>
-                    <div class="col-4 bm-2">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6>ብር</h6>
-                                <h6>Birr:
+                                <h6>Tax Payer's Name:-
                                     <b>
-                                        <t t-esc="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        <t t-esc="o.partner_id.name"/>
+                                    </b>
+                                </h6>
+                                <h6>የግብር መለያ ቁጥር</h6>
+                                <h6>Tax Payer Identifcation No:-
+                                    <b>
+                                        <t t-esc="o.partner_id.vat"/>
+                                    </b>
+                                </h6>
+
+                            </div>
+                        </div>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-2 bm-2">
+                                <h6>አድራሻ</h6>
+                                <h6>Address</h6>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <h6>ክልል</h6>
+                                <h6>Region:
+                                    <b>
+                                        <t t-esc="o.partner_id.state_id.name"/>
+                                    </b>
+                                </h6>
+                            </div>
+                            <div class="col-3 bm-2">
+
+                                <h6>ክፍለ ከተማ</h6>
+                                <h6>Sub-City:
+                                    <b>
+                                        <t t-esc="o.partner_id.city"/>
+                                    </b>
+                                </h6>
+                            </div>
+                            <div class="col-2 bm-2">
+                                <h6>ቀበሌ</h6>
+                                <h6>Kebele:
+                                    <b>
+                                    </b>
+                                </h6>
+                            </div>
+                            <div class="col-2 bm-2">
+                                <h6>የቤት ቁጥር</h6>
+                                <h6>House No:-
+                                    <b>
                                     </b>
                                 </h6>
                             </div>
                         </div>
 
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6>የግብይት አይነት</h6>
+                                <h6>Type of Transaction</h6>
+                            </div>
+
+                        </div>
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-8 bm-2">
+                                <h6>የግብይት መጠን</h6>
+                                <h6>Amount:-
+                                    <b>
+                                        <t t-esc="o.untaxed_amount_word"/>
+                                    </b>
+                                </h6>
+                            </div>
+                            <div class="col-4 bm-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>ብር</h6>
+                                        <h6>Birr:
+                                            <b>
+                                                <t t-esc="o.amount_untaxed"
+                                                   t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </b>
+                                        </h6>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6>ተቀናሽ የተደረገ 2% ግብር ብር</h6>
+                                <h6>2% withhold birr:-
+                                    <b>
+                                        <t t-if="o.withholding_two_percent!=0">
+                                            <t t-esc="o.tax_amount_word"/>
+                                        </t>
+
+                                    </b>
+                                </h6>
+                            </div>
+
+
+                        </div>
+                        <div id="informations" class="row mt32 mb32">
+                            <h6>ተቀናሽ የተደረገ 30% ግብር ብር</h6>
+                            <h6>30% withhold birr:-
+                                <b>
+                                    <t t-if="o.withholding_thirty_percent!=0">
+                                        <t t-esc="o.tax_amount_word"/>
+                                    </t>
+                                </b>
+                            </h6>
+                        </div>
+
                     </div>
-
-                </div>
-
-                <div id="informations" class="row mt32 mb32">
-                    <div class="col-12 bm-2">
-                        <h6>ተቀናሽ የተደረገ 2% ግብር ብር</h6>
-                        <h6>2% withhold birr:-
-                            <b>
-                                <t t-if="o.withholding_two_percent!=0">
-                                    <t t-esc="o.tax_amount_word"/>
-                                </t>
-
-                            </b>
-                        </h6>
+                    <div id="informations" class="row mt32 mb32">
+                        <div class="col-6 bm-2">
+                            <h6>የባንክ ሰነድ ቁጥር</h6>
+                            <h6>Bank Voucher</h6>
+                        </div>
+                        <div class="col-6 bm-2">
+                            <h6>የሽያጭ ደረሰኝ ቁጥር</h6>
+                            <h6>Sales Invoice No</h6>
+                        </div>
                     </div>
+                    <div id="informations" class="row mt32 mb32">
+                        <div class="col-6 bm-2">
+                            <h6>የቼክ ቁጥር</h6>
+                            <h6>Check No</h6>
+                        </div>
 
+                    </div>
+                    <br></br>
+                    <div id="informations" class="row mt32 mb32">
+                        <div class="col-12 bm-2">
+                            <h6>በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ ለግብር ሰብሳቢው መ/ቤት
+                                የሚከፈል 2% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን
+                            </h6>
+                        </div>
+                    </div>
+                    <div id="informations" class="row mt32 mb32">
+                        <div class="col-12 bm-2">
+                            <h6>We have withold from the above named Taxpayer
+                                <b>
 
-                </div>
-                <div id="informations" class="row mt32 mb32">
-                    <h6>ተቀናሽ የተደረገ 30% ግብር ብር</h6>
-                    <h6>30% withhold birr:-
-                        <b>
-                            <t t-if="o.withholding_thirty_percent!=0">
-                                <t t-esc="o.tax_amount_word"/>
-                            </t>
-                        </b>
-                    </h6>
-                </div>
+                                    <t t-if="o.withholding_two_percent!=0">
+                                        <u>
+                                            <t t-esc="o.withholding_two_percent"
+                                               t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </u>
+                                    </t>
 
-            </div>
-            <div id="informations" class="row mt32 mb32">
-                <div class="col-6 bm-2">
-                    <h6>የባንክ ሰነድ ቁጥር</h6>
-                    <h6>Bank Voucher</h6>
-                </div>
-                <div class="col-6 bm-2">
-                    <h6>የሽያጭ ደረሰኝ ቁጥር</h6>
-                    <h6>Sales Invoice No</h6>
-                </div>
-            </div>
-            <div id="informations" class="row mt32 mb32">
-                <div class="col-6 bm-2">
-                    <h6>የቼክ ቁጥር</h6>
-                    <h6>Check No</h6>
-                </div>
+                                </b>
+                                representing 2% tax payable to the Tax Authority as per the article 92/1 of the income
+                                tax proclamtion No.979/2008
+                            </h6>
+                        </div>
+                    </div>
+                    <div id="informations" class="row mt32 mb32">
+                        <div class="col-12 bm-2">
+                            <h6>በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ ለግብር ሰብሳቢው መ/ቤት
+                                የሚከፈል 30% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን
+                            </h6>
+                        </div>
+                    </div>
+                    <div id="informations" class="row mt32 mb32">
+                        <div class="col-12 bm-2">
+                            <h6>We have withold from the above named Taxpayer
+                                <b>
+                                    <t t-if="o.withholding_thirty_percent!=0">
+                                        <u>
+                                            <t t-esc="o.withholding_thirty_percent"
+                                               t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </u>
+                                    </t>
+                                </b>
+                                representing 30% tax payable to the Tax Authority as per the article 92/1 of the income
+                                tax proclamtion No.979/2008
+                            </h6>
+                        </div>
+                    </div>
+                    <br></br>
+                    <div id="informations" class="row mt32 mb32">
+                        <div class="col-6 bm-2">
+                            <h6>ስም</h6>
+                            <h6>Name</h6>
+                        </div>
+                        <div class="col-6 bm-2">
+                            <h6>የስራ ሃላፊነት</h6>
+                            <h6>Position</h6>
+                        </div>
 
+                    </div>
+                    <div id="informations" class="row mt32 mb32">
+                        <div class="col-6 bm-2">
+                            <h6>ፊርማ</h6>
+                            <h6>Siganature</h6>
+                        </div>
+                        <div class="col-6 bm-2">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>ማህተም</h6>
+                                    <h6>Seal</h6>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="droga_account_withholding_printout_table_report" name="Withholding Printout">
+        <t t-call="web.html_container">
+            <div id="non-printable">
+                <button class="btn btn-primary btn-sm o_report_print" onclick="window.print();">Print Preview
+                </button>
             </div>
             <br></br>
-            <div id="informations" class="row mt32 mb32">
-                <div class="col-12 bm-2">
-                    <h6>በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ ለግብር ሰብሳቢው መ/ቤት የሚከፈል 2% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን</h6>
-                </div>
-            </div>
-            <div id="informations" class="row mt32 mb32">
-                <div class="col-12 bm-2">
-                    <h6>We have withold from the above named Taxpayer <b>
+            <t t-call="web.basic_layout">
 
-                        <t t-if="o.withholding_two_percent!=0">
-                            <u><t t-esc="o.withholding_two_percent" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></u>
-                        </t>
 
-                    </b>representing 2% tax payable to the Tax Authority as per the article 92/1 of the income tax proclamtion No.979/2008 </h6>
-            </div>
-        </div>
-        <div id="informations" class="row mt32 mb32">
-            <div class="col-12 bm-2">
-                <h6>በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ ለግብር ሰብሳቢው መ/ቤት የሚከፈል 30% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን</h6>
-            </div>
-        </div>
-        <div id="informations" class="row mt32 mb32">
-            <div class="col-12 bm-2">
-                <h6>We have withold from the above named Taxpayer 
-                    <b>
-                        <t t-if="o.withholding_thirty_percent!=0">
-                        <u> <t t-esc="o.withholding_thirty_percent" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></u>
-                        </t>
-                    </b>
-                    representing 30% tax payable to the Tax Authority as per the article 92/1 of the income tax proclamtion No.979/2008 </h6>
-            </div>
-        </div>
-        <br></br>
-        <div id="informations" class="row mt32 mb32">
-            <div class="col-6 bm-2">
-                <h6>ስም</h6>
-                <h6>Name</h6>
-            </div>
-            <div class="col-6 bm-2">
-                <h6>የስራ ሃላፊነት</h6>
-                <h6>Position</h6>
-            </div>
+                <style type="text/css">
 
-        </div>
-        <div id="informations" class="row mt32 mb32">
-            <div class="col-6 bm-2">
-                <h6>ፊርማ</h6>
-                <h6>Siganature</h6>
-            </div>
-            <div class="col-6 bm-2">
-                <div class="card">
-                    <div class="card-body">
-                        <h6>ማህተም</h6>
-                        <h6>Seal</h6>
+                    /* Default left, right, top, bottom margin is 2cm */
+                    @page {
+                    size: A4 portrait;
+                    margin-top: 3cm;
+                    margin-left:4cm;
+                    margin-right:2cm;
+                    margin-bottom:2cm;
+                    }
+
+                    @media print
+                    {
+                    #non-printable { visibility: hidden; }
+                    #wrapwrap { visibility: visible; }
+                    }
+                </style>
+
+                <t t-foreach="docs" t-as="o">
+
+
+                    <div class="page">
+                        <div class="oe_structure"/>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6 class="small">የተቀነሰበት ግብር ከፋይ</h6>
+                                <h6 class="small">Tax Payer's Name:-
+                                    <b>
+                                        <span class="small">
+                                            <t t-esc="o.partner_id.name"/>
+                                        </span>
+                                    </b>
+                                </h6>
+                                <h6 class="small">የግብር መለያ ቁጥር</h6>
+                                <h6 class="small">Tax Payer Identifcation No:-
+                                    <b>
+                                        <span class="small">
+                                            <t t-esc="o.partner_id.vat"/>
+                                        </span>
+                                    </b>
+                                </h6>
+
+                            </div>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-2 bm-2 ">
+                                <h6 class="small">አድራሻ</h6>
+                                <h6 class="small">Address</h6>
+                            </div>
+                            <div class="col-3 bm-2">
+                                <h6 class="small">ክልል</h6>
+                                <h6 class="small">Region:
+                                    <b>
+                                        <t class="small" t-esc="o.partner_id.state_id.name"/>
+                                    </b>
+                                </h6>
+                            </div>
+                            <div class="col-3 bm-2">
+
+                                <h6 class="small">ክፍለ ከተማ</h6>
+                                <h6 class="small">Sub-City:
+                                    <b>
+                                        <t class="small" t-esc="o.partner_id.city"/>
+                                    </b>
+                                </h6>
+                            </div>
+                            <div class="col-2 bm-2">
+                                <h6 class="small">ቀበሌ</h6>
+                                <h6 class="small">Kebele:
+                                    <b>
+                                    </b>
+                                </h6>
+                            </div>
+                            <div class="col-2 bm-2">
+                                <h6 class="small">የቤት ቁጥር</h6>
+                                <h6 class="small">House No:-
+                                    <b>
+                                    </b>
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6 class="small">የግብይት አይነት</h6>
+                                <h6 class="small">Type of Transaction</h6>
+                            </div>
+
+                        </div>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-9 bm-2">
+                                <h6 class="small">የግብይት መጠን</h6>
+                                <h6 class="small">Amount:-
+                                    <b>
+                                        <span class="small">
+                                            <t t-esc="o.untaxed_amount_word"/>
+                                        </span>
+                                    </b>
+                                </h6>
+                            </div>
+                            <div class="col-3 bm-2 border">
+
+                                <h6 class="small">ብር</h6>
+                                <h6 class="small">Birr:
+                                    <b>
+                                        <t class="small" t-esc="o.amount_untaxed"
+                                           t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </b>
+                                </h6>
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6 class="small">ተቀናሽ የተደረገ 2% ግብር ብር</h6>
+                                <h6 class="small">2% withhold birr:-
+                                    <b>
+                                        <span class="small">
+                                            <t t-if="o.withholding_two_percent!=0">
+                                                <t class="small" t-esc="o.tax_amount_word"/>
+                                            </t>
+                                        </span>
+
+                                    </b>
+                                </h6>
+                            </div>
+
+
+                        </div>
+                        <div class="row mt32 mb32">
+                            <h6 class="small">ተቀናሽ የተደረገ 30% ግብር ብር</h6>
+                            <h6 class="small">30% withhold birr:-
+                                <b>
+                                    <t t-if="o.withholding_thirty_percent!=0">
+                                        <span class="small">
+                                            <t t-esc="o.tax_amount_word"/>
+                                        </span>
+                                    </t>
+                                </b>
+                            </h6>
+                        </div>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-6 bm-2">
+                                <h6 class="small">የባንክ ሰነድ ቁጥር</h6>
+                                <h6 class="small">Bank Voucher</h6>
+                            </div>
+                            <div class="col-6 bm-2">
+                                <h6 class="small">የሽያጭ ደረሰኝ ቁጥር</h6>
+                                <h6 class="small">Sales Invoice No</h6>
+                            </div>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-6 bm-2">
+                                <h6 class="small">የቼክ ቁጥር</h6>
+                                <h6 class="small">Check No</h6>
+                            </div>
+
+                        </div>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6 class="small">በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ
+                                    ለግብር ሰብሳቢው
+                                    መ/ቤት
+                                    የሚከፈል 2% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6 class="small">We have withold from the above named Taxpayer
+                                    <b>
+
+                                        <t t-if="o.withholding_two_percent!=0">
+                                            <u>
+                                                <span class="small">
+                                                    <t t-esc="o.withholding_two_percent"
+                                                       t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </span>
+                                            </u>
+                                        </t>
+
+                                    </b>
+                                    representing 2% tax payable to the Tax Authority as per the article 92/1 of the
+                                    income
+                                    tax proclamtion No.979/2008
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6 class="small">በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ
+                                    ለግብር ሰብሳቢው
+                                    መ/ቤት
+                                    የሚከፈል 30% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6 class="small">We have withold from the above named Taxpayer
+                                    <b>
+                                        <t t-if="o.withholding_thirty_percent!=0">
+                                            <u>
+                                                <span class="small">
+                                                    <t t-esc="o.withholding_thirty_percent"
+                                                       t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </span>
+                                            </u>
+                                        </t>
+                                    </b>
+                                    representing 30% tax payable to the Tax Authority as per the article 92/1 of the
+                                    income
+                                    tax proclamtion No.979/2008
+                                </h6>
+                            </div>
+                        </div>
+                        <br></br>
+                        <div class="row mt32 mb32">
+                            <div class="col-6 bm-2">
+                                <h6 class="small">ስም</h6>
+                                <h6 class="small">Name</h6>
+                            </div>
+                            <div class="col-6 bm-2">
+                                <h6 class="small">የስራ ሃላፊነት</h6>
+                                <h6 class="small">Position</h6>
+                            </div>
+
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-6 bm-2">
+                                <h6 class="small">ፊርማ</h6>
+                                <h6 class="small">Signature</h6>
+                            </div>
+                            <div class="col-6 bm-2">
+
+                                <h6 class="small">ማህተም</h6>
+                                <h6 class="small">Seal</h6>
+
+
+                            </div>
+                        </div>
+
                     </div>
-                </div>
 
-            </div>
-        </div>
-    </t>
-</t>
-</t>
-</template>
+                </t>
+            </t>
+        </t>
+    </template>
 
 </odoo>

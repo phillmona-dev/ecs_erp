@@ -25,39 +25,40 @@
 
 
                 <style type="text/css">
-    
-                        /* Default left, right, top, bottom margin is 2cm */
-                        @page {
-                        size: A4 portrait;
-                        margin: 1cm;
-                        }
-    
-                        @media print
-                        {
-                        #non-printable { visibility: hidden; }
-                        #wrapwrap { visibility: visible; }
-                        }
+
+                    /* Default left, right, top, bottom margin is 2cm */
+                    @page {
+                    size: A4 portrait;
+                    margin: 1cm;
+                    }
+
+                    @media print
+                    {
+                    #non-printable { visibility: hidden; }
+                    #wrapwrap { visibility: visible; }
+                    }
                 </style>
 
                 <t t-foreach="docs" t-as="o">
 
 
                     <div class="page">
-                        <br></br>
-                        <br></br>
-                        <br></br>
+
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-6 bm-2">
-                                <h6>ከ:-                                    <strong t-esc="o.company_id.name"/>
+                                <h6>ከ:-
+                                    <strong t-esc="o.company_id.name"/>
                                 </h6>
                                 <h6>From
-                                    
+
                                 </h6>
-                                <h6>አድራሻ/ክልል፦አ.አ                                    <span style="padding-left: 10px;">ክ.ከ፦አ/ከተማ</span>
+                                <h6>አድራሻ/ክልል፦አ.አ
+                                    <span style="padding-left: 10px;">ክ.ከ፦አ/ከተማ</span>
                                     <span style="padding-left: 10px;">ወ፦06</span>
                                     <span style="padding-left: 10px;">ቤ.ቁ፦133</span>
                                 </h6>
-                                <h6>Address Region<span style="padding-left: 8px;">K/K</span>
+                                <h6>Address Region
+                                    <span style="padding-left: 8px;">K/K</span>
                                     <span style="padding-right: 15px;">W.</span>
                                     <span style="padding-left: 15px;">H.No.</span>
                                 </h6>
@@ -66,10 +67,11 @@
                                 <h6>Supplier's TIN No.</h6>
                             </div>
                             <div class="col-6 bm-2">
-                                <h6>ለ:-                                    <strong t-esc="o.partner_id.name"/>
+                                <h6>ለ:-
+                                    <strong t-esc="o.partner_id.name"/>
                                 </h6>
                                 <h6>To
-                                    
+
                                 </h6>
                                 <h6>አድራሻ/ክልል፦____ክ.ከ፦____ወ፦____ቤ.ቁ፦_____</h6>
                                 <h6>Address Region&#160;K/K&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;W.&#160;&#160;&#160;&#160;&#160;&#160;&#160;H.No.</h6>
@@ -77,7 +79,7 @@
                                 <h6>የተ.እ.ታ ቁጥር______________________________</h6>
                                 <h6>VAT Reg. No</h6>
 
-                                <h6>የታክስ ከፋይ መ.ቁ:-                                    
+                                <h6>የታክስ ከፋይ መ.ቁ:-
                                     <u>
                                         <t t-esc="o.partner_id.vat"/>
                                     </u>
@@ -93,7 +95,7 @@
                             <div class="col-12 bm-2">
                                 <h6>የክፍያው ምክንያት</h6>
                                 <h6>Payment Description:-
-                                    
+
                                     <t t-esc="o.purpose"/>
 
                                 </h6>
@@ -111,43 +113,47 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <h6>ብር</h6>
-                                        <h6>Birr:<b>
-                                            <t t-esc="o.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                        </b>
+                                        <h6>Birr:
+                                            <b>
+                                                <t t-esc="o.amount"
+                                                   t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </b>
 
-                                    </h6>
+                                        </h6>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
 
-                    </div>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6>
+                                    <span>የክፍያ ሁኔታ</span>
+                                    <span style="padding-left: 75px;">በጥሬ&#160;</span>
+                                    <input type="checkbox"></input>
+                                    <span style="padding-left: 15px;">በቼክ&#160;</span>
+                                    <input type="checkbox"></input>
+                                    <span style="padding-left: 25px;">የቼክ ቁጥር</span>
+                                </h6>
+                                <h6>Mode of Payment
+                                    <span style="padding-left: 15px;">Cash</span>
+                                    <span style="padding-left: 15px;">Cheque</span>
+                                    <span style="padding-left: 15px;">Cheque No</span>_____________________
+                                </h6>
+                                <br></br>
 
-                    <div id="informations" class="row mt32 mb32">
-                        <div class="col-12 bm-2">
-                            <h6>
-                                <span>የክፍያ ሁኔታ</span>
-                                <span style="padding-left: 75px;">በጥሬ&#160;</span>
-                                <input type="checkbox"></input>
-                                <span style="padding-left: 15px;">በቼክ&#160;</span>
-                                <input type="checkbox"></input>
-                                <span style="padding-left: 25px;">የቼክ ቁጥር</span>
-                            </h6>
-                            <h6>Mode of Payment <span style="padding-left: 15px;">Cash</span>
-                                <span style="padding-left: 15px;">Cheque</span>
-                                <span style="padding-left: 15px;">Cheque No</span>_____________________</h6>
-                            <br></br>
+                                <h6>ያዘጋጀው ስምና ፊርማ_____________________________________</h6>
+                                <h6>Prepared By</h6>
 
-                            <h6>ያዘጋጀው ስምና ፊርማ_____________________________________</h6>
-                            <h6>Prepared By</h6>
-
-                            <h6>የተቀባይ (የሻጭ) ስምና ፊርማ_______________________________</h6>
-                            <h6>Cashier's Signature</h6>
+                                <h6>የተቀባይ (የሻጭ) ስምና ፊርማ_______________________________</h6>
+                                <h6>Cashier's Signature</h6>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </t>
             </t>
         </t>
-    </t>
-</template>
+    </template>
 
 </odoo>

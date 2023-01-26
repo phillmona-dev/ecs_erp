@@ -6,12 +6,12 @@
          <xpath expr="//ActionMenus" position="after">
 
             <button class="btn btn-info" type="button" t-on-click="PrintToPos"
-                    groups="purchase.group_purchase_manager">
+                    groups="purchase.group_purchase_manager" id="btnPosPrint">
                 Print to POS
             </button>
 
              <button class="btn btn-info" type="button" t-on-click="CancelPosTransaction"
-                    groups="purchase.group_purchase_manager">
+                     groups="purchase.group_purchase_manager" id="btnPosCancel">
                 Cancel
             </button>
 
@@ -20,6 +20,8 @@
 
 
         </xpath>
+
+
 
     </t>
 </templates>
