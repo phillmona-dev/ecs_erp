@@ -42,7 +42,7 @@
                 <field name="available_qty" decoration-danger="available_qty &lt;= 0" widget="badge"
                        groups="droga_sales.sales_price_change_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_import_approve_admin"></field>
                 <field name="store_placement"></field>
-                <field name="wareh" string="Warehouse" options="{'no_create': True}"/>
+                <field name="wareh" string="Warehouse" domain="[('wh_type','=',parent.order_type)]" options="{'no_create': True}"/>
             </xpath>
 
             <xpath expr="//form/sheet/div/button[@name='action_preview_sale_order']" position="before">
@@ -147,7 +147,7 @@
 
             <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="after">
                 <field name="store_placement"></field>
-                <field name="wareh" string="Warehouse"></field>
+                <field name="wareh" domain="[('wh_type','=',parent.order_type)]" string="Warehouse"></field>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="attributes">

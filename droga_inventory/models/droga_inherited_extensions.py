@@ -249,7 +249,7 @@ class droga_stock_uom_extension(models.Model):
 class droga_stock_move_extension(models.Model):
     _inherit = 'stock.move'
     from_reconcile_menu=fields.Boolean(related='picking_id.from_reconcile_menu')
-    reservation_discard_time=fields.Datetime(string='Reservation discard time',compute='_compute_res_discard',inverse='_inverse_res_discard')
+    reservation_discard_time=fields.Datetime(string='Reservation cancel time',compute='_compute_res_discard',inverse='_inverse_res_discard')
     reserve_indef=fields.Boolean('Reserve indefinitely',default=False)
     def _inverse_res_discard(self):
         pass
@@ -275,7 +275,7 @@ class droga_stock_move_extension(models.Model):
     has_access = fields.Boolean('is_move_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
 
-    reserved_qty=fields.Float('Reserved qty',default=0)
+    reserved_qty=fields.Float('Reserved qty',default=0,tracking=True)
 
     def _search_has_access(self, operator, value):
 
@@ -295,6 +295,10 @@ class droga_stock_move_extension(models.Model):
             else:
                 rec.has_access = False
 
+    @api.model
+    def create(self, vals_list):
+        vals_list['reserved_qty']=vals_list['product_uom_qty']
+        return super(droga_stock_move_extension, self).create(vals_list)
 
     def unlink_(self):
         raise ValidationError(

@@ -43,7 +43,7 @@ class sale_order_line(models.Model):
     store_placement = fields.Boolean('Placement',default=False)
     std_unit_price=fields.Float(readonly=True,string='UP Default')
 
-    @api.depends('product_id')
+    @api.depends('product_id','order_id.order_type')
     def _is_prod_available(self):
         for rec in self:
             rec.available_qty=0
@@ -75,10 +75,6 @@ class sale_order_line(models.Model):
     def _inverse_price(self):
         pass
 
-    @api.onchange('product_id')
-    def _get_wh(self):
-        for rec in self:
-            rec.wareh=rec.product_id.default_warehouse
     def calc_sales_totals(self):
         core_sum=0
         non_core_sum=0
@@ -112,8 +108,12 @@ class sale_order_line(models.Model):
             return
 
         for line in self:
-            if not line.wareh:
+            if line.product_id.default_warehouse.wh_type==self.order_id.order_type:
                 line.wareh=line.product_id.default_warehouse
+            elif not line.wareh:
+                line.wareh=self.env['stock.warehouse'].search(
+                    [('wh_type', '=', self.order_id.order_type)], limit=1,
+                    order="id asc")
 
             #Get discounts/additional payments per type
             type_rates = self.env['droga.price.discount.per.type'].search(
@@ -303,6 +303,11 @@ class sale_order_ext(models.Model):
             lambda x: not x.wareh)
         if (len(order_lines_nowareh) > 0):
             raise ValidationError("Warehouse must be filled for each order line.")
+
+        order_lines_nowareh = self.order_line.filtered(
+            lambda x: x.wareh.wh_type!=self.order_type)
+        if (len(order_lines_nowareh) > 0):
+            raise ValidationError("Please check if all warehouses are under "+dict(self._fields['order_type'].selection).get(self.order_type)+".")
 
         order_lines_negative = self.order_line.filtered(
             lambda x: not x.is_prod_available)
