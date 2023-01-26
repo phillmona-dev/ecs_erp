@@ -60,7 +60,7 @@ class sale_order_line(models.Model):
     def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
         self = self.sudo()
         moves=self.env['stock.move'].search(
-                [('product_id','=',product_id.id),('location_id.warehouse_id', '=', warehouse_id.id),('reserve_indef','=',False), ('location_id.usage', '=', 'internal'),('location_dest_id.usage', '!=', 'internal'),('state','not in',['done','cancel','draft'])])
+                [('product_id','=',product_id.id),('location_id.warehouse_id', '=', warehouse_id.id),('location_id.usage', '=', 'internal'),('location_dest_id.usage', '!=', 'internal'),('state','not in',['done','cancel','draft'])])
         return sum(moves.mapped('reserved_qty'))
 
     def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):
