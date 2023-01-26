@@ -101,7 +101,7 @@
                         string="Confirm"/>
                 <button name="reject_order" type="object" class="oe_highlight btn-warning"
                         attrs="{'invisible': [('state', 'not in', ['price_request','req'])]}"
-                        groups="droga_sales.sales_price_change_admin"
+                        groups="droga_sales.sales_price_change_admin,droga_sales.sales_import_approve_admin,droga_sales.sales_wholesale_approve_admin"
                         string="Reject"/>
             </xpath>
             <xpath expr="//form/header/button[@name='action_quotation_send']" position="attributes">
