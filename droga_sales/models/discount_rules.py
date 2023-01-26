@@ -108,7 +108,7 @@ class sale_order_line(models.Model):
             return
 
         for line in self:
-            if line.product_id.default_warehouse.wh_type==self.order_id.order_type:
+            if not line.wareh and line.product_id.default_warehouse.wh_type==self.order_id.order_type:
                 line.wareh=line.product_id.default_warehouse
             elif not line.wareh:
                 line.wareh=self.env['stock.warehouse'].search(
