@@ -108,7 +108,7 @@
                             <br/>
 
 
-                            <table class="table  table-bordered table-sm o_main_table" style="page-break-inside: avoid;">
+                            <table class="table  table-bordered table-sm o_main_table " style="page-break-inside: avoid;">
                                 <tr>
                                     <td>
                                         <strong>Date:</strong>
@@ -156,7 +156,7 @@
                                 </tr>
                             </table>
 
-                            <table class="table table-bordered o_main_table">
+                            <table class="table table-bordered o_main_table table-sm">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th scope="col" class="text-start">Item Description</th>
@@ -257,14 +257,12 @@
 
 
                             <br/>
-                            <br/>
                             <div id="informations" class="row mt32 mb32">
                                 <div class="col-12 bm-2">
                                     <strong>Total Amount in Words:</strong>
                                     <span t-esc="o.total_amount_word"/>
                                 </div>
                             </div>
-                            <br/>
                             <br/>
                             <div id="informations" class="row mt32 mb32">
                                 <div class="col-12 bm-2">
@@ -273,7 +271,6 @@
                                     </strong>
                                 </div>
                             </div>
-                            <br/>
                             <br/>
                             <div id="informations" class="row mt32 mb32">
                                 <div class="col-12 bm-2">
