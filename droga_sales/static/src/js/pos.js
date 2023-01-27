@@ -110,9 +110,7 @@ export class PosFormController extends FormController {
             method: "POST",
             dataType: "json",
             crossDomain: true,
-            headers: {
-                'Access-Control-Allow-Origin': '*', ApiKey: "b904ea3c8a3446a0894aeec285e774b7",
-            },
+            headers: headers,
             data: invoice,
             contentType: "application/json",
 
