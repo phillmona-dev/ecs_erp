@@ -103,7 +103,7 @@ export class PosFormController extends FormController {
         });
 
         let invoice = JSON.stringify(header);
-
+        console.log(invoice);
 
         $.ajax({
             url: posUrl + "/pedsfpsrv/api/SalesInvoice/PrintInvoice?printCopy=false",
@@ -156,7 +156,7 @@ export class PosFormController extends FormController {
             });
     }
 
-    btnUpdateFs(){
+    btnUpdateFs() {
 
     }
 
