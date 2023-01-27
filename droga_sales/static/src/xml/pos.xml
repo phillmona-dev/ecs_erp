@@ -9,7 +9,7 @@
                     groups="purchase.group_purchase_manager" id="btnPosPrint">
                 Print to POS
             </button>
-             
+
 
              <button class="btn btn-info" type="button" t-on-click="CancelPosTransaction"
                      groups="purchase.group_purchase_manager" id="btnPosCancel">

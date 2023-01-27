@@ -121,7 +121,7 @@
                                 <tr>
                                     <td>
                                         <strong>Date:</strong>
-                                        <span class="small" t-esc="o.FTimeStamp"/>
+                                        <span class="small" t-esc="o.FTimeStamp" t-options='{"widget": "datetime","format": "MM-dd-yyyy h:mm a"}'/>
                                     </td>
                                     <td>
                                         <strong>Fs No.:</strong>
