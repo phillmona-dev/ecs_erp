@@ -29,6 +29,7 @@
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
                        t-as="sale_order">
+                        <t t-set="sales_order_no" t-value="sale_order.name"/>
                         <t t-set="sales_representative" t-value="sale_order.sales_initiator"/>
                         <t t-set="store" t-value="sale_order.order_type"/>
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
@@ -132,8 +133,12 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="3">
+                                    <td colspan="2">
                                         <strong>Customer Information</strong>
+                                    </td>
+                                    <td>
+                                        <strong>Order No.:</strong>
+                                        <span class="small" t-esc="sales_order_no"/>
                                     </td>
                                 </tr>
                                 <tr>
@@ -141,6 +146,7 @@
                                         <strong>Customer Name:</strong>
                                         <span class="small" t-esc="o.partner_id.name"/>
                                     </td>
+
                                     <td>
                                         <strong>TIN.:</strong>
                                         <span class="small" t-esc="o.partner_id.vat"/>
@@ -167,8 +173,9 @@
                             <table class="table table-bordered o_main_table table-sm">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th scope="col" class="text-start">Item Description</th>
+
                                         <th scope="col" class="text-start">Code</th>
+                                        <th scope="col" class="text-start">Item Description</th>
                                         <th scope="col">Batch #</th>
                                         <th scope="col">Expiry Date</th>
                                         <th scope="col" class="text-center">UoM</th>
@@ -194,12 +201,13 @@
                                             </t>
                                         </t>
                                         <tr>
-                                            <td>
-                                                <span class="small" t-esc="line.product_id.name"/>
-                                            </td>
+
                                             <td class="text-start">
                                                 <span class="small"
                                                       t-esc="line.product_id.product_tmpl_id.default_code"/>
+                                            </td>
+                                            <td>
+                                                <span class="small" t-esc="line.product_id.name"/>
                                             </td>
                                             <td>
                                                 <span class="small">
@@ -301,7 +309,7 @@
                                     <span>Approved By :________________________</span>
                                 </div>
                                 <div class="col-6 bm-2">
-                                    <span>Approved By :________________________</span>
+                                    <span>Received By :________________________</span>
                                 </div>
                             </div>
                             <br/>
@@ -316,6 +324,13 @@
                                 <div class="col-12 bm-2 text-center">
                                     <strong>This receipt is not valid unless the fiscal receipt is attached!</strong>
 
+                                </div>
+
+                            </div>
+                            <br/>
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-12 bm-2 text-center">
+                                    <span t-esc="o.FPMachineID"/>
                                 </div>
 
                             </div>
