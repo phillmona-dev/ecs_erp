@@ -9,6 +9,8 @@ const core = require("web.core");
 const ajax = require("web.ajax");
 const Dialog = require("web.Dialog");
 const framework = require('web.framework');
+var session = require('web.session');
+
 
 const rpc = require("web.rpc");
 const _t = core._t;
@@ -28,7 +30,7 @@ export class PosFormController extends FormController {
 
     PrintToPos() {
 
-
+        console.log(session.user_id);
         console.log(this.model.root.data);
         if (this.model.root.data.is_invoice_printed_pos === true) {
             Dialog.alert(this, _t("The current invoice has already been printed!"));
@@ -64,12 +66,12 @@ export class PosFormController extends FormController {
             AddOnValue: "0",
             DiscountType: "fixed",
             DiscountValue: "0",
-            UserName: this.model.root.data.user_id[1],
+            UserName: this.model.root.data.current_user_id[1],
             HeaderMemo: "Free Text",
             FooterMemo: "Welcome Message",
             TimeStamp: dateString,
             Remark: "",
-            ApprovedBy: "",
+            ApprovedBy: this.model.root.data.current_user_id[1],
         };
 
         let lineItems = [];

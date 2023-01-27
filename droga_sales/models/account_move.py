@@ -10,11 +10,9 @@ from odoo import api, fields, models
 class account_move(models.Model):
     _inherit = "account.move"
 
-    def get_current_user_id(self):
-        context = self._context
-        return context.get('uid')
-
-    logged_user_id = fields.Many2one('res.users', default=get_current_user_id)
+    logged_user_id = fields.Many2one('res.users')
+    current_user_id = fields.Many2one('res.users', compute="_get_current_user_id")
+    # = fields.Many2one('res.users', string='My User', default=lambda self: self.env.user)
 
     FPMachineID = fields.Char("Machine ID")
     FSInvoiceNumber = fields.Char("FS Invoice Number")
@@ -26,6 +24,11 @@ class account_move(models.Model):
 
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
     total_amount_word = fields.Char(compute="_get_total_amount_word")
+
+    def _get_current_user_id(self):
+        context = self._context
+        self.current_user_id = self.env.user
+        # return context.get('uid')
 
     def _get_total_amount_word(self):
         for record in self:

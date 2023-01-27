@@ -20,7 +20,8 @@
             </form>
 
             <xpath expr="//button[@name='button_set_checked']" position="after">
-                <button type="object" name="print_sales_attachment" string="Sales Attachement" attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}"/>
+                <button type="object" name="print_sales_attachment" string="Sales Attachement"
+                        attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}"/>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
@@ -31,6 +32,7 @@
 
                             <field name="FSInvoiceNumber" string="FS Number"/>
                             <field name="FTimeStamp" string="Timestamp" readonly="0"/>
+                            <field name="current_user_id"/>
                         </group>
                         <group>
                             <field name="FPMachineID" string="MachineID" readonly="0"/>
