@@ -29,14 +29,14 @@ export class PosFormController extends FormController {
     PrintToPos() {
 
 
-        console.log(this.model.root.data.pos_device_ip_address);
-        /*if (this.model.root.data.is_invoice_printed_pos === true) {
+        console.log(this.model.root.data);
+        if (this.model.root.data.is_invoice_printed_pos === true) {
             Dialog.alert(this, _t("The current invoice has already been printed!"));
             return;
         } else if (this.model.root.data.pos_device_ip_address === "") {
             Dialog.alert(this, _t("The POS device IP address is not set for the current user, please contact the system administrator to set it."));
             return;
-        }*/
+        }
 
         //set posurl
         posUrl = "http://" + this.model.root.data.pos_device_ip_address;
@@ -69,7 +69,7 @@ export class PosFormController extends FormController {
             FooterMemo: "Welcome Message",
             TimeStamp: dateString,
             Remark: "",
-            ApprovedBy: this.model.root.data.user_id[1],
+            ApprovedBy: "",
         };
 
         let lineItems = [];
