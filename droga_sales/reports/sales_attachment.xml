@@ -25,11 +25,13 @@
                     <!-- Store and Sales Represnetataives -->
                     <t t-set="store" t-value=""/>
                     <t t-set="sales_representative" t-value=""/>
+                    <t t-set="order_type" t-value=""/>
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
                        t-as="sale_order">
                         <t t-set="sales_representative" t-value="sale_order.sales_initiator"/>
                         <t t-set="store" t-value="sale_order.order_type"/>
+                        <t t-set="order_type" t-value="sale_order.sales_type"/>
                     </t>
 
                     <div class="header">
@@ -86,7 +88,12 @@
 
                             <div id="informations" class="row mt32 mb32 text-center">
                                 <div class="col-12 bm-2">
-                                    <h2>Cash Sales Attachment</h2>
+                                    <t t-if="order_type=='Cash sales'">
+                                        <h2>Cash Sales Attachment</h2>
+                                    </t>
+                                    <t t-if="order_type=='Credit sales'">
+                                        <h2>Credit Sales Attachment</h2>
+                                    </t>
                                 </div>
                             </div>
 
@@ -108,7 +115,8 @@
                             <br/>
 
 
-                            <table class="table  table-bordered table-sm o_main_table " style="page-break-inside: avoid;">
+                            <table class="table  table-bordered table-sm o_main_table "
+                                   style="page-break-inside: avoid;">
                                 <tr>
                                     <td>
                                         <strong>Date:</strong>
@@ -227,7 +235,7 @@
                                         </td>
                                         <td>
                                             <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
-                                                  class="small"/>
+                                                    class="small"/>
                                         </td>
                                     </tr>
                                     <tr class="is-subtotal text-end">
@@ -247,7 +255,7 @@
                                         </td>
                                         <td>
                                             <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
-                                                  class="small"/>
+                                                    class="small"/>
                                         </td>
                                     </tr>
 
