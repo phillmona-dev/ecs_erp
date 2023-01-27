@@ -19,7 +19,7 @@ const headers = {
 
 let posUrl = "";
 
-$('#btnPosPrint').hide();
+//$('#btnPosPrint').hide();
 
 export class PosFormController extends FormController {
     setup() {
@@ -117,6 +117,7 @@ export class PosFormController extends FormController {
             timeout: 5000,
         })
             .then((data) => {
+                console.log(data);
                 //unblock UI
                 framework.unblockUI();
                 //check print status
@@ -148,6 +149,7 @@ export class PosFormController extends FormController {
             })
             .catch((error) => {
                 //unblock UI
+                console.log(error);
                 framework.unblockUI();
                 Dialog.alert(this, _t("The connection to the POS service is not established, please check the connection. "));
             });
