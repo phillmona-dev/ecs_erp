@@ -124,8 +124,9 @@ export class PosFormController extends FormController {
                 if (data.Success === "True" && data.Status === "Finished") {
                     //update data on odoo
 
-                    let ts = new Date(data.Content.TimeStamp);
+                    let ts = new Date();
                     let timeStamp = ts.getUTCFullYear() + "-" + ("0" + (ts.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + ts.getUTCDate()).slice(-2) + " " + ("0" + ts.getUTCHours()).slice(-2) + ":" + ("0" + ts.getUTCMinutes()).slice(-2) + ":" + ("0" + ts.getUTCSeconds()).slice(-2);
+
 
                     rpc
                         .query({
@@ -153,6 +154,10 @@ export class PosFormController extends FormController {
                 framework.unblockUI();
                 Dialog.alert(this, _t("The connection to the POS service is not established, please check the connection. "));
             });
+    }
+
+    btnUpdateFs(){
+
     }
 
     //cancel command when the pos machine stack due to different  reasons
