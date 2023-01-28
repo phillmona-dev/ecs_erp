@@ -132,13 +132,13 @@ export class PosFormController extends FormController {
 
                     rpc
                         .query({
-                            model: "account.move", method: "write", args: [[this.model.root.data.id], {
+                            model: "account.move", method: "write", timeout: 60000, args: [[this.model.root.data.id], {
                                 FPMachineID: data.Content.FPMachineID,
                                 FSInvoiceNumber: data.Content.FSInvoiceNumber,
                                 EJNumber: data.Content.EJNumber,
                                 FTimeStamp: timeStamp,
                                 is_invoice_printed_pos: "true",
-                            }], timeout: 30000,
+                            }],
                         })
                         .then(function (data) {
                             Dialog.alert(this, _t("Invoice has been successfully printed!"));
