@@ -19,7 +19,7 @@ class account_move(models.Model):
     EJNumber = fields.Char("EJ Number")
     FTimeStamp = fields.Datetime("TimeStamp")
     is_invoice_printed_pos = fields.Boolean("Invoice Printed POS", default=False)
-    tin_no = fields.Char(compute="get_tin_no", string="Tin No", store=True)
+    tin_no = fields.Char(compute="get_tin_no", string="Tin No")
     sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
 
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
@@ -35,12 +35,10 @@ class account_move(models.Model):
             # convert amount to word
             record.total_amount_word = self.convert_to_word(record.amount_total) + " Only"
 
-    @api.depends("partner_id")
+    # @api.depends("partner_id")
     def get_tin_no(self):
         for record in self:
             record.tin_no = record.partner_id.vat
-            # convert amount to word
-            # record.amount_total_word = self.convert_to_word(record.amount_total) + " only"
 
     @api.depends('invoice_payment_term_id')
     def _get_so_type(self):
