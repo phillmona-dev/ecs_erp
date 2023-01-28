@@ -30,7 +30,7 @@ export class PosFormController extends FormController {
 
     PrintToPos() {
 
-        /*console.log(session.user_id);
+        console.log(session.user_id);
         console.log(this.model.root.data);
         if (this.model.root.data.is_invoice_printed_pos === true) {
             Dialog.alert(this, _t("The current invoice has already been printed!"));
@@ -38,7 +38,7 @@ export class PosFormController extends FormController {
         } else if (this.model.root.data.pos_device_ip_address === "") {
             Dialog.alert(this, _t("The POS device IP address is not set for the current user, please contact the system administrator to set it."));
             return;
-        }*/
+        }
 
         //set posurl
         posUrl = "http://" + this.model.root.data.pos_device_ip_address;
@@ -132,14 +132,14 @@ export class PosFormController extends FormController {
 
                     rpc
                         .query({
-                            model: "account.move", method: "write", timeout: 60000, args: [[this.model.root.data.id], {
+                            model: "account.move", method: "write", args: [[this.model.root.data.id], {
                                 FPMachineID: data.Content.FPMachineID,
                                 FSInvoiceNumber: data.Content.FSInvoiceNumber,
                                 EJNumber: data.Content.EJNumber,
                                 FTimeStamp: timeStamp,
                                 is_invoice_printed_pos: "true",
                             }],
-                        })
+                        }, {timeout: 30000})
                         .then(function (data) {
                             Dialog.alert(this, _t("Invoice has been successfully printed!"));
                             browser.location.reload();
