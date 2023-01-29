@@ -51,6 +51,12 @@
                     <label for="deliv_after_payment"/>
                         <field name="deliv_after_payment"/>
             </xpath>
+            <xpath expr="//form/sheet" position="after">
+                <div class="oe_chatter">
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </xpath>
         </field>
     </record>
 

@@ -36,6 +36,11 @@ class cust_contact_extension(models.Model):
     street = fields.Char(compute='_get_add')
     key_account=fields.Boolean('Key account')
 
+    def write(self, vals):
+        if 'vat' in vals:
+            raise UserError("You can not edit Tin no.")
+        return super(cust_contact_extension, self).write(vals)
+
     @api.depends('location','area')
     def _get_add(self):
         for rec in self:

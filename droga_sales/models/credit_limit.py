@@ -33,7 +33,7 @@ class cust_sales_credit_limit(models.Model):
     mature_amount = fields.Monetary('Matured amount', compute='_get_mature_amount')
     show_invoice_button = fields.Boolean(compute='_get_mature_amount')
     manual_price = fields.Boolean('Manual price', default=False, required=True, tracking=True)
-    Vat_no = fields.Char(related='partner_id.vat', readonly=False)
+    Vat_no = fields.Char(related='partner_id.vat')
     sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
 
     order_type = fields.Selection([
@@ -54,15 +54,23 @@ class cust_sales_credit_limit(models.Model):
     def _get_mature_amount(self):
         for rec in self:
             matured_invoices = self.env['account.move'].search(
-                [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'), ('invoice_date_due', '<', datetime.now()),
+                [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'), ('invoice_date_due', '<=', datetime.now()),
                  ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', rec.partner_id.vat), '|',
                  ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
             tot_amount = 0
             for mi in matured_invoices:
+
                 tot_amount = tot_amount + (
                     mi['amount_total_signed'] if mi['amount_residual'] == 0 else mi['amount_residual'])
             rec.mature_amount = tot_amount
             rec.show_invoice_button = False if rec.mature_amount == 0 else True
+
+    def action_cancel(self):
+        for rec in self:
+            #Validations here
+            pass
+        return super(cust_sales_credit_limit,self).action_cancel()
+
 
     @api.model
     def create(self, vals):
@@ -146,5 +154,9 @@ class cust_sales_no_create_after_invoice(models.Model):
 
 class payment_term_no_credit(models.Model):
     _inherit = 'account.payment.term'
-    apply_credit_limit = fields.Boolean(string='Apply credit limit', default=True)
+    apply_credit_limit = fields.Boolean(string='Apply credit limit', default=True,Tracking=True)
     deliv_after_payment = fields.Boolean(string='Delivery after payment', default=False)
+
+class payment_term_no_credit_messages(models.Model):
+    _name = 'account.payment.term'
+    _inherit = ['account.payment.term','mail.thread', 'mail.activity.mixin', 'image.mixin']
