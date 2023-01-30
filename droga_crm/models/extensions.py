@@ -35,7 +35,24 @@ class cust_contact_extension(models.Model):
     contacts=fields.One2many('droga.crm.contacts','parent_customer')
     street = fields.Char(compute='_get_add')
     key_account=fields.Boolean('Key account')
-
+    def _def_rec(self):
+        cid=self.env.company.id
+        acc=self.env['account.account'].search([('company_id','=',cid),('code','=','114001')])
+        return acc[0].id if len(acc)>0 else False
+    property_account_receivable_id = fields.Many2one('account.account', company_dependent=True,
+                                                     string="Account Receivable",
+                                                     domain="[('account_type', '=', 'asset_receivable'), ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
+                                                     help="This account will be used instead of the default one as the receivable account for the current partner",
+                                                     required=True,default=_def_rec)
+    def _def_pay(self):
+        cid=self.env.company.id
+        acc=self.env['account.account'].search([('company_id','=',cid),('code','=','211001')])
+        return acc[0].id if len(acc)>0 else False
+    property_account_payable_id = fields.Many2one('account.account', company_dependent=True,
+                                                  string="Account Payable",
+                                                  domain="[('account_type', '=', 'liability_payable'), ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
+                                                  help="This account will be used instead of the default one as the payable account for the current partner",
+                                                  required=True,default=_def_pay)
     def write(self, vals):
         for rec in self:
             if 'vat' in vals and rec.vat:

@@ -6,16 +6,101 @@ from datetime import datetime, timedelta, date
 class update_cost(models.Model):
     _name = "update.cost"
 
-    def fetch_and_create_currency(self):
+    def in1(self):
         Product = self.env['product.product']
-        move_vals_list=[]
-        in_stock_valuation_layers=self.env['stock.valuation.layer'].search([('stock_move_id','!=',False),('description','not like','OB%'),('description','not like','Product%'),('quantity','>',0)])
-        move_vals_list += Product._svl_replenish_stock_am(in_stock_valuation_layers)
-        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id','!=',False),('description','not like','OB%'),('description','not like','Product%'),('quantity','<',0)])
-        move_vals_list += Product._svl_empty_stock_am(in_stock_valuation_layers)
 
+        #For local purchase GRN
+        move_vals_list = []
+        in_stock_valuation_layers=self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('description', 'like', 'GRN%'),  ('description', 'like', '%/LP/%')])
+        move_vals_list += Product._svl_replenish_stock_am(in_stock_valuation_layers)
+        if move_vals_list:
+            account_moves = self.env['account.move'].sudo().create(move_vals_list)
+            account_moves._post()
+
+    def in2(self):
+        Product = self.env['product.product']
+
+        #For local purchase COR
+        move_vals_list = []
+        in_stock_valuation_layers=self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('description', 'like', 'COR/%')])
+        move_vals_list += Product._svl_replenish_stock_am(in_stock_valuation_layers)
+        if move_vals_list:
+            account_moves = self.env['account.move'].sudo().create(move_vals_list)
+            account_moves._post()
+
+    def in3(self):
+        Product = self.env['product.product']
+
+        #For foreign purchase GRN
+        move_vals_list=[]
+        in_stock_valuation_layers=self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('description', 'like', 'GRN%'),  ('description', 'like', '%/FP/%')])
+        move_vals_list += Product._svl_replenish_stock_am(in_stock_valuation_layers)
+        if move_vals_list:
+            account_moves = self.env['account.move'].sudo().create(move_vals_list)
+            account_moves._post()
+
+    def in4(self):
+        Product = self.env['product.product']
+        # For customer to store return
+        move_vals_list = []
+        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('stock_move_id.location_dest_id.usage', '=', 'internal'),  ('stock_move_id.location_id.name', '=', 'Customers')])
+        move_vals_list += Product._svl_replenish_stock_am(in_stock_valuation_layers)
+        if move_vals_list:
+            account_moves = self.env['account.move'].sudo().create(move_vals_list)
+            account_moves._post()
+
+    def out1(self):
+        Product = self.env['product.product']
+        # For sales issue
+        move_vals_list = []
+        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('stock_move_id.location_id.usage', '=', 'internal'),  ('stock_move_id.location_dest_id.name', '=', 'Customers')])
+        move_vals_list += Product._svl_empty_stock_am(in_stock_valuation_layers)
+        if move_vals_list:
+            account_moves = self.env['account.move'].sudo().create(move_vals_list)
+            account_moves._post()
+
+    def out2(self):
+        Product = self.env['product.product']
+
+        # For store to supplier
+        move_vals_list = []
+        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('stock_move_id.location_id.usage', '=', 'internal'),  ('stock_move_id.location_dest_id.name', '=', 'Vendors')])
+        move_vals_list += Product._svl_empty_stock_am(in_stock_valuation_layers)
+        if move_vals_list:
+            account_moves = self.env['account.move'].sudo().create(move_vals_list)
+            account_moves._post()
+
+    def out3(self):
+        Product = self.env['product.product']
+
+        # For store to supplier
+        move_vals_list = []
+        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('description', 'like', 'COI/LI/22/00002%')])
+        move_vals_list += Product._svl_empty_stock_am(in_stock_valuation_layers)
         if move_vals_list:
             account_moves = self.env['account.move'].sudo().create(move_vals_list)
             account_moves._post()
 
 
+    def out4(self):
+        Product = self.env['product.product']
+
+        # For store to supplier
+        move_vals_list = []
+        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('description', 'like', 'COI/LI/22/00006%')])
+        move_vals_list += Product._svl_empty_stock_am(in_stock_valuation_layers)
+        if move_vals_list:
+            account_moves = self.env['account.move'].sudo().create(move_vals_list)
+            account_moves._post()
+
+
+    def out5(self):
+        Product = self.env['product.product']
+
+        # For store to supplier
+        move_vals_list = []
+        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('description', 'like', 'COI/LI/22/00007%')])
+        move_vals_list += Product._svl_empty_stock_am(in_stock_valuation_layers)
+        if move_vals_list:
+            account_moves = self.env['account.move'].sudo().create(move_vals_list)
+            account_moves._post()
