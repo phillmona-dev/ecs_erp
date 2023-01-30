@@ -25,12 +25,15 @@ let posUrl = "";
 
 export class PosFormController extends FormController {
     setup() {
+
+        $('.btn-info').hide();
         super.setup();
+
+
     }
 
     PrintToPos() {
 
-        console.log(session.user_id);
         console.log(this.model.root.data);
         if (this.model.root.data.is_invoice_printed_pos === true) {
             Dialog.alert(this, _t("The current invoice has already been printed!"));
@@ -115,8 +118,7 @@ export class PosFormController extends FormController {
             headers: headers,
             data: invoice,
             contentType: "application/json",
-
-            timeout: 5000,
+            timeout: 30000,
         })
             .then((data) => {
                 console.log(data);
@@ -200,6 +202,7 @@ PosFormController.template = "droga_sales.PosFormView";
 export class PosFormRenderer extends FormRenderer {
     setup() {
         super.setup();
+
     }
 }
 
