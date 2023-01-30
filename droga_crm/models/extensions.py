@@ -37,8 +37,9 @@ class cust_contact_extension(models.Model):
     key_account=fields.Boolean('Key account')
 
     def write(self, vals):
-        if 'vat' in vals:
-            raise UserError("You can not edit Tin no.")
+        for rec in self:
+            if 'vat' in vals and rec.vat:
+                raise UserError("You can not edit Tin no.")
         return super(cust_contact_extension, self).write(vals)
 
     @api.depends('location','area')
