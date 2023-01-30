@@ -31,6 +31,7 @@
         'views/extensions.xml',
         'views/employee.xml',
         'reports/sales_attachment.xml',
+        'reports/daily_sales.xml',
         'views/module_menus.xml',
     ],
     # only loaded in demonstration mode

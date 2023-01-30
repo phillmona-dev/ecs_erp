@@ -3,7 +3,14 @@
     <t t-name="droga_sales.PosFormView" t-inherit="web.FormView" t-inherit-mode="primary" owl="1">
 
 
-         <xpath expr="//ActionMenus" position="after">
+
+        <xpath expr="//ActionMenus" position="after">
+
+            <!--<span t-esc="props.context.uid"/>
+
+            <t t-foreach="request.env['res.users'].search([])" t-as="info" t-key="info_index">
+                        <span> "<t t-esc="obj"/>"</span>
+            </t>-->
 
             <button class="btn btn-info" type="button" t-on-click="PrintToPos"
                     groups="purchase.group_purchase_manager" id="btnPosPrint">
@@ -11,8 +18,8 @@
             </button>
 
 
-             <button class="btn btn-info" type="button" t-on-click="CancelPosTransaction"
-                     groups="purchase.group_purchase_manager" id="btnPosCancel">
+            <button class="btn btn-info" type="button" t-on-click="CancelPosTransaction"
+                    groups="purchase.group_purchase_manager" id="btnPosCancel">
                 Cancel
             </button>
 
