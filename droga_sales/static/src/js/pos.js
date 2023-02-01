@@ -26,7 +26,7 @@ let posUrl = "";
 export class PosFormController extends FormController {
     setup() {
 
-        $('.btn-info').hide();
+
         super.setup();
 
 
