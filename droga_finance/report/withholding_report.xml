@@ -304,7 +304,7 @@
                     /* Default left, right, top, bottom margin is 2cm */
                     @page {
                     size: A4 portrait;
-                    margin-top: 3cm;
+                    margin-top: 4cm;
                     margin-left:4cm;
                     margin-right:2cm;
                     margin-bottom:2cm;
@@ -522,7 +522,6 @@
                                 </h6>
                             </div>
                         </div>
-                        <br></br>
                         <div class="row mt32 mb32">
                             <div class="col-6 bm-2">
                                 <h6 class="small">ስም</h6>
