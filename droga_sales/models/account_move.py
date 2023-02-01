@@ -34,7 +34,12 @@ class account_move(models.Model):
     def _get_total_amount_word(self):
         for record in self:
             # convert amount to word
-            record.total_amount_word = self.convert_to_word(record.amount_total) + " Only"
+            amount_in_word = self.convert_to_word(record.amount_total)
+            last_word = self.lastWord(amount_in_word)
+            if last_word == 'Cents':
+                record.total_amount_word = amount_in_word + " Only"
+            else:
+                record.total_amount_word = amount_in_word + " Birr Only"
 
     # @api.depends("partner_id")
     def get_tin_no(self):
@@ -270,12 +275,24 @@ class account_move(models.Model):
             word += ' birr and '
             word += self.convert_to_word(dec_side) + " cents"
 
-        # if dec_side != '':
-        # word += ' birr '
-
         # word += " only"
 
         return word.title()
+
+    # Function which returns last word
+    def lastWord(self, string):
+        # taking empty string
+        newstring = ""
+        # calculating length of string
+        length = len(string)
+        # traversing from last
+        for i in range(length - 1, 0, -1):
+            # if space is occurred then return
+            if (string[i] == " "):
+                # return reverse of newstring
+                return newstring[::-1]
+            else:
+                newstring = newstring + string[i]
 
     def set_analytic_accounts(self):
         # get analytic account
