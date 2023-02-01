@@ -5,6 +5,7 @@ import xml.etree.cElementTree as ET
 from datetime import datetime
 import requests
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class account_move(models.Model):
@@ -276,6 +277,21 @@ class account_move(models.Model):
 
         return word.title()
 
+    def set_analytic_accounts(self):
+        # get analytic account
+        analytic_distribution = ""
+        for record in self.invoice_line_ids:
+            if record.analytic_distribution:
+                analytic_distribution = record.analytic_distribution
+                break
+
+        if analytic_distribution == '':
+            ValidationError("At least fill the first line!")
+
+        # fill empty analytic lines
+        for record in self.invoice_line_ids:
+            record.analytic_distribution = analytic_distribution
+
 
 class account_move_line(models.Model):
     _inherit = "account.move.line"
@@ -286,3 +302,7 @@ class account_move_line(models.Model):
             record.item_code = record.product_id.product_tmpl_id.default_code
 
     item_code = fields.Char(compute="get_item_code", string="Item Code", store=True)
+
+    @api.onchange('analytic_distribution')
+    def analytic_distribution(self):
+        ValidationError("Hello")

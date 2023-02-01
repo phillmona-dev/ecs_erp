@@ -644,7 +644,7 @@
                                 <h6 class="small">Date of Registration</h6>
                             </div>
                         </div>
-                        <br></br>
+
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-8 bm-2">
                                 <h6 class="small">የክፍያው ምክንያት</h6>
@@ -694,11 +694,8 @@
                                     <span style="padding-left: 15px;" class="small">Cheque No</span>
                                     _____________________
                                 </h6>
-                                <br></br>
-
                                 <h6 class="small">ያዘጋጀው ስምና ፊርማ_____________________________________</h6>
                                 <h6 class="small">Prepared By</h6>
-
                                 <h6 class="small">የተቀባይ (የሻጭ) ስምና ፊርማ_______________________________</h6>
                                 <h6 class="small">Cashier's Signature</h6>
                             </div>

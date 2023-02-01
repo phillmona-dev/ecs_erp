@@ -85,7 +85,9 @@
                     </div>
                     <div class="mt-5">
                         <div class="page">
+
                             <div class="oe_structure"/>
+
 
                             <div id="informations" class="row mt32 mb32 text-center">
                                 <div class="col-12 bm-2">
@@ -121,7 +123,8 @@
                                 <tr>
                                     <td>
                                         <strong>Date:</strong>
-                                        <span class="small" t-esc="o.FTimeStamp" t-options='{"widget": "datetime","format": "MM-dd-yyyy h:mm a"}'/>
+                                        <span class="small" t-esc="o.FTimeStamp"
+                                              t-options='{"widget": "datetime","format": "MM-dd-yyyy h:mm a"}'/>
                                     </td>
                                     <td>
                                         <strong>Fs No.:</strong>
@@ -170,6 +173,11 @@
                                 </tr>
                             </table>
 
+                            <div class="watermark"
+                                 style="position:absolute;opacity:0.1;font-size:3em;height:100%width:100%;text-align:center;z-index:1000;border:0; transform: rotate(-45deg); -webkit-transform: rotate(-45deg);">
+                                <span style="font-size:120px; transform: rotate(45deg);  ">Attachement</span>
+                            </div>
+
                             <table class="table table-bordered o_main_table table-sm">
                                 <thead class="thead-dark">
                                     <tr>
@@ -186,54 +194,57 @@
                                 </thead>
                                 <tbody class="invoice_tbody">
                                     <t t-foreach="o.invoice_line_ids" t-as="line">
-                                        <!-- get batch no and expiry date -->
-                                        <t t-set="batch_no" t-value=""/>
-                                        <t t-set="expiry_date" t-value=""/>
+                                        <t t-if="line.price_unit!=0">
 
-                                        <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
-                                           t-as="sale_order">
-                                            <t t-foreach="sale_order.order_line" t-as="sale_order_line">
-                                                <t t-if="sale_order_line.product_id.id==line.product_id.id">
-                                                    <t t-set="batch_no" t-value="sale_order_line.batch_html"/>
-                                                    <t t-set="expiry_date"
-                                                       t-value="sale_order_line.expiry_date_html"/>
+                                            <!-- get batch no and expiry date -->
+                                            <t t-set="batch_no" t-value=""/>
+                                            <t t-set="expiry_date" t-value=""/>
+
+                                            <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
+                                               t-as="sale_order">
+                                                <t t-foreach="sale_order.order_line" t-as="sale_order_line">
+                                                    <t t-if="sale_order_line.product_id.id==line.product_id.id">
+                                                        <t t-set="batch_no" t-value="sale_order_line.batch_html"/>
+                                                        <t t-set="expiry_date"
+                                                           t-value="sale_order_line.expiry_date_html"/>
+                                                    </t>
                                                 </t>
                                             </t>
-                                        </t>
-                                        <tr>
+                                            <tr>
 
-                                            <td class="text-start">
-                                                <span class="small"
-                                                      t-esc="line.product_id.product_tmpl_id.default_code"/>
-                                            </td>
-                                            <td>
-                                                <span class="small" t-esc="line.product_id.name"/>
-                                            </td>
-                                            <td>
-                                                <span class="small">
-                                                    <t t-esc="batch_no"/>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="small">
-                                                    <t t-esc="expiry_date"/>
-                                                </span>
-                                            </td>
-                                            <td class="text-center">
-                                                <span class="small" t-esc="line.product_uom_id.name"/>
-                                            </td>
-                                            <td class="text-center">
-                                                <span class="small" t-esc="line.quantity"/>
-                                            </td>
-                                            <td class="text-end">
-                                                <span t-esc="'{0:,.2f}'.format(line.price_unit)"
-                                                      class="small"/>
-                                            </td>
-                                            <td class="text-end">
-                                                <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"
-                                                      class="small"/>
-                                            </td>
-                                        </tr>
+                                                <td class="text-start">
+                                                    <span class="small"
+                                                          t-esc="line.product_id.product_tmpl_id.default_code"/>
+                                                </td>
+                                                <td>
+                                                    <span class="small" t-esc="line.product_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <span class="small">
+                                                        <t t-esc="batch_no"/>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="small">
+                                                        <t t-esc="expiry_date"/>
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="small" t-esc="line.product_uom_id.name"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="small" t-esc="line.quantity"/>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span t-esc="'{0:,.2f}'.format(line.price_unit)"
+                                                          class="small"/>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"
+                                                          class="small"/>
+                                                </td>
+                                            </tr>
+                                        </t>
                                     </t>
 
                                     <tr class="is-subtotal text-end">

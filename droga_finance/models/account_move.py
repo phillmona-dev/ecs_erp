@@ -2,6 +2,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 from datetime import datetime
 
+
 class AccountMove(models.Model):
     _inherit = "account.move"
 
@@ -144,3 +145,7 @@ class AccountMove(models.Model):
         word += " only"
 
         return word.title()
+
+
+
+

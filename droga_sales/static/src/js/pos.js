@@ -34,6 +34,7 @@ export class PosFormController extends FormController {
 
     PrintToPos() {
 
+
         console.log(this.model.root.data);
         if (this.model.root.data.is_invoice_printed_pos === true) {
             Dialog.alert(this, _t("The current invoice has already been printed!"));
@@ -88,23 +89,27 @@ export class PosFormController extends FormController {
             let tax_percent = 0;
             let line_no = 0;
 
-            let lineItem = {
-                LineIndex: line_no++,
-                ItemTransactionId: currentElement.data.id,
-                ItemID: currentElement.data.item_code,
-                ItemShortName: currentElement.data.product_id[1],
-                ItemDescription: currentElement.data.product_id[1],
-                UnitName: currentElement.data.product_uom_id[1],
-                Quantity: currentElement.data.quantity,
-                UnitPrice: currentElement.data.price_unit,
-                TaxRate: tax_percent,
-                AddOnType: "percentage",
-                AddOnValue: "0",
-                DiscountType: "fixed",
-                DiscountValue: "0",
-            };
+            if (currentElement.data.price_unit !== 0) {
 
-            header.LineItem.push(lineItem);
+                let lineItem = {
+                    LineIndex: line_no++,
+                    ItemTransactionId: currentElement.data.id,
+                    ItemID: currentElement.data.item_code,
+                    ItemShortName: currentElement.data.product_id[1],
+                    ItemDescription: currentElement.data.product_id[1],
+                    UnitName: currentElement.data.product_uom_id[1],
+                    Quantity: currentElement.data.quantity,
+                    UnitPrice: currentElement.data.price_unit,
+                    TaxRate: tax_percent,
+                    AddOnType: "percentage",
+                    AddOnValue: "0",
+                    DiscountType: "fixed",
+                    DiscountValue: "0",
+                };
+                header.LineItem.push(lineItem);
+            }
+
+
         });
 
         let invoice = JSON.stringify(header);
@@ -118,7 +123,7 @@ export class PosFormController extends FormController {
             headers: headers,
             data: invoice,
             contentType: "application/json",
-            timeout: 30000,
+            timeout: 60000,
         })
             .then((data) => {
                 console.log(data);
@@ -141,7 +146,7 @@ export class PosFormController extends FormController {
                                 FTimeStamp: timeStamp,
                                 is_invoice_printed_pos: "true",
                             }],
-                        }, {timeout: 30000})
+                        }, {timeout: 60000})
                         .then(function (data) {
                             Dialog.alert(this, _t("Invoice has been successfully printed!"));
                             browser.location.reload();
@@ -156,7 +161,7 @@ export class PosFormController extends FormController {
                 //unblock UI
                 console.log(error);
                 framework.unblockUI();
-                Dialog.alert(this, _t("Invoice has been successfully printed, the FS invoice number not updated"));
+                Dialog.alert(this, _t("Error"));
             });
     }
 
