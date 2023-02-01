@@ -67,7 +67,7 @@ class AccountMove(models.Model):
             # search sales order
             sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_origin)])
             for order in sale_order:
-                self.sales_initiator = order.sales_initiator
+                record.sales_initiator = order.sales_initiator
 
     def convert_to_word1(self, number):
         number = str(number)

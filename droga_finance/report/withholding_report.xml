@@ -305,7 +305,7 @@
                     @page {
                     size: A4 portrait;
                     margin-top: 4cm;
-                    margin-left:4cm;
+                    margin-left:3cm;
                     margin-right:2cm;
                     margin-bottom:2cm;
                     }
@@ -447,21 +447,18 @@
                         </div>
 
                         <div class="row mt32 mb32">
-                            <div class="col-6 bm-2">
+                            <div class="col-4 bm-2">
                                 <h6 class="small">የባንክ ሰነድ ቁጥር</h6>
                                 <h6 class="small">Bank Voucher</h6>
                             </div>
-                            <div class="col-6 bm-2">
+                            <div class="col-4 bm-2">
                                 <h6 class="small">የሽያጭ ደረሰኝ ቁጥር</h6>
                                 <h6 class="small">Sales Invoice No</h6>
                             </div>
-                        </div>
-                        <div class="row mt32 mb32">
-                            <div class="col-6 bm-2">
+                            <div class="col-4 bm-2">
                                 <h6 class="small">የቼክ ቁጥር</h6>
                                 <h6 class="small">Check No</h6>
                             </div>
-
                         </div>
 
                         <div class="row mt32 mb32">

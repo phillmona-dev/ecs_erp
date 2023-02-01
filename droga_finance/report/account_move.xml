@@ -575,7 +575,7 @@
                     /* Default left, right, top, bottom margin is 2cm */
                     @page {
                     size: A4 portrait;
-                    margin-top: 5cm;
+                    margin-top: 6.5cm;
                     margin-left:3cm;
                     margin-right:2cm;
                     margin-bottom:2cm;
