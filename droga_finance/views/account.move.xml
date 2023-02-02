@@ -27,6 +27,8 @@
                        attrs="{'invisible': [('move_type', 'in', ('in_invoice', 'in_refund', 'in_receipt','out_invoice'))]}"/>
                 <field name="withholding_no"/>
                 <field name="purpose"/>
+
+
             </xpath>
             <xpath expr="//field[@name='partner_bank_id']" position="attributes">
                 <attribute name="invisible">1</attribute>

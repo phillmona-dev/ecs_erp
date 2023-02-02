@@ -560,7 +560,7 @@
     </record>
 
 
-    <template id="droga_account_cash_reciept_voucher_report" name="Cash Reciept Voucher">
+    <template id="droga_account_cash_reciept_voucher_report" name="Cash Receipt Voucher">
         <t t-call="web.html_container">
             <div id="non-printable">
                 <button class="btn btn-primary btn-sm o_report_print" onclick="window.print();">Print Preview
@@ -575,7 +575,7 @@
                     /* Default left, right, top, bottom margin is 2cm */
                     @page {
                     size: A4 portrait;
-                    margin-top: 3cm;
+                    margin-top: 6.5cm;
                     margin-left:3cm;
                     margin-right:2cm;
                     margin-bottom:2cm;
@@ -644,7 +644,7 @@
                                 <h6 class="small">Date of Registration</h6>
                             </div>
                         </div>
-                        <br></br>
+
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-8 bm-2">
                                 <h6 class="small">የክፍያው ምክንያት</h6>
@@ -694,11 +694,8 @@
                                     <span style="padding-left: 15px;" class="small">Cheque No</span>
                                     _____________________
                                 </h6>
-                                <br></br>
-
                                 <h6 class="small">ያዘጋጀው ስምና ፊርማ_____________________________________</h6>
                                 <h6 class="small">Prepared By</h6>
-
                                 <h6 class="small">የተቀባይ (የሻጭ) ስምና ፊርማ_______________________________</h6>
                                 <h6 class="small">Cashier's Signature</h6>
                             </div>

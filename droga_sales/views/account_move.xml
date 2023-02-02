@@ -22,6 +22,8 @@
             <xpath expr="//button[@name='button_set_checked']" position="after">
                 <button type="object" name="print_sales_attachment" string="Sales Attachement"
                         attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}"/>
+                <button type="object" name="set_analytic_accounts" string="Fill Analytic"
+                        attrs="{'invisible': ['|',('move_type', '!=', 'out_invoice'),('state', '!=', 'draft')]}"/>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
@@ -46,6 +48,7 @@
                     </group>
                 </page>
             </xpath>
+
 
             <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='price_total']"
                    position="after">
