@@ -59,7 +59,6 @@ class cust_sales_credit_limit(models.Model):
                  ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
             tot_amount = 0
             for mi in matured_invoices:
-
                 tot_amount = tot_amount + (
                     mi['amount_total_signed'] if mi['amount_residual'] == 0 else mi['amount_residual'])
             rec.mature_amount = tot_amount
@@ -67,10 +66,13 @@ class cust_sales_credit_limit(models.Model):
 
     def action_cancel(self):
         for rec in self:
-            #Validations here
-            pass
-        return super(cust_sales_credit_limit,self).action_cancel()
+            if rec.invoice_status not in ('no','to invoice'):
+                raise ValidationError("The sales order is already invoiced, hence can not be cancelled.")
 
+            if len(rec.order_line.filtered(lambda x: x.qty_delivered >0)) > 0:
+                raise ValidationError("There are dispatched items under the sales order, hence can not be cancelled..")
+            pass
+        return super(cust_sales_credit_limit, self).action_cancel()
 
     @api.model
     def create(self, vals):
@@ -125,7 +127,7 @@ class cust_sales_no_create_after_invoice(models.Model):
         self.ensure_one()
         # Use the delivery date if there is else use date_order and lead time
         date_deadline = self.order_id.commitment_date or (
-                    self.order_id.date_order + timedelta(days=self.customer_lead or 0.0))
+                self.order_id.date_order + timedelta(days=self.customer_lead or 0.0))
         date_planned = date_deadline - timedelta(days=self.order_id.company_id.security_lead)
         values.update({
             'group_id': group_id,
@@ -154,9 +156,10 @@ class cust_sales_no_create_after_invoice(models.Model):
 
 class payment_term_no_credit(models.Model):
     _inherit = 'account.payment.term'
-    apply_credit_limit = fields.Boolean(string='Apply credit limit', default=True,Tracking=True)
+    apply_credit_limit = fields.Boolean(string='Apply credit limit', default=True, Tracking=True)
     deliv_after_payment = fields.Boolean(string='Delivery after payment', default=False)
+
 
 class payment_term_no_credit_messages(models.Model):
     _name = 'account.payment.term'
-    _inherit = ['account.payment.term','mail.thread', 'mail.activity.mixin', 'image.mixin']
+    _inherit = ['account.payment.term', 'mail.thread', 'mail.activity.mixin', 'image.mixin']

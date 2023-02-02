@@ -84,7 +84,7 @@
             <xpath expr="//form/header/button[@name='action_cancel']" position="replace">
                 <button name="action_cancel" type="object" string="Cancel"
                         attrs="{'invisible': [('state', 'in', ['cancel', 'done'])]}"
-                        groups="droga_sales.sales_price_change_admin,droga_sales.sales_import_approve_admin" data-hotkey="z"/>
+                        groups="droga_sales.sales_price_change_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_import_approve_admin" data-hotkey="z"/>
             </xpath>
 
             <xpath expr="//form/header/button[@name='payment_action_capture']" position="after">
