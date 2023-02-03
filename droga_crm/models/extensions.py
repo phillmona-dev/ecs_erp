@@ -55,7 +55,7 @@ class cust_contact_extension(models.Model):
                                                   required=True,default=_def_pay)
     def write(self, vals):
         for rec in self:
-            if 'vat' in vals and rec.vat:
+            if 'vat' in vals and rec.vat and not self.env.user.has_group('droga_crm.tin_admin'):
                 raise UserError("You can not edit Tin no.")
         return super(cust_contact_extension, self).write(vals)
 

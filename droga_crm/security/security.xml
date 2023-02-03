@@ -29,6 +29,11 @@
         <field name="name">CRM admin</field>
         <field name="category_id" ref="crm_management"/>
     </record>
+
+    <record id="tin_admin" model="res.groups">
+        <field name="name">Tin no administrator</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
 </odoo>
 
 

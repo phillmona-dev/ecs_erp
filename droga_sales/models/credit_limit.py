@@ -70,7 +70,7 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("The sales order is already invoiced, hence can not be cancelled.")
 
             if len(rec.order_line.filtered(lambda x: x.qty_delivered >0)) > 0:
-                raise ValidationError("There are dispatched items under the sales order, hence can not be cancelled..")
+                raise ValidationError("There are dispatched items under the sales order, hence can not be cancelled.")
             pass
         return super(cust_sales_credit_limit, self).action_cancel()
 
