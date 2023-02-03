@@ -222,6 +222,7 @@ class sale_order_ext(models.Model):
     total_added = fields.Float('Total accrual')
     price_change_approver = fields.Many2one('res.users',compute='_get_approvers')
     operation_approver=fields.Many2one('res.users',compute='_get_approvers')
+    final_approver=fields.Many2one('res.users',compute='_get_approvers')
     out_of_stock_items=fields.Char('Stock out items',compute='_get_stock_out')
     has_access = fields.Boolean(default=False,search='_has_access',compute='_compute_has_access')
     sales_initiator=fields.Char('Sales person',compute='_get_sales_init')
@@ -277,6 +278,8 @@ class sale_order_ext(models.Model):
         for rec in self:
             rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.ids[0] if len(
                 self.env.ref("droga_sales.sales_price_change_admin").users.ids) > 0 else None
+            rec.final_approver=self.env.ref("droga_sales.sales_import_final_approve").users.ids[0] if len(
+                self.env.ref("droga_sales.sales_import_final_approve").users.ids) > 0 else None
             if rec.order_type=='IM':
                 rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.ids[0] if len(
                     self.env.ref("droga_sales.sales_import_approve_admin").users.ids) > 0 else None
