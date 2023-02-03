@@ -209,6 +209,7 @@ class sale_order_ext(models.Model):
             ('sent', "Quotation Sent"),
             ('price_request', "Price change approval"),
             ('req', "Operation manager"),
+            ('fia', "Final approve"),
             ('cancel', "Cancelled"),
             ('sale', "Sales Order"),
             ('done', "Locked"),
@@ -323,9 +324,12 @@ class sale_order_ext(models.Model):
             if so.mature_amount > 0:
                 raise ValidationError("Please settle matured amounts before initiating another sales!")
         self.ensure_one()
+
+        #Physiotheraphy order automatic confirmation
         if self.order_type=='PT':
             self.action_confirm()
-        elif self.manual_price:
+        #Manual price and discounts routing to price change approver
+        elif (self.manual_price and len(self.order_line.filtered(lambda x: x.std_unit_price>x.price_unit >0))>0) or self.tender_origin_form_tender:
             self.state='price_request'
         else:
             self.state='req'
@@ -340,9 +344,17 @@ class sale_order_ext(models.Model):
         self.ensure_one()
         self.set_activity_done()
         self.state = 'req'
-        #self.set_activity_done()
 
     def operation_confirm(self):
+        self.ensure_one()
+        self.set_activity_done()
+
+        if self.order_type != 'IM':
+            self.action_confirm()
+        else:
+            self.state = 'fia'
+
+    def final_approval(self):
         self.ensure_one()
         self.set_activity_done()
         self.action_confirm()

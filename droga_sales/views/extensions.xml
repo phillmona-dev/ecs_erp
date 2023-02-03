@@ -99,6 +99,10 @@
                         attrs="{'invisible': [('state', 'not in', ['req'])]}"
                         groups="droga_sales.sales_import_approve_admin,droga_sales.sales_wholesale_approve_admin"
                         string="Confirm"/>
+                <button name="final_approval" type="object" class="btn-primary"
+                        attrs="{'invisible': [('state', 'not in', ['fia'])]}"
+                        groups="droga_sales.sales_import_final_approve"
+                        string="Confirm"/>
                 <button name="reject_order" type="object" class="oe_highlight btn-warning"
                         attrs="{'invisible': [('state', 'not in', ['price_request','req'])]}"
                         groups="droga_sales.sales_price_change_admin,droga_sales.sales_import_approve_admin,droga_sales.sales_wholesale_approve_admin"

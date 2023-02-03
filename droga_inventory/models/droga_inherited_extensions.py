@@ -578,11 +578,27 @@ class droga_stock_product_extension(models.Model):
             raise UserError("You can not update a product. Please contact your supervisor.")
         for rec in self:
             if 'default_code' in vals_list:
-                if rec.default_code!=vals_list['default_code']:
+                if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_':
                     raise UserError("You can not edit product code.")
 
         return super(droga_stock_product_extension, self).write(vals_list)
 
+    @api.onchange('default_code')
+    def _onchange_default_code(self):
+        if not self.default_code:
+            return
+        self.default_code=self.default_code.upper()
+        domain = [('default_code', '=', self.default_code)]
+        if self.id.origin:
+            domain.append(('id', '!=', self.id.origin))
+
+        if self.env['product.template'].search(domain, limit=1):
+            dc=self.default_code
+            self.default_code = self._origin.default_code
+            return {'warning': {
+                'title': ("Note:"),
+                'message': ("The Internal Reference "+dc+" already exists."),
+            }}
     @api.model
     def create(self, vals_list):
 

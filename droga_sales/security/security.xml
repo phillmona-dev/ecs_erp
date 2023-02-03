@@ -16,6 +16,11 @@
         <field name="category_id" ref="sales_management"/>
     </record>
 
+    <record id="sales_import_final_approve" model="res.groups">
+        <field name="name">Droga import sales final workflow approver</field>
+        <field name="category_id" ref="sales_management"/>
+    </record>
+
     <record id="sales_import_approve_admin" model="res.groups">
         <field name="name">Droga import sales workflow approver</field>
         <field name="category_id" ref="sales_management"/>
