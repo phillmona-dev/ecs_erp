@@ -26,6 +26,8 @@ class account_move(models.Model):
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
     total_amount_word = fields.Char(compute="_get_total_amount_word")
 
+    #
+
     def _get_current_user_id(self):
         context = self._context
         self.current_user_id = self.env.user
@@ -319,6 +321,8 @@ class account_move_line(models.Model):
             record.item_code = record.product_id.product_tmpl_id.default_code
 
     item_code = fields.Char(compute="get_item_code", string="Item Code", store=True)
+    item_description_alternate = fields.Char("Item Description Alternate")
+    item_uom_alternate = fields.Char("UoM Alternate", default="")
 
     @api.onchange('analytic_distribution')
     def analytic_distribution(self):

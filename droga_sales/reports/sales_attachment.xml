@@ -217,7 +217,7 @@
                                                           t-esc="line.product_id.product_tmpl_id.default_code"/>
                                                 </td>
                                                 <td>
-                                                    <span class="small" t-esc="line.product_id.name"/>
+                                                    <span class="small" t-esc="line.name"/>
                                                 </td>
                                                 <td>
                                                     <span class="small">
@@ -230,7 +230,13 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="small" t-esc="line.product_uom_id.name"/>
+                                                    <t t-if="not line.item_uom_alternate">
+                                                        <span class="small" t-esc="line.product_uom_id.name"/>
+                                                    </t>
+                                                      <t t-if="line.item_uom_alternate">
+                                                        <span class="small" t-esc="line.item_uom_alternate"/>
+                                                    </t>
+
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="small" t-esc="line.quantity"/>
