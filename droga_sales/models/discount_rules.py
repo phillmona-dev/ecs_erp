@@ -52,7 +52,7 @@ class sale_order_line(models.Model):
 
             #rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
 
-            if not rec.product_id.bought_locally and rec.available_qty<=rec.product_id.emergency_order_point:
+            if not rec.product_id.bought_locally and rec.available_qty<=0:
                 rec.is_prod_available=False
             else:
                 rec.is_prod_available = True
