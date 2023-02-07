@@ -94,8 +94,8 @@ export class PosFormController extends FormController {
                 let lineItem = {
                     LineIndex: line_no++,
                     ItemTransactionId: currentElement.data.id,
-                    ItemID: currentElement.data.item_code,
-                    ItemShortName: currentElement.data.product_id[1],
+                    ItemID: currentElement.data.item_code, //ItemShortName: currentElement.data.product_id[1],
+                    ItemShortName: currentElement.data.name.trim(),
                     ItemDescription: currentElement.data.product_id[1],
                     UnitName: currentElement.data.product_uom_id[1],
                     Quantity: currentElement.data.quantity,

@@ -50,6 +50,13 @@
             </xpath>
 
 
+            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='product_uom_id']"
+                   position="after">
+
+                <field name="item_uom_alternate" optional="hide"
+                       attrs="{'readonly': [('parent.state', 'not in', ('draft'))],'invisible': [('parent.move_type', '!=', 'out_invoice')]}"/>
+            </xpath>
+
             <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='price_total']"
                    position="after">
                 <field name="item_code" invisible="1"/>
