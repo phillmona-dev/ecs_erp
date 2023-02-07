@@ -21,6 +21,15 @@ class droga_promotors_sales_master(models.Model):
     def change_id(self):
         self.ensure_one()
         self.write({'p_id': '12345'})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': 'ID has been changed to 12345 successfully.',
+                'type': 'success',
+                'sticky': False
+            }
+        }
 
 class droga_promotors_sales_detail_visit(models.Model):
     _name = 'droga.pro.sales.master.visit'

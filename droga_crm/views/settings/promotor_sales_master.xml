@@ -20,7 +20,7 @@
                 <button type="object" string="Change ID to 12345" name="change_id" confirm="Are you sure you want to change ID?"
                                     class="oe_highlight"></button>
 
-                
+
             </tree>
         </field>
     </record>
