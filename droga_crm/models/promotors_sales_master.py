@@ -9,7 +9,7 @@ class droga_promotors_sales_master(models.Model):
     _rec_name = 'p_name'
     p_name = fields.Char('Promotor/Sales full name', required=True)
     s_name = fields.Char('Promotor/Sales short name')
-    p_id = fields.Char('Promotor/Sales ID',default='12345', required=True)
+    p_id = fields.Char('Promotor/Sales ID',default='12345', required=True,tracking=True)
     p_regions =fields.Many2many('droga.crm.settings.city', required=True)
     p_groups=fields.Many2many('droga.crm.settings.prod_group',required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],
@@ -18,6 +18,18 @@ class droga_promotors_sales_master(models.Model):
     employee_access_users=fields.Many2one('res.users',string='Login user',required=True)
     res_user_name=fields.Char(related=employee_access_users.name)
 
+    def change_id(self):
+        self.ensure_one()
+        self.write({'p_id': '12345'})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': 'ID has been changed to 12345 successfully.',
+                'type': 'success',
+                'sticky': False
+            }
+        }
 
 class droga_promotors_sales_detail_visit(models.Model):
     _name = 'droga.pro.sales.master.visit'
