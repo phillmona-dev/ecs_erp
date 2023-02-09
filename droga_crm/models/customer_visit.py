@@ -124,7 +124,7 @@ class customer_visit_header(models.Model):
          ('08', 'August'), ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')], string='Month',required=True)
 
     _sql_constraints = [
-        ('user_month_year_cityname_uniq', 'unique (pr_sales,city_name,year,month)', 'The combination month/year/city type for user already exists!')
+        ('user_month_year_cityname_uniq', 'unique (pr_sales,year,month)', 'The combination month/year type for user already exists!')
     ]
 
     def get_years(self):
@@ -158,7 +158,7 @@ class customer_visit_header(models.Model):
             'view_mode': 'form',
             'view_type': 'form',
             'res_model': 'droga.customer.visit.header',
-            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_header_view_form').id,
+            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_header_view_form_popup').id,
             'type': 'ir.actions.act_window',
             #'context': {'search_default_group_week_no':1,'default_visit_header':self.id},
             #'domain': [('pr_sales', '=', self.pr_sales)],
@@ -168,7 +168,7 @@ class customer_visit_header(models.Model):
 
     def plan_analysis(self):
         return {
-            'name': 'Plan analysis for '+self.userid+' - '+calendar.month_name[int(self.month)]+', '+self.year+' - '+self.city_name.city_descr,
+            'name': 'Plan analysis for '+self.userid+' - '+calendar.month_name[int(self.month)]+', '+self.year,
             'view_mode': 'tree',
             'view_type': 'form',
             'res_model': 'droga.crm.grade.vs.schedule.view',
@@ -365,7 +365,7 @@ class customer_visit_header(models.Model):
         for record in self:
             try:
                 record.descr= record.pr_sales.p_name + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
-                    record.year) + ' - ' + record.city_name.city_descr
+                    record.year)
             except:
                 record.descr=record.pr_sales.p_name if record.pr_sales.p_name else '-'
 class customer_visit_detail(models.Model):
@@ -449,7 +449,7 @@ class customer_visit_detail(models.Model):
             'view_type': 'form',
             'res_model': 'droga.customer.visit.detail',
             #'context': "{'search_default_group_cust_name':1}",
-            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_detail_view_form').id,
+            'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_detail_view_form_popup').id,
             'type': 'ir.actions.act_window',
             #'domain': [('day', '=', self.visit_date.weekday())],
             'target': 'new',

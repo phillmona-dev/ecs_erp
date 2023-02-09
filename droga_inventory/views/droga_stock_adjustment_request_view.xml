@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="droga_stock_adjustment_request_form" model="ir.ui.view">
+        <field name="model">droga.stock.adjustment.request</field>
+        <field name="name">Stock Adjustment</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group string="Stock Adjustment Request Form">
+                        <group>
+                            <field name="to_correct_ref"/>
+                            <field name="operation_type"/>
+                            <field name="source_location_id"/>
+                        </group>
+                        <group>
+                            <field name="dest_location_id"/>
+                            <field name="request_date_time"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order Line">
+                            <field name="stock_adjustment_detail_entries">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="product_uom_category_id" invisible="1"></field>
+                                    <field name="lot_ser_no"/>
+                                    <field name="expiry_date"/>
+                                    <field name="qty"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <!--                Chatter-->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids" options="{'post_refresh': 'recipients'}"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="droga_stock_adjustment_request_tree" model="ir.ui.view">
+        <field name="model">droga.stock.adjustment.request</field>
+        <field name="name">Stock Adjustment request</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="to_correct_ref"/>
+                <field name="operation_type"/>
+                <field name="source_location_id"/>
+                <field name="dest_location_id"/>
+                <field name="request_date_time"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_stock_adjustment_request_view_id" model="ir.actions.act_window">
+        <field name="name">Stock Adjustment</field>
+        <field name="res_model">droga.stock.adjustment.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Your First Stock Adjustment Request
+            </p>
+        </field>
+    </record>
+    <menuitem id="stock_adjustment"
+              name="Stock adjustment request"
+              parent="stock.menu_stock_warehouse_mgmt"
+              action="droga_stock_adjustment_request_view_id"/>
+</odoo>

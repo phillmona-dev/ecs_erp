@@ -59,3 +59,10 @@ droga_export/models/__pycache__/droga_product.cpython-37.pyc
 *.pyc
 droga_sales/models/__pycache__/__init__.cpython-37.pyc
 droga_sales/models/__pycache__/account_move.cpython-37.pyc
+*.pyc
+droga_sales/models/__pycache__/account_move.cpython-37.pyc
+droga_sales/models/__pycache__/__init__.cpython-37.pyc
+droga_sales/models/__pycache__/account_move.cpython-37.pyc
+*.pyc
+*.pyc
+**/.pyc

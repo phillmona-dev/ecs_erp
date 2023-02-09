@@ -103,7 +103,7 @@
             <xpath expr="//form/sheet/notebook/page/group/group[@name='group_standard_price']" position="replace">
                 <group name="group_standard_price">
 
-                    <field name="standard_price" readonly="1" widget='monetary'/>
+                    <field name="standard_price" groups="droga_inventory.inv_prod_fin" readonly="1" widget='monetary'/>
                     <field name="list_price" widget='monetary'/>
 
                     <field name="default_warehouse" string="Default warehouse"

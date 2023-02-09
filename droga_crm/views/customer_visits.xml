@@ -7,14 +7,15 @@
         <field name="model">droga.customer.visit.header</field>
         <field name="arch" type="xml">
             <tree string="" editable="top">
-                <field name="pr_sales"></field>
+                <field name="pr_sales" options='{"no_open": True, "no_create": True}'></field>
                 <field name="pr_sales_logged" invisible="1"></field>
                 <field name="is_record_owner" invisible="1"/>
-                <field name="month"></field>
-                <field name="year"></field>
+                <field name="id" invisible="1"/>
+                <field name="month" attrs="{'readonly': [('id', '!=', False)]}"></field>
+                <field name="year" attrs="{'readonly': [('id', '!=', False)]}"></field>
                 <field name="pr_avail_areas" invisible="1"/>
                 <field name="state"></field>
-                <field name="approver" readonly="True" required="True"></field>
+                <field name="approver" options='{"no_open": True, "no_create": True}' readonly="True" required="True"></field>
                 <field name="is_record_owner" invisible="True"></field>
                 <field name="is_approver" invisible="True"></field>
 
@@ -38,146 +39,96 @@
                         type="object" string=" Approve"
                         name="approve" class="oe_stat_button"/>
             </tree>
-
         </field>
     </record>
-    <record id="droga_crm_customer_visit_view_form" model="ir.ui.view">
-        <field name="name">droga.customer.visit.header.view.tree</field>
-        <field name="model">droga.customer.visit.header</field>
-        <field name="arch" type="xml">
-            <form>
-                <group>
-                    <field name="pr_sales"></field>
-                    <field name="pr_sales_logged" invisible="1"></field>
-                    <field name="is_record_owner" invisible="1"/>
-                    <field name="month"></field>
-                    <field name="year"></field>
-                    <field name="pr_avail_areas" invisible="1"/>
-                    <field name="city_name" domain="[('id', 'in',pr_avail_areas)]"
-                           options="{'no_create':True,'no_open':True}"></field>
-                    <field name="state"></field>
-                    <field name="approver" readonly="True" required="True"></field>
-                    <field name="is_record_owner" invisible="True"></field>
-                    <field name="is_approver" invisible="True"></field>
 
-                    <button icon="fa-credit-card-alt"
-                            attrs="{'invisible': [('state', 'not in', ('draft','requested','approved'))]}"
-                            type="object" string=" Visit detail"
-                            name="visit_detail_open" class="oe_stat_button"/>
-                    <button icon="fa-credit-card-alt"
-                            attrs="{'invisible': ['|',('is_record_owner','=',False),('state', '!=', ('draft'))]}"
-                            type="object" string=" Request approval"
-                            name="request_approval" class="oe_stat_button"/>
-                    <button icon="fa-credit-card-alt"
-                            type="object" string=" Plan analysis"
-                            name="plan_analysis" class="oe_stat_button"/>
-                    <button icon="fa-credit-card-alt"
-                            attrs="{'invisible': ['|',('is_approver','=',False),('state', '!=', ('requested'))]}"
-                            type="object" string=" Revise"
-                            name="revise" class="oe_stat_button"/>
-                    <button icon="fa-credit-card-alt"
-                            attrs="{'invisible': ['|',('is_approver','=',False),('state', '!=', ('requested'))]}"
-                            type="object" string=" Approve"
-                            name="approve" class="oe_stat_button"/>
-                </group>
-            </form>
-
-        </field>
-    </record>
     <record id="droga_crm_customer_visit_view_kanban" model="ir.ui.view">
         <field name="name">droga.customer.visit.header.view.kanban</field>
         <field name="model">droga.customer.visit.header</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile">
+            <kanban class="o_kanban_small_column" on_create="quick_create" quick_create_view="droga_crm.droga_crm_customer_visit_view_form">
                 <field name="pr_sales"></field>
-                <field name="pr_sales_logged" invisible="1"></field>
-                <field name="is_record_owner" invisible="1"/>
-                <field name="month"></field>
-                <field name="year"></field>
-                <field name="pr_avail_areas" invisible="1"/>
-                <field name="city_name" domain="[('id', 'in',pr_avail_areas)]"
-                       options="{'no_create':True,'no_open':True}"></field>
+                <field name="pr_sales_logged"></field>
+                <field name="is_record_owner"/>
+                <field name="id" invisible="1"/>
+                <field name="month" attrs="{'readonly': [('id', '!=', False)]}"></field>
+                <field name="year" attrs="{'readonly': [('id', '!=', False)]}"></field>
+                <field name="pr_avail_areas"/>
+                <field name="city_name"></field>
                 <field name="state"></field>
-                <field name="approver" readonly="True" required="True"></field>
-                <field name="is_record_owner" invisible="True"></field>
-                <field name="is_approver" invisible="True"></field>
-
-                <button icon="fa-credit-card-alt"
-                        attrs="{'invisible': [('state', 'not in', ('draft','requested','approved'))]}"
-                        type="object" string=" Visit detail"
-                        name="visit_detail_open" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        attrs="{'invisible': ['|',('is_record_owner','=',False),('state', '!=', ('draft'))]}"
-                        type="object" string=" Request approval"
-                        name="request_approval" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        type="object" string=" Plan analysis"
-                        name="plan_analysis" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        attrs="{'invisible': ['|',('is_approver','=',False),('state', '!=', ('requested'))]}"
-                        type="object" string=" Revise"
-                        name="revise" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        attrs="{'invisible': ['|',('is_approver','=',False),('state', '!=', ('requested'))]}"
-                        type="object" string=" Approve"
-                        name="approve" class="oe_stat_button"/>
+                <field name="approver"></field>
+                <field name="is_record_owner"></field>
+                <field name="is_approver"></field>
                 <templates>
                     <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
+                        <div t-attf-class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <ul>
                                     <li>
-                                        Promoter:
-                                        <field name="pr_sales"></field>
+                                        <field name="descr"></field>
                                     </li>
                                     <li>
-                                        Month:
-                                        <field name="month"></field>
-                                    </li>
-                                    <li>
-                                        Year:
-                                        <field name="year"></field>
-                                    </li>
-                                    <li>
-                                        Sales city/sub-city:
-                                        <field name="city_name"></field>
-                                    </li>
-                                    <li>
-                                        Status:
+                                        <b>Status: </b>
                                         <field name="state"></field>
                                     </li>
-                                </ul>
-                                <button type="object" class="btn btn-primary btn-sm"
-                                        name="visit_detail_open">Visit detail
-                                </button>
-                                <span></span>
-                                <span></span>
+                                    <li>
+                                        <strong>Approver: </strong>
+                                        <field name="approver" options='{"no_open": True, "no_create": True}'></field>
+                                    </li>
 
-                                <button type="object" class="btn btn-primary btn-sm"
-                                        name="plan_analysis">Plan analysis
-                                </button>
-                                <span></span>
-                                <span></span>
-                                <button type="object" class="btn btn-primary btn-sm"
-                                        attrs="{'invisible': ['|',('is_approver','=',False),('state', '!=', ('requested'))]}"
-                                        name="revise">Revise
-                                </button>
-                                <span></span>
-                                <span></span>
-                                <button type="object" class="btn btn-primary btn-sm"
-                                        attrs="{'invisible': ['|',('is_approver','=',False),('state', '!=', ('requested'))]}"
-                                        name="approve">Approve
-                                </button>
+                                    <table>
+                                        <tr>
+                                            <th>
+                                                <button type="object" class="btn btn-primary btn-sm"
+                                                        name="visit_detail_open">Visit detail
+                                                </button>
+                                            </th>
+                                            <th>
+                                                <button type="object" class="btn btn-primary btn-sm"
+                                                        attrs="{'invisible': ['|',('is_record_owner','=',False),('state', '!=', ('draft'))]}"
+                                                        name="request_approval">Request approval
+                                                </button>
+                                            </th>
+                                            <th>
+                                                <button type="object"
+                                                        name="plan_analysis" style="top-margin:3px">Plan analysis
+                                                </button>
+                                            </th>
+                                        </tr>
+                                    </table>
+
+
+                                </ul>
                             </div>
                         </div>
                     </t>
                 </templates>
             </kanban>
-
         </field>
     </record>
-    <record id="droga_crm_customer_visit_header_view_form" model="ir.ui.view">
+
+    <record id="droga_crm_customer_visit_view_form" model="ir.ui.view">
         <field name="name">droga.customer.visit.header.view.form</field>
+        <field name="model">droga.customer.visit.header</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="pr_sales" options='{"no_open": True, "no_create": True}' readonly="1"></field>
+                    <field name="pr_sales_logged" invisible="1"></field>
+                    <field name="is_record_owner" invisible="1"/>
+                    <field name="month" attrs="{'readonly': [('id', '!=', False)]}"></field>
+                    <field name="year" attrs="{'readonly': [('id', '!=', False)]}"></field>
+                    <field name="state"></field>
+                    <field name="approver" options='{"no_open": True, "no_create": True}' readonly="True" required="True"></field>
+                    <field name="is_record_owner" invisible="True"></field>
+                    <field name="is_approver" invisible="True"></field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="droga_crm_customer_visit_header_view_form_popup" model="ir.ui.view">
+        <field name="name">droga.customer.visit.header.view.form_popup</field>
         <field name="model">droga.customer.visit.header</field>
         <field name="arch" type="xml">
             <form delete="0">
@@ -194,13 +145,13 @@
                                 -
                                 <field name="wk1_to" readonly="True"></field>
                             </div>
-                            <field name="week_1_domain" mode="tree,kanban" widget="visit_header_one2many">
+                            <field name="week_1_domain" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
+                                            type="object" string=" Contact plan"
                                             name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
@@ -213,35 +164,24 @@
                                     <field name="remark" string='Comment'></field>
                                 </tree>
                                 <form string="Week 1">
-                                    <field name="visit_date"></field>
-
-
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"></field>
-                                        <field name="cont_plan_des"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Plan"
-                                                name="visit_contact_open" class="oe_stat_button"/>
-
-                                        <field name="city_name" invisible="1"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Schedule"
-                                                name="visit_schedule_open" class="oe_stat_button"/>
-
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
                                         <field name="remark" string='Comment'></field>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Contact plan"
+                                                name="visit_contact_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Schedule"
+                                                name="visit_schedule_open" class="oe_highlight"/>
                                     </group>
                                 </form>
-
-
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
 
@@ -263,22 +203,13 @@
                                                         <li>
                                                             Visit Date:
                                                             <field name="visit_date"></field>
-                                                            <span></span>
+                                                            <span> </span>
                                                             <field name="planned_visit_selection"></field>
                                                         </li>
                                                         <li>
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_contact_open">Plan
-                                                        </button>
-                                                        <span></span>
-                                                        <span></span>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_schedule_open">Schedule
-                                                        </button>
-
                                                     </ul>
                                                 </div>
                                             </div>
@@ -301,7 +232,7 @@
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
+                                            type="object" string=" Contact plan"
                                             name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
@@ -313,34 +244,25 @@
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
-                                <form string="Week 2">
-
-
+                                <form string="Week 1">
                                     <group>
                                         <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                               domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
-                                        <field name="cont_plan_des"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Plan"
-                                                name="visit_contact_open" class="oe_stat_button"/>
-
-                                        <field name="city_name" invisible="1"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Schedule"
-                                                name="visit_schedule_open" class="oe_stat_button"/>
-
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
                                         <field name="remark" string='Comment'></field>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Contact plan"
+                                                name="visit_contact_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Schedule"
+                                                name="visit_schedule_open" class="oe_highlight"/>
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
 
@@ -362,22 +284,13 @@
                                                         <li>
                                                             Visit Date:
                                                             <field name="visit_date"></field>
-                                                            <span></span>
+                                                            <span> </span>
                                                             <field name="planned_visit_selection"></field>
                                                         </li>
                                                         <li>
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_contact_open">Plan
-                                                        </button>
-                                                        <span></span>
-                                                        <span></span>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_schedule_open">Schedule
-                                                        </button>
-
                                                     </ul>
                                                 </div>
                                             </div>
@@ -400,7 +313,7 @@
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
+                                            type="object" string=" Contact plan"
                                             name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
@@ -412,34 +325,25 @@
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
-                                <form string="Week 3">
-
-
+                                <form string="Week 1">
                                     <group>
                                         <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                               domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
-                                        <field name="cont_plan_des"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Plan"
-                                                name="visit_contact_open" class="oe_stat_button"/>
-
-                                        <field name="city_name" invisible="1"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Schedule"
-                                                name="visit_schedule_open" class="oe_stat_button"/>
-
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
                                         <field name="remark" string='Comment'></field>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Contact plan"
+                                                name="visit_contact_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Schedule"
+                                                name="visit_schedule_open" class="oe_highlight"/>
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
 
@@ -461,22 +365,13 @@
                                                         <li>
                                                             Visit Date:
                                                             <field name="visit_date"></field>
-                                                            <span></span>
+                                                            <span> </span>
                                                             <field name="planned_visit_selection"></field>
                                                         </li>
                                                         <li>
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_contact_open">Plan
-                                                        </button>
-                                                        <span></span>
-                                                        <span></span>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_schedule_open">Schedule
-                                                        </button>
-
                                                     </ul>
                                                 </div>
                                             </div>
@@ -496,10 +391,10 @@
                             <field name="week_4_domain" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
+                                            type="object" string=" Contact plan"
                                             name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
@@ -511,34 +406,25 @@
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
-                                <form string="Week 4">
-
-
+                                <form string="Week 1">
                                     <group>
                                         <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                               domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
-                                        <field name="cont_plan_des"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Plan"
-                                                name="visit_contact_open" class="oe_stat_button"/>
-
-                                        <field name="city_name" invisible="1"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Schedule"
-                                                name="visit_schedule_open" class="oe_stat_button"/>
-
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
                                         <field name="remark" string='Comment'></field>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Contact plan"
+                                                name="visit_contact_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Schedule"
+                                                name="visit_schedule_open" class="oe_highlight"/>
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
 
@@ -560,22 +446,13 @@
                                                         <li>
                                                             Visit Date:
                                                             <field name="visit_date"></field>
-                                                            <span></span>
+                                                            <span> </span>
                                                             <field name="planned_visit_selection"></field>
                                                         </li>
                                                         <li>
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_contact_open">Plan
-                                                        </button>
-                                                        <span></span>
-                                                        <span></span>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_schedule_open">Schedule
-                                                        </button>
-
                                                     </ul>
                                                 </div>
                                             </div>
@@ -596,10 +473,10 @@
                             <field name="week_5_domain" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
+                                            type="object" string=" Contact plan"
                                             name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
@@ -611,34 +488,25 @@
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
-                                <form string="Week 5">
-
-
+                                <form string="Week 1">
                                     <group>
                                         <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                               domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
-                                        <field name="cont_plan_des"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Plan"
-                                                name="visit_contact_open" class="oe_stat_button"/>
-
-                                        <field name="city_name" invisible="1"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Schedule"
-                                                name="visit_schedule_open" class="oe_stat_button"/>
-
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
                                         <field name="remark" string='Comment'></field>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Contact plan"
+                                                name="visit_contact_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Schedule"
+                                                name="visit_schedule_open" class="oe_highlight"/>
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
 
@@ -660,22 +528,13 @@
                                                         <li>
                                                             Visit Date:
                                                             <field name="visit_date"></field>
-                                                            <span></span>
+                                                            <span> </span>
                                                             <field name="planned_visit_selection"></field>
                                                         </li>
                                                         <li>
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_contact_open">Plan
-                                                        </button>
-                                                        <span></span>
-                                                        <span></span>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_schedule_open">Schedule
-                                                        </button>
-
                                                     </ul>
                                                 </div>
                                             </div>
@@ -693,7 +552,7 @@
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
+                                            type="object" string=" Contact plan"
                                             name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
@@ -702,38 +561,28 @@
                                             name="visit_schedule_open" class="oe_stat_button"/>
 
                                     <field name="visit_date"></field>
-                                    <field name="week_num"></field>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
                                 <form string="All weeks">
-
                                     <group>
                                         <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                               domain="[('is_company', '=',True),('city_name', '=',city_name)]"></field>
-                                        <field name="cont_plan_des"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Plan"
-                                                name="visit_contact_open" class="oe_stat_button"/>
-
-                                        <field name="city_name" invisible="1"></field>
-                                        <button icon="fa-credit-card-alt"
-                                                type="object" string=" Schedule"
-                                                name="visit_schedule_open" class="oe_stat_button"/>
-
+                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                         <field name="visit_date"></field>
-                                        <field name="week_num"></field>
                                         <field name="planned_visit_selection"></field>
                                         <field name="remark" string='Comment'></field>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Contact plan"
+                                                name="visit_contact_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                                type="object" string=" Schedule"
+                                                name="visit_schedule_open" class="oe_highlight"/>
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
                                     <field name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
 
                                     <field name="city_name" invisible="1"></field>
 
@@ -755,22 +604,13 @@
                                                         <li>
                                                             Visit Date:
                                                             <field name="visit_date"></field>
-                                                            <span></span>
+                                                            <span> </span>
                                                             <field name="planned_visit_selection"></field>
                                                         </li>
                                                         <li>
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_contact_open">Plan
-                                                        </button>
-                                                        <span></span>
-                                                        <span></span>
-                                                        <button type="object" class="btn btn-primary btn-sm"
-                                                                name="visit_schedule_open">Schedule
-                                                        </button>
-
                                                     </ul>
                                                 </div>
                                             </div>
@@ -787,8 +627,8 @@
         </field>
     </record>
 
-    <record id="droga_crm_customer_visit_detail_view_form" model="ir.ui.view">
-        <field name="name">droga.customer.visit.detail.view.form</field>
+    <record id="droga_crm_customer_visit_detail_view_form_popup" model="ir.ui.view">
+        <field name="name">droga.customer.visit.detail.view.form_popup</field>
         <field name="model">droga.customer.visit.detail</field>
         <field name="arch" type="xml">
             <form delete="0">
@@ -833,7 +673,7 @@
                                                 <div class="oe_kanban_details">
                                                     <ul>
                                                         <li>
-                                                            <strong class="o_kanban_record_title">Customer:
+                                                            <strong class="o_kanban_record_title">Contact:
                                                                 <field name="contact_custom"></field>
                                                             </strong>
                                                         </li>
@@ -841,7 +681,6 @@
                                                             Phone:
                                                             <field name="phone_no"></field>
                                                             <span></span>
-                                                            <field name="cust"></field>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -856,351 +695,17 @@
             </form>
         </field>
     </record>
-    <record id="quick_create_droga_visit_form" model="ir.ui.view">
-        <field name="name">droga.customer.visit.header.form.quick_create</field>
-        <field name="model">droga.customer.visit.header</field>
-        <field name="priority">1000</field>
-        <field name="arch" type="xml">
-            <form>
-                <group>
-                    <field name="month"></field>
-                    <field name="year"></field>
-                    <field name="state"></field>
-
-                </group>
-            </form>
-        </field>
-    </record>
-    <record id="droga_crm_customer_visit_header_view_kanban" model="ir.ui.view">
-        <field name="name">droga.customer.visit.header.view.kanban</field>
-        <field name="model">droga.customer.visit.header</field>
-        <field name="priority" eval="1"/>
-        <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile" sample="1"
-                    quick_create_view="droga_crm.quick_create_droga_visit_form">
-                <field name="pr_sales"></field>
-                <field name="pr_sales_logged"></field>
-                <field name="is_record_owner"/>
-                <field name="month"></field>
-                <field name="year"></field>
-                <field name="pr_avail_areas"/>
-                <field name="city_name"></field>
-                <field name="state"></field>
-                <field name="approver"></field>
-                <field name="is_record_owner"></field>
-                <field name="is_approver"></field>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
-                            <div class="oe_kanban_details">
-                                <ul>
-                                    <li>
-                                        <field name="descr"></field>
-                                    </li>
-                                    <li>
-                                        Status:
-                                        <field name="state"></field>
-                                    </li>
-                                    <li>
-                                        Approver:
-                                        <field name="approver"></field>
-                                    </li>
-
-                                    <table>
-                                        <tr>
-                                            <th>
-                                                <button type="object" class="btn btn-primary btn-sm"
-                                                        name="visit_detail_open">Visit detail
-                                                </button>
-                                            </th>
-                                            <th>
-                                                <button type="object" class="btn btn-primary btn-sm"
-                                                        attrs="{'invisible': ['|',('is_record_owner','=',False),('state', '!=', ('draft'))]}"
-                                                        name="request_approval">Request approval
-                                                </button>
-                                            </th>
-                                            <th>
-                                                <button type="object" class="btn btn-primary btn-sm"
-                                                        name="plan_analysis" style="top-margin:3px">Plan analysis
-                                                </button>
-                                            </th>
-                                        </tr>
-                                    </table>
-
-
-                                </ul>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
 
     <record id="droga_crm_customer_visit_action" model="ir.actions.act_window">
         <field name="name">Customers visit log book</field>
         <field name="res_model">droga.customer.visit.header</field>
-        <field name="view_mode">tree,kanban,form</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_crm_customer_visit_view_tree')}),
-                (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_crm_customer_visit_header_view_kanban')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('droga_crm_customer_visit_view_form')})]"/>
-        <field name="domain">[('is_record_owner','=',True)]</field>
-    </record>
-
-    <record id="droga_crm_customer_visit_view_approve_tree" model="ir.ui.view">
-        <field name="name">droga.customer.visit.header.approve.view.tree</field>
-        <field name="model">droga.customer.visit.header</field>
-        <field name="arch" type="xml">
-            <tree string="">
-                <field readonly="True" name="pr_sales"></field>
-                <field readonly="True" name="pr_sales_logged" invisible="1"></field>
-                <field readonly="True" name="is_record_owner" invisible="1"/>
-                <field readonly="True" name="month"></field>
-                <field readonly="True" name="year"></field>
-                <field readonly="True" name="pr_avail_areas" invisible="1"/>
-                <field readonly="True" name="state"></field>
-                <field readonly="True" name="approver" required="True"></field>
-                <field readonly="True" name="is_record_owner" invisible="True"></field>
-                <field readonly="True" name="is_approver" invisible="True"></field>
-
-                <button icon="fa-credit-card-alt"
-                        attrs="{'invisible': [('state', 'not in', ('draft','requested','approved'))]}"
-                        type="object" string=" Visit detail"
-                        name="visit_detail_open" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        attrs="{'invisible': ['|',('is_record_owner','=',False),('state', '!=', ('draft'))]}"
-                        type="object" string=" Request approval"
-                        name="request_approval" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        type="object" string=" Plan analysis"
-                        name="plan_analysis" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        attrs="{'invisible': ['|',('is_approver','=',False),('state', '!=', ('requested'))]}"
-                        type="object" string=" Revise"
-                        name="revise" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        attrs="{'invisible': ['|',('is_approver','=',False),('state', '!=', ('requested'))]}"
-                        type="object" string=" Approve"
-                        name="approve" class="oe_stat_button"/>
-            </tree>
-
-        </field>
-    </record>
-
-    <record id="droga_crm_customer_visit_header_view_approve_form" model="ir.ui.view">
-        <field name="name">droga.customer.visit.header.approve.view.form</field>
-        <field name="model">droga.customer.visit.header</field>
-        <field name="arch" type="xml">
-            <form delete="0">
-                <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button icon="fa-credit-card-alt"
-                                type="object" string=" Plan analysis"
-                                name="plan_analysis" class="oe_stat_button"/>
-                    </div>
-                    <notebook>
-                        <page delete="0" create="0" string="Week 1 schedule">
-                            <div>
-                                <field readonly="True" name="wk1_from"></field>
-                                -
-                                <field readonly="True" name="wk1_to"></field>
-                            </div>
-                            <field readonly="True" name="week_1_domain" mode="tree">
-                                <tree editable="top" delete="1" expand="1">
-                                    <field readonly="True" name="visit_client"
-                                           options="{'no_create':True,'no_open':True}"></field>
-                                    <field readonly="True" name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="city_name" invisible="1"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Schedule"
-                                            name="visit_schedule_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="visit_date"></field>
-                                    <field readonly="True" name="planned_visit_selection"></field>
-                                    <field readonly="True" name="remark" string='Comment'></field>
-                                </tree>
-
-
-                            </field>
-                        </page>
-                        <page delete="0" create="0" string="Week 2 schedule">
-                            <div>
-                                <field readonly="True" name="wk2_from"></field>
-                                -
-                                <field readonly="True" name="wk2_to"></field>
-                            </div>
-                            <field readonly="True" name="week_2_domain" mode="tree">
-                                <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
-                                    <field readonly="True" name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="city_name" invisible="1"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Schedule"
-                                            name="visit_schedule_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="visit_date"></field>
-                                    <field readonly="True" name="planned_visit_selection"></field>
-                                    <field readonly="True" name="remark" string='Comment'></field>
-                                </tree>
-                            </field>
-                        </page>
-                        <page delete="0" create="0" string="Week 3 schedule">
-                            <div>
-                                <field readonly="True" name="wk3_from"></field>
-                                -
-                                <field readonly="True" name="wk3_to"></field>
-                            </div>
-                            <field readonly="True" name="week_3_domain" mode="tree">
-                                <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
-                                    <field readonly="True" name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="city_name" invisible="1"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Schedule"
-                                            name="visit_schedule_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="visit_date"></field>
-                                    <field readonly="True" name="planned_visit_selection"></field>
-                                    <field readonly="True" name="remark" string='Comment'></field>
-                                </tree>
-                            </field>
-                        </page>
-                        <page delete="0" create="0" string="Week 4 schedule">
-                            <div>
-                                <field readonly="True" name="wk4_from"></field>
-                                -
-                                <field readonly="True" name="wk4_to"></field>
-                            </div>
-                            <field readonly="True" name="week_4_domain" mode="tree">
-                                <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
-                                    <field readonly="True" name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="city_name" invisible="1"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Schedule"
-                                            name="visit_schedule_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="visit_date"></field>
-                                    <field readonly="True" name="planned_visit_selection"></field>
-                                    <field readonly="True" name="remark" string='Comment'></field>
-                                </tree>
-                            </field>
-                        </page>
-                        <field readonly="True" name="week_5_count" invisible="1"/>
-                        <page delete="0" create="0" string="Week 5 schedule"
-                              attrs="{'invisible': [('week_5_count', '=', 0)]}">
-                            <div>
-                                <field readonly="True" name="wk5_from"></field>
-                                -
-                                <field readonly="True" name="wk5_to"></field>
-                            </div>
-                            <field readonly="True" name="week_5_domain" mode="tree">
-                                <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
-                                    <field readonly="True" name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="city_name" invisible="1"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Schedule"
-                                            name="visit_schedule_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="visit_date"></field>
-                                    <field readonly="True" name="planned_visit_selection"></field>
-                                    <field readonly="True" name="remark" string='Comment'></field>
-                                </tree>
-                            </field>
-                        </page>
-                        <page delete="0" create="0" string="All weeks">
-                            <field readonly="True" name="plan_detail" mode="tree">
-                                <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
-                                           domain="[('is_company', '=',True),('is_cust_available','=',True)]"></field>
-                                    <field readonly="True" name="cont_plan_des"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Plan"
-                                            name="visit_contact_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="city_name" invisible="1"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Schedule"
-                                            name="visit_schedule_open" class="oe_stat_button"/>
-
-                                    <field readonly="True" name="visit_date"></field>
-                                    <field readonly="True" name="week_num"></field>
-                                    <field readonly="True" name="planned_visit_selection"></field>
-                                    <field readonly="True" name="remark" string='Comment'></field>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="droga_crm_customer_visit_detail_view_approve_form" model="ir.ui.view">
-        <field name="name">droga.customer.visit.detail.approve.view.form</field>
-        <field name="model">droga.customer.visit.detail</field>
-        <field name="arch" type="xml">
-            <form delete="0">
-                <sheet>
-                    <notebook>
-                        <page string="Contacts schedule">
-                            <field name="contacts_schedule" mode="tree">
-                                <tree editable="bottom">
-                                    <field readonly="True" name="cust"/>
-                                    <field readonly="True" name="contact_custom"
-                                           domain="([('parent_customer','=',cust)])"
-                                           options="{'no_create':True,'no_open':True}"></field>
-                                    <field readonly="True" name="co_travel_crm" widget="many2many_tags"
-                                           options="{'no_create':True,'no_open':True}"/>
-                                    <field readonly="True" name="phone_no"/>
-                                    <field readonly="True" name="core_products" widget="many2many_tags"
-                                           options="{'no_create':True,'no_open':True}"/>/>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="droga_crm_customer_visit_to_approve_action" model="ir.actions.act_window">
-        <field name="name">Customers visit log approve book</field>
-        <field name="res_model">droga.customer.visit.header</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_crm_customer_visit_view_tree')}),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_crm_customer_visit_view_kanban')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('droga_crm_customer_visit_view_form')})]"/>
-        <field name="domain">[('is_approver','=',True),('state','in',('requested','approved'))]</field>
+        <field name="domain">[('is_record_owner','=',True)]</field>
     </record>
-
 
     <menuitem
             id="menu_vist_log"
@@ -1217,11 +722,4 @@
             groups="crm_mr"
             sequence="18"/>
 
-    <menuitem
-            id="droga_crm_customer_visit_to_approve_menu"
-            name="Customer visit log to approve"
-            action="droga_crm_customer_visit_to_approve_action"
-            parent="menu_vist_log"
-            groups="crm_rsm,crm_nsm"
-            sequence="18"/>
 </odoo>

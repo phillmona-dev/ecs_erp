@@ -25,6 +25,7 @@
                 <field name="product_id" readonly="1"></field>
                 <field name="reference" readonly="1"></field>
                 <field name="origin" readonly="1"></field>
+                <field name="partner_id" string="Customer"></field>
                 <field name="reservation_discard_time"></field>
                 <field name="source_wh"></field>
                 <field name="reserve_indef"></field>

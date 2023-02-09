@@ -27,7 +27,7 @@ class droga_promotors_sales_master(models.Model):
             'params': {
                 'message': 'ID has been changed to 12345 successfully.',
                 'type': 'success',
-                'sticky': False
+                'sticky': True
             }
         }
 

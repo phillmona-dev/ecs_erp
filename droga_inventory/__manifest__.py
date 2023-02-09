@@ -34,6 +34,7 @@
         'report/report_tree_extension.xml',
         'report/xls_stock_card.xml',
         'report/store_request.xml',
+        'views/droga_stock_adjustment_request_view.xml'
     ],
 
     # any module necessary for this one to work correctly
