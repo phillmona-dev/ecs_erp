@@ -305,7 +305,7 @@
                     @page {
                     size: A4 portrait;
                     margin-top: 4cm;
-                    margin-left:3cm;
+                    margin-left:2cm;
                     margin-right:2cm;
                     margin-bottom:2cm;
                     }
