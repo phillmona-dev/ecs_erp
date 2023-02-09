@@ -8,7 +8,8 @@
             <tree string="" create="1">
                 <field name="name"></field>
                 <field name="customer"></field>
-                <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}" widget="many2many_tags" readonly="1"></field>
+                <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}" widget="many2many_tags"
+                       readonly="1"></field>
                 <field name="state"></field>
             </tree>
         </field>
@@ -21,7 +22,8 @@
             <tree string="" create="1">
                 <field name="name"></field>
                 <field name="customer"></field>
-                <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}" widget="many2many_tags" readonly="1"></field>
+                <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}" widget="many2many_tags"
+                       readonly="1"></field>
                 <field name="state"></field>
             </tree>
         </field>
@@ -37,10 +39,12 @@
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="stmg_approve"
-                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager"
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
+                            groups="droga_inventory.stores_manager"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
-                            attrs="{'invisible': [('state', 'not in', ('stmg','mtmg'))]}" groups="droga_inventory.stores_manager,droga_inventory.marketing_manager"
+                            attrs="{'invisible': [('state', 'not in', ('stmg','mtmg'))]}"
+                            groups="droga_inventory.stores_manager,droga_inventory.marketing_manager"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
@@ -49,39 +53,46 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
-                    <group>
+                    <group string="Store issue request">
                         <group>
-                            <field name="customer"></field>
-                            <field name="issue_type" required="True"></field>
+                            <field name="customer"
+                                   attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
+                            <field name="issue_type" required="True"
+                                   attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
                         </group>
                         <group>
-                            <field name="issue_date" attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
-                            <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}" widget="many2many_tags" readonly="1"></field>
+                            <field name="issue_date"
+                                   attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
+                            <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}"
+                                   widget="many2many_tags" readonly="1"></field>
                             <field name="remark"></field>
                         </group>
                     </group>
                     <notebook>
                         <page string="Product Details">
                             <field name="state" invisible="1"></field>
-                            <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
+                            <field name="detail_entries"
+                                   attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
                                 <tree editable="bottom">
                                     <field name="company_id" invisible="1"/>
-                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
+                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}"
+                                           context="{'default_detailed_type': 'product'}"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="product_uom_qty" string="Quantity"/>
-                                    <field name="warehouse_id" attrs="{'required': [('state', '!=','draft')]}" string="Issuer warehouse" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="warehouse_id" attrs="{'required': [('state', '!=','draft')]}"
+                                           string="Issuer warehouse" options="{'no_create':True,'no_open':True}"/>
                                 </tree>
                             </field>
                         </page>
 
                     </notebook>
                     <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </sheet>
             </form>
         </field>

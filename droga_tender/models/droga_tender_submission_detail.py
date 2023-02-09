@@ -8,7 +8,7 @@ class droga_tender_submission_detail(models.Model):
 
     #Selection fields
     tech_result = fields.Selection([('Pass', 'Pass'), ('Fail', 'Fail')])
-    status = fields.Selection([('awarded', 'Awarded'), ('cancelled', 'Cancelled'),('undeva', 'Under evaluation'),('faiten', 'Failed tender'),('lost', 'Lost')],traking=True)
+    status = fields.Selection([('awarded', 'Awarded'), ('cancelled', 'Cancelled'),('undeva', 'Under evaluation'),('faiten', 'Failed tender'),('lost', 'Lost')],tracking=True)
 
     #Text fields
     lot_number=fields.Char("Lot Number",required=True)
@@ -29,7 +29,7 @@ class droga_tender_submission_detail(models.Model):
 
     # decimal fields
     quantity=fields.Float("Quantity",default=1)
-    unit_price = fields.Float("Unit Price",tracing=True)
+    unit_price = fields.Float("Unit Price",tracking=True)
     amount = fields.Float("Amount",compute="compute_amount")
     @api.depends("unit_price","quantity")
     def compute_amount(self):

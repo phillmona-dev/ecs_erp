@@ -32,6 +32,7 @@
         'views/employee.xml',
         'reports/sales_attachment.xml',
         'reports/daily_sales.xml',
+        'reports/request_report.xml',
         'views/module_menus.xml',
     ],
     # only loaded in demonstration mode

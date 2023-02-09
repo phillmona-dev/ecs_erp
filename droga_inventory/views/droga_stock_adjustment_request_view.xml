@@ -9,12 +9,12 @@
                     <group string="Stock Adjustment Request Form">
                         <group>
                             <field name="to_correct_ref"/>
-                            <field name="operation_type"/>
-                            <field name="source_location_id"/>
+                            <field name="request_date_time" readonly="1"/>
+                            <field name="remark"/>
                         </group>
                         <group>
-                            <field name="dest_location_id"/>
-                            <field name="request_date_time"/>
+                            <field name="source_location_id" domain="['|',('complete_name','like','Partners/'),('has_access','=',True)]"/>
+                            <field name="dest_location_id" domain="['|',('complete_name','like','Partners/'),('has_access','=',True)]"/>
                         </group>
                     </group>
                     <notebook>
@@ -22,11 +22,11 @@
                             <field name="stock_adjustment_detail_entries">
                                 <tree editable="bottom">
                                     <field name="product_id"/>
-                                    <field name="product_uom_qty"/>
-                                    <field name="product_uom_category_id" invisible="1"></field>
-                                    <field name="lot_ser_no"/>
-                                    <field name="expiry_date"/>
+                                    <field name="product_uom"/>
                                     <field name="qty"/>
+                                    <field name="product_uom_category_id" invisible="1"></field>
+                                    <field name="lot_ser_no" domain="[('product_id','=',product_id)]"/>
+                                    <field name="expiry_date"/>
                                 </tree>
                             </field>
                         </page>
@@ -57,9 +57,10 @@
     </record>
 
     <record id="droga_stock_adjustment_request_view_id" model="ir.actions.act_window">
-        <field name="name">Stock Adjustment</field>
+        <field name="name">Stock adjustment request</field>
         <field name="res_model">droga.stock.adjustment.request</field>
         <field name="view_mode">tree,form</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create Your First Stock Adjustment Request
