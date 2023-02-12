@@ -123,10 +123,6 @@ class customer_visit_header(models.Model):
          ('07', 'July'),
          ('08', 'August'), ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')], string='Month',required=True)
 
-    _sql_constraints = [
-        ('user_month_year_cityname_uniq', 'unique (pr_sales,year,month)', 'The combination month/year type for user already exists!')
-    ]
-
     def get_years(self):
         year_list = []
         #for i in range(datetime.date.today().year-2, datetime.date.today().year+2):
@@ -319,6 +315,9 @@ class customer_visit_header(models.Model):
         res.pr_sales=vals_list['pr_sales']
 
         #custs['cust_grade']['visit_times_per_month']
+
+        if len(self.env['droga.customer.visit.header'].search([('id','!=',res.id),('pr_sales', '=', vals_list['pr_sales']),('month', '=', vals_list['month']),('year', '=', vals_list['year'])]))>0:
+            raise ValidationError("The combination month/year type for user already exists!")
 
         week_num=0
         #Creates a list of visit details for user under month

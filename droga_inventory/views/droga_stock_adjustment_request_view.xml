@@ -47,6 +47,7 @@
         <field name="name">Stock Adjustment request</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="name"/>
                 <field name="to_correct_ref"/>
                 <field name="operation_type"/>
                 <field name="source_location_id"/>

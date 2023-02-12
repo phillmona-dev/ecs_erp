@@ -12,144 +12,145 @@
     </record>
     <template id="issue_report_template">
         <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout"></t>
-                <style>
-                    #issue_report {
-                    font-family: Arial, Helvetica, sans-serif;
-                    border-collapse: collapse;
-                    width: 100%;
-                    }
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <style>
+                        #issue_report {
+                        font-family: Arial, Helvetica, sans-serif;
+                        border-collapse: collapse;
+                        width: 100%;
+                        }
 
-                    #issue_report td, #issue_report th {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    }
-                    #issue_report th {
-                    padding-top: 12px;
-                    padding-bottom: 12px;
-                    text-align: left;
-                    }
-                    td{
-                    padding-left: 40px;
-                    font-size: 19px;
-                    }
-                </style>
-                <div class="page">
-                    <div class="col-lg-12">
+                        #issue_report td, #issue_report th {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        }
+                        #issue_report th {
+                        padding-top: 12px;
+                        padding-bottom: 12px;
+                        text-align: left;
+                        }
+                        td{
+                        padding-left: 40px;
+                        font-size: 19px;
+                        }
+                    </style>
+                    <div class="page">
+                        <div class="col-lg-12">
 
-                        <div>
-                            <div class="col-12 mb4 text-right">
-                                <table>
-                                    <tr>
-                                        <td>Name Of Institution</td>
-                                        <td>
-                                            <t t-esc="o.partner_id.name"/>
-                                        </td>
-                                        <td>TIN NO.</td>
-                                        <td>
-                                            <t t-esc="o.Vat_no"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Address</td>
-                                        <td>
-                                            <t t-esc="o.partner_id.location"/>
-                                        </td>
-                                        <td>Mode Of Payment.</td>
-                                        <td>
-                                            <t t-esc="o.payment_term_id.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Expected Delivery Time</td>
-                                    </tr>
-                                </table>
+                            <div>
+                                <div class="col-12 mb4 text-right">
+                                    <table>
+                                        <tr>
+                                            <td>Name Of Institution</td>
+                                            <td>
+                                                <t t-esc="o.partner_id.name"/>
+                                            </td>
+                                            <td>TIN NO.</td>
+                                            <td>
+                                                <t t-esc="o.Vat_no"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Address</td>
+                                            <td>
+                                                <t t-esc="o.partner_id.location"/>
+                                            </td>
+                                            <td>Mode Of Payment.</td>
+                                            <td>
+                                                <t t-esc="o.payment_term_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Expected Delivery Time</td>
+                                        </tr>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
 
-                        <table id="issue_report" class="table table-border" style="border: 1px solid black;">
-                            <tr>
-                                <th>No.</th>
-                                <th>Item Code</th>
-                                <th>Description</th>
-                                <th>UOM</th>
-                                <th>Quantity</th>
-                                <th>Batch No.</th>
-                                <th>Expiry Date</th>
-                                <th>Unit Price</th>
-                                <th>Total Amount</th>
-                                <th>Remark</th>
-                            </tr>
-                            <t t-set="index" t-value="1"/>
-                            <t t-foreach="o.order_line" t-as="order_line">
+                            <table id="issue_report" class="table table-border" style="border: 1px solid black;">
                                 <tr>
-                                    <td>
-                                        <t t-esc="index"/>
-                                    </td>
-                                    <td>
-                                        <t t-esc="order_line.product_id.default_code"/>
-                                    </td>
-                                    <td>
-                                        <t t-esc="order_line.product_id.name"/>
-                                    </td>
+                                    <th>No.</th>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>UOM</th>
+                                    <th>Quantity</th>
+                                    <th>Batch No.</th>
+                                    <th>Expiry Date</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Amount</th>
+                                    <th>Remark</th>
+                                </tr>
+                                <t t-set="index" t-value="1"/>
+                                <t t-foreach="o.order_line" t-as="order_line">
+                                    <tr>
+                                        <td>
+                                            <t t-esc="index"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="order_line.product_id.default_code"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="order_line.product_id.name"/>
+                                        </td>
 
-                                    <td>
-                                        <t t-esc="order_line.product_uom.name"/>
-                                    </td>
-                                    <td>
-                                        <t t-esc="order_line.product_uom_qty"/>
-                                    </td>
+                                        <td>
+                                            <t t-esc="order_line.product_uom.name"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="order_line.product_uom_qty"/>
+                                        </td>
 
+                                        <td>
+                                            <t t-esc="order_line.batch_html"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="order_line.expiry_date_html"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="order_line.price_unit"/>
+                                        </td>
+                                        <td>
+                                            Total Amount
+                                        </td>
+                                        <td>
+                                            Remark
+                                        </td>
+                                    </tr>
+                                    <t t-set="index" t-value="index+1"/>
+                                </t>
+                            </table>
+
+                            <table>
+                                <tr>
+                                    <td>Requested By:</td>
                                     <td>
-                                        <t t-esc="order_line.batch_html"/>
+                                        <!--                                    <t t-esc="o.user"/>-->
                                     </td>
+                                    <td>Approved By:</td>
                                     <td>
-                                        <t t-esc="order_line.expiry_date_html"/>
-                                    </td>
-                                    <td>
-                                        <t t-esc="order_line.price_unit"/>
-                                    </td>
-                                    <td>
-                                        Total Amount
-                                    </td>
-                                    <td>
-                                        Remark
+
                                     </td>
                                 </tr>
-                                <t t-set="index" t-value="index+1"/>
-                            </t>
-                        </table>
+                                <tr>
+                                    <td>Signature:</td>
+                                    <td>
 
-                        <table>
-                            <tr>
-                                <td>Requested By:</td>
-                                <td>
-<!--                                    <t t-esc="o.user"/>-->
-                                </td>
-                                <td>Approved By:</td>
-                                <td>
+                                    </td>
+                                    <td>Signature:</td>
+                                    <td>
 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Signature:</td>
-                                <td>
-
-                                </td>
-                                <td>Signature:</td>
-                                <td>
-
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Date:</td>
-                                <td></td>
-                                <td>Date:</td>
-                            </tr>
-                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Date:</td>
+                                    <td></td>
+                                    <td>Date:</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                </t>
             </t>
         </t>
     </template>

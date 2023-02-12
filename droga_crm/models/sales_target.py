@@ -45,7 +45,7 @@ class sales_target_header(models.Model):
 class sales_target_detail(models.Model):
     _name='droga.crm.sales.target.detail'
     target_header=fields.Many2one('droga.crm.sales.target.header',required=True)
-    indicator=fields.Many2one('product.template',domain=[('is_core_product','=','true')])
+    indicator=fields.Many2one('product.template')
     target_qty=fields.Integer('Target qty')
     target_amt = fields.Integer('Target amt')
     achievement = fields.Integer('Achievement')     #Fix me

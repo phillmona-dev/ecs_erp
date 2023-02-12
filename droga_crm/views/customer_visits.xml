@@ -643,7 +643,7 @@
                                     <field name="co_travel_crm" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
                                     <field name="phone_no"/>
-                                    <field name="core_products" widget="many2many_tags"
+                                    <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                                            options="{'no_create':True,'no_open':True}"/>
                                 </tree>
                                 <form>
@@ -654,7 +654,7 @@
                                         <field name="co_travel_crm" widget="many2many_tags"
                                                options="{'no_create':True,'no_open':True}"/>
                                         <field name="phone_no"/>
-                                        <field name="core_products" widget="many2many_tags"
+                                        <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                                                options="{'no_create':True,'no_open':True}"/>
                                     </group>
                                 </form>
@@ -665,7 +665,7 @@
                                     <field name="co_travel_crm" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
                                     <field name="phone_no"/>
-                                    <field name="core_products" widget="many2many_tags"
+                                    <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                                            options="{'no_create':True,'no_open':True}"/>
                                     <templates>
                                         <t t-name="kanban-box">
@@ -707,6 +707,17 @@
         <field name="domain">[('is_record_owner','=',True)]</field>
     </record>
 
+    <record id="droga_crm_customer_visit_to_approve_action" model="ir.actions.act_window">
+        <field name="name">Customers visit log approve book</field>
+        <field name="res_model">droga.customer.visit.header</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_crm_customer_visit_view_tree')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_crm_customer_visit_view_kanban')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('droga_crm_customer_visit_view_form')})]"/>
+        <field name="domain">[('is_approver','=',True),('state','in',('requested','approved'))]</field>
+    </record>
+
     <menuitem
             id="menu_vist_log"
             name="Visit plan and target"
@@ -721,5 +732,14 @@
             parent="menu_vist_log"
             groups="crm_mr"
             sequence="18"/>
+
+    <menuitem
+            id="droga_crm_customer_visit_to_approve_menu"
+            name="Customer visit log to approve"
+            action="droga_crm_customer_visit_to_approve_action"
+            parent="menu_vist_log"
+            groups="crm_rsm,crm_nsm"
+            sequence="18"/>
+
 
 </odoo>
