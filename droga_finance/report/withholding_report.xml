@@ -304,8 +304,8 @@
                     /* Default left, right, top, bottom margin is 2cm */
                     @page {
                     size: A4 portrait;
-                    margin-top: 4cm;
-                    margin-left:2cm;
+                    margin-top: 4.5cm;
+                    margin-left:3cm;
                     margin-right:2cm;
                     margin-bottom:2cm;
                     }
@@ -315,6 +315,12 @@
                     #non-printable { visibility: hidden; }
                     #wrapwrap { visibility: visible; }
                     }
+
+                    .nopadding {
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    }
+
                 </style>
 
                 <t t-foreach="docs" t-as="o">
@@ -325,7 +331,7 @@
 
                         <div class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <h6 class="small">የተቀነሰበት ግብር ከፋይ</h6>
+                                <h6 class="small nopadding">የተቀነሰበት ግብር ከፋይ</h6>
                                 <h6 class="small">Tax Payer's Name:-
                                     <b>
                                         <span class="small">
@@ -333,7 +339,7 @@
                                         </span>
                                     </b>
                                 </h6>
-                                <h6 class="small">የግብር መለያ ቁጥር</h6>
+                                <h6 class="small nopadding">የግብር መለያ ቁጥር</h6>
                                 <h6 class="small">Tax Payer Identifcation No:-
                                     <b>
                                         <span class="small">
@@ -346,12 +352,12 @@
                         </div>
                         <div class="row mt32 mb32">
                             <div class="col-2 bm-2 ">
-                                <h6 class="small">አድራሻ</h6>
-                                <h6 class="small">Address</h6>
+                                <h6 class="small nopadding">አድራሻ</h6>
+                                <h6 class="small ">Address</h6>
                             </div>
                             <div class="col-3 bm-2">
-                                <h6 class="small">ክልል</h6>
-                                <h6 class="small">Region:
+                                <h6 class="small nopadding">ክልል</h6>
+                                <h6 class="small ">Region:
                                     <b>
                                         <t class="small" t-esc="o.partner_id.state_id.name"/>
                                     </b>
@@ -359,23 +365,23 @@
                             </div>
                             <div class="col-3 bm-2">
 
-                                <h6 class="small">ክፍለ ከተማ</h6>
-                                <h6 class="small">Sub-City:
+                                <h6 class="small nopadding">ክፍለ ከተማ</h6>
+                                <h6 class="small ">Sub-City:
                                     <b>
                                         <t class="small" t-esc="o.partner_id.city"/>
                                     </b>
                                 </h6>
                             </div>
                             <div class="col-2 bm-2">
-                                <h6 class="small">ቀበሌ</h6>
-                                <h6 class="small">Kebele:
+                                <h6 class="small nopadding">ቀበሌ</h6>
+                                <h6 class="small ">Kebele:
                                     <b>
                                     </b>
                                 </h6>
                             </div>
                             <div class="col-2 bm-2">
-                                <h6 class="small">የቤት ቁጥር</h6>
-                                <h6 class="small">House No:-
+                                <h6 class="small nopadding">የቤት ቁጥር</h6>
+                                <h6 class="small ">House No:-
                                     <b>
                                     </b>
                                 </h6>
@@ -384,7 +390,7 @@
 
                         <div class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <h6 class="small">የግብይት አይነት</h6>
+                                <h6 class="small nopadding">የግብይት አይነት</h6>
                                 <h6 class="small">Type of Transaction</h6>
                             </div>
 
@@ -392,7 +398,7 @@
 
                         <div class="row mt32 mb32">
                             <div class="col-9 bm-2">
-                                <h6 class="small">የግብይት መጠን</h6>
+                                <h6 class="small nopadding">የግብይት መጠን</h6>
                                 <h6 class="small">Amount:-
                                     <b>
                                         <span class="small">
@@ -403,7 +409,7 @@
                             </div>
                             <div class="col-3 bm-2 border">
 
-                                <h6 class="small">ብር</h6>
+                                <h6 class="small nopadding">ብር</h6>
                                 <h6 class="small">Birr:
                                     <b>
                                         <t class="small" t-esc="o.amount_untaxed"
@@ -418,7 +424,7 @@
 
                         <div class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <h6 class="small">ተቀናሽ የተደረገ 2% ግብር ብር</h6>
+                                <h6 class="small nopadding">ተቀናሽ የተደረገ 2% ግብር ብር</h6>
                                 <h6 class="small">2% withhold birr:-
                                     <b>
                                         <span class="small">
@@ -434,36 +440,39 @@
 
                         </div>
                         <div class="row mt32 mb32">
-                            <h6 class="small">ተቀናሽ የተደረገ 30% ግብር ብር</h6>
-                            <h6 class="small">30% withhold birr:-
-                                <b>
-                                    <t t-if="o.withholding_thirty_percent!=0">
-                                        <span class="small">
-                                            <t t-esc="o.tax_amount_word"/>
-                                        </span>
-                                    </t>
-                                </b>
-                            </h6>
+                            <div class="col-12 bm-2">
+                                <h6 class="small nopadding">ተቀናሽ የተደረገ 30% ግብር ብር</h6>
+                                <h6 class="small">30% withhold birr:-
+                                    <b>
+                                        <t t-if="o.withholding_thirty_percent!=0">
+                                            <span class="small">
+                                                <t t-esc="o.tax_amount_word"/>
+                                            </span>
+                                        </t>
+                                    </b>
+                                </h6>
+                            </div>
                         </div>
 
                         <div class="row mt32 mb32">
                             <div class="col-4 bm-2">
-                                <h6 class="small">የባንክ ሰነድ ቁጥር</h6>
+                                <h6 class="small nopadding">የባንክ ሰነድ ቁጥር</h6>
                                 <h6 class="small">Bank Voucher</h6>
                             </div>
                             <div class="col-4 bm-2">
-                                <h6 class="small">የሽያጭ ደረሰኝ ቁጥር</h6>
+                                <h6 class="small nopadding">የሽያጭ ደረሰኝ ቁጥር</h6>
                                 <h6 class="small">Sales Invoice No</h6>
                             </div>
                             <div class="col-4 bm-2">
-                                <h6 class="small">የቼክ ቁጥር</h6>
+                                <h6 class="small nopadding">የቼክ ቁጥር</h6>
                                 <h6 class="small">Check No</h6>
                             </div>
                         </div>
 
                         <div class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <h6 class="small">በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ
+                                <h6 class="small nopadding">በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ
+                                    ከፈጸምነው ክፍያ
                                     ለግብር ሰብሳቢው
                                     መ/ቤት
                                     የሚከፈል 2% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን
@@ -472,7 +481,7 @@
                         </div>
                         <div class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <h6 class="small">We have withold from the above named Taxpayer
+                                <h6 class="small ">We have withold from the above named Taxpayer
                                     <b>
 
                                         <t t-if="o.withholding_two_percent!=0">
@@ -493,7 +502,8 @@
                         </div>
                         <div class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <h6 class="small">በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ
+                                <h6 class="small nopadding">በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ
+                                    ከፈጸምነው ክፍያ
                                     ለግብር ሰብሳቢው
                                     መ/ቤት
                                     የሚከፈል 30% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን
