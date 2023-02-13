@@ -135,8 +135,9 @@ class droga_stock_office_supplies(models.Model):
             raise ValidationError(
                 "A manager is not set for the requester, please contact HR to set manager for your employee record")
         # create activity for the approver
-        #self.create_activity(self.department_manager_user_id.id)
+        # self.create_activity(self.department_manager_user_id.id)
         self.create_activity(self.requested_by.parent_id.user_id.id)
+
     # verify request
     def action_verify(self):
         self.state = "verify"
@@ -390,6 +391,7 @@ class droga_stock_office_supplies(models.Model):
             else:
                 record.department_manager = record.requested_by.parent_id
 
+
 class droga_stock_transfer_office_supplies_request_detail(models.Model):
     _name = 'droga.inventory.office.supplies.request.detail'
     request_header = fields.Many2one(
@@ -429,7 +431,7 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
         "Unavilable Qty", compute="compute_unavilable_qty")
 
     stock_balance = fields.Float(
-        "Stock Balance", compute='_compute_current_stock_balance', store=True)
+        "Stock Balance", compute='_compute_current_stock_balance')
 
     @api.depends('product_uom_qty', 'unit_price')
     def _compute_total(self):
@@ -502,7 +504,7 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
         for record in self:
             record.unavilable_qty = record.product_uom_qty - record.avaliable_qty
 
-    @api.depends('product_id', 'request_header.warehouse')
+    # @api.depends('product_id', 'request_header.warehouse')
     def _compute_current_stock_balance(self):
         for record in self:
             # search available quantity
