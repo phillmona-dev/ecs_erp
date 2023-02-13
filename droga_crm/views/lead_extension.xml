@@ -76,7 +76,6 @@
                     <field name="contact_custom" options="{'no_create':True,'no_open':True}"></field>
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned"/>
-                    <field name="planned_visit_selection"/>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'opportunity')]}">>
                     <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
@@ -84,7 +83,7 @@
                     <field name="co_travel_crm" widget="many2many_tags"
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="phone" string="Mobile"/>
-                    <field name="closed_sales" readonly="1"></field>
+                    <field name="planned_visit_selection"/>
                 </group>
             </xpath>
 
