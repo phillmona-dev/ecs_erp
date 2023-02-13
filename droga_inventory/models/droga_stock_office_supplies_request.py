@@ -187,7 +187,7 @@ class droga_stock_office_supplies(models.Model):
         def_location_id = self.env['stock.location'].search(
             [('complete_name', 'like', wh.code + '/Stock%'), ('usage', '=', 'internal')])[0].id
         def_dest_id = self.env['stock.location'].search(
-            [('name', 'like', 'Office supplies expense')])
+            [('name', 'like', 'Office%'),('con_type', '=', 'INC')])
 
         if not def_location_id:
             raise UserError(
