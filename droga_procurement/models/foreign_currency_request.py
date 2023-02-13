@@ -60,8 +60,9 @@ class ForeignCurrencyRequest(models.Model):
 
     request_approved_date = fields.Date("Approved Date")
 
-    state = fields.Selection([('Draft', 'Draft'),  ("Queued", "Queued"),
-                             ('On Progress', 'On Progress'), ('Approved', 'Approved'), ('Cancelled', 'Cancelled')], default="Draft", tracking=True)
+    state = fields.Selection([('Draft', 'Draft'), ("Queued", "Queued"),
+                              ('On Progress', 'On Progress'), ('Approved', 'Approved'), ('Cancelled', 'Cancelled')],
+                             default="Draft", tracking=True)
 
     @api.model
     def create(self, vals):
@@ -81,7 +82,7 @@ class ForeignCurrencyRequest(models.Model):
 
     @api.depends('total_amount', 'exchange_rate')
     def _compute_total(self):
-        self.total_amount_etb = self.total_amount*self.exchange_rate
+        self.total_amount_etb = self.total_amount * self.exchange_rate
 
     @api.depends('total_amount', 'exchange_rate')
     def _compute_amount_to_word(self):
@@ -95,10 +96,12 @@ class ForeignCurrencyRequest(models.Model):
 
     def on_progress_request(self):
         self.write({'state': 'On Progress'})
+        self.send_notfication_on_approval('On Progress')
         return True
 
     def approve_request(self):
         self.write({'state': 'Approved'})
+        self.send_notfication_on_approval('Approved')
         return True
 
     def cancel_request(self):
@@ -109,14 +112,17 @@ class ForeignCurrencyRequest(models.Model):
         self.write({'state': 'Draft'})
         return True
 
-    def send_notfication_on_approval(self):
-        purchase_group = self.env.ref('purchase.group_purchase_user')
+    def send_notfication_on_approval(self, approval_type):
+        purchase_group = self.env.ref('droga_procurement.group_purchase_procurement_manager_group')
         purchase_user = self.env['res.users'].search(
             [('groups_id', '=', purchase_group.ids)])
 
         notification_ids = []
 
-        message = 'Your request for foregin currency is with RFQ #'+self.name
+        if approval_type == "On Progress":
+            message = 'Your request for foregin currency with Request #' + self.name + " for RFQ #" + self.rfq_id.name + " is on progress"
+        else:
+            message = 'Your request for foregin currency with Request #' + self.name + " for RFQ #" + self.rfq_id.name + " is approved by the bank of " + self.bank.name
 
         for purchase in purchase_user:
             notification_ids.append((0, 0, {

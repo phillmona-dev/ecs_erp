@@ -15,6 +15,8 @@ class purchase_order(models.Model):
     rfq_id = fields.Many2one("droga.purhcase.request.rfq")
     rfq_local_id = fields.Many2one("droga.purchase.request.rfq.local")
     purchase_request_id = fields.Many2one("droga.purhcase.request")
+    purchase_order_partial_shipments = fields.One2many("purchase.order.partial.shipment", "purchase_order_id")
+
     shipping_reconcilations = fields.One2many(
         'droga.purchase.shipping.reconcilation', 'purchase_order_id')
     lcs = fields.One2many('droga.purchase.lc', 'purchase_order_id')
@@ -66,6 +68,8 @@ class purchase_order(models.Model):
     insurance_premium_cost = fields.Float("Insurance Premium Cost")
 
     # shipment
+    shipment_percent = fields.Float("Shipment Percent", required=True, default=100)
+    is_shipment_partial = fields.Boolean("Is Shipment Partial", default=False)
     shipment_date = fields.Date("Estimated Shipment Date")
     production_completion_date = fields.Date("Estimaed Production Completion Date")
 
@@ -266,14 +270,14 @@ class purchase_order(models.Model):
             self.env['droga.purchase.shipping.reconcilation'].create(
                 shipping_line)
 
-    @api.onchange('margin', 'exchange_rate_lc_settlement')
+    @api.onchange('margin', 'exchange_rate_lc_settlement', 'shipment_percent')
     def lc_margin_amount(self):
         for record in self:
-            record.deposit_amount = (record.margin * record.amount_total) / 100
+            record.deposit_amount = (record.margin * record.amount_total * record.shipment_percent / 100) / 100
             # remaining margin percent
             rem_margin_percent = (100 - record.margin) / 100
             record.shipment_lc_amount = (
-                                                record.amount_total_usd * record.exchange_rate_lc_settlement) * rem_margin_percent
+                                                record.amount_total_usd * record.exchange_rate_lc_settlement * record.shipment_percent / 100) * rem_margin_percent
 
 
 class purchase_order_line(models.Model):
@@ -289,6 +293,128 @@ class purchase_order_line(models.Model):
             if record.order_id.request_type == 'Foregin':
                 record.total_price_foregin = record.unit_price_foregin * record.product_qty
                 record.price_unit = record.unit_price_foregin * record.order_id.exchange_rate
+
+
+# partial shipment
+class partial_shipment(models.Model):
+    _name = 'purchase.order.partial.shipment'
+
+    purchase_order_id = fields.Many2one("purchase.order")
+    mode_of_transport = fields.Selection(related='purchase_order_id.mode_of_transport')
+    request_type = fields.Selection(related='purchase_order_id.request_type')
+    # amount_total = fields.Monetary(related="purchase_order_id.amount_total")
+    amount_total_usd = fields.Float(related="purchase_order_id.amount_total_usd")
+
+    # shipment
+    shipment_percent = fields.Float("Shipment Percent", required=True)
+    shipment_description = fields.Char("Shipment Description", required=True)
+    shipment_date = fields.Date("Estimated Shipment Date")
+    production_completion_date = fields.Date("Estimaed Production Completion Date")
+
+    # shipment document
+    shipment_scan_copy_doc_recived_date = fields.Date("Shipment Document Scan Copy Recived Date")
+    shipment_original_copy_doc_recived_date = fields.Date(
+        "Shipment Document Original Recived Date")
+
+    shipment_doc_original_sent_from_supplier = fields.Date(
+        "Date Original Document Sent from Supplier to Applicant Bank")
+    shipment_doc_original_sent_from_supplier_courier = fields.Date(
+        "Date Original Document Sent from Supplier to Applicant Bank By Courier")
+    document_tracking_number = fields.Char("Courier Tracking No")
+    shipment_doc_original_recived_by_applicant_bank = fields.Date(
+        "Date Original Document Recived by Applicant Bank")
+
+    # shipment lc amount
+    exchange_rate_lc_settlement = fields.Float("Exchange Rate", digits=(12, 4))
+    shipment_lc_amount = fields.Float("Deposit Amount for LC Settlement")
+
+    lc_settlement_deposited = fields.Date("LC Settlement Deposited Date")
+    shipment_doc_collected_from_applicant_bank = fields.Date(
+        "Date Original Document Collected from Applicant Bank")
+    shipment_doc_handed_to_finance = fields.Date(
+        "Date Original Document Handed to Finance")
+    supplier_payment_date = fields.Date("Supplier Payment Date")
+
+    document_tracking_date = fields.Date("Document Tracking Date")
+
+    discrepancy = fields.Selection(
+        [('Yes', 'Yes'), ('No', 'No')], string="Discrepancy?")
+    accept_discrepancy = fields.Boolean("Accept Discrepancy")
+    discrepancy_comment = fields.Html("Discrepancy Comment")
+
+    # good clearance
+    goods_arrival_date = fields.Date(
+        "Good Arrival Date", help="Good arrival to Port of discharge")
+    goods_arrival_date_final_destination = fields.Date(
+        "Good Arrival Date to Final Destination", help="Good Arrival Date to Final Destination")
+
+    # mode_of_transport = fields.Selection(related='rfq_id.mod_of_shipment')
+    ports = fields.One2many(
+        'droga.purchase.arrival.ports', 'purchase_order_id')
+
+    freight_payment_by_air = fields.Float("Freight Amout ETB")
+    freight_payment_by_sea = fields.Float("Freight Amount USD")
+    freight_payment_by_sea_dg = fields.Float(
+        "Freight Amount from Djibouti to Galafi USD", help="From Djibouti to Galafi")
+    freight_payment_by_sea_gp = fields.Float(
+        "Freight Amount from Galafi to Dry Port ETB", help="From Galafi to Dry Port")
+
+    freight_paid_date = fields.Date("Freight Paid Date")
+    container_deposit_amount = fields.Float("Container Deposit Amount")
+
+    freight_settlement_advice_to_finance = fields.Date(
+        "Freight Settlement Debit Advice Handed Over to Finance")
+    shipping_doc_to_transitor = fields.Date(
+        "Shipping Document & Settlement Advice is Handed Over to Transistor")
+
+    declaration_number = fields.Char("Declaration Number")
+    release_permit_applied_to_fda = fields.Date(
+        "Release Permit Applied Date to FDA")
+    custom_duty_tax_amount = fields.Float("Custom Duty Tax Amount")
+    custom_duty_tax_paid_date = fields.Date("Custom Duty Tax Paid Date")
+    custom_tax_acceptance = fields.Boolean(
+        "Acceptance of the Duty Tax by Custom ")
+    custom_duty_tax_additional_amount = fields.Float(
+        "Additional Custom Duty Tax Amount")
+
+    storage_cost = fields.Float("Storage Cost")
+    demurrage_cost = fields.Float("Demurrage Cost")
+    local_transport_cost = fields.Float("Local Transport Cost")
+    loading_unloading_cost = fields.Float("Loading & Unloading Cost")
+
+    release_permit_received_from_fda = fields.Date(
+        "Release Permit Received from FDA")
+    release_date_from_customs_delivery = fields.Date(
+        "Release Date from Customs to Delivery Warehouse")
+
+    goods_release_date = fields.Date("Release Date", help="Good Release Date")
+
+    # post good clearance
+    packing_list_shared_with_inventory = fields.Date(
+        "Packing List Shared Date to Inventory")
+    goods_arrival_date = fields.Date("Goods Arrival Date to Warehouse")
+    grn_reconcilation_form_recived_date = fields.Date(
+        "GRN and Reconciliation Form Received Date")
+    reconcilation_discrepancy = fields.Boolean("Reconciliation Discrepancy")
+    discrepancy_comment = fields.Html("Discrepancy Comment")
+    discrepancy_action = fields.Html("Discrepancy Action")
+    grn_submitted_to_finance = fields.Date("GRN Submission Date to Finance")
+    stamped_declaration_recived_date = fields.Date(
+        "Final Custom Stamped Invoice & Declaration Recived Date")
+    delinquent_settlement_date = fields.Date("NBE Delinquent Settlement Date")
+    transistor_service_payment_Amount = fields.Float(
+        "Transitor Service Payment Amount")
+    container_deposit_reimbursed_date = fields.Date(
+        "Container Deposit Reimbursed Date")
+    transistor_service_payment_done_date = fields.Date(
+        "Transitor Service Payment Done Date")
+
+    @api.onchange('exchange_rate_lc_settlement', 'shipment_percent')
+    def lc_margin_amount(self):
+        for record in self:
+            rem_margin_percent = record.shipment_percent / 100
+            record.shipment_lc_amount = (
+                    record.amount_total_usd * record.exchange_rate_lc_settlement * record.shipment_percent / 100)
 
 
 # arrival ports

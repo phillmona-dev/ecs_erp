@@ -43,4 +43,7 @@ access_droga_procurement_purchase_request_line_vendors,droga.purchase.request.li
 
 access_droga_procurement_purchase_competitors,droga.purchase.competitors,model_droga_purchase_competitors,purchase.group_purchase_manager,1,1,1,1
 access_droga_procurement_purchase_request_rfq_landed.cost.main,droga.purchase.request.rfq.landed.cost.main,model_droga_purchase_request_rfq_landed_cost_main,purchase.group_purchase_manager,1,1,1,1
+access_droga_procurement_purchase_order_partial_shipment,purchase.order.partial.shipment,model_purchase_order_partial_shipment,purchase.group_purchase_manager,1,1,1,1
+
+
 
