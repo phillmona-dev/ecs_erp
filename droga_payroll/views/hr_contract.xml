@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!--inherit contract -->
+    <record id="inherit_hr_contract_view_form" model="ir.ui.view">
+        <field name="name">Contract</field>
+        <field name="model">hr.contract</field>
+        <field name="priority" eval="1"/>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='information']" position="after">
+                <page string="Benefits" name="benefits">
+                    <group>
+                        <group>
+                            <field name="housing_allowance"/>
+                            <field name="transport_allowance"/>
+                            <field name="representation_allowance"/>
+                        </group>
+                        <group>
+                            <field name="fuel_allowance"/>
+                            <field name="acting_allowance"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
