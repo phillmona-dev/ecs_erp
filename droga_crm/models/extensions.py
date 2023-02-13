@@ -63,6 +63,7 @@ class cust_contact_extension(models.Model):
     def create(self, vals):
         if not self.env.user.has_group('droga_crm.crm_cust_create'):
             raise UserError("You don't have access to create a customer.")
+        return super(cust_contact_extension, self).create(vals)
     @api.depends('location','area')
     def _get_add(self):
         for rec in self:
