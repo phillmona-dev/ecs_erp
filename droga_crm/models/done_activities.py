@@ -45,20 +45,21 @@ class mail_activity_extension(models.Model):
 
         for activity in res:
             # mod_des='Lead' if activity.res_model_id=='Lead' and
-            done_act.create(
-                {'name': activity.summary, 'activity_date': activity.date_deadline,
-                 'type': activity.activity_type_id.name, 'from_visit_plan': True if (
-                            activity.res_model_id.model == 'crm.lead' and self.env['crm.lead'].search(
-                        [('id', '=', activity.res_id)]).plan_id) else False,
-                 'sales_rep':self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[0].id if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)]))>0 else False,
-                 'state': 'Open', 'source_name': activity.res_name+'-'+activity.summary, 'act_id': activity.id, 'source_id': activity.res_id,
-                 'sales_area': self.env['crm.lead'].search([('id', '=',
-                                                             activity.res_id)]).partner_id.city_name.city_descr if activity.res_model_id.model == 'crm.lead' else activity.res_model_id.name,
-                 'res_model_id': activity.res_model_id, 'res_model_descr': capwords(self.env['crm.lead'].search([('id',
-                                                                                                                  '=',
-                                                                                                                  activity.res_id)]).type) if activity.res_model_id.model == 'crm.lead' else activity.res_model_id.name,
-                 'act_note': activity.note if activity.note else '', 'res_model': activity.res_model,
-                 'user': activity.user_id.name})
+            if activity.res_model_id.model == 'crm.lead':
+                done_act.create(
+                    {'name': activity.summary, 'activity_date': activity.date_deadline,
+                     'type': activity.activity_type_id.name, 'from_visit_plan': True if (
+                                activity.res_model_id.model == 'crm.lead' and self.env['crm.lead'].search(
+                            [('id', '=', activity.res_id)]).plan_id) else False,
+                     'sales_rep':self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[0].id if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)]))>0 else False,
+                     'state': 'Open', 'source_name': activity.res_name+'-'+activity.summary, 'act_id': activity.id, 'source_id': activity.res_id,
+                     'sales_area': self.env['crm.lead'].search([('id', '=',
+                                                                 activity.res_id)]).partner_id.city_name.city_descr if activity.res_model_id.model == 'crm.lead' else activity.res_model_id.name,
+                     'res_model_id': activity.res_model_id, 'res_model_descr': capwords(self.env['crm.lead'].search([('id',
+                                                                                                                      '=',
+                                                                                                                      activity.res_id)]).type) if activity.res_model_id.model == 'crm.lead' else activity.res_model_id.name,
+                     'act_note': activity.note if activity.note else '', 'res_model': activity.res_model,
+                     'user': activity.user_id.name})
         return res
 
     def action_feedback(self, feedback=False, attachment_ids=None):
