@@ -4,7 +4,6 @@
         <field name="description">User access level for CRM module</field>
         <field name="sequence">20</field>
     </record>
-
     <record id="crm_mr" model="res.groups">
         <field name="name">CRM MR/PM</field>
         <field name="category_id" ref="crm_management"/>
@@ -24,14 +23,21 @@
         <field name="category_id" ref="crm_management"/>
         <field name="implied_ids" eval="[(4, ref('crm_rsm'))]"/>
     </record>
-
+    <record id="crm_cust_create" model="res.groups">
+        <field name="name">Customer create access</field>
+        <field name="category_id" ref="crm_management"/>
+        <field name="implied_ids" eval="[(4, ref('crm_sr'))]"/>
+    </record>
     <record id="crm_cust" model="res.groups">
         <field name="name">CRM admin</field>
         <field name="category_id" ref="crm_management"/>
     </record>
-
     <record id="tin_admin" model="res.groups">
         <field name="name">Tin no administrator</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
+    <record id="crm_core_only" model="res.groups">
+        <field name="name">Only core products access</field>
         <field name="category_id" ref="crm_management"/>
     </record>
 </odoo>

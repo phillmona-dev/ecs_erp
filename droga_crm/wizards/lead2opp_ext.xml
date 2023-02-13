@@ -16,6 +16,7 @@
             </xpath>
             <xpath expr="//form/group/field[@name='user_id']" position="after">
                 <field name="pr_sales" options="{'no_create':True,'no_open':True}"/>
+                <field name="closed_sales"/>
             </xpath>
             <xpath expr="//form/group/field[@name='user_id']" position="attributes">
                 <attribute name="invisible">True</attribute>

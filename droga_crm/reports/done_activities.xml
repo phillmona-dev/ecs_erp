@@ -6,14 +6,14 @@
         <field name="arch" type="xml">
             <tree string="" expand="1" create="0">
                 <field name="source_name"/>
-                <field name="user"/>
-                <field name="activity_date"/>
-                <field name="action_date"/>
-                <field name="res_model_descr"/>
-                <field name="sales_area"/>
+                <field name="sales_rep"/>
+                <field name="activity_date" string="Plan date"/>
+                <field name="action_date" string="Done date"/>
+                <field name="res_model_descr" string="Type"/>
+                <field name="sales_area" string="Area"/>
                 <field name="type" optional="hide"/>
                 <field name="state" decoration-success="state == 'Done'" decoration-info="state == 'Open'" decoration-danger="state == 'Cancelled'" widget="badge"/>
-                <field name="feedback"/>
+                <field name="feedback" string="Feedback"/>
                 <field name="from_visit_plan"/>
                 <field name="act_note" widget="html" optional="hide"/>
             </tree>
@@ -37,7 +37,7 @@
                 <filter name="open" string="Open activities" domain="[('state', '=', 'Open')]" />
                 <filter name="cancel" string="Cancelled activities" domain="[('state', '=', 'Cancelled')]" />
                 <filter name="Done" string="Done activities" domain="[('state', '=', 'Done')]" />
-                <filter name="group_user" string="User" context="{'group_by':'user'}"/>
+                <filter name="group_user" string="User" context="{'group_by':'sales_rep'}"/>
 
                 <filter string="Current week activities" name="current_week"
                     domain="[('activity_date', '&lt;=', ((context_today()+relativedelta(weeks=0, weekday=-1)).strftime('%Y-%m-%d'))),

@@ -32,7 +32,7 @@
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='internal_notes']" position="replace">
-                <page string="Ordred qty" name="ord_qty">
+                <page string="Items" name="ord_qty">
                     <field name="ordered_prods" mode="tree">
                         <tree editable="bottom">
                             <field name="prod" options="{'no_create':True,'no_open':True}"/>
@@ -76,15 +76,14 @@
                     <field name="contact_custom" options="{'no_create':True,'no_open':True}"></field>
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned"/>
-                    <field name="planned_visit_selection"/>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'opportunity')]}">>
-                    <field name="core_products" widget="many2many_tags"
+                    <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="co_travel_crm" widget="many2many_tags"
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="phone" string="Mobile"/>
-                    <field name="closed_sales"></field>
+                    <field name="planned_visit_selection"/>
                 </group>
             </xpath>
 
@@ -100,7 +99,7 @@
 
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'lead')]}">
-                    <field name="core_products" widget="many2many_tags"
+                    <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="co_travel_crm" widget="many2many_tags"
                            options="{'no_create':True,'no_open':True}"></field>
@@ -115,7 +114,7 @@
                     <field name="partner_phone_update" invisible="1"/>
                     <!--<field name="partner_name" string="Opportunity Descr." />-->
                     <field name="phone" string="Mobile" widget="phone"/>
-                    <field name="sales_finished"/>
+                    <field name="closed_sales" readonly="1"/>
                     <label for="email_from" class="oe_inline"/>
                     <div class="o_row o_row_readonly" invisible="1">
                         <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger"

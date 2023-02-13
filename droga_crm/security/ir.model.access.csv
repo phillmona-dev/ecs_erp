@@ -29,4 +29,5 @@ access_droga_crm_settings_prod_group,droga_crm.droga_crm_settings_prod_group,mod
 access_droga_decimal_precision_config,droga_crm.decimal.precision.configuration,base.model_decimal_precision,droga_crm.crm_sr,1,1,0,0
 
 access_droga_res_partner,crm.res_partner,base.model_res_partner,droga_crm.crm_sr,1,1,1,1
+access_droga_res_partner_mr,crm.res_partner,base.model_res_partner,droga_crm.crm_mr,1,1,0,0
 access_droga_res_partner_readonly,crm.res_partner_read,base.model_res_partner,base.group_user,1,0,0,0

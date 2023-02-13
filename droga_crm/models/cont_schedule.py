@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 class contacts_schedule(models.Model):
@@ -14,16 +15,14 @@ class contacts_schedule(models.Model):
     visits_header = fields.Many2one(related='visits.visit_header',store=True)
     cust=fields.Many2one('res.partner',related='visits.visit_client')
     #custlead = fields.Many2one('res.partner', related='leads.partner_id')
-    core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])
+    core_products = fields.Many2many('product.template')
 
-    #def _get_partner_id(self):
-    #    for rec in self:
-    #        if rec.visits:
-    #            rec.cust=rec.visits['visit_client']
-    #        elif rec.leads:
-    #            rec.cust = rec.leads['partner_id']
-    #        else:
-    #            rec.cust=None
+    @api.model
+    def create(self, vals_list):
+        if len(self.env['droga.crm.contacts.schedule'].search(
+                [('contact_custom', '=', vals_list['contact_custom']), ('visits', '=', vals_list['visits'])])) > 0:
+            raise ValidationError("Visit with the same customer/client/date already exists.!")
+        return super().create(vals_list)
 
 class lead_ordred_products(models.Model):
     _name='droga.lead.ordered.products'

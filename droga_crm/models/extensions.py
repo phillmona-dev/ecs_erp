@@ -59,6 +59,10 @@ class cust_contact_extension(models.Model):
                 raise UserError("You can not edit Tin no.")
         return super(cust_contact_extension, self).write(vals)
 
+    @api.model
+    def create(self, vals):
+        if not self.env.user.has_group('droga_crm.crm_cust_create'):
+            raise UserError("You don't have access to create a customer.")
     @api.depends('location','area')
     def _get_add(self):
         for rec in self:
@@ -78,6 +82,7 @@ class cust_contact_extension(models.Model):
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             return False if len(ses) == 0 else ses[0].pro_id[0].p_regions.ids
             #return self.pr_sales_logged.p_regions
+
     pr_avail_area=fields.Many2many('droga.crm.settings.city',default=_get_areas)
 
 
@@ -92,7 +97,10 @@ class cust_contact_extension(models.Model):
                 else:
                     rec.is_cust_available = False
 
+
+
     is_cust_available = fields.Boolean('Show cust', store=False, compute="_is_cust_loc_avail", search="_search_cust_avail")
+
 
 
     def _search_cust_avail(self, operator, value):
@@ -104,6 +112,7 @@ class cust_contact_extension(models.Model):
         is_cust_avail = self.env['res.partner'].sudo().search(
             [('city_name', 'in', ses[0].pro_id[0].p_regions.ids)])
         return [('id', 'in', [x.id for x in is_cust_avail] if is_cust_avail else False)]
+
 
 
 class account_move_pr_sales(models.Model):
@@ -136,7 +145,6 @@ class crm_lead_extension(models.Model):
     co_travel_crm = fields.Many2many('droga.pro.sales.master', string='Co-travelers')
     date_planned=fields.Datetime('Lead date')
     origin_user_id=fields.Many2one('res.users')
-    sales_finished=fields.Boolean('Sales finished')
     planned_visit_selection = fields.Selection([
         ('Early Morning', 'Early Morning'),
         ('Late Morning', 'Late Morning'),
@@ -149,7 +157,6 @@ class crm_lead_extension(models.Model):
         'Phone', tracking=50,
         compute='_compute_phone', inverse='_inverse_phone', readonly=False, store=True)
 
-    to_update=fields.Boolean(default=False)
 
 
     def _get_pr_sales_logged(self):
@@ -159,8 +166,6 @@ class crm_lead_extension(models.Model):
         return False if len(ses)==0 else ses[0].pro_id.ids[0]
     pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True,tracking=True)
     pr_lead = fields.Many2one('droga.pro.sales.master',default=_get_pr_sales_logged)
-    #pr_temp is used for updating
-    pr_temp = fields.Many2one('droga.pro.sales.master')
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     def _get_areas(self):
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
@@ -186,12 +191,6 @@ class crm_lead_extension(models.Model):
             if len(ses)==0:
                 return [('id','in',[])]
             else:
-                leads = self.env['crm.lead'].search(
-                    [('to_update', '=', True), ('pr_temp', '=', ses[0].pro_id.ids[0])])
-                for lead in leads:
-                    lead.sudo().write({'to_update': False,
-                                       'pr_sales': lead.pr_temp})
-
                 is_rec_owner=self.env['crm.lead'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
                 #is_rec_inside_self=self.sudo().search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
                 return [('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False)]

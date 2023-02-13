@@ -747,7 +747,7 @@
                                     <field name="co_travel_crm" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
                                     <field name="phone_no"/>
-                                    <field name="core_products" widget="many2many_tags"
+                                    <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                                            options="{'no_create':True,'no_open':True}"/>
                                 </tree>
                                 <form>
@@ -758,7 +758,7 @@
                                         <field name="co_travel_crm" widget="many2many_tags"
                                                options="{'no_create':True,'no_open':True}"/>
                                         <field name="phone_no"/>
-                                        <field name="core_products" widget="many2many_tags"
+                                        <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                                                options="{'no_create':True,'no_open':True}"/>
                                     </group>
                                 </form>
@@ -769,7 +769,7 @@
                                     <field name="co_travel_crm" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
                                     <field name="phone_no"/>
-                                    <field name="core_products" widget="many2many_tags"
+                                    <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                                            options="{'no_create':True,'no_open':True}"/>
                                     <templates>
                                         <t t-name="kanban-box">
@@ -1125,7 +1125,7 @@
                                     <field readonly="True" name="co_travel_crm" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
                                     <field readonly="True" name="phone_no"/>
-                                    <field readonly="True" name="core_products" widget="many2many_tags"
+                                    <field readonly="True" name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
                                            options="{'no_create':True,'no_open':True}"/>/>
                                 </tree>
                             </field>
