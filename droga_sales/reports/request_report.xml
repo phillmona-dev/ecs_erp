@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <record id="item_issue_request_report" model="ir.actions.report">
-        <field name="name">Requisition Report</field>
+        <field name="name">Requisition Form</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">droga_sales.issue_report_template</field>
@@ -37,7 +37,6 @@
                     </style>
                     <div class="page">
                         <div class="col-lg-12">
-
                             <div>
                                 <div class="col-12 mb4 text-right">
                                     <table>
@@ -82,6 +81,7 @@
                                     <th>Remark</th>
                                 </tr>
                                 <t t-set="index" t-value="1"/>
+                                <t t-set="grand_total" t-value="0"/>
                                 <t t-foreach="o.order_line" t-as="order_line">
                                     <tr>
                                         <td>
@@ -111,14 +111,23 @@
                                             <t t-esc="order_line.price_unit"/>
                                         </td>
                                         <td>
-                                            Total Amount
+                                            <t t-esc="order_line.price_subtotal"/>
                                         </td>
                                         <td>
                                             Remark
                                         </td>
                                     </tr>
+                                    <t t-set="grand_total"
+                                       t-value="grand_total+order_line['price_subtotal']"/>
                                     <t t-set="index" t-value="index+1"/>
                                 </t>
+                                <tr>
+                                    <td colspan="8" style="text-align: right;">Grand Total
+                                    </td>
+                                    <td colspan="2">
+                                        <t t-esc="grand_total"/>
+                                    </td>
+                                </tr>
                             </table>
 
                             <table>
