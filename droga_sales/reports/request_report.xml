@@ -16,7 +16,7 @@
                 <t t-foreach="docs" t-as="o">
                     <style>
                         table,th,td{
-                        font-size: 18px;
+                        font-size: 15px;
                         }
                     </style>
                     <div class="page">
