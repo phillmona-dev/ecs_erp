@@ -53,10 +53,18 @@ class cust_sales_credit_limit(models.Model):
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
-            matured_invoices = self.env['account.move'].search(
-                [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'), ('invoice_date_due', '<=', datetime.now()),
-                 ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', rec.partner_id.vat), '|',
-                 ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
+            if rec.partner_id.vat!='0000000000':
+                matured_invoices = self.env['account.move'].search(
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'), ('invoice_date_due', '<=', datetime.now()),
+                     ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', rec.partner_id.vat), '|',
+                     ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
+            else:
+                matured_invoices = self.env['account.move'].search(
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
+                     ('invoice_date_due', '<=', datetime.now()),
+                     ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id', '=', rec.partner_id.id), '|',
+                     ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
+
             tot_amount = 0
             for mi in matured_invoices:
                 tot_amount = tot_amount + (

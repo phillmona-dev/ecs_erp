@@ -118,13 +118,13 @@
                     <field name="area" options="{'no_create':True,'no_open':True}" string="Area"
                            domain="([('parent_id','=',city_name),('status','=','Active')])"></field>
                     <field name="location"></field>
-                    <field name="key_account"></field>
 
                 </group>
 
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="after">
                 <field name="vat" attrs="{'invisible': [('supplier_rank', '>', 0)]}" string="Tin No"></field>
+                <field name="key_account"></field>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="attributes">

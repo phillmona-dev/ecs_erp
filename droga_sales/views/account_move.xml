@@ -66,6 +66,12 @@
                    position="replace">
                 <field name="product_uom_id" string="UoM" groups="uom.group_uom" readonly="True" optional="show"/>
             </xpath>
+
+
+            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree" position="attributes">
+                <attribute name="limit">500</attribute>
+            </xpath>
+
         </field>
     </record>
 
