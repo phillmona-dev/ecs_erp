@@ -90,6 +90,12 @@ class cust_contact_extension(models.Model):
 
     pr_avail_area=fields.Many2many('droga.crm.settings.city',default=_get_areas)
 
+    def name_get(self):
+        result = []
+        for record in self:
+            result.append(
+                (record.id, record.name+ ((',  '+record.mobile) if record.mobile else '')+((',  '+record.phone) if record.phone else '')))
+        return result
 
     def _is_cust_loc_avail(self):
         if not self.env.user.name.upper().startswith('CRM') and self.env.user.has_group('droga_crm.crm_cust'):
