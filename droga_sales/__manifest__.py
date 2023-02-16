@@ -30,6 +30,7 @@
         'views/sales_discount_rules.xml',
         'views/extensions.xml',
         'views/employee.xml',
+        'views/droga_header_footer_template.xml',
         'reports/sales_attachment.xml',
         'reports/daily_sales.xml',
         'reports/request_report.xml',
