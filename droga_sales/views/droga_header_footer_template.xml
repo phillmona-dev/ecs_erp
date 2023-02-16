@@ -12,9 +12,9 @@
                              alt="Logo"/>
                     </div>
                     <div class="col-7 mb4 text-left">
-                        <h1 style="font-weight: bold;">DROGA PHARMA Pvt.Ltd.Co</h1>
+                        <h1>DROGA PHARMA Pvt.Ltd.Co</h1>
                         <h6>Human Medicine and Medical Supplies Importer and Distributor</h6>
-                        <h2 style="font-weight: bold;  text-align: center;">Requisition Form</h2>
+                        <h3 style="text-align: center;">Requisition Form</h3>
                     </div>
                     <div class="col-3 mb4 text-right">
                         <div t-if="report_type == 'pdf'" class="text-muted">
