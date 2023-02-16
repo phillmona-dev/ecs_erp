@@ -44,10 +44,11 @@
                                     <td>
                                         <t t-esc="o.partner_id.name"/>
                                     </td>
-                                    <td>TIN NO:</td>
+                                    <td>Expected Delivery Time:</td>
                                     <td>
-                                        <t t-esc="o.Vat_no"/>
+                                        <t t-esc="o.commitment_date"/>
                                     </td>
+
                                 </tr>
                                 <tr>
                                     <td>Address:</td>
@@ -60,9 +61,9 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Expected Delivery Time:</td>
+                                    <td>TIN NO:</td>
                                     <td>
-                                        <t t-esc="o.commitment_date"/>
+                                        <t t-esc="o.Vat_no"/>
                                     </td>
                                     <td>Order From:</td>
                                     <td>
@@ -113,10 +114,10 @@
                                             <t t-esc="order_line.expiry_date_html"/>
                                         </td>
                                         <td style="text-align: right;">
-                                            <t t-esc="order_line.price_unit"/>
+                                            <t t-esc="'{:,}'.format(order_line.price_unit)"/>
                                         </td>
                                         <td style="text-align: right;">
-                                            <t t-esc="order_line.price_subtotal"/>
+                                            <t t-esc="'{:,}'.format(order_line.price_subtotal)"/>
                                         </td>
                                         <td>
 
@@ -130,7 +131,7 @@
                                     <td colspan="8" style="text-align: right;">Grand Total
                                     </td>
                                     <td style="text-align: right;">
-                                        <t t-esc="grand_total"/>
+                                        <t t-esc="'{:,}'.format(grand_total)"/>
                                     </td>
                                     <td></td>
                                 </tr>
