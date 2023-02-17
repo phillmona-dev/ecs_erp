@@ -39,7 +39,8 @@
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_uom_readonly']"
                    position="after">
-                <field name="available_qty" decoration-danger="available_qty &lt;= product_uom_qty" widget="badge"
+                
+                <field name="available_qty" type="Integer" digits="[42, 0]" decoration-warning="available_qty &lt;= 0" decoration-danger="available_qty &lt;= product_uom_qty" widget="badge"
                        groups="droga_sales.sales_price_change_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_import_approve_admin"></field>
                 <field name="store_placement"></field>
                 <field name="wareh" string="Warehouse" domain="[('wh_type','=',parent.order_type)]" options="{'no_create': True}"/>
@@ -126,6 +127,7 @@
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="after">
                 <field name="Vat_no" readonly="1" string="Tin No"></field>
+                <field name="cust_id" widget="char" string="Cust ID" readonly="1" attrs="{'readonly':[(1,'=',1)],'invisible': [('Vat_no', '!=', '0000000000')]}"></field>
                 <field name="pay_type" invisible="1"/>
                 <field name="cash_upfront"
                        attrs="{'invisible': [('pay_type', '=', False)],'readonly': [('state','!=', 'draft')]}"/>
