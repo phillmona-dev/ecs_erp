@@ -12,29 +12,9 @@
                              alt="Logo"/>
                     </div>
                     <div class="col-7 mb4 text-left">
-                        <h4>DROGA PHARMA Pvt.Ltd.Co</h4>
+                        <h3 style="text-align: center;">DROGA PHARMA Pvt.Ltd.Co</h3>
                         <h6>Human Medicine and Medical Supplies Importer and Distributor</h6>
                         <h5 style="text-align: center;">Requisition Form</h5>
-                    </div>
-                    <div class="col-3 mb4 text-right">
-                        <div t-if="report_type == 'pdf'" class="text-muted">
-                            Page:
-                            <li class="list-inline-item">
-                                <strong>
-                                    <span class="page"/>
-                                    /
-                                    <span class="topage"/>
-                                </strong>
-                            </li>
-                        </div>
-                        <div>
-                            Print date:
-                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
-                        </div>
-                        <div>
-                            By:
-                            <span t-esc="user.name"/>
-                        </div>
                     </div>
                 </div>
                 <div t-if="company.logo or company.report_header" class="row zero_min_height">

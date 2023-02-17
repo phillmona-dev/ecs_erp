@@ -12,6 +12,12 @@
                 <page string="Benefits" name="benefits">
                     <group>
                         <group>
+                            <field name="pension_contribution"/>
+                            <field name="sales"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
                             <field name="housing_allowance"/>
                             <field name="transport_allowance"/>
                             <field name="representation_allowance"/>
@@ -19,6 +25,7 @@
                         <group>
                             <field name="fuel_allowance"/>
                             <field name="acting_allowance"/>
+                            <field name="telephone_allowance"/>
                         </group>
                     </group>
                 </page>

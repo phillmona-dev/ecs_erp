@@ -380,6 +380,10 @@
                 </page>
             </xpath>
 
+            <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree" position="attributes">
+                <attribute name="limit">500</attribute>
+            </xpath>
+
 
         </field>
     </record>
