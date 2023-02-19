@@ -40,6 +40,11 @@
         <field name="name">Only core products access</field>
         <field name="category_id" ref="crm_management"/>
     </record>
+
+    <record id="non_existent_group" model="res.groups">
+        <field name="name">No one access, used for hiding menus</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
 </odoo>
 
 
