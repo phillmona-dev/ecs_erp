@@ -496,6 +496,7 @@ class purchase_request_extension(models.Model):
 
 class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     order_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'),
@@ -624,6 +625,7 @@ class product_selection_field(models.Model):
     _inherit = 'product.category'
     avail_in_product_master=fields.Boolean('Available in product master file',default=False)
     off_supplies=fields.Boolean('Office supplies group',default=False)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     group_type=fields.Selection([
         ('MI','Medical items'),
         ('SC', 'Services'),
