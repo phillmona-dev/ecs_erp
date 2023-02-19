@@ -44,7 +44,7 @@ class customer_visit_header(models.Model):
         elif pr_sales_loc.employee_access_users.login.upper().startswith('CRM_RSM'):
             approver_login = 'crm_nsm@drogapharma.com'
         elif pr_sales_loc.employee_access_users.login.upper().startswith('CRM_MR') and pr_sales_loc.is_pm:
-            approver_login = 'crm_pm_npm@drogapharma.com'
+            approver_login = 'crm_npm@drogapharma.com'
         else:
             approver_login = '-'
 
