@@ -31,7 +31,7 @@
         id="crm.crm_menu_report"
         name="Reporting"
         parent="crm.crm_menu_root"
-        groups="crm_nsm"/>
+        groups="non_existent_group"/>
 
     <!-- Lead menu domain -->
         <record model="ir.actions.act_window" id="crm.crm_lead_all_leads">
