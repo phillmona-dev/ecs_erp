@@ -18,6 +18,11 @@ class droga_stock_update_status(models.Model):
             )
             to_update['state'] = 'reject'
 
+            to_update = self.env['droga.stock.adjustment.request'].search(
+                [('name', '=', rec['origin'])]
+            )
+            to_update['state'] = 'reject'
+
         return super(droga_stock_update_status,self).action_cancel()
 
     def button_validate(self):
@@ -28,6 +33,11 @@ class droga_stock_update_status(models.Model):
             to_update['state'] = 'processed'
 
             to_update = self.env['droga.inventory.consignment.receive'].search(
+                [('name', '=', rec['origin'])]
+            )
+            to_update['state'] = 'processed'
+
+            to_update = self.env['droga.stock.adjustment.request'].search(
                 [('name', '=', rec['origin'])]
             )
             to_update['state'] = 'processed'

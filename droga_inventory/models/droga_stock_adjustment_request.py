@@ -19,18 +19,72 @@ class droga_stock_adjustment_request(models.Model):
     stock_adjustment_detail_entries = fields.One2many('droga.stock.adjustment.request.detail',
                                                       'stock_adjustment_header')
     remark=fields.Char('Adjustment description',required=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('cancel', 'Cancelled'),  # When requester cancels it from draft
+        ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
+        ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
+        ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
+        ('processed', 'Processed'),  # When request is processed
+        ('done', 'Received'),  # When request is received
+    ], string='Status', default="draft", readonly=True, tracking=True)
+    store_manager = fields.Many2one('res.users', compute='_get_approvers')
+    def _get_approvers(self):
+        for rec in self:
+            rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
         if vals_list.get('name', 'New') == 'New':
-            if len(vals_list['stock_adjustment_detail_entries']) == 0:
-                raise UserError("At least one product must be filled to save record.")
             _name = self.env['ir.sequence'].next_by_code('droga.inventory.adjustment.request.sequence.all')
             if not _name:
                 raise UserError("Order sequence not found.")
             vals_list['name'] = _name
         return super(droga_stock_adjustment_request, self).create(vals_list)
 
+    def request(self):
+        if len(self['stock_adjustment_detail_entries']) == 0:
+            raise UserError("At least one product must be filled to request adjustement.")
+        self.set_activity_done()
+        self.ensure_one()
+        self.state = 'stmg'
+
+    def amend(self):
+        self.set_activity_done()
+        self.ensure_one()
+        self.state = 'draft'
+
+    def action_cancel(self):
+        self.state='cancel'
+
+    def stmg_approve(self):
+        self.set_activity_done()
+
+        self.state = 'waiting'
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        for act in activity:
+            act.sudo().action_done()
+
+    def action_open_adj(self):
+        self.set_activity_done()
+        return {
+            'name': 'Stock adjustement',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'stock.picking',
+            'view_id': self.env.ref('stock.view_picking_form').id,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_origin': self.name,
+                'default_request_no': self.name,
+                'default_from_reconcile_menu':True,
+                'default_to_correct_pick':self.to_correct_ref.id
+            }
+        }
 class droga_stock_adjustment_request_detail(models.Model):
     _name = 'droga.stock.adjustment.request.detail'
     _description = 'Store adjustment request detail'
@@ -42,6 +96,7 @@ class droga_stock_adjustment_request_detail(models.Model):
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
     lot_ser_no = fields.Many2one('stock.lot', string='Lot/Ser.No.')
     expiry_date = fields.Datetime('Expiry Date', related='lot_ser_no.expiration_date')
+    ref=fields.Char(related='stock_adjustment_header.to_correct_ref.name')
     qty = fields.Float(
         'Quantity',
         digits='Product Unit of Measure', store=True,
@@ -54,3 +109,13 @@ class droga_stock_adjustment_request_detail(models.Model):
 
     def set_uom(self):
         pass
+
+    @api.model
+    def create(self, vals):
+        ref=self.env['droga.stock.adjustment.request'].search([('id','=',vals['stock_adjustment_header'] if vals else 0)]).to_correct_ref.name
+        if len(self.env['stock.move'].search(
+                [('state', '=', 'done'), ('reference', '=',ref ),
+                 ('product_id', '=', vals['product_id'])])) == 0:
+            item=self.env['product.product'].search([('id','=',vals['product_id'])])
+            raise UserError("Item '%s' is not found under transaction %s." % (item.name, ref))
+        return super(droga_stock_adjustment_request_detail, self).create(vals)

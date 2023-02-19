@@ -39,8 +39,8 @@
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_uom_readonly']"
                    position="after">
-                
-                <field name="available_qty" type="Integer" digits="[42, 0]" decoration-warning="available_qty &lt;= 0" decoration-danger="available_qty &lt;= product_uom_qty" widget="badge"
+                <field name="is_prod_available" invisible="1"></field>
+                <field name="avail_char" decoration-success="is_prod_available==True" decoration-danger="is_prod_available==False" widget="badge"
                        groups="droga_sales.sales_price_change_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_import_approve_admin"></field>
                 <field name="store_placement"></field>
                 <field name="wareh" string="Warehouse" domain="[('wh_type','=',parent.order_type)]" options="{'no_create': True}"/>

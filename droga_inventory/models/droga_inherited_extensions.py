@@ -331,6 +331,19 @@ class droga_stock_move_extension(models.Model):
         raise ValidationError(
             "You can't delete inventory transaction, either cancel it or pass a correcting entry.")
 
+    def _search_picking_for_assignation_domain(self):
+        domain = [
+            ('group_id', '=', self.group_id.id),
+            ('location_id', '=', self.location_id.id),
+            ('location_dest_id', '=', self.location_dest_id.id),
+            ('picking_type_id', '=', self.picking_type_id.id),
+            ('printed', '=', False),
+            ('immediate_transfer', '=', False),
+            ('state', 'in', ['draft', 'confirmed', 'waiting', 'partially_available', 'assigned'])]
+        if self.partner_id and (self.location_id.usage == 'transit' or self.location_dest_id.usage == 'transit'):
+            domain += [('partner_id', '=', self.partner_id.id)]
+        return domain
+
     def _search_picking_for_assignation(self):
         if self.location_id.con_type=='SRL' or  self.location_dest_id.con_type=='SRL':
             return False

@@ -5,6 +5,26 @@
         <field name="name">Stock Adjustment</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="request"
+                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
+                            string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="stmg_approve"
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
+                            groups="droga_inventory.stores_manager"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="amend"
+                            attrs="{'invisible': [('state', 'not in', ('stmg','mtmg'))]}"
+                            groups="droga_inventory.stores_manager"
+                            string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
+                    <button name="action_cancel"
+                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
+                            string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_open_adj"
+                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
+                            string="Open adjustement" groups="droga_inventory.inv_prod_fin" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,processed"/>
+                </header>
                 <sheet>
                     <group string="Stock Adjustment Request Form">
                         <group>
@@ -53,6 +73,7 @@
                 <field name="source_location_id"/>
                 <field name="dest_location_id"/>
                 <field name="request_date_time"/>
+                <field name="state"></field>
             </tree>
         </field>
     </record>
