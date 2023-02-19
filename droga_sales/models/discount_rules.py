@@ -38,6 +38,7 @@ class sale_order_line(models.Model):
         store=True, required=True)
     is_prod_available=fields.Boolean(compute='_is_prod_available')
     available_qty=fields.Float('Available',compute='_is_prod_available')
+    avail_char = fields.Char('Available', readonly=True, compute="_is_prod_available")
     price_unit_before_discount=fields.Float('')
     wareh=fields.Many2one('stock.warehouse')
     store_placement = fields.Boolean('Placement',default=False)
@@ -49,10 +50,10 @@ class sale_order_line(models.Model):
             rec.available_qty=0
             for wh in self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)]):
                 rec.available_qty=rec.available_qty+self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh)
-
+                rec.avail_char=str(rec.available_qty)
             #rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
 
-            if not rec.product_id.bought_locally and rec.available_qty<=0:
+            if not rec.product_id.bought_locally and rec.available_qty<rec.product_uom_qty:
                 rec.is_prod_available=False
             else:
                 rec.is_prod_available = True

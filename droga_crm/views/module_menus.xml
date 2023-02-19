@@ -15,11 +15,11 @@
 
     <!-- Customer menu move to parent menu -->
     <menuitem
-        id="res_partner_menu_customer"
-        name="Customers"
-        parent="crm.crm_menu_root"
-        action="base.action_partner_form"
-        sequence="5"/>
+            id="res_partner_menu_customer"
+            name="Customers"
+            parent="crm.crm_menu_root"
+            action="base.action_partner_form"
+            sequence="5"/>
 
     <!-- Customer action add domain to filter by region -->
     <record id="base.action_partner_form" model="ir.actions.act_window">
@@ -27,18 +27,17 @@
     </record>
 
     <!-- Hide default reporting menu -->
-    <menuitem
-        id="crm.crm_menu_report"
-        name="Reporting"
-        parent="crm.crm_menu_root"
-        groups="crm_nsm"/>
+
+    <record model="ir.ui.menu" id="crm.crm_menu_report">
+        <field name="groups_id" eval="[(6,0,[ref('non_existent_group')])]"/>
+    </record>
 
     <!-- Lead menu domain -->
-        <record model="ir.actions.act_window" id="crm.crm_lead_all_leads">
-            <field name="domain">['&amp;',('is_record_owner','=',True),'|', ('type','=','lead'), ('type','=',False)]</field>
-        </record>
+    <record model="ir.actions.act_window" id="crm.crm_lead_all_leads">
+        <field name="domain">['&amp;',('is_record_owner','=',True),'|', ('type','=','lead'), ('type','=',False)]</field>
+    </record>
     <!-- Pipeline menu domain -->
     <record model="ir.actions.act_window" id="crm.crm_lead_action_pipeline">
-            <field name="domain">[('is_record_owner','=',True),('type','=','opportunity')]</field>
+        <field name="domain">[('is_record_owner','=',True),('type','=','opportunity')]</field>
     </record>
 </odoo>

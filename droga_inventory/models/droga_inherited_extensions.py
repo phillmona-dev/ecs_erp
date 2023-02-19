@@ -331,6 +331,19 @@ class droga_stock_move_extension(models.Model):
         raise ValidationError(
             "You can't delete inventory transaction, either cancel it or pass a correcting entry.")
 
+    def _search_picking_for_assignation_domain(self):
+        domain = [
+            ('group_id', '=', self.group_id.id),
+            ('location_id', '=', self.location_id.id),
+            ('location_dest_id', '=', self.location_dest_id.id),
+            ('picking_type_id', '=', self.picking_type_id.id),
+            ('printed', '=', False),
+            ('immediate_transfer', '=', False),
+            ('state', 'in', ['draft', 'confirmed', 'waiting', 'partially_available', 'assigned'])]
+        if self.partner_id and (self.location_id.usage == 'transit' or self.location_dest_id.usage == 'transit'):
+            domain += [('partner_id', '=', self.partner_id.id)]
+        return domain
+
     def _search_picking_for_assignation(self):
         if self.location_id.con_type=='SRL' or  self.location_dest_id.con_type=='SRL':
             return False
@@ -483,6 +496,7 @@ class purchase_request_extension(models.Model):
 
 class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     order_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'),
@@ -611,6 +625,7 @@ class product_selection_field(models.Model):
     _inherit = 'product.category'
     avail_in_product_master=fields.Boolean('Available in product master file',default=False)
     off_supplies=fields.Boolean('Office supplies group',default=False)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     group_type=fields.Selection([
         ('MI','Medical items'),
         ('SC', 'Services'),

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_export_items_composition,droga.export.items.composition,model_droga_export_items_composition,droga_export.export_manager,1,1,1,1
+access_export_items_composition_detail,droga.export.items.composition.fin.goods,model_droga_export_items_composition_fin_goods,droga_export.export_manager,1,1,1,1

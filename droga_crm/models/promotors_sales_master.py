@@ -14,7 +14,7 @@ class droga_promotors_sales_master(models.Model):
     p_groups=fields.Many2many('droga.crm.settings.prod_group',required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],
                             required=True,default='Active')
-    is_pr_sales=fields.Boolean('Is PR/Sales')
+    is_pm=fields.Boolean('Is PM',default=False)
     employee_access_users=fields.Many2one('res.users',string='Login user',required=True)
     res_user_name=fields.Char(related=employee_access_users.name)
 

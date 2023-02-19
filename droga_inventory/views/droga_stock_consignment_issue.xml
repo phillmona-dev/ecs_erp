@@ -50,7 +50,7 @@
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
 
-                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,processed"/>
                 </header>
                 <sheet>
                     <group string="Store issue request">
