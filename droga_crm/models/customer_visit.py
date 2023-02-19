@@ -39,12 +39,12 @@ class customer_visit_header(models.Model):
             pr_sales_loc=ses[0].pro_id[0]
 
         approver_login=''
-        if pr_sales_loc.employee_access_users.login.upper().startswith('CRM_MR')  or pr_sales_loc.employee_access_users.login.upper().startswith('CRM_SR'):
+        if (pr_sales_loc.employee_access_users.login.upper().startswith('CRM_MR') and not pr_sales_loc.is_pm)  or pr_sales_loc.employee_access_users.login.upper().startswith('CRM_SR'):
             approver_login='crm_rsm@drogapharma.com'
         elif pr_sales_loc.employee_access_users.login.upper().startswith('CRM_RSM'):
             approver_login = 'crm_nsm@drogapharma.com'
-        elif pr_sales_loc.employee_access_users.login.upper().startswith('CRM_PM'):
-            approver_login = 'crm_pm_nsm@drogapharma.com'
+        elif pr_sales_loc.employee_access_users.login.upper().startswith('CRM_MR') and pr_sales_loc.is_pm:
+            approver_login = 'crm_pm_npm@drogapharma.com'
         else:
             approver_login = '-'
 
