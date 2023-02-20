@@ -94,7 +94,7 @@ class cust_contact_extension(models.Model):
         result = []
         for record in self:
             result.append(
-                (record.id, record.name+ ((',  '+record.mobile) if record.mobile else '')+((',  '+record.phone) if record.phone else '')))
+                (record.id, record.name))
         return result
 
     def _is_cust_loc_avail(self):

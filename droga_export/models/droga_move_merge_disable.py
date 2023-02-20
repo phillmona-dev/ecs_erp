@@ -5,6 +5,18 @@ from odoo.tools import float_compare
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    def button_validate(self):
+        for rec in self:
+
+            initial_moves = self.env['stock.picking'].search([('origin', '=', rec.name)]).mapped('group_id.id')
+
+            mrp_items = self.env['mrp.production'].search(
+                [('procurement_group_id', 'in', initial_moves), ('state', '!=', 'done')])
+            for mrp in mrp_items:
+                mrp.button_mark_done()
+
+        return super(StockPicking, self).button_validate()
+
     def _subcontracted_produce(self, subcontract_details):
         self.ensure_one()
         prior_id = False
