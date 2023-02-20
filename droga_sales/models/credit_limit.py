@@ -36,6 +36,7 @@ class cust_sales_credit_limit(models.Model):
     Vat_no = fields.Char(related='partner_id.vat',readonly='True')
     cust_id = fields.Integer(related='partner_id.id',readonly='True')
     sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
+    supporters=fields.Many2many('droga.pro.sales.master',string='Supporters')
 
     order_type = fields.Selection([
         ('IM', 'Import'),

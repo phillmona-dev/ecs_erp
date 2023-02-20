@@ -127,6 +127,7 @@
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="after">
                 <field name="Vat_no" readonly="1" string="Tin No"></field>
+                <field name="supporters" widget="many2many_tags" string="Supporters"></field>
                 <field name="cust_id" widget="char" string="Cust ID" readonly="1" attrs="{'readonly':[(1,'=',1)],'invisible': [('Vat_no', '!=', '0000000000')]}"></field>
                 <field name="pay_type" invisible="1"/>
                 <field name="cash_upfront"
