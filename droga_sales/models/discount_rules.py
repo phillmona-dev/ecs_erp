@@ -202,6 +202,7 @@ class sale_order_line(models.Model):
 
 class sale_order_ext(models.Model):
     _inherit='sale.order'
+    cust_location=fields.Char
     core_sum=fields.Float('Core total',compute='_get_sub_totals')
     non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
     state = fields.Selection(
