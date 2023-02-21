@@ -2,16 +2,6 @@
 <odoo>
 
 
-    <!-- action for witholding report-->
-    <record id="droga_payroll_sheet_report_action" model="ir.actions.act_window">
-        <field name="name">Payroll Master Report - Excel</field>
-        <field name="res_model">hr.payslip.run.report</field>
-        <field name="view_mode">form</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'form', 'view_id': ref('droga_payroll_sheet_report_form')})]"/>
-        <field name="target">new</field>
-    </record>
-
     <!-- report form -->
     <record id="droga_payroll_sheet_report_form" model="ir.ui.view">
         <field name="name">hr.payslip.run.report.form</field>
@@ -50,5 +40,15 @@
                 <attribute name="readonly">0</attribute>
             </xpath>
         </field>
+    </record>
+
+    <!-- action for witholding report-->
+    <record id="droga_payroll_sheet_report_action" model="ir.actions.act_window">
+        <field name="name">Payroll Master Report - Excel</field>
+        <field name="res_model">hr.payslip.run.report</field>
+        <field name="view_mode">form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'form', 'view_id': ref('droga_payroll_sheet_report_form')})]"/>
+        <field name="target">new</field>
     </record>
 </odoo>
