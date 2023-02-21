@@ -15,3 +15,13 @@ class AccountFiscalYear(models.Model):
     description = fields.Char("Description", required=True)
     date_from = fields.Date("Date From", required=True)
     date_to = fields.Date("Date To", required=True)
+
+    def name_get(self):
+        res = []
+        for record in self:
+            name = record.description
+            res.append((record.id, name))
+        return res
+
+
+

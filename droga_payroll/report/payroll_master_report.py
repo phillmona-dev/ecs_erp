@@ -12,10 +12,12 @@ except ImportError:
 
 
 class PayrollMasterReports(models.Model):
-    _inherit = 'hr.payslip.run'
+    _name = 'hr.payslip.run.report'
 
     #
+    batch = fields.Many2one('hr.payslip.run', required=True)
     fileout = fields.Binary('File', readonly=True)
+    cost_center = fields.Many2many("hr.department")
 
     def convert_to_word(self, number):
         number = str(number)
@@ -128,6 +130,8 @@ class PayrollMasterReports(models.Model):
         workbook = xlsxwriter.Workbook(file_io)
         self.payroll_sheet_report(workbook)
         self.payroll_net_report(workbook)
+        self.deductions_report(workbook)
+        self.payroll_reconciliation_report(workbook)
         workbook.close()
 
         # The file to download will be stored under fileout field
@@ -174,13 +178,13 @@ class PayrollMasterReports(models.Model):
         sheet.set_column('U:U', 15)
         sheet.set_column('V:V', 15)
 
-        row_start = 0
+        row_start = 2
         date_format = workbook.add_format(
             {'num_format': 'mm/dd/yyyy', 'border': 7})
-        num_format = workbook.add_format({'num_format': 43, 'border': 1})
+        num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 9})
         num_format_sub_total = workbook.add_format({'num_format': 43, 'border': 1, 'bold': 1})
         cent_format = workbook.add_format({'num_format': 41, 'border': 1})
-        border = workbook.add_format({'border': 1})
+        border = workbook.add_format({'border': 1, 'font_name': 'Calibri', 'font_size': 9})
         bold = workbook.add_format({'bold': True})
         header_format = workbook.add_format({
             'bold': 1,
@@ -193,6 +197,7 @@ class PayrollMasterReports(models.Model):
             'border': 0,
             'align': 'center',
             'valign': 'vcenter',
+            'font_name': 'Calibri',
             'font_size': 16})
         parameter_format = workbook.add_format({
             'bold': 1,
@@ -215,7 +220,8 @@ class PayrollMasterReports(models.Model):
             'border': 1,
             'align': 'center',
             'valign': 'vcenter',
-            'font_size': 11,
+            'font_size': 9,
+            'font_name': 'Calibri',
             'text_wrap': 1,
             'fg_color': '#F6F5F5'})
         title_format_num = workbook.add_format({
@@ -229,6 +235,9 @@ class PayrollMasterReports(models.Model):
             'fg_color': '#F6F5F5'})
 
         # search RFQ
+
+        sheet.merge_range('A1:G1', self.batch.company_id.name, main_title_format)
+        sheet.merge_range('A2:G2', self.batch.name, main_title_format)
 
         sheet.write(row_start, 0, 'No', title_format)
         sheet.write(row_start, 1, 'ID No', title_format)
@@ -271,8 +280,14 @@ class PayrollMasterReports(models.Model):
         total_ded_sub_total = 0
         net_pay_sub_total = 0
 
-        for record in self.slip_ids:
-            sheet.write(row_start, 0, row_start, border)
+        # search based on cost center
+        if self.cost_center.ids:
+            slips = self.batch.slip_ids.search([('employee_id.department_id', 'in', self.cost_center.ids)])
+        else:
+            slips = self.batch.slip_ids
+
+        for record in slips:
+            sheet.write(row_start, 0, row_start - 2, border)
             sheet.write(row_start, 1, record.employee_id.barcode, border)
             sheet.write(row_start, 2, record.employee_id.name, border)
             sheet.write(row_start, 3, record.employee_id.job_title, border)
@@ -460,7 +475,7 @@ class PayrollMasterReports(models.Model):
             'fg_color': '#F6F5F5'})
 
         # add titles
-        sheet.merge_range('A1:G1', self.company_id.name, big_header_format)
+        sheet.merge_range('A1:G1', self.batch.company_id.name, big_header_format)
         sheet.merge_range('A2:G2', 'Date:' + str(datetime.date.today()), small_header_format)
         sheet.merge_range('A3:G3', 'Our Ref. No.: DR/FI/794/14', small_header_format)
         sheet.merge_range('A4:G4', '', small_header_format)
@@ -481,7 +496,13 @@ class PayrollMasterReports(models.Model):
         row_start += 1
         total_net_pay = 0
 
-        for record in self.slip_ids:
+        # search based on cost center
+        if self.cost_center.ids:
+            slips = self.batch.slip_ids.search([('employee_id.department_id', 'in', self.cost_center.ids)])
+        else:
+            slips = self.batch.slip_ids
+
+        for record in slips:
             sheet.write(row_start, 0, row_start - 13, border)
             sheet.write(row_start, 1, record.employee_id.name, border)
             sheet.write(row_start, 2, '-', border)
@@ -513,3 +534,277 @@ class PayrollMasterReports(models.Model):
         row = 'A' + str(row_start) + ':G' + str(row_start)
         sheet.merge_range(row, 'Position: Chief Executive Officer       ________________________________',
                           small_header_format)
+
+    def deductions_report(self, workbook):
+        sheet = workbook.add_worksheet('Deductions')
+
+        sheet.set_column('A:A', 8)
+        sheet.set_column('B:B', 20)
+        sheet.set_column('C:C', 10)
+        sheet.set_column('D:D', 10)
+        sheet.set_column('E:E', 10)
+        sheet.set_column('F:F', 10)
+        sheet.set_column('G:G', 10)
+        sheet.set_column('H:H', 10)
+
+        row_start = 2
+
+        date_format = workbook.add_format(
+            {'num_format': 'mm/dd/yyyy', 'border': 7})
+        num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 9})
+        num_format_sub_total = workbook.add_format({'num_format': 43, 'border': 1, 'bold': 1})
+        cent_format = workbook.add_format({'num_format': 41, 'border': 1})
+        border = workbook.add_format({'border': 1, 'font_name': 'Calibri', 'font_size': 9})
+        bold = workbook.add_format({'bold': True})
+        header_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 22})
+        main_title_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_name': 'Calibri',
+            'font_size': 16})
+        parameter_format = workbook.add_format({
+            'bold': 1,
+            'border': 7,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 12,
+            'fg_color': '#F6F5F5'})
+
+        separator_format = workbook.add_format({
+            'bold': 1,
+            'border': 7,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 12,
+            'fg_color': '#D9D9D9'})
+
+        title_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 9,
+            'font_name': 'Calibri',
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+        title_format_num = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'num_format': 43,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 11,
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+
+        sheet.merge_range('A1:G1', "Deductions", main_title_format)
+        sheet.merge_range('A2:G2', self.batch.name, main_title_format)
+
+        sheet.write(row_start, 0, 'ID No', title_format)
+        sheet.write(row_start, 1, 'Employee Name', title_format)
+        sheet.write(row_start, 2, 'Housing', title_format)
+        sheet.write(row_start, 3, 'Canteen', title_format)
+        sheet.write(row_start, 4, 'Loan', title_format)
+        sheet.write(row_start, 5, 'Fuel', title_format)
+        sheet.write(row_start, 6, 'Others', title_format)
+        sheet.write(row_start, 7, 'Total', title_format)
+        row_start += 1
+
+        # search based on cost center
+        if self.cost_center.ids:
+            slips = self.batch.slip_ids.search([('employee_id.department_id', 'in', self.cost_center.ids)])
+        else:
+            slips = self.batch.slip_ids
+
+        for record in slips:
+            sheet.write(row_start, 0, record.employee_id.barcode, border)
+            sheet.write(row_start, 1, record.employee_id.name, border)
+
+            num = 0
+            sheet.write(row_start, 2, num, num_format)
+            sheet.write(row_start, 3, num, num_format)
+            sheet.write(row_start, 4, num, num_format)
+            sheet.write(row_start, 5, num, num_format)
+            sheet.write(row_start, 6, num, num_format)
+            sheet.write(row_start, 7, num, num_format)
+
+            # load data
+            # get payroll detail
+            total = 0
+            for payslip_detail in record.line_ids:
+                # format the cell
+
+                if payslip_detail.code == 'NFALL':
+                    sheet.write(row_start, 5, payslip_detail.total, num_format)
+                    total += payslip_detail.total
+
+            row_start += 1
+
+    def payroll_reconciliation_report(self, workbook):
+        sheet = workbook.add_worksheet('Reconciliation')
+
+        sheet.set_column('A:A', 5)
+        sheet.set_column('B:B', 10)
+        sheet.set_column('C:C', 30)
+        sheet.set_column('D:D', 15)
+        sheet.set_column('E:E', 15)
+        sheet.set_column('F:F', 15)
+        sheet.set_column('G:G', 20)
+
+        row_start = 2
+
+        date_format = workbook.add_format(
+            {'num_format': 'mm/dd/yyyy', 'border': 7})
+        num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 9})
+        num_format_sub_total = workbook.add_format({'num_format': 43, 'border': 1, 'bold': 1})
+        cent_format = workbook.add_format({'num_format': 41, 'border': 1})
+        border = workbook.add_format({'border': 1, 'font_name': 'Calibri', 'font_size': 9})
+        bold = workbook.add_format({'bold': True})
+        header_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 22})
+        main_title_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_name': 'Calibri',
+            'font_size': 16})
+        parameter_format = workbook.add_format({
+            'bold': 1,
+            'border': 7,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 12,
+            'fg_color': '#F6F5F5'})
+
+        separator_format = workbook.add_format({
+            'bold': 1,
+            'border': 7,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 12,
+            'fg_color': '#D9D9D9'})
+
+        title_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 9,
+            'font_name': 'Calibri',
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+        title_format_num = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'num_format': 43,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 11,
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+
+        sheet.merge_range('A1:G1', "Reconciliation - Net pay", main_title_format)
+        sheet.merge_range('A2:G2', self.batch.name, main_title_format)
+
+        sheet.write(row_start, 0, 'No', title_format)
+        sheet.write(row_start, 1, 'ID No', title_format)
+        sheet.write(row_start, 2, 'Employee Name', title_format)
+        sheet.write(row_start, 3, 'Previous Month', title_format)
+        sheet.write(row_start, 4, 'Current Month', title_format)
+        sheet.write(row_start, 5, 'Difference', title_format)
+        sheet.write(row_start, 6, 'Remark', title_format)
+        row_start += 1
+
+        # unique employee list
+        emp_list = self.get_unique_employee_id()
+
+        # search employees from hr.employee
+        employees = self.env['hr.employee'].search([('id', 'in', emp_list)])
+
+        current_period = self.batch.period
+        previous_period = self.get_period()
+
+        for record in employees:
+            sheet.write(row_start, 0, row_start - 2, border)
+            sheet.write(row_start, 1, record.barcode, border)
+            sheet.write(row_start, 2, record.name, border)
+
+            previous_net_wage = self.get_net_pay_amount(previous_period, record.id)
+            current_net_wage = self.get_net_pay_amount(current_period, record.id)
+            difference = previous_net_wage - current_net_wage
+
+            sheet.write(row_start, 3, previous_net_wage, num_format)
+            sheet.write(row_start, 4, current_net_wage, num_format)
+            sheet.write(row_start, 5, difference, num_format)
+            sheet.write(row_start, 6, '', border)
+
+            row_start += 1
+
+    def get_period(self):
+        # get the last two items
+        period = ''
+        for record in self.batch:
+            period_last = record.period.name[-2:]
+            period_first = record.period.name[0:4]
+
+            period_last = int(period_last)
+            period_first = int(period_first)
+
+            if period_last == 1:
+                period = str(period_first - 1) + str('12')
+            else:
+                period_last -= 1
+                period = str(period_first) + "{0:0=2d}".format(period_last)
+
+        periods = self.env['account.fiscal.year.period'].search([('name', '=', period)])
+
+        for x in periods:
+            period = x
+
+        return period
+
+    # get unique employee id from two payroll periods
+    def get_unique_employee_id(self):
+        unique_employee_list = []
+        # get current and previous period
+        for record in self:
+            current_period = record.batch.period
+            previous_period = self.get_period()
+
+        # get current period employee list
+        current_period_employees = self.batch
+
+        # get previous period employee list
+        previous_period_employees = self.env['hr.payslip.run'].search([('period', '=', previous_period.id)])
+
+        # add employee list from previous period
+        for record in previous_period_employees.slip_ids.employee_id:
+            unique_employee_list.append(record.id)
+
+        for record in current_period_employees.slip_ids.employee_id:
+            if record.id not in unique_employee_list:
+                unique_employee_list.append(record.id)
+
+        return unique_employee_list
+
+    def get_net_pay_amount(self, period, emp_id):
+        net_wage = 0
+        batch = self.env['hr.payslip.run'].search([('period', '=', period.id)])
+
+        for slips in batch.slip_ids:
+            if slips.employee_id.id == emp_id:
+                net_wage = slips.net_wage
+
+        return net_wage

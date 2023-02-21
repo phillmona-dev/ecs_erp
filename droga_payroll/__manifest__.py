@@ -20,13 +20,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_contract','hr_payroll'],
+    'depends': ['base', 'hr', 'hr_contract', 'hr_payroll'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'report/hr_payslip_run.xml',
+        'security/ir.model.access.csv',
+        'views/hr_payslip_run.xml',
         'views/hr_contract.xml',
+        'report/hr_payslip_run.xml',
 
     ],
     # only loaded in demonstration mode
