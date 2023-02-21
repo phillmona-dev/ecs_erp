@@ -73,12 +73,10 @@
         <field name="context">{'search_default_today_sales': 1}</field>
     </record>
 
-
     <menuitem
             id="droga_sales_detail_report_menu"
             name="Sales detail report"
             action="droga_sales_detail_action"
             parent="sale.menu_sale_report"
             sequence="17"/>
-
 </odoo>

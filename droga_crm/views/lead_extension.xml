@@ -72,7 +72,7 @@
                 <group name="lead_partner" attrs="{'invisible': [('type', '=', 'opportunity')]}">
                     <field name="pr_avail_areas" invisible="1"/>
                     <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one" required="True" string="Customer"
-                           invisible="False"/>
+                           invisible="True"/>
                     <field name="contact_custom" options="{'no_create':True,'no_open':True}"></field>
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned"/>
@@ -87,11 +87,19 @@
                 </group>
             </xpath>
 
+            <xpath expr="//form/sheet/div/h1" position="after">
+                <h1><field class="text-break" name="partner_id" options="{'no_create':True,'no_open':True}" placeholder="Select customer"/></h1>
+            </xpath>
+
+            <xpath expr="//form/sheet/div/h1" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
             <xpath expr="//form/sheet/group/group[@name='opportunity_partner']" position="replace">
                 <group name="opportunity_partner" attrs="{'invisible': [('type', '=', 'lead')]}">
                     <field name="pr_avail_areas" invisible="1"/>
                     <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one" required="True" string="Customer"
-                           invisible="False"/>
+                           invisible="True"/>
                     <field name="contact_custom" domain="([('parent_customer','=',partner_id)])"
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned" string="Opportunity date"/>
