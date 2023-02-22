@@ -2,7 +2,7 @@
 from odoo import api, fields, models
 from io import BytesIO
 import xlsxwriter
-import datetime
+from datetime import date
 from odoo.exceptions import UserError
 
 try:
@@ -17,8 +17,8 @@ class inventory_stock_card_xls(models.TransientModel):
 
     warehouse=fields.Many2one('stock.warehouse','Warehouse')
     product = fields.Many2one('product.product','Product')
-    date_from=fields.Date('Date from')
-    date_to = fields.Date('Date to')
+    date_from=fields.Date('Date from', default=date(2022, 12, 20))
+    date_to = fields.Date('Date to',default=fields.Date.today())
     per_location = fields.Binary('Per location?')
     fileout = fields.Binary('File', readonly=True)
     #fileout_filename = fields.Char('Filename', readonly=True)

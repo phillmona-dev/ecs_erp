@@ -13,9 +13,13 @@
                             attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
                             groups="droga_inventory.stores_manager"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="fin_approve"
+                            attrs="{'invisible': [('state', 'not in', ('finmg'))]}"
+                            groups="droga_inventory.inv_prod_fin_wf"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
-                            attrs="{'invisible': [('state', 'not in', ('stmg','mtmg'))]}"
-                            groups="droga_inventory.stores_manager"
+                            attrs="{'invisible': [('state', 'not in', ('stmg','finmg','mtmg'))]}"
+                            groups="droga_inventory.stores_manager,droga_inventory.inv_prod_fin_wf"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
@@ -23,7 +27,7 @@
                     <button name="action_open_adj"
                             attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
                             string="Open adjustement" groups="droga_inventory.inv_prod_fin" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,processed"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,finmg,waiting,processed"/>
                 </header>
                 <sheet>
                     <group string="Stock Adjustment Request Form">
@@ -73,7 +77,8 @@
                 <field name="source_location_id"/>
                 <field name="dest_location_id"/>
                 <field name="request_date_time"/>
-                <field name="state"></field>
+                <field name="state" decoration-warning="state in('waiting')"
+                       decoration-success="state == 'processed'" widget="badge"></field>
             </tree>
         </field>
     </record>
@@ -83,6 +88,9 @@
         <field name="res_model">droga.stock.adjustment.request</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_stock_adjustment_request_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('droga_stock_adjustment_request_form')})]"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create Your First Stock Adjustment Request
@@ -93,4 +101,27 @@
               name="Stock adjustment request"
               parent="stock.menu_stock_warehouse_mgmt"
               action="droga_stock_adjustment_request_view_id"/>
+
+
+    <record id="droga_stock_adjustment_request_view_fin_id" model="ir.actions.act_window">
+        <field name="name">Stock adjustment request</field>
+        <field name="res_model">droga.stock.adjustment.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state','in',('waiting','processed'))]</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_stock_adjustment_request_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('droga_stock_adjustment_request_form')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Your First Stock Adjustment Request
+            </p>
+        </field>
+    </record>
+    <menuitem id="stock_adjustment_fin"
+              name="Stock adjustment requests"
+              parent="account.menu_finance_entries_accounting_miscellaneous"
+              groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf"
+              sequence="21"
+              action="droga_stock_adjustment_request_view_fin_id"/>
+
 </odoo>

@@ -71,6 +71,10 @@
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
     </record>
 
+    <record id="inv_prod_fin_wf" model="res.groups">
+        <field name="name">Finance inventory workflow approver</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+    </record>
 
     <record id="inv_prod_fin" model="res.groups">
         <field name="name">Finance inventory controller</field>

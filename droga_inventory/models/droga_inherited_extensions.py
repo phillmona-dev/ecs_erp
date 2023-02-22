@@ -469,6 +469,12 @@ class droga_stock_picking_extension(models.Model):
         if self.cons_receive_request:
             self.cons_receive_request.write({'state': 'done'})
 
+        to_update = self.env['droga.stock.adjustment.request'].search(
+            [('name', '=', self['origin'])]
+        )
+        if len(to_update)>0:
+            to_update[0]['state'] = 'processed'
+
         return super(droga_stock_picking_extension, self).button_validate()
 
     @api.model

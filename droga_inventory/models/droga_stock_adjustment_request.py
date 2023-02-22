@@ -23,16 +23,21 @@ class droga_stock_adjustment_request(models.Model):
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),  # When requester cancels it from draft
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
+        ('finmg', 'Finance approver'),
         ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
         ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
         ('done', 'Received'),  # When request is received
     ], string='Status', default="draft", readonly=True, tracking=True)
-    store_manager = fields.Many2one('res.users', compute='_get_approvers')
+    store_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    finance_wf_manager=fields.Many2one('res.users',compute='_get_approvers',store=True)
     def _get_approvers(self):
         for rec in self:
             rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
                 self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+
+            rec.finance_wf_manager=self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids[0] if len(
+                self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
@@ -41,11 +46,14 @@ class droga_stock_adjustment_request(models.Model):
             if not _name:
                 raise UserError("Order sequence not found.")
             vals_list['name'] = _name
+
         return super(droga_stock_adjustment_request, self).create(vals_list)
 
     def request(self):
         if len(self['stock_adjustment_detail_entries']) == 0:
             raise UserError("At least one product must be filled to request adjustement.")
+        if len(self.env.ref("droga_inventory.stores_manager").users.ids)==0 or len(self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids)==0:
+            raise UserError("Stores manager or finance manger not configured, please contact IT for support.")
         self.set_activity_done()
         self.ensure_one()
         self.state = 'stmg'
@@ -59,6 +67,11 @@ class droga_stock_adjustment_request(models.Model):
         self.state='cancel'
 
     def stmg_approve(self):
+        self.set_activity_done()
+
+        self.state = 'finmg'
+
+    def fin_approve(self):
         self.set_activity_done()
 
         self.state = 'waiting'
