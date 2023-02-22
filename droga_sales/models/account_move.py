@@ -299,17 +299,25 @@ class account_move(models.Model):
     def set_analytic_accounts(self):
         # get analytic account
         analytic_distribution = ""
+        tax_ids = ''
         for record in self.invoice_line_ids:
             if record.analytic_distribution:
                 analytic_distribution = record.analytic_distribution
+            elif record.tax_ids:
+                tax_ids = record.tax_ids
+
+            if analytic_distribution != '' and tax_ids != '':
                 break
 
-        if analytic_distribution == '':
+        if analytic_distribution == '' and tax_ids == '':
             ValidationError("At least fill the first line!")
 
         # fill empty analytic lines
         for record in self.invoice_line_ids:
-            record.analytic_distribution = analytic_distribution
+            if analytic_distribution != '':
+                record.analytic_distribution = analytic_distribution
+            if tax_ids != '':
+                record.tax_ids = tax_ids
 
 
 class account_move_line(models.Model):
