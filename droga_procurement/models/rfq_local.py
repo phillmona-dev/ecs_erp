@@ -49,6 +49,9 @@ class Rfq_Local(models.Model):
          ("Committee Approval", "Committee Approved"),
          ("CEO Approval", "CEO"), ("Cancel", "Canceled")], default="Draft", tracking=True)
 
+    wf_state = fields.Selection(
+        [('On Progress', 'On Progress'), ('Approved', 'Approved')], default="On Progress")
+
     # total winner amount
     total_winner_amount = fields.Float(
         "Total Winner Amount", compute="_compute_total_winner_amount", store=True, default=0)
@@ -110,7 +113,7 @@ class Rfq_Local(models.Model):
     # ceo approval
     def ceo_approval(self):
         self.write({'state': 'CEO Approval'})
-        #self.load_foregin_rfq_status()
+        # self.load_foregin_rfq_status()
         return True
 
     # reject request
