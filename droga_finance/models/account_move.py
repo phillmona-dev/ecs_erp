@@ -8,7 +8,11 @@ class AccountMove(models.Model):
 
     purpose = fields.Char("Purpose")
     vendor_customer_name = fields.Char("Customer/Vendor Name")
-    withholding_no = fields.Char("Withholding Ref")
+    withholding_no = fields.Char("Withholding Ref", help="Withholding invoice number")
+    withholding_invoice = fields.Boolean("Has Withholding",
+                                         help="The transaction has withholding invoice")
+    withholding_invoice_provided = fields.Boolean("Withholding Invoice",
+                                                  help="If the transaction has been withheld, the customer needs to provide a withholding invoice")
     sales_initiator = fields.Char("Sales Person", compute="_get_sales_person")
 
     transaction_type = fields.Many2one("account.transaction.type")

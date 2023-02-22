@@ -25,7 +25,11 @@
                        attrs="{'readonly': [('transaction_no', '!=', 'New')],'invisible': [('move_type', 'in', ('in_invoice', 'in_refund', 'in_receipt','out_invoice'))]}"/>
                 <field name="transaction_no" readonly="1"
                        attrs="{'invisible': [('move_type', 'in', ('in_invoice', 'in_refund', 'in_receipt','out_invoice'))]}"/>
-                <field name="withholding_no"/>
+                <field name="withholding_invoice"/>
+                <field name="withholding_invoice_provided"
+                       attrs="{'invisible': [('withholding_invoice', '=', False)]}"/>
+                <field name="withholding_no"
+                       attrs="{'invisible': [('withholding_invoice_provided', '=', False)],'required': [('withholding_invoice_provided', '=', True)]}"/>
                 <field name="purpose"/>
 
 
