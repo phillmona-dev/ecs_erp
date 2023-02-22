@@ -36,8 +36,8 @@ class droga_stock_adjustment_request(models.Model):
             rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
                 self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
-            rec.finance_wf_manager=self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids[0] if len(
-                self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids) > 0 else None
+            rec.finance_wf_manager=self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
@@ -52,7 +52,7 @@ class droga_stock_adjustment_request(models.Model):
     def request(self):
         if len(self['stock_adjustment_detail_entries']) == 0:
             raise UserError("At least one product must be filled to request adjustement.")
-        if len(self.env.ref("droga_inventory.stores_manager").users.ids)==0 or len(self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids)==0:
+        if len(self.env.ref("droga_inventory.stores_manager").users.ids)==0 or len(self.env.ref("droga_inventory.stores_manager").users.ids)==0:
             raise UserError("Stores manager or finance manger not configured, please contact IT for support.")
         self.set_activity_done()
         self.ensure_one()
