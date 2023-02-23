@@ -8,11 +8,13 @@ class AccountMove(models.Model):
 
     purpose = fields.Char("Purpose")
     vendor_customer_name = fields.Char("Customer/Vendor Name")
-    withholding_no = fields.Char("Withholding Ref", help="Withholding invoice number")
+    withholding_no = fields.Char("Withholding Ref", help="Withholding invoice number", store=True)
     withholding_invoice = fields.Boolean("Has Withholding",
-                                         help="The transaction has withholding invoice")
+                                         help="The transaction has withholding invoice",
+                                         compute="is_withholding_transaction", store=True, default=False)
     withholding_invoice_provided = fields.Boolean("Withholding Invoice",
-                                                  help="If the transaction has been withheld, the customer needs to provide a withholding invoice")
+                                                  help="If the transaction has been withheld, the customer needs to provide a withholding invoice",
+                                                  default=False)
     sales_initiator = fields.Char("Sales Person", compute="_get_sales_person")
 
     transaction_type = fields.Many2one("account.transaction.type")
@@ -31,11 +33,15 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
+        # Check withholding
+        # vals.update({'withholding_invoice': self.is_withholding_transaction()})
         # generate transaction number
         res = super(AccountMove, self).create(vals)
         return res
 
     def write(self, vals):
+        # Check withholding
+        # vals.update({'withholding_invoice': self.is_withholding_transaction()})
         return super(AccountMove, self).write(vals)
 
     def _compute_amount_word(self):
@@ -215,3 +221,31 @@ class AccountMove(models.Model):
             up_change += 1
 
         return word.title()
+
+    # check if the transaction has withholding transaction
+    @api.depends("invoice_line_ids.tax_ids")
+    def is_withholding_transaction(self):
+        has_withholding_line = False
+        for record in self.invoice_line_ids:
+            for tax in record.tax_ids:
+                if tax.tax_group_id.name == 'Withholding':
+                    has_withholding_line = True
+                    break
+        self.withholding_invoice = has_withholding_line
+
+    def update_withholding_status(self):
+        self.env.cr.execute("""Update account_move set withholding_invoice=false,withholding_invoice_provided=false """)
+
+        xx = self.env['account.move'].search([])
+
+        for rec in xx.invoice_line_ids:
+            for tax in rec.tax_ids:
+                if tax.tax_group_id.name == 'Withholding':
+                    yy = rec.move_id
+                    yy['withholding_invoice'] = True
+                    if not yy.withholding_no and yy.ref:
+                        yy['withholding_invoice_provided'] = True
+                    if yy.withholding_no:
+                        yy['withholding_invoice_provided'] = True
+                    if yy['withholding_invoice_provided'] == True and not yy.withholding_no:
+                        yy['withholding_no'] = yy['ref']
