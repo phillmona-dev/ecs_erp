@@ -49,7 +49,8 @@ class sale_order_line(models.Model):
         for rec in self:
             rec.available_qty=0
             for wh in self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)]):
-                rec.available_qty=rec.available_qty+self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh)
+                rec.available_qty=rec.available_qty+((self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh))*(rec.product_uom.factor/rec.product_id.uom_id.factor))
+                #rec.available_qty=rec.available_qty*(rec.product_uom.factor/rec.product_id.uom_id.factor)
                 rec.avail_char=str(rec.available_qty)
             #rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
 

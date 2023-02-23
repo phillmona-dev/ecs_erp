@@ -31,6 +31,7 @@ class droga_stock_adjustment_request(models.Model):
     ], string='Status', default="draft", readonly=True, tracking=True)
     store_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
     finance_wf_manager=fields.Many2one('res.users',compute='_get_approvers',store=True)
+    finance_controller=fields.Many2one('res.users',compute='_get_approvers',store=True)
     def _get_approvers(self):
         for rec in self:
             rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
@@ -38,6 +39,9 @@ class droga_stock_adjustment_request(models.Model):
 
             rec.finance_wf_manager=self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids[0] if len(
                 self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids) > 0 else None
+
+            rec.finance_controller = self.env.ref("droga_inventory.inv_prod_fin").users.ids[0] if len(
+                self.env.ref("droga_inventory.inv_prod_fin").users.ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
