@@ -44,12 +44,13 @@ class sale_order_line(models.Model):
     store_placement = fields.Boolean('Placement',default=False)
     std_unit_price=fields.Float(readonly=True,string='UP Default')
 
-    @api.depends('product_id','order_id.order_type')
+    @api.depends('product_id','order_id.order_type','product_uom')
     def _is_prod_available(self):
         for rec in self:
             rec.available_qty=0
             for wh in self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)]):
-                rec.available_qty=rec.available_qty+((self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh))*(rec.product_uom.factor/rec.product_id.uom_id.factor))
+                rate=rec.product_uom.factor/(rec.product_id.uom_id.factor if rec.product_id.uom_id.factor!=0 else (rec.product_uom.factor if rec.product_uom.factor!=0 else 1))
+                rec.available_qty=rec.available_qty+((self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh))*(rate))
                 #rec.available_qty=rec.available_qty*(rec.product_uom.factor/rec.product_id.uom_id.factor)
                 rec.avail_char=str(rec.available_qty)
             #rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
