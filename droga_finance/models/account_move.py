@@ -232,20 +232,3 @@ class AccountMove(models.Model):
                     has_withholding_line = True
                     break
         self.withholding_invoice = has_withholding_line
-
-    def update_withholding_status(self):
-        self.env.cr.execute("""Update account_move set withholding_invoice=false,withholding_invoice_provided=false """)
-
-        xx = self.env['account.move'].search([])
-
-        for rec in xx.invoice_line_ids:
-            for tax in rec.tax_ids:
-                if tax.tax_group_id.name == 'Withholding':
-                    yy = rec.move_id
-                    yy['withholding_invoice'] = True
-                    if not yy.withholding_no and yy.ref:
-                        yy['withholding_invoice_provided'] = True
-                    if yy.withholding_no:
-                        yy['withholding_invoice_provided'] = True
-                    if yy['withholding_invoice_provided'] == True and not yy.withholding_no:
-                        yy['withholding_no'] = yy['ref']

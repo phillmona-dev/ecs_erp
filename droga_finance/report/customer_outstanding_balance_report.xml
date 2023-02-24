@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- action for customer outstanding balance report-->
+    <record id="droga_finance_reports_outstanding_balance_excel_action" model="ir.actions.act_window">
+        <field name="name">Customer Outstanding Balance - Excel</field>
+        <field name="res_model">droga.finance.customer.balance.excel.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- report form -->
+    <record id="droga_finance_reports_outstanding_balance_excel_form" model="ir.ui.view">
+        <field name="name">droga.finance.customer.balance.excel.report</field>
+        <field name="model">droga.finance.customer.balance.excel.report</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <group>
+                    <group>
+                        <field name="date"/>
+                        <field name="company_id" options="{'no_create':True,'no_open':True}"></field>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_get_xls" string="Print" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+</odoo>

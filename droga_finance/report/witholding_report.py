@@ -11,7 +11,6 @@ except ImportError:
 
 
 class WitholdingReport(models.TransientModel):
-
     _name = 'droga.finance.witholding.excel.report'
 
     report = fields.Selection(
@@ -137,7 +136,7 @@ class WitholdingReport(models.TransientModel):
             # get witholde name and tin no
             witholdee_name = record.move_id.partner_id.name if record.move_id.partner_id.name else ''
             witholdee_tin = record.move_id.partner_id.vat if record.move_id.partner_id.vat else ''
-            reciept_no = record.ref if record.ref else ''
+            reciept_no = record.move_id.withholding_no if record.move_id.withholding_no else ''
 
             sheet.write(row_start, 0, "9063340002", border)
             sheet.write(row_start, 1, witholdee_tin, border)
@@ -235,7 +234,7 @@ class WitholdingReport(models.TransientModel):
             # get witholde name and tin no
             witholdee_name = record.move_id.partner_id.name if record.move_id.partner_id.name else ''
             witholdee_tin = record.move_id.partner_id.vat if record.move_id.partner_id.vat else ''
-            reciept_no = record.ref if record.ref else ''
+            reciept_no = record.move_id.withholding_no if record.move_id.withholding_no else ''
 
             sheet.write(row_start, 0, "9063340002", border)
             sheet.write(row_start, 1, witholdee_tin, border)
