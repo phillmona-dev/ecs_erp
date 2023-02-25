@@ -1,7 +1,6 @@
 from odoo import api, fields, models
 from io import BytesIO
 import xlsxwriter
-import datetime
 from datetime import datetime
 
 
