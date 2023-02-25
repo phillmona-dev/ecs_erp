@@ -49,7 +49,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         file_io.close()
 
         # The file name is stored under filename
-        datetime_string = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        datetime_string = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = '%s_%s' % ('Customer Outstanding Balance', datetime_string)
 
         # This downloads file. The file is fileout and the name if filename
