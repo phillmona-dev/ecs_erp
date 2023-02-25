@@ -29,4 +29,48 @@
     </record>
 
 
+    <!-- action for customer outstanding balance tree view report-->
+    <record id="droga_finance_reports_outstanding_balance_tree_action" model="ir.actions.act_window">
+        <field name="name">Customer Outstanding Balance</field>
+        <field name="res_model">droga.finance.customer.balance</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- tree view report for customer outstanding balance -->
+    <record id="droga_finance_reports_outstanding_balance_excel_tree" model="ir.ui.view">
+        <field name="name">Customer Outstanding Balance</field>
+        <field name="model">droga.finance.customer.balance</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="partner_id"/>
+                <field name="cust_org_type"/>
+                <field name="sales_type"/>
+                <field name="order_type" string="Order From"/>
+                <field name="sales_channel"/>
+                <field name="invoice_date_due"/>
+                <field name="date_diff"/>
+                <field name="amount_residual"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- search view report for customer outstanding balance -->
+    <record id="droga_finance_reports_outstanding_balance_search" model="ir.ui.view">
+        <field name="name">Customer Outstanding Balance</field>
+        <field name="model">droga.finance.customer.balance</field>
+        <field name="arch" type="xml">
+            <search string="">
+                <field name="partner_id"/>
+                <field name="cust_org_type"/>
+                <field name="sales_type"/>
+                <field name="order_type" string="Order From"/>
+                <field name="sales_channel"/>
+                <field name="invoice_date_due"/>
+                <field name="date_diff"/>
+                <field name="amount_residual"/>
+            </search>
+        </field>
+    </record>
+
+
 </odoo>

@@ -1,8 +1,7 @@
-from odoo import api, fields, models
+from odoo import api, fields, models,tools
 from io import BytesIO
 import xlsxwriter
 from datetime import datetime
-
 
 from odoo.exceptions import UserError
 from odoo.tools.sql import drop_view_if_exists
@@ -35,13 +34,18 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
 
-        self.cash_sales_by_costcenter(workbook)
-        self.credit_sales_by_costcenter(workbook)
-        self.cash_sale_by_channel(workbook)
-        self.credit_sales_by_channel(workbook)
-        self.cash_customer_balance(workbook)
-        self.credit_customer_balance(workbook)
-        self.total_customer_balance(workbook)
+        records = self.env['droga.finance.customer.balance'].sudo().search([])
+
+        self.cash_sales_by_costcenter(workbook, records)
+        self.credit_sales_by_costcenter(workbook, records)
+        self.cash_sale_by_channel(workbook, records)
+        self.credit_sales_by_channel(workbook, records)
+        self.cash_customer_balance(workbook, records)
+        self.credit_customer_balance(workbook, records)
+        self.total_customer_balance(workbook, records)
+
+        self.cash_sales_by_customer_type(workbook, records)
+        self.credit_sales_by_customer_type(workbook, records)
         workbook.close()
 
         # The file to download will be stored under fileout field
@@ -60,7 +64,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
                 self.id) + '&field=fileout&download=true&filename=' + filename,
         }
 
-    def cash_sales_by_costcenter(self, workbook):
+    def cash_sales_by_costcenter(self, workbook, records):
 
         sheet = workbook.add_worksheet('Summary')
 
@@ -90,7 +94,6 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.set_column('E:E', 20)
 
         # get data
-        records = self.env['droga.finance.customer.balance'].sudo().search([])
         import_division = records.search([('order_type', '=', 'IM'), ('sales_type', '=', 'Cash')])
         whole_sales = records.search([('order_type', '=', 'WS'), ('sales_type', '=', 'Cash')])
         no_branch = records.search([('order_type', 'not in', ('IM', 'WS')), ('sales_type', '=', 'Cash')])
@@ -170,7 +173,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.write_formula(8, 3, '=SUM(D6:D8)', num_format_total)
         sheet.write_formula(8, 4, '=SUM(E6:E8)', num_format_total)
 
-    def credit_sales_by_costcenter(self, workbook):
+    def credit_sales_by_costcenter(self, workbook, records):
         sheet = workbook.get_worksheet_by_name("Summary")
 
         num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11})
@@ -201,7 +204,6 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
             'fg_color': '#F6F5F5'})
 
         # get data
-        records = self.env['droga.finance.customer.balance'].sudo().search([])
         import_division = records.search([('order_type', '=', 'IM'), ('sales_type', '=', 'Credit')])
         whole_sales = records.search([('order_type', '=', 'WS'), ('sales_type', '=', 'Credit')])
         no_branch = records.search([('order_type', 'not in', ('IM', 'WS')), ('sales_type', '=', 'Credit')])
@@ -289,7 +291,269 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.merge_range('A21:D21', "Grand Total", title_format)
         sheet.write_formula(20, 4, "=E18+E19+E20", num_format_total)
 
-    def cash_sale_by_channel(self, workbook):
+    def cash_sales_by_customer_type(self, workbook, records):
+
+        sheet = workbook.get_worksheet_by_name('Summary')
+
+        num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11})
+        num_format_total = workbook.add_format(
+            {'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11, 'bold': True,
+             'fg_color': '#F6F5F5'})
+        main_title_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 16})
+        title_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 11,
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+
+        sheet.set_column('A:A', 25)
+        sheet.set_column('B:B', 20)
+        sheet.set_column('C:C', 20)
+        sheet.set_column('D:D', 20)
+        sheet.set_column('E:E', 20)
+
+        # get data
+
+        cust_types = records.search([('sales_type', '=', 'Cash')])
+
+        government_45_days = 0
+        government_60_days = 0
+        government_other_days = 0
+
+        ngo_45_days = 0
+        ngo_60_days = 0
+        ngo_other_days = 0
+
+        private_45_days = 0
+        private_60_days = 0
+        private_other_days = 0
+
+        others_45_days = 0
+        others_60_days = 0
+        others_other_days = 0
+
+        for rec in cust_types:
+            if rec.partner_id.cust_type_ext.cust_org_type == "Government":
+                if rec.date_diff <= 45:
+                    government_45_days += rec.amount_residual
+                elif rec.date_diff <= 60:
+                    government_60_days += rec.amount_residual
+                else:
+                    government_other_days += rec.amount_residual
+
+            elif rec.partner_id.cust_type_ext.cust_org_type == "Ngo":
+                if rec.date_diff <= 45:
+                    ngo_45_days += rec.amount_residual
+                elif rec.date_diff <= 60:
+                    ngo_60_days += rec.amount_residual
+                else:
+                    ngo_other_days += rec.amount_residual
+
+            elif rec.partner_id.cust_type_ext.cust_org_type == "Private":
+                if rec.date_diff <= 45:
+                    private_45_days += rec.amount_residual
+                elif rec.date_diff <= 60:
+                    private_60_days += rec.amount_residual
+                else:
+                    private_other_days += rec.amount_residual
+            else:
+                if rec.date_diff <= 45:
+                    others_45_days += rec.amount_residual
+                elif rec.date_diff <= 60:
+                    others_60_days += rec.amount_residual
+                else:
+                    others_other_days += rec.amount_residual
+
+        import_division_total = government_45_days + government_60_days + government_other_days
+        wholesale_total = ngo_45_days + ngo_60_days + ngo_other_days
+        no_branch_total = private_45_days + private_60_days + private_other_days
+        others_total = others_45_days + others_60_days + others_other_days
+
+        sheet.merge_range('A40:E40', "Weekly Customers Outstanding Balance ", title_format)
+        sheet.write(41, 0, 'Cash Sales', title_format)
+        sheet.write(41, 1, '0-45 Days', title_format)
+        sheet.write(41, 2, '46-60 Days', title_format)
+        sheet.write(41, 3, ' > 60 Days ', title_format)
+        sheet.write(41, 4, 'Total', title_format)
+
+        sheet.write(42, 0, 'Government', num_format)
+        sheet.write(42, 1, government_45_days, num_format)
+        sheet.write(42, 2, government_60_days, num_format)
+        sheet.write(42, 3, government_other_days, num_format)
+        sheet.write(42, 4, import_division_total, num_format)
+
+        sheet.write(43, 0, 'Ngo', num_format)
+        sheet.write(43, 1, ngo_45_days, num_format)
+        sheet.write(43, 2, ngo_60_days, num_format)
+        sheet.write(43, 3, ngo_other_days, num_format)
+        sheet.write(43, 4, wholesale_total, num_format)
+
+        sheet.write(44, 0, 'Private', num_format)
+        sheet.write(44, 1, private_45_days, num_format)
+        sheet.write(44, 2, private_60_days, num_format)
+        sheet.write(44, 3, private_other_days, num_format)
+        sheet.write(44, 4, no_branch_total, num_format)
+
+        sheet.write(45, 0, 'Others', num_format)
+        sheet.write(45, 1, others_45_days, num_format)
+        sheet.write(45, 2, others_60_days, num_format)
+        sheet.write(45, 3, others_other_days, num_format)
+        sheet.write(45, 4, others_total, num_format)
+
+        # sum total
+        sheet.write_formula(46, 1, '=SUM(B41:B46)', num_format_total)
+        sheet.write_formula(46, 2, '=SUM(C41:C46)', num_format_total)
+        sheet.write_formula(46, 3, '=SUM(D41:D46)', num_format_total)
+        sheet.write_formula(46, 4, '=SUM(E41:E46)', num_format_total)
+
+    def credit_sales_by_customer_type(self, workbook, records):
+
+        sheet = workbook.get_worksheet_by_name('Summary')
+
+        num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11})
+        num_format_total = workbook.add_format(
+            {'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11, 'bold': True,
+             'fg_color': '#F6F5F5'})
+        main_title_format = workbook.add_format({
+            'bold': 1,
+            'border': 0,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 16})
+        title_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 11,
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+
+        sheet.set_column('A:A', 25)
+        sheet.set_column('B:B', 20)
+        sheet.set_column('C:C', 20)
+        sheet.set_column('D:D', 20)
+        sheet.set_column('E:E', 20)
+
+        # get data
+
+        cust_types = records.search([('sales_type', '=', 'Credit')])
+        ngo = records.search([('sales_type', '=', 'Credit')])
+        private = records.search([('sales_type', '=', 'Credit')])
+
+        government_45_days = 0
+        government_60_days = 0
+        government_other_days = 0
+
+        ngo_45_days = 0
+        ngo_60_days = 0
+        ngo_other_days = 0
+
+        private_45_days = 0
+        private_60_days = 0
+        private_other_days = 0
+
+        others_45_days = 0
+        others_60_days = 0
+        others_other_days = 0
+
+        for rec in cust_types:
+            if rec.partner_id.cust_type_ext.cust_org_type == "Government":
+                if rec.date_diff <= 45:
+                    government_45_days += rec.amount_residual
+                elif rec.date_diff <= 60:
+                    government_60_days += rec.amount_residual
+                else:
+                    government_other_days += rec.amount_residual
+
+            elif rec.partner_id.cust_type_ext.cust_org_type == "Ngo":
+                if rec.date_diff <= 45:
+                    ngo_45_days += rec.amount_residual
+                elif rec.date_diff <= 60:
+                    ngo_60_days += rec.amount_residual
+                else:
+                    ngo_other_days += rec.amount_residual
+
+            elif rec.partner_id.cust_type_ext.cust_org_type == "Private":
+                if rec.date_diff <= 45:
+                    private_45_days += rec.amount_residual
+                elif rec.date_diff <= 60:
+                    private_60_days += rec.amount_residual
+                else:
+                    private_other_days += rec.amount_residual
+            else:
+                if rec.date_diff <= 45:
+                    others_45_days += rec.amount_residual
+                elif rec.date_diff <= 60:
+                    others_60_days += rec.amount_residual
+                else:
+                    others_other_days += rec.amount_residual
+
+        import_division_total = government_45_days + government_60_days + government_other_days
+        wholesale_total = ngo_45_days + ngo_60_days + ngo_other_days
+        no_branch_total = private_45_days + private_60_days + private_other_days
+        others_total = others_45_days + others_60_days + others_other_days
+
+        sheet.write(49, 0, 'Credit Sales', title_format)
+        sheet.write(49, 1, '0-45 Days', title_format)
+        sheet.write(49, 2, '46-60 Days', title_format)
+        sheet.write(49, 3, ' > 60 Days ', title_format)
+        sheet.write(49, 4, 'Total', title_format)
+
+        sheet.write(50, 0, 'Government', num_format)
+        sheet.write(50, 1, government_45_days, num_format)
+        sheet.write(50, 2, government_60_days, num_format)
+        sheet.write(50, 3, government_other_days, num_format)
+        sheet.write(50, 4, import_division_total, num_format)
+
+        sheet.write(51, 0, 'Ngo', num_format)
+        sheet.write(51, 1, ngo_45_days, num_format)
+        sheet.write(51, 2, ngo_60_days, num_format)
+        sheet.write(51, 3, ngo_other_days, num_format)
+        sheet.write(51, 4, wholesale_total, num_format)
+
+        sheet.write(52, 0, 'Private', num_format)
+        sheet.write(52, 1, private_45_days, num_format)
+        sheet.write(52, 2, private_60_days, num_format)
+        sheet.write(52, 3, private_other_days, num_format)
+        sheet.write(52, 4, no_branch_total, num_format)
+
+        sheet.write(53, 0, 'Others', num_format)
+        sheet.write(53, 1, others_45_days, num_format)
+        sheet.write(53, 2, others_60_days, num_format)
+        sheet.write(53, 3, others_other_days, num_format)
+        sheet.write(53, 4, others_total, num_format)
+
+        # sum total
+        sheet.write_formula(54, 1, '=SUM(B49:B54)', num_format_total)
+        sheet.write_formula(54, 2, '=SUM(C49:C54)', num_format_total)
+        sheet.write_formula(54, 3, '=SUM(D49:D54)', num_format_total)
+        sheet.write_formula(54, 4, '=SUM(E49:E54)', num_format_total)
+
+        sheet.merge_range('A55:D55', "Total Government Organization Sales Outstanding Balance", title_format)
+        sheet.write_formula(54, 4, "=E43+E51", num_format_total)
+
+        sheet.merge_range('A56:D56', "Total NGO Organization Sales Outstanding Balance", title_format)
+        sheet.write_formula(55, 4, "=E44+E52", num_format_total)
+
+        sheet.merge_range('A57:D57', "Total Private Organization Sales Outstanding Balance", title_format)
+        sheet.write_formula(56, 4, "=E45+E53", num_format_total)
+
+        sheet.merge_range('A58:D58', "Total Other Organization Sales Outstanding Balance", title_format)
+        sheet.write_formula(57, 4, "=E46+E54", num_format_total)
+
+        sheet.merge_range('A59:D59', "Grand Total", title_format)
+        sheet.write_formula(58, 4, "=E55+E56+E57+E58", num_format_total)
+
+    def cash_sale_by_channel(self, workbook, records):
         sheet = workbook.get_worksheet_by_name('Summary')
 
         num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11})
@@ -320,7 +584,6 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
             'fg_color': '#F6F5F5'})
 
         # get data
-        records = self.env['droga.finance.customer.balance'].sudo().search([])
         tender = records.search([('sales_channel', '=', 'Tender'), ('sales_type', '=', 'Cash')])
         marketing = records.search([('sales_channel', '=', 'Marketing'), ('sales_type', '=', 'Cash')])
         no_branch = records.search([('sales_channel', 'not in', ('Tender', 'Marketing')), ('sales_type', '=', 'Cash')])
@@ -397,7 +660,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.write_formula(27, 3, '=SUM(D25:D26)', num_format_total)
         sheet.write_formula(27, 4, '=SUM(E25:E26)', num_format_total)
 
-    def credit_sales_by_channel(self, workbook):
+    def credit_sales_by_channel(self, workbook, records):
         sheet = workbook.get_worksheet_by_name("Summary")
 
         num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11})
@@ -428,7 +691,6 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
             'fg_color': '#F6F5F5'})
 
         # get data
-        records = self.env['droga.finance.customer.balance'].sudo().search([])
         tender = records.search([('sales_channel', '=', 'Tender'), ('sales_type', '=', 'Credit')])
         marketing = records.search([('sales_channel', '=', 'Marketing'), ('sales_type', '=', 'Credit')])
         no_branch = records.search(
@@ -507,7 +769,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.merge_range('A38:D38', "Grand Total", title_format)
         sheet.write_formula(37, 4, "=E36+E37", num_format_total)
 
-    def cash_customer_balance(self, workbook):
+    def cash_customer_balance(self, workbook, records):
         sheet = workbook.add_worksheet('Cash Customer Balance')
 
         num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11})
@@ -563,7 +825,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         row_start += 1
 
         # get data
-        records = self.env['droga.finance.customer.balance'].sudo().search([('sales_type', '=', 'Cash')])
+        records = records.search([('sales_type', '=', 'Cash')])
 
         partner_ids = []
 
@@ -607,7 +869,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.write(row_start, 4, totalother, num_format_total)
         sheet.write(row_start, 5, total7 + total15 + totalother, num_format_total)
 
-    def credit_customer_balance(self, workbook):
+    def credit_customer_balance(self, workbook, records):
         sheet = workbook.add_worksheet('Credit Customer Balance')
 
         num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11})
@@ -663,7 +925,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         row_start += 1
 
         # get data
-        records = self.env['droga.finance.customer.balance'].sudo().search([('sales_type', '=', 'Credit')])
+        records = records.search([('sales_type', '=', 'Credit')])
 
         partner_ids = []
 
@@ -707,7 +969,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.write(row_start, 4, totalother, num_format_total)
         sheet.write(row_start, 5, total7 + total15 + totalother, num_format_total)
 
-    def total_customer_balance(self, workbook):
+    def total_customer_balance(self, workbook, records):
         sheet = workbook.add_worksheet('Total Customer Balance')
 
         num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 11})
@@ -763,7 +1025,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         row_start += 1
 
         # get data
-        records = self.env['droga.finance.customer.balance'].sudo().search([])
+        # records = records.search([])
 
         partner_ids = []
 
@@ -829,6 +1091,7 @@ class CustomerOutStandingBalanceQuery(models.Model):
 
     id = fields.Integer('Id')
     partner_id = fields.Many2one("res.partner")
+    cust_org_type = fields.Char("Customer Category")
     sales_type = fields.Char("Sales Type")
     order_type = fields.Selection([('IM', 'Import'), ('WS', 'Wholesale'), ('PT', 'Physiotherapy')])
     sales_channel = fields.Char("Sales Channel")
@@ -858,10 +1121,11 @@ class CustomerOutStandingBalanceQuery(models.Model):
                 rec.invoice_payment_term_id = 14
 
     def init(self):
+        tools.drop_view_if_exists(self.env.cr, 'droga_finance_customer_balance')
         self.env.cr.execute("""
                    create or replace view droga_finance_customer_balance as (
 
-                        select  row_number() over () as id,a.partner_id,a.sales_type,s.order_type, 
+                         select  row_number() over () as id,a.partner_id,COALESCE(ct.cust_org_type,'Others') as cust_org_type,a.sales_type,COALESCE(s.order_type,'Others') as order_type,
                         CASE
                           WHEN s.tender_origin_form_tender IS NULL Then 'Marketing'
                           WHEN s.tender_origin_form_tender IS not NULL Then'Tender'
@@ -869,6 +1133,8 @@ class CustomerOutStandingBalanceQuery(models.Model):
                          END AS sales_channel,
                         a.invoice_date_due,CURRENT_DATE-a.invoice_date_due as date_diff,a.amount_residual
                         from account_move a left join sale_order s on a.invoice_origin=s.name
-                        where a.invoice_date_due<CURRENT_DATE and a.payment_state in('not_paid','partial') 
-                        and a.move_type in('out_invoice') and amount_residual!=0  and a.partner_id is not null  and a.state in('posted')        
+                        left join res_partner r on r.id=a.partner_id left join droga_cust_type ct on ct.id=r.cust_type_ext
+
+                        where a.invoice_date_due<CURRENT_DATE and a.payment_state in('not_paid','partial')
+                        and a.move_type in('out_invoice') and amount_residual!=0  and a.partner_id is not null  and a.state in('posted')    
                    )""")
