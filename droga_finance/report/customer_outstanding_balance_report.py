@@ -2,6 +2,9 @@ from odoo import api, fields, models
 from io import BytesIO
 import xlsxwriter
 import datetime
+from datetime import datetime
+
+
 from odoo.exceptions import UserError
 from odoo.tools.sql import drop_view_if_exists
 
@@ -14,7 +17,7 @@ except ImportError:
 class CustomerOutStandingBalanceReport(models.TransientModel):
     _name = 'droga.finance.customer.balance.excel.report'
 
-    date = fields.Date("As of Date", required=True)
+    date = fields.Date("As of Date", required=True, default=datetime.today())
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
 
