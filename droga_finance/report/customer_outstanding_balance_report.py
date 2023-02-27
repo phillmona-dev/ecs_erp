@@ -140,7 +140,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
 
         sheet.merge_range('A1:E1', self.company_id.name, main_title_format)
         sheet.merge_range('A2:E2', "Customers Outstanding Balance", main_title_format)
-        sheet.merge_range('A3:E3', "As of " + str(self.date.strftime("%b %s, %Y")), main_title_format)
+        sheet.merge_range('A3:E3', "As of " + str(self.date), main_title_format)
 
         sheet.merge_range('A4:E4', "Weekly Customers Outstanding Balance By Division", title_format)
         sheet.write(4, 0, 'Cash Sales', title_format)
@@ -811,7 +811,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.set_column('G:G', 20)
 
         sheet.merge_range('A1:E1', self.company_id.name, main_title_format)
-        sheet.merge_range('A2:E2', "As of " + str(self.date.strftime("%b %s, %Y")), main_title_format)
+        sheet.merge_range('A2:E2', "As of " + str(self.date), main_title_format)
 
         row_start = 3
 
@@ -911,7 +911,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.set_column('G:G', 20)
 
         sheet.merge_range('A1:E1', self.company_id.name, main_title_format)
-        sheet.merge_range('A2:E2', "As of " + str(self.date.strftime("%b %s, %Y")), main_title_format)
+        sheet.merge_range('A2:E2', "As of " + str(self.date), main_title_format)
 
         row_start = 3
 
@@ -1011,7 +1011,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.set_column('G:G', 20)
 
         sheet.merge_range('A1:E1', self.company_id.name, main_title_format)
-        sheet.merge_range('A2:E2', "As of " + str(self.date.strftime("%b %s, %Y")), main_title_format)
+        sheet.merge_range('A2:E2', "As of " + str(self.date), main_title_format)
 
         row_start = 3
 

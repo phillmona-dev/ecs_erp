@@ -36,6 +36,8 @@ class AccountMove(models.Model):
         compute='_get_sales_person')
     sales_channel = fields.Char("Cost Center", compute='_get_sales_person')
     customer_category = fields.Char(compute="_get_sales_person", )
+    due_date_in_days = fields.Integer(compute="_get_sales_person")
+
 
     @api.model
     def create(self, vals):
@@ -85,6 +87,11 @@ class AccountMove(models.Model):
             record.cost_center = "Others"
             record.sales_channel = "Others"
             record.customer_category = record.partner_id.cust_type_ext.cust_org_type
+
+            # calculate due days
+            delta = datetime.now().date() - record.invoice_date_due
+            record.due_date_in_days = delta.days
+
             # search sales order
             sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_origin)])
             for order in sale_order:

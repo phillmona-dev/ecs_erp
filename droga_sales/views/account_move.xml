@@ -72,6 +72,7 @@
                 <attribute name="limit">500</attribute>
             </xpath>
 
+
         </field>
     </record>
 
@@ -84,6 +85,10 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
                 <field name="FSInvoiceNumber" string="FS Number"/>
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
+                <field name="sales_type" optional="hide" string="Sales Type"/>
             </xpath>
         </field>
     </record>

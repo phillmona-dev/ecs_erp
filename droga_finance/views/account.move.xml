@@ -62,6 +62,7 @@
                 <field name="customer_category" optional="hide" string="Cust Category"/>
                 <field name="cost_center" optional="hide" string="Division"/>
                 <field name="sales_channel" optional="hide" string="Sales Channel"/>
+                <field name="due_date_in_days" optional="hide" string="Due Days"/>
             </xpath>
 
         </field>
