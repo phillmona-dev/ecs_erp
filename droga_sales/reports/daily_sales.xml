@@ -29,16 +29,16 @@
         <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="arch" type="xml">
 
-                <field name="name" position="after">
-                    <field name="FSInvoiceNumber"/>
-                    <field name="invoice_partner_display_name" string="Customer"/>
-                    <field name="invoice_date"/>
-                    <field name="amount_untaxed_signed"/>
-                    <field name="amount_total_signed"/>
-                    <field name="payment_state"/>
-                    <field name="state"/>
-                </field>
-
+            <field name="name" position="after">
+                <field name="FSInvoiceNumber"/>
+                <field name="invoice_partner_display_name" string="Customer"/>
+                <field name="invoice_date"/>
+                <field name="amount_untaxed_signed"/>
+                <field name="amount_total_signed"/>
+                <field name="payment_state"/>
+                <field name="state"/>
+            </field>
+            <filter name="due_date" position="after">
 
                 <filter name="today" string="Today"
                         domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
@@ -48,6 +48,7 @@
                         domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=0, weekday=5)).strftime('%Y-%m-%d'))]"/>
                 <filter name="last_week" string="Last Week"
                         domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=5)).strftime('%Y-%m-%d'))]"/>
+            </filter>
 
         </field>
     </record>
