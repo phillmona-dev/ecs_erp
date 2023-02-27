@@ -59,8 +59,9 @@
             </xpath>
 
             <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
-                <field name="customer_category" optional="show" string="Cust Category"/>
-                <field name="cost_center" optional="show" string="Division"/>
+                <field name="customer_category" optional="hide" string="Cust Category"/>
+                <field name="cost_center" optional="hide" string="Division"/>
+                <field name="sales_channel" optional="hide" string="Sales Channel"/>
             </xpath>
 
         </field>

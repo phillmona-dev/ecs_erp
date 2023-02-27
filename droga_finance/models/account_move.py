@@ -31,8 +31,11 @@ class AccountMove(models.Model):
     withholding_thirty_percent = fields.Float(
         compute='_compute_withholding_amount')
 
-    cost_center = fields.Char("Cost Center", compute='_get_sales_person', default="Data Not Found")
-    customer_category = fields.Char(compute="_get_sales_person", default="Others")
+    cost_center = fields.Selection(
+        [('IM', 'Import'), ('WS', 'Wholesale'), ('PT', 'Physiotherapy'), ('Others', 'Others')],
+        compute='_get_sales_person')
+    sales_channel = fields.Char("Cost Center", compute='_get_sales_person')
+    customer_category = fields.Char(compute="_get_sales_person", )
 
     @api.model
     def create(self, vals):
@@ -80,6 +83,7 @@ class AccountMove(models.Model):
             # get customer category
             record.customer_category = 'Others'
             record.cost_center = "Others"
+            record.sales_channel = "Others"
             record.customer_category = record.partner_id.cust_type_ext.cust_org_type
             # search sales order
             sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_origin)])
@@ -87,11 +91,13 @@ class AccountMove(models.Model):
                 record.sales_initiator = order.sales_initiator
 
                 # get cost center
-
                 if order.tender_origin_form_tender:
-                    record.cost_center = "Tender"
+                    record.sales_channel = "Tender"
                 else:
-                    record.cost_center = "Marketing"
+                    record.sales_channel = "Marketing"
+
+                if order.order_type:
+                    record.cost_center = order.order_type
 
     def convert_to_word1(self, number):
         number = str(number)
