@@ -109,7 +109,8 @@ class droga_location_extension(models.Model):
         ('ATL', 'Asset transit location'),
         ('SAP','Sales placement location'),
         ('SRL', 'Inter-store receive transit location'),
-        ('INC', 'Internal consumption')
+        ('INC', 'Internal consumption'),
+        ('SUBL', 'Subcontractor location')
         ], string='Cons/sample Type')
     wcode=fields.Char(related='warehouse_id.code')
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
@@ -601,6 +602,9 @@ class droga_stock_product_extension(models.Model):
             if 'default_code' in vals_list:
                 if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_':
                     raise UserError("You can not edit product code.")
+                to_update=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
+                for prod in to_update:
+                    prod.write({'default_code':vals_list['default_code']})
 
         return super(droga_stock_product_extension, self).write(vals_list)
 
