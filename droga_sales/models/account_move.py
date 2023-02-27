@@ -26,8 +26,6 @@ class account_move(models.Model):
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
     total_amount_word = fields.Char(compute="_get_total_amount_word")
 
-    #
-
     def _get_current_user_id(self):
         context = self._context
         self.current_user_id = self.env.user

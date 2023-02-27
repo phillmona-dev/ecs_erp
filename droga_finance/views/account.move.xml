@@ -58,6 +58,11 @@
                 <field name="sales_initiator" optional="show"/>
             </xpath>
 
+            <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
+                <field name="customer_category" optional="show" string="Cust Category"/>
+                <field name="cost_center" optional="show" string="Division"/>
+            </xpath>
+
         </field>
     </record>
 

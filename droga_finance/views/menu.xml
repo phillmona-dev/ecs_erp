@@ -42,10 +42,10 @@
                   action="droga_finance_reports_outstanding_balance_excel_action" groups="account.group_account_manager"
                   sequence="2"/>
 
-           <menuitem id="droga_account_customer_outstanding_balance_report_tree_menu" name="Customer Outstanding Report"
-                  action="droga_finance_reports_outstanding_balance_tree_action" groups="account.group_account_manager"
+        <menuitem id="droga_account_customer_outstanding_balance_report_tree_menu" name="Customer Outstanding Report"
+                  action="droga_finance_reports_outstanding_invoice_balance_tree_action"
+                  groups="account.group_account_manager"
                   sequence="3"/>
-
 
 
     </menuitem>

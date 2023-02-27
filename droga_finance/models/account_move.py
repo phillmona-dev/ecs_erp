@@ -31,6 +31,9 @@ class AccountMove(models.Model):
     withholding_thirty_percent = fields.Float(
         compute='_compute_withholding_amount')
 
+    cost_center = fields.Char("Cost Center", compute='_get_sales_person', default="Data Not Found")
+    customer_category = fields.Char(compute="_get_sales_person", default="Others")
+
     @api.model
     def create(self, vals):
         # Check withholding
@@ -74,10 +77,21 @@ class AccountMove(models.Model):
     def _get_sales_person(self):
         self.sales_initiator = ''
         for record in self:
+            # get customer category
+            record.customer_category = 'Others'
+            record.cost_center = "Others"
+            record.customer_category = record.partner_id.cust_type_ext.cust_org_type
             # search sales order
             sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_origin)])
             for order in sale_order:
                 record.sales_initiator = order.sales_initiator
+
+                # get cost center
+
+                if order.tender_origin_form_tender:
+                    record.cost_center = "Tender"
+                else:
+                    record.cost_center = "Marketing"
 
     def convert_to_word1(self, number):
         number = str(number)

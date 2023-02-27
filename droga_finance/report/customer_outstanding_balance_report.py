@@ -1,4 +1,4 @@
-from odoo import api, fields, models,tools
+from odoo import api, fields, models, tools
 from io import BytesIO
 import xlsxwriter
 from datetime import datetime
@@ -139,9 +139,10 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         no_branch_total = nobranch_7_days + nobranch_15_days + nobranch_other_days
 
         sheet.merge_range('A1:E1', self.company_id.name, main_title_format)
-        sheet.merge_range('A2:E2', "As of " + str(self.date), main_title_format)
+        sheet.merge_range('A2:E2', "Customers Outstanding Balance", main_title_format)
+        sheet.merge_range('A3:E3', "As of " + str(self.date.strftime("%b %s, %Y")), main_title_format)
 
-        sheet.merge_range('A4:E4', "Weekly Customers Outstanding Balance ", title_format)
+        sheet.merge_range('A4:E4', "Weekly Customers Outstanding Balance By Division", title_format)
         sheet.write(4, 0, 'Cash Sales', title_format)
         sheet.write(4, 1, '0-7 Days', title_format)
         sheet.write(4, 2, '7-15 Days', title_format)
@@ -349,7 +350,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
                 else:
                     government_other_days += rec.amount_residual
 
-            elif rec.partner_id.cust_type_ext.cust_org_type == "Ngo":
+            elif rec.partner_id.cust_type_ext.cust_org_type == "NGO":
                 if rec.date_diff <= 45:
                     ngo_45_days += rec.amount_residual
                 elif rec.date_diff <= 60:
@@ -377,7 +378,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         no_branch_total = private_45_days + private_60_days + private_other_days
         others_total = others_45_days + others_60_days + others_other_days
 
-        sheet.merge_range('A40:E40', "Weekly Customers Outstanding Balance ", title_format)
+        sheet.merge_range('A40:E40', "Weekly Customers Outstanding Balance By Customer Type", title_format)
         sheet.write(41, 0, 'Cash Sales', title_format)
         sheet.write(41, 1, '0-45 Days', title_format)
         sheet.write(41, 2, '46-60 Days', title_format)
@@ -474,7 +475,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
                 else:
                     government_other_days += rec.amount_residual
 
-            elif rec.partner_id.cust_type_ext.cust_org_type == "Ngo":
+            elif rec.partner_id.cust_type_ext.cust_org_type == "NGO":
                 if rec.date_diff <= 45:
                     ngo_45_days += rec.amount_residual
                 elif rec.date_diff <= 60:
@@ -628,7 +629,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         tender_total = tender_7_days + tender_15_days + tender_other_days
         no_branch_total = nobranch_7_days + nobranch_15_days + nobranch_other_days
 
-        sheet.merge_range('A23:E23', "Weekly Customers Outstanding Balance ", title_format)
+        sheet.merge_range('A23:E23', "Weekly Customers Outstanding Balance Sales Channel", title_format)
         sheet.write(24, 0, 'Cash Sales', title_format)
         sheet.write(24, 1, '0-7 Days', title_format)
         sheet.write(24, 2, '7-15 Days', title_format)
@@ -810,7 +811,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.set_column('G:G', 20)
 
         sheet.merge_range('A1:E1', self.company_id.name, main_title_format)
-        sheet.merge_range('A2:E2', "As of " + str(self.date), main_title_format)
+        sheet.merge_range('A2:E2', "As of " + str(self.date.strftime("%b %s, %Y")), main_title_format)
 
         row_start = 3
 
@@ -910,7 +911,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.set_column('G:G', 20)
 
         sheet.merge_range('A1:E1', self.company_id.name, main_title_format)
-        sheet.merge_range('A2:E2', "As of " + str(self.date), main_title_format)
+        sheet.merge_range('A2:E2', "As of " + str(self.date.strftime("%b %s, %Y")), main_title_format)
 
         row_start = 3
 
@@ -1010,7 +1011,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
         sheet.set_column('G:G', 20)
 
         sheet.merge_range('A1:E1', self.company_id.name, main_title_format)
-        sheet.merge_range('A2:E2', "As of " + str(self.date), main_title_format)
+        sheet.merge_range('A2:E2', "As of " + str(self.date.strftime("%b %s, %Y")), main_title_format)
 
         row_start = 3
 
@@ -1090,11 +1091,13 @@ class CustomerOutStandingBalanceQuery(models.Model):
     _order = 'partner_id'
 
     id = fields.Integer('Id')
+    invoice_id = fields.Char("Number")
     partner_id = fields.Many2one("res.partner")
     cust_org_type = fields.Char("Customer Category")
     sales_type = fields.Char("Sales Type")
     order_type = fields.Selection([('IM', 'Import'), ('WS', 'Wholesale'), ('PT', 'Physiotherapy')])
     sales_channel = fields.Char("Sales Channel")
+    sales_initiator = fields.Char("Sales Person", compute="_get_sales_person")
     invoice_date_due = fields.Date("Due Date")
     date_diff = fields.Integer("Passed Days")
     amount_residual = fields.Float("Remaining Amount")
@@ -1120,17 +1123,25 @@ class CustomerOutStandingBalanceQuery(models.Model):
             else:
                 rec.invoice_payment_term_id = 14
 
+    def _get_sales_person(self):
+        self.sales_initiator = ''
+        for record in self:
+            # search sales order
+            sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_id)])
+            for order in sale_order:
+                record.sales_initiator = order.sales_initiator
+
     def init(self):
         tools.drop_view_if_exists(self.env.cr, 'droga_finance_customer_balance')
         self.env.cr.execute("""
                    create or replace view droga_finance_customer_balance as (
 
-                         select  row_number() over () as id,a.partner_id,COALESCE(ct.cust_org_type,'Others') as cust_org_type,a.sales_type,COALESCE(s.order_type,'Others') as order_type,
+                         select  row_number() over () as id,a.name as invoice_id,a.partner_id,COALESCE(ct.cust_org_type,'Others') as cust_org_type,a.sales_type,COALESCE(s.order_type,'Others') as order_type,
                         CASE
                           WHEN s.tender_origin_form_tender IS NULL Then 'Marketing'
                           WHEN s.tender_origin_form_tender IS not NULL Then'Tender'
                           ELSE 'Data Not Found'
-                         END AS sales_channel,
+                         END AS sales_channel,'' as sales_initiator,
                         a.invoice_date_due,CURRENT_DATE-a.invoice_date_due as date_diff,a.amount_residual
                         from account_move a left join sale_order s on a.invoice_origin=s.name
                         left join res_partner r on r.id=a.partner_id left join droga_cust_type ct on ct.id=r.cust_type_ext

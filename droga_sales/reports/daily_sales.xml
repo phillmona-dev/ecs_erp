@@ -26,25 +26,29 @@
     <record id="daily_sales_for_cashier_search_view" model="ir.ui.view">
         <field name="name">Daily Sales Search</field>
         <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="arch" type="xml">
-            <search string="">
-                <field name="name"/>
-                <field name="FSInvoiceNumber"/>
-                <field name="invoice_partner_display_name" string="Customer"/>
-                <field name="invoice_date"/>
-                <field name="amount_untaxed_signed"/>
-                <field name="amount_total_signed"/>
-                <field name="payment_state"/>
-                <field name="state" widget="badge"/>
+
+                <field name="name" position="after">
+                    <field name="FSInvoiceNumber"/>
+                    <field name="invoice_partner_display_name" string="Customer"/>
+                    <field name="invoice_date"/>
+                    <field name="amount_untaxed_signed"/>
+                    <field name="amount_total_signed"/>
+                    <field name="payment_state"/>
+                    <field name="state"/>
+                </field>
 
 
                 <filter name="today" string="Today"
                         domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
-                <filter name="yesterday" string="Yesterday" domain="[('invoice_date', '&gt;', (context_today() + relativedelta(days=-2)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today().strftime('%Y-%m-%d')))]"/>
-                <filter name="this_week" string="This Week" domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=0, weekday=5)).strftime('%Y-%m-%d'))]"/>
-                <filter name="last_week" string="Last Week" domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=5)).strftime('%Y-%m-%d'))]"/>
+                <filter name="yesterday" string="Yesterday"
+                        domain="[('invoice_date', '&gt;', (context_today() + relativedelta(days=-2)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today().strftime('%Y-%m-%d')))]"/>
+                <filter name="this_week" string="This Week"
+                        domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=0, weekday=5)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_week" string="Last Week"
+                        domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=5)).strftime('%Y-%m-%d'))]"/>
 
-            </search>
         </field>
     </record>
 
@@ -65,6 +69,7 @@
 
     <!-- add menu on sales report -->
     <menuitem id="daily_sales_for_cashier_tree_menu" name="Daily Sales Report" parent="sale.sale_menu_root"
-              action="daily_sales_for_cashier_tree_action" groups="droga_sales.sales_wholesale_invoicer,droga_sales.sales_import_invoicer" sequence="41"/>
+              action="daily_sales_for_cashier_tree_action"
+              groups="droga_sales.sales_wholesale_invoicer,droga_sales.sales_import_invoicer" sequence="41"/>
 
 </odoo>
