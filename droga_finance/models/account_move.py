@@ -31,6 +31,14 @@ class AccountMove(models.Model):
     withholding_thirty_percent = fields.Float(
         compute='_compute_withholding_amount')
 
+    cost_center = fields.Selection(
+        [('IM', 'Import'), ('WS', 'Wholesale'), ('PT', 'Physiotherapy'), ('Others', 'Others')],
+        compute='_get_sales_person')
+    sales_channel = fields.Char("Cost Center", compute='_get_sales_person')
+    customer_category = fields.Char(compute="_get_sales_person", )
+    due_date_in_days = fields.Integer(compute="_get_sales_person")
+
+
     @api.model
     def create(self, vals):
         # Check withholding
@@ -74,10 +82,29 @@ class AccountMove(models.Model):
     def _get_sales_person(self):
         self.sales_initiator = ''
         for record in self:
+            # get customer category
+            record.customer_category = 'Others'
+            record.cost_center = "Others"
+            record.sales_channel = "Others"
+            record.customer_category = record.partner_id.cust_type_ext.cust_org_type
+
+            # calculate due days
+            delta = datetime.now().date() - record.invoice_date_due
+            record.due_date_in_days = delta.days
+
             # search sales order
             sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_origin)])
             for order in sale_order:
                 record.sales_initiator = order.sales_initiator
+
+                # get cost center
+                if order.tender_origin_form_tender:
+                    record.sales_channel = "Tender"
+                else:
+                    record.sales_channel = "Marketing"
+
+                if order.order_type:
+                    record.cost_center = order.order_type
 
     def convert_to_word1(self, number):
         number = str(number)

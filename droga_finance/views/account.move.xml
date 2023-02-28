@@ -58,6 +58,13 @@
                 <field name="sales_initiator" optional="show"/>
             </xpath>
 
+            <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
+                <field name="customer_category" optional="hide" string="Cust Category"/>
+                <field name="cost_center" optional="hide" string="Division"/>
+                <field name="sales_channel" optional="hide" string="Sales Channel"/>
+                <field name="due_date_in_days" optional="hide" string="Due Days"/>
+            </xpath>
+
         </field>
     </record>
 
