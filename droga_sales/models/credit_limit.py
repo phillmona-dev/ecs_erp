@@ -34,9 +34,13 @@ class cust_sales_credit_limit(models.Model):
     show_invoice_button = fields.Boolean(compute='_get_mature_amount')
     manual_price = fields.Boolean('Manual price', default=False, required=True, tracking=True)
     Vat_no = fields.Char(related='partner_id.vat',readonly='True')
+    cust_type_ext=fields.Many2one('droga.cust.type',related='partner_id.cust_type_ext',inverse='_cust_type_inv',string='Customer type')
     cust_id = fields.Integer(related='partner_id.id',readonly='True')
     sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
     supporters=fields.Many2many('droga.pro.sales.master',string='Supporters')
+
+    def _cust_type_inv(self):
+        pass
 
     order_type = fields.Selection([
         ('IM', 'Import'),
@@ -96,13 +100,11 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Please login before registering a sales order!")
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
+
+            if 'cust_type_ext' in vals:
+                if result.partner_id.cust_type_ext!=vals['cust_type_ext']:
+                    result.partner_id.cust_type_ext = vals['cust_type_ext']
         return result
-
-
-class inventory_placement_extension(models.Model):
-    _inherit = 'droga.inventory.consignment.issue'
-    sales_placement_origin_form = fields.Many2one('sale.order', readonly=True)
-
 
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
