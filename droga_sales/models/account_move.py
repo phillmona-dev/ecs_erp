@@ -301,7 +301,7 @@ class account_move(models.Model):
         for record in self.invoice_line_ids:
             if record.analytic_distribution:
                 analytic_distribution = record.analytic_distribution
-            elif record.tax_ids:
+            if record.tax_ids:
                 tax_ids = record.tax_ids
 
             if analytic_distribution != '' and tax_ids != '':
