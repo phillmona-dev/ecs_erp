@@ -1205,7 +1205,7 @@ class CustomerOutStandingBalanceReport(models.TransientModel):
                 days_other = self.get_remaining_amount_by_days(cash.partner_id.id, 61, 10000000000000, "")
                 no_due_days_amount = self.get_remaining_amount_with_no_due_date(cash.partner_id.id, "")
 
-                if days7 + days15 + days_other != 0:
+                if days7 + days15 + days_other + total_no_due_days_amount != 0:
                     total7 += days7
                     total15 += days15
                     totalother += days_other
