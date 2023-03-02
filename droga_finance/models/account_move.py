@@ -15,7 +15,7 @@ class AccountMove(models.Model):
     withholding_invoice_provided = fields.Boolean("Withholding Invoice",
                                                   help="If the transaction has been withheld, the customer needs to provide a withholding invoice",
                                                   default=False)
-    sales_initiator = fields.Char("Sales Person", compute="_get_sales_person")
+    sales_initiator = fields.Char("Sales Person", store=True)
 
     transaction_type = fields.Many2one("account.transaction.type")
     transaction_no = fields.Char("Transaction Number", default='New')
@@ -32,12 +32,11 @@ class AccountMove(models.Model):
         compute='_compute_withholding_amount')
 
     cost_center = fields.Selection(
-        [('IM', 'Import'), ('WS', 'Wholesale'), ('PT', 'Physiotherapy'), ('Others', 'Others')],
-        compute='_get_sales_person')
-    sales_channel = fields.Char("Cost Center", compute='_get_sales_person')
-    customer_category = fields.Char(compute="_get_sales_person", )
-    due_date_in_days = fields.Integer(compute="_get_sales_person")
-
+        [('IM', 'Import'), ('WS', 'Wholesale'), ('PT', 'Physiotherapy'), ('Others', 'Others')], store=True,
+        compute='_get_sales_info')
+    sales_channel = fields.Char("Cost Center", store=True, compute='_get_sales_info')
+    customer_category = fields.Char("Customer Category", store=True, compute='_get_sales_info')
+    due_date_in_days = fields.Integer("Due Days", store=True, compute='update_due_days')
 
     @api.model
     def create(self, vals):
@@ -79,32 +78,91 @@ class AccountMove(models.Model):
         self.withholding_thirty_percent = tax_amount2
 
     # get sales person
-    def _get_sales_person(self):
+    @api.depends('partner_id')
+    def _get_sales_info(self):
         self.sales_initiator = ''
         for record in self:
-            # get customer category
-            record.customer_category = 'Others'
-            record.cost_center = "Others"
-            record.sales_channel = "Others"
-            record.customer_category = record.partner_id.cust_type_ext.cust_org_type
+            if record.move_type == 'out_invoice':
+                # get customer category
+                record.customer_category = 'Others'
+                record.cost_center = "Others"
+                record.sales_channel = "Others"
+                record.customer_category = record.partner_id.cust_type_ext.cust_org_type
 
+                # calculate due days
+                delta = datetime.now().date() - record.invoice_date_due
+                record.due_date_in_days = delta.days
+
+                # search sales order
+                sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_origin)])
+                for order in sale_order:
+                    record.sales_initiator = order.sales_initiator
+
+                    # get cost center
+                    if order.tender_origin_form_tender:
+                        record.sales_channel = "Tender"
+                    else:
+                        record.sales_channel = "Marketing"
+
+                    if order.order_type:
+                        record.cost_center = order.order_type
+
+    @api.depends('invoice_date', 'invoice_payment_term_id')
+    def update_due_days(self):
+        for record in self:
             # calculate due days
             delta = datetime.now().date() - record.invoice_date_due
             record.due_date_in_days = delta.days
 
-            # search sales order
-            sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_origin)])
-            for order in sale_order:
-                record.sales_initiator = order.sales_initiator
+    def update_due_days_all(self):
+        records = self.env['account.move'].search(
+            [('move_type', '=', 'out_invoice'), ('payment_state', 'in', ('not_paid', 'partial'))])
+        for record in records:
+            # calculate due days
+            delta = datetime.now().date() - record.invoice_date_due
+            due_date_in_days = delta.days
 
-                # get cost center
-                if order.tender_origin_form_tender:
-                    record.sales_channel = "Tender"
-                else:
-                    record.sales_channel = "Marketing"
+            self.env.cr.execute(
+                """ update account_move set due_date_in_days=%s where id=%s""",
+                (due_date_in_days, record.id))
 
-                if order.order_type:
-                    record.cost_center = order.order_type
+    def _get_sales_info_obsolete(self):
+        self.sales_initiator = ''
+        recs = self.env['account.move'].search([('move_type', '=', 'out_invoice')])
+
+        for record in recs:
+            if record.move_type == 'out_invoice':
+
+                customer_category = 'Others'
+                cost_center = "Others"
+                sales_channel = "Others"
+                sales_initiator = ""
+
+                if record.partner_id.cust_type_ext:
+                    customer_category = record.partner_id.cust_type_ext.cust_org_type
+
+                # calculate due days
+                delta = datetime.now().date() - record.invoice_date_due
+                due_date_in_days = delta.days
+
+                # search sales order
+                sale_order = self.env["sale.order"].sudo().search([('name', '=', record.invoice_origin)])
+                for order in sale_order:
+                    sales_initiator = order.sales_initiator
+
+                    # get cost center
+                    if order.tender_origin_form_tender:
+                        sales_channel = "Tender"
+                    else:
+                        sales_channel = "Marketing"
+
+                    if order.order_type:
+                        cost_center = order.order_type
+
+                self.env.cr.execute(
+                    """ update account_move set customer_category=%s,cost_center=%s,sales_channel=%s,due_date_in_days=%s,sales_initiator=%s where id=%s""",
+                    (
+                        customer_category, cost_center, sales_channel, due_date_in_days, sales_initiator, record.id))
 
     def convert_to_word1(self, number):
         number = str(number)
