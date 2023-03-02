@@ -78,7 +78,7 @@ class AccountMove(models.Model):
         self.withholding_thirty_percent = tax_amount2
 
     # get sales person
-    @api.depends('partner_id')
+    #@api.depends('partner_id')
     def _get_sales_info(self):
         self.sales_initiator = ''
         for record in self:
