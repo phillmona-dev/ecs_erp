@@ -33,9 +33,9 @@ class AccountMove(models.Model):
 
     cost_center = fields.Selection(
         [('IM', 'Import'), ('WS', 'Wholesale'), ('PT', 'Physiotherapy'), ('Others', 'Others')], store=True,
-        compute='_get_sales_info')
-    sales_channel = fields.Char("Cost Center", store=True, compute='_get_sales_info')
-    customer_category = fields.Char("Customer Category", store=True, compute='_get_sales_info')
+        )
+    sales_channel = fields.Char("Cost Center", store=True)
+    customer_category = fields.Char("Customer Category", store=True)
     due_date_in_days = fields.Integer("Due Days", store=True, compute='update_due_days')
 
     @api.model
@@ -78,7 +78,7 @@ class AccountMove(models.Model):
         self.withholding_thirty_percent = tax_amount2
 
     # get sales person
-    #@api.depends('partner_id')
+    @api.depends('partner_id')
     def _get_sales_info(self):
         self.sales_initiator = ''
         for record in self:
