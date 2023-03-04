@@ -359,11 +359,12 @@ class Rfq(models.Model):
                     bank_branch = record11.bank_branch
                     approved_date = record11.request_approved_date
 
-        suppliers = []
+        suppliers = record.supplier_id
+
         # get unique suppliers from the rfq
-        for line in self.rfq_lines:
-            if line.winner == "Yes" and self.check_supplier(line.supplier_name, suppliers) == 0:
-                suppliers.append(line)
+        # for line in self.rfq_lines:
+        # if line.winner == "Yes" and self.check_supplier(line.supplier_name, suppliers) == 0:
+        # suppliers.append(line)
 
         if suppliers:
             # close the status of purchase request commitment budget
@@ -374,8 +375,8 @@ class Rfq(models.Model):
                     'name': 'New',
                     'state': 'draft',
                     'date_order': datetime.now(),
-                    'rfq_id': supplier.rfq_id.id,
-                    'partner_id': supplier.supplier_id.id,
+                    'rfq_id': self.id,
+                    'partner_id': supplier.id,
                     'request_type': self.request_type,
                     'bank': bank.id if bank else None,
                     'branch': bank_branch if bank_branch else None,
@@ -386,46 +387,46 @@ class Rfq(models.Model):
 
                 # get products the supplier won
                 for line in self.rfq_lines:
-                    if line.winner == "Yes" and line.supplier_id == supplier.supplier_id:
-                        order_line_vals = (0, 0, {
-                            'date_planned': fields.Date.today(),
-                            'name': line.product_id.name,
-                            'price_unit': line.unit_price,
-                            'product_id': line.product_id.id,
-                            'product_qty': line.product_qty,
-                            'product_uom': line.product_uom.id,
-                            'unit_price_foregin': line.unit_price_foregin,
-                            'taxes_id': [(6, 0, line.tax_id.ids)],
-                        })
+                    # if line.winner == "Yes" and line.supplier_id == supplier.supplier_id:
+                    order_line_vals = (0, 0, {
+                        'date_planned': fields.Date.today(),
+                        'name': line.product_id.name,
+                        'price_unit': line.unit_price,
+                        'product_id': line.product_id.id,
+                        'product_qty': line.product_qty,
+                        'product_uom': line.product_uom.id,
+                        'unit_price_foregin': line.unit_price_foregin,
+                        'taxes_id': [(6, 0, line.tax_id.ids)],
+                    })
 
-                        vals['order_line'].append(order_line_vals)
+                    vals['order_line'].append(order_line_vals)
 
                 # create purchase orders
                 purchase_order = self.env['purchase.order'].create(vals)
 
             # create purchase order commitment budget
             for line in self.rfq_lines:
-                if line.winner == "Yes":
-                    # get budgetary position and expense account from purchase request
-                    purchase_request = self.env['droga.purhcase.request.line'].search(
-                        [('purhcase_request_id', '=', self.purhcase_request_id.id),
-                         ('product_id', '=', line.product_id.id)])
+                # if line.winner == "Yes":
+                # get budgetary position and expense account from purchase request
+                purchase_request = self.env['droga.purhcase.request.line'].search(
+                    [('purhcase_request_id', '=', self.purhcase_request_id.id),
+                     ('product_id', '=', line.product_id.id)])
 
-                    commitment_budget = {
-                        'document_type': 'PO',
-                        'purchase_order_id': purchase_order.id,
-                        'purchase_order_total_amount': purchase_order.amount_total,
-                        'budget_date': purchase_order.date_order,
-                        'budgetary_position': purchase_request.budgetary_position.id,
-                        'expense_account': purchase_request.expense_account.id,
-                        'analytic_account_id': self.purhcase_request_id.branch.id,
-                        'company_id': self.company_id.id,
-                        'state': 'Active'
-                    }
+                commitment_budget = {
+                    'document_type': 'PO',
+                    'purchase_order_id': purchase_order.id,
+                    'purchase_order_total_amount': purchase_order.amount_total,
+                    'budget_date': purchase_order.date_order,
+                    'budgetary_position': purchase_request.budgetary_position.id,
+                    'expense_account': purchase_request.expense_account.id,
+                    'analytic_account_id': self.purhcase_request_id.branch.id,
+                    'company_id': self.company_id.id,
+                    'state': 'Active'
+                }
 
-                    # persist to database
-                    self.env['droga.budget.commitment.budget'].create(
-                        commitment_budget)
+                # persist to database
+                self.env['droga.budget.commitment.budget'].create(
+                    commitment_budget)
 
         return {
             'type': 'ir.actions.client',

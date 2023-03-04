@@ -135,7 +135,7 @@ class AccountMove(models.Model):
 
                 customer_category = 'Others'
                 cost_center = "Others"
-                sales_channel = "Others"
+                sales_channel = "Marketing"
                 sales_initiator = ""
 
                 if record.partner_id.cust_type_ext:
