@@ -86,7 +86,7 @@ class AccountMove(models.Model):
                 # get customer category
                 record.customer_category = 'Others'
                 record.cost_center = "Others"
-                record.sales_channel = "Others"
+                record.sales_channel = "Marketing"
                 record.customer_category = record.partner_id.cust_type_ext.cust_org_type
 
                 # calculate due days
