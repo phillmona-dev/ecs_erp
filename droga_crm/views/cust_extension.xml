@@ -7,8 +7,7 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/notebook/page[@name='contact_addresses']" position="after">
-                <field name="customer_rank"></field>
-<!--                <field name="customer_rank" invisible="1"></field>-->
+                <field name="customer_rank" invisible="1"></field>
                 <page string="Contacts" attrs="{'invisible': [('supplier_rank', '>', 0)]}">
                     <field name="contacts" mode="tree,kanban">
                         <tree editable="1" create="1">
