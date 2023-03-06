@@ -67,6 +67,7 @@
                 <field name="purhcase_request_id"/>
                 <field name="name"/>
                 <field name="date"/>
+                <field name="supplier_id"/>
                 <field name="request_type"/>
                 <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')"
                        decoration-danger="state == 'Cancel'"
