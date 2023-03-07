@@ -68,6 +68,29 @@
         </field>
     </record>
 
+    <!-- customer invoice -->
+    <record id="inherit_for_account_move_journal_main_form" model="ir.ui.view">
+        <field name="name">Account Move</field>
+        <field name="model">account.move</field>
+        <field name="priority" eval="1"/>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_date_due']" position="after">
+                <field name="sales_initiator" optional="show"/>
+            </xpath>
+
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="partner_id" optional="hide" string="Customer"/>
+                <field name="customer_category" optional="hide" string="Cust Category"/>
+                <field name="cost_center" optional="hide" string="Division"/>
+                <field name="sales_channel" optional="hide" string="Sales Channel"/>
+                <field name="due_date_in_days" optional="hide" string="Due Days"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
     <record id="inherit_for_account_move_tree" model="ir.ui.view">
         <field name="name">Account Move</field>
         <field name="model">account.move</field>
