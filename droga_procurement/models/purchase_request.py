@@ -134,6 +134,25 @@ class purhcase_request(models.Model):
 
     reject_message = fields.Char('Reason')
 
+    rfq_count = fields.Integer("RFQ Count", compute='compute_rfq_count', default=0)
+    rfq_status = fields.Char("RFQ Status", compute="compute_rfq_status")
+
+    def compute_rfq_status(self):
+        # set rfq status to not created
+        for record in self:
+            record.rfq_status = "Not Created"
+            for rfq in record.rfqs:
+                if rfq.state != 'Cancel':
+                    record.rfq_status = rfq.state
+                    break
+
+    def compute_rfq_count(self):
+        for record in self:
+            count = 0
+            for rec in record.rfqs:
+                count += 1
+            record.rfq_count = count
+
     @api.depends('is_user_import_operation', 'request_by')
     def get_import_operation_group(self):
         res_user = self.env['res.users'].search([('id', '=', self._uid)])
@@ -380,6 +399,7 @@ class purhcase_request_line(models.Model):
     _description = "Purchase Request Line"
     _rec_name = 'product_id'
 
+    seq_no = fields.Integer("No", compute='compute_sequence_no')
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
     current_market_status = fields.One2many('droga.purchase.request.line.current.market.analysis',
                                             'purchase_request_line_id')
@@ -448,6 +468,12 @@ class purhcase_request_line(models.Model):
 
     order_qty_and_current_stcok = fields.Float(
         "Order Qty & Current Stock", compute="_consumption_total", help="Order Quantity Plus Current Stock", store=True)
+
+    def compute_sequence_no(self):
+        seq_no = 1
+        for record in self:
+            record.seq_no = seq_no
+            seq_no += 1
 
     @api.depends('product_qty', 'unit_price', 'unit_price_foregin', 'exchange_rate')
     def _compute_total(self):

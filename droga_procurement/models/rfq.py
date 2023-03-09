@@ -15,6 +15,7 @@ class Rfq(models.Model):
                        index=True, copy=False, default='New')
     purhcase_request_id = fields.Many2one(
         "droga.purhcase.request", required=True)
+    purchase_requests = fields.Many2many('droga.purhcase.request', domain=[('wf_state', '=', 'Approved')])
     request_type = fields.Selection(
         related="purhcase_request_id.request_type", store=True)
 
@@ -99,6 +100,18 @@ class Rfq(models.Model):
     total_cost = fields.Float("Total Cost", compute='_compute_standard_cost', store=True, digits=(12, 4))
     coefficient = fields.Float("Coefficient", compute='_compute_standard_cost', store=True, digits=(12, 10), default=1)
     landed_cost_total = fields.Float("Total Landed Cost", compute='_compute_standard_cost', store=True, digits=(12, 4))
+
+    # currency request status
+    currency_request_status = fields.Char("Currency Request", compute='_compute_currency_request_status')
+
+    def _compute_currency_request_status(self):
+        # set currency request status to not requested
+        for record in self:
+            record.currency_request_status = "Not Requested"
+            for currency_request in record.currency_requests:
+                if currency_request.state != 'Cancelled':
+                    record.currency_request_status = currency_request.state
+                    break
 
     @api.depends('rfq_lines.product_qty', 'rfq_lines.unit_price', 'rfq_lines.unit_price_foregin', 'landed_costs.amount')
     def _compute_standard_cost(self):
@@ -658,13 +671,13 @@ class Rfq(models.Model):
             'res_id': self.id
         }
 
-    @api.constrains('proforma_invoice_no')
+    """@api.constrains('proforma_invoice_no')
     def _check_proforma_invoice_no_unique(self):
         counts = self.search_count(
             [('proforma_invoice_no', '=', self.proforma_invoice_no)])
 
         if counts > 1 and self.proforma_invoice_no != '':
-            raise ValidationError("Proforma invoice number already exists!")
+            raise ValidationError("Proforma invoice number already exists!")"""
 
 
 class Rfq_Detail(models.Model):
@@ -672,6 +685,7 @@ class Rfq_Detail(models.Model):
     _description = 'Request for Quotation Detail'
     _order = "supplier_name asc"
 
+    seq_no = fields.Integer("No", compute='compute_sequence_no')
     rfq_id = fields.Many2one("droga.purhcase.request.rfq")
     company_id = fields.Many2one(
         'res.company', related='rfq_id.company_id', string='Company', store=True, readonly=True)
@@ -739,6 +753,12 @@ class Rfq_Detail(models.Model):
     total_cost = fields.Float("Total Cost", digits=(12, 4))
     unit_cost = fields.Float("Unit Cost", digits=(12, 4))
 
+    def compute_sequence_no(self):
+        seq_no = 1
+        for record in self:
+            record.seq_no = seq_no
+            seq_no += 1
+
     @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id', 'exchange_rate', 'unit_price_foregin')
     def _compute_total(self):
         for record in self:
@@ -774,7 +794,14 @@ class Rfq_Detail(models.Model):
 
     @api.onchange('product_id')
     def onchange_product_id(self):
+        x = []
         x = self.purhcase_request_lines.product_id.ids
+
+        # add products from merged product ids
+        for rec in self.rfq_id.purchase_requests:
+            for id in rec.purhcase_request_lines.product_id.ids:
+                x.append(id)
+
         # set quantity
         products = self.purhcase_request_lines
 

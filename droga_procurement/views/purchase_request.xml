@@ -37,6 +37,9 @@
                        decoration-success="state in('Ceo Approved,Procurement Manager')" widget="badge"/>
                 <field name="wf_state" decoration-warning="wf_state in('On Progress')"
                        decoration-success="wf_state in('Approved')" widget="badge"/>
+                <field name="rfq_status" widget="badge" decoration-danger="state == 'Not Created'"
+                       decoration-warning="state in('Checked','Operation Manager')"
+                       decoration-success="wf_state in('CEO Approval')"/>
             </tree>
         </field>
     </record>
@@ -77,11 +80,14 @@
                     <field name="wf_state" widget="statusbar" invisible="1"/>
                 </header>
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="%(droga_purchase_request_rfq_action)d" string="RFQ" type="action"
+                    <div name="button_box" position="inside">
+                        <button name="%(droga_purchase_request_rfq_action)d" type="action"
                                 class="oe_stat_button" icon="fa-arrows-v"
                                 attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"
-                                context="{'request_type':'Local'}"/>
+                                context="{'request_type':'Local'}">
+                            <field string="RFQ" name="rfq_count" widget="statinfo"/>
+                        </button>
+
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Purchase Requistion</span>
@@ -233,7 +239,6 @@
         </field>
     </record>
 
-
     <!-- kanban view  procurement -->
     <record id="droga_purhcase_request_view_kanban" model="ir.ui.view">
         <field name="name">Purchase Request</field>
@@ -288,7 +293,8 @@
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
-                <field name="purhcase_request_lines" filter_domain="[('purhcase_request_lines.product_id', 'ilike', self)]"  string="Product"/>
+                <field name="purhcase_request_lines"
+                       filter_domain="[('purhcase_request_lines.product_id', 'ilike', self)]" string="Product"/>
                 <field name="company_id"/>
                 <field name="state"/>
                 <separator/>
@@ -323,10 +329,14 @@
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
-                <field name="company_id"/>
                 <field name="state" decoration-warning="state in('Draft')"
                        decoration-info="state in('Submitted','Verified','Budget Approved')"
                        decoration-danger="state == 'Cancel'" decoration-success="state == 'Approved'" widget="badge"/>
+
+                <field name="rfq_status" widget="badge" decoration-danger="rfq_status == 'Not Created'"
+                       decoration-warning="rfq_status in('Draft','Checked','Operation Manager')"
+                       decoration-success="rfq_status in('CEO Approval')"/>
+                <field name="company_id"/>
             </tree>
         </field>
     </record>
@@ -335,12 +345,13 @@
     <record id="droga_purhcase_request_foregin_view_form" model="ir.ui.view">
         <field name="name">droga.purhcase.request.foregin.view.form</field>
         <field name="model">droga.purhcase.request</field>
-         <field name="priority" eval="1"/>
+        <field name="priority" eval="1"/>
         <field name="arch" type="xml">
             <form string="Purchase Request" delete="0">
                 <header>
                     <button name="submit_request" type="object" string="Submit" class="oe_highlight"
-                            id="submit_request" data-hotkey="v"  attrs="{'invisible':['|',('requester','=',False),('state','not in',('Draft'))]}"/>
+                            id="submit_request" data-hotkey="v"
+                            attrs="{'invisible':['|',('requester','=',False),('state','not in',('Draft'))]}"/>
 
                     <button name="verify_request" type="object" string="Verify" id="draft_request"
                             class="oe_highlight" data-hotkey="v"
@@ -374,7 +385,9 @@
                         <button name="%(droga_purchase_request_rfq_foregin_action)d" string="RFQ" type="action"
                                 class="oe_stat_button" icon="fa-list"
                                 attrs="{'invisible': [('buying_method', '!=', 'RFQ')]}"
-                                context="{'default_currency_id': currency_id,'default_exchange_rate':exchange_rate,'request_type':'Foregin'}"/>
+                                context="{'default_currency_id': currency_id,'default_exchange_rate':exchange_rate,'request_type':'Foregin'}">
+                            <field string="RFQ" name="rfq_count" widget="statinfo"/>
+                        </button>
                     </div>
                     <div class="oe_title">
                         <span class="o_form_label">Purchase Requisition</span>
@@ -414,7 +427,8 @@
                         <page string="Products" name="products">
                             <field name="purhcase_request_lines" mode="tree"
                                    attrs="{'readonly': ['|',('state', 'in', ('Approved', 'Cancel')),('is_user_import_operation','=', False)]}">
-                                <tree editable="bottom">
+                                <tree editable="bottom" limit="500">
+                                    <field name="seq_no" string="No"/>
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}"
                                            domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                            string="Requested Products"/>
@@ -457,7 +471,8 @@
                         <page string="Requested Product Info" products="expected">
                             <field name="purhcase_request_lines_expectetd" mode="tree"
                                    attrs="{'readonly': ['|',('state', 'in', ('Approved', 'Cancel')),('is_user_import_operation','=', False)]}">
-                                <tree create="0" delete="0" editable="bottom">
+                                <tree create="0" delete="0" editable="bottom" limit="500">
+                                    <field name="seq_no" string="No"/>
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}"
                                            domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                            readonly="1"/>
@@ -476,7 +491,8 @@
                         <page string="Current Market Status">
                             <field name="purhcase_request_lines_market_analysis" mode="tree"
                                    attrs="{'readonly': ['|',('state', 'in', ('Approved', 'Cancel')),('is_user_import_operation','=', False)]}">
-                                <tree create="0" delete="0" editable="bottom">
+                                <tree create="0" delete="0" editable="bottom" limit="500">
+                                    <field name="seq_no" string="No"/>
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}"
                                            domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                            readonly="1"/>
@@ -498,7 +514,8 @@
                               groups="droga_procurement.group_purchase_procurement_manager_group,droga_procurement.group_purchase_procurement_officer_group,droga_self_service.ceo_group,droga_procurement.group_purchase_import_operation_group">
                             <field name="purhcase_request_lines_foregin_competitors" mode="tree"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
-                                <tree create="0" delete="0" editable="bottom">
+                                <tree create="0" delete="0" editable="bottom" limit="500">
+                                    <field name="seq_no" string="No"/>
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}"
                                            domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                            readonly="1"/>
@@ -521,7 +538,8 @@
                               groups="droga_procurement.group_purchase_procurement_manager_group,droga_procurement.group_purchase_procurement_officer_group">
                             <field name="purhcase_request_lines_foregin_supp_list" mode="tree"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancel'))]}">
-                                <tree create="0" delete="0" editable="bottom">
+                                <tree create="0" delete="0" editable="bottom" limit="500">
+                                    <field name="seq_no" string="No"/>
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}"
                                            domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                            readonly="1"/>
@@ -538,7 +556,8 @@
                         <page string="Analysis Report">
 
                             <field name="purchase_analysis_report" mode="tree" readonly="1">
-                                <tree create="0" delete="0">
+                                <tree create="0" delete="0" limit="500">
+                                    <field name="seq_no" string="No"/>
                                     <field name="product_id" width="25" options="{'no_create':True,'no_open':True}"
                                            domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                            readonly="1"/>
