@@ -31,7 +31,7 @@ class AccountMove(models.Model):
     withholding_thirty_percent = fields.Float(
         compute='_compute_withholding_amount')
 
-    cost_center = fields.Char(string="Division", compute='_get_sales_info')
+    cost_center = fields.Char(string="Division", store=True, compute='_get_sales_info')
     sales_channel = fields.Char("Sales Channel", store=True, compute='_get_sales_info')
     customer_category = fields.Char("Customer Category", store=True, compute='_get_sales_info')
     due_date_in_days = fields.Integer("Due Days", store=True, compute='update_due_days')
