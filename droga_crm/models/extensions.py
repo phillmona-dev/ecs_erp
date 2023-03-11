@@ -68,14 +68,15 @@ class cust_contact_extension(models.Model):
 
     @api.model
     def create(self, vals):
-        if not self.env.user.has_group('droga_crm.crm_cust_create') and vals['supplier_rank'] == 0:
-            raise UserError("You don't have access to create a customer.")
-        if vals['supplier_rank'] == 0 and 'vat' in vals:
-            if len(vals['vat']) == 0:
-                raise UserError("Please enter Tin no. It is mandatory")
-        if vals['supplier_rank'] == 0 and 'vat' in vals:
-            if (len(vals['vat']) < 10 or len(vals['vat']) > 14):
-                raise UserError("Length of Tin no should either be 10 or 13, please ammend accordingly.")
+        if 'supplier_rank' in vals and 'vat' in vals:
+            if not self.env.user.has_group('droga_crm.crm_cust_create') and vals['supplier_rank'] == 0:
+                raise UserError("You don't have access to create a customer.")
+            if vals['supplier_rank'] == 0:
+                if len(vals['vat']) == 0:
+                    raise UserError("Please enter Tin no. It is mandatory")
+            if vals['supplier_rank'] == 0:
+                if (len(vals['vat']) < 10 or len(vals['vat']) > 14):
+                    raise UserError("Length of Tin no should either be 10 or 13, please ammend accordingly.")
         return super(cust_contact_extension, self).create(vals)
 
     @api.depends('location', 'area')

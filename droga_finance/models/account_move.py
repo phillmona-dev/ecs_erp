@@ -31,12 +31,13 @@ class AccountMove(models.Model):
     withholding_thirty_percent = fields.Float(
         compute='_compute_withholding_amount')
 
-    cost_center = fields.Selection(
-        [('IM', 'Import'), ('WS', 'Wholesale'), ('PT', 'Physiotherapy'), ('Others', 'Others')], store=True,
-        compute='_get_sales_info', string="Division")
+    cost_center = fields.Char(string="Division", compute='_get_sales_info')
     sales_channel = fields.Char("Sales Channel", store=True, compute='_get_sales_info')
     customer_category = fields.Char("Customer Category", store=True, compute='_get_sales_info')
     due_date_in_days = fields.Integer("Due Days", store=True, compute='update_due_days')
+
+    # picking list for vendor invoice
+    picking_list = fields.One2many('stock.picking', compute='get_picking_list')
 
     @api.model
     def create(self, vals):
@@ -78,7 +79,7 @@ class AccountMove(models.Model):
         self.withholding_thirty_percent = tax_amount2
 
     # get sales person
-    @api.depends('partner_id')
+    @api.depends('invoice_line_ids.analytic_distribution')
     def _get_sales_info(self):
         self.sales_initiator = ''
         for record in self:
@@ -98,14 +99,19 @@ class AccountMove(models.Model):
                 for order in sale_order:
                     record.sales_initiator = order.sales_initiator
 
-                    # get cost center
-                    if order.tender_origin_form_tender:
-                        record.sales_channel = "Tender"
-                    else:
-                        record.sales_channel = "Marketing"
-
-                    if order.order_type:
-                        record.cost_center = order.order_type
+                for o in record.invoice_line_ids:
+                    if o.analytic_distribution:
+                        analytic_distributions = o.analytic_distribution
+                        for analytic_distribution_id in analytic_distributions:
+                            # search analytic definition table
+                            analytic_plans = self.env['account.analytic.account'].search(
+                                [('id', '=', analytic_distribution_id)])
+                            for analytic_plan in analytic_plans:
+                                if analytic_plan.plan_id.complete_name == 'Profit Center':
+                                    record.cost_center = analytic_plan.display_name
+                                elif analytic_plan.plan_id.complete_name == 'Sales Channel':
+                                    record.sales_channel = analytic_plan.display_name
+                        break
 
     @api.depends('invoice_date', 'invoice_payment_term_id')
     def update_due_days(self):
@@ -150,14 +156,29 @@ class AccountMove(models.Model):
                 for order in sale_order:
                     sales_initiator = order.sales_initiator
 
-                    # get cost center
+                    """# get cost center
                     if order.tender_origin_form_tender:
                         sales_channel = "Tender"
                     else:
                         sales_channel = "Marketing"
 
                     if order.order_type:
-                        cost_center = order.order_type
+                        cost_center = order.order_type"""
+
+                for o in record.invoice_line_ids:
+
+                    if o.analytic_distribution:
+                        analytic_distributions = o.analytic_distribution
+                        for analytic_distribution_id in analytic_distributions:
+                            # search analytic definition table
+                            analytic_plans = self.env['account.analytic.account'].search(
+                                [('id', '=', analytic_distribution_id)])
+                            for analytic_plan in analytic_plans:
+                                if analytic_plan.plan_id.complete_name == 'Profit Center':
+                                    cost_center = analytic_plan.display_name
+                                elif analytic_plan.plan_id.complete_name == 'Sales Channel':
+                                    sales_channel = analytic_plan.display_name
+                        break
 
                 self.env.cr.execute(
                     """ update account_move set customer_category=%s,cost_center=%s,sales_channel=%s,due_date_in_days=%s,sales_initiator=%s where id=%s""",
@@ -317,3 +338,12 @@ class AccountMove(models.Model):
                     has_withholding_line = True
                     break
         self.withholding_invoice = has_withholding_line
+
+    # get picking list from purchase order
+    def get_picking_list(self):
+        for record in self:
+            if record.move_type in ('out_invoice', 'in_invoice'):
+                # search picking list using purchase order name
+                picking_lists = self.env['stock.picking'].search([('origin', '=', record.invoice_origin)])
+                if picking_lists:
+                    record.picking_list = picking_lists
