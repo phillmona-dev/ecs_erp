@@ -544,14 +544,14 @@
     </template>
 
 
-    <!-- cash reciept voucher -->
+    <!-- cash reciept voucher
     <record id="droga_account_cash_reciept_voucher_action" model="ir.actions.report">
         <field name="name">Cash Reciept Voucher</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-html</field>
         <field name="report_name">droga_finance.droga_account_cash_reciept_voucher_report</field>
         <field name="report_file">droga_finance.droga_account_cash_reciept_voucher_report</field>
-        <field name="print_report_name">'Cash Reciept Voucher - %s' % (object.name)
+        <field name="print_report_name">'Cash Receipt Voucher - %s' % (object.name)
         </field>
         <field name="binding_model_id" ref="account.model_account_move"/>
 
@@ -559,6 +559,7 @@
 
     </record>
 
+    -->
 
     <template id="droga_account_cash_reciept_voucher_report" name="Cash Receipt Voucher">
         <t t-call="web.html_container">
@@ -669,6 +670,180 @@
                                     <b>
                                         <span class="small">
                                             <t t-esc="o.amount_total"
+                                               t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </span>
+                                    </b>
+
+                                </h6>
+                            </div>
+                        </div>
+
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-12 bm-2">
+                                <h6 class="small">
+                                    <span class="small">የክፍያ ሁኔታ</span>
+                                    <span style="padding-left: 75px;" class="small">በጥሬ&#160;</span>
+                                    <input type="checkbox"></input>
+                                    <span style="padding-left: 15px;" class="small">በቼክ&#160;</span>
+                                    <input type="checkbox"></input>
+                                    <span style="padding-left: 25px;" class="small">የቼክ ቁጥር</span>
+                                </h6>
+                                <h6 class="small">Mode of Payment
+                                    <span style="padding-left: 15px;" class="small">Cash</span>
+                                    <span style="padding-left: 15px;" class="small">Cheque</span>
+                                    <span style="padding-left: 15px;" class="small">Cheque No</span>
+                                    _____________________
+                                </h6>
+                                <h6 class="small">ያዘጋጀው ስምና ፊርማ_____________________________________</h6>
+                                <h6 class="small">Prepared By</h6>
+                                <h6 class="small">የተቀባይ (የሻጭ) ስምና ፊርማ_______________________________</h6>
+                                <h6 class="small">Cashier's Signature</h6>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+    <!-- cash receipt voucher new -->
+    <record id="droga_account_cash_receipt_new_voucher_action" model="ir.actions.report">
+        <field name="name">Cash Receipt Voucher</field>
+        <field name="model">account.move.crv</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_finance.droga_account_cash_new_receipt_voucher_report</field>
+        <field name="report_file">droga_finance.droga_account_cash_new_receipt_voucher_report</field>
+        <field name="print_report_name">'Cash Receipt Voucher - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+
+        <field name="binding_type">report</field>
+
+    </record>
+
+
+    <template id="droga_account_cash_new_receipt_voucher_report" name="Cash Receipt Voucher">
+        <t t-call="web.html_container">
+            <div id="non-printable">
+                <button class="btn btn-primary btn-sm o_report_print" onclick="window.print();">Print Preview
+                </button>
+            </div>
+            <br></br>
+            <t t-call="web.basic_layout">
+
+
+                <style type="text/css">
+
+                    /* Default left, right, top, bottom margin is 2cm */
+                    @page {
+                    size: A4 portrait;
+                    margin-top: 6.5cm;
+                    margin-left:3cm;
+                    margin-right:2cm;
+                    margin-bottom:2cm;
+                    }
+
+                    @media print
+                    {
+                    #non-printable { visibility: hidden; }
+                    #wrapwrap { visibility: visible; }
+                    }
+                </style>
+
+                <t t-foreach="docs.move_id_crv" t-as="o">
+
+                    <!-- get amount,and purpose from the main document -->
+                    <t t-set="total_amount" t-value=""/>
+                    <t t-set="total_amount_word" t-value=""/>
+                    <t t-set="purpose" t-value=""/>
+
+                    <t t-foreach="docs" t-as="crv">
+                        <t t-set="total_amount" t-value="crv.amount"/>
+                        <t t-set="total_amount_word" t-value="crv.amount_word"/>
+                        <t t-set="purpose" t-value="crv.payment_description"/>
+                    </t>
+
+
+                    <div class="page">
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-6 bm-2">
+                                <h6 class="small">ከ:-
+                                    <strong t-esc="o.company_id.name"/>
+                                </h6>
+                                <h6 class="small">From
+
+                                </h6>
+                                <h6 class="small">አድራሻ/ክልል፦አ.አ
+                                    <span style="padding-left: 10px;" class="small">ክ.ከ፦አ/ከተማ</span>
+                                    <span style="padding-left: 10px;" class="small">ወ፦06</span>
+                                    <span style="padding-left: 10px;" class="small">ቤ.ቁ፦133</span>
+                                </h6>
+                                <h6 class="small">Address Region
+                                    <span style="padding-left: 8px;" class="small">K/K</span>
+                                    <span style="padding-left: 15px;" class="small">W.</span>
+                                    <span style="padding-left: 15px;" class="small">H.No.</span>
+                                </h6>
+                                <h6 class="small">የታክስ ከፋይ መ.ቁ፦&#160;&#160;<u>0045080232</u>
+                                </h6>
+                                <h6 class="small">Supplier's TIN No.</h6>
+                                <h6 class="small">የተ.እ.ታ ቁጥር______________________________</h6>
+                                <h6 class="small">VAT Reg. No</h6>
+                                <h6 class="small">የተመዘገበበት ቀን_______________________________</h6>
+                                <h6 class="small">Date of Registration</h6>
+
+                            </div>
+                            <div class="col-6 bm-2">
+                                <h6 class="small">ለ:-
+                                    <strong t-esc="o.partner_id.name"/>
+                                </h6>
+                                <h6 class="small">To
+
+                                </h6>
+                                <h6 class="small">አድራሻ/ክልል፦____ክ.ከ፦____ወ፦____ቤ.ቁ፦_____</h6>
+                                <h6 class="small">Address Region&#160;K/K&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;W.&#160;&#160;&#160;&#160;&#160;&#160;&#160;H.No.</h6>
+
+                                <h6 class="small">የተ.እ.ታ ቁጥር______________________________</h6>
+                                <h6 class="small">VAT Reg. No</h6>
+
+                                <h6 class="small">የታክስ ከፋይ መ.ቁ:-
+                                    <u>
+                                        <t t-esc="o.partner_id.vat"/>
+                                    </u>
+                                </h6>
+                                <h6 class="small">Customer's TIN No.</h6>
+
+                                <h6 class="small">የተመዘገበበት ቀን_______________________________</h6>
+                                <h6 class="small">Date of Registration</h6>
+                            </div>
+                        </div>
+
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-8 bm-2">
+                                <h6 class="small">የክፍያው ምክንያት</h6>
+                                <h6 class="small">Payment Description:-
+                                    <span class="small">
+                                        <t t-esc="purpose"/>
+                                    </span>
+                                </h6>
+                                <h6 class="small">የገንዘብ ልክ በፊደል</h6>
+                                <h6 class="small">Amount in Words:-
+                                    <span class="small">
+                                        <t t-esc="total_amount_word"/>
+                                    </span>
+
+                                </h6>
+
+
+                            </div>
+                            <div class="col-4 bm-2">
+                                <h6 class="small">ብር</h6>
+                                <h6 class="small">Birr:
+                                    <b>
+                                        <span class="small">
+                                            <t t-esc="total_amount"
                                                t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                         </span>
                                     </b>

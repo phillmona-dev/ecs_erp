@@ -39,6 +39,9 @@ class AccountMove(models.Model):
     # picking list for vendor invoice
     picking_list = fields.One2many('stock.picking', compute='get_picking_list')
 
+    # crv
+    crvs = fields.One2many('account.move.crv', 'move_id_crv')
+
     @api.model
     def create(self, vals):
         # Check withholding
@@ -347,3 +350,40 @@ class AccountMove(models.Model):
                 picking_lists = self.env['stock.picking'].search([('origin', '=', record.invoice_origin)])
                 if picking_lists:
                     record.picking_list = picking_lists
+
+    @api.constrains('crvs')
+    def validate_crv(self):
+        # get total amount
+        total_amount = self.amount_total_signed
+        total_amount_crv = 0
+        for record in self.crvs:
+            # sum crv amount
+            total_amount_crv += record.amount
+
+        if total_amount_crv > total_amount:
+            raise ValidationError("You can't print CRV amount greater than the invoice amount")
+
+
+# CRV document tracking
+class AccountCrv(models.Model):
+    _name = 'account.move.crv'
+
+    move_id_crv = fields.Many2one('account.move')
+    crv_ref = fields.Char("CRV Reference", required=True)
+    amount = fields.Float("Amount", required=True)
+    is_crv_document_printed = fields.Boolean("Document Printed")
+    payment_description = fields.Char("Payment Description")
+    amount_word = fields.Char("Amount Word", compute='_compute_amount_word')
+
+    def _compute_amount_word(self):
+        for record in self:
+            record.amount_word = self.env['account.move'].convert_to_word1(record.amount)
+
+    @api.constrains('crv_ref')
+    def check_crv_ref(self):
+        for record in self:
+            # search crv ref in the database
+            crv_count = self.env['account.move.crv'].search_count([('crv_ref', '=', record.crv_ref)])
+            if crv_count > 1:
+                raise ValidationError(
+                    'CRV Reference already registered in the system, you can''t use one reference multiple times')

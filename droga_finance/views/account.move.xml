@@ -69,7 +69,7 @@
     </record>
 
 
-    <!-- vendor invoice -->
+    <!-- customer/vendor invoice form-->
     <record id="inherit_for_account_move_vendor_invoice_form" model="ir.ui.view">
         <field name="name">Account Move</field>
         <field name="model">account.move</field>
@@ -82,6 +82,21 @@
                 <page id="grn_view" string="Delivery Slip"
                       attrs="{'invisible': [('move_type', 'not in', ('in_invoice','out_invoice'))]}">
                     <field name="picking_list" readonly="1"/>
+                </page>
+                <page id="crv_view" string="CRV"
+                      attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))]}">
+                    <field name="crvs" mode="tree">
+                        <tree editable="bottom">
+                            <field name="crv_ref" width="20"/>
+                            <field name="amount" width="20"/>
+                            <field name="payment_description" width="30"/>
+                            <field name="is_crv_document_printed" width="20"/>
+                            <button name="%(droga_account_cash_receipt_new_voucher_action)d" string="Report"
+                                    type="action"
+                                    class="oe_stat_button" icon="fa-align-justify" width="10"
+                            />
+                        </tree>
+                    </field>
                 </page>
             </xpath>
 
