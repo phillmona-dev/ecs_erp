@@ -344,7 +344,9 @@ class AccountMove(models.Model):
 
     # get picking list from purchase order
     def get_picking_list(self):
+
         for record in self:
+            record.picking_list = None
             if record.move_type in ('out_invoice', 'in_invoice'):
                 # search picking list using purchase order name
                 picking_lists = self.env['stock.picking'].search([('origin', '=', record.invoice_origin)])
