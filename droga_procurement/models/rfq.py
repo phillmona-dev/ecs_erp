@@ -15,6 +15,7 @@ class Rfq(models.Model):
                        index=True, copy=False, default='New')
     purhcase_request_id = fields.Many2one(
         "droga.purhcase.request", required=True)
+    purchase_requests = fields.Many2many('droga.purhcase.request', domain=[('wf_state', '=', 'Approved')])
     request_type = fields.Selection(
         related="purhcase_request_id.request_type", store=True)
 
@@ -99,6 +100,18 @@ class Rfq(models.Model):
     total_cost = fields.Float("Total Cost", compute='_compute_standard_cost', store=True, digits=(12, 4))
     coefficient = fields.Float("Coefficient", compute='_compute_standard_cost', store=True, digits=(12, 10), default=1)
     landed_cost_total = fields.Float("Total Landed Cost", compute='_compute_standard_cost', store=True, digits=(12, 4))
+
+    # currency request status
+    currency_request_status = fields.Char("Currency Request", compute='_compute_currency_request_status')
+
+    def _compute_currency_request_status(self):
+        # set currency request status to not requested
+        for record in self:
+            record.currency_request_status = "Not Requested"
+            for currency_request in record.currency_requests:
+                if currency_request.state != 'Cancelled':
+                    record.currency_request_status = currency_request.state
+                    break
 
     @api.depends('rfq_lines.product_qty', 'rfq_lines.unit_price', 'rfq_lines.unit_price_foregin', 'landed_costs.amount')
     def _compute_standard_cost(self):
@@ -359,11 +372,12 @@ class Rfq(models.Model):
                     bank_branch = record11.bank_branch
                     approved_date = record11.request_approved_date
 
-        suppliers = []
+        suppliers = record.supplier_id
+
         # get unique suppliers from the rfq
-        for line in self.rfq_lines:
-            if line.winner == "Yes" and self.check_supplier(line.supplier_name, suppliers) == 0:
-                suppliers.append(line)
+        # for line in self.rfq_lines:
+        # if line.winner == "Yes" and self.check_supplier(line.supplier_name, suppliers) == 0:
+        # suppliers.append(line)
 
         if suppliers:
             # close the status of purchase request commitment budget
@@ -374,8 +388,8 @@ class Rfq(models.Model):
                     'name': 'New',
                     'state': 'draft',
                     'date_order': datetime.now(),
-                    'rfq_id': supplier.rfq_id.id,
-                    'partner_id': supplier.supplier_id.id,
+                    'rfq_id': self.id,
+                    'partner_id': supplier.id,
                     'request_type': self.request_type,
                     'bank': bank.id if bank else None,
                     'branch': bank_branch if bank_branch else None,
@@ -386,46 +400,46 @@ class Rfq(models.Model):
 
                 # get products the supplier won
                 for line in self.rfq_lines:
-                    if line.winner == "Yes" and line.supplier_id == supplier.supplier_id:
-                        order_line_vals = (0, 0, {
-                            'date_planned': fields.Date.today(),
-                            'name': line.product_id.name,
-                            'price_unit': line.unit_price,
-                            'product_id': line.product_id.id,
-                            'product_qty': line.product_qty,
-                            'product_uom': line.product_uom.id,
-                            'unit_price_foregin': line.unit_price_foregin,
-                            'taxes_id': [(6, 0, line.tax_id.ids)],
-                        })
+                    # if line.winner == "Yes" and line.supplier_id == supplier.supplier_id:
+                    order_line_vals = (0, 0, {
+                        'date_planned': fields.Date.today(),
+                        'name': line.product_id.name,
+                        'price_unit': line.unit_price,
+                        'product_id': line.product_id.id,
+                        'product_qty': line.product_qty,
+                        'product_uom': line.product_uom.id,
+                        'unit_price_foregin': line.unit_price_foregin,
+                        'taxes_id': [(6, 0, line.tax_id.ids)],
+                    })
 
-                        vals['order_line'].append(order_line_vals)
+                    vals['order_line'].append(order_line_vals)
 
                 # create purchase orders
                 purchase_order = self.env['purchase.order'].create(vals)
 
             # create purchase order commitment budget
             for line in self.rfq_lines:
-                if line.winner == "Yes":
-                    # get budgetary position and expense account from purchase request
-                    purchase_request = self.env['droga.purhcase.request.line'].search(
-                        [('purhcase_request_id', '=', self.purhcase_request_id.id),
-                         ('product_id', '=', line.product_id.id)])
+                # if line.winner == "Yes":
+                # get budgetary position and expense account from purchase request
+                purchase_request = self.env['droga.purhcase.request.line'].search(
+                    [('purhcase_request_id', '=', self.purhcase_request_id.id),
+                     ('product_id', '=', line.product_id.id)])
 
-                    commitment_budget = {
-                        'document_type': 'PO',
-                        'purchase_order_id': purchase_order.id,
-                        'purchase_order_total_amount': purchase_order.amount_total,
-                        'budget_date': purchase_order.date_order,
-                        'budgetary_position': purchase_request.budgetary_position.id,
-                        'expense_account': purchase_request.expense_account.id,
-                        'analytic_account_id': self.purhcase_request_id.branch.id,
-                        'company_id': self.company_id.id,
-                        'state': 'Active'
-                    }
+                commitment_budget = {
+                    'document_type': 'PO',
+                    'purchase_order_id': purchase_order.id,
+                    'purchase_order_total_amount': purchase_order.amount_total,
+                    'budget_date': purchase_order.date_order,
+                    'budgetary_position': purchase_request.budgetary_position.id,
+                    'expense_account': purchase_request.expense_account.id,
+                    'analytic_account_id': self.purhcase_request_id.branch.id,
+                    'company_id': self.company_id.id,
+                    'state': 'Active'
+                }
 
-                    # persist to database
-                    self.env['droga.budget.commitment.budget'].create(
-                        commitment_budget)
+                # persist to database
+                self.env['droga.budget.commitment.budget'].create(
+                    commitment_budget)
 
         return {
             'type': 'ir.actions.client',
@@ -657,13 +671,13 @@ class Rfq(models.Model):
             'res_id': self.id
         }
 
-    @api.constrains('proforma_invoice_no')
+    """@api.constrains('proforma_invoice_no')
     def _check_proforma_invoice_no_unique(self):
         counts = self.search_count(
             [('proforma_invoice_no', '=', self.proforma_invoice_no)])
 
         if counts > 1 and self.proforma_invoice_no != '':
-            raise ValidationError("Proforma invoice number already exists!")
+            raise ValidationError("Proforma invoice number already exists!")"""
 
 
 class Rfq_Detail(models.Model):
@@ -671,6 +685,7 @@ class Rfq_Detail(models.Model):
     _description = 'Request for Quotation Detail'
     _order = "supplier_name asc"
 
+    seq_no = fields.Integer("No", compute='compute_sequence_no')
     rfq_id = fields.Many2one("droga.purhcase.request.rfq")
     company_id = fields.Many2one(
         'res.company', related='rfq_id.company_id', string='Company', store=True, readonly=True)
@@ -738,6 +753,12 @@ class Rfq_Detail(models.Model):
     total_cost = fields.Float("Total Cost", digits=(12, 4))
     unit_cost = fields.Float("Unit Cost", digits=(12, 4))
 
+    def compute_sequence_no(self):
+        seq_no = 1
+        for record in self:
+            record.seq_no = seq_no
+            seq_no += 1
+
     @api.depends('product_id', 'product_qty', 'unit_price', 'tax_id', 'exchange_rate', 'unit_price_foregin')
     def _compute_total(self):
         for record in self:
@@ -773,7 +794,14 @@ class Rfq_Detail(models.Model):
 
     @api.onchange('product_id')
     def onchange_product_id(self):
+        x = []
         x = self.purhcase_request_lines.product_id.ids
+
+        # add products from merged product ids
+        for rec in self.rfq_id.purchase_requests:
+            for id in rec.purhcase_request_lines.product_id.ids:
+                x.append(id)
+
         # set quantity
         products = self.purhcase_request_lines
 

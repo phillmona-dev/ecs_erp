@@ -105,6 +105,27 @@
         </field>
     </record>
 
+    <!--search view for foreign currency request -->
+    <record id="foreign_currency_request_view_search" model="ir.ui.view">
+        <field name="name">foreign_currency_request.view.search</field>
+        <field name="model">droga.account.foreign.currency.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="request_by"/>
+                <field name="department"/>
+                <field name="request_date"/>
+                <field name="currency_id"/>
+                <field name="total_amount"/>
+                <field name="state"/>
+                <field name="rfq_id"
+                       filter_domain="[('rfq_id.rfq_lines.product_id', 'ilike', self)]" string="Product"/>
+                <field name="rfq_id"
+                       filter_domain="[('rfq_id.supplier_id', 'ilike', self)]" string="Supplier"/>
+            </search>
+        </field>
+    </record>
+
     <!-- rule for filtering data specific data -->
     <record model="ir.rule" id="droga_account_foreign_currency_request_rule">
         <field name="name">Foreign Currency Request multi-company</field>

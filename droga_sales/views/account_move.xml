@@ -27,7 +27,7 @@
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
-                <page string="FS Info">
+                <page string="FS Info" attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))]}">
 
                     <group>
                         <group>

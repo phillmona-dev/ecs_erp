@@ -68,6 +68,81 @@
         </field>
     </record>
 
+
+    <!-- cash receipt voucher new -->
+    <record id="droga_account_cash_receipt_new_voucher_action" model="ir.actions.report">
+        <field name="name">Cash Receipt Voucher</field>
+        <field name="model">account.move.crv</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">droga_finance.droga_account_cash_new_receipt_voucher_report</field>
+        <field name="report_file">droga_finance.droga_account_cash_new_receipt_voucher_report</field>
+        <field name="print_report_name">'Cash Receipt Voucher - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+
+        <field name="binding_type">report</field>
+
+    </record>
+
+
+    <!-- customer/vendor invoice form-->
+    <record id="inherit_for_account_move_vendor_invoice_form" model="ir.ui.view">
+        <field name="name">Account Move</field>
+        <field name="model">account.move</field>
+        <field name="priority" eval="1"/>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+
+            <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
+                <page id="grn_view" string="Delivery Slip"
+                      attrs="{'invisible': [('move_type', 'not in', ('in_invoice','out_invoice'))]}">
+                    <field name="picking_list" readonly="1"/>
+                </page>
+                <page id="crv_view" string="CRV"
+                      attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))]}">
+                    <field name="crvs" mode="tree">
+                        <tree editable="bottom">
+                            <field name="crv_ref" width="20"/>
+                            <field name="amount" width="20"/>
+                            <field name="payment_description" width="30"/>
+                            <field name="is_crv_document_printed" width="20"/>
+                            <button name="%(droga_account_cash_receipt_new_voucher_action)d" string="Report"
+                                    type="action"
+                                    class="oe_stat_button" icon="fa-align-justify" width="10"
+                            />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+
+
+        </field>
+    </record>
+
+    <!-- Journal Entry -->
+    <record id="inherit_for_account_move_journal_main_form" model="ir.ui.view">
+        <field name="name">Account Move</field>
+        <field name="model">account.move</field>
+        <field name="priority" eval="1"/>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_date_due']" position="after">
+                <field name="sales_initiator" optional="show"/>
+            </xpath>
+
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="partner_id" optional="hide" string="Customer"/>
+                <field name="customer_category" optional="hide" string="Cust Category"/>
+                <field name="cost_center" optional="hide" string="Division"/>
+                <field name="sales_channel" optional="hide" string="Sales Channel"/>
+                <field name="due_date_in_days" optional="hide" string="Due Days"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
     <record id="inherit_for_account_move_tree" model="ir.ui.view">
         <field name="name">Account Move</field>
         <field name="model">account.move</field>

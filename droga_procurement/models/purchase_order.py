@@ -68,7 +68,7 @@ class purchase_order(models.Model):
     insurance_premium_cost = fields.Float("Insurance Premium Cost")
 
     # shipment
-    shipment_percent = fields.Float("Shipment Percent", required=True, default=100)
+    shipment_percent = fields.Float("1st Shipment Amount", required=True, default=0)
     is_shipment_partial = fields.Boolean("Is Shipment Partial", default=False)
     shipment_date = fields.Date("Estimated Shipment Date")
     production_completion_date = fields.Date("Estimaed Production Completion Date")
@@ -283,9 +283,16 @@ class purchase_order(models.Model):
 class purchase_order_line(models.Model):
     _inherit = "purchase.order.line"
 
+    seq_no = fields.Integer("No", compute='compute_sequence_no')
     unit_price_foregin = fields.Float('Unit Price')
     total_price_foregin = fields.Float(
         'Total Price', compute="_compute_total", store=True)
+
+    def compute_sequence_no(self):
+        seq_no = 1
+        for record in self:
+            record.seq_no = seq_no
+            seq_no += 1
 
     @api.depends('unit_price_foregin', 'product_qty', 'order_id.exchange_rate')
     def _compute_total(self):
@@ -306,7 +313,7 @@ class partial_shipment(models.Model):
     amount_total_usd = fields.Float(related="purchase_order_id.amount_total_usd")
 
     # shipment
-    shipment_percent = fields.Float("Shipment Percent", required=True)
+    shipment_percent = fields.Float("Shipment Amount", required=True)
     shipment_description = fields.Char("Shipment Description", required=True)
     shipment_date = fields.Date("Estimated Shipment Date")
     production_completion_date = fields.Date("Estimaed Production Completion Date")
