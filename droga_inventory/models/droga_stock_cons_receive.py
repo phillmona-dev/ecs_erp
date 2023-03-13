@@ -17,8 +17,11 @@ class droga_stock_cons_receive(models.Model):
         ('cancel', 'Cancelled'),  # When requester cancels it from draft
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
         ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
+        ('mg', 'Export manager'),
+        ('sc', 'Sent to SC'),
         ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
+
         ('done', 'Received'),  # When request is received
     ], string='Status', default="draft", readonly=True, tracking=True,
         help=" * Requested: The consignment receive order is sent to warehouse.\n"
@@ -35,7 +38,7 @@ class droga_stock_cons_receive(models.Model):
     consignment_reference = fields.Char(string='Order reference', default='', readonly=True)
     cons_ref = fields.One2many('stock.picking', 'cons_receive_request', string='Consignment reference')
 
-    issue_type = fields.Selection([('CONR', 'Consignment recieve'), ('SIR', 'Sample return')],
+    issue_type = fields.Selection([('CONR', 'Consignment recieve'), ('SIR', 'Sample return'),('SUBL','Sub-contractor return')],
                                   string='Issue type', required=True)
     marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
     store_manager = fields.Many2one('res.users', compute='_get_approvers')

@@ -12,7 +12,7 @@ class cust_contact_extension(models.Model):
                                     selection=[('company', 'Company'),('person', 'Individual')],
                                     compute='_compute_company_type', inverse='_write_company_type',default='company')
     cust_grade=fields.Many2one('droga.cust.grade',string='Customer grade')
-    cust_type_ext=fields.Many2one('droga.cust.type',string='Customer type')
+    cust_type_ext=fields.Many2one('droga.cust.type',string='Customer type',tracking=True)
     contact_tobe_accessed_by=fields.Selection([('Promotors', 'Promotors'),('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
     type = fields.Selection(
         [('contact', 'Contact'),

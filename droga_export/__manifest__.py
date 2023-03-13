@@ -24,11 +24,14 @@
         'data/sequence.xml',
         'views/purchase_auto.xml',
         'views/items_composition.xml',
+        'views/droga_sub_contractor_send.xml',
+        'views/droga_sales_extension.xml',
+        'views/droga_sub_contractor_receipt.xml'
     ],
 
     # any module necessary for this one to work correctly
 
-    'depends': ['base', 'hr', 'mrp',
+    'depends': ['base', 'hr',
                 'mail', 'stock', 'http_routing', 'sale',
                 'resource', 'stock', 'droga_inventory',
                 'web', 'crm'],
