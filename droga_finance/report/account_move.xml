@@ -708,20 +708,7 @@
     </template>
 
 
-    <!-- cash receipt voucher new -->
-    <record id="droga_account_cash_receipt_new_voucher_action" model="ir.actions.report">
-        <field name="name">Cash Receipt Voucher</field>
-        <field name="model">account.move.crv</field>
-        <field name="report_type">qweb-html</field>
-        <field name="report_name">droga_finance.droga_account_cash_new_receipt_voucher_report</field>
-        <field name="report_file">droga_finance.droga_account_cash_new_receipt_voucher_report</field>
-        <field name="print_report_name">'Cash Receipt Voucher - %s' % (object.name)
-        </field>
-        <field name="binding_model_id" ref="account.model_account_move"/>
 
-        <field name="binding_type">report</field>
-
-    </record>
 
 
     <template id="droga_account_cash_new_receipt_voucher_report" name="Cash Receipt Voucher">
