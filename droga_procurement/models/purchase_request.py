@@ -278,6 +278,7 @@ class purhcase_request(models.Model):
         self.write({'state': 'Procurement Manager'})
         if self.total_amount <= 100000:
             self.write({'wf_state': 'Approved'})
+            self.send_notification_on_approval()
         return True
 
     # approve request
@@ -287,6 +288,7 @@ class purhcase_request(models.Model):
         # record commitment budget
 
         self.set_activity_done()
+        self.send_notification_on_approval()
         return True
 
     def open_rfq(self):
@@ -392,6 +394,26 @@ class purhcase_request(models.Model):
             'target': 'new',
             'res_id': self.id
         }
+
+    def send_notification_on_approval(self):
+        purchase_group = self.env.ref('droga_procurement.group_purchase_procurement_manager_group')
+        purchase_user = self.env['res.users'].search(
+            [('groups_id', '=', purchase_group.ids)])
+
+        notification_ids = []
+
+        message = "Purchase request #" + self.name + " is approved, please create RFQ"
+
+        for purchase in purchase_user:
+            notification_ids.append((0, 0, {
+                'res_partner_id': purchase.partner_id.id,
+                'notification_type': 'inbox'}))
+
+        subtype_id = self.env['ir.model.data']._xmlid_to_res_id('mail.mt_note')
+
+        self.message_post(body=message, message_type="notification",
+                          author_id=self.env.user.partner_id.id, subtype_id=subtype_id,
+                          notification_ids=notification_ids)
 
 
 class purhcase_request_line(models.Model):
