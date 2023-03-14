@@ -10,12 +10,11 @@ class cust_contact_extension(models.Model):
     name = fields.Char(index=True, default_export_compatible=True, tracking=True)
     display_name = fields.Char(compute='_compute_display_name', recursive=True, store=True, index=True, tracking=True)
     company_type = fields.Selection(string='Company Type',
-                                    selection=[('company', 'Company'), ('person', 'Individual')],
-                                    compute='_compute_company_type', inverse='_write_company_type', default='company')
-    cust_grade = fields.Many2one('droga.cust.grade', string='Customer grade')
-    cust_type_ext = fields.Many2one('droga.cust.type', string='Customer type')
-    contact_tobe_accessed_by = fields.Selection(
-        [('Promotors', 'Promotors'), ('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
+                                    selection=[('company', 'Company'),('person', 'Individual')],
+                                    compute='_compute_company_type', inverse='_write_company_type',default='company')
+    cust_grade=fields.Many2one('droga.cust.grade',string='Customer grade')
+    cust_type_ext=fields.Many2one('droga.cust.type',string='Customer type',tracking=True)
+    contact_tobe_accessed_by=fields.Selection([('Promotors', 'Promotors'),('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
     type = fields.Selection(
         [('contact', 'Contact'),
          ('invoice', 'Invoice Address'),

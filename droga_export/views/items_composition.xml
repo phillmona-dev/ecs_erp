@@ -57,6 +57,6 @@
             id="droga_export_items_composition_menu"
             name="Export Items Composition"
             action="droga_export_items_composition_form_action"
-            parent="mrp.menu_mrp_bom"
+            parent="sale.menu_sales_config"
             sequence="40"/>
 </odoo>

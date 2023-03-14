@@ -100,7 +100,8 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Please login before registering a sales order!")
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
-
+            if so.amount_total<so.payment_term_id.min_amount:
+                raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
             if 'cust_type_ext' in vals:
                 if result.partner_id.cust_type_ext!=vals['cust_type_ext']:
                     result.partner_id.cust_type_ext = vals['cust_type_ext']
@@ -171,6 +172,7 @@ class payment_term_no_credit(models.Model):
     _inherit = 'account.payment.term'
     apply_credit_limit = fields.Boolean(string='Apply credit limit', default=True, Tracking=True)
     deliv_after_payment = fields.Boolean(string='Delivery after payment', default=False)
+    min_amount=fields.Float(string='Minimum order amount', default=0)
 
 
 class payment_term_no_credit_messages(models.Model):

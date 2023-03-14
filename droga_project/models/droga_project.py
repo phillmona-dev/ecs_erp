@@ -1,30 +1,30 @@
-from odoo import fields, models
-class DrogaProject(models.Model):
+from odoo import fields, models, api
+
+
+class parentProject(models.Model):
+    _name = 'parent.project'
+
+    name = fields.Char()
+    location = fields.Many2one('res.partner')
+
+
+class drogaProject(models.Model):
     _inherit = 'project.project'
-    isinterest= fields.Boolean(string="Is intest has interest?", compute='_compute_isinterest')
-    isactive= fields.Boolean(string="Active?")
-    droga_companies = fields.Many2one('res.company', string='Sister Companies', required=True, default=lambda self: self.env.company)
-   
-    
-    # _name='droga.project'
-    #droga_companies=fields.Many2one('res.company', string="Sister Company",copy=True)
-    droga_parent_project=fields.Many2one( 'droga.parent.project',string='Parent Project',copy=True)
-    droga_project_type=fields.Many2one('droga.project.type', string="Project Type",copy=True)
 
+    parent_project = fields.Many2one('parent.project')
+    project_progress = fields.Float(compute="_project_progress")
+    stages_sum=fields.Char('Stages sum',compute='_project_progress')
 
-
-   
-    
-class DrogaParentProject(models.Model):
-    _name = 'droga.parent.project'
-    #_description = "This model is used to catagoraize difrent type of loan"
-
-    name=fields.Char('parent Project', required=True)
-    
-
-class DrogaProjectType(models.Model):
-    _name = 'droga.project.type'
-    #_description = "This model is used to catagoraize difrent type of loan"
-
-    name=fields.Char('Drpga Project type', required=True)
-
+    def _project_progress(self):
+        for record in self:
+            record.ensure_one()
+            record.project_progress =0
+            record.stages_sum=''
+            sta_sum=0
+            task_list = record.env['project.task.type'].search([('project_ids', '=', record.id)])
+            print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+            print(task_list)
+            for rec in task_list:
+                record.project_progress += (rec.task_stage_progress * rec.task_stage_weight) / 100
+                sta_sum += rec.task_stage_weight
+            record.stages_sum=str(sta_sum)
