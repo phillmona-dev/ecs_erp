@@ -35,7 +35,8 @@
         'reports/daily_sales.xml',
         'reports/request_report.xml',
         'views/module_menus.xml',
-        'reports/sales_detail.xml'
+        'reports/sales_detail.xml',
+        'reports/sales_summary.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
