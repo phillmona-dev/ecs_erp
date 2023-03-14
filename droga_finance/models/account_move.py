@@ -356,7 +356,7 @@ class AccountMove(models.Model):
     @api.constrains('crvs')
     def validate_crv(self):
         # get total amount
-        total_amount = abs(self.amount_total_signed)
+        total_amount = abs(self.amount_untaxed_signed)
         total_amount_crv = 0
         for record in self.crvs:
             # sum crv amount

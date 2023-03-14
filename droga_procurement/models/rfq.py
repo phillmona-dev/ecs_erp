@@ -263,6 +263,7 @@ class Rfq(models.Model):
     def pick_winner(self):
 
         # validate rfq lines
+        self.validate_rfq()
         self.validae_rfq_lines()
 
         # update all record to no
@@ -671,13 +672,12 @@ class Rfq(models.Model):
             'res_id': self.id
         }
 
-    """@api.constrains('proforma_invoice_no')
-    def _check_proforma_invoice_no_unique(self):
-        counts = self.search_count(
-            [('proforma_invoice_no', '=', self.proforma_invoice_no)])
+    def validate_rfq(self):
+        # validate hs code
+        for record in self.hs_codes:
+            if not record.hs_code:
+                raise ValidationError("Please fill HS code for all products")
 
-        if counts > 1 and self.proforma_invoice_no != '':
-            raise ValidationError("Proforma invoice number already exists!")"""
 
 
 class Rfq_Detail(models.Model):
