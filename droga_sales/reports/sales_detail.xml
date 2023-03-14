@@ -22,6 +22,8 @@
                 <field name="wareh" optional="hide" string="Warehouse"></field>
                 <field name="product_uom" string="UOM"></field>
                 <field name="price_unit"></field>
+                <field name="state"></field>
+                <field name="invoice_status"></field>
             </tree>
         </field>
     </record>
@@ -70,13 +72,22 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_detail_view_tree')})]"/>
         <field name="search_view_id" ref="droga_sales_detail_search_tree"></field>
+        <field name="domain">[('state', '!=', 'cancel')]</field>
         <field name="context">{'search_default_today_sales': 1}</field>
     </record>
+
+    <menuitem
+            id="droga_sales_reports_menu"
+            name="Reports"
+            parent="sale.sale_menu_root"
+            groups="droga_crm.crm_sr"
+            sequence="21"/>
 
     <menuitem
             id="droga_sales_detail_report_menu"
             name="Sales detail report"
             action="droga_sales_detail_action"
-            parent="sale.menu_sale_report"
+            parent="droga_sales.droga_sales_reports_menu"
+            groups="droga_crm.crm_sr"
             sequence="17"/>
 </odoo>
