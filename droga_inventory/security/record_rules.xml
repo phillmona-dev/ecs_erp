@@ -89,7 +89,7 @@
     </record>
 
     <record id = "inventory_warehouse_read_access" model = "ir.rule">
-        <field name = "name"> Every store keeper can create read other warehouse for inter-store request issuance </field>
+        <field name = "name"> Every store keeper can read other warehouse for inter-store request issuance </field>
         <field name = "model_id" search="[('model','=','stock.warehouse')]" />
         <field name = "groups" eval = "[(4, ref ('base.group_user'))]" />
         <field name = "perm_read" eval = "True" />
