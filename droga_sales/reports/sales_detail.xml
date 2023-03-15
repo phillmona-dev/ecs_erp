@@ -9,19 +9,22 @@
                 <field name="cust_location"></field>
                 <field name="order_id"></field>
                 <field name="product_id"></field>
+                <field name="product_uom" string="UOM"></field>
+                <field name="crm_group"></field>
+                <field name="is_core"></field>
                 <field name="name"></field>
                 <field name="date_order_det" string="Date"></field>
                 <field name="order_type_det"></field>
                 <field name="payment_term_det"></field>
-                <field name="crm_group"></field>
                 <field name="product_uom_qty"></field>
                 <field name="qty_delivered" optional="hide"></field>
                 <field name="qty_invoiced" optional="hide"></field>
                 <field name="price_subtotal"></field>
                 <field name="store_placement"></field>
                 <field name="wareh" optional="hide" string="Warehouse"></field>
-                <field name="product_uom" string="UOM"></field>
                 <field name="price_unit"></field>
+                <field name="state"></field>
+                <field name="invoice_status"></field>
             </tree>
         </field>
     </record>
@@ -39,6 +42,7 @@
                 <field name="order_type_det"></field>
                 <field name="payment_term_det"></field>
                 <field name="crm_group"></field>
+                <field name="is_core"></field>
 
                 <filter name="group_type" string="By customer" context="{'group_by':'order_partner_id'}"/>
                 <filter name="group_type" string="By location" context="{'group_by':'cust_location'}"/>
@@ -46,6 +50,11 @@
                 <filter name="group_type" string="By product group" context="{'group_by':'crm_group'}"/>
                 <filter name="group_type" string="By product" context="{'group_by':'product_id'}"/>
                 <filter name="group_type" string="By payment term" context="{'group_by':'payment_term_det'}"/>
+
+                <filter name="app_so" string="Sales orders" domain="[('state', '=', 'sale')]" />
+                <filter name="pro_so" string="WF pending SO" domain="[('state', '!=', 'sale')]" />
+
+                <separator/>
 
                 <filter string="Today sales"
                         domain="[('date_order_det', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date_order_det', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
@@ -70,13 +79,22 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_detail_view_tree')})]"/>
         <field name="search_view_id" ref="droga_sales_detail_search_tree"></field>
-        <field name="context">{'search_default_today_sales': 1}</field>
+        <field name="domain">[('state', '!=', 'cancel')]</field>
+        <field name="context">{'search_default_today_sales': 1,'search_default_app_so':1}</field>
     </record>
+
+    <menuitem
+            id="droga_sales_reports_menu"
+            name="Reports"
+            parent="sale.sale_menu_root"
+            groups="droga_crm.crm_sr"
+            sequence="21"/>
 
     <menuitem
             id="droga_sales_detail_report_menu"
             name="Sales detail report"
             action="droga_sales_detail_action"
-            parent="sale.menu_sale_report"
+            parent="droga_sales.droga_sales_reports_menu"
+            groups="droga_crm.crm_sr"
             sequence="17"/>
 </odoo>

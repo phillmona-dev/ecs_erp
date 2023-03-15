@@ -31,7 +31,7 @@ class ForeignCurrencyRequest(models.Model):
         "hr.employee", string="Requested By", required=True, default=_get_employee_id)
     request_date = fields.Datetime(
         "Request Date", required=True, default=datetime.today())
-    payment_due_date = fields.Datetime("Payment Due Date")
+    payment_due_date = fields.Datetime("Payment Due Date", required=True)
     department = fields.Many2one(
         "hr.department", string="Department", required=True, default=_get_department_id)
 

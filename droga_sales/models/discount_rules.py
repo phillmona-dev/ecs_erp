@@ -27,6 +27,7 @@ class droga_price_discount_per_amount(models.Model):
     core_products_or_all= fields.Selection([('Core', 'Core products'), ('Noncore', 'Non-core products'),('All', 'All')],string='Core?',required=True,default='Core',tracking=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active',tracking=True)
 
+
 class sale_order_line(models.Model):
     _inherit = 'sale.order.line'
 
@@ -35,8 +36,8 @@ class sale_order_line(models.Model):
         compute='_compute_price_unit',
         inverse='_inverse_price',
         digits='Product Price',
-        store=True, required=True)
-    is_prod_available=fields.Boolean(compute='_is_prod_available')
+        store=True, required=True,tracking=True)
+    is_prod_available=fields.Char(compute='_is_prod_available')
     available_qty=fields.Float('Available',compute='_is_prod_available')
     avail_char = fields.Char('Available', readonly=True, compute="_is_prod_available")
     price_unit_before_discount=fields.Float('')
@@ -56,9 +57,11 @@ class sale_order_line(models.Model):
             #rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
 
             if not rec.product_id.bought_locally and rec.available_qty<rec.product_uom_qty:
-                rec.is_prod_available=False
+                rec.is_prod_available='False'
+            elif rec.product_id.bought_locally and rec.available_qty<rec.product_uom_qty:
+                rec.is_prod_available='Kinda'
             else:
-                rec.is_prod_available = True
+                rec.is_prod_available = 'True'
 
     def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
         self = self.sudo()
@@ -105,9 +108,9 @@ class sale_order_line(models.Model):
         self.order_id.non_core_sum = non_core_sum
         self.order_id.total_discount=total_before_discount-(core_sum+non_core_sum)
         self.order_id.total_added=(core_sum+non_core_sum)-total_before_discount
-    @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id','manual_price','store_placement')
+    @api.depends('product_id', 'product_uom', 'product_uom_qty','tax_id','order_id.partner_id','order_id.payment_term_id','manual_price')
     def _compute_price_unit(self):
-        if self.order_id.state in ('sale','cancel','done'):
+        if self.order_id.state in ('sale','cancel','done','fia'):
             return
 
         for line in self:
@@ -302,34 +305,40 @@ class sale_order_ext(models.Model):
 
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
 
-    def save_request_button(self):
+    def validate_form(self):
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
         if (len(order_lines_nowareh) > 0):
             raise ValidationError("Warehouse must be filled for each order line.")
 
         order_lines_nowareh = self.order_line.filtered(
-            lambda x: x.wareh.wh_type!=self.order_type)
+            lambda x: x.wareh.wh_type != self.order_type)
         if (len(order_lines_nowareh) > 0):
-            raise ValidationError("Please check if all warehouses are under "+dict(self._fields['order_type'].selection).get(self.order_type)+".")
+            raise ValidationError(
+                "Please check if all warehouses are under " + dict(self._fields['order_type'].selection).get(
+                    self.order_type) + ".")
 
         order_lines_negative = self.order_line.filtered(
             lambda x: not x.is_prod_available)
         if (len(order_lines_negative) > 0):
-            products=''
+            products = ''
             for lin in order_lines_negative:
-                products+=lin.product_template_id.default_code + ', '
-            raise ValidationError("Product quantity is out of stock for "+products)
+                products += lin.product_template_id.default_code + ', '
+            raise ValidationError("Product quantity is out of stock for " + products)
 
         for so in self:
             if not so.partner_id.vat:
                 raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
+            if so.amount_total<so.payment_term_id.min_amount:
+                raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 raise ValidationError("Please login before registering a sales order!")
             if so.mature_amount > 0:
                 raise ValidationError("Please settle matured amounts before initiating another sales!")
+    def save_request_button(self):
+        self.validate_form()
         self.ensure_one()
 
         #Physiotheraphy order automatic confirmation
@@ -345,14 +354,17 @@ class sale_order_ext(models.Model):
 
     def reject_order(self):
         self.ensure_one()
+        self.set_activity_done()
         self.state = 'draft'
 
     def price_approval(self):
+        self.validate_form()
         self.ensure_one()
         self.set_activity_done()
         self.state = 'req'
 
     def operation_confirm(self):
+        self.validate_form()
         self.ensure_one()
         self.set_activity_done()
 
@@ -362,6 +374,7 @@ class sale_order_ext(models.Model):
             self.state = 'fia'
 
     def final_approval(self):
+        self.validate_form()
         self.ensure_one()
         self.set_activity_done()
         self.action_confirm()
@@ -440,8 +453,19 @@ class sale_order_ext(models.Model):
                 if node.get("modifiers") is None or node.get("name") in ('name'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
-                modifiers['readonly'] = [['state','not in', ('draft','req','price_request')]]
+                if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
+                        'droga_sales.sales_import_approve_admin') or self.user_has_groups(
+                        'droga_sales.sales_wholesale_approve_admin'):
+                    modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request')]]
+                else:
+                    modifiers['readonly'] = [['state', 'not in', ('draft')]]
+
                 node.set('modifiers', simplejson.dumps(modifiers))
             res['arch'] = etree.tostring(doc)
 
         return res
+
+class sale_order_line_mail_inherit(models.Model):
+    _name = 'sale.order.line'
+    _inherit = ['sale.order.line', 'mail.thread', 'mail.activity.mixin', 'image.mixin']
+

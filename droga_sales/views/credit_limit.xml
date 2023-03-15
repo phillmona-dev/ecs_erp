@@ -50,6 +50,8 @@
                         <field name="apply_credit_limit"/>
                     <label for="deliv_after_payment"/>
                         <field name="deliv_after_payment"/>
+                <label for="min_amount"/>
+                        <field name="min_amount"/>
             </xpath>
             <xpath expr="//form/sheet" position="after">
                 <div class="oe_chatter">

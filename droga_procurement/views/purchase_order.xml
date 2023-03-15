@@ -36,6 +36,10 @@
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
 
+            <xpath expr="//field[@name='product_id']" position="before">
+                <field name="seq_no"/>
+            </xpath>
+
             <xpath expr="//field[@name='partner_ref']" position="after">
                 <field name="rfq_id" options="{'no_create':True}" readonly="1" string="Request for Quotation"
                        attrs="{'invisible': [('request_type', '==', 'Local')]}"/>
@@ -202,6 +206,9 @@
                             <field name="discrepancy_comment"
                                    attrs="{'invisible': ['|',('accept_discrepancy', '!=', True),('discrepancy', '!=', 'Yes')]}"/>
 
+                            <field name="discrepancy_amount"
+                                   attrs="{'invisible': ['|',('accept_discrepancy', '!=', True),('discrepancy', '!=', 'Yes')]}"/>
+
 
                             <field name="shipment_doc_collected_from_applicant_bank"/>
                             <field name="exchange_rate_lc_settlement"/>
@@ -211,7 +218,10 @@
                             <field name="shipment_doc_handed_to_finance"/>
                             <field name="supplier_payment_date"/>
                         </group>
-
+                        <group string="Deliver Order">
+                            <field name="is_it_do"/>
+                            <field name="do_amount" attrs="{'invisible': [('is_it_do', '!=', True)]}"/>
+                        </group>
 
                     </group>
                     <br></br>
@@ -288,6 +298,7 @@
 
                             <field name="declaration_number"/>
                             <field name="custom_duty_tax_amount"/>
+                            <field name="custom_duty_withholding_tax"/>
                             <field name="custom_duty_tax_paid_date"/>
                             <field name="custom_tax_acceptance"/>
                             <field name="custom_duty_tax_additional_amount"
@@ -429,6 +440,9 @@
                                     <field name="discrepancy_comment"
                                            attrs="{'invisible': ['|',('accept_discrepancy', '!=', True),('discrepancy', '!=', 'Yes')]}"/>
 
+                                    <field name="discrepancy_amount"
+                                           attrs="{'invisible': ['|',('accept_discrepancy', '!=', True),('discrepancy', '!=', 'Yes')]}"/>
+
 
                                     <field name="shipment_doc_collected_from_applicant_bank"/>
                                     <field name="exchange_rate_lc_settlement"/>
@@ -437,6 +451,11 @@
 
                                     <field name="shipment_doc_handed_to_finance"/>
                                     <field name="supplier_payment_date"/>
+                                </group>
+
+                                <group string="Deliver Order">
+                                    <field name="is_it_do"/>
+                                    <field name="do_amount" attrs="{'invisible': [('is_it_do', '!=', True)]}"/>
                                 </group>
 
 
@@ -468,6 +487,7 @@
 
                                     <field name="declaration_number"/>
                                     <field name="custom_duty_tax_amount"/>
+                                    <field name="custom_duty_withholding_tax"/>
                                     <field name="custom_duty_tax_paid_date"/>
                                     <field name="custom_tax_acceptance"/>
                                     <field name="custom_duty_tax_additional_amount"

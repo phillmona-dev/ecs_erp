@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 class Lc(models.Model):
-
     _name = 'droga.purchase.lc'
     _description = 'LC Tracking'
 
@@ -37,15 +36,17 @@ class Lc(models.Model):
     draft_lc_approved_date_supplier = fields.Date(
         "Draft LC Approved Date by Supplier")
 
-    total_amount_etb = fields.Float("Total Amount ETB")
+    exchange_rate = fields.Float(related='purchase_order_id.exchange_rate', store=True)
+    total_amount_etb = fields.Float("Total Amount ETB", compute='calculate_exchange_amount')
     total_amount_usd = fields.Float("Total Amount USD/Others")
     state = fields.Selection(
-        [('Draft', 'Draft'), ('Active', 'Active'), ('Expired', 'Expired'), ('Closed', 'Closed')], default='Draft', tracking=True)
+        [('Draft', 'Draft'), ('Active', 'Active'), ('Expired', 'Expired'), ('Closed', 'Closed')], default='Draft',
+        tracking=True)
 
     def create(self, vals):
         # get lc Reconciliation Documents types
         lc_reconciliation_docs = self.env['droga.purchase.reconciliation.docs'].search([
-                                                                                       ('doc_type', '=', 'LC')])
+            ('doc_type', '=', 'LC')])
         Shipping_reconciliation_docs = self.env['droga.purchase.reconciliation.docs'].search([
             ('doc_type', '=', 'Shipping')])
 
@@ -92,7 +93,7 @@ class Lc(models.Model):
             if record.start_date:
                 start_date = fields.Date.from_string(record.start_date)
                 now = fields.Date.from_string(datetime.now())
-                record.count_days = (now-start_date).days
+                record.count_days = (now - start_date).days
 
     @api.depends('')
     def _get_currency_request_detail(self):
@@ -114,6 +115,12 @@ class Lc(models.Model):
 
     def cancel_request(self):
         self.write({'state': 'Closed'})
+
+    @api.depends('total_amount_usd')
+    def calculate_exchange_amount(self):
+        for record in self:
+            record.total_amount_etb = record.total_amount_usd * record.exchange_rate
+
 
 class LcDetail(models.Model):
     _name = 'droga.purchase.lc.detail'

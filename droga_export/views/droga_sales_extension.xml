@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="droga_sale_order_warehouse_line" model="ir.ui.view">
+        <field name="name">Sales order line warehouse extension</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/header/button[@name='action_cancel']" position="after">
+                <button name="subcontract_issue_open" type="object" class="oe_stat_button"
+                        string="Send to sub-contractor"/>
+                <button name="pay_req_open" type="object" class="oe_stat_button"
+                        string="Payment request"/>
+                <button name="pay_req_open" type="object" class="oe_stat_button"
+                        string="Purchase order"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="droga_export_payment_request" model="ir.ui.view">
+        <field name="name">droga.account.payment.request.export.inherited</field>
+        <field name="model">droga.account.payment.request</field>
+        <field name="inherit_id" ref="droga_finance.droga_account_payment_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group/group/field[@name='currency_id']" position="after">
+                <field string='Export origin' name="export_origin_form" attrs="{'invisible': [('export_origin_form', '=', False)]}"></field>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="droga_project_inherited_form" model="ir.ui.view">
+        <field name="name">droga.project.inherited</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/div/h1" position="after">
+                <group>
+                    <field name="parent_project"/>
+                    <field name="project_progress"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="parent_project_view_kanban_inherit_documents" model="ir.ui.view">
+        <field name="name">parent.project.kanban.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="priority">27</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban/templates/t/div/div/div/div/div" position="inside">
+                <div role="menuitem">
+                    <field name="parent_project"/>
+                    Project Progress:
+                    <field name="project_progress"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="parent_project_view_form_inherit" model="ir.ui.view">
+        <field name="name">parent.project.form.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="priority">27</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group" position="inside">
+                <group>
+                    <field name="parent_project"/>
+                    <field name="project_progress"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -10,12 +10,11 @@ class cust_contact_extension(models.Model):
     name = fields.Char(index=True, default_export_compatible=True, tracking=True)
     display_name = fields.Char(compute='_compute_display_name', recursive=True, store=True, index=True, tracking=True)
     company_type = fields.Selection(string='Company Type',
-                                    selection=[('company', 'Company'), ('person', 'Individual')],
-                                    compute='_compute_company_type', inverse='_write_company_type', default='company')
-    cust_grade = fields.Many2one('droga.cust.grade', string='Customer grade')
-    cust_type_ext = fields.Many2one('droga.cust.type', string='Customer type')
-    contact_tobe_accessed_by = fields.Selection(
-        [('Promotors', 'Promotors'), ('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
+                                    selection=[('company', 'Company'),('person', 'Individual')],
+                                    compute='_compute_company_type', inverse='_write_company_type',default='company')
+    cust_grade=fields.Many2one('droga.cust.grade',string='Customer grade')
+    cust_type_ext=fields.Many2one('droga.cust.type',string='Customer type',tracking=True)
+    contact_tobe_accessed_by=fields.Selection([('Promotors', 'Promotors'),('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
     type = fields.Selection(
         [('contact', 'Contact'),
          ('invoice', 'Invoice Address'),
@@ -68,12 +67,15 @@ class cust_contact_extension(models.Model):
 
     @api.model
     def create(self, vals):
-        if not self.env.user.has_group('droga_crm.crm_cust_create') and vals['supplier_rank'] == 0:
-            raise UserError("You don't have access to create a customer.")
-        # if vals['supplier_rank'] == 0:
-        #     raise UserError("Please enter Tin no. It is mandatory")
-        if vals['supplier_rank'] == 0 and (len(vals['vat']) < 10 or len(vals['vat']) > 14):
-            raise UserError("Length of Tin no should either be 10 or 13, please ammend accordingly.")
+        if 'supplier_rank' in vals and 'vat' in vals:
+            if not self.env.user.has_group('droga_crm.crm_cust_create') and vals['supplier_rank'] == 0:
+                raise UserError("You don't have access to create a customer.")
+            if vals['supplier_rank'] == 0:
+                if len(vals['vat']) == 0:
+                    raise UserError("Please enter Tin no. It is mandatory")
+            if vals['supplier_rank'] == 0:
+                if (len(vals['vat']) < 10 or len(vals['vat']) > 14):
+                    raise UserError("Length of Tin no should either be 10 or 13, please ammend accordingly.")
         return super(cust_contact_extension, self).create(vals)
 
     @api.depends('location', 'area')

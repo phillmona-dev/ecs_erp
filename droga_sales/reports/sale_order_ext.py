@@ -16,6 +16,7 @@ class sales_report_det_fields(models.Model):
         string="Payment Terms",related='order_id.payment_term_id',store=True)
 
     crm_group=fields.Char('Product group',compute='_get_prod_group',store=True)
+    is_core=fields.Boolean(related='product_id.is_core_product')
 
     def _get_prod_group(self):
         for rec in self:

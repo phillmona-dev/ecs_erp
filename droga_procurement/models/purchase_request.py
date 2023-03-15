@@ -134,6 +134,25 @@ class purhcase_request(models.Model):
 
     reject_message = fields.Char('Reason')
 
+    rfq_count = fields.Integer("RFQ Count", compute='compute_rfq_count', default=0)
+    rfq_status = fields.Char("RFQ Status", compute="compute_rfq_status")
+
+    def compute_rfq_status(self):
+        # set rfq status to not created
+        for record in self:
+            record.rfq_status = "Not Created"
+            for rfq in record.rfqs:
+                if rfq.state != 'Cancel':
+                    record.rfq_status = rfq.state
+                    break
+
+    def compute_rfq_count(self):
+        for record in self:
+            count = 0
+            for rec in record.rfqs:
+                count += 1
+            record.rfq_count = count
+
     @api.depends('is_user_import_operation', 'request_by')
     def get_import_operation_group(self):
         res_user = self.env['res.users'].search([('id', '=', self._uid)])
@@ -259,6 +278,7 @@ class purhcase_request(models.Model):
         self.write({'state': 'Procurement Manager'})
         if self.total_amount <= 100000:
             self.write({'wf_state': 'Approved'})
+            self.send_notification_on_approval()
         return True
 
     # approve request
@@ -268,6 +288,7 @@ class purhcase_request(models.Model):
         # record commitment budget
 
         self.set_activity_done()
+        self.send_notification_on_approval()
         return True
 
     def open_rfq(self):
@@ -374,12 +395,33 @@ class purhcase_request(models.Model):
             'res_id': self.id
         }
 
+    def send_notification_on_approval(self):
+        purchase_group = self.env.ref('droga_procurement.group_purchase_procurement_manager_group')
+        purchase_user = self.env['res.users'].search(
+            [('groups_id', '=', purchase_group.ids)])
+
+        notification_ids = []
+
+        message = "Purchase request #" + self.name + " is approved, please create RFQ"
+
+        for purchase in purchase_user:
+            notification_ids.append((0, 0, {
+                'res_partner_id': purchase.partner_id.id,
+                'notification_type': 'inbox'}))
+
+        subtype_id = self.env['ir.model.data']._xmlid_to_res_id('mail.mt_note')
+
+        self.message_post(body=message, message_type="notification",
+                          author_id=self.env.user.partner_id.id, subtype_id=subtype_id,
+                          notification_ids=notification_ids)
+
 
 class purhcase_request_line(models.Model):
     _name = "droga.purhcase.request.line"
     _description = "Purchase Request Line"
     _rec_name = 'product_id'
 
+    seq_no = fields.Integer("No", compute='compute_sequence_no')
     purhcase_request_id = fields.Many2one("droga.purhcase.request")
     current_market_status = fields.One2many('droga.purchase.request.line.current.market.analysis',
                                             'purchase_request_line_id')
@@ -448,6 +490,12 @@ class purhcase_request_line(models.Model):
 
     order_qty_and_current_stcok = fields.Float(
         "Order Qty & Current Stock", compute="_consumption_total", help="Order Quantity Plus Current Stock", store=True)
+
+    def compute_sequence_no(self):
+        seq_no = 1
+        for record in self:
+            record.seq_no = seq_no
+            seq_no += 1
 
     @api.depends('product_qty', 'unit_price', 'unit_price_foregin', 'exchange_rate')
     def _compute_total(self):

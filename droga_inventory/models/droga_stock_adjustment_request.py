@@ -131,7 +131,7 @@ class droga_stock_adjustment_request_detail(models.Model):
     def create(self, vals):
         ref=self.env['droga.stock.adjustment.request'].search([('id','=',vals['stock_adjustment_header'] if vals else 0)]).to_correct_ref.name
         if len(self.env['stock.move'].search(
-                [('state', '=', 'done'), ('reference', '=',ref ),
+                [('reference', '=',ref ),
                  ('product_id', '=', vals['product_id'])])) == 0:
             item=self.env['product.product'].search([('id','=',vals['product_id'])])
             raise UserError("Item '%s' is not found under transaction %s." % (item.name, ref))
