@@ -103,6 +103,10 @@ class purchase_order(models.Model):
         [('Yes', 'Yes'), ('No', 'No')], string="Discrepancy?")
     accept_discrepancy = fields.Boolean("Accept Discrepancy")
     discrepancy_comment = fields.Html("Discrepancy Comment")
+    discrepancy_amount = fields.Float("Discrepancy Amount")
+
+    is_it_do = fields.Boolean("IS it DO")
+    do_amount = fields.Float("DO Amount", compute="calculate_do_amount", store=True)
 
     # good clearance
     goods_arrival_date = fields.Date(
@@ -138,6 +142,8 @@ class purchase_order(models.Model):
         "Acceptance of the Duty Tax by Custom ")
     custom_duty_tax_additional_amount = fields.Float(
         "Additional Custom Duty Tax Amount")
+
+    custom_duty_withholding_tax = fields.Float("Custom Withholding Tax")
 
     storage_cost = fields.Float("Storage Cost")
     demurrage_cost = fields.Float("Demurrage Cost")
@@ -279,6 +285,14 @@ class purchase_order(models.Model):
             record.shipment_lc_amount = (
                                                 record.amount_total_usd * record.exchange_rate_lc_settlement * record.shipment_percent / 100) * rem_margin_percent
 
+    @api.depends("is_it_do")
+    def calculate_do_amount(self):
+        for record in self:
+            if record.is_it_do:
+                record.do_amount = record.shipment_percent * 1.1
+            else:
+                record.do_amount = 0
+
 
 class purchase_order_line(models.Model):
     _inherit = "purchase.order.line"
@@ -348,6 +362,10 @@ class partial_shipment(models.Model):
         [('Yes', 'Yes'), ('No', 'No')], string="Discrepancy?")
     accept_discrepancy = fields.Boolean("Accept Discrepancy")
     discrepancy_comment = fields.Html("Discrepancy Comment")
+    discrepancy_amount = fields.Float("Discrepancy Amount")
+
+    is_it_do = fields.Boolean("IS it DO")
+    do_amount = fields.Float("DO Amount", compute='calculate_do_amount', store=True)
 
     # good clearance
     goods_arrival_date = fields.Date(
@@ -384,6 +402,8 @@ class partial_shipment(models.Model):
     custom_duty_tax_additional_amount = fields.Float(
         "Additional Custom Duty Tax Amount")
 
+    custom_duty_withholding_tax = fields.Float("Custom Withholding Tax")
+
     storage_cost = fields.Float("Storage Cost")
     demurrage_cost = fields.Float("Demurrage Cost")
     local_transport_cost = fields.Float("Local Transport Cost")
@@ -416,12 +436,20 @@ class partial_shipment(models.Model):
     transistor_service_payment_done_date = fields.Date(
         "Transitor Service Payment Done Date")
 
-    @api.onchange('exchange_rate_lc_settlement', 'shipment_percent')
+    # @api.onchange('exchange_rate_lc_settlement', 'shipment_percent')
     def lc_margin_amount(self):
         for record in self:
             rem_margin_percent = record.shipment_percent / 100
             record.shipment_lc_amount = (
                     record.amount_total_usd * record.exchange_rate_lc_settlement * record.shipment_percent / 100)
+
+    @api.depends("is_it_do")
+    def calculate_do_amount(self):
+        for record in self:
+            if record.is_it_do:
+                record.do_amount = record.shipment_percent * 1.1
+            else:
+                record.do_amount = 0
 
 
 # arrival ports
