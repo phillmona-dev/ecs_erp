@@ -544,7 +544,7 @@
     </template>
 
 
-    <!-- cash reciept voucher
+    <!--cash reciept voucher-->
     <record id="droga_account_cash_reciept_voucher_action" model="ir.actions.report">
         <field name="name">Cash Reciept Voucher</field>
         <field name="model">account.move</field>
@@ -559,7 +559,7 @@
 
     </record>
 
-    -->
+
 
     <template id="droga_account_cash_reciept_voucher_report" name="Cash Receipt Voucher">
         <t t-call="web.html_container">
