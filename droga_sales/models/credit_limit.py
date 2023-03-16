@@ -100,7 +100,7 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError("Please login before registering a sales order!")
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
-            if so.amount_total<so.payment_term_id.min_amount:
+            if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender:
                 raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
             if 'cust_type_ext' in vals:
                 if result.partner_id.cust_type_ext!=vals['cust_type_ext']:
