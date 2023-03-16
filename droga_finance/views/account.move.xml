@@ -78,7 +78,6 @@
         <field name="report_file">droga_finance.droga_account_cash_new_receipt_voucher_report</field>
         <field name="print_report_name">'Cash Receipt Voucher - %s' % (object.name)
         </field>
-        <field name="binding_model_id" ref="account.model_account_move"/>
 
         <field name="binding_type">report</field>
 
