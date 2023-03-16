@@ -27,6 +27,24 @@ class droga_price_discount_per_amount(models.Model):
     core_products_or_all= fields.Selection([('Core', 'Core products'), ('Noncore', 'Non-core products'),('All', 'All')],string='Core?',required=True,default='Core',tracking=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active',tracking=True)
 
+class droga_price_discount_per_product_qty(models.Model):
+    _name = 'droga.price.discount.per.product.qty'
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
+    payment_term = fields.Many2one('account.payment.term',string='Payment term',tracking=True)
+    product = fields.Many2one('product.product', string='Product', tracking=True)
+    from_qty = fields.Float(string='From quantity', tracking=True)
+    to_qty = fields.Float(string='To quantity', tracking=True)
+    percent = fields.Float(string='Percentage (+ve or -ve)',tracking=True)
+    status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active',tracking=True)
+
+class droga_price_discount_per_product_customer(models.Model):
+    _name = 'droga.price.discount.per.product.customer'
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
+    payment_term = fields.Many2one('account.payment.term',string='Payment term',tracking=True)
+    product = fields.Many2one('product.product',string='Product',tracking=True)
+    cust = fields.Many2one('res.partner',string='Customer',tracking=True)
+    percent = fields.Float(string='Percentage (+ve or -ve)',tracking=True)
+    status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active',tracking=True)
 
 class sale_order_line(models.Model):
     _inherit = 'sale.order.line'
@@ -132,6 +150,22 @@ class sale_order_line(models.Model):
                     non_core_rate = non_core_rate + rate['percent']
                 elif rate['core_products_or_all'] == 'All':
                     all_rate = all_rate + rate['percent']
+
+            #Product and customer combination discount rules
+            product_customer = self.env['droga.price.discount.per.product.customer'].search(
+                ['|',('payment_term', '=', self.order_id['payment_term_id'].id),('payment_term', '=', False),
+                    ('product', '=', line.product_id.id), ('status', '=', 'Active'),
+                 ('cust', '=', self.order_id['partner_id'].id)])
+            for rate in product_customer:
+                all_rate = all_rate + rate['percent']
+
+            #Product and quantity discount rules
+            product_qty = self.env['droga.price.discount.per.product.qty'].search(
+                ['|',('payment_term', '=', self.order_id['payment_term_id'].id),('payment_term', '=', False),
+                 ('product', '=', line.product_id.id), ('status', '=', 'Active'),
+                 ('from_qty', '<=', line.product_uom_qty),('to_qty', '>=', line.product_uom_qty)])
+            for rate in product_qty:
+                all_rate = all_rate + rate['percent']
 
             if line.store_placement:
                 line.price_unit = 0.0
@@ -331,7 +365,7 @@ class sale_order_ext(models.Model):
                 raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
-            if so.amount_total<so.payment_term_id.min_amount:
+            if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender:
                 raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 raise ValidationError("Please login before registering a sales order!")
