@@ -70,7 +70,7 @@
 
 
     <!-- cash receipt voucher new -->
-    <record id="droga_account_cash_receipt_new_voucher_action1" model="ir.actions.report">
+    <record id="droga_account_cash_receipt_new_voucher_action" model="ir.actions.report">
         <field name="name">Cash Receipt Voucher</field>
         <field name="model">account.move.crv</field>
         <field name="report_type">qweb-html</field>
@@ -78,6 +78,7 @@
         <field name="report_file">droga_finance.droga_account_cash_new_receipt_voucher_report</field>
         <field name="print_report_name">'Cash Receipt Voucher - %s' % (object.name)
         </field>
+        <field name="binding_model_id" ref="account.model_account_move_crv"/>
 
         <field name="binding_type">report</field>
 
@@ -106,7 +107,7 @@
                             <field name="amount" width="20"/>
                             <field name="payment_description" width="30"/>
                             <field name="is_crv_document_printed" width="20"/>
-                            <button name="%(droga_account_cash_receipt_new_voucher_action1)d" string="Report"
+                            <button name="%(droga_account_cash_receipt_new_voucher_action)d" string="Report"
                                     type="action"
                                     class="oe_stat_button" icon="fa-align-justify" width="10"
                             />
