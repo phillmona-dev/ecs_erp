@@ -107,10 +107,7 @@
                             <field name="amount" width="20"/>
                             <field name="payment_description" width="30"/>
                             <field name="is_crv_document_printed" width="20"/>
-                            <button name="%(droga_account_cash_receipt_new_voucher_action1)d" string="Report"
-                                    type="action"
-                                    class="oe_stat_button" icon="fa-align-justify" width="10"
-                            />
+                            
                         </tree>
                     </field>
                 </page>
