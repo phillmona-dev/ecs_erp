@@ -96,7 +96,7 @@ class cust_sales_credit_limit(models.Model):
         for so in result:
             if not so.partner_id.vat:
                 raise ValidationError("Tin No must be registered for customer!")
-            if not so.pr_sales and self.env.user.name.startswith('CRM'):
+            if not so.pr_sales and (self.env.user.name.startswith('CRM') or self.env.user.name.startswith('Tender')):
                 raise ValidationError("Please login before registering a sales order!")
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
                 raise ValidationError("You cannot exceed credit limit!")
