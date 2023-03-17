@@ -15,10 +15,10 @@
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
 
-            <!--<xpath expr="//button[@name='button_draft']" position="replace">
-                <button name="button_draft" string="Reset to Draft" type="object" groups="droga_finance.account_payable_accountant_group,droga_finance.account_recivables_accountant_group,droga_finance.account_receivable_team_leader_group,droga_finance.account_payable_team_leader_group"
+            <xpath expr="//button[@name='button_draft']" position="replace">
+                <button name="button_draft" string="Reset to Draft" type="object" groups="droga_finance.account_payable_accountant_group,droga_finance.account_recivables_accountant_group,droga_finance.account_receivable_team_leader_group,droga_finance.account_recivables_cashier_accountant_group,droga_finance.account_chief_finance_officer_group,droga_finance.account_payable_team_leader_group"
                                 attrs="{'invisible' : [('show_reset_to_draft_button', '=', False)]}" data-hotkey="q" />
-            </xpath>-->
+            </xpath>
             <form position="attributes">
                 <attribute name="js_class">pos_form_view</attribute>
             </form>

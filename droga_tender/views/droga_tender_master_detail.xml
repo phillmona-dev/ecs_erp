@@ -11,7 +11,7 @@
             <field name="name">droga.tender.master.detail.view.tree</field>
             <field name="model">droga.tender.master.detail</field>
             <field name="arch" type="xml">
-                <tree string="">
+                <tree string="" default_order='create_date desc'>
                     <field name="lot_number"></field>
                     <field name="type_item" widget="many2many_tags" options="{'no_create':True,'no_open':True}"></field>
                     <field name="remark"></field>

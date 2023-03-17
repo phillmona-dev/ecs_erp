@@ -10,7 +10,7 @@ class droga_tender_master(models.Model):
     _name = 'droga.tender.master'
     _description = 'Tender master file'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name = 'ten_name'
+    _rec_name = 'ten_id'
 
     # region fields definition
     # Date fields
@@ -212,7 +212,7 @@ class droga_tender_master(models.Model):
                     'name': line.droga_product.name,
                     'product_template_id': line.droga_product.id,
                     'product_uom': line.droga_product.uom_id.id,
-                    'product_id':line.droga_product.id,
+                    'product_id':self.env['product.product'].search([('product_tmpl_id','=',line.droga_product.id)])[0].id ,
                     'product_uom_qty': line.quantity - line.ordered_qty,
                     'price_unit': line.unit_price,
                     'tender_line': line.id
