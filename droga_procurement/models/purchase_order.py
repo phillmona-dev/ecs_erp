@@ -185,6 +185,8 @@ class purchase_order(models.Model):
     request_type = fields.Selection(
         [("Local", "Local"), ("Foregin", "Foregin")], default="Local")
 
+    lc_margins = fields.One2many("droga.purchase.lc.margin", "purchase_order_id")
+
     def open_lc_detail(self):
         view = self.env.ref('droga_procurement.droga_purchase_lc_view_form')
 

@@ -125,6 +125,17 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Margins" name="margins">
+                            <field name="lc_margins" mode="tree">
+                                <tree editable="bottom">
+                                    <field name="margin_percent"/>
+                                    <field name="foreign_amount"/>
+                                    <field name="exchange_rate"/>
+                                    <field name="amount_etb"/>
+                                </tree>
+                            </field>
+                        </page>
+
                         <page string="Status Tracking" invisible="1">
                             <field name="order_phase_status" mode="tree">
                                 <tree editable="bottom" create="0" delete="0">
