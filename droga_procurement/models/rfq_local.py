@@ -100,6 +100,8 @@ class Rfq_Local(models.Model):
     # Committee Approval
     def committee_approval(self):
         self.write({'state': 'Committee Approval'})
+        if self.total_winner_amount < 100000:
+            self.write({'wf_state': 'Approved'})
         return True
 
     def operational_approval(self):
@@ -113,6 +115,7 @@ class Rfq_Local(models.Model):
     # ceo approval
     def ceo_approval(self):
         self.write({'state': 'CEO Approval'})
+        self.write({'wf_state': 'Approved'})
         # self.load_foregin_rfq_status()
         return True
 
