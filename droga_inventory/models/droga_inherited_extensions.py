@@ -58,18 +58,12 @@ class droga_warehouse_extension(models.Model):
                                 search='_search_has_access')
     wh_type=fields.Selection([
         ('IM','Import'),
-        ('WS', 'Wholesale'),], string='Warehouse type.')
+        ('WS', 'Wholesale'),
+    ('PH', 'Pharmacy'),], string='Warehouse type.')
 
     def _search_has_access(self, operator, value):
 
-        compiled_wh_domain = []
-        user_groups_list = self.env.user.groups_id
-        for user_group in user_groups_list:
-            given_ules = user_group.rule_groups
-            for rule in given_ules:
-                if 'Warehouse' in rule.model_id.name:
-                    compiled_wh_domain.append(
-                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+        compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
 
         if operator == '=':
             if len(compiled_wh_domain) == 0:
@@ -83,13 +77,7 @@ class droga_warehouse_extension(models.Model):
 
     def _compute_has_access(self):
         compiled_wh_domain = []
-        user_groups_list = self.env.user.groups_id
-        for user_group in user_groups_list:
-            given_ules = user_group.rule_groups
-            for rule in given_ules:
-                if 'Warehouse' in rule.model_id.name:
-                    compiled_wh_domain.append(
-                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+        compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
 
         for rec in self:
             if rec.code in compiled_wh_domain:
@@ -118,42 +106,30 @@ class droga_location_extension(models.Model):
 
     def _search_has_access(self, operator, value):
 
-        compiled_wh_domain = []
-        user_groups_list = self.env.user.groups_id
-        for user_group in user_groups_list:
-            given_ules = user_group.rule_groups
-            for rule in given_ules:
-                if 'Warehouse' in rule.model_id.name:
-                    compiled_wh_domain.append(
-                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+        compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
 
         if operator == '=':
             if len(compiled_wh_domain) == 0:
                 return [('id', 'in', [])]
             else:
-
-                has_access = self.env['stock.location'].sudo().search(
-                    [('wcode', 'in', compiled_wh_domain) ,('con_type','!=','DIL')])
-                if self.env.user.has_group('droga_inventory.inventory_dmw') or self.env.user.has_group(
-                        'droga_inventory.inventory_dmi'):
+                has_access=self.env['stock.location']
+                if self.env.user.has_group('droga_inventory.inventory_stk'):
+                    has_access+= self.env['stock.location'].sudo().search(
+                        [('wcode', 'in', compiled_wh_domain) ,('con_type','!=','DIL')])
+                if self.env.user.has_group('droga_inventory.inventory_dm') :
                     has_access+= self.env['stock.location'].sudo().search(
                         [('wcode', 'in', compiled_wh_domain), ('con_type', '=', 'DIL')])
+
                 return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id', 'in', [])]
 
     def _compute_has_access(self):
-        compiled_wh_domain = []
-        user_groups_list = self.env.user.groups_id
-        for user_group in user_groups_list:
-            given_ules = user_group.rule_groups
-            for rule in given_ules:
-                if 'Warehouse' in rule.model_id.name:
-                    compiled_wh_domain.append(
-                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+        compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
 
         for rec in self:
-            if rec.wcode in compiled_wh_domain and ((self.env.user.has_group('droga_inventory.inventory_dmi') or self.env.user.has_group('droga_inventory.inventory_dmw')) or rec.con_type!='DIL'):
+            if rec.wcode in compiled_wh_domain and ((self.env.user.has_group('droga_inventory.inventory_dm') and rec.con_type=='DIL') or
+                                                    (self.env.user.has_group('droga_inventory.inventory_stk') and rec.con_type!='DIL')):
                 rec.has_access = True
             else:
                 rec.has_access = False
@@ -194,37 +170,26 @@ class droga_stock_picking_type_extension(models.Model):
         return action
     def _search_has_access(self, operator, value):
 
-        compiled_wh_domain = []
-        user_groups_list = self.env.user.groups_id
-        for user_group in user_groups_list:
-            given_ules = user_group.rule_groups
-            for rule in given_ules:
-                if 'Warehouse' in rule.model_id.name:
-                    compiled_wh_domain.append(
-                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+        compiled_wh_domain = self.env.user.warehouse_ids_im_ws.mapped('code') + self.env.user.warehouse_ids_ph.mapped(
+            'code')
 
         if operator=='=':
             if len(compiled_wh_domain)==0:
                 return [('id','in',[])]
             else:
-                has_access=self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain),('dispatch_location','=',False)])
-                if self.env.user.has_group('droga_inventory.inventory_dmi'):
-                    has_access+=(self.env['stock.picking.type'].sudo().search([('dispatch_location','=','IM')]))
-                if self.env.user.has_group('droga_inventory.inventory_dmw'):
-                    has_access+=(self.env['stock.picking.type'].sudo().search([('dispatch_location', '=', 'WS')]))
+                has_access = self.env['stock.picking.type']
+                if self.env.user.has_group('droga_inventory.inventory_stk'):
+                    has_access+=self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain),('dispatch_location','=',False)])
+                if self.env.user.has_group('droga_inventory.inventory_dm'):
+                    has_access+=(self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain),('dispatch_location','!=',False)]))
+
                 return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id','in',[])]
 
     def _compute_has_access(self):
-        compiled_wh_domain = []
-        user_groups_list = self.env.user.groups_id
-        for user_group in user_groups_list:
-            given_ules = user_group.rule_groups
-            for rule in given_ules:
-                if 'Warehouse' in rule.model_id.name:
-                    compiled_wh_domain.append(
-                        rule.domain_force.strip().replace("[('code', '=', ", '').replace("'", '').replace(')]', ''))
+        compiled_wh_domain = self.env.user.warehouse_ids_im_ws.mapped('code') + self.env.user.warehouse_ids_ph.mapped(
+            'code')
 
         for rec in self:
             if rec.warehouse_code in compiled_wh_domain:
@@ -503,7 +468,7 @@ class purchase_request_extension(models.Model):
 
 class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=False)
     order_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'),
@@ -532,7 +497,7 @@ class droga_stock_product_extension(models.Model):
          help="Select sub-category for the current product")
     default_code = fields.Char('Internal Reference',compute='_compute_default_code',
         inverse='_compute_default_code',
-         store=True,required=True)
+         store=True,required=False)
     prod_read_only=fields.Boolean(compute='is_prod_readonly')
     def _compute_default_code(self):
         pass
@@ -596,7 +561,7 @@ class droga_stock_product_extension(models.Model):
 
     def write(self, vals_list):
 
-        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and 'seller_ids' not in vals_list:
+        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager') and 'seller_ids' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
         for rec in self:
             if 'default_code' in vals_list:
@@ -627,17 +592,29 @@ class droga_stock_product_extension(models.Model):
     @api.model
     def create(self, vals_list):
 
-        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager'):
+        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
+        if not vals_list['default_code']:
+            raise UserError("Default code can not be empty.")
         return super(droga_stock_product_extension, self).create(vals_list)
 
 class product_selection_field(models.Model):
     _inherit = 'product.category'
     avail_in_product_master=fields.Boolean('Available in product master file',default=False)
     off_supplies=fields.Boolean('Office supplies group',default=False)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=False)
     group_type=fields.Selection([
         ('MI','Medical items'),
         ('SC', 'Services'),
+        ('EX','Export items'),
     ('OS', 'Office supplies')], string='Group type.')
     reservation_period=fields.Float('Reservation period in Hrs',default=0)
+
+class ResUsers(models.Model):
+    _inherit = 'res.users'
+
+    warehouse_ids_im_ws = fields.Many2many('stock.warehouse', 'stock_warehouse_access_is_ws', 'uid', 'warehouse_id',domain="[('wh_type', '!=', 'PH')]",
+                                            string='Stock warehouse access')
+    warehouse_ids_ph = fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph', 'uid', 'warehouse_id',
+                                           domain="[('wh_type', '=', 'PH')]",
+                                           string='Stock warehouse access')

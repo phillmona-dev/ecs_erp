@@ -13,7 +13,7 @@
         <field name="arch" type="xml">
             <form string="">
                 <group>
-                    <field name="pro_id" domain="([('employee_access_users','=',uid),('status','=','Active')])" options="{'no_create':True,'no_open':True}"></field>
+                    <field name="pro_id" widget="selection" domain="([('employee_access_users','=',uid),('status','=','Active')])" options="{'no_create':True,'no_open':True}"></field>
                     <field name="p_id"></field>
                 </group>
                 <footer>
@@ -38,7 +38,7 @@
         <field name="arch" type="xml">
             <form string="">
                 <group>
-                    <field name="pro_id" domain="([('employee_access_users','=',uid),('status','=','Active')])"
+                    <field name="pro_id" widget="selection" domain="([('employee_access_users','=',uid),('status','=','Active')])"
                            options="{'no_create':True,'no_open':True}"/>
                     <field name="pre_pass" string="Previous ID"/>
                     <field name="new_pass" string="New ID"/>

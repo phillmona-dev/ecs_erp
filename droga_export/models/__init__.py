@@ -1,1 +1,1 @@
-from . import droga_purchase_autofill,droga_items_composition,droga_extensions
+from . import droga_items_composition,droga_extensions

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Droga Export",
+    'name': "Droga PHARMA",
 
     'summary': """
-        Droga Pharma Pvt. Ltd.Co Export extension module.""",
+        Droga Pharma Pvt. Ltd.Co Pharmacy project stand-alone module.""",
 
     'description': """
-        This module is developed for Droga Pharma Pvt. Ltd.Co. It works as stand-alone module for Export.
+        This module is developed for Droga Pharma Pvt. Ltd.Co. The module contains cross-modular functionalities for inventory, finance, sales, PO and others as well.
     """,
 
     'author': "Afomsoft Technologies",
@@ -14,19 +14,12 @@
 
     # Categories can be used to filter modules in modules listing
     # for the full list
-    'category': 'Export Extension',
+    'category': 'Pharmacy Extension',
     'version': '1.0',
 
     # always loaded
     'data': [
-        'security/security.xml',
-        'security/ir.model.access.csv',
-        'data/sequence.xml',
 
-        'views/items_composition.xml',
-        'views/droga_sub_contractor_send.xml',
-        'views/droga_sales_extension.xml',
-        'views/droga_sub_contractor_receipt.xml'
     ],
 
     # any module necessary for this one to work correctly

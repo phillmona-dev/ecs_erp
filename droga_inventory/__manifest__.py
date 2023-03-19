@@ -20,7 +20,6 @@
     # always loaded
     'data': [
         'security/security.xml',
-        'security/record_rules.xml',
         'views/module_menus.xml',
         'data/droga_inv_sequence.xml',
         'security/ir.model.access.csv',
@@ -30,6 +29,7 @@
         'views/droga_stock_extensions.xml',
         'views/droga_stock_product_extension.xml',
         'views/droga_stock_office_supplies_request.xml',
+        'views/stock_res_users.xml',
         'views/reservation_list.xml',
         'views/droga_header_footer_template.xml',
         'report/report_tree_extension.xml',

@@ -35,7 +35,7 @@
                 <filter name="group_type" string="By payment term" context="{'group_by':'payment_term_id'}"/>
 
                 <filter name="app_so" string="Sales orders" domain="[('state', '=', 'sale')]" />
-                <filter name="pro_so" string="WF pending SO" domain="[('state', '!=', 'sale')]" />
+                <filter name="pro_so" string="Workflow pending SO" domain="[('state', '!=', 'sale')]" />
 
                 <separator/>
 
@@ -62,7 +62,7 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_summary_view_tree')})]"/>
         <field name="search_view_id" ref="droga_sales_summary_search_tree"></field>
-        <field name="domain">[('state', '!=', 'cancel')]</field>
+        <field name="domain">[('state', '!=', 'cancel'),('has_access','=',True)]</field>
         <field name="context">{'search_default_today_sales': 1,'search_default_app_so':1}</field>
     </record>
 

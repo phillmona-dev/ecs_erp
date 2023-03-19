@@ -54,8 +54,9 @@ class droga_stock_cons_issue(models.Model):
     @api.model
     def create(self, vals_list):
         if vals_list.get('name', 'New') == 'New':
-            if len(vals_list['detail_entries'])==0:
-                raise UserError("At least one product must be requested to save record.")
+            if 'detail_entries' in vals_list:
+                if len(vals_list['detail_entries'])==0:
+                    raise UserError("At least one product must be requested to save record.")
             _name = self.env['ir.sequence'].next_by_code('droga.inventory.consignment.issue.sequence')
             if not _name:
                 raise UserError("Order sequence not found.")

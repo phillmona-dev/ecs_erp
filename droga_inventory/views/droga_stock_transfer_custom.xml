@@ -84,6 +84,6 @@
             id="droga_stock_transfer_menu"
             name="Store transfer requests"
             action="droga_inventory_transfer_custom_action"
-            groups="inventory_li,inventory_me,inventory_md,inventory_ms,inventory_os"
+            groups="inventory_stk"
             parent="stock.menu_stock_warehouse_mgmt"/>
 </odoo>

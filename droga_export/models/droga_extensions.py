@@ -81,12 +81,31 @@ class inventory_return_extension(models.Model):
 class payment_request_export_extension(models.Model):
     _inherit = 'droga.account.payment.request'
     export_origin_form = fields.Many2one('sale.order', readonly=True)
+    issue_export_origin_form = fields.Many2one('droga.inventory.consignment.issue', readonly=True)
 
+class purchase_order_extension(models.Model):
+    _inherit = 'purchase.order'
+    export_origin_form = fields.Many2one('sale.order', readonly=True)
 
 class droga_cons_inherit(models.Model):
     _inherit = 'droga.inventory.consignment.issue'
 
     subcontract_issue_origin_form = fields.Many2one('sale.order', readonly=True)
+
+    def pay_req_open(self):
+        return {
+            'name': 'Payment request',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.account.payment.request',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_issue_export_origin_form': self.id,
+            },
+            'domain':
+                ([('issue_export_origin_form', '=', self.id)])
+        }
 
     def request_mg(self):
         self.set_activity_done()
@@ -189,11 +208,16 @@ class droga_cons_inherit(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_issue_type': 'SUBL',
+                'default_supplier':self.customer.id,
                 'default_subcontract_return_origin_form': self.subcontract_issue_origin_form.id,
                 'default_detail_entries': items
             },
             'domain': [('subcontract_return_origin_form', '=', self.id)],
         }
+
+    class droga_cons_inherit(models.Model):
+        _inherit = 'droga.inventory.cons.issue.detail'
+        proc_cost = fields.Float('Processing cost')
 
     def write(self, vals):
         result = super(droga_cons_inherit, self).create(vals)
@@ -244,6 +268,21 @@ class droga_sale_inherit(models.Model):
             'view_type': 'form',
             'view_mode': 'tree,form',
             'res_model': 'droga.account.payment.request',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_export_origin_form': self.id,
+            },
+            'domain':
+                ([('export_origin_form', '=', self.id)])
+        }
+
+    def po_open(self):
+        return {
+            'name': 'Purchase order',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'purchase.order',
             'view_id': False,
             'type': 'ir.actions.act_window',
             'context': {

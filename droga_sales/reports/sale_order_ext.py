@@ -1,8 +1,9 @@
-from odoo import models,fields
+from odoo import models, fields, api
+
 
 class sales_report_fields(models.Model):
     _inherit = 'sale.order'
-    cust_location=fields.Many2one('droga.crm.settings.city',related='partner_id.city_name')
+    cust_location=fields.Many2one('droga.crm.settings.city',related='partner_id.city_name',store=True)
 
 class sales_report_det_fields(models.Model):
     _inherit='sale.order.line'
@@ -15,13 +16,7 @@ class sales_report_det_fields(models.Model):
     payment_term_det = fields.Many2one('account.payment.term',
         string="Payment Terms",related='order_id.payment_term_id',store=True)
 
-    crm_group=fields.Char('Product group',compute='_get_prod_group',store=True)
-    is_core=fields.Boolean(related='product_id.is_core_product')
-
-    def _get_prod_group(self):
-        for rec in self:
-            prod_temp=self.env['product.template'].search([('id','=',rec.product_id.product_tmpl_id.id)])
-            rec.crm_group=prod_temp.crm_group.prod_group if len(prod_temp)>0 else False
-
+    crm_group1 = fields.Many2one('droga.crm.settings.prod_group', related='product_id.crm_group', store=True)
+    is_core=fields.Boolean(related='product_id.is_core_product',store=True)
 
 

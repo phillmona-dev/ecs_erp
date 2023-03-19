@@ -7,11 +7,11 @@
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
             <xpath expr="//form/header/button[@name='action_cancel']" position="after">
-                <button name="subcontract_issue_open" type="object" class="oe_stat_button"
+                <button name="subcontract_issue_open" type="object" class="oe_stat_button" groups="droga_export.export_user"
                         string="Send to sub-contractor"/>
-                <button name="pay_req_open" type="object" class="oe_stat_button"
+                <button name="pay_req_open" type="object" class="oe_stat_button" groups="droga_export.export_user"
                         string="Payment request"/>
-                <button name="pay_req_open" type="object" class="oe_stat_button"
+                <button name="po_open" type="object" class="oe_stat_button"  groups="droga_export.export_user"
                         string="Purchase order"/>
             </xpath>
         </field>
@@ -24,6 +24,7 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='currency_id']" position="after">
                 <field string='Export origin' name="export_origin_form" attrs="{'invisible': [('export_origin_form', '=', False)]}"></field>
+                <field string='Sub-contractor issue origin' name="issue_export_origin_form" attrs="{'invisible': [('issue_export_origin_form', '=', False)]}"></field>
             </xpath>
         </field>
     </record>

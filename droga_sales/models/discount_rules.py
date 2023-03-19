@@ -62,6 +62,7 @@ class sale_order_line(models.Model):
     wareh=fields.Many2one('stock.warehouse')
     store_placement = fields.Boolean('Placement',default=False)
     std_unit_price=fields.Float(readonly=True,string='UP Default')
+    has_access = fields.Boolean(related='order_id.has_access')
 
     @api.depends('product_id','order_id.order_type','product_uom')
     def _is_prod_available(self):
@@ -241,7 +242,6 @@ class sale_order_line(models.Model):
 
 class sale_order_ext(models.Model):
     _inherit='sale.order'
-    cust_location=fields.Char
     core_sum=fields.Float('Core total',compute='_get_sub_totals')
     non_core_sum = fields.Float('Non-core total',compute='_get_sub_totals')
     state = fields.Selection(
