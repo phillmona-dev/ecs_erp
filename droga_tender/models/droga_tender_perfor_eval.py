@@ -32,8 +32,12 @@ class droga_tender_master(models.Model):
         for rec in self:
             prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id)])[0].id
             ten_sales=self.env['sale.order'].search([('state','=','sale'),('tender_origin_form_tender','=',rec.parent_tender_performance.id)]).ids
-            rec.ordered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','=',prod_id)]).mapped('product_uom_qty'))
-            rec.delivered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','=',prod_id)]).mapped('qty_delivered'))
+            if not prod_id:
+                rec.ordered_qty = 0
+                rec.delivered_qty = 0
+            else:
+                rec.ordered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','=',prod_id)]).mapped('product_uom_qty'))
+                rec.delivered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','=',prod_id)]).mapped('qty_delivered'))
     def _get_order_status(self):
         for rec in self:
             if self.env['sale.order.line'].search([('tender_line','=',rec.id)]):
