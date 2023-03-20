@@ -3,36 +3,36 @@
 
     <!-- Stock.picking.type default filter per warehouse access -->
     <record id="stock.stock_picking_type_action" model="ir.actions.act_window">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('has_read_access','=',True)]</field>
     </record>
 
     <!-- Stock transfers default filter per warehouse access -->
     <record id="stock.action_picking_tree_all" model="ir.actions.act_window">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('has_read_access','=',True)]</field>
         <field name="context">{'create': "0",'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
     </record>
 
     <!-- Stock transfers default filter per warehouse access -->
     <record id="stock.action_picking_tree_ready" model="ir.actions.act_window">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('has_read_access','=',True)]</field>
         <field name="context">{'create': False,'contact_display': 'partner_address', 'search_default_available': 1}</field>
     </record>
 
     <!-- Location report filter per warehouse access -->
     <record model="ir.actions.act_window" id="stock.dashboard_open_quants">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('has_read_access','=',True)]</field>
         <field name="name">Stock on hand</field>
     </record>
 
     <!-- Location report filter per warehouse access -->
     <record model="ir.actions.act_window" id="stock.location_open_quants">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('has_read_access','=',True)]</field>
         <field name="name">Stock on hand</field>
     </record>
 
     <!-- Move lines history filter per warehouse access -->
     <record id="stock.stock_move_action" model="ir.actions.act_window">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('has_read_access','=',True)]</field>
         <field name="name">Stock summary by reference</field>
     </record>
 
