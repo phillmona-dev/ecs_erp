@@ -6,6 +6,7 @@ from odoo.tools import config, float_compare
 class StockQuant(models.Model):
     _inherit = "stock.quant"
     has_access=fields.Boolean(related='warehouse_id.has_access')
+    has_read_access = fields.Boolean(related='location_id.has_read_access')
 
     @api.constrains("product_id", "quantity")
     def check_negative_qty(self):

@@ -49,6 +49,11 @@
         <field name="name">Droga Stores manager </field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
     </record>
+    <record id="inventory_report" model="res.groups">
+        <field name="name">Reporting read only</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+    </record>
 </odoo>
 
 
