@@ -150,13 +150,12 @@ class droga_location_extension(models.Model):
         compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
 
         if operator == '=':
-            if len(compiled_wh_domain) == 0:
+            if len(compiled_wh_domain) == 0 or not self.env.user.has_group('droga_inventory.inventory_report'):
                 return [('id', 'in', [])]
             else:
                 has_read_access=self.env['stock.location']
-                if self.env.user.has_group('droga_inventory.inventory_report'):
-                    has_read_access+= self.env['stock.location'].sudo().search(
-                        [('wcode', 'in', compiled_wh_domain)])
+                has_read_access= self.env['stock.location'].sudo().search(
+                    [('wcode', 'in', compiled_wh_domain)])
 
                 return [('id', 'in', [x.id for x in has_read_access] if has_read_access else False)]
         else:

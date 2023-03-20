@@ -38,6 +38,7 @@
 
     <!-- Move history rename -->
     <record id="stock.stock_move_line_action" model="ir.actions.act_window">
+        <field name="domain">[('has_read_access','=',True)]</field>
         <field name="name">Stock report by item</field>
     </record>
 
