@@ -16,7 +16,10 @@ class converter:
             year_converted=yyyy+8
         else:
             year_converted=yyyy+7
-        
+
+        if year_converted>2000:
+            year_converted-=2000
+
         day_converted=0
         if (mm in [1,2] and yyyy%4==0):
             day_converted=dd+11
