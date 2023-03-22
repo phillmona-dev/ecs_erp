@@ -17,7 +17,7 @@ class AccountPayment(models.Model):
     def create(self, vals):
         res = super(AccountPayment, self).create(vals)
         # enable when manual transaction number stops
-        #self.generate_transaction_type(res)
+        self.generate_transaction_type(res)
         return res
 
     @api.onchange('transaction_type', 'journal_id', 'payment_type')

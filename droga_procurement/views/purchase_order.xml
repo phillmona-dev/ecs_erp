@@ -128,10 +128,18 @@
                         <page string="Margins" name="margins">
                             <field name="lc_margins" mode="tree">
                                 <tree editable="bottom">
-                                    <field name="margin_percent"/>
-                                    <field name="foreign_amount"/>
+                                    <field name="margin_percent" sum="Total"/>
+                                    <field name="foreign_amount" sum="Total"/>
                                     <field name="exchange_rate"/>
-                                    <field name="amount_etb"/>
+                                    <field name="amount_etb" sum="total"/>
+                                    <field name="margin_order"/>
+                                    <field name="margin_calculation"
+                                           attrs="{'readonly': [('margin_order', 'in', ('1'))]}"/>
+
+                                    <field name="move_id" options="{'no_create':True,'no_open':True}" readonly="1"/>
+                                    <button name="create_vendor_invoice" type="object" string="Create Invoice"
+                                            id="checked" data-hotkey="v" class="oe_highlight"/>
+
                                 </tree>
                             </field>
                         </page>
