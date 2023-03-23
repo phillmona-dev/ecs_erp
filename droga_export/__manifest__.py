@@ -22,7 +22,8 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/sequence.xml',
-
+        'views/droga_status_list.xml',
+        'views/droga_sales_status_list.xml',
         'views/items_composition.xml',
         'views/droga_sub_contractor_send.xml',
         'views/droga_sales_extension.xml',
