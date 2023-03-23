@@ -71,7 +71,8 @@
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="product_uom_qty" sum="Total" string="Quantity"/>
-                                    <field name="proc_cost" ></field>
+                                    <field name="proc_cost" sum="Total"></field>
+                                    <field name="tot_cost" sum="Total"></field>
                                     <field name="warehouse_id" attrs="{'required': [('state', '!=','draft')]}"
                                            string="Issuer warehouse" options="{'no_create':True,'no_open':True}"/>
                                 </tree>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="droga_empl_contact_extension" model="ir.ui.view">
+        <field name="name">customer</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page[@name='contact_addresses']" position="before">
+                <field name="customer_rank" invisible="1"></field>
+                <page string="Employees" attrs="{'invisible': [('supplier_rank', '>', 0)]}" groups="droga_pharma.pharma_br_admin">
+                    <field name="employees" mode="tree,kanban">
+                        <tree editable="1" create="1">
+                            <field name="employee_name"/>
+                            <field name="job_position"/>
+                            <field name="gender"/>
+                            <field name="mobile"/>
+                            <field name="additional_product_groups" domain="([('avail_in_product_master','=',True)])"
+                                   widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                            <field name="max_amount"/>
+                            <field name="amount_valid_for"/>
+                            <field name="amount_valid_type"/>
+                            <field name="remaining_amount_period"></field>
+                        </tree>
+                        <form>
+                            <group>
+                                <field name="employee_name"/>
+                            <field name="job_position"/>
+                            <field name="gender"/>
+                            <field name="mobile"/>
+                            <field name="additional_product_groups" domain="([('avail_in_product_master','=',True)])"
+                                   widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                            <field name="max_amount"/>
+                            <field name="amount_valid_for"/>
+                            <field name="amount_valid_type"/>
+                            <field name="remaining_amount_period"></field>
+                            </group>
+                        </form>
+                        <kanban class="o_kanban_mobile">
+                            <field name="employee_name"/>
+                            <field name="job_position"/>
+                            <field name="gender"/>
+                            <field name="mobile"/>
+                            <field name="additional_product_groups" domain="([('avail_in_product_master','=',True)])"
+                                   widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                            <field name="max_amount"/>
+                            <field name="amount_valid_for"/>
+                            <field name="amount_valid_type"/>
+                            <field name="remaining_amount_period"></field>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
+                                        <div class="oe_kanban_details">
+                                            <ul>
+                                                <li>
+                                                    <field name="employee_name"></field>
+                                                </li>
+                                                <li>
+                                                    <span></span>
+                                                    Job Position:
+                                                    <field name="job_position"></field>
+                                                </li>
+                                                <li>
+                                                    Gender:
+                                                    <field name="gender"></field>
+                                                    <span></span>-
+                                                    <span></span>
+                                                    Mobile:
+                                                    <field name="mobile"></field>
+                                                </li>
+
+
+                                            </ul>
+
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+
+                        </kanban>
+                    </field>
+                </page>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group" position="inside">
+                    <field name="allowed_product_groups" attrs="{'invisible': [('supplier_rank', '>', 0)]}" domain="([('avail_in_product_master','=',True)])"
+                                   widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

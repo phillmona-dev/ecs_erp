@@ -7,12 +7,34 @@
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
             <xpath expr="//form/header/button[@name='action_cancel']" position="after">
-                <button name="subcontract_issue_open" type="object" class="oe_stat_button" groups="droga_export.export_user"
-                        string="Send to sub-contractor"/>
                 <button name="pay_req_open" type="object" class="oe_stat_button" groups="droga_export.export_user"
-                        string="Payment request"/>
+                        attrs="{'invisible': [('state', 'not in', ('sale','done'))]}" string="Payment request"/>
                 <button name="po_open" type="object" class="oe_stat_button"  groups="droga_export.export_user"
-                        string="Purchase order"/>
+                        attrs="{'invisible': [('state', 'not in', ('sale','done'))]}" string="Purchase order"/>
+            </xpath>
+            <xpath expr="//form/sheet/div/button[@name='action_preview_sale_order']" position="before">
+                <button name="subcontract_issue_open"
+                        type="object"
+                        class="oe_stat_button"
+                        attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"
+                        groups="droga_export.export_user"
+                        icon="fa-car icon">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Send to</span>
+                            <span class="o_stat_text">Sub-contractor</span>
+                        </div>
+                    </button>
+                <button name="export_status_list"
+                        type="object"
+                        class="oe_stat_button"
+                        attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"
+                        groups="droga_export.export_user"
+                        icon="fa-credit-card-alt">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Export</span>
+                            <span class="o_stat_text">Status</span>
+                        </div>
+                    </button>
             </xpath>
         </field>
     </record>

@@ -195,7 +195,7 @@ class droga_cons_inherit(models.Model):
                         'price_unit': 0,  # FIXME
 
                         'company_id': self.env.company.id,
-                        'warehouse_id': det['warehouse_id'],
+                        'warehouse_id': det['warehouse_id'].id,
                     })
 
         return {
@@ -215,31 +215,38 @@ class droga_cons_inherit(models.Model):
             'domain': [('subcontract_return_origin_form', '=', self.id)],
         }
 
-    class droga_cons_inherit(models.Model):
-        _inherit = 'droga.inventory.cons.issue.detail'
-        proc_cost = fields.Float('Processing cost')
+class droga_cons_inherit_detail(models.Model):
+    _inherit = 'droga.inventory.cons.issue.detail'
+    proc_cost = fields.Float('Processing cost')
+    tot_cost= fields.Float('Total',compute='_compute_tot_cost')
 
+    @api.depends('product_uom_qty')
+    def _compute_tot_cost(self):
+        for rec in self:
+            rec.tot_cost=rec.proc_cost*rec.product_uom_qty
     def write(self, vals):
-        result = super(droga_cons_inherit, self).create(vals)
-        sale_details = result.subcontract_issue_origin_form.order_line
-        raw_materials = self.env['droga.export.items.composition.fin.goods'].search([('item', 'in',
-                                                                                      sale_details.product_id.product_tmpl_id.ids)]).items_header.raw_item.ids
-        for sub_item in result.detail_entries:
-            if sub_item.product_id.product_tmpl_id.id not in raw_materials:
-                raise UserError(
-                    "Item " + sub_item.product_id.default_code + ' - ' + sub_item.product_id.name + " is not raw material for any sales item.")
+        result = super(droga_cons_inherit_detail, self).create(vals)
+        if result.cons_header.subcontract_issue_origin_form:
+            sale_details = result.subcontract_issue_origin_form.order_line
+            raw_materials = self.env['droga.export.items.composition.fin.goods'].search([('item', 'in',
+                                                                                          sale_details.product_id.product_tmpl_id.ids)]).items_header.raw_item.ids
+            for sub_item in result.cons_header.detail_entries:
+                if sub_item.product_id.product_tmpl_id.id not in raw_materials:
+                    raise UserError(
+                        "Item " + sub_item.product_id.default_code + ' - ' + sub_item.product_id.name + " is not raw material for any sales item.")
         return result
 
     @api.model
     def create(self, vals):
-        result = super(droga_cons_inherit, self).create(vals)
-        sale_details = result.subcontract_issue_origin_form.order_line
-        raw_materials = self.env['droga.export.items.composition.fin.goods'].search([('item', 'in',
-                                                                                      sale_details.product_id.product_tmpl_id.ids)]).items_header.raw_item.ids
-        for sub_item in result.detail_entries:
-            if sub_item.product_id.product_tmpl_id.id not in raw_materials:
-                raise UserError(
-                    "Item " + sub_item.product_id.default_code + ' - ' + sub_item.product_id.name + " is not raw material for any sales item.")
+        result = super(droga_cons_inherit_detail, self).create(vals)
+        if result.cons_header.subcontract_issue_origin_form:
+            sale_details = result.cons_header.subcontract_issue_origin_form.order_line
+            raw_materials = self.env['droga.export.items.composition.fin.goods'].search([('item', 'in',
+                                                                                          sale_details.product_id.product_tmpl_id.ids)]).items_header.raw_item.ids
+            for sub_item in result.cons_header.detail_entries:
+                if sub_item.product_id.product_tmpl_id.id not in raw_materials:
+                    raise UserError(
+                        "Item " + sub_item.product_id.default_code + ' - ' + sub_item.product_id.name + " is not raw material for any sales item.")
         return result
 
 
@@ -261,7 +268,22 @@ class droga_sale_inherit(models.Model):
             },
             'domain': [('subcontract_issue_origin_form', '=', self.id)],
         }
-
+    def export_status_list(self):
+        if len(self.env['droga.export.status'].search([('status_origin_sales','=',self.id)]))==0:
+            status_list=self.env['droga.export.status.list'].search([('status','=','Active')])
+            for status in status_list:
+                self.env['droga.export.status'].sudo().create({
+                    'status_origin_sales':self.id,
+                    'status':status.status_list,
+                })
+        return {
+            'name': 'Export status',
+            'view_type': 'tree',
+            'view_mode': 'tree',
+            'res_model': 'droga.export.status',
+            'type': 'ir.actions.act_window',
+            'domain': [('status_origin_sales', '=', self.id)],
+        }
     def pay_req_open(self):
         return {
             'name': 'Payment request',
