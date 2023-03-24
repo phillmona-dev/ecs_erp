@@ -21,7 +21,7 @@
                         icon="fa-car icon">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_text">Send to</span>
-                            <span class="o_stat_text">Sub-contractor</span>
+                            <span class="o_stat_text">Cleaning unit</span>
                         </div>
                     </button>
                 <button name="export_status_list"
@@ -46,7 +46,7 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='currency_id']" position="after">
                 <field string='Export origin' name="export_origin_form" attrs="{'invisible': [('export_origin_form', '=', False)]}"></field>
-                <field string='Sub-contractor issue origin' name="issue_export_origin_form" attrs="{'invisible': [('issue_export_origin_form', '=', False)]}"></field>
+                <field string='Cleaning unit issue origin' name="issue_export_origin_form" attrs="{'invisible': [('issue_export_origin_form', '=', False)]}"></field>
             </xpath>
         </field>
     </record>

@@ -12,7 +12,7 @@ class drogapoinherit(models.Model):
     _inherit = 'purchase.order'
     sub_cont_sent=fields.Boolean('Subcontractor sent',default=False)
     raw_items=fields.One2many('droga.export.raw.items','po_id')
-    show_sub_contractor_price=fields.Boolean('Show sub-contractor price',default=False)
+    show_sub_contractor_price=fields.Boolean('Show cleaning unit price',default=False)
     def fill_po(self):
         by_products = []
         waste = []
@@ -153,7 +153,7 @@ class drogapoinherit(models.Model):
 
     def open_deliveries(self):
         return {
-            'name': 'Sub-contractor issue',
+            'name': 'cleaning unit issue',
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'stock.picking',

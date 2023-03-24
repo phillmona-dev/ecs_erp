@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <tree string="">
                 <field name="name"></field>
-                <field name="supplier" string="Sub-contractor"></field>
+                <field name="supplier" string="Cleaning unit"></field>
                 <field name="state"></field>
             </tree>
         </field>
@@ -39,7 +39,7 @@
                 <sheet>
                     <group string="Store receive request">
                         <group>
-                            <field name="supplier" string="Sub-contractor"
+                            <field name="supplier" string="Cleaning unit"
                                    attrs="{'readonly': True}"></field>
                             <field name="issue_type" required="True"
                                    attrs="{'readonly': [('issue_type', '=', 'SUBL')]}"></field>

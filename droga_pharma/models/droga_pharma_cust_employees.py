@@ -30,7 +30,7 @@ class droga_pharma_customer_employees(models.Model):
     remaining_amount_period=fields.Char(string='Remaining',compute='_remain_amount_period')
     def _remain_amount_period(self):
         for rec in self:
-            rec.remaining_amount_period='FIXME'
+            rec.remaining_amount_period='FIX ME'
 
     def _get_descr(self):
         for record in self:

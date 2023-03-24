@@ -192,14 +192,14 @@ class droga_cons_inherit(models.Model):
                         'product_uom_qty': det.product_uom_qty * it['rate_in_pct'] / 100,
                         'product_uom': it['item'].uom_id.id,
 
-                        'price_unit': 0,  # FIXME
+                        'price_unit': 0,  # FIX ME
 
                         'company_id': self.env.company.id,
                         'warehouse_id': det['warehouse_id'].id,
                     })
 
         return {
-            'name': 'Sub-contractor items return',
+            'name': 'cleaning unit items return',
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'droga.inventory.consignment.receive',
@@ -255,7 +255,7 @@ class droga_sale_inherit(models.Model):
 
     def subcontract_issue_open(self):
         return {
-            'name': 'Sub-contractor issue',
+            'name': 'Cleaning unit issue',
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'droga.inventory.consignment.issue',
