@@ -277,6 +277,8 @@ class sale_order_ext(models.Model):
         for rec in self:
             if rec.user_id.name.startswith('CRM'):
                 rec.sales_initiator='SR-'+rec.pr_sales.p_name if rec.pr_sales else rec.user_id.name
+            elif  rec.user_id.name.startswith('Tender'):
+                rec.sales_initiator = 'TEN-' + rec.pr_sales.p_name if rec.pr_sales else rec.user_id.name
             else:
                 rec.sales_initiator = rec.user_id.name
     def _compute_has_access(self):
