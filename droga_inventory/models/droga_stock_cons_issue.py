@@ -17,7 +17,7 @@ class droga_stock_cons_issue(models.Model):
         ('stmg', 'Store manager'),  #Issue sent to store manager for warehouse allocation
         ('waiting', 'Requested'),   #When consignment is waiting for storekeeper to issue at warehouse
         ('mg','Export manager'),
-        ('sc', 'Sent to SC'),
+        ('sc', 'Sent to CU'),
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
 
@@ -159,7 +159,7 @@ class droga_stock_cons_issue_detail(models.Model):
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
         ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
         ('mg', 'Export manager'),
-        ('sc', 'Sent to SC'),
+        ('sc', 'Sent to CU'),
         ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
 

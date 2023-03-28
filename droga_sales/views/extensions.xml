@@ -123,7 +123,7 @@
             </xpath>
 
             <xpath expr="//form/header/field[@name='state']" position="replace">
-                <field name="state" widget="statusbar" statusbar_visible="draft,req,sale"/>
+                <field name="state" widget="statusbar" statusbar_visible="draft,req,fia,sale"/>
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="after">
                 <field name="Vat_no" readonly="1" string="Tin No"></field>

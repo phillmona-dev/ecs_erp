@@ -42,13 +42,8 @@ class droga_stock_transfer_custom(models.Model):
 
     @api.depends('request_date')
     def _filter_location_access(self):
-        compiled_domain=[]
-        user_groups_list=self.env.user.groups_id
-        for user_group in user_groups_list:
-            given_ules=user_group.rule_groups
-            for rule in given_ules:
-                if 'Warehouse' in rule.model_id.name:
-                    compiled_domain.append(rule.domain_force.strip().replace("[('code', '=', ",'').replace("'",'').replace(')]',''))
+
+        compiled_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
 
         if len(compiled_domain)==0:
             #User has no warehouse access, so this will return an empty list

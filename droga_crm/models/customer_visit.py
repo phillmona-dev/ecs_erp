@@ -204,7 +204,7 @@ class customer_visit_header(models.Model):
                     'type': 'lead',
                     'stage_id': 1,
                     'plan_id':det.id,
-                    'expected_revenue': 0,  # Fix me
+                    'expected_revenue': 0,
                     'date_planned': det['visit_date'],
                     'partner_id': det['visit_client'].id,
                     'planned_visit_selection':det['planned_visit_selection']
@@ -242,7 +242,7 @@ class customer_visit_header(models.Model):
                         'core_products': contdet['core_products'],
                         'co_travel_crm': contdet['co_travel_crm'],
                         'contact_custom':contdet['contact_custom'].id,
-                        'expected_revenue': 0,  # Fix me
+                        'expected_revenue': 0,
                         'date_planned': det['visit_date'],
                         'partner_id': det['visit_client'].id,
                         'planned_visit_selection': det['planned_visit_selection']

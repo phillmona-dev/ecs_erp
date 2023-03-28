@@ -77,6 +77,7 @@ class sale_order_line(models.Model):
 
             if not rec.product_id.bought_locally and rec.available_qty<rec.product_uom_qty:
                 rec.is_prod_available='False'
+            #This is for out of stock products that are bought locally
             elif rec.product_id.bought_locally and rec.available_qty<rec.product_uom_qty:
                 rec.is_prod_available='Kinda'
             else:
@@ -316,17 +317,18 @@ class sale_order_ext(models.Model):
 
 
     def _get_approvers(self):
+
         for rec in self:
-            rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.ids[0] if len(
-                self.env.ref("droga_sales.sales_price_change_admin").users.ids) > 0 else None
-            rec.final_approver=self.env.ref("droga_sales.sales_import_final_approve").users.ids[0] if len(
-                self.env.ref("droga_sales.sales_import_final_approve").users.ids) > 0 else None
+            rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.filtered(lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                self.env.ref("droga_sales.sales_price_change_admin").users.filtered(lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+            rec.final_approver=self.env.ref("droga_sales.sales_import_final_approve").users.filtered(lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                self.env.ref("droga_sales.sales_import_final_approve").users.filtered(lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
             if rec.order_type=='IM':
-                rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.ids[0] if len(
-                    self.env.ref("droga_sales.sales_import_approve_admin").users.ids) > 0 else None
+                rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
             else:
-                rec.operation_approver = self.env.ref("droga_sales.sales_wholesale_approve_admin").users.ids[0] if len(
-                    self.env.ref("droga_sales.sales_wholesale_approve_admin").users.ids) > 0 else None
+                rec.operation_approver = self.env.ref("droga_sales.sales_wholesale_approve_admin").users.filtered(lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_sales.sales_wholesale_approve_admin").users.filtered(lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
     def _get_pr_sales_logged(self):
         if not request:
             return False
@@ -340,37 +342,57 @@ class sale_order_ext(models.Model):
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
 
     def validate_form(self):
+        message = ''
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
         if (len(order_lines_nowareh) > 0):
-            raise ValidationError("Warehouse must be filled for each order line.")
+            message = message + ('\n' if message else '') + "Warehouse must be filled for each order line."
+            #raise ValidationError("Warehouse must be filled for each order line.")
 
         order_lines_nowareh = self.order_line.filtered(
             lambda x: x.wareh.wh_type != self.order_type)
         if (len(order_lines_nowareh) > 0):
-            raise ValidationError(
-                "Please check if all warehouses are under " + dict(self._fields['order_type'].selection).get(
-                    self.order_type) + ".")
+            message = message + ('\n' if message else '') + "Please check if all warehouses are under " + dict(self._fields['order_type'].selection).get(
+                    self.order_type) + "."
 
+        if not self.price_change_approver:
+            raise ValidationError("Price change approver is not configured for client.")
+        if not self.final_approver:
+            raise ValidationError("Final approver is not configured for client.")
+        if not self.operation_approver:
+            raise ValidationError("Operation manager is not configured for client.")
         order_lines_negative = self.order_line.filtered(
-            lambda x: not x.is_prod_available)
+            lambda x: x.is_prod_available=='False')
         if (len(order_lines_negative) > 0):
             products = ''
             for lin in order_lines_negative:
                 products += lin.product_template_id.default_code + ', '
-            raise ValidationError("Product quantity is out of stock for " + products)
+            message = message + ('\n' if message else '') + "Product quantity is out of stock for " + products
+            #raise ValidationError("Product quantity is out of stock for " + products)
 
         for so in self:
+            if not so.partner_id.cust_type_ext:
+                message = message + "Customer type must be registered for customer!"
+            if not so.partner_id.city_name:
+                message =message + ('\n' if message else '') +  message + "City must be registered for customer!"
             if not so.partner_id.vat:
-                raise ValidationError("Tin No must be registered for customer!")
+                message =message + ('\n' if message else '') +  message + "Tin No must be registered for customer!"
+                #raise ValidationError("Tin No must be registered for customer!")
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
-                raise ValidationError("You cannot exceed credit limit!")
+                message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
+                # raise ValidationError("You cannot exceed credit limit!")
             if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender:
-                raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
+                message = message+('\n' if message else '') + "Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount)
+                #raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
-                raise ValidationError("Please login before registering a sales order!")
+                message = message + ('\n' if message else '') + "Please login before requesting a sales order!"
+                # raise ValidationError("Please login before registering a sales order!")
             if so.mature_amount > 0:
-                raise ValidationError("Please settle matured amounts before initiating another sales!")
+                message = message+('\n' if message else '') + "Please settle matured amounts before initiating another sales!"
+                #raise ValidationError("Please settle matured amounts before initiating another sales!")
+
+        if message:
+            raise ValidationError(message)
     def save_request_button(self):
         self.validate_form()
         self.ensure_one()
