@@ -14,8 +14,18 @@
 
         <record id="export_sub_contractor_issue" model="ir.sequence">
             <field name="name">Subcontractor issue sequence</field>
-            <field name="code">droga.export.items.sub.contractor.sequence</field>
-            <field name="prefix">SUBC/%(y)s/</field>
+            <field name="code">droga.export.items.sub.contractor.issue.sequence</field>
+            <field name="prefix">SUBI/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="implementation">no_gap</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="export_sub_contractor_return" model="ir.sequence">
+            <field name="name">Subcontractor return sequence</field>
+            <field name="code">droga.export.items.sub.contractor.return.sequence</field>
+            <field name="prefix">SUBR/%(y)s/</field>
             <field name="suffix"></field>
             <field name="number_increment">1</field>
             <field name="padding">5</field>

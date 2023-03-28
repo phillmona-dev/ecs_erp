@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Droga Pharmacy chain",
+    'name': "Droga Pharmacy Chain",
 
     'summary': """
         Droga Pharma Pvt. Ltd.Co Pharmacy project stand-alone module.""",
@@ -22,11 +22,12 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/droga_export_emp_extension.xml',
+        'views/droga_pharma_sales.xml'
     ],
 
     # any module necessary for this one to work correctly
 
-    'depends': ['base', 'hr',
+    'depends': ['base', 'hr','droga_sales',
                 'mail', 'stock', 'http_routing', 'sale',
                 'resource', 'stock', 'droga_inventory',
                 'web', 'crm'],

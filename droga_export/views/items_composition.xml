@@ -21,7 +21,7 @@
                 <sheet>
                     <group string="Export items composition">
                         <group>
-                            <field name="raw_item"></field>
+                            <field name="raw_item" options="{'no_create':True,'no_open':True}"></field>
                         </group>
                     </group>
                     <notebook>

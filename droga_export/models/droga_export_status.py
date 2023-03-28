@@ -5,6 +5,7 @@ class droga_export_status(models.Model):
     status_origin_sales = fields.Many2one('sale.order', readonly=True)
     status=fields.Char('Status')
     completed=fields.Boolean('Completed',default=False)
+    remark=fields.Char('Remark')
 
 class droga_export_status_list(models.Model):
     _name='droga.export.status.list'

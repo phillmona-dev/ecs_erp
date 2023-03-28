@@ -179,7 +179,7 @@ class drogapochildinherit(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    def button_validate(self):
+    def button_validate_dont_run(self):
         #res=super(StockPicking, self).button_validate()
         for rec in self:
 

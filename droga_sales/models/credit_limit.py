@@ -6,7 +6,7 @@ from stdnum.ch import uid
 
 from odoo import models, fields, api
 from odoo.addons.base.models.ir_model import IrModelData
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class cust_credit_limit(models.Model):
@@ -44,7 +44,8 @@ class cust_sales_credit_limit(models.Model):
 
     order_type = fields.Selection([
         ('IM', 'Import'),
-        ('WS', 'Wholesale'), ('PT', 'Physiotherapy')], string='Order from', required=True)
+        ('WS', 'Wholesale')], string='Order from')
+    order_from=fields.Char('Order from')
 
     @api.depends('payment_term_id')
     def _get_so_type(self):
@@ -113,7 +114,45 @@ class cust_sales_credit_limit(models.Model):
             if 'cust_type_ext' in vals:
                 if result.partner_id.cust_type_ext!=vals['cust_type_ext']:
                     result.partner_id.cust_type_ext = vals['cust_type_ext']
+
+            # Physiotheraphy sales
+            if so.order_from == 'PT':
+                for res in so.order_line:
+                    res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
+                    res.product_id.product_tmpl_id.invoice_policy='order'
+            else:
+                for res in so.order_line:
+                    res.product_id.product_tmpl_id.invoice_policy = 'delivery'
+
         return result
+
+    def action_create(self):
+        if self._get_forbidden_state_confirm() & set(self.mapped('state')):
+            raise UserError((
+                "It is not allowed to confirm an order in the following states: %s",
+                ", ".join(self._get_forbidden_state_confirm()),
+            ))
+
+        self.order_line._validate_analytic_distribution()
+
+        for order in self:
+            if order.partner_id in order.message_partner_ids:
+                continue
+            order.message_subscribe([order.partner_id.id])
+
+        self.write(self._prepare_confirmation_values())
+
+        # Context key 'default_name' is sometimes propagated up to here.
+        # We don't need it and it creates issues in the creation of linked records.
+        context = self._context.copy()
+        context.pop('default_name', None)
+
+        self.with_context(context)._action_confirm()
+        if self.env.user.has_group('sale.group_auto_done_setting'):
+            self.action_done()
+
+        return True
+
 
 class cust_sales_no_create_after_invoice(models.Model):
     _inherit = 'sale.order.line'
@@ -123,7 +162,7 @@ class cust_sales_no_create_after_invoice(models.Model):
 
     order_type = fields.Selection([
         ('IM', 'Import'),
-        ('WS', 'Wholesale'), ('PT', 'Physiotherapy')], string='Order from', related='order_id.order_type')
+        ('WS', 'Wholesale')], string='Order from', related='order_id.order_type')
 
     def _get_expiry(self):
         for rec in self:
@@ -167,13 +206,15 @@ class cust_sales_no_create_after_invoice(models.Model):
         })
         return values
 
+
     # Restrict multiple sales order invoicing
     @api.model
     def create(self, vals):
+        res=super(cust_sales_no_create_after_invoice, self).create(vals)
         if self.order_id.state != 'draft' and self.order_id.state:
             raise ValidationError("Sales order is already invoiced!")
         else:
-            return super(cust_sales_no_create_after_invoice, self).create(vals)
+            return res
 
 
 class payment_term_no_credit(models.Model):

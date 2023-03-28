@@ -4,7 +4,7 @@ from odoo.exceptions import UserError
 
 class inventory_return_extension(models.Model):
     _inherit = 'droga.inventory.consignment.receive'
-    subcontract_return_origin_form = fields.Many2one('sale.order', readonly=True)
+    subcontractor_return_origin_form = fields.Many2one('droga.inventory.consignment.issue', readonly=True)
 
     def request_mg(self):
         self.set_activity_done()
@@ -18,12 +18,12 @@ class inventory_return_extension(models.Model):
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id)]).id
             if not pick_type_id:
-                raise UserError("Picking type is not configured for one of the warehouses.")
+                raise UserError("Picking type SUBL is not configured for one of the warehouses.")
 
         cons_vendor = self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
 
         if not cons_vendor:
-            raise UserError("Consignment vendor location not set. Please configure accordingly.")
+            raise UserError("SUBL location not set. Please configure accordingly.")
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
@@ -118,10 +118,10 @@ class droga_cons_inherit(models.Model):
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'SUBI'), ('warehouse_id', '=', wh.id)]).id
             cust_locat = self.env['stock.location'].search([('con_type', '=', 'SUBL')]).id
             if not pick_type_id:
-                raise UserError("Picking type is not configured for one of the warehouses.")
+                raise UserError("SUBI is not configured for one of the warehouses.")
             if not cust_locat:
                 raise UserError(
                     "Subcontractor location for type " + self.issue_type + " not set. Please configure accordingly.")
@@ -130,7 +130,7 @@ class droga_cons_inherit(models.Model):
             # Get picking type for issue type per warehouse.
             # Issue type will be configured per warehouse.
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'SUBI'), ('warehouse_id', '=', wh.id)]).id
             # Get default location for the warehouse
             def_loc_id = self.env['stock.location'].search(
                 [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False), ('usage', '=', 'internal')])[
@@ -186,17 +186,19 @@ class droga_cons_inherit(models.Model):
                 [('raw_item', 'in', det.product_id.product_tmpl_id.ids)])
             if len(raw_details) > 0:
                 for it in raw_details.items_detail:
-                    items.append({
-                        'product_id': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
-                            0].id,
-                        'product_uom_qty': det.product_uom_qty * it['rate_in_pct'] / 100,
-                        'product_uom': it['item'].uom_id.id,
+                    if self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
+                                0].id in self.subcontract_issue_origin_form.order_line.mapped('product_id').ids:
+                        items.append({
+                            'product_id': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
+                                0].id,
+                            'product_uom_qty': det.product_uom_qty * it['rate_in_pct'] / 100,
+                            'product_uom': it['item'].uom_id.id,
 
-                        'price_unit': 0,  # FIX ME
+                            'price_unit': it.items_header[0].raw_item.standard_price+det.proc_cost,  # FIX ME
 
-                        'company_id': self.env.company.id,
-                        'warehouse_id': det['warehouse_id'].id,
-                    })
+                            'company_id': self.env.company.id,
+                            'warehouse_id': det['warehouse_id'].id,
+                        })
 
         return {
             'name': 'cleaning unit items return',
@@ -209,10 +211,10 @@ class droga_cons_inherit(models.Model):
             'context': {
                 'default_issue_type': 'SUBL',
                 'default_supplier':self.customer.id,
-                'default_subcontract_return_origin_form': self.subcontract_issue_origin_form.id,
+                'default_subcontractor_return_origin_form': self.id,
                 'default_detail_entries': items
             },
-            'domain': [('subcontract_return_origin_form', '=', self.id)],
+            'domain': [('subcontractor_return_origin_form', '=', self.id)],
         }
 
 class droga_cons_inherit_detail(models.Model):
@@ -220,7 +222,7 @@ class droga_cons_inherit_detail(models.Model):
     proc_cost = fields.Float('Processing cost')
     tot_cost= fields.Float('Total',compute='_compute_tot_cost')
 
-    @api.depends('product_uom_qty')
+    @api.depends('product_uom_qty','proc_cost')
     def _compute_tot_cost(self):
         for rec in self:
             rec.tot_cost=rec.proc_cost*rec.product_uom_qty

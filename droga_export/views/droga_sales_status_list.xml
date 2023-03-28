@@ -8,6 +8,7 @@
             <tree editable="bottom" create="0" delete="1">
                 <field name="status" readonly="1"></field>
                 <field name="completed"></field>
+                <field name="remark"></field>
             </tree>
         </field>
     </record>

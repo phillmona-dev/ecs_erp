@@ -312,6 +312,44 @@ class sale_order_ext(models.Model):
         else:
             return [('id','in',[])]
 
+    def create_inv_local(self):
+        self.action_confirm()
+        x = {
+            'advance_payment_method': 'delivered',
+            'sale_order_ids': [self.id],
+        }
+        y=self.env['sale.advance.payment.inv'].create(x)
+        y.create_invoices()
+
+        invoices = self.mapped('invoice_ids')
+        action = self.env['ir.actions.actions']._for_xml_id('account.action_move_out_invoice_type')
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            form_view = [(self.env.ref('account.view_move_form').id, 'form')]
+            if 'views' in action:
+                action['views'] = form_view + [(state, view) for state, view in action['views'] if view != 'form']
+            else:
+                action['views'] = form_view
+            action['res_id'] = invoices.id
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+
+        context = {
+            'default_move_type': 'out_invoice',
+        }
+        if len(self) == 1:
+            context.update({
+                'default_partner_id': self.partner_id.id,
+                'default_partner_shipping_id': self.partner_shipping_id.id,
+                'default_invoice_payment_term_id': self.payment_term_id.id or self.partner_id.property_payment_term_id.id or
+                                                   self.env['account.move'].default_get(
+                                                       ['invoice_payment_term_id']).get('invoice_payment_term_id'),
+                'default_invoice_origin': self.name,
+                'default_user_id': self.user_id.id,
+            })
+        action['context'] = context
+        return action
     @api.depends('order_line.product_template_id')
     def _get_stock_out(self):
         for rec in self:
@@ -508,7 +546,7 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name'):
+                if node.get("modifiers") is None or node.get("name") in ('name','amount_total'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(

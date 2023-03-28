@@ -78,7 +78,7 @@ class droga_warehouse_extension(models.Model):
 
     wh_type=fields.Selection([
         ('IM','Import'),
-        ('WS', 'Wholesale'),
+        ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),], string='Warehouse type.')
 
     def _search_has_access(self, operator, value):

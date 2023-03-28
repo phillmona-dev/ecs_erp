@@ -43,7 +43,7 @@
                                    attrs="{'readonly': True}"></field>
                             <field name="issue_type" required="True"
                                    attrs="{'readonly': [('issue_type', '=', 'SUBL')]}"></field>
-                            <field name="subcontract_return_origin_form" readonly="1"
+                            <field name="subcontractor_return_origin_form" readonly="1"
                                    options="{'no_create':True,'no_open':True}"></field>
                         </group>
                         <group>
