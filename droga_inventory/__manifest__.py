@@ -32,6 +32,7 @@
         'views/stock_res_users.xml',
         'views/reservation_list.xml',
         'views/droga_header_footer_template.xml',
+        'views/droga_landed_cost.xml',
         'report/report_tree_extension.xml',
         'report/stock_adjustment_request_report.xml',
         'report/xls_stock_card.xml',
@@ -43,7 +44,7 @@
 
     'depends': ['base',
                 'mail',
-                'resource','droga_procurement',
+                'resource', 'droga_procurement',
                 'web', 'crm'],
     "license": "AGPL-3",
     # only loaded in demonstration mode

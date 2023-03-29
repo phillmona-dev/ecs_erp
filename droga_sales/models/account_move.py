@@ -22,9 +22,20 @@ class account_move(models.Model):
     is_invoice_printed_pos = fields.Boolean("Invoice Printed POS", default=False)
     tin_no = fields.Char(compute="get_tin_no", string="Tin No")
     sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
+    order_from = fields.Char("Order From", compute='_compute_order_from')
 
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
     total_amount_word = fields.Char(compute="_get_total_amount_word")
+
+    def _compute_order_from(self):
+        for record in self:
+            recs = self.env['sale.order'].search([('name', '=', record.invoice_origin)])
+
+            for r in recs:
+                if r.order_type:
+                    record.order_from = r.order_type
+                else:
+                    record.order_from = r.order_from
 
     def _get_current_user_id(self):
         context = self._context
@@ -198,7 +209,10 @@ class account_move(models.Model):
         return True
 
     def print_sales_attachment(self):
-        res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_action').report_action(self)
+        if self.order_from in ('IM', 'WS', 'IM-IM', 'IM-WS'):
+            res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_action').report_action(self)
+        else:
+            res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_a5_action').report_action(self)
         return res1
 
     def convert_to_word(self, number):
