@@ -117,10 +117,11 @@ class cust_sales_credit_limit(models.Model):
                     result.partner_id.cust_type_ext = vals['cust_type_ext']
 
             # Physiotheraphy sales
-            if so.order_from.startswith('PT'):
-                for res in so.order_line:
-                    res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
-                    res.product_id.product_tmpl_id.invoice_policy='order'
+            if so.order_from:
+                if so.order_from.startswith('PT'):
+                    for res in so.order_line:
+                        res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
+                        res.product_id.product_tmpl_id.invoice_policy='order'
             else:
                 for res in so.order_line:
                     res.product_id.product_tmpl_id.invoice_policy = 'delivery'
