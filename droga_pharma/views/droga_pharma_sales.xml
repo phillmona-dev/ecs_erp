@@ -4,7 +4,7 @@
         <field name="name">sale.order.tree.pharma.invoice</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
-            <tree string="" delete="false">
+            <tree string="" create="0" delete="false">
                 <field name="name"></field>
                 <field name="partner_id"></field>
                 <field name="amount_total"></field>
