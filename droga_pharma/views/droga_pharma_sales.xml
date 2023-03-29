@@ -112,14 +112,15 @@
                             <field name="partner_id" widget="res_partner_many2one"
                                    context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
                                    options='{"always_reload": True}'/>
-                            <field name="payment_term_id" options="{'no_open':True,'no_create': True}"/>
+                            <field name="cust_name" attrs="{'invisible': [('partner_id', '!=', 15390)]}"></field>
+
                             <field name="partner_invoice_id" groups="account.group_delivery_invoice_address"
                                    context="{'default_type':'invoice'}" options='{"always_reload": True}'/>
                             <field name="partner_shipping_id" groups="account.group_delivery_invoice_address"
                                    context="{'default_type':'delivery'}" options='{"always_reload": True}'/>
                         </group>
                         <group name="order_details">
-
+                            <field name="payment_term_id" options="{'no_open':True,'no_create': True}"/>
                             <div class="o_td_label" groups="base.group_no_one">
                                 <label for="date_order" string="Order Date"/>
 
@@ -488,7 +489,7 @@
         <field name="name">Sales order 4 Kilo</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-4 Kilo'}</field>
+        <field name="context">{'default_partner_id':15390,'default_payment_term_id':11,'default_order_from':'PT-4 Kilo'}</field>
         <field name="domain">[('order_from','=','PT-4 Kilo')]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_bole_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
@@ -512,7 +513,7 @@
         <field name="name">Sales order Bole</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-Bole'}</field>
+        <field name="context">{'default_partner_id':15390,'default_payment_term_id':11,'default_order_from':'PT-Bole'}</field>
         <field name="domain">[('order_from','=','PT-Bole')]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_bole_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),

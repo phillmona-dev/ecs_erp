@@ -38,6 +38,7 @@ class cust_sales_credit_limit(models.Model):
     cust_id = fields.Integer(related='partner_id.id',readonly='True')
     sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
     supporters=fields.Many2many('droga.pro.sales.master',string='Supporters')
+    cust_name=fields.Char('Customer Name')
 
     def _cust_type_inv(self):
         pass
