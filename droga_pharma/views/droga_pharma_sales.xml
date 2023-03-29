@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="view_order_tree_pharmacy_invoice" model="ir.ui.view">
-        <field name="name">sale.order.tree.pharma</field>
+        <field name="name">sale.order.tree.pharma.invoice</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
             <tree string="" delete="false">
@@ -14,11 +14,14 @@
                     decoration-warning="invoice_status == 'upselling'"
                     widget="badge" optional="show"/>
                 <field name="state" invisible="1"></field>
+
+                <!--
                 <button name="create_inv_local"
                             string="Create Invoice" font-size="16px"
                             groups="droga_pharma.physio_user_bole_invoice,droga_pharma.physio_user_4k_invoice"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+                -->
             </tree>
         </field>
     </record>
