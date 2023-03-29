@@ -14,14 +14,9 @@
                     decoration-warning="invoice_status == 'upselling'"
                     widget="badge" optional="show"/>
                 <field name="state" invisible="1"></field>
-
-                <!--
-                <button name="create_inv_local"
-                            string="Create Invoice" font-size="16px"
-                            groups="droga_pharma.physio_user_bole_invoice,droga_pharma.physio_user_4k_invoice"
-                            type="object" class="btn-primary" data-hotkey="q"
-                            attrs="{'invisible': [('state', '!=', 'sale')]}"/>
-                -->
+                
+                <button type="object" string="Create Invoice" name="create_inv_local" attrs="{'invisible': [('state', '!=', 'sale')]}"
+                                    class="oe_highlight"></button>
             </tree>
         </field>
     </record>
