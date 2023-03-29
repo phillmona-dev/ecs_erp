@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id="view_order_tree_pharmacy" model="ir.ui.view">
+    <record id="view_order_tree_pharmacy_invoice" model="ir.ui.view">
         <field name="name">sale.order.tree.pharma</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
@@ -8,6 +8,37 @@
                 <field name="name"></field>
                 <field name="partner_id"></field>
                 <field name="amount_total"></field>
+                <field name="invoice_status"
+                    decoration-success="invoice_status == 'invoiced'"
+                    decoration-info="invoice_status == 'to invoice'"
+                    decoration-warning="invoice_status == 'upselling'"
+                    widget="badge" optional="show"/>
+                <field name="state" invisible="1"></field>
+                <button name="create_inv_local"
+                            string="Create Invoice" font-size="16px"
+                            groups="droga_pharma.physio_user_bole_invoice,droga_pharma.physio_user_4k_invoice"
+                            type="object" class="btn-primary" data-hotkey="q"
+                            attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_order_tree_pharmacy_no_invoice" model="ir.ui.view">
+        <field name="name">sale.order.tree.pharma.no.invoice</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <tree string="" delete="false">
+                <field name="name"></field>
+                <field name="partner_id"></field>
+                <field name="amount_total"></field>
+                <field name="state"></field>
+                <field name="invoice_status"
+                    decoration-success="invoice_status == 'invoiced'"
+                    decoration-info="invoice_status == 'to invoice'"
+                    decoration-warning="invoice_status == 'upselling'"
+                    widget="badge" optional="show"/>
+
+
             </tree>
         </field>
     </record>
@@ -19,11 +50,17 @@
             <form string="Sales Order" class="o_sale_order"  style="font-size:11pt">
                 <header>
                     <field name="invoice_status" invisible="1"></field>
+                    <button name="action_confirm"
+                            string="Confirm" font-size="16px"
+                            groups="droga_pharma.physio_user_bole,droga_pharma.physio_user_4k"
+                            type="object" class="btn-primary" data-hotkey="q"
+                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
 
                     <button name="create_inv_local"
                             string="Create Invoice" font-size="16px"
+                            groups="droga_pharma.physio_user_bole_invoice,droga_pharma.physio_user_4k_invoice"
                             type="object" class="btn-primary" data-hotkey="q"
-                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                            attrs="{'invisible': [('state', '!=', 'sale')]}"/>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,sale"/>
 
@@ -74,7 +111,7 @@
                                 <label for="date_order" string="Order Date"/>
 
                             </div>
-                            <field name="date_order" nolabel="1" groups="base.group_no_one"/>
+                            <field name="date_order" nolabel="1"/>
                             <field name="show_invoice_button" invisible="1"></field>
                             <field name="mature_amount" style="color:red"
                                    attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
@@ -434,21 +471,83 @@
         </field>
     </record>
 
-    <record id="droga_sales_pharmacy_action" model="ir.actions.act_window">
-        <field name="name">Sales order</field>
+    <record id="droga_sales_pharmacy_action_4k" model="ir.actions.act_window">
+        <field name="name">Sales order 4 Kilo</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_partner_id':10998,'default_order_from':'PT'}</field>
+        <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-4 Kilo'}</field>
+        <field name="domain">[('order_from','=','PT-4 Kilo')]</field>
         <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy')}),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy_no_invoice')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharmacy')})]"/>
     </record>
 
+    <record id="droga_sales_pharmacy_action_4k_to_invoice" model="ir.actions.act_window">
+        <field name="name">Sales order 4 Kilo</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-4 Kilo'}</field>
+        <field name="domain">[('order_from','=','PT-4 Kilo'),('invoice_status','in',('to invoice','invoiced'))]</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy_invoice')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharmacy')})]"/>
+    </record>
+
+    <record id="droga_sales_pharmacy_action_bole" model="ir.actions.act_window">
+        <field name="name">Sales order Bole</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-Bole'}</field>
+        <field name="domain">[('order_from','=','PT-Bole')]</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy_no_invoice')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharmacy')})]"/>
+    </record>
+
+    <record id="droga_sales_pharmacy_action_bole_to_invoice" model="ir.actions.act_window">
+        <field name="name">Sales order Bole</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-Bole'}</field>
+        <field name="domain">[('order_from','=','PT-Bole'),('invoice_status','in',('to invoice','invoiced'))]</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy_invoice')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharmacy')})]"/>
+    </record>
+
+    <menuitem id="physio_main_menu" name="Physiotherapy" groups="physio_user_4k,physio_user_bole,physio_user_4k_invoice,physio_user_bole_invoice"
+              sequence="10"/>
+
     <menuitem
-            id="droga_sales_pharmacy_menu"
-            name="Sales order"
-            action="droga_sales_pharmacy_action"
-            parent="sale.sale_order_menu"
+            id="droga_sales_pharmacy_menu_4k"
+            name="Sales order - 4 kilo"
+            action="droga_sales_pharmacy_action_4k"
+            parent="droga_pharma.physio_main_menu"
+            groups="physio_user_4k"
+            sequence="20"/>
+
+    <menuitem
+            id="droga_sales_pharmacy_menu_bole"
+            name="Sales order - Bole"
+            action="droga_sales_pharmacy_action_bole"
+            parent="droga_pharma.physio_main_menu"
+            groups="physio_user_bole"
+            sequence="20"/>
+
+    <menuitem
+            id="droga_sales_pharmacy_menu_4k_invoice"
+            name="To invoice - 4 kilo"
+            action="droga_sales_pharmacy_action_4k_to_invoice"
+            parent="droga_pharma.physio_main_menu"
+            groups="physio_user_4k_invoice"
+            sequence="20"/>
+
+    <menuitem
+            id="droga_sales_pharmacy_menu_bole_invoice"
+            name="To invoice - Bole"
+            action="droga_sales_pharmacy_action_bole_to_invoice"
+            parent="droga_pharma.physio_main_menu"
+            groups="physio_user_bole_invoice"
             sequence="20"/>
 </odoo>
 

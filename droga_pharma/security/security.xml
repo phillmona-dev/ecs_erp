@@ -8,5 +8,40 @@
         <field name="name">Pharmacy branch admin</field>
         <field name="category_id" ref="crm_management"/>
     </record>
+
+
+
+
+
+
+
+
+
+
+
+    <record model="ir.module.category" id="physio_management">
+             <field name="name">Physiotherapy</field>
+             <field name="description">Physiotherapy access level</field>
+             <field name="sequence">20</field>
+        </record>
+
+    <record id="physio_user_4k" model="res.groups">
+            <field name="name">Physio 4k</field>
+            <field name="category_id" ref="physio_management"/>
+        </record>
+    <record id="physio_user_bole" model="res.groups">
+        <field name="name">Physio Bole</field>
+        <field name="category_id" ref="physio_management"/>
+    </record>
+    <record id="physio_user_4k_invoice" model="res.groups">
+            <field name="name">Physio 4k Invoice</field>
+            <field name="category_id" ref="physio_management"/>
+        </record>
+    <record id="physio_user_bole_invoice" model="res.groups">
+        <field name="name">Physio Bole Invoice</field>
+        <field name="category_id" ref="physio_management"/>
+    </record>
+
+
 </odoo>
 

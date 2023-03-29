@@ -313,7 +313,7 @@ class sale_order_ext(models.Model):
             return [('id','in',[])]
 
     def create_inv_local(self):
-        self.action_confirm()
+        #self.action_confirm()
         x = {
             'advance_payment_method': 'delivered',
             'sale_order_ids': [self.id],
