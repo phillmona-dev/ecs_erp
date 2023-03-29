@@ -121,12 +121,11 @@
                         </group>
                         <group name="order_details">
                             <field name="payment_term_id" options="{'no_open':True,'no_create': True}"/>
-                            <div class="o_td_label" groups="base.group_no_one">
+                            <div class="o_td_label">
                                 <label for="date_order" string="Order Date"/>
 
                             </div>
                             <field name="date_order" nolabel="1"/>
-                            <field name="payment_term_id" options="{'no_open':True,'no_create': True}"/>
                             <field name="show_invoice_button" invisible="1"></field>
                             <field name="mature_amount" style="color:red"
                                    attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
