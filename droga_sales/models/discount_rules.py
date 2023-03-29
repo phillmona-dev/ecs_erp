@@ -75,9 +75,11 @@ class sale_order_line(models.Model):
                 rec.avail_char=str(rec.available_qty)
             #rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
 
-            if not rec.product_id.bought_locally and rec.available_qty<rec.product_uom_qty:
+            if rec.product_id.detailed_type=='service':
+                rec.is_prod_available = 'True'
+            elif not rec.product_id.bought_locally and rec.available_qty<rec.product_uom_qty:
                 rec.is_prod_available='False'
-            #This is for out of stock products that are bought locally
+            #This is for out of stock products that are bought locally, they'll show up with orange color
             elif rec.product_id.bought_locally and rec.available_qty<rec.product_uom_qty:
                 rec.is_prod_available='Kinda'
             else:
@@ -177,7 +179,7 @@ class sale_order_line(models.Model):
                 line.std_unit_price = 0.0
             else:
                 price = line.with_company(line.company_id)._get_display_price()
-                if not line.tender_origin_form_tender and not line.manual_price:
+                if not line.tender_origin_form_tender and (not line.manual_price or line.price_unit==0):
                     line.price_unit = line.product_id._get_tax_included_unit_price(
                         line.company_id,
                         line.order_id.currency_id,
@@ -381,6 +383,11 @@ class sale_order_ext(models.Model):
 
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
 
+    def action_confirm(self):
+        for rec in self:
+            rec.validate_form()
+        return super(sale_order_ext, self).action_confirm()
+
     def validate_form(self):
         message = ''
         order_lines_nowareh = self.order_line.filtered(
@@ -391,7 +398,7 @@ class sale_order_ext(models.Model):
 
         order_lines_nowareh = self.order_line.filtered(
             lambda x: x.wareh.wh_type != self.order_type)
-        if (len(order_lines_nowareh) > 0):
+        if (len(order_lines_nowareh) > 0 and self.order_type):
             message = message + ('\n' if message else '') + "Please check if all warehouses are under " + dict(self._fields['order_type'].selection).get(
                     self.order_type) + "."
 
@@ -418,10 +425,10 @@ class sale_order_ext(models.Model):
             if not so.partner_id.vat:
                 message =message + ('\n' if message else '') +  message + "Tin No must be registered for customer!"
                 #raise ValidationError("Tin No must be registered for customer!")
-            if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
+            if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [15390]:
                 message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
                 # raise ValidationError("You cannot exceed credit limit!")
-            if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender:
+            if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender and not so.order_from:
                 message = message+('\n' if message else '') + "Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount)
                 #raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
@@ -513,7 +520,7 @@ class sale_order_ext(models.Model):
             order = order.with_company(order.company_id)
             if not order.payment_term_id:
                 order.payment_term_id = order.partner_id.property_payment_term_id
-            
+
     @api.depends('order_line.price_unit','order_line.product_uom_qty','partner_id','payment_term_id')
     def _get_sub_totals(self):
         order_lines_core=None

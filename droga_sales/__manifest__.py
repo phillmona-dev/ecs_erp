@@ -36,6 +36,7 @@
         'reports/request_report.xml',
         'views/module_menus.xml',
         'reports/sales_detail.xml',
+        'reports/sales_detail_waiter.xml',
         'reports/sales_summary.xml',
         'wizard/sales_report_view.xml',
     ],

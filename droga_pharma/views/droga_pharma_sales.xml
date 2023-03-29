@@ -113,22 +113,25 @@
                                    context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
                                    options='{"always_reload": True}'/>
                             <field name="cust_name"></field>
-
+                            <field name="cust_id"></field>
+                            <field name="manual_price" invisible="1"></field>
+                            <field name="show_invoice_button" invisible="1"></field>
+                            <field name="mature_amount" style="color:red"
+                                   attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                             <field name="partner_invoice_id" groups="account.group_delivery_invoice_address"
                                    context="{'default_type':'invoice'}" options='{"always_reload": True}'/>
                             <field name="partner_shipping_id" groups="account.group_delivery_invoice_address"
                                    context="{'default_type':'delivery'}" options='{"always_reload": True}'/>
                         </group>
                         <group name="order_details">
-                            <field name="payment_term_id" options="{'no_open':True,'no_create': True}"/>
+                            <field name="Vat_no" readonly="1" string="Tin No"></field>
+                            <field name="payment_term_id" domain="[('id', 'in', (11,4))]" options="{'no_open':True,'no_create': True}"/>
                             <div class="o_td_label">
                                 <label for="date_order" string="Order Date"/>
 
                             </div>
                             <field name="date_order" nolabel="1"/>
-                            <field name="show_invoice_button" invisible="1"></field>
-                            <field name="mature_amount" style="color:red"
-                                   attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
+
                             <field name="show_update_pricelist" invisible="1"/>
                             <label for="pricelist_id" invisible="1" groups="product.group_product_pricelist"/>
                             <div groups="product.group_product_pricelist" invisible="1" class="o_row">
@@ -489,7 +492,7 @@
         <field name="name">Sales order 4 Kilo</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_partner_id':15390,'default_payment_term_id':11,'default_order_from':'PT-4 Kilo'}</field>
+        <field name="context">{'default_partner_id':15390,'default_manual_price':True,'default_payment_term_id':11,'default_order_from':'PT-4 Kilo'}</field>
         <field name="domain">[('order_from','=','')]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_bole_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
@@ -498,7 +501,7 @@
     </record>
 
     <record id="droga_sales_pharmacy_action_4k_to_invoice" model="ir.actions.act_window">
-        <field name="name">Sales order 4 Kilo</field>
+        <field name="name">Sales invoice 4 Kilo</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-4 Kilo','search_default_to_invoice':1}</field>
@@ -513,7 +516,7 @@
         <field name="name">Sales order Bole</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_partner_id':15390,'default_payment_term_id':11,'default_order_from':'PT-Bole'}</field>
+        <field name="context">{'default_partner_id':15390,'default_manual_price':True,default_payment_term_id':11,'default_order_from':'PT-Bole'}</field>
         <field name="domain">[('order_from','=','PT-Bole')]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_bole_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
@@ -522,7 +525,7 @@
     </record>
 
     <record id="droga_sales_pharmacy_action_bole_to_invoice" model="ir.actions.act_window">
-        <field name="name">Sales order Bole</field>
+        <field name="name">Sales invoice Bole</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-Bole','search_default_to_invoice':1}</field>

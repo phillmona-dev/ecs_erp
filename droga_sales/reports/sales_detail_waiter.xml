@@ -1,34 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="droga_sales_detail_view_tree" model="ir.ui.view">
+    <record id="droga_sales_waiter_view_tree" model="ir.ui.view">
         <field name="name">sale.order.line.view.tree</field>
         <field name="model">sale.order.line</field>
         <field name="arch" type="xml">
             <tree default_order='date_order_det,order_partner_id,order_id' string="" create="false" delete="false">
-                <field name="order_partner_id"></field>
-                <field name="cust_location"></field>
-                <field name="order_id"></field>
-                <field name="product_id"></field>
-                <field name="product_uom" string="UOM"></field>
-                <field name="crm_group1"></field>
-                <field name="is_core"></field>
-                <field name="date_order_det" string="Date"></field>
-                <field name="order_type_det"></field>
-                <field name="payment_term_det"></field>
-                <field name="product_uom_qty"></field>
+                <field name="sales_initiator_det" string="WaiterName"></field>
+                <field name="sales_dept" string="SalesMemo"></field>
+                <field name="order_id" string="InvoiceNumber"></field>
+                <field name="itemcode" string="ItemCode"></field>
+                <field name="itemdesc" string="ItemDescription"></field>
+                <field name="crm_group1" string="CRMCategory"></field>
+                <field name="itemcateg" string="INVCategory"></field>
+                <field name="cash_or_credit" string="PaymentType"></field>
+                <field name="order_partner_id" string="BuyerName"></field>
+                <field name="cust_location" string="City"></field>
+                <field name="qty_invoiced" string="Qty"></field>
+                <field name="invoiced_amt" string="Grand Total"></field>
+
+                <field name="product_uom" string="UOM" optional="hide"></field>
+                <field name="crm_group1" optional="hide"></field>
+                <field name="is_core" optional="hide"></field>
+                <field name="date_order_det" string="Date" optional="hide"></field>
+                <field name="order_type_det" optional="hide"></field>
+                <field name="payment_term_det" optional="hide"></field>
+
                 <field name="qty_delivered" optional="hide"></field>
-                <field name="qty_invoiced" optional="hide"></field>
-                <field name="price_subtotal"></field>
-                <field name="store_placement"></field>
+                <field name="product_uom_qty" string="Qty ordered" optional="hide"></field>
+
+                <field name="store_placement" optional="hide"></field>
                 <field name="wareh" optional="hide" string="Warehouse"></field>
-                <field name="price_unit"></field>
-                <field name="state"></field>
-                <field name="invoice_status"></field>
+                <field name="price_unit" optional="hide"></field>
+                <field name="state" optional="hide"></field>
+                <field name="invoice_status" optional="hide"></field>
             </tree>
         </field>
     </record>
 
-    <record id="droga_sales_detail_search_tree" model="ir.ui.view">
+    <record id="droga_sales_waiter_search_tree" model="ir.ui.view">
         <field name="name">sale.order.line.search.tree</field>
         <field name="model">sale.order.line</field>
         <field name="arch" type="xml">
@@ -54,6 +63,7 @@
                 <filter name="pro_so" string="Workflow pending SO" domain="[('state', '!=', 'sale')]"/>
                 <filter name="core_only" string="Core products" domain="[('is_core', '=', True)]"/>
                 <filter name="non_core" string="Non-core products" domain="[('is_core', '=', False)]"/>
+                <filter name="invoiced" string="Invoiced" domain="[('qty_invoiced','>',0)]"/>
 
                 <separator/>
 
@@ -76,28 +86,21 @@
         </field>
     </record>
 
-    <record id="droga_sales_detail_action" model="ir.actions.act_window">
-        <field name="name">Sales detail report</field>
+    <record id="droga_sales_waiter_action" model="ir.actions.act_window">
+        <field name="name">Sales waiter report</field>
         <field name="res_model">sale.order.line</field>
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_detail_view_tree')})]"/>
-        <field name="search_view_id" ref="droga_sales_detail_search_tree"></field>
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_waiter_view_tree')})]"/>
+        <field name="search_view_id" ref="droga_sales_waiter_search_tree"></field>
         <field name="domain">[('state', '!=', 'cancel'),('has_access','=',True)]</field>
-        <field name="context">{'search_default_today_sales': 1,'search_default_app_so':1}</field>
+        <field name="context">{'search_default_invoiced':1,'search_default_today_sales': 1}</field>
     </record>
 
     <menuitem
-            id="droga_sales_reports_menu"
-            name="Reports"
-            parent="sale.sale_menu_root"
-            groups="droga_crm.crm_sr"
-            sequence="21"/>
-
-    <menuitem
-            id="droga_sales_detail_report_menu"
-            name="Sales detail report"
-            action="droga_sales_detail_action"
+            id="droga_sales_waiter_report_menu"
+            name="Sales waiter report"
+            action="droga_sales_waiter_action"
             parent="droga_sales.droga_sales_reports_menu"
             groups="droga_crm.crm_sr"
             sequence="17"/>

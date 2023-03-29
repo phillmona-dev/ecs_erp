@@ -39,6 +39,7 @@ class cust_sales_credit_limit(models.Model):
     sales_type = fields.Char('Sales order type', compute='_get_so_type', store=True)
     supporters=fields.Many2many('droga.pro.sales.master',string='Supporters')
     cust_name=fields.Char('Customer Name')
+    cust_id = fields.Char('Customer ID')
 
     def _cust_type_inv(self):
         pass
@@ -61,7 +62,9 @@ class cust_sales_credit_limit(models.Model):
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
-            if rec.partner_id.vat != '0000000000':
+            if rec.partner_id.id in [15390]:
+                matured_invoices=[]
+            elif rec.partner_id.vat != '0000000000':
                 matured_invoices = self.env['account.move'].search(
                     [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
                      ('invoice_date_due', '<=', datetime.now()),
@@ -102,10 +105,10 @@ class cust_sales_credit_limit(models.Model):
             if not so.pr_sales and (self.env.user.name.startswith('CRM') or self.env.user.name.startswith('Tender')):
                 message = message+('\n' if message else '') + "Please login before registering a sales order!"
                 #raise ValidationError("Please login before registering a sales order!")
-            if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit:
+            if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [15390]:
                 message = message+('\n' if message else '') + "You cannot exceed credit limit!"
                 #raise ValidationError("You cannot exceed credit limit!")
-            if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender:
+            if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender and not so.order_from:
                 message = message+('\n' if message else '') + "Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount)
                 #raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
 
@@ -115,6 +118,9 @@ class cust_sales_credit_limit(models.Model):
             if 'cust_type_ext' in vals:
                 if result.partner_id.cust_type_ext!=vals['cust_type_ext']:
                     result.partner_id.cust_type_ext = vals['cust_type_ext']
+
+            if len(so.order_line)==0:
+                raise ValidationError('Please register atleast one product to initiate sales order.')
 
             # Physiotheraphy sales
             if so.order_from:
