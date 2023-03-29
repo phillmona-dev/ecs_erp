@@ -123,6 +123,7 @@ class cust_sales_credit_limit(models.Model):
                         res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
                         res.product_id.product_tmpl_id.invoice_policy='order'
             else:
+                so.order_from='IM-'+so.order_type
                 for res in so.order_line:
                     res.product_id.product_tmpl_id.invoice_policy = 'delivery'
 
