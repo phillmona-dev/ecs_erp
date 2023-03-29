@@ -508,6 +508,12 @@ class sale_order_ext(models.Model):
         store=True, readonly=False, precompute=True, check_company=True,  # Unrequired company
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
+    def _compute_payment_term_id(self):
+        for order in self:
+            order = order.with_company(order.company_id)
+            if not order.payment_term_id:
+                order.payment_term_id = order.partner_id.property_payment_term_id
+            
     @api.depends('order_line.price_unit','order_line.product_uom_qty','partner_id','payment_term_id')
     def _get_sub_totals(self):
         order_lines_core=None
