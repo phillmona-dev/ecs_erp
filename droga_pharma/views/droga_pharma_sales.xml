@@ -570,5 +570,21 @@
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_bole_invoice"
             sequence="20"/>
+
+
+
+    <menuitem
+            id="droga_physio_requests_menu"
+            name="Requests"
+            parent="droga_pharma.physio_main_menu"
+            groups="physio_user_bole,physio_user_4k"
+            sequence="20"/>
+    <menuitem
+            id="droga_sales_con_issue_menu"
+            name="Stores Issue"
+            action="droga_inventory.droga_inventory_consignment_issue_action"
+            parent="droga_physio_requests_menu"
+            groups="physio_user_bole,physio_user_4k"
+            sequence="30"/>
 </odoo>
 
