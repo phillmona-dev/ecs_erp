@@ -648,7 +648,7 @@
                                 <td colspan="2">
                                     <strong class="small">Customer Name:</strong>
 
-                                    <t class="small" t-esc="customer_name"/>
+                                    <span class="small" t-esc="o.partner_id.name"/>
                                 </td>
 
                                 <td>
@@ -666,7 +666,8 @@
                             <tr>
                                 <td colspan="2">
                                     <strong class="small">Contact Person:</strong>
-                                    <span class="small" t-esc="o.partner_id.name"/>
+                                    <t class="small" t-esc="customer_name"/>
+
                                 </td>
 
                             </tr>
