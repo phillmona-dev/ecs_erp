@@ -60,8 +60,14 @@ export class PosFormController extends FormController {
         const dateString = m.getUTCFullYear() + "-" + ("0" + (m.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + m.getUTCDate()).slice(-2) + " " + ("0" + m.getUTCHours()).slice(-2) + ":" + ("0" + m.getUTCMinutes()).slice(-2) + ":" + ("0" + m.getUTCSeconds()).slice(-2);
 
         let tin_no = this.model.root.data.tin_no;
+        let customer_name = this.model.root.data.commercial_partner_id[1];
+
         if (this.model.root.data.tin_no === "0000000000") {
             tin_no = "";
+        }
+
+        if (this.model.root.data.customer_name1 !== "") {
+            customer_name = this.model.root.data.customer_name1;
         }
 
 
@@ -73,7 +79,7 @@ export class PosFormController extends FormController {
             ReferenceNumber: this.model.root.data.name,
             PaymentType: payment_type,
             PaymentReferenceNumber: this.model.root.data.name,
-            BuyerName: this.model.root.data.commercial_partner_id[1],
+            BuyerName: customer_name,
             BuyerTaxIdNumber: tin_no,
             AddOnType: "percentage",
             AddOnValue: "0",
