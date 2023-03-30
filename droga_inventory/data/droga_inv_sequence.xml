@@ -78,6 +78,17 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <record id="seq_transfer_request_pb" model="ir.sequence">
+            <field name="name">Transfer request PB store</field>
+            <field name="code">droga.inventory.transfer.custom.sequence.pb</field>
+            <field name="prefix">MTIV/PB/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="number_increment">1</field>
+            <field name="implementation">no_gap</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
         <record id="seq_transfer_request_of" model="ir.sequence">
             <field name="name">Transfer request OF store</field>
             <field name="code">droga.inventory.transfer.custom.sequence.of</field>
@@ -248,6 +259,17 @@
             <field name="name">Transfer issue EE store</field>
             <field name="code">droga.inventory.transfer.issue.sequence.ee</field>
             <field name="prefix">MTOV/EE/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_transfer_issue_pb" model="ir.sequence">
+            <field name="name">Transfer issue PB store</field>
+            <field name="code">droga.inventory.transfer.issue.sequence.PB</field>
+            <field name="prefix">MTOV/PB/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
