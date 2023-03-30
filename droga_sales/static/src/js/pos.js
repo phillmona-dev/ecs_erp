@@ -59,6 +59,12 @@ export class PosFormController extends FormController {
 
         const dateString = m.getUTCFullYear() + "-" + ("0" + (m.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + m.getUTCDate()).slice(-2) + " " + ("0" + m.getUTCHours()).slice(-2) + ":" + ("0" + m.getUTCMinutes()).slice(-2) + ":" + ("0" + m.getUTCSeconds()).slice(-2);
 
+        let tin_no = '';
+        if (this.model.root.data.tin_no !== '0000000000') {
+            tin_no = this.model.root.data.tin_no;
+        }
+
+
         //build json file
         const header = {
             ThirdPartyID: "Odoo",
@@ -68,7 +74,7 @@ export class PosFormController extends FormController {
             PaymentType: payment_type,
             PaymentReferenceNumber: this.model.root.data.name,
             BuyerName: this.model.root.data.commercial_partner_id[1],
-            BuyerTaxIdNumber: this.model.root.data.tin_no,
+            BuyerTaxIdNumber: tin_no,
             AddOnType: "percentage",
             AddOnValue: "0",
             DiscountType: "fixed",
