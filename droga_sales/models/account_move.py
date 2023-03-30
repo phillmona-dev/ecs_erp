@@ -32,7 +32,7 @@ class account_move(models.Model):
     def _compute_order_from(self):
         for record in self:
             recs = self.env['sale.order'].search([('name', '=', record.invoice_origin)])
-
+            record.customer_name1 = ''
             for r in recs:
                 # get customer name
                 record.customer_name1 = r.cust_name
