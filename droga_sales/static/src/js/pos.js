@@ -62,6 +62,7 @@ export class PosFormController extends FormController {
         let tin_no = this.model.root.data.tin_no;
         let customer_name = this.model.root.data.commercial_partner_id[1];
 
+
         if (this.model.root.data.tin_no === "0000000000") {
             tin_no = "";
         }
