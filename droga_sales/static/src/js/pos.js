@@ -59,9 +59,9 @@ export class PosFormController extends FormController {
 
         const dateString = m.getUTCFullYear() + "-" + ("0" + (m.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + m.getUTCDate()).slice(-2) + " " + ("0" + m.getUTCHours()).slice(-2) + ":" + ("0" + m.getUTCMinutes()).slice(-2) + ":" + ("0" + m.getUTCSeconds()).slice(-2);
 
-        let tin_no = '';
-        if (this.model.root.data.tin_no !== '0000000000') {
-            tin_no = this.model.root.data.tin_no;
+        let tin_no = this.model.root.data.tin_no;
+        if (this.model.root.data.tin_no === "0000000000") {
+            tin_no = "";
         }
 
 
