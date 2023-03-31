@@ -136,11 +136,10 @@ class cust_sales_credit_limit(models.Model):
         return result
 
     def action_confirm(self):
-        if self.order_from:
-            if self.order_from.startswith('PT'):
-                for res in self.order_line:
-                    res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
-                    res.product_id.product_tmpl_id.invoice_policy = 'order'
+        if not self.order_type:
+            for res in self.order_line:
+                res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
+                res.product_id.product_tmpl_id.invoice_policy = 'order'
         else:
             self.order_from = 'IM-' + self.order_type
             for res in self.order_line:
