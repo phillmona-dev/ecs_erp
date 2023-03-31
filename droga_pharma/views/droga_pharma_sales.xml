@@ -125,7 +125,7 @@
                         </group>
                         <group name="order_details">
                             <field name="Vat_no" readonly="1" string="Tin No"></field>
-                            <field name="payment_term_id" domain="[('id', 'in', (11,4))]" options="{'no_open':True,'no_create': True}"/>
+                            <field name="payment_term_id" domain="[('id', 'in', (11,4,6))]" options="{'no_open':True,'no_create': True}"/>
                             <div class="o_td_label">
                                 <label for="date_order" string="Order Date"/>
 
