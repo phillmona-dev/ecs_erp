@@ -392,7 +392,7 @@ class sale_order_ext(models.Model):
         message = ''
         if not self.order_type:
             for res in self.order_line:
-                res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
+                res.wareh = 32 if self.order_from=='PT-Bole' else 31
                 res.product_id.product_tmpl_id.invoice_policy = 'order'
         else:
             self.order_from = 'IM-' + self.order_type

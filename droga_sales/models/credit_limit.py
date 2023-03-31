@@ -124,10 +124,9 @@ class cust_sales_credit_limit(models.Model):
 
             # Physiotheraphy sales
             if so.order_from:
-                if so.order_from.startswith('PT'):
-                    for res in so.order_line:
-                        res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
-                        res.product_id.product_tmpl_id.invoice_policy='order'
+                for res in so.order_line:
+                    res.wareh = 32 if so.order_from=='PT-Bole' else 31
+                    res.product_id.product_tmpl_id.invoice_policy='order'
             else:
                 so.order_from='IM-'+so.order_type
                 for res in so.order_line:
