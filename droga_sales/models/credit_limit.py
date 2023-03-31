@@ -135,16 +135,7 @@ class cust_sales_credit_limit(models.Model):
 
         return result
 
-    def action_confirm(self):
-        if not self.order_type:
-            for res in self.order_line:
-                res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
-                res.product_id.product_tmpl_id.invoice_policy = 'order'
-        else:
-            self.order_from = 'IM-' + self.order_type
-            for res in self.order_line:
-                res.product_id.product_tmpl_id.invoice_policy = 'delivery'
-        return super(cust_sales_credit_limit, self).action_confirm()
+
 
     def action_create(self):
         if self._get_forbidden_state_confirm() & set(self.mapped('state')):

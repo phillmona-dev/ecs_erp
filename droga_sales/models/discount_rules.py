@@ -390,6 +390,15 @@ class sale_order_ext(models.Model):
 
     def validate_form(self):
         message = ''
+        if not self.order_type:
+            for res in self.order_line:
+                res.wareh = self.env['stock.warehouse'].search([('wh_type', '=', 'PT')])[0].id
+                res.product_id.product_tmpl_id.invoice_policy = 'order'
+        else:
+            self.order_from = 'IM-' + self.order_type
+            for res in self.order_line:
+                res.product_id.product_tmpl_id.invoice_policy = 'delivery'
+                
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
         if (len(order_lines_nowareh) > 0):
