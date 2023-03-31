@@ -460,6 +460,11 @@
                     margin: 0 !important;
                     }
 
+                    .padding1 {
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    }
+
                     .table_morecondensed>thead>tr>th,
                     .table_morecondensed>tbody>tr>th,
                     .table_morecondensed>tfoot>tr>th,
@@ -546,10 +551,10 @@
                                 <div class="col-4 bm-2">
 
                                     <h6 class="small nopadding">
-                                        Sub City: Bole
+                                        Sub City: Arada
                                     </h6>
                                     <h6 class="small nopadding">
-                                        Tel 1 : +251 974 959 595
+                                        Tel 1 : +251 913 667 573
                                     </h6>
                                     <h6 class="small nopadding">
                                         TIN: 0045080232
@@ -559,10 +564,10 @@
                                 <div class="col-4 bm-2">
 
                                     <h6 class="small nopadding">
-                                        Woreda: 02
+                                        Woreda: 09
                                     </h6>
                                     <h6 class="small nopadding">
-                                        Tel 2 : +000 000 000 000
+                                        Tel 2 : +251 929 908 565/66
                                     </h6>
                                     <h6 class="small nopadding">
                                         VAT Reg. No. :
@@ -788,7 +793,7 @@
                         <br></br>
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <strong class="small">I received the above goods/services in good
+                                <strong class="small nopadding">I received the above goods/services in good
                                     condition._______________________________
                                 </strong>
                             </div>
@@ -815,7 +820,7 @@
                                 <span class="small">Approved By :________________________</span>
                             </div>
                             <div class="col-6 bm-2">
-                                <span>Received By :________________________</span>
+                                <span class="small">Received By :________________________</span>
                             </div>
                         </div>
                         <br/>
@@ -828,7 +833,8 @@
                         <hr></hr>
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2 text-center">
-                                <strong class="small">This receipt is not valid unless the fiscal receipt is attached!
+                                <strong class="small">This receipt is not valid unless the fiscal receipt is
+                                    attached!
                                 </strong>
 
                             </div>
