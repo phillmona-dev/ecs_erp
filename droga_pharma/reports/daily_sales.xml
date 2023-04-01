@@ -8,19 +8,19 @@
         <field name="priority" eval="100000000"/>
         <field name="arch" type="xml">
             <tree create="0" edit="0" delete="0">
-                <field name="name"/>
-                <field name="FSInvoiceNumber"/>
-                <field name="invoice_partner_display_name" string="Customer"/>
-                <field name="cust_id" string="Card No"/>
-                <field name="customer_name1" string="Contact Person"/>
-                <field name="invoice_date"/>
-                <field name="sales_initiator"/>
-                <field name="sales_type" string="Sales Type"/>
+                <field name="name" optional="show"/>
+                <field name="FSInvoiceNumber" optional="show"/>
+                <field name="invoice_partner_display_name" string="Customer" optional="show"/>
+                <field name="cust_id" string="Card No" optional="show"/>
+                <field name="customer_name1" string="Contact Person" optional="show"/>
+                <field name="invoice_date" optional="show"/>
+                <field name="sales_initiator" optional="show"/>
+                <field name="sales_type" string="Sales Type" optional="show"/>
                 <!--<field name="amount_untaxed_signed" sum="total"/>-->
-                <field name="amount_total_signed" sum="total" string="Amount"/>
+                <field name="amount_total_signed" sum="total" string="Amount" optional="show"/>
                 <field name="payment_state" invisible="1"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'"
-                       decoration-success="state == 'posted'"/>
+                       decoration-success="state == 'posted'" optional="show"/>
             </tree>
         </field>
 
