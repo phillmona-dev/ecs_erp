@@ -22,12 +22,13 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/droga_export_emp_extension.xml',
-        'views/droga_pharma_sales.xml'
+        'views/droga_pharma_sales.xml',
+        'reports/daily_sales.xml'
     ],
 
     # any module necessary for this one to work correctly
 
-    'depends': ['base', 'hr','droga_sales',
+    'depends': ['base', 'hr', 'droga_sales',
                 'mail', 'stock', 'http_routing', 'sale',
                 'resource', 'stock', 'droga_inventory',
                 'web', 'crm'],
