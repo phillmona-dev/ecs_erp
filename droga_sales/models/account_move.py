@@ -25,6 +25,7 @@ class account_move(models.Model):
     order_from = fields.Char("Order From", compute='_compute_order_from')
 
     customer_name1 = fields.Char(compute='_compute_order_from', string='Customer Name')
+    cust_id = fields.Char(compute='_compute_order_from', string='Customer Name')
 
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
     total_amount_word = fields.Char(compute="_get_total_amount_word")
@@ -33,8 +34,10 @@ class account_move(models.Model):
         for record in self:
             recs = self.env['sale.order'].search([('name', '=', record.invoice_origin)])
             record.customer_name1 = ''
+            record.cust_id = ''
             for r in recs:
                 # get customer name
+                record.cust_id = r.cust_id
                 record.customer_name1 = r.cust_name
                 if r.order_type:
                     record.order_from = r.order_type
