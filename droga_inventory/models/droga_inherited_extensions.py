@@ -539,7 +539,7 @@ class droga_stock_product_extension(models.Model):
         ('IM', 'Import'),
         ('WS', 'Wholesale'),
         ('BT', 'Import and wholesale'),
-    ('PT', 'Physiotherapy')], string='Product used under')
+    ('PT', 'Physiotherapy only'),('PH', 'Pharmacy only'),('ALL','ALL')], string='Product used under')
     bought_locally=fields.Boolean('Bought Locally',default=False)
     list_price = fields.Float(
         'Sales Price', default=1.0,

@@ -22,7 +22,8 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/droga_export_emp_extension.xml',
-        'views/droga_pharma_sales.xml'
+        'views/droga_physio_sales.xml',
+        'views/droga_pharmacy_sales.xml'
     ],
 
     # any module necessary for this one to work correctly

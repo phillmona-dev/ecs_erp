@@ -10,6 +10,7 @@
                 <field name="product_group" options="{'no_create':True,'no_open':True}"></field>
                 <field name="percent"></field>
                 <field name="core_products_or_all"></field>
+                <field name="used_under"></field>
                 <field name="status"></field>
             </tree>
         </field>
@@ -28,6 +29,7 @@
                                options="{'no_create':True,'no_open':True}"></field>
                         <field name="percent"></field>
                         <field name="core_products_or_all"></field>
+                        <field name="used_under"></field>
                         <field name="status"></field>
                     </group>
                 </sheet>
@@ -74,6 +76,7 @@
                 <field name="to_amt"></field>
                 <field name="percent"></field>
                 <field name="core_products_or_all"></field>
+                <field name="used_under"></field>
                 <field name="status"></field>
             </tree>
         </field>
@@ -91,6 +94,7 @@
                         <field name="to_amt"></field>
                         <field name="percent"></field>
                         <field name="core_products_or_all"></field>
+                        <field name="used_under"></field>
                         <field name="status"></field>
                     </group>
                 </sheet>
@@ -137,6 +141,7 @@
                 <field name="from_qty"></field>
                 <field name="to_qty"></field>
                 <field name="percent"></field>
+                <field name="used_under"></field>
                 <field name="status"></field>
             </tree>
         </field>
@@ -154,6 +159,7 @@
                         <field name="from_qty"></field>
                         <field name="to_qty"></field>
                         <field name="percent"></field>
+                        <field name="used_under"></field>
                         <field name="status"></field>
                     </group>
                 </sheet>
@@ -199,6 +205,7 @@
                 <field name="product" options="{'no_create':True,'no_open':True}"></field>
                 <field name="cust" options="{'no_create':True,'no_open':True}"></field>
                 <field name="percent"></field>
+                <field name="used_under"></field>
                 <field name="status"></field>
             </tree>
         </field>
@@ -215,6 +222,7 @@
                         <field name="product" options="{'no_create':True,'no_open':True}"></field>
                         <field name="cust" options="{'no_create':True,'no_open':True}"></field>
                         <field name="percent"></field>
+                        <field name="used_under"></field>
                         <field name="status"></field>
                     </group>
                 </sheet>

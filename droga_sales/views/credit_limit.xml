@@ -52,6 +52,8 @@
                         <field name="deliv_after_payment"/>
                 <label for="min_amount"/>
                         <field name="min_amount"/>
+                <label for ="used_under"></label>
+                <field name="used_under"></field>
             </xpath>
             <xpath expr="//form/sheet" position="after">
                 <div class="oe_chatter">

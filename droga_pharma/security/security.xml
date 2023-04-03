@@ -9,9 +9,20 @@
         <field name="category_id" ref="crm_management"/>
     </record>
 
+    <record id="pharma_dp_admin" model="res.groups">
+        <field name="name">Dispensing Pharmacist</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
 
+    <record id="pharma_ip_admin" model="res.groups">
+        <field name="name">Invoicing Parmacist</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
 
-
+    <record id="pharma_di_admin" model="res.groups">
+        <field name="name">DI Pharmacist</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
 
 
 
@@ -24,7 +35,6 @@
              <field name="description">Physiotherapy access level</field>
              <field name="sequence">20</field>
         </record>
-
     <record id="physio_user_4k" model="res.groups">
             <field name="name">Physio 4k</field>
             <field name="category_id" ref="physio_management"/>
@@ -41,7 +51,5 @@
         <field name="name">Physio Bole Invoice</field>
         <field name="category_id" ref="physio_management"/>
     </record>
-
-
 </odoo>
 

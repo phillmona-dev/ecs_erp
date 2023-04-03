@@ -46,7 +46,7 @@ class cust_sales_credit_limit(models.Model):
 
     order_type = fields.Selection([
         ('IM', 'Import'),
-        ('WS', 'Wholesale')], string='Order from')
+        ('WS', 'Wholesale')], string='Order type')
     order_from=fields.Char('Order from')
 
     @api.depends('payment_term_id')
@@ -123,14 +123,17 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError('Please register atleast one product to initiate sales order.')
 
             # Physiotheraphy sales
-            if so.order_from:
-                for res in so.order_line:
-                    res.wareh = 32 if so.order_from=='PT-Bole' else 31
-                    res.product_id.product_tmpl_id.invoice_policy='order'
-            else:
-                so.order_from='IM-'+so.order_type
-                for res in so.order_line:
-                    res.product_id.product_tmpl_id.invoice_policy = 'delivery'
+            if not so.order_type:
+                if so.order_from.startswith('PH'):
+                    if not so.wareh:
+                        raise ValidationError("User is not linked to a pharmacy chain branch.")
+                    for res in so.order_line:
+                        res.wareh = so.wareh
+                        res.product_id.product_tmpl_id.invoice_policy = 'order'
+                else:
+                    for res in so.order_line:
+                        res.wareh = 32 if so.order_from == 'PT-Bole' else 31
+                        res.product_id.product_tmpl_id.invoice_policy = 'order'
 
         return result
 
@@ -172,7 +175,7 @@ class cust_sales_no_create_after_invoice(models.Model):
 
     order_type = fields.Selection([
         ('IM', 'Import'),
-        ('WS', 'Wholesale')], string='Order from', related='order_id.order_type')
+        ('WS', 'Wholesale')], string='Order type', related='order_id.order_type')
 
     def _get_expiry(self):
         for rec in self:
@@ -232,6 +235,9 @@ class payment_term_no_credit(models.Model):
     apply_credit_limit = fields.Boolean(string='Apply credit limit', default=True, Tracking=True)
     deliv_after_payment = fields.Boolean(string='Delivery after payment', default=False)
     min_amount=fields.Float(string='Minimum order amount', default=0)
+    used_under=fields.Selection([
+        ('BT', 'Both'),
+        ('DR', 'Droga'),('PC', 'Pharmacy chain')], string='Term used under')
 
 
 class payment_term_no_credit_messages(models.Model):

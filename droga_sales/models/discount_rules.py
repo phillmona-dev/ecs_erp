@@ -15,6 +15,7 @@ class droga_price_discount_per_type(models.Model):
     product_group = fields.Many2one('product.category',string='Product category',tracking=True)
     percent = fields.Float(string='Percentage (+ve or -ve)',tracking=True,digits=(12, 9))
     core_products_or_all= fields.Selection([('Core', 'Core products'), ('Noncore', 'Non-core products'),('All', 'All')],string='Core?',required=True,default='Core',tracking=True)
+    used_under=fields.Selection([('IM', 'Import'), ('PT', 'Physiotherapy'),('PH','Pharmacy'),('All', 'All')],string='Used under',required=True,tracking=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active',tracking=True)
 
 class droga_price_discount_per_amount(models.Model):
@@ -25,6 +26,8 @@ class droga_price_discount_per_amount(models.Model):
     to_amt = fields.Float(string='To amount',tracking=True)
     percent = fields.Float(string='Percentage (+ve or -ve)',tracking=True)
     core_products_or_all= fields.Selection([('Core', 'Core products'), ('Noncore', 'Non-core products'),('All', 'All')],string='Core?',required=True,default='Core',tracking=True)
+    used_under = fields.Selection([('IM', 'Import'), ('PT', 'Physiotherapy'), ('PH', 'Pharmacy'), ('All', 'All')],
+                                  string='Used under', required=True, tracking=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active',tracking=True)
 
 class droga_price_discount_per_product_qty(models.Model):
@@ -35,6 +38,8 @@ class droga_price_discount_per_product_qty(models.Model):
     from_qty = fields.Float(string='From quantity', tracking=True)
     to_qty = fields.Float(string='To quantity', tracking=True)
     percent = fields.Float(string='Percentage (+ve or -ve)',tracking=True)
+    used_under = fields.Selection([('IM', 'Import'), ('PT', 'Physiotherapy'), ('PH', 'Pharmacy'), ('All', 'All')],
+                                  string='Used under', required=True, tracking=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active',tracking=True)
 
 class droga_price_discount_per_product_customer(models.Model):
@@ -44,6 +49,8 @@ class droga_price_discount_per_product_customer(models.Model):
     product = fields.Many2one('product.product',string='Product',tracking=True)
     cust = fields.Many2one('res.partner',string='Customer',tracking=True)
     percent = fields.Float(string='Percentage (+ve or -ve)',tracking=True)
+    used_under = fields.Selection([('IM', 'Import'), ('PT', 'Physiotherapy'), ('PH', 'Pharmacy'), ('All', 'All')],
+                                  string='Used under', required=True, tracking=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active',tracking=True)
 
 class sale_order_line(models.Model):
@@ -138,11 +145,20 @@ class sale_order_line(models.Model):
         for line in self:
             if not line.wareh and line.product_id.default_warehouse.wh_type==self.order_id.order_type:
                 line.wareh=line.product_id.default_warehouse
+            used_under=[]
 
+            if self.order_id.order_from:
+                if self.order_id.order_from.startswith('PH'):
+                    used_under=['PH','ALL']
+                else:
+                    used_under = ['PT', 'ALL']
+
+            else:
+                used_under = ['IM', 'ALL']
             #Get discounts/additional payments per type
             type_rates = self.env['droga.price.discount.per.type'].search(
                 [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id),('status','=','Active'),
-                 ('product_group', '=', line.product_id.categ_id.id)])
+                 ('product_group', '=', line.product_id.categ_id.id),('used_under','in',used_under)])
             core_rate = 0  # Discount rate for core products defined
             non_core_rate = 0  # Discount rate for non-core products defined
             all_rate = 0  # Discount rate for all products defined
@@ -159,15 +175,17 @@ class sale_order_line(models.Model):
             product_customer = self.env['droga.price.discount.per.product.customer'].search(
                 ['|',('payment_term', '=', self.order_id['payment_term_id'].id),('payment_term', '=', False),
                     ('product', '=', line.product_id.id), ('status', '=', 'Active'),
-                 ('cust', '=', self.order_id['partner_id'].id)])
+                 ('cust', '=', self.order_id['partner_id'].id),('used_under','in',used_under)])
             for rate in product_customer:
                 all_rate = all_rate + rate['percent']
 
+            uom_rate = self.product_uom.factor / (self.product_id.uom_id.factor if self.product_id.uom_id.factor != 0 else (
+                self.product_uom.factor if self.product_uom.factor != 0 else 1))
             #Product and quantity discount rules
             product_qty = self.env['droga.price.discount.per.product.qty'].search(
                 ['|',('payment_term', '=', self.order_id['payment_term_id'].id),('payment_term', '=', False),
                  ('product', '=', line.product_id.id), ('status', '=', 'Active'),
-                 ('from_qty', '<=', line.product_uom_qty),('to_qty', '>=', line.product_uom_qty)])
+                 ('from_qty', '<=', line.product_uom_qty*uom_rate),('to_qty', '>=', line.product_uom_qty*uom_rate),('used_under','in',used_under)])
             for rate in product_qty:
                 all_rate = all_rate + rate['percent']
 
@@ -179,7 +197,7 @@ class sale_order_line(models.Model):
                 line.std_unit_price = 0.0
             else:
                 price = line.with_company(line.company_id)._get_display_price()
-                if not line.tender_origin_form_tender and (not line.manual_price or line.price_unit==0):
+                if not line.tender_origin_form_tender and not line.manual_price:
                     line.price_unit = line.product_id._get_tax_included_unit_price(
                         line.company_id,
                         line.order_id.currency_id,
@@ -209,7 +227,7 @@ class sale_order_line(models.Model):
         non_core_sum = self.order_id.non_core_sum
 
         amount_rates = self.env['droga.price.discount.per.amount'].search(
-            [('payment_term', '=', self.order_id['payment_term_id'].id),('status','=','Active')])
+            [('payment_term', '=', self.order_id['payment_term_id'].id),('status','=','Active'),('used_under','in',used_under)])
 
         core_rate=0
         non_core_rate=0
@@ -270,10 +288,14 @@ class sale_order_ext(models.Model):
     out_of_stock_items=fields.Char('Stock out items',compute='_get_stock_out')
     has_access = fields.Boolean(default=False,search='_has_access',compute='_compute_has_access')
     sales_initiator=fields.Char('Sales person',compute='_get_sales_init')
-
+    wareh=fields.Many2one('stock.warehouse',string='User linked pharmacy warehouse',compute='_get_pharma_wh')
     def unlink(self):
         raise ValidationError(
             "You can't delete sales transaction, either cancel it or pass a correcting entry.")
+
+    def _get_pharma_wh(self):
+        for rec in self:
+            rec.wareh=self.env.user.warehouse_ids_ph[0].id if len(self.env.user.warehouse_ids_ph>0) else False
 
     def _get_sales_init(self):
         for rec in self:
@@ -384,20 +406,30 @@ class sale_order_ext(models.Model):
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
 
     def action_confirm(self):
+        returnv=super(sale_order_ext, self).action_confirm()
+
         for rec in self:
+            if not rec.order_type:
+                if rec.order_from.startswith('PH'):
+                    if not rec.wareh:
+                        raise ValidationError("User is not linked to a pharmacy chain branch.")
+                    for res in rec.order_line:
+                        res.wareh = rec.wareh
+                        res.product_id.product_tmpl_id.invoice_policy = 'order'
+                else:
+                    for res in rec.order_line:
+                        res.wareh = 32 if rec.order_from == 'PT-Bole' else 31
+                        res.product_id.product_tmpl_id.invoice_policy = 'order'
+            else:
+                rec.order_from = 'IM-' + rec.order_type
+                for res in rec.order_line:
+                    res.product_id.product_tmpl_id.invoice_policy = 'delivery'
+
             rec.validate_form()
-        return super(sale_order_ext, self).action_confirm()
+        return returnv
 
     def validate_form(self):
         message = ''
-        if not self.order_type:
-            for res in self.order_line:
-                res.wareh = 32 if self.order_from=='PT-Bole' else 31
-                res.product_id.product_tmpl_id.invoice_policy = 'order'
-        else:
-            self.order_from = 'IM-' + self.order_type
-            for res in self.order_line:
-                res.product_id.product_tmpl_id.invoice_policy = 'delivery'
                 
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
@@ -524,11 +556,11 @@ class sale_order_ext(models.Model):
         store=True, readonly=False, precompute=True, check_company=True,  # Unrequired company
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
+    @api.depends('partner_id')
     def _compute_payment_term_id(self):
         for order in self:
             order = order.with_company(order.company_id)
-            if not order.payment_term_id:
-                order.payment_term_id = order.partner_id.property_payment_term_id
+            order.payment_term_id = order.partner_id.property_payment_term_id if order.partner_id.property_payment_term_id else order.payment_term_id
 
     @api.depends('order_line.price_unit','order_line.product_uom_qty','partner_id','payment_term_id')
     def _get_sub_totals(self):
@@ -568,7 +600,7 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name','amount_total'):
+                if node.get("modifiers") is None or node.get("name") in ('name','amount_total','price_unit'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
