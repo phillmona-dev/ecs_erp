@@ -237,7 +237,7 @@
                                             <field name="sequence" invisible="1"/>
                                         </group>
                                         <group attrs="{'invisible': [('display_type', '!=', False)]}"  style="font-size:11pt">>
-                                            <field name="price_unit" readonly="True"/>
+                                            <field name="price_unit"/>
                                             <field name="tax_id" widget="many2many_tags" options="{'no_create': True}"
                                                    context="{'search_view_ref': 'account.account_tax_view_search'}"
                                                    domain="[('type_tax_use','=','sale'), ('company_id','=',parent.company_id), ('country_id', '=', parent.tax_country_id)]"
