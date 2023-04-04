@@ -50,16 +50,25 @@
                 <field name="show_invoice_button" invisible="1"></field>
             </xpath>
 
+            <xpath expr="//form/sheet/group/group/label[@for='pricelist_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/div[3]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
             <xpath expr="//form/sheet/group/group/field[@name='payment_term_id']" position="after">
                 <field name="show_invoice_button" invisible="1"></field>
                 <field name="mature_amount" style="color:red"
                        attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
-                <field name="order_type" required="True"></field>
-                <field name="manual_price"></field>
+                <field name="order_type" attrs="{'invisible': [('company_id', '!=', 1)],'required': [('company_id', '=', 1)]}" ></field>
+                <field name="company_id" invisible="1"></field>
+                <field name="manual_price" attrs="{'invisible': [('company_id', '!=', 1)]}"></field>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="replace">
-                <field name="partner_id" domain="[('is_cust_available','=',True)]" widget="res_partner_many2one"
+                <field name="partner_id" domain="[('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]" widget="res_partner_many2one"
                        context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': False}"
                        options='{"always_reload": True,"no_create":True,"no_open":True}'/>
             </xpath>
@@ -128,7 +137,8 @@
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="after">
                 <field name="Vat_no" readonly="1" string="Tin No"></field>
                 <field name="cust_type_ext" readonly="1" string="Customer Type"></field>
-                <field name="supporters" widget="many2many_tags" string="Supporters"></field>
+                <field name="company_id" invisible="1"></field>
+                <field name="supporters" attrs="{'invisible': [('company_id', '!=', 1)]}" widget="many2many_tags" string="Supporters"></field>
                 <field name="cust_id" widget="char" string="Cust ID" readonly="1" attrs="{'readonly':[(1,'=',1)],'invisible': [('Vat_no', '!=', '0000000000')]}"></field>
                 <field name="pay_type" invisible="1"/>
                 <field name="cash_upfront"

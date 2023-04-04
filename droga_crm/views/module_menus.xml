@@ -23,7 +23,7 @@
 
     <!-- Customer action add domain to filter by region -->
     <record id="base.action_partner_form" model="ir.actions.act_window">
-        <field name="domain">[('is_cust_available','=',True)]</field>
+        <field name="domain">[('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]</field>
     </record>
 
     <!-- Hide default reporting menu -->

@@ -96,19 +96,19 @@
                     <field name="invoice_status" invisible="1"></field>
                     <button name="action_confirm"
                             string="Confirm" font-size="16px"
-                            groups="droga_pharma.physio_user_bole,droga_pharma.physio_user_4k"
+                            groups="pharma_dp_admin,pharma_br_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
 
                     <button name="create_inv_local"
                             string="Create Invoice" font-size="16px"
-                            groups="droga_pharma.physio_user_bole_invoice,droga_pharma.physio_user_4k_invoice"
+                            groups="pharma_br_admin,pharma_ip_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'sale')]}"/>
 
-                    <button name="create_inv_local"
+                    <button name="conf_and_invoice"
                             string="Confirm and create invoice" font-size="16px"
-                            groups="droga_pharma.physio_user_bole,droga_pharma.physio_user_4k"
+                            groups="pharma_di_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
 

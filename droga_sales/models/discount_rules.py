@@ -70,7 +70,7 @@ class sale_order_line(models.Model):
     store_placement = fields.Boolean('Placement',default=False)
     std_unit_price=fields.Float(readonly=True,string='UP Default')
     has_access = fields.Boolean(related='order_id.has_access')
-
+    order_from=fields.Char(related='order_id.order_from')
     @api.depends('product_id','order_id.order_type','product_uom')
     def _is_prod_available(self):
         for rec in self:
@@ -81,7 +81,7 @@ class sale_order_line(models.Model):
             else:
                 wh_list=self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)])
 
-            for wh in self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)]):
+            for wh in wh_list:
                 rate=rec.product_uom.factor/(rec.product_id.uom_id.factor if rec.product_id.uom_id.factor!=0 else (rec.product_uom.factor if rec.product_uom.factor!=0 else 1))
                 rec.available_qty=rec.available_qty+((self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh))*(rate))
                 #rec.available_qty=rec.available_qty*(rec.product_uom.factor/rec.product_id.uom_id.factor)
@@ -149,14 +149,15 @@ class sale_order_line(models.Model):
             return
         used_under = []
 
-        if self.order_id.order_from:
-            if self.order_id.order_from.startswith('PH'):
-                used_under = ['PH', 'ALL']
-            else:
-                used_under = ['PT', 'ALL']
+        if self.order_id.order_line and self.order_id.company_id.id==1:
+            if self.order_id.order_line[0].order_from:
+                if self.order_id.order_line[0].order_from.startswith('PH'):
+                    used_under = ['PH', 'ALL']
+                else:
+                    used_under = ['PT', 'ALL']
 
-        else:
-            used_under = ['IM', 'ALL']
+            else:
+                used_under = ['IM', 'ALL']
 
         for line in self:
             if not line.wareh and line.product_id.default_warehouse.wh_type==self.order_id.order_type:
@@ -344,6 +345,9 @@ class sale_order_ext(models.Model):
         else:
             return [('id','in',[])]
 
+    def conf_and_invoice(self):
+        self.action_confirm()
+        self.create_inv_local()
     def create_inv_local(self):
         #self.action_confirm()
         x = {
@@ -417,7 +421,7 @@ class sale_order_ext(models.Model):
         returnv=super(sale_order_ext, self).action_confirm()
 
         for rec in self:
-            if not rec.order_type:
+            if not rec.order_type and self.company_id.id==1:
                 if rec.order_from.startswith('PH'):
                     if not rec.wareh:
                         raise ValidationError("User is not linked to a pharmacy chain branch.")
@@ -429,7 +433,8 @@ class sale_order_ext(models.Model):
                         res.wareh = 32 if rec.order_from == 'PT-Bole' else 31
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
             else:
-                rec.order_from = 'IM-' + rec.order_type
+                if rec.order_type:
+                    rec.order_from = 'IM-' + rec.order_type
                 for res in rec.order_line:
                     res.product_id.product_tmpl_id.invoice_policy = 'delivery'
 
@@ -491,6 +496,7 @@ class sale_order_ext(models.Model):
             raise ValidationError(message)
     def save_request_button(self):
         self.validate_form()
+        self.set_activity_done()
         self.ensure_one()
 
         #Physiotheraphy order automatic confirmation

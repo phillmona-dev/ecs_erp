@@ -36,7 +36,8 @@ class cust_contact_extension(models.Model):
     contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
-
+    company_id = fields.Many2one(
+        'res.company', 'Company', default=lambda self: self.env.company,index=True)
     def _def_rec(self):
         cid = self.env.company.id
         acc = self.env['account.account'].search([('company_id', '=', cid), ('code', '=', '114001')])
@@ -149,7 +150,8 @@ class cust_contact_extension(models.Model):
 
 class account_move_pr_sales(models.Model):
     _inherit = "account.move"
-
+    cust_location=fields.Many2one('droga.crm.settings.city',related='partner_id.city_name')
+    is_cust_available = fields.Boolean(related='partner_id.is_cust_available')
     def _get_pr_sales_logged(self):
         sale = self.env['sale.order'].search([('name', '=', self.invoice_origin)])
         return False if len(sale) == 0 else sale[0].pr_sales

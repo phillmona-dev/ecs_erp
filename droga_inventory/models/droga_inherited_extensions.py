@@ -534,7 +534,7 @@ class purchase_request_extension(models.Model):
 
 class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=False)
+    company_id = fields.Many2one('res.company', string='Company',index=True, default=lambda self: self.env.company, required=False)
     order_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'),
