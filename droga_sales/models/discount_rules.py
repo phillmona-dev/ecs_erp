@@ -433,7 +433,7 @@ class sale_order_ext(models.Model):
                 for res in rec.order_line:
                     res.product_id.product_tmpl_id.invoice_policy = 'delivery'
 
-            rec.validate_form()
+            #rec.validate_form()
         return returnv
 
     def validate_form(self):
