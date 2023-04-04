@@ -81,7 +81,7 @@ class sale_order_line(models.Model):
             else:
                 wh_list=self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)])
 
-            for wh in wh_list:
+            for wh in self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)]):
                 rate=rec.product_uom.factor/(rec.product_id.uom_id.factor if rec.product_id.uom_id.factor!=0 else (rec.product_uom.factor if rec.product_uom.factor!=0 else 1))
                 rec.available_qty=rec.available_qty+((self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh))*(rate))
                 #rec.available_qty=rec.available_qty*(rec.product_uom.factor/rec.product_id.uom_id.factor)
