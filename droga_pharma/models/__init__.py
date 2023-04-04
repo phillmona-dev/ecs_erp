@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import droga_pharma_cust_employees
+from . import droga_pharma_cust_employees,sales_integ

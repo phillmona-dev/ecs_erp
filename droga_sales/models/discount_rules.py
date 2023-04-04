@@ -63,7 +63,7 @@ class sale_order_line(models.Model):
         digits='Product Price',
         store=True, required=True,tracking=True)
     is_prod_available=fields.Char(compute='_is_prod_available')
-    available_qty=fields.Float('Available',compute='_is_prod_available')
+    available_qty=fields.Float('Available',default=0,compute='_is_prod_available')
     avail_char = fields.Char('Available', readonly=True, compute="_is_prod_available")
     price_unit_before_discount=fields.Float('')
     wareh=fields.Many2one('stock.warehouse')
@@ -75,7 +75,13 @@ class sale_order_line(models.Model):
     def _is_prod_available(self):
         for rec in self:
             rec.available_qty=0
-            for wh in self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)]):
+
+            if rec.order_id.order_from=='PH':
+                wh_list=rec.order_id.wareh
+            else:
+                wh_list=self.env['stock.warehouse'].search([('wh_type','=',rec.order_id.order_type)])
+
+            for wh in wh_list:
                 rate=rec.product_uom.factor/(rec.product_id.uom_id.factor if rec.product_id.uom_id.factor!=0 else (rec.product_uom.factor if rec.product_uom.factor!=0 else 1))
                 rec.available_qty=rec.available_qty+((self._get_avail_qty_per_warehouse(rec.product_id,wh)-self._get_outgoing_qty_per_warehouse(rec.product_id,wh))*(rate))
                 #rec.available_qty=rec.available_qty*(rec.product_uom.factor/rec.product_id.uom_id.factor)
@@ -141,20 +147,21 @@ class sale_order_line(models.Model):
     def _compute_price_unit(self):
         if self.order_id.state in ('sale','cancel','done','fia'):
             return
+        used_under = []
+
+        if self.order_id.order_from:
+            if self.order_id.order_from.startswith('PH'):
+                used_under = ['PH', 'ALL']
+            else:
+                used_under = ['PT', 'ALL']
+
+        else:
+            used_under = ['IM', 'ALL']
 
         for line in self:
             if not line.wareh and line.product_id.default_warehouse.wh_type==self.order_id.order_type:
                 line.wareh=line.product_id.default_warehouse
-            used_under=[]
 
-            if self.order_id.order_from:
-                if self.order_id.order_from.startswith('PH'):
-                    used_under=['PH','ALL']
-                else:
-                    used_under = ['PT', 'ALL']
-
-            else:
-                used_under = ['IM', 'ALL']
             #Get discounts/additional payments per type
             type_rates = self.env['droga.price.discount.per.type'].search(
                 [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id),('status','=','Active'),
@@ -179,8 +186,8 @@ class sale_order_line(models.Model):
             for rate in product_customer:
                 all_rate = all_rate + rate['percent']
 
-            uom_rate = self.product_uom.factor / (self.product_id.uom_id.factor if self.product_id.uom_id.factor != 0 else (
-                self.product_uom.factor if self.product_uom.factor != 0 else 1))
+            uom_rate = line.product_uom.factor / (line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else (
+                line.product_uom.factor if line.product_uom.factor != 0 else 1))
             #Product and quantity discount rules
             product_qty = self.env['droga.price.discount.per.product.qty'].search(
                 ['|',('payment_term', '=', self.order_id['payment_term_id'].id),('payment_term', '=', False),
@@ -274,6 +281,7 @@ class sale_order_ext(models.Model):
             ('fia', "Final approve"),
             ('cancel', "Cancelled"),
             ('sale', "Sales Order"),
+            ('dispense','Dispensed'),
             ('done', "Locked"),
         ],
         string="Status",
@@ -295,7 +303,7 @@ class sale_order_ext(models.Model):
 
     def _get_pharma_wh(self):
         for rec in self:
-            rec.wareh=self.env.user.warehouse_ids_ph[0].id if len(self.env.user.warehouse_ids_ph>0) else False
+            rec.wareh=self.env.user.warehouse_ids_ph[0].id if len(self.env.user.warehouse_ids_ph)>0 else False
 
     def _get_sales_init(self):
         for rec in self:
@@ -600,7 +608,7 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name','amount_total','price_unit'):
+                if node.get("modifiers") is None or node.get("name") in ('name','amount_total','price_unit','age'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
