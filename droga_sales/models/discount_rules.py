@@ -421,7 +421,7 @@ class sale_order_ext(models.Model):
         returnv=super(sale_order_ext, self).action_confirm()
 
         for rec in self:
-            if not rec.order_type and self.company_id.id==1:
+            if not rec.order_type and self.env.company.id==1:
                 if rec.order_from.startswith('PH'):
                     if not rec.wareh:
                         raise ValidationError("User is not linked to a pharmacy chain branch.")
