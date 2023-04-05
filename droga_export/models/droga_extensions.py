@@ -124,7 +124,7 @@ class droga_cons_inherit(models.Model):
                 raise UserError("SUBI is not configured for one of the warehouses.")
             if not cust_locat:
                 raise UserError(
-                    "Subcontractor location for type " + self.issue_type + " not set. Please configure accordingly.")
+                    "Cleaning unit location for type " + self.issue_type + " not set. Please configure accordingly.")
 
         for wh in warehouse_list:
             # Get picking type for issue type per warehouse.

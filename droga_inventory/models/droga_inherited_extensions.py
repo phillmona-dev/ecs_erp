@@ -118,7 +118,7 @@ class droga_location_extension(models.Model):
         ('SAP','Sales placement location'),
         ('SRL', 'Inter-store receive transit location'),
         ('INC', 'Internal consumption'),
-        ('SUBL', 'Subcontractor location')
+        ('SUBL', 'Cleaning unit location')
         ], string='Cons/sample Type')
     wcode=fields.Char(related='warehouse_id.code')
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',

@@ -92,7 +92,7 @@
 
 
     <record id="droga_sales_subcontract_issue_action_sales" model="ir.actions.act_window">
-        <field name="name">Sales Cleaning unit items issuance</field>
+        <field name="name">Cleaning unit items issuance</field>
         <field name="res_model">droga.inventory.consignment.issue</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_subcontractor_issue_view_tree')}),
@@ -100,4 +100,12 @@
         <field name="context">{'default_issue_type': 'SUBL'}</field>
         <field name="domain">[('create_uid','=',uid)]</field>
     </record>
+
+
+    <menuitem
+            id="droga_export_clean_issue_menu"
+            name="Cleaning unit issue and return"
+            action="droga_export.droga_sales_subcontract_issue_action_sales"
+            parent="stock.menu_stock_warehouse_mgmt"
+            sequence="30"/>
 </odoo>

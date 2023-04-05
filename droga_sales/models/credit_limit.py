@@ -123,7 +123,7 @@ class cust_sales_credit_limit(models.Model):
                 raise ValidationError('Please register atleast one product to initiate sales order.')
 
             # Physiotheraphy sales
-            if not so.order_type and self.company_id.id==1:
+            if not so.order_type and self.env.company.id==1:
                 if so.order_from.startswith('PH'):
                     if not so.wareh:
                         raise ValidationError("User is not linked to a pharmacy chain branch.")

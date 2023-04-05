@@ -26,7 +26,7 @@ class droga_stock_cons_issue(models.Model):
         help=" * Requested: The consignment issue order is sent to warehouse.\n"
              " * Done: The consignment items are issued from warehouse.\n")
 
-    issue_type = fields.Selection([('CONI', 'Consignment'),('INC','Internal consumption'), ('SIF', 'Free sample'),('SIR', 'Sample issue to be returned'),('SUBL','Sub-contractor issue')],string='Issue type', required=True)
+    issue_type = fields.Selection([('CONI', 'Consignment'),('INC','Internal consumption'), ('SIF', 'Free sample'),('SIR', 'Sample issue to be returned'),('SUBL','Cleaning unit issue')],string='Issue type', required=True)
     #SIF - Sample issue free        -   This will post under expense account (transfer to sample location)
     #SIR - Sample issue to return   -   This will post under sample receivable
     #CONI - Consignment issue       -   This will post under consignment receivable (transfer to consignment location)
