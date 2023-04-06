@@ -15,8 +15,8 @@ class droga_stock_cons_issue(models.Model):
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
         ('stmg', 'Store manager'),  #Issue sent to store manager for warehouse allocation
+        ('mg', 'Export manager'),
         ('waiting', 'Requested'),   #When consignment is waiting for storekeeper to issue at warehouse
-        ('mg','Export manager'),
         ('sc', 'Sent to CU'),
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
@@ -108,7 +108,7 @@ class droga_stock_cons_issue(models.Model):
                 'picking_type_id': pick_type_id,
                 'location_id': def_loc_id,
                 'location_dest_id': cust_locat,
-                # 'origin': self.name,
+                'origin': self.name,
                 'cons_sample_issue_request': self.id,
                 'state': 'confirmed',
                 'scheduled_date': self.issue_date

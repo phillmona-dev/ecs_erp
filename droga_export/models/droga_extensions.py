@@ -90,7 +90,7 @@ class purchase_order_extension(models.Model):
 class droga_cons_inherit(models.Model):
     _inherit = 'droga.inventory.consignment.issue'
 
-    subcontract_issue_origin_form = fields.Many2one('sale.order', readonly=True)
+    subcontract_issue_origin_form = fields.Many2one('sale.order', readonly=True,string='Cleaning unit origin')
 
     def pay_req_open(self):
         return {
@@ -180,25 +180,28 @@ class droga_cons_inherit(models.Model):
         self.state = 'waiting'
 
     def sub_cont_return(self):
+        if len(self.cons_ref.filtered(lambda x: (x.state=='done')))==0:
+            raise UserError("Please send items to cleaning unit first before receving them.")
+
         items = []
         for det in self.detail_entries:
             raw_details = self.env['droga.export.items.composition'].search(
                 [('raw_item', 'in', det.product_id.product_tmpl_id.ids)])
             if len(raw_details) > 0:
                 for it in raw_details.items_detail:
-                    if self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
-                                0].id in self.subcontract_issue_origin_form.order_line.mapped('product_id').ids:
-                        items.append({
-                            'product_id': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
-                                0].id,
-                            'product_uom_qty': det.product_uom_qty * it['rate_in_pct'] / 100,
-                            'product_uom': it['item'].uom_id.id,
+                    #if self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
+                            #    0].id in self.subcontract_issue_origin_form.order_line.mapped('product_id').ids:
+                    items.append({
+                        'product_id': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
+                            0].id,
+                        'product_uom_qty': det.product_uom_qty * it['rate_in_pct'] / 100,
+                        'product_uom': it['item'].uom_id.id,
 
-                            'price_unit': it.items_header[0].raw_item.standard_price+det.proc_cost,  # FIX ME
+                        'price_unit': it.items_header[0].raw_item.standard_price+det.proc_cost,  # FIX ME
 
-                            'company_id': self.env.company.id,
-                            'warehouse_id': det['warehouse_id'].id,
-                        })
+                        'company_id': self.env.company.id,
+                        'warehouse_id': det['warehouse_id'].id,
+                    })
 
         return {
             'name': 'cleaning unit items return',
