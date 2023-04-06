@@ -15,6 +15,7 @@ class AccountMove(models.Model):
     withholding_invoice_provided = fields.Boolean("Withholding Invoice",
                                                   help="If the transaction has been withheld, the customer needs to provide a withholding invoice",
                                                   default=False)
+    withholding_internal_ref = fields.Char("Withholding Internal Ref", help="Withholding Internal Reference")
     sales_initiator = fields.Char("Sales Person", store=True)
 
     transaction_type = fields.Many2one("account.transaction.type")
@@ -352,6 +353,17 @@ class AccountMove(models.Model):
                 picking_lists = self.env['stock.picking'].search([('origin', '=', record.invoice_origin)])
                 if picking_lists:
                     record.picking_list = picking_lists
+
+    # Generate withholding reference
+    def generate_withholding_ref(self):
+        # get sequence number for each company
+        for record in self:
+            if record.withholding_internal_ref:
+                raise ValidationError("Internal withholding reference already generated")
+            self_comp = self.with_company(record.company_id)
+
+            record.withholding_internal_ref = self_comp.env['ir.sequence'].next_by_code(
+                'withholding.internal.reference') or '/'
 
     @api.constrains('crvs')
     def validate_crv(self):

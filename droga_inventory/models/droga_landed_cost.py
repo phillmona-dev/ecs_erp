@@ -13,15 +13,24 @@ class LandedCost(models.Model):
         for record in self:
             for move in record.account_move_id:
                 # update lc analytics
-                data = {str(record.lc.id): 100.00}
-                for move_line in move.line_ids:
-                    move_line.analytic_distribution = data
+                # data = {str(record.lc.id): 100.00}
 
-    def button_validate(self):
-        raise ValidationError("The LC is already linked with another landed cost")
+                data = {}
+                data[str(record.lc.id)] = 100.00
+                json_data = json.dumps(data)
+
+                self.env.cr.execute(
+                    """ update account_move_line set analytic_distribution=%s where move_id=%s and company_id=%s """,
+                    (json_data, move.id, move.company_id.id))
+
+                # for move_line in move.line_ids:
+                # move_line.analytic_distribution = data
+
+    # def button_validate(self):
+    # raise ValidationError("The LC is already linked with another landed cost")
 
     # one LC can be linked to one landed cost
-    @api.constrains('lc')
+    # @api.constrains('lc')
     def validate_lc(self):
         for record in self:
             # search lc in landed costs

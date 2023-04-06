@@ -560,7 +560,6 @@
     </record>
 
 
-
     <template id="droga_account_cash_reciept_voucher_report" name="Cash Receipt Voucher">
         <t t-call="web.html_container">
             <div id="non-printable">
@@ -706,9 +705,6 @@
             </t>
         </t>
     </template>
-
-
-
 
 
     <template id="droga_account_cash_new_receipt_voucher_report" name="Cash Receipt Voucher">
@@ -898,7 +894,7 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.transaction_no" class="m-0"/>
+                                <span t-field="o.name" class="m-0"/>
 
                             </div>
                         </div>
