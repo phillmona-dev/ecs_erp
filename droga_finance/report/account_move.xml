@@ -30,7 +30,7 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.transaction_no" class="m-0"/>
+                                <span t-field="o.transaction_no" class="m-0" style="font-size: 25px;"/>
 
                             </div>
                         </div>
@@ -47,7 +47,7 @@
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
                                 <strong>Purpose:-</strong>
-                                <span t-field="o.narration" class="m-0"/>
+                                <span t-field="o.purpose" class="m-0"/>
                             </div>
                         </div>
                         <br></br>
@@ -139,7 +139,7 @@
                                 <span>___________________</span>
                             </div>
                             <div class="col-3 bm-2">
-                                <strong>Approved By</strong>
+                                <strong>Authorized By</strong>
                                 <br></br>
                                 <br></br>
                                 <span>___________________</span>
@@ -211,7 +211,7 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.transaction_no" class="m-0"/>
+                                <span t-field="o.transaction_no" class="m-0" style="font-size: 25px;"/>
 
                             </div>
                         </div>
@@ -320,7 +320,7 @@
                                 <span>___________________</span>
                             </div>
                             <div class="col-3 bm-2">
-                                <strong>Approved By</strong>
+                                <strong>Authorized By</strong>
                                 <br></br>
                                 <br></br>
                                 <span>___________________</span>
@@ -393,7 +393,7 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.transaction_no" class="m-0"/>
+                                <span t-field="o.transaction_no" class="m-0" style="font-size: 25px;"/>
 
                             </div>
                         </div>
@@ -500,7 +500,7 @@
                                 <span>___________________</span>
                             </div>
                             <div class="col-3 bm-2">
-                                <strong>Approved By</strong>
+                                <strong>Authorized By</strong>
                                 <br></br>
                                 <br></br>
                                 <span>___________________</span>
@@ -894,7 +894,7 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.name" class="m-0"/>
+                                <span t-field="o.name" class="m-0" style="font-size: 25px;"/>
 
                             </div>
                         </div>
@@ -906,7 +906,7 @@
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
                                 <strong>Purpose:-</strong>
-                                <span t-field="o.narration" class="m-0"/>
+                                <span t-field="o.purpose" class="m-0"/>
                             </div>
                         </div>
                         <br></br>
@@ -919,6 +919,10 @@
 
                                 <br></br>
                                 <strong>Amount in Words:-</strong>
+                                <u>
+                                    <span t-field="o.amount_total_word" class="m-0"/>
+
+                                </u>
 
                             </div>
 
@@ -988,7 +992,7 @@
                                 <span>___________________</span>
                             </div>
                             <div class="col-3 bm-2">
-                                <strong>Approved By</strong>
+                                <strong>Authorized By</strong>
                                 <br></br>
                                 <br></br>
                                 <span>___________________</span>
