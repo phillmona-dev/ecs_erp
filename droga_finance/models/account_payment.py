@@ -13,6 +13,8 @@ class AccountPayment(models.Model):
     check_due_date = fields.Date("Check Due Date")
     vendor_supplier = fields.Char("Vendor/Customer Name")
 
+
+
     @api.model
     def create(self, vals):
         res = super(AccountPayment, self).create(vals)
