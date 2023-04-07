@@ -128,17 +128,28 @@
                         <page string="Margins" name="margins">
                             <field name="lc_margins" mode="tree">
                                 <tree editable="bottom">
-                                    <field name="margin_percent" sum="Total"/>
-                                    <field name="foreign_amount" sum="Total"/>
-                                    <field name="exchange_rate"/>
-                                    <field name="amount_etb" sum="total"/>
-                                    <field name="margin_order"/>
+                                    <field name="margin_percent" sum="Total" width="10"
+                                           attrs="{'readonly': [('move_id', '!=', False)]}"/>
+                                    <field name="margin_order" width="15"
+                                           attrs="{'readonly': [('move_id', '!=', False)]}"/>
                                     <field name="margin_calculation"
-                                           attrs="{'readonly': [('margin_order', 'in', ('1'))]}"/>
+                                           attrs="{'readonly': ['|',('margin_order', 'in', ('1')),('move_id', '!=', False)],'required': [('margin_order', 'in', ('2'))]}"
+                                           width="10"
+                                           string="Calculation"/>
+                                    <field name="foreign_amount" sum="Total" width="15" string="USD"/>
+                                    <field name="exchange_rate" width="10"
+                                           attrs="{'readonly': [('move_id', '!=', False)]}"/>
+                                    <field name="amount_etb" sum="total" width="15" string="ETB"/>
+                                    <field name="account" options="{'no_create':True,'no_open':True}" width="15"
+                                           attrs="{'readonly': [('move_id', '!=', False)]}"/>
+                                    <field name="lc" options="{'no_create':True,'no_open':True}" width="15"
+                                           attrs="{'readonly': [('move_id', '!=', False)]}"/>
 
-                                    <field name="move_id" options="{'no_create':True,'no_open':True}" readonly="1"/>
+                                    <field name="move_id" options="{'no_create':True}" readonly="1"
+                                           width="10"/>
                                     <button name="create_vendor_invoice" type="object" string="Create Invoice"
-                                            id="checked" data-hotkey="v" class="oe_highlight"/>
+                                            id="checked" data-hotkey="v" class="oe_highlight" width="10"
+                                            attrs="{'invisible': [('move_id', '!=', False)]}"/>
 
                                 </tree>
                             </field>
