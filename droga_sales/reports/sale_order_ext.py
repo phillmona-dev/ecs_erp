@@ -42,7 +42,7 @@ class sales_report_det_fields(models.Model):
         for rec in self:
             if rec.sales_initiator_det.startswith('SR'):
                 rec.sales_dept='Marketing'
-            elif rec.sales_initiator_det.startswith('Ten'):
+            elif rec.sales_initiator_det.startswith('Ten') or rec.sales_initiator_det.startswith('TEN'):
                 rec.sales_dept = 'Tender'
             else:
                 rec.sales_dept = 'Employee'
