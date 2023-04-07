@@ -296,7 +296,7 @@ class sale_order_ext(models.Model):
     final_approver=fields.Many2one('res.users',compute='_get_approvers')
     out_of_stock_items=fields.Char('Stock out items',compute='_get_stock_out')
     has_access = fields.Boolean(default=False,search='_has_access',compute='_compute_has_access')
-    sales_initiator=fields.Char('Sales person',compute='_get_sales_init')
+    sales_initiator=fields.Char('Sales person',compute='_get_sales_init',store=True)
     wareh=fields.Many2one('stock.warehouse',string='User linked pharmacy warehouse',compute='_get_pharma_wh')
     def unlink(self):
         raise ValidationError(
