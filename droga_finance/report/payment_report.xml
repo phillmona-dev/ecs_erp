@@ -32,7 +32,7 @@
         <field name="name">account.payment.pivot</field>
         <field name="model">account.payment</field>
         <field name="arch" type="xml">
-            <pivot string="" disable_linking="true">
+            <pivot string="">
                 <field name="partner_id" type="row"/>
 
                 <field name="amount" type="measure"/>
