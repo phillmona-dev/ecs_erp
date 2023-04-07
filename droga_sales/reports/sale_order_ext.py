@@ -31,7 +31,7 @@ class sales_report_det_fields(models.Model):
     itemdesc = fields.Char(related='product_id.name')
     itemcateg=fields.Many2one('product.category',related='product_id.categ_id')
 
-    invoiced_amt=fields.Float('Invoiced Amount',compute='_get_invoiced_amount')
+    invoiced_amt=fields.Float('Invoiced Amount',compute='_get_invoiced_amount',store=True)
     def _get_invoiced_amount(self):
         for rec in self:
             rec.invoiced_amt=rec.qty_invoiced*rec.price_unit

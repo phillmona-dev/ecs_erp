@@ -12,6 +12,7 @@ class inventory_request_extension(models.Model):
 class sale_order_extension(models.Model):
     _inherit = 'sale.order'
     tender_origin_form_tender=fields.Many2one('droga.tender.master',readonly=True)
+    po_tender=fields.Many2many('purchase.order',string='Purchase order')
 
 class sale_order_line_extension(models.Model):
     _inherit = 'sale.order.line'
@@ -23,8 +24,8 @@ class tender_customer_extension(models.Model):
     @api.model
     def create(self, vals_list):
         new_cus=super().create(vals_list)
-        if 'customer_rank' in vals_list:
-            if vals_list["customer_rank"]>0 and vals_list["is_company"]:
+        if 'supplier_rank' in vals_list:
+            if vals_list["supplier_rank"]==0 and vals_list["is_company"]:
                 prev_rec=self.env['droga.tender.settings.customers'].sudo().search([('name','=',vals_list['name'])])
                 if len(prev_rec)>0:
                     for rec in prev_rec:

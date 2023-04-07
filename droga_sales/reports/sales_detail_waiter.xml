@@ -89,7 +89,7 @@
     <record id="droga_sales_waiter_action" model="ir.actions.act_window">
         <field name="name">Sales waiter report</field>
         <field name="res_model">sale.order.line</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,pivot</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_waiter_view_tree')})]"/>
         <field name="search_view_id" ref="droga_sales_waiter_search_tree"></field>

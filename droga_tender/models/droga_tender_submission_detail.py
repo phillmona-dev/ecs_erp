@@ -86,7 +86,7 @@ class droga_tender_submission_detail(models.Model):
             'res_id': self.id,
 
             # When target is new, it will popup else it will use it's own form, wow ferenj
-            'target': 'new',
+            #'target': 'new',
 
         }
     @api.model

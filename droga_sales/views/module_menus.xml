@@ -29,7 +29,7 @@
               name="Open invoices"
               action="droga_sales_matured_customers_action"
               groups="sales_team.group_sale_salesman"
-              parent="sale.sale_order_menu"
+              parent="droga_crm.crm_sr"
               sequence="60"/>
 
     <record id="sale.action_orders" model="ir.actions.act_window">
