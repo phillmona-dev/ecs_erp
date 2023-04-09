@@ -47,6 +47,13 @@
                   groups="account.group_account_manager"
                   sequence="3"/>
 
+         <menuitem id="droga_account_payment_report_tree_menu" name="Payment Report"
+                  action="action_account_payments_reports"
+                  groups="account.group_account_manager"
+                  sequence="4"/>
+
+
+
 
     </menuitem>
 </odoo>
