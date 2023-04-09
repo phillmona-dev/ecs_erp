@@ -33,7 +33,7 @@
               sequence="60"/>
 
     <record id="sale.action_orders" model="ir.actions.act_window">
-        <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')),('has_access','=',True)]</field>
+        <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')),('has_access','=',True),'|',('company_id','!=',1),('order_type','!=',False)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create a new quotation, the first step of a new sale!
@@ -45,7 +45,7 @@
 
     <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
         <field name="name">Quotations / Sales</field>
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('has_access','=',True),'|',('company_id','!=',1),('order_type','!=',False)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create a new quotation/sales order.
