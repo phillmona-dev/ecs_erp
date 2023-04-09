@@ -9,3 +9,5 @@ access_droga_approver_name,droga.approver.name,model_droga_approver_name,droga_f
 access_droga_finance_customer_balance,droga.finance.customer.balance,model_droga_finance_customer_balance,droga_finance.finance_self_service_group,1,1,1,1
 access_droga_finance_customer_balance_excel_report,droga.finance.customer.balance.excel.report,model_droga_finance_customer_balance_excel_report,droga_finance.finance_self_service_group,1,1,1,1
 access_droga_account_move_crv,account.move.crv,model_account_move_crv,droga_finance.finance_self_service_group,1,1,1,1
+access_droga_finance_payment_report,droga.finance.payment.report,model_droga_finance_payment_report,droga_finance.finance_self_service_group,1,1,1,1
+
