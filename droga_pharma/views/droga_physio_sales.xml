@@ -114,6 +114,8 @@
                                    options='{"always_reload": True}'/>
                             <field name="cust_name"></field>
                             <field name="cust_id"></field>
+                            <field name="order_from" invisible="1"></field>
+                            <field name="physiotherapist" domain="[('status','=','Active'),('branch','=',order_from)]" options="{'no_open':True,'no_create': True}"/>
                             <field name="manual_price" invisible="1"></field>
                             <field name="show_invoice_button" invisible="1"></field>
                             <field name="mature_amount" style="color:red"

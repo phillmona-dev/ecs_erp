@@ -40,3 +40,10 @@ class droga_pharma_customer_employees(models.Model):
                 record.descr = name + record.employee_name
             except:
                 record.descr = record.employee_name if record.employee_name else ' '
+
+class droga_physiotherapist_list(models.Model):
+    _name='droga.physiotherapist.list'
+    _rec_name='physiotherapist_name'
+    physiotherapist_name = fields.Many2one('hr.employee', string='Physiotherapist Name',required=True)
+    branch=fields.Selection([('PT-4 Kilo', '4 kilo branch'), ('PT-Bole', 'Bole branch')], required=True)
+    status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active')

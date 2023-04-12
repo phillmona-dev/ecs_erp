@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_droga_pharma_cust_emp,droga_pharma.droga_pharma_cust_employees,model_droga_pharma_cust_employees,droga_pharma.pharma_br_admin,1,1,1,1
 access_droga_pharma_cust_emp_crm,droga_pharma.droga_pharma_cust_employees_crm,model_droga_pharma_cust_employees,droga_crm.crm_mr,1,1,1,1
+access_droga_physiotherapist_list,droga_pharma.droga_physiotherapist_list,model_droga_physiotherapist_list,droga_pharma.physio_admin,1,1,1,1

@@ -14,6 +14,7 @@ class sales_integ(models.Model):
         string='Sex')
     weight=fields.Float('Weight')
     diagnosis=fields.Html('Diagnosis')
+    physiotherapist=fields.Many2one('droga.physiotherapist.list')
 
     @api.depends('dob')
     def _compute_age(self):

@@ -51,5 +51,10 @@
         <field name="name">Physio Bole Invoice</field>
         <field name="category_id" ref="physio_management"/>
     </record>
+
+    <record id="physio_admin" model="res.groups">
+        <field name="name">Physio Administrator</field>
+        <field name="category_id" ref="physio_management"/>
+    </record>
 </odoo>
 
