@@ -11,8 +11,8 @@
                 <field name="analytic_account_id" string="Analytic" options="{'no_create':True,'no_open':True}"/>
                 <field name="fiscal_year" invisible="1"/>
                 <field name="period" options="{'no_create':True,'no_open':True}"/>
-                <field name="date_from" invisible="1"/>
-                <field name="date_to" invisible="1"/>
+                <field name="date_from" invisible="0"/>
+                <field name="date_to" invisible="0"/>
                 <field name="planned_amount" sum="Planned Amount" readonly="0"/>
                 <field name="reallaocation_addition" readonly="1"/>
                 <field name="addition" readonly="1" sum="Addition"/>
@@ -77,11 +77,11 @@
             </xpath>
 
             <xpath expr="//field[@name='date_from']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="readonly">0</attribute>
             </xpath>
 
             <xpath expr="//field[@name='date_to']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="readonly">0</attribute>
             </xpath>
 
             <xpath expr="//notebook/page/field[@name='crossovered_budget_line']/tree/field[@name='general_budget_id']" position="attributes">
