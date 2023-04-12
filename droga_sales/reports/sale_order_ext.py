@@ -40,7 +40,9 @@ class sales_report_det_fields(models.Model):
     sales_dept=fields.Char(compute='_get_sales_dep')
     def _get_sales_dep(self):
         for rec in self:
-            if rec.sales_initiator_det.startswith('SR'):
+            if not rec.sales_initiator_det:
+                rec.sales_dept = ' '
+            elif rec.sales_initiator_det.startswith('SR'):
                 rec.sales_dept='Marketing'
             elif rec.sales_initiator_det.startswith('Ten') or rec.sales_initiator_det.startswith('TEN'):
                 rec.sales_dept = 'Tender'
