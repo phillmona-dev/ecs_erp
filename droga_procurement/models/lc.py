@@ -37,10 +37,10 @@ class Lc(models.Model):
         "Draft LC Approved Date by Supplier")
 
     exchange_rate = fields.Float(related='purchase_order_id.exchange_rate', store=True)
-    total_amount_etb = fields.Float("Total Amount ETB", compute='calculate_exchange_amount')
+    total_amount_etb = fields.Float("Total Amount ETB", compute='calculate_exchange_amount', store=True)
     total_amount_usd = fields.Float("Total Amount USD/Others")
     state = fields.Selection(
-        [('Draft', 'Draft'), ('Active', 'Active'), ('Expired', 'Expired'), ('Closed', 'Closed')], default='Draft',
+        [('Draft', 'Draft'), ('Active', 'Active'), ('Expired', 'Expired'), ('Closed', 'Closed')], default='Active',
         tracking=True)
 
     def create(self, vals):
@@ -116,10 +116,25 @@ class Lc(models.Model):
     def cancel_request(self):
         self.write({'state': 'Closed'})
 
-    @api.depends('total_amount_usd')
+    @api.depends('purchase_order_id', 'exchange_rate', 'total_amount_usd', 'total_amount_etb')
     def calculate_exchange_amount(self):
         for record in self:
             record.total_amount_etb = record.total_amount_usd * record.exchange_rate
+
+    def update_lc_status(self):
+        lcs = self.env['droga.purchase.lc'].search([('state', '!=', 'Expired')])
+        for record in lcs:
+            if record.expire_date:
+                if record.expire_date >= datetime.now().date():
+                    record.state = 'Expired'
+                else:
+                    if record.state != 'Active':
+                        record.state = 'Active'
+
+    def update_amount(self):
+        lcs = self.env['droga.purchase.lc'].search([])
+        for record in lcs:
+            record.total_amount_etb = record.exchange_rate * record.total_amount_usd
 
 
 class LcDetail(models.Model):

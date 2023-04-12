@@ -12,11 +12,40 @@
                 <field name="department"/>
                 <field name="request_date"/>
                 <field name="currency_id"/>
-                <field name="total_amount"/>
+                <field name="total_amount" string="Total Amount USD"/>
+                <field name="total_amount_etb" string="Total Amount ETB"/>
                 <field name="state" widget="badge" decoration-success="state == 'Approved'"
                        decoration-danger="state == 'Cancelled'"
                        decoration-warning="state in('Draft','Queued','On Progress')"/>
             </tree>
+        </field>
+    </record>
+
+    <!-- pivot table -->
+    <record id="foreign_currency_request_view_pivot" model="ir.ui.view">
+        <field name="name">foreign_currency_request.view.pivot</field>
+        <field name="model">droga.account.foreign.currency.request</field>
+        <field name="arch" type="xml">
+            <pivot string="Foreign Currency Request"  display_quantity="1" sample="1">
+                <field name="bank" type="row"/>
+                <field name="state" type="column"/>
+                <field name="total_amount" type="measure"/>
+                <field name="total_amount_etb" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- graph -->
+    <record id="foreign_currency_request_view_graph" model="ir.ui.view">
+        <field name="name">foreign_currency_request.view.graph</field>
+        <field name="model">droga.account.foreign.currency.request</field>
+        <field name="arch" type="xml">
+            <graph string="Foreign Currency Request">
+                <field name="bank"/>
+                <field name="state"/>
+                <field name="total_amount" type="measure"/>
+                <field name="total_amount_etb" type="measure"/>
+            </graph>
         </field>
     </record>
 

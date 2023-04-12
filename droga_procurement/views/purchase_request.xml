@@ -329,6 +329,7 @@
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
+                <field name="total_amount" sum="total"/>
                 <field name="state" decoration-warning="state in('Draft')"
                        decoration-info="state in('Submitted','Verified','Budget Approved')"
                        decoration-danger="state == 'Cancel'" decoration-success="state == 'Approved'" widget="badge"/>
@@ -338,6 +339,36 @@
                        decoration-success="rfq_status in('CEO Approval')"/>
                 <field name="company_id"/>
             </tree>
+        </field>
+    </record>
+
+    <!-- pivot table -->
+    <record id="droga_purchase_request_foreign_view_pivot" model="ir.ui.view">
+        <field name="name">droga.purhcase.request.pivot</field>
+        <field name="model">droga.purhcase.request</field>
+        <field name="arch" type="xml">
+            <pivot string="Purchase Request" disable_linking="false" display_quantity="1" sample="1">
+                <field name="request_date" type="row"/>
+
+                <field name="wf_state" type="column"/>
+                <field name="state" type="column"/>
+
+                <field name="total_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- graph -->
+    <record id="droga_purchase_request_foreign_view_graph" model="ir.ui.view">
+        <field name="name">droga.purhcase.request.graph</field>
+        <field name="model">droga.purhcase.request</field>
+        <field name="arch" type="xml">
+            <graph sample="1" string="Purchase Request">
+                <field name="request_date"/>
+                <field name="wf_state"/>
+                <field name="state"/>
+                <field name="total_amount" type="measure"/>
+            </graph>
         </field>
     </record>
 
@@ -743,13 +774,15 @@
     <record id="droga_purhcase_request_foregin_action" model="ir.actions.act_window">
         <field name="name">Purchase Request Foreign</field>
         <field name="res_model">droga.purhcase.request</field>
-        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_mode">tree,form,kanban,pivot,graph</field>
         <field name="domain">[('request_type', '=', 'Foregin')]</field>
         <field name="context">{'default_request_type': 'Foregin','default_buying_method': 'RFQ'}</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_foregin_view_tree')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_request_foregin_view_form')}),
-         (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_purhcase_request_view_kanban')})]"/>
+         (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_purhcase_request_view_kanban')}),
+         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_request_foreign_view_pivot')}),
+         (0, 0, {'view_mode': 'graph', 'view_id': ref('droga_purchase_request_foreign_view_graph')})]"/>
 
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

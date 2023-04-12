@@ -51,10 +51,10 @@ class ForeignCurrencyRequest(models.Model):
     bank = fields.Many2one("res.bank")
     bank_branch = fields.Char("Branch")
 
-    total_amount = fields.Float("Total Amount")
+    total_amount = fields.Float("Total Amount USD")
     exchange_rate = fields.Float("Exchange Rate", default=1, digits=(12, 4))
     total_amount_etb = fields.Float(
-        "Total Amount ETB", compute="_compute_total", required=True)
+        "Total Amount ETB", compute="_compute_total", required=True, store=True)
     amount_in_word = fields.Char(
         "Amount in Word", compute="_compute_amount_to_word", store=True)
 
@@ -82,7 +82,8 @@ class ForeignCurrencyRequest(models.Model):
 
     @api.depends('total_amount', 'exchange_rate')
     def _compute_total(self):
-        self.total_amount_etb = self.total_amount * self.exchange_rate
+        for record in self:
+            record.total_amount_etb = record.total_amount * record.exchange_rate
 
     @api.depends('total_amount', 'exchange_rate')
     def _compute_amount_to_word(self):
@@ -120,9 +121,9 @@ class ForeignCurrencyRequest(models.Model):
         notification_ids = []
 
         if approval_type == "On Progress":
-            message = 'Your request for foregin currency with Request #' + self.name + " for RFQ #" + self.rfq_id.name + " is on progress"
+            message = 'Your request for foreign currency with Request #' + self.name + " for RFQ #" + self.rfq_id.name + " is on progress"
         else:
-            message = 'Your request for foregin currency with Request #' + self.name + " for RFQ #" + self.rfq_id.name + " is approved by the bank of " + self.bank.name
+            message = 'Your request for foreign currency with Request #' + self.name + " for RFQ #" + self.rfq_id.name + " is approved by the bank of " + self.bank.name
 
         for purchase in purchase_user:
             notification_ids.append((0, 0, {

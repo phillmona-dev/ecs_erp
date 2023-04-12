@@ -47,7 +47,7 @@
     <record id="droga_foreign_currency_request_action1" model="ir.actions.act_window">
         <field name="name">Currency Request</field>
         <field name="res_model">droga.account.foreign.currency.request</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="target">current</field>
@@ -218,6 +218,7 @@
         </field>
     </record>
 
+
     <!-- tree view -->
     <record id="droga_purhcase_request_rfq_foregin_view_tree" model="ir.ui.view">
         <field name="name">droga_purhcase_request_rfq_foregin.view.tree</field>
@@ -229,6 +230,8 @@
                 <field name="supplier_id"/>
                 <field name="date"/>
                 <field name="request_type"/>
+                <field name="total_amount_usd"/>
+                <field name="total_amount_etb"/>
                 <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')"
                        decoration-danger="state == 'Cancel'"
                        decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
@@ -240,6 +243,39 @@
             </tree>
         </field>
     </record>
+
+
+    <!-- pivot table -->
+    <record id="droga_purhcase_request_rfq_foregin_view_pivot" model="ir.ui.view">
+        <field name="name">droga_purhcase_request_rfq_foregin.view.pivot</field>
+        <field name="model">droga.purhcase.request.rfq</field>
+        <field name="arch" type="xml">
+            <pivot string="Request for Quotation" disable_linking="false" display_quantity="1" sample="1">
+                <field name="date" type="row"/>
+
+                <field name="state" type="column"/>
+
+                <field name="total_amount_usd" type="measure"/>
+                <field name="total_amount_etb" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- graph -->
+    <record id="droga_purhcase_request_rfq_foregin_view_graph" model="ir.ui.view">
+        <field name="name">droga_purhcase_request_rfq_foregin.view.graph</field>
+        <field name="model">droga.purhcase.request.rfq</field>
+        <field name="arch" type="xml">
+            <pivot string="Request for Quotation" disable_linking="false">
+
+                <field name="state"/>
+
+                <field name="total_amount_usd" type="measure"/>
+                <field name="total_amount_etb" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
 
     <!-- form view -->
     <record id="droga_purhcase_rfq_foregin_view_form" model="ir.ui.view">
@@ -558,10 +594,12 @@
     <record id="droga_purchase_request_rfq_foregin_main_action" model="ir.actions.act_window">
         <field name="name">Request for Quotation</field>
         <field name="res_model">droga.purhcase.request.rfq</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_rfq_foregin_view_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_foregin_view_form')})]"/>
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purhcase_rfq_foregin_view_form')}),
+         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purhcase_request_rfq_foregin_view_pivot')}),
+         (0, 0, {'view_mode': 'graph', 'view_id': ref('droga_purhcase_request_rfq_foregin_view_graph')})]"/>
         <field name="domain">[('request_type','=','Foregin')]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
