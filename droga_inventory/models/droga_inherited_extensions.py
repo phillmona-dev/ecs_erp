@@ -565,6 +565,15 @@ class droga_stock_product_extension(models.Model):
         inverse='_compute_default_code',
          store=True,required=False)
     prod_read_only=fields.Boolean(compute='is_prod_readonly')
+    product_id_db=fields.Integer('Product product db id',compute='_get_prod_id')
+
+    def _get_prod_id(self):
+        for rec in self:
+            prods=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
+            if len(prods)>0:
+                rec.product_id_db=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])[0].id
+            else:
+                rec.product_id_db=0
     def _compute_default_code(self):
         pass
 
