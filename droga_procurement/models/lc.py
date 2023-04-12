@@ -126,7 +126,7 @@ class Lc(models.Model):
         for record in lcs:
             record.state = 'Active'
             if record.expire_date:
-                if record.expire_date >= datetime.now().date():
+                if record.expire_date <= datetime.now().date():
                     record.state = 'Expired'
 
     def update_amount(self):
