@@ -127,9 +127,8 @@ class Lc(models.Model):
             if record.expire_date:
                 if record.expire_date >= datetime.now().date():
                     record.state = 'Expired'
-                else:
-                    if record.state != 'Active':
-                        record.state = 'Active'
+            if record.state != 'Active':
+                record.state = 'Active'
 
     def update_amount(self):
         lcs = self.env['droga.purchase.lc'].search([])
