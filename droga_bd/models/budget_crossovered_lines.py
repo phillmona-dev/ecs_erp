@@ -36,7 +36,6 @@ class CrossoveredBudget(models.Model):
 
 
 class CrossoveredBudgetLines(models.Model):
-
     _inherit = "crossovered.budget.lines"
 
     fiscal_year = fields.Many2one(related="crossovered_budget_id.fiscal_year")
@@ -105,7 +104,6 @@ class CrossoveredBudgetLines(models.Model):
             'res_id': self.id,
             'target': 'new',
 
-
         }
 
     def unlink(self):
@@ -136,9 +134,14 @@ class CrossoveredBudgetLines(models.Model):
             record.date_from = record.period.date_from
             record.date_to = record.period.date_to
 
+    def update_budget_period(self):
+        budget_lines = self.env['crossovered.budget.lines'].search([])
+        for record in budget_lines:
+            record.date_from = record.period.date_from
+            record.date_to = record.period.date_to
+
 
 class CrossoveredBudgetLinesDetail(models.Model):
-
     _name = 'crossovered.budget.lines.detail'
 
     _order = 'account asc'
@@ -201,7 +204,7 @@ class CrossoveredBudgetLinesDetail(models.Model):
 
         # self.load_commitment_budget()
         # self.calculate_remaining_budget()
-        
+
         return res
 
     def unlink(self):
@@ -227,8 +230,10 @@ class CrossoveredBudgetLinesDetail(models.Model):
                 commitment_budgets = self.env['droga.budget.commitment.budget'].search(
                     [('state', '=', 'Active'), ('budgetary_position', '=', budget.general_budget_id.id),
                      ('budget_date', '>=',
-                      budget.crossovered_budget_id.date_from), ('budget_date', '<=', budget.crossovered_budget_id.date_to),
-                     ('expense_account', '=', line.account.id), ('analytic_account_id', '=', budget.analytic_account_id.id)])
+                      budget.crossovered_budget_id.date_from),
+                     ('budget_date', '<=', budget.crossovered_budget_id.date_to),
+                     ('expense_account', '=', line.account.id),
+                     ('analytic_account_id', '=', budget.analytic_account_id.id)])
 
                 account_commitment_budget = 0
                 for commitment_budget in commitment_budgets:
@@ -261,14 +266,14 @@ class CrossoveredBudgetLinesDetail(models.Model):
                 revised_budget = 0
 
                 # calculate revised budget
-                #revised_budget = line.planned_amount+line.reallaocation_addition+line.addition
+                # revised_budget = line.planned_amount+line.reallaocation_addition+line.addition
 
                 if line.planned_amount > 0:
                     remaining_balance = line.revised_budget + \
-                        line.practical_amount
+                                        line.practical_amount
                 else:
                     remaining_balance = line.revised_budget + \
-                        line.practical_amount
+                                        line.practical_amount
 
                 line.write({'remaining_balance': remaining_balance})
 
@@ -285,10 +290,10 @@ class CrossoveredBudgetLinesDetail(models.Model):
             # calculate revised budget
             if record.budget_amount > 0:
                 revised_budget = record.budget_amount + \
-                    record.commitment_budget+record.reallaocation+record.addition
+                                 record.commitment_budget + record.reallaocation + record.addition
             else:
                 revised_budget = record.budget_amount + \
-                    record.commitment_budget+record.reallaocation+record.addition
+                                 record.commitment_budget + record.reallaocation + record.addition
             # update revised budget
             record.revised_budget = revised_budget
 
@@ -308,16 +313,16 @@ class CrossoveredBudgetLinesDetail(models.Model):
                         actual += line.balance
 
             # update remaining balance
-            #record.actual = actual * -1
+            # record.actual = actual * -1
 
             # calcualte remaining balance
             if record.budget_amount > 0:
-                remaining_balalnce = record.revised_budget-record.actual
+                remaining_balalnce = record.revised_budget - record.actual
             else:
-                remaining_balalnce = record.revised_budget-record.actual
+                remaining_balalnce = record.revised_budget - record.actual
 
             record.write({'revised_budget': revised_budget,
-                         'actual': actual, 'remaining_balance': remaining_balalnce})
+                          'actual': actual, 'remaining_balance': remaining_balalnce})
 
     @api.depends('budget_amount', 'commitment_budget', 'reallaocation', 'addition')
     def calculate_budget(self):
@@ -327,10 +332,10 @@ class CrossoveredBudgetLinesDetail(models.Model):
             # calculate revised budget
             if record.budget_amount > 0:
                 revised_budget = record.budget_amount + \
-                    record.commitment_budget+record.reallaocation+record.addition
+                                 record.commitment_budget + record.reallaocation + record.addition
             else:
                 revised_budget = record.budget_amount + \
-                    record.commitment_budget+record.reallaocation+record.addition
+                                 record.commitment_budget + record.reallaocation + record.addition
             # update revised budget
             record.revised_budget = revised_budget
 
@@ -349,14 +354,14 @@ class CrossoveredBudgetLinesDetail(models.Model):
                         actual += line.balance
 
             # update remaining balance
-            #record.actual = actual * -1
+            # record.actual = actual * -1
             record.actual = actual
 
             # calcualte remaining balance
             if record.budget_amount > 0:
-                record.remaining_balance = record.revised_budget-record.actual
+                record.remaining_balance = record.revised_budget - record.actual
             else:
-                record.remaining_balance = record.revised_budget-record.actual
+                record.remaining_balance = record.revised_budget - record.actual
 
     @api.onchange('account')
     def on_account_change(self):
