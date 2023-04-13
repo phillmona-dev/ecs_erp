@@ -30,7 +30,7 @@
         <field name="name">droga.purchase.lc.view.pivot</field>
         <field name="model">droga.purchase.lc</field>
         <field name="arch" type="xml">
-            <pivot string="" disable_linking="true">
+            <pivot string="" disable_linking="true" display_quantity="1" sample="1">
                 <field name="bank" type="row"/>
                 <field name="name" type="row"/>
 
@@ -160,7 +160,7 @@
     <record id="droga_purchase_lc_report_action" model="ir.actions.act_window">
         <field name="name">LC Report</field>
         <field name="res_model">droga.purchase.lc</field>
-        <field name="view_mode">tree,pivot</field>
+        <field name="view_mode">tree,form,pivot</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
 

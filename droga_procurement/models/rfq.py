@@ -104,6 +104,23 @@ class Rfq(models.Model):
     # currency request status
     currency_request_status = fields.Char("Currency Request", compute='_compute_currency_request_status')
 
+    total_amount_etb = fields.Float("Total Amount ETB", compute='_compute_total_amount', store=True)
+    total_amount_usd = fields.Float("Total Amount USD", compute='_compute_total_amount', store=True)
+
+    @api.depends("name", "purhcase_request_id")
+    def _compute_total_amount(self):
+        total_amount_etb = 0
+        total_amount_usd = 0
+
+        for rec in self:
+
+            for record in rec.rfq_lines:
+                total_amount_etb += record.total_price
+                total_amount_usd += record.total_price_foregin
+
+            rec.total_amount_etb = total_amount_etb
+            rec.total_amount_usd = total_amount_usd
+
     def _compute_currency_request_status(self):
         # set currency request status to not requested
         for record in self:
@@ -677,7 +694,6 @@ class Rfq(models.Model):
         for record in self.hs_codes:
             if not record.hs_code:
                 raise ValidationError("Please fill HS code for all products")
-
 
 
 class Rfq_Detail(models.Model):
