@@ -122,8 +122,9 @@ class cust_sales_credit_limit(models.Model):
             if len(so.order_line)==0:
                 raise ValidationError('Please register atleast one product to initiate sales order.')
 
-            if so.order_type and self.env.company.id == 1:
-                raise ValidationError("SALES IS NOT ACTIVE CURRENTLY AS INVENTORY IS UNDER STOCK TAKE   .")
+            if so.order_type:
+                if so.order_type=='WS' and self.env.company.id == 1:
+                    raise ValidationError("WHOLESALE IS NOT ACTIVE CURRENTLY AS INVENTORY IS UNDER STOCK TAKE.")
 
             # Physiotheraphy sales
             if not so.order_type and self.env.company.id==1:
