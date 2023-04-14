@@ -109,10 +109,27 @@ class Rfq(models.Model):
 
     @api.depends("name", "purhcase_request_id")
     def _compute_total_amount(self):
-        total_amount_etb = 0
-        total_amount_usd = 0
 
         for rec in self:
+            total_amount_etb = 0
+            total_amount_usd = 0
+
+            for record in rec.rfq_lines:
+                total_amount_etb += record.total_price
+                total_amount_usd += record.total_price_foregin
+
+            rec.total_amount_etb = total_amount_etb
+            rec.total_amount_usd = total_amount_usd
+
+    #for one time update
+    def update_rfq_total_amount(self):
+
+        rfqs = self.env['droga.purhcase.request.rfq'].search([])
+
+        for rec in rfqs:
+
+            total_amount_etb = 0
+            total_amount_usd = 0
 
             for record in rec.rfq_lines:
                 total_amount_etb += record.total_price
