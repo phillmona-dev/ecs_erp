@@ -300,7 +300,8 @@
                 <filter name="submitted" string="Submitted" domain="[('state', '=', 'Submitted')]"/>
                 <filter name="verified" string="Verified" domain="[('state', '=', 'Verified')]"/>
                 <filter name="budget" string="Budget Approved" domain="[('state', '=', 'Budget Approved')]"/>
-                <filter name="approved" string="Approved" domain="[('state', '=', 'Approved')]"/>
+                <filter name="approved" string="Approved"
+                        domain="[('state', '=', 'Approved'),('wf_state', '=', 'Approved')]"/>
                 <filter name="canceled" string="Canceled" domain="[('state', '=', 'Canceled')]"/>
                 <separator/>
                 <filter name="request_date" string="Request Date" date="request_date"/>

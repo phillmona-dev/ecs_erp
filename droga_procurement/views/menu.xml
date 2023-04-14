@@ -71,12 +71,43 @@
                   action="droga_purchase_request_rfq_foregin_report_action"
                   groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
 
+
+        <menuitem id="droga_purchase_rfq_mod_of_shipment_report_menu" name="Air Vs Sea by Amount and Count" sequence="2"
+                  action="droga_purchase_rfq_mod_of_shipment_report_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+
+        <menuitem id="droga_purchase_rfq_lc_vs_tt_report_menu" name="LCs Vs TT by Amount and Count" sequence="3"
+                  action="droga_purchase_rfq_lc_vs_tt_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+
+        <menuitem id="droga_purchase_request_rfq_landed_cost_main_report_menu" name="Expected Costs" sequence="4"
+                  action="droga_purchase_request_rfq_landed_cost_main_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+
+    </menuitem>
+
+    <menuitem id="droag_foreign_request_report_parent" name="Foreign Currency Request" sequence="3"
+              parent="purchase.purchase_report_main"
+              groups="purchase.group_purchase_manager,purchase.group_purchase_user">
+
+        <menuitem id="droga_foreign_currency_request_report_menu" name="Currency Requests" sequence="4"
+                  action="droga_foreign_currency_request_action2"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+
     </menuitem>
 
     <menuitem id="droga_purcahse_report_lc_parent" name="Letter of Credit" sequence="4"
               parent="purchase.purchase_report_main"
               groups="purchase.group_purchase_manager,purchase.group_purchase_user">
         <menuitem id="droga_purcahse_report_lc" name="LC Report" sequence="1" action="droga_purchase_lc_report_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+    </menuitem>
+
+    <menuitem id="droga_purchase_order_parent" name="Purchase Order" sequence="10"
+              parent="purchase.purchase_report_main"
+              groups="purchase.group_purchase_manager,purchase.group_purchase_user">
+        <menuitem id="droga_purchase_order_cost_report_report_menu" name="Cost Report" sequence="1"
+                  action="droga_purchase_order_cost_report_action"
                   groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
     </menuitem>
 
