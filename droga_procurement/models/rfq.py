@@ -60,7 +60,7 @@ class Rfq(models.Model):
     state = fields.Selection(
         [("Draft", "Draft"), ("Winner Picked", "Winner Picked"), ("Checked", "Checked"),
          ("Committee Approval", "Committee Approved"), ("Operation Manager", "Operation Manager"),
-         ("CEO Approval", "CEO"), ("Cancel", "Canceled")], default="Draft", tracking=True)
+         ("CEO Approval", "CEO Approved"), ("Cancel", "Canceled")], default="Draft", tracking=True)
 
     state_rfq = fields.Selection(
         [('Draft', 'Draft'), ('RFQ Sent', 'RFQ Sent'), ('Proforma Invoice', 'Proforma Invoice')], default='Draft',
@@ -109,10 +109,27 @@ class Rfq(models.Model):
 
     @api.depends("name", "purhcase_request_id")
     def _compute_total_amount(self):
-        total_amount_etb = 0
-        total_amount_usd = 0
 
         for rec in self:
+            total_amount_etb = 0
+            total_amount_usd = 0
+
+            for record in rec.rfq_lines:
+                total_amount_etb += record.total_price
+                total_amount_usd += record.total_price_foregin
+
+            rec.total_amount_etb = total_amount_etb
+            rec.total_amount_usd = total_amount_usd
+
+    # for one time update
+    def update_rfq_total_amount(self):
+
+        rfqs = self.env['droga.purhcase.request.rfq'].search([])
+
+        for rec in rfqs:
+
+            total_amount_etb = 0
+            total_amount_usd = 0
 
             for record in rec.rfq_lines:
                 total_amount_etb += record.total_price
@@ -918,6 +935,9 @@ class rfq_landed_cost_main(models.Model):
         return id
 
     rfq_id = fields.Many2one("droga.purhcase.request.rfq")
+    rfq_date = fields.Datetime(related='rfq_id.date')
+    state = fields.Selection(related='rfq_id.state')
+    state_rfq = fields.Selection(related='rfq_id.state_rfq')
     product_id = fields.Many2one("product.product", domain=[
         ('landed_cost_ok', '=', True)])
     currency = fields.Many2one("res.currency", default=_default_currency, required=True)

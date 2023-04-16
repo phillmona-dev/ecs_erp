@@ -28,10 +28,10 @@
                     <t t-set="supplier_orders" t-value="[]"/>
 
 
-
                     <div class="page">
                         <div class="oe_structure"/>
-                        <h2>Offer Analysis Sheet #<span t-field="o.name"/>
+                        <h2>Offer Analysis Sheet #
+                            <span t-field="o.name"/>
                         </h2>
 
                         <div id="informations" class="row mt32 mb32">
@@ -90,7 +90,7 @@
                                 <t t-foreach="products" t-as="product">
                                     <tr colspan="2">
                                         <td>
-                                            <span t-esc="product_index + 1" />
+                                            <span t-esc="product_index + 1"/>
                                         </td>
 
                                         <td>
@@ -102,13 +102,14 @@
                                             <div t-if="line.product_id.id == product.id">
 
                                                 <td>
-                                                    <span t-esc="'{0:,.2f}'.format(line.unit_price)" class="small float-right"/>
+                                                    <span t-esc="'{0:,.2f}'.format(line.unit_price)"
+                                                          class="small float-right"/>
                                                 </td>
                                                 <td>
-                                                    <span t-esc="'{0:,.2f}'.format(line.total_price)" class="small float-right"/>
+                                                    <span t-esc="'{0:,.2f}'.format(line.total_price)"
+                                                          class="small float-right"/>
                                                 </td>
                                             </div>
-
 
 
                                         </t>
@@ -138,7 +139,8 @@
 
                     <div class="page">
                         <div class="oe_structure"/>
-                        <h3>Offer Analysis Sheet #<span t-field="o.name"/>
+                        <h3>Offer Analysis Sheet #
+                            <span t-field="o.name"/>
                         </h3>
 
                         <div id="informations" class="row mt32 mb32">
@@ -212,10 +214,12 @@
                                                     <span t-esc="line.product_uom.name" class="small"/>
                                                 </td>
                                                 <td>
-                                                    <span t-esc="'{0:,.2f}'.format(line.unit_price)" class="small float-right"/>
+                                                    <span t-esc="'{0:,.2f}'.format(line.unit_price)"
+                                                          class="small float-right"/>
                                                 </td>
                                                 <td>
-                                                    <span t-esc="'{0:,.2f}'.format(line.total_price)" class="small float-right"/>
+                                                    <span t-esc="'{0:,.2f}'.format(line.total_price)"
+                                                          class="small float-right"/>
                                                 </td>
                                                 <td class="text-center">
                                                     <t t-if="line.winner=='Yes'">
@@ -275,7 +279,7 @@
                                 <t t-foreach="request.env['droga.purhcase.committee'].search([])" t-as="committees">
                                     <table style="width:100%" class="table table-hover table-sm table-pos-info">
                                         <thead class="thead-dark">
-                                            <tr >
+                                            <tr>
                                                 <td>Name of Committee</td>
                                                 <td>Signature</td>
                                             </tr>
@@ -341,7 +345,8 @@
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
                         <div class="oe_structure"/>
-                        <h2>Request for Quotation #<span t-field="o.name"/>
+                        <h2>Request for Quotation #
+                            <span t-field="o.name"/>
                         </h2>
 
                         <div id="informations" class="row mt32 mb32">
@@ -411,9 +416,15 @@
                             <div class="row">
                                 <div class="col-12 bm-2">
                                     <ol>
-                                        <li>Products should have minimum 80% of its shelf life on arrival at Addis Ababa/Port of entry.</li>
-                                        <li>Language used for writing label, leaflet and other documents shall be English.</li>
-                                        <li>All packing should be suitable for road, air and sea transport under tropical conditions.</li>
+                                        <li>Products should have minimum 80% of its shelf life on arrival at Addis
+                                            Ababa/Port of entry.
+                                        </li>
+                                        <li>Language used for writing label, leaflet and other documents shall be
+                                            English.
+                                        </li>
+                                        <li>All packing should be suitable for road, air and sea transport under
+                                            tropical conditions.
+                                        </li>
                                         <li>The label of the immediate container should at least include:-
                                             <ul>
                                                 <li>The name of the product, brand and Generic/INN</li>
@@ -428,18 +439,27 @@
                                         </li>
                                         <li>Name and address of the manufacturer</li>
                                         <li>A leaflet in its immediate container should accompany every product.
-                    A leaflet must bear adequate information for use and it should at least include:
+                                            A leaflet must bear adequate information for use and it should at least
+                                            include:
                                             <ul>
                                                 <li>The name of the product: brand and generic/INN</li>
-                                                <li>Description appearance, pharmaceutical dosage form and route of administration.</li>
+                                                <li>Description appearance, pharmaceutical dosage form and route of
+                                                    administration.
+                                                </li>
                                                 <li>Qualitative and quantitative composition of active ingredients</li>
-                                                <li>Clinical pharmacology, indication(s), warnings, precautions, contraindications.</li>
+                                                <li>Clinical pharmacology, indication(s), warnings, precautions,
+                                                    contraindications.
+                                                </li>
                                                 <li>Adverse reactions/side effects.</li>
                                                 <li>Dosage and administration (directions for use)</li>
-                                                <li>Over dosage, withdrawal time, storage instruction, package quantity, Name and address of Manufacturer.</li>
+                                                <li>Over dosage, withdrawal time, storage instruction, package quantity,
+                                                    Name and address of Manufacturer.
+                                                </li>
                                             </ul>
                                         </li>
-                                        <li>This purchase order is valid for 90 days shipment and presentation of document from ---------------onwards.</li>
+                                        <li>This purchase order is valid for 90 days shipment and presentation of
+                                            document from ---------------onwards.
+                                        </li>
 
 
                                     </ol>
@@ -454,8 +474,118 @@
         </t>
     </template>
 
+    <!-- action for rfq report -->
+    <record id="droga_purchase_request_rfq_foregin_report_action" model="ir.actions.act_window">
+        <field name="name">Request for Quotation</field>
+        <field name="res_model">droga.purhcase.request.rfq</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+
+         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purhcase_request_rfq_foregin_view_pivot')}),
+         (0, 0, {'view_mode': 'graph', 'view_id': ref('droga_purhcase_request_rfq_foregin_view_graph')})]"/>
+        <field name="domain">[('request_type','=','Foregin')]</field>
+        <field name="context">{'search_default_ceo_approved': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Request for Quotation
+            </p>
+        </field>
+    </record>
 
 
+    <!-- Air Vs sea by value and count -->
+    <!-- pivot -->
+    <record id="droga_purchase_rfq_mod_of_shipment_pivot" model="ir.ui.view">
+        <field name="name">Air Vs Sea by Amount and Count</field>
+        <field name="model">droga.purhcase.request.rfq</field>
+        <field name="arch" type="xml">
+            <pivot string="Air Vs Sea by Amount and Count" display_quantity="1" sample="1">
+                <field name="mod_of_shipment" type="row"/>
+                <field name="total_amount_usd" type="measure"/>
+                <field name="total_amount_etb" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- graph-->
+    <record id="droga_purchase_rfq_mod_of_shipment_graph" model="ir.ui.view">
+        <field name="name">Air Vs Sea by Amount and Count</field>
+        <field name="model">droga.purhcase.request.rfq</field>
+        <field name="arch" type="xml">
+            <graph string="Air Vs Sea by Amount and Count">
+                <field name="mod_of_shipment"/>
+                <field name="total_amount_usd" type="measure"/>
+                <field name="total_amount_etb" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action for Air Vs sea by value and count -->
+    <!-- action for rfq report -->
+    <record id="droga_purchase_rfq_mod_of_shipment_report_action" model="ir.actions.act_window">
+        <field name="name">Request for Quotation</field>
+        <field name="res_model">droga.purhcase.request.rfq</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+
+         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_rfq_mod_of_shipment_pivot')}),
+         (0, 0, {'view_mode': 'graph', 'view_id': ref('droga_purchase_rfq_mod_of_shipment_graph')})]"/>
+        <field name="domain">[('request_type','=','Foregin')]</field>
+        <field name="context">{'search_default_ceo_approved': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Request for Quotation
+            </p>
+        </field>
+    </record>
+
+
+
+    <!-- LCs Vs TT by amount and count -->
+    <!-- pivot -->
+    <record id="droga_purchase_rfq_lc_vs_tt_pivot" model="ir.ui.view">
+        <field name="name">Air Vs Sea by Amount and Count</field>
+        <field name="model">droga.purhcase.request.rfq</field>
+        <field name="arch" type="xml">
+            <pivot string="Air Vs Sea by Amount and Count" display_quantity="1" sample="1">
+                <field name="payment_term" type="row"/>
+                <field name="total_amount_usd" type="measure"/>
+                <field name="total_amount_etb" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- graph-->
+    <record id="droga_purchase_rfq_lc_vs_tt_graph" model="ir.ui.view">
+        <field name="name">Air Vs Sea by Amount and Count</field>
+        <field name="model">droga.purhcase.request.rfq</field>
+        <field name="arch" type="xml">
+            <graph string="Air Vs Sea by Amount and Count">
+                <field name="payment_term"/>
+                <field name="total_amount_usd" type="measure"/>
+                <field name="total_amount_etb" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action for LCs Vs TT by amount and count -->
+    <!-- action for rfq report -->
+    <record id="droga_purchase_rfq_lc_vs_tt_action" model="ir.actions.act_window">
+        <field name="name">Request for Quotation</field>
+        <field name="res_model">droga.purhcase.request.rfq</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+
+         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_rfq_lc_vs_tt_pivot')}),
+         (0, 0, {'view_mode': 'graph', 'view_id': ref('droga_purchase_rfq_lc_vs_tt_graph')})]"/>
+        <field name="domain">[('request_type','=','Foregin')]</field>
+        <field name="context">{'search_default_ceo_approved': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Request for Quotation
+            </p>
+        </field>
+    </record>
 
 
 </odoo>

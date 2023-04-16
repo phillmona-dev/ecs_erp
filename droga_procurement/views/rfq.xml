@@ -58,6 +58,20 @@
         </field>
     </record>
 
+    <record id="droga_foreign_currency_request_action2" model="ir.actions.act_window">
+        <field name="name">Currency Request</field>
+        <field name="res_model">droga.account.foreign.currency.request</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="target">current</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Foreign Currency Request
+            </p>
+        </field>
+    </record>
+
     <!-- tree view -->
     <record id="droga_purhcase_request_rfq_view_tree" model="ir.ui.view">
         <field name="name">droga_purhcase_request_rfq.view.tree</field>
@@ -69,6 +83,8 @@
                 <field name="date"/>
                 <field name="supplier_id"/>
                 <field name="request_type"/>
+                <field name="total_amount_usd"/>
+                <field name="total_amount_etb"/>
                 <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Winner Picked')"
                        decoration-danger="state == 'Cancel'"
                        decoration-success="state in('CEO Approval','Committee Approval')" widget="badge"/>
@@ -197,7 +213,10 @@
                 <filter name="Checked" string="Checked" domain="[('state', '=', 'Checked')]"/>
                 <filter name="Operation Manager" string="Operation Manager"
                         domain="[('state', '=', 'Operation Manager')]"/>
-                <filter name="CEO Approval" string="CEO Approval" domain="[('state', '=', 'CEO Approval')]"/>
+                <filter name="ceo_approved" string="CEO Approved" domain="[('state', '=', 'CEO Approval')]"/>
+
+                <separator/>
+                <filter name="date" string="Date" date="date"/>
 
             </search>
         </field>

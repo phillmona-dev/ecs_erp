@@ -20,7 +20,8 @@
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
                         <div class="oe_structure"/>
-                        <h2>Purhcase Request #<span t-field="o.name"/>
+                        <h2>Purhcase Request #
+                            <span t-field="o.name"/>
                         </h2>
 
                         <div id="informations" class="row mt32 mb32">
@@ -82,7 +83,7 @@
                                 <t t-foreach="o.purhcase_request_lines" t-as="line">
                                     <tr>
                                         <td id="no">
-                                            <span t-esc="line_index + 1" />
+                                            <span t-esc="line_index + 1"/>
                                         </td>
                                         <td id="product">
                                             <span t-field="line.product_id"/>
@@ -167,7 +168,8 @@
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
                         <div class="oe_structure"/>
-                        <h2>Purhcase Request #<span t-field="o.name"/>
+                        <h2>Purhcase Request #
+                            <span t-field="o.name"/>
                         </h2>
 
                         <div id="informations" class="row mt32 mb32">
@@ -224,7 +226,7 @@
                                 <t t-foreach="o.purhcase_request_lines" t-as="line">
                                     <tr>
                                         <td id="no">
-                                            <span t-esc="line_index + 1" />
+                                            <span t-esc="line_index + 1"/>
                                         </td>
                                         <td id="product">
                                             <span t-field="line.product_id"/>
@@ -286,7 +288,6 @@
     </template>
 
 
-
     <!-- tree view report -->
     <record id="droga_purhcase_request_report_view_tree" model="ir.ui.view">
         <field name="name">droga.purhcase.request.view.tree</field>
@@ -299,7 +300,9 @@
                 <field name="department"/>
                 <field name="purpose"/>
                 <field name="company_id"/>
-                <field name="state" decoration-warning="state in('Draft')" decoration-info="state in('Submitted','Verified','Budget Checked')" decoration-danger="state == 'Cancel'" decoration-success="state == 'Approved'" widget="badge"/>
+                <field name="state" decoration-warning="state in('Draft')"
+                       decoration-info="state in('Submitted','Verified','Budget Checked')"
+                       decoration-danger="state == 'Cancel'" decoration-success="state == 'Approved'" widget="badge"/>
             </tree>
         </field>
     </record>
@@ -307,11 +310,14 @@
     <record id="droga_purhcase_request_report_view_action" model="ir.actions.act_window">
         <field name="name">Purchase Request Report</field>
         <field name="res_model">droga.purhcase.request</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">pivot,graph,tree</field>
         <field name="domain">[]</field>
-        <field name="context">{}</field>
+        <field name="context">{'search_default_approved': 1}</field>
         <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purhcase_request_report_view_tree')})]"/>
+
+        (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_request_foreign_view_pivot')}),
+        (0, 0, {'view_mode': 'graph', 'view_id': ref('droga_purchase_request_foreign_view_graph')})
+        ]"/>
 
     </record>
 

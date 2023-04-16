@@ -217,7 +217,7 @@
                                 <span style="font-size:120px; transform: rotate(45deg);  ">Attachement</span>
                             </div>
 
-                            <table class="table table-bordered o_main_table table-sm">
+                            <table class="table table-bordered o_main_table table-sm ">
                                 <thead class="thead-dark">
                                     <tr>
 
@@ -471,6 +471,9 @@
                     .table_morecondensed>thead>tr>td,
                     .table_morecondensed>tbody>tr>td,
                     .table_morecondensed>tfoot>tr>td{ padding: 1px; }
+
+                    .top5 { margin-top:15px; }
+
 
                 </style>
 
@@ -783,14 +786,12 @@
                         </table>
 
 
-                        <br/>
-                        <div id="informations" class="row mt32 mb32">
+                        <div id="informations" class="row mt32 mb32 pb-2">
                             <div class="col-12 bm-2">
-                                <strong class="small nopadding">Total Amount in Words:</strong>
-                                <span class="small nopadding" t-esc="o.total_amount_word"/>
+                                <strong class="small">Total Amount in Words:</strong>
+                                <span class="small" t-esc="o.total_amount_word"/>
                             </div>
                         </div>
-                        <br></br>
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
                                 <strong class="small nopadding">I received the above goods/services in good
@@ -798,8 +799,7 @@
                                 </strong>
                             </div>
                         </div>
-                        <br/>
-                        <div id="informations" class="row mt32 mb32">
+                        <div id="informations" class="row mt32 mb32 pb-1">
                             <div class="col-12 bm-2">
                                 <span class="small">Memo / Note:</span>
                             </div>
@@ -814,7 +814,6 @@
                                 <span class="small">Checked By :________________________</span>
                             </div>
                         </div>
-                        <br/>
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-6 bm-2">
                                 <span class="small">Approved By :________________________</span>
@@ -823,7 +822,6 @@
                                 <span class="small">Received By :________________________</span>
                             </div>
                         </div>
-                        <br/>
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-6 bm-2">
                                 <span class="small">Signature :___________________________</span>
@@ -840,7 +838,6 @@
                             </div>
 
                         </div>
-                        <br/>
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2 text-center">
                                 <span t-esc="o.FPMachineID"/>

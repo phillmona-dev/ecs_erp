@@ -26,9 +26,10 @@
         <field name="name">foreign_currency_request.view.pivot</field>
         <field name="model">droga.account.foreign.currency.request</field>
         <field name="arch" type="xml">
-            <pivot string="Foreign Currency Request"  display_quantity="1" sample="1">
-                <field name="bank" type="row"/>
+            <pivot string="Foreign Currency Request" display_quantity="1" sample="1">
                 <field name="state" type="column"/>
+                <field name="bank" type="row"/>
+
                 <field name="total_amount" type="measure"/>
                 <field name="total_amount_etb" type="measure"/>
             </pivot>

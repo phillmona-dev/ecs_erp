@@ -38,6 +38,7 @@
         'views/foreign_currency_request.xml',
         'views/configuration.xml',
         'views/competitors.xml',
+        'views/estimated_landed_cost.xml',
         'report/paper_format.xml',
         'report/purchase_request.xml',
         'report/purchase_request_local.xml',
@@ -45,6 +46,7 @@
         'report/rfq.xml',
         'report/rfq_local.xml',
         'report/purchase_order.xml',
+        'report/estimated_landed_cost.xml',
         'data/mail_template.xml',
         'views/menu.xml',
 
