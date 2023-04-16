@@ -105,18 +105,20 @@ class cust_sales_credit_limit(models.Model):
             if not so.pr_sales and (self.env.user.name.startswith('CRM') or self.env.user.name.startswith('Tender')):
                 message = message+('\n' if message else '') + "Please login before registering a sales order!"
                 #raise ValidationError("Please login before registering a sales order!")
+            if so.payment_term_id.allowed_cust:
+                if so.partner_id.id not in so.payment_term_id.allowed_cust.ids:
+                    message = message + ('\n' if message else '') + "%s is not eligible for %s!" % (so.partner_id.name,so.payment_term_id.name)
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [15390]:
                 message = message+('\n' if message else '') + "You cannot exceed credit limit!"
                 #raise ValidationError("You cannot exceed credit limit!")
             if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender and not so.order_from:
                 message = message+('\n' if message else '') + "Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount)
                 #raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
-
             if message:
                 raise ValidationError(message)
 
             if 'cust_type_ext' in vals:
-                if result.partner_id.cust_type_ext!=vals['cust_type_ext']:
+                if result.partner_id.cust_type_ext.id!=vals['cust_type_ext']:
                     result.partner_id.cust_type_ext = vals['cust_type_ext']
 
             if len(so.order_line)==0:
@@ -138,6 +140,13 @@ class cust_sales_credit_limit(models.Model):
                     for res in so.order_line:
                         res.wareh = 32 if so.order_from == 'PT-Bole' else 31
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
+
+            if result.user_id.name.startswith('CRM'):
+                result.sales_initiator='SR-'+result.pr_sales.p_name if result.pr_sales else result.user_id.name
+            elif  result.user_id.name.startswith('Tender'):
+                result.sales_initiator = 'TEN-' + result.pr_sales.p_name if result.pr_sales else result.user_id.name
+            else:
+                result.sales_initiator = result.user_id.name
 
         return result
 
@@ -236,12 +245,13 @@ class cust_sales_no_create_after_invoice(models.Model):
 
 class payment_term_no_credit(models.Model):
     _inherit = 'account.payment.term'
-    apply_credit_limit = fields.Boolean(string='Apply credit limit', default=True, Tracking=True)
-    deliv_after_payment = fields.Boolean(string='Delivery after payment', default=False)
-    min_amount=fields.Float(string='Minimum order amount', default=0)
+    apply_credit_limit = fields.Boolean(string='Apply credit limit', default=True, tracking=True)
+    deliv_after_payment = fields.Boolean(string='Delivery after payment', default=False, tracking=True)
+    min_amount=fields.Float(string='Minimum order amount', default=0, tracking=True)
     used_under=fields.Selection([
         ('BT', 'Both'),
         ('DR', 'Droga'),('PC', 'Pharmacy chain')], string='Term used under')
+    allowed_cust=fields.Many2many('res.partner',string='Allowed customers',tracking=True)
 
 
 class payment_term_no_credit_messages(models.Model):

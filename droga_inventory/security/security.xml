@@ -46,7 +46,11 @@
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
     </record>
     <record id="stores_manager" model="res.groups">
-        <field name="name">Droga Stores manager </field>
+        <field name="name">Droga Stores manager import</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+    </record>
+    <record id="stores_manager_ws" model="res.groups">
+        <field name="name">Droga Stores manager wholesale</field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
     </record>
     <record id="inventory_report" model="res.groups">

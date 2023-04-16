@@ -48,3 +48,11 @@ class sales_report_det_fields(models.Model):
                 rec.sales_dept = 'Tender'
             else:
                 rec.sales_dept = 'Employee'
+    invoice_date=fields.Date('Invoice date',compute='_get_invoice_date')
+
+    def _get_invoice_date(self):
+        for rec in self:
+            if len(rec.invoice_lines)>0:
+                rec.invoice_date=rec.invoice_lines[0].move_id.invoice_date
+            else:
+                rec.invoice_date=False

@@ -296,7 +296,7 @@ class sale_order_ext(models.Model):
     final_approver=fields.Many2one('res.users',compute='_get_approvers')
     out_of_stock_items=fields.Char('Stock out items',compute='_get_stock_out')
     has_access = fields.Boolean(default=False,search='_has_access',compute='_compute_has_access')
-    sales_initiator=fields.Char('Sales person',compute='_get_sales_init',store=True)
+    sales_initiator=fields.Char('Sales person',store=True)
     wareh=fields.Many2one('stock.warehouse',string='User linked pharmacy warehouse',compute='_get_pharma_wh')
     def unlink(self):
         raise ValidationError(
@@ -306,14 +306,6 @@ class sale_order_ext(models.Model):
         for rec in self:
             rec.wareh=self.env.user.warehouse_ids_ph[0].id if len(self.env.user.warehouse_ids_ph)>0 else False
 
-    def _get_sales_init(self):
-        for rec in self:
-            if rec.user_id.name.startswith('CRM'):
-                rec.sales_initiator='SR-'+rec.pr_sales.p_name if rec.pr_sales else rec.user_id.name
-            elif  rec.user_id.name.startswith('Tender'):
-                rec.sales_initiator = 'TEN-' + rec.pr_sales.p_name if rec.pr_sales else rec.user_id.name
-            else:
-                rec.sales_initiator = rec.user_id.name
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
             for rec in self:
@@ -443,7 +435,7 @@ class sale_order_ext(models.Model):
 
     def validate_form(self):
         message = ''
-                
+
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
         if (len(order_lines_nowareh) > 0):
@@ -485,6 +477,9 @@ class sale_order_ext(models.Model):
             if so.amount_total<so.payment_term_id.min_amount and not so.tender_origin_form_tender and not so.order_from:
                 message = message+('\n' if message else '') + "Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount)
                 #raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
+            if so.payment_term_id.allowed_cust:
+                if so.partner_id.id not in so.payment_term_id.allowed_cust.ids:
+                    message = message + ('\n' if message else '') + "%s is not eligible for %s!" % (so.partner_id.name,so.payment_term_id.name)
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 message = message + ('\n' if message else '') + "Please login before requesting a sales order!"
                 # raise ValidationError("Please login before registering a sales order!")

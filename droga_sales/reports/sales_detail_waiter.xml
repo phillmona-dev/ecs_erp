@@ -17,6 +17,7 @@
                 <field name="cust_location" string="City"></field>
                 <field name="qty_invoiced" string="Qty"></field>
                 <field name="invoiced_amt" string="Grand Total"></field>
+                <field name="invoice_date" string="Invoice Date"></field>
 
                 <field name="product_uom" string="UOM" optional="hide"></field>
                 <field name="crm_group1" optional="hide"></field>

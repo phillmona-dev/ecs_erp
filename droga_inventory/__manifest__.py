@@ -33,6 +33,7 @@
         'views/reservation_list.xml',
         'views/droga_header_footer_template.xml',
         'views/droga_landed_cost.xml',
+        'views/lock_period_views.xml',
         'report/report_tree_extension.xml',
         'report/stock_adjustment_request_report.xml',
         'report/xls_stock_card.xml',

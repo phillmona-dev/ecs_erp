@@ -37,8 +37,14 @@ class droga_stock_transfer_custom(models.Model):
 
     def _get_approvers(self):
         for rec in self:
-            rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
-                self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+
+            if len(rec.detail_entries) > 0:
+                if rec.detail_entries[0].warehouse_id.wh_type=='IM':
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+                elif rec.detail_entries[0].warehouse_id.wh_type=='WS':
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
 
     @api.depends('request_date')
     def _filter_location_access(self):
