@@ -76,8 +76,7 @@ class CrossoveredBudgetLines(models.Model):
                         self.env['crossovered.budget.lines.detail'].create(x)
 
                 # call remaining budget calculator
-                self.env['crossovered.budget.lines.detail'].calculate_remaining_budget_detail(
-                )
+                #self.env['crossovered.budget.lines.detail'].calculate_remaining_budget_detail()
 
             else:
                 for account in accounts.account_ids:
