@@ -304,6 +304,8 @@ class purchase_order_line(models.Model):
     total_price_foregin = fields.Float(
         'Total Price', compute="_compute_total", store=True)
 
+    product_category = fields.Many2one(related='product_id.categ_id',store=True)
+
     def compute_sequence_no(self):
         seq_no = 1
         for record in self:

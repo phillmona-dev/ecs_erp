@@ -440,6 +440,7 @@ class purhcase_request_line(models.Model):
         related='purhcase_request_id.state')
     product_id = fields.Many2one('product.product', string='Product', domain=[
         ('purchase_ok', '=', True)], change_default=True)
+    product_category = fields.Many2one(related='product_id.categ_id', store=True)
     product_qty = fields.Float(
         string='Quantity', digits='Product Unit of Measure', required=True, default=1)
 

@@ -109,6 +109,10 @@
         <menuitem id="droga_purchase_order_cost_report_report_menu" name="Cost Report" sequence="1"
                   action="droga_purchase_order_cost_report_action"
                   groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+
+        <menuitem id="droga_purchase_order_by_product_report_menu" name="Purchase Order by Product" sequence="2"
+                  action="droga_purchase_order_by_product_report_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
     </menuitem>
 
 
