@@ -75,6 +75,12 @@
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'sale')]}"/>
 
+                     <button name="set_to_draft"
+                            string="Set to Draft" font-size="16px"
+                            groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
+                            type="object" class="btn-primary" data-hotkey="q"
+                            attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+
                     <field name="state" widget="statusbar" statusbar_visible="draft,sale"/>
 
                 </header>
