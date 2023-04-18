@@ -53,7 +53,7 @@ class StockMove(models.Model):
             'droga.inv.lock_period']
         uid = self.env.user.id
         for rec in self:
-            date_expected = rec.mapped('date_order')[0]
+            date_expected = rec.mapped('date')[0]
             all_lock_period = lock_period_obj.search([
                 ('date_start', '<=', date_expected),
                 ('date_end', '>=', date_expected)])
