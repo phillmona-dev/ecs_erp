@@ -77,7 +77,7 @@
 
                      <button name="set_to_draft"
                             string="Set to Draft" font-size="16px"
-                            groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
+                            groups="droga_pharma.physio_user_bole_invoice,droga_pharma.physio_user_4k_invoice"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
 
