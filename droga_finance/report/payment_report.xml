@@ -111,7 +111,9 @@
                 <field name="settled_amount" optional="show"/>
                 <field name="payment_type" optional="hide"/>
                 <field name="due_days" decoration-danger="due_days &gt; 0"
-                       decoration-success="due_days &lt;=0"   />
+                       decoration-success="due_days &lt;=0"/>
+
+                <field name="paid_passed_days" optional="hide"/>
 
 
                 <!--<field name="state" widget="badge" decoration-info="state == 'draft'"

@@ -24,6 +24,11 @@
         <field name="category_id" ref="crm_management"/>
     </record>
 
+      <record id="pharma_supply_chain_manager" model="res.groups">
+        <field name="name">Supply Chain Manager</field>
+        <field name="category_id" ref="crm_management"/>
+    </record>
+
 
 
 

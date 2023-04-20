@@ -23,6 +23,7 @@ class PaymentReport(models.Model):
     paid_amount = fields.Float("Paid Amount")
     settled_amount = fields.Float("Settled Amount")
     due_days = fields.Integer("Due Days")
+    paid_passed_days = fields.Integer("Paid Passed Days")
 
     def compute_sales_info(self):
         for record in self:
@@ -57,11 +58,12 @@ class PaymentReport(models.Model):
         self.env.cr.execute("""
                            create or replace view droga_finance_payment_report as (
 
-                                select row_number()over() as id,x.partner_id,x.payment_type,x.category,x.division,x.invoice_no,x.sales_type,x.sales_initiator,x.invoice_date_due,x.paid_date,x.total_amount,x.paid_amount,x.settled_amount,x.due_days from(
+                                select row_number()over() as id,x.partner_id,x.payment_type,x.category,x.division,x.invoice_no,x.sales_type,
+x.sales_initiator,x.invoice_date_due,x.paid_date,x.total_amount,x.paid_amount,x.settled_amount,x.due_days,x.paid_passed_days from(
 select ap.partner_id,'Customer' as payment_type,'' as category,'' as division,am."name" as invoice_no,am.sales_type,am.sales_initiator,
 am.invoice_date_due,apr.max_date as paid_date,
 am.amount_total_signed as total_amount,ap.amount  as paid_amount,apr.amount as settled_amount,
-(apr.max_date-am.invoice_date_due) as due_days
+(apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days
 from account_move am inner join account_move_line aml on  am.id=aml.move_id 
 inner join account_partial_reconcile apr on aml.id=apr.debit_move_id 
 inner join account_payment ap on ap.id=(select distinct payment_id  from account_move_line   where id=apr.credit_move_id)
@@ -73,10 +75,12 @@ union
 select ap.partner_id,'Vendor' as payment_type,'' as category,'' as division,am."name" as invoice_no,am.sales_type,am.sales_initiator,
 am.invoice_date_due,apr.max_date as paid_date,
 abs(am.amount_total_signed) as total_amount,ap.amount  as paid_amount,apr.amount as settled_amount,
-(apr.max_date-am.invoice_date_due) as due_days
+(apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days
 from account_move am inner join account_move_line aml on  am.id=aml.move_id 
 inner join account_partial_reconcile apr on aml.id=apr.credit_move_id  
 inner join account_payment ap on ap.id=(select distinct payment_id  from account_move_line   where id=apr.debit_move_id)
 where aml.display_type ='payment_term' and ap.payment_type='outbound' and am.state ='posted')x order by x.payment_type,x.paid_date,x.invoice_no
+
+
  
                            )""")
