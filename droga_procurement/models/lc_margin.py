@@ -8,9 +8,9 @@ class LcMargin(models.Model):
 
     purchase_order_id = fields.Many2one("purchase.order")
     margin_percent = fields.Integer("Margin %", required=True)
-    foreign_amount = fields.Float("Foregin Amount", required=True, digits=(12, 4), compute="compute_amount")
-    exchange_rate = fields.Float("Exchange Rate", required=True, digits=(12, 4))
-    amount_etb = fields.Float("ETB Amount", require=True, compute="compute_amount", digits=(12, 4))
+    foreign_amount = fields.Float("Foreign Amount", required=True, digits=(12, 2), compute="compute_amount")
+    exchange_rate = fields.Float("Exchange Rate", required=True, digits=(12, 6))
+    amount_etb = fields.Float("ETB Amount", require=True, compute="compute_amount", digits=(12, 2))
     margin_order = fields.Selection([('1', 'First Margin'), ('2', 'Last Margin')])
     margin_calculation = fields.Selection([('1', 'Post full amount'), ('2', 'Post the Difference')])
     account = fields.Many2one("account.account", required=True)

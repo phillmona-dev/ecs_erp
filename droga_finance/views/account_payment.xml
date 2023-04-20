@@ -80,4 +80,16 @@
         </field>
     </record>
 
+    <!--Inherit quotations search view-->
+    <record id="view_account_payment_inherit_search" model="ir.ui.view">
+        <field name="name">account.payment.filter</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="transaction_no"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

@@ -302,11 +302,14 @@ class purchase_order_line(models.Model):
     _inherit = "purchase.order.line"
 
     seq_no = fields.Integer("No", compute='compute_sequence_no')
-    unit_price_foregin = fields.Float('Unit Price')
+    unit_price_foregin = fields.Float('Unit Price', digits=(12, 4))
     total_price_foregin = fields.Float(
-        'Total Price', compute="_compute_total", store=True)
+        'Total Price', compute="_compute_total", store=True, inverse="_inverse_compute_total")
 
     product_category = fields.Many2one(related='product_id.categ_id', store=True)
+
+    def _inverse_compute_total(self):
+        pass
 
     def compute_sequence_no(self):
         seq_no = 1
