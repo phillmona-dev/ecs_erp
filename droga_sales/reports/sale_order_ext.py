@@ -13,10 +13,15 @@ class sales_report_det_fields(models.Model):
     order_type_det = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'), ('PT', 'Physiotherapy')], string='Order from',related='order_id.order_type',store=True)
+    order_from_det = fields.Char('Order from',compute='_get_order_from',store=True)
     payment_term_det = fields.Many2one('account.payment.term',
         string="Payment Terms",related='order_id.payment_term_id',store=True)
     cash_or_credit=fields.Char(compute='_cash_or_credit')
 
+    @api.depends('order_id.order_from')
+    def _get_order_from(self):
+        for rec in self:
+            rec.order_from_det=rec.order_id.order_from
     def _cash_or_credit(self):
         for rec in self:
             if rec.payment_term_det.apply_credit_limit:

@@ -128,7 +128,7 @@ class cust_sales_credit_limit(models.Model):
             #    if so.order_type=='WS' and self.env.company.id == 1:
             #        raise ValidationError("WHOLESALE IS NOT ACTIVE CURRENTLY AS INVENTORY IS UNDER STOCK TAKE.")
 
-            # Physiotheraphy sales
+            # Pharmacy and physiotheraphy sales (so.order_type is false for pharmacy and physio as this field is used for import and wholesale)
             if not so.order_type and self.env.company.id==1:
                 if so.order_from.startswith('PH'):
                     if not so.wareh:
@@ -140,6 +140,9 @@ class cust_sales_credit_limit(models.Model):
                     for res in so.order_line:
                         res.wareh = 32 if so.order_from == 'PT-Bole' else 31
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
+            #This is for import or wholesale sales under Droga
+            elif so.order_type and self.env.company.id==1:
+                so.order_from='IM-'+so.order_type
 
             if result.user_id.name.startswith('CRM'):
                 result.sales_initiator='SR-'+result.pr_sales.p_name if result.pr_sales else result.user_id.name

@@ -430,7 +430,7 @@ class sale_order_ext(models.Model):
                 for res in rec.order_line:
                     res.product_id.product_tmpl_id.invoice_policy = 'delivery'
 
-            #rec.validate_form()
+            rec.validate_form()
         return returnv
 
     def validate_form(self):
@@ -489,6 +489,10 @@ class sale_order_ext(models.Model):
 
         if message:
             raise ValidationError(message)
+
+        # This is for import or wholesale sales under Droga
+        if so.order_type and self.env.company.id == 1:
+            so.order_from = 'IM-' + so.order_type
     def save_request_button(self):
         self.validate_form()
         self.set_activity_done()

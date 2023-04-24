@@ -24,7 +24,7 @@
                 <field name="crm_group1" optional="hide"></field>
                 <field name="is_core" optional="hide"></field>
                 <field name="date_order_det" string="Date" optional="hide"></field>
-                <field name="order_type_det" optional="hide"></field>
+                <field name="order_from_det" optional="hide"></field>
                 <field name="payment_term_det" optional="hide"></field>
 
                 <field name="qty_delivered" optional="hide"></field>
@@ -50,22 +50,25 @@
                 <field name="product_id"></field>
                 <field name="name"></field>
                 <field name="date_order_det" string="Date"></field>
-                <field name="order_type_det"></field>
+                <field name="order_from_det"></field>
                 <field name="payment_term_det"></field>
                 <field name="crm_group1"></field>
                 <field name="is_core"></field>
 
-                <filter name="group_type" string="By customer" context="{'group_by':'order_partner_id'}"/>
-                <filter name="group_type" string="By location" context="{'group_by':'cust_location'}"/>
-                <filter name="group_type" string="By sales order" context="{'group_by':'order_id'}"/>
-                <filter name="group_type" string="By product group" context="{'group_by':'crm_group1'}"/>
-                <filter name="group_type" string="By product" context="{'group_by':'product_id'}"/>
-                <filter name="group_type" string="By payment term" context="{'group_by':'payment_term_det'}"/>
+                <filter name="group_customer" string="By customer" context="{'group_by':'order_partner_id'}"/>
+                <filter name="group_location" string="By location" context="{'group_by':'cust_location'}"/>
+                <filter name="group_order_id" string="By sales order" context="{'group_by':'order_id'}"/>
+                <filter name="group_prod_group" string="By product group" context="{'group_by':'crm_group1'}"/>
+                <filter name="group_prod_id" string="By product" context="{'group_by':'product_id'}"/>
+                <filter name="group_pay_term" string="By payment term" context="{'group_by':'payment_term_det'}"/>
+                <filter name="group_order_from" string="By order from" context="{'group_by':'order_from_det'}"/>
 
                 <filter name="app_so" string="Sales orders" domain="[('state', '=', 'sale')]"/>
                 <filter name="pro_so" string="Workflow pending SO" domain="[('state', '!=', 'sale')]"/>
                 <filter name="core_only" string="Core products" domain="[('is_core', '=', True)]"/>
                 <filter name="non_core" string="Non-core products" domain="[('is_core', '=', False)]"/>
+                <filter name="import_whole" string="Import and wholesale only" domain="[('order_from_det', 'in', ('IM-IM','IM-WS'))]"/>
+                <filter name="physio" string="Physiotherapy only" domain="[('order_from_det', 'in', ('PT-4 Kilo','PT-Bole'))]"/>
                 <filter name="invoiced" string="Invoiced" domain="[('qty_invoiced','>',0)]"/>
 
                 <separator/>
