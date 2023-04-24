@@ -14,6 +14,7 @@
                 <field name="itemcateg" string="INVCategory"></field>
                 <field name="cash_or_credit" string="PaymentType"></field>
                 <field name="order_partner_id" string="BuyerName"></field>
+                <field name="cust_type_ext_det"></field>
                 <field name="cust_location" string="City"></field>
                 <field name="qty_invoiced" string="Qty"></field>
                 <field name="invoiced_amt" string="Grand Total"></field>
@@ -44,6 +45,7 @@
         <field name="arch" type="xml">
             <search string="Sales report">
                 <field name="order_partner_id"></field>
+                <field name="cust_type_ext_det"></field>
                 <field name="order_id"></field>
                 <field name="product_id"></field>
                 <field name="name"></field>
