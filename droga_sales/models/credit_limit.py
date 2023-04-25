@@ -122,7 +122,7 @@ class cust_sales_credit_limit(models.Model):
                     result.partner_id.cust_type_ext = vals['cust_type_ext']
 
             if len(so.order_line)==0:
-                raise ValidationError('Please register atleast one product to initiate sales order.')
+                raise ValidationError('Please register at least one product to initiate sales order.')
 
             #if so.order_type:
             #    if so.order_type=='WS' and self.env.company.id == 1:

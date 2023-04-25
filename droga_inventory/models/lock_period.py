@@ -63,7 +63,7 @@ class StockMove(models.Model):
                 if uid in lock_period.excluded_users.mapped('id'):
                     continue
 
-                raise Warning('Inventory transaction is closed for the period between %s and %s.'%
+                raise UserError('Inventory transaction is closed for the period between %s and %s.'%
                               (lock_period.date_start, lock_period.date_end))
 
 class SalesOrder(models.Model):
