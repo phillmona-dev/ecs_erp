@@ -63,14 +63,10 @@
                 <filter name="group_pay_term" string="By payment term" context="{'group_by':'payment_term_det'}"/>
                 <filter name="group_order_from" string="By order from" context="{'group_by':'order_from_det'}"/>
 
-                <separator/>
-
                 <filter name="app_so" string="Sales orders" domain="[('state', '=', 'sale')]"/>
                 <filter name="pro_so" string="Workflow pending SO" domain="[('state', '!=', 'sale')]"/>
                 <filter name="core_only" string="Core products" domain="[('is_core', '=', True)]"/>
                 <filter name="non_core" string="Non-core products" domain="[('is_core', '=', False)]"/>
-                <filter name="import_whole" string="Import and wholesale only" domain="[('order_from_det', 'in', ('IM-IM','IM-WS'))]"/>
-                <filter name="physio" string="Physiotherapy only" domain="[('order_from_det', 'in', ('PT-4 Kilo','PT-Bole'))]"/>
                 <filter name="invoiced" string="Invoiced" domain="[('qty_invoiced','>',0)]"/>
 
                 <separator/>
@@ -94,21 +90,21 @@
         </field>
     </record>
 
-    <record id="droga_sales_waiter_action" model="ir.actions.act_window">
+    <record id="droga_sales_waiteraction" model="ir.actions.act_window">
         <field name="name">Sales waiter report</field>
         <field name="res_model">sale.order.line</field>
         <field name="view_mode">tree,pivot</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_waiter_view_tree')})]"/>
         <field name="search_view_id" ref="droga_sales_waiter_search_tree"></field>
-        <field name="domain">[('state', '!=', 'cancel'),('has_access','=',True)]</field>
-        <field name="context">{'search_default_invoiced':1,'search_default_import_whole':1,'search_default_today_sales': 1}</field>
+        <field name="domain">[('state', '!=', 'cancel'),('has_access','=',True),('order_from_det', 'in', ('IM-IM','IM-WS',False))]</field>
+        <field name="context">{'search_default_invoiced':1,'search_default_today_sales': 1}</field>
     </record>
 
     <menuitem
             id="droga_sales_waiter_report_menu"
             name="Sales waiter report"
-            action="droga_sales_waiter_action"
+            action="droga_sales_waiteraction"
             parent="droga_sales.droga_sales_reports_menu"
             groups="droga_crm.crm_sr"
             sequence="17"/>
