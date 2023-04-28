@@ -39,12 +39,12 @@ class droga_stock_transfer_custom(models.Model):
         for rec in self:
 
             if len(rec.detail_entries) > 0:
-                if rec.detail_entries[0].warehouse_id.wh_type=='IM':
-                    rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
-                        self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
-                elif rec.detail_entries[0].warehouse_id.wh_type=='WS':
+                if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
                     rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
                         self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
+                else:
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
     @api.depends('request_date')
     def _filter_location_access(self):
@@ -96,10 +96,13 @@ class droga_stock_transfer_custom(models.Model):
 
     def amend(self):
         self.ensure_one()
+        self.set_activity_done()
         self.state = 'draft'
+
 
     def request(self):
         self.ensure_one()
+        self._get_approvers()
         self.state = 'stmg'
 
     def stmg_approve(self):

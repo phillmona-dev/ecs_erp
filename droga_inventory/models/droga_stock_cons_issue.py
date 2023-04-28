@@ -48,8 +48,12 @@ class droga_stock_cons_issue(models.Model):
         for rec in self:
             rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.ids[0] if len(
                 self.env.ref("droga_inventory.marketing_manager").users.ids) > 0 else None
-            rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
-                self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+            if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
+                rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
+                    self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
+            else:
+                rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                    self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
@@ -69,12 +73,14 @@ class droga_stock_cons_issue(models.Model):
     def request(self):
         self.set_activity_done()
         self.ensure_one()
+        self._get_approvers()
         self.state = 'stmg'
 
     def amend(self):
         self.set_activity_done()
         self.ensure_one()
         self.state = 'draft'
+
 
     def stmg_approve(self):
         self.set_activity_done()

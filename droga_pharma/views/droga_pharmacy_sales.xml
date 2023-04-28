@@ -96,7 +96,7 @@
                     <field name="invoice_status" invisible="1"></field>
                     <button name="action_confirm"
                             string="Confirm" font-size="16px"
-                            groups="pharma_dp_admin,pharma_br_admin"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
 
