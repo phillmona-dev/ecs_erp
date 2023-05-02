@@ -30,4 +30,10 @@
 
 
     </menuitem>
+
+    <menuitem id="self_service_hr_menu" name="Human Resource" groups="self_service_group" sequence="4"
+              parent="self_service_main_menu">
+        <menuitem id="self_service_head_count_request_menu" name="Head Count Request" sequence="1"
+                  action="droga_hr_head_count_request_action" groups="self_service_group"/>
+    </menuitem>
 </odoo>

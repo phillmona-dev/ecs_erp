@@ -13,3 +13,22 @@ class HrContract(models.Model):
     pension_contribution = fields.Boolean("Contribute Pension", default=True)
     sales = fields.Boolean("Sales",
                            help="For sales transport allowance upto 2200 is not taxable for others it is upto 600")
+
+    custom_salary_structure = fields.Boolean("Custom Salary Structure", default=False)
+    salary_structure = fields.One2many(related="job_id.salary_structure")
+    salary_structure_custom = fields.One2many("hr.job.salary", "contract_id")
+
+    # get contract rate
+    def get_employee_rate(self, payment_code):
+        rate = 0
+        for record in self:
+            if record.custom_salary_structure:  # get rate from custom salary structure
+                rates = record.salary_structure_custom.salary_detail.search([('payment_type.code', '=', payment_code)])
+                for rate in rates:
+                    rate = rate.amount
+            else:  # get rate from main salary structure
+                rates = record.salary_structure.salary_detail.search([('payment_type.code', '=', payment_code)])
+                for rate in rates:
+                    rate = rate.amount
+
+        return rate

@@ -20,17 +20,22 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'hr'],
 
     # always loaded
     'data': [
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'security/hr_security.xml',
-        'views/views.xml',
-        'views/templates.xml',
+        'views/hr_job.xml',
+        'views/hr_job_salary_payment.xml',
+        'views/hr_head_count_request.xml',
+        'views/menu.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
 
     ],
+
+    'installable': True,
+    'application': True,
 }

@@ -8,7 +8,6 @@ class PaymentRequest(models.Model):
     _description = 'Payment Request Form'
 
     _order = 'name desc'
-
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
 
     def _get_employee_id(self):
@@ -149,7 +148,7 @@ class PaymentRequest(models.Model):
         self.set_activity_done()
         # create new activity
         # get budget accountant
-        users = self.get_users_for_roles('Business Control Specialist')
+        users = self.get_users_for_roles('Business Control Specialist', self.company_id.id)
         for user in users:
             self.create_activity(user)
 
@@ -163,7 +162,7 @@ class PaymentRequest(models.Model):
         self.set_activity_done()
         # create new activity
         # get budget accountant
-        users = self.get_users_for_roles('Finance Operation Manager')
+        users = self.get_users_for_roles('Finance Operation Manager', self.company_id.id)
         for user in users:
             self.create_activity(user)
         self.return_to_tree_view()
@@ -230,12 +229,13 @@ class PaymentRequest(models.Model):
             else:
                 record.department_manager = record.request_by.parent_id
 
-    def get_users_for_roles(self, role):
+    def get_users_for_roles(self, role, company_id):
         users = []
         roles = self.env['res.groups'].search([('name', '=', role)])
 
         for user in roles.users:
-            users.append(user.id)
+            if user.company_id.id == company_id:
+                users.append(user.id)
         return users
 
     def reject_box(self):
