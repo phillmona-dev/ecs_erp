@@ -41,7 +41,25 @@ class sales_report_det_fields(models.Model):
     itemcateg = fields.Many2one('product.category', related='product_id.categ_id')
 
     invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount', store=True)
+    unit_cost=fields.Float('Unit Cost',compute='_get_cost')
+    total_cost=fields.Float('Total Cost',compute='_get_cost')
+    margin = fields.Float('Profit Margin', compute='_get_cost')
+    margin_pct = fields.Float('Profit Margin %', compute='_get_cost')
 
+    def _get_cost(self):
+        for rec in self:
+            uc = self.env['droga.sales.cost.of.sales'].search(
+                [('sale_line_id', '=', rec.id)])
+            if not uc:
+                rec.unit_cost=0
+                rec.total_cost=0
+                rec.margin=0
+                rec.margin_pct=0
+            else:
+                rec.unit_cost=uc[0].unit_cost
+                rec.total_cost=rec.qty_invoiced*rec.unit_cost
+                rec.margin=rec.invoiced_amt-rec.total_cost
+                rec.margin_pct=(rec.margin/rec.invoiced_amt)*100 if rec.invoiced_amt!=0 else 0
     def _get_invoiced_amount(self):
         for rec in self:
             rec.invoiced_amt = rec.qty_invoiced * rec.price_unit
