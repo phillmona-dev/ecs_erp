@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem id="droga_hr_job_grade_menu" name="Job Grades" action="droga_hr_job_grade_action"
+              groups="hr.group_hr_user" parent="hr.menu_config_recruitment" sequence="9"/>
+    <menuitem id="droga_hr_job_salary_payment_menu" name="Payment Types" action="droga_hr_job_salary_payment_action"
+              groups="hr.group_hr_user" parent="hr.menu_config_recruitment" sequence="10"/>
+
+    <menuitem id="droag_hr_request_froms" name="Approvals" sequence="30"
+              parent="hr.menu_hr_root" groups="human_resource_manager_group">
+        <menuitem id="droga_hr_head_count_request_menu" name="Head Count Request"
+                  action="droga_hr_head_count_request1_action" groups="human_resource_manager_group"
+                  sequence="1"/>
+    </menuitem>
+</odoo>

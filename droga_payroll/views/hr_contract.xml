@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
+
+    <record id="inherit_hr_contract_view_action" model="ir.actions.act_window">
+        <field name="name">Salary Detail</field>
+        <field name="res_model">hr.job.salary</field>
+        <field name="view_mode">form</field>
+        <field name="domain">[]</field>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Salary Detail
+            </p>
+        </field>
+    </record>
+
     <!--inherit contract -->
     <record id="inherit_hr_contract_view_form" model="ir.ui.view">
         <field name="name">Contract</field>
@@ -8,8 +23,41 @@
         <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
         <field name="arch" type="xml">
 
-            <xpath expr="//page[@name='information']" position="after">
-                <page string="Benefits" name="benefits">
+            <xpath expr="//page[@name='other']" position="before">
+                <page string="Salary and Benefits" name="salaryandbenefits">
+                    <group cols="1">
+                        <field name="custom_salary_structure" string="Custom Salary"/>
+                        <field name="pension_contribution"/>
+                        <field name="sales"/>
+                        <field name="job_id"/>
+                    </group>
+                    <field name="salary_structure" mode="tree"
+                           attrs="{'invisible': [('custom_salary_structure', '==',True )]}">
+                        <tree editable="bottom">
+                            <field name="name" width="20"/>
+                            <field name="date_from" width="20" required="1"/>
+                            <field name="date_to" width="20"/>
+                            <field name="state" width="20"/>
+
+
+                        </tree>
+                    </field>
+                    <field name="salary_structure_custom" mode="tree"
+                           attrs="{'invisible': [('custom_salary_structure', '==', False)]}">
+                        <tree context="{'default_contract_id':active_id,'default_job_id':job_id}">
+                            <field name="job_id" invisible="1"/>
+                            <field name="name" width="20"/>
+                            <field name="date_from" width="20" required="1"/>
+                            <field name="date_to" width="20"/>
+                            <field name="state" width="20"/>
+
+
+
+                        </tree>
+                    </field>
+                </page>
+
+                <page string="Benefits" name="benefits" invisible="1">
                     <group>
                         <group>
                             <field name="pension_contribution"/>
@@ -29,6 +77,17 @@
                         </group>
                     </group>
                 </page>
+
+                <xpath expr="//page[@name='information']" position="attributes">
+
+                    <attribute name="attrs">{'invisible': True}</attribute>
+
+                </xpath>
+                <xpath expr="//page[@name='salary_info']" position="attributes">
+
+                    <attribute name="attrs">{'invisible': 1}</attribute>
+
+                </xpath>
             </xpath>
         </field>
     </record>
