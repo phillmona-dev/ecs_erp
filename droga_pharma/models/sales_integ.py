@@ -6,16 +6,21 @@ from odoo import models, fields, api
 class sales_integ(models.Model):
     _inherit = 'sale.order'
     cust_details = fields.Boolean(default=False, string='Customer Details')
-
-    dob = fields.Date('Date of birth', default=datetime.date.today())
-    age = fields.Integer(compute='_compute_age')
+    customer_emp=fields.Many2one('droga.pharma.cust.employees',string='Customer Name', domain="[('parent_customer','=',partner_id)]")
+    dob = fields.Date('Date of birth', default=datetime.date.today(),related='customer_emp.dob')
+    age = fields.Integer(compute='_compute_age',related='customer_emp.age')
     sex = fields.Selection(
         [('Male', 'Male'), ('Female', 'Female')],
-        string='Sex')
+        string='Sex',related='customer_emp.gender')
     weight = fields.Float('Weight')
     diagnosis = fields.Html('Diagnosis')
     physiotherapist = fields.Many2one('droga.physiotherapist.list')
 
+    @api.onchange('dob','sex')
+    def _onchange_dob_weight_sex(self):
+        for rec in self:
+            rec.customer_emp.dob=self.dob
+            rec.customer_emp.gender = self.sex
     @api.depends('dob')
     def _compute_age(self):
         for record in self:

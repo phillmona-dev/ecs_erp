@@ -8,36 +8,25 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/notebook/page[@name='contact_addresses']" position="before">
                 <field name="customer_rank" invisible="1"></field>
-                <page string="Employees" attrs="{'invisible': [('supplier_rank', '>', 0)]}" groups="droga_pharma.pharma_br_admin">
+                <page string="Employees" attrs="{'invisible': [('supplier_rank', '>', 0)]}"
+                      groups="droga_pharma.pharma_br_admin">
                     <field name="employees" mode="tree,kanban">
                         <tree editable="1" create="1">
                             <field name="employee_name"/>
                             <field name="job_position"/>
                             <field name="gender"/>
                             <field name="mobile"/>
-                            <field name="additional_product_groups" domain="([('avail_in_product_master','=',True)])"
-                                   widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
-                            <field name="from_date"/>
-                            <field name="to_date"/>
-                            <field name="max_amount"/>
-                            <field name="amount_valid_for"/>
-                            <field name="amount_valid_type"/>
-                            <field name="remaining_amount_period"></field>
+                            <field name="dob"/>
+                            <field name="age"/>
                         </tree>
                         <form>
                             <group>
                                 <field name="employee_name"/>
-                            <field name="job_position"/>
-                            <field name="gender"/>
-                            <field name="mobile"/>
-                            <field name="additional_product_groups" domain="([('avail_in_product_master','=',True)])"
-                                   widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
-                            <field name="from_date"/>
-                            <field name="to_date"/>
-                            <field name="max_amount"/>
-                            <field name="amount_valid_for"/>
-                            <field name="amount_valid_type"/>
-                            <field name="remaining_amount_period"></field>
+                                <field name="job_position"/>
+                                <field name="gender"/>
+                                <field name="mobile"/>
+                                <field name="dob"/>
+                                <field name="age"/>
                             </group>
                         </form>
                         <kanban class="o_kanban_mobile">
@@ -45,14 +34,8 @@
                             <field name="job_position"/>
                             <field name="gender"/>
                             <field name="mobile"/>
-                            <field name="additional_product_groups" domain="([('avail_in_product_master','=',True)])"
-                                   widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
-                            <field name="from_date"/>
-                            <field name="to_date"/>
-                            <field name="max_amount"/>
-                            <field name="amount_valid_for"/>
-                            <field name="amount_valid_type"/>
-                            <field name="remaining_amount_period"></field>
+                            <field name="dob"/>
+                            <field name="age"/>
                             <templates>
                                 <t t-name="kanban-box">
                                     <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
@@ -89,8 +72,9 @@
             </xpath>
 
             <xpath expr="//form/sheet/group/group" position="inside">
-                    <field name="allowed_product_groups" attrs="{'invisible': [('supplier_rank', '>', 0)]}" domain="([('avail_in_product_master','=',True)])"
-                                   widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
+                <field name="allowed_product_groups" attrs="{'invisible': [('supplier_rank', '>', 0)]}"
+                       domain="([('avail_in_product_master','=',True)])"
+                       widget='many2many_tags' options="{'no_create':True,'no_open':True}"/>
             </xpath>
         </field>
     </record>

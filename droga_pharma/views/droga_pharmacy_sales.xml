@@ -102,13 +102,13 @@
 
                     <button name="create_inv_local"
                             string="Create Invoice" font-size="16px"
-                            groups="pharma_br_admin,pharma_ip_admin"
+                            groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'sale')]}"/>
 
                     <button name="conf_and_invoice"
                             string="Confirm and create invoice" font-size="16px"
-                            groups="pharma_di_admin"
+                            groups="droga_pharma.pharma_di_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
 
@@ -150,14 +150,12 @@
                         <group name="partner_details">
                             <field name="partner_id" widget="res_partner_many2one"
                                    context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
-                                   options='{"always_reload": True}'/>
-                            <field name="cust_name"></field>
+                                   options='{"always_reload": True,"no_open":True,"no_create": True}'/>
+                            <field name="customer_emp" context="{'default_parent_customer':partner_id,'show_age': True}"></field>
                             <field name="cust_id"></field>
                             <field name="cust_details"></field>
                             <field name="manual_price" invisible="1"></field>
                             <field name="show_invoice_button" invisible="1"></field>
-                            <field name="mature_amount" style="color:red"
-                                   attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                             <field name="partner_invoice_id" groups="account.group_delivery_invoice_address"
                                    context="{'default_type':'invoice'}" options='{"always_reload": True}'/>
                             <field name="partner_shipping_id" groups="account.group_delivery_invoice_address"
@@ -172,7 +170,8 @@
 
                             </div>
                             <field name="date_order" nolabel="1"/>
-
+                            <field name="mature_amount" style="color:red"
+                                   attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                             <field name="show_update_pricelist" invisible="1"/>
                             <label for="pricelist_id" invisible="1" groups="product.group_product_pricelist"/>
                             <div groups="product.group_product_pricelist" invisible="1" class="o_row">
@@ -612,7 +611,7 @@
 
 
     <menuitem id="pharma_main_menu" name="Pharmacy chain"
-              groups="pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_di_admin"
+              groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_dp_admin,droga_pharma.pharma_ip_admin,droga_pharma.pharma_di_admin"
               web_icon="droga_pharma,static/description/icon.png"
               sequence="10"/>
 
@@ -621,7 +620,7 @@
             name="Sales order"
             action="droga_sales_order_pharmacy_action"
             parent="droga_pharma.pharma_main_menu"
-            groups="pharma_dp_admin,pharma_br_admin"
+            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
             sequence="20"/>
 
 
@@ -630,8 +629,8 @@
             name="To invoice"
             action="droga_sales_pharmacy_action_to_invoice"
             parent="droga_pharma.pharma_main_menu"
-            groups="pharma_br_admin,pharma_ip_admin"
-            sequence="20"/>
+            groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
+            sequence="21"/>
 
     <menuitem
             id="droga_sales_pharmacy_menu_so_and_invoice"
@@ -639,7 +638,7 @@
             action="droga_sales_pharmacy_action_so_and_invoice"
             parent="droga_pharma.pharma_main_menu"
             groups="pharma_di_admin"
-            sequence="20"/>
+            sequence="22"/>
 
 </odoo>
 

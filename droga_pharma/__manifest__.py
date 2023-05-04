@@ -25,7 +25,8 @@
         'views/droga_physio_sales.xml',
         'views/droga_pharmacy_sales.xml',
         'reports/daily_sales.xml',
-        'views/droga_physio_list.xml'
+        'views/droga_physio_list.xml',
+        'views/customers.xml'
     ],
 
     # any module necessary for this one to work correctly

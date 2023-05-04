@@ -1,4 +1,7 @@
-from odoo import models, fields
+import datetime
+
+from odoo import models, fields, api
+
 
 class droga_pharma_customer(models.Model):
     _inherit='res.partner'
@@ -7,7 +10,13 @@ class droga_pharma_customer(models.Model):
 
 class droga_pharma_customer_employees(models.Model):
     _name = 'droga.pharma.cust.employees'
+
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
+
     _rec_name = 'descr'
+    sales=fields.One2many('sale.order','customer_emp')
+    sales_detail=fields.One2many('sale.order.line',related='sales.order_line')
+
     descr = fields.Char('descr', compute='_get_descr')
     parent_customer = fields.Many2one('res.partner', string='Customer Name')
     employer_name = fields.Char(related='parent_customer.name', store=True)
@@ -15,9 +24,11 @@ class droga_pharma_customer_employees(models.Model):
     mobile = fields.Char('Mobile')
     gender = fields.Selection(
         [('Male', 'Male'), ('Female', 'Female')],
-        string='Gender')
+        string='Gender',tracking=True)
     job_position = fields.Char(string='Job position')
 
+    age = fields.Integer(compute='_compute_age')
+    dob = fields.Date('Date of birth', default=datetime.date.today(),tracking=True)
     additional_product_groups=fields.Many2many('product.category')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     max_amount=fields.Float(string='Max amount')
@@ -40,6 +51,19 @@ class droga_pharma_customer_employees(models.Model):
                 record.descr = name + record.employee_name
             except:
                 record.descr = record.employee_name if record.employee_name else ' '
+
+    @api.depends('dob')
+    def _compute_age(self):
+        for record in self:
+            if record.dob:
+                today = datetime.date.today()
+                # Check if the date has passed this year
+                if today.strftime("%m%d") >= record.dob.strftime("%m%d"):
+                    record['age'] = today.year - record.dob.year
+                else:
+                    record['age'] = today.year - record.dob.year - 1
+            else:
+                record['age'] = 0
 
 class droga_physiotherapist_list(models.Model):
     _name='droga.physiotherapist.list'
