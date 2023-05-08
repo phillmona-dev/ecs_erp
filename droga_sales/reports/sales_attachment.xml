@@ -20,6 +20,45 @@
 
             <t t-call="web.basic_layout">
 
+                <style type="text/css">
+
+                    /* Default left, right, top, bottom margin is 2cm */
+                    @page {
+                    size: A4 portrait;
+                    margin-top: 0cm;
+                    margin-left:1cm;
+                    margin-right:1cm;
+                    margin-bottom:1cm;
+                    }
+
+                    @media print
+                    {
+                    #non-printable { visibility: hidden; }
+                    #wrapwrap { visibility: visible; }
+                    }
+
+                    .nopadding {
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    }
+
+                    .padding1 {
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    }
+
+                    .table_morecondensed>thead>tr>th,
+                    .table_morecondensed>tbody>tr>th,
+                    .table_morecondensed>tfoot>tr>th,
+                    .table_morecondensed>thead>tr>td,
+                    .table_morecondensed>tbody>tr>td,
+                    .table_morecondensed>tfoot>tr>td{ padding: 1px; }
+
+                    .top5 { margin-top:15px; }
+
+
+                </style>
+
                 <t t-foreach="docs" t-as="o">
 
                     <!-- Store and Sales Represnetataives -->
@@ -35,6 +74,7 @@
                         <t t-set="order_from" t-value="sale_order.order_from"/>
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
                         <t t-set="customer_name" t-value="sale_order.cust_name"/>
+                        <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                     </t>
 
                     <div class="header">
@@ -157,7 +197,7 @@
                             <br/>
 
 
-                            <table class="table  table-bordered table-sm o_main_table "
+                            <table class="table  table-bordered table-sm table_morecondensed "
                                    style="page-break-inside: avoid;">
                                 <tr>
                                     <td>
@@ -198,7 +238,10 @@
                                     <td>
                                         <strong>ID No.:</strong>
                                     </td>
-                                    <td colspan="2"></td>
+                                    <td colspan="2">
+                                        <strong>Payment Term.:</strong>
+                                        <span class="small" t-esc="o.invoice_payment_term_id.name"/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -217,7 +260,7 @@
                                 <span style="font-size:120px; transform: rotate(45deg);  ">Attachement</span>
                             </div>
 
-                            <table class="table table-bordered o_main_table table-sm ">
+                            <table class="table table-bordered o_main_table table-sm table_morecondensed">
                                 <thead class="thead-dark">
                                     <tr>
 
@@ -318,6 +361,28 @@
 
                                         </td>
                                         <td>
+                                            <strong t-esc="'{0:,.2f}'.format(o.amount_untaxed)"
+                                                    class="small"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="is-subtotal text-end">
+
+                                        <td colspan="7">
+                                            <strong class="mr16">Withholding</strong>
+
+                                        </td>
+                                        <td>
+                                            <strong t-esc="'{0:,.2f}'.format(withholding_amt)"
+                                                    class="small"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="is-subtotal text-end">
+
+                                        <td colspan="7">
+                                            <strong class="mr16">Net Total</strong>
+
+                                        </td>
+                                        <td>
                                             <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
                                                     class="small"/>
                                         </td>
@@ -328,62 +393,58 @@
                             </table>
 
 
-                            <br/>
-                            <div id="informations" class="row mt32 mb32">
+                            <div id="informations" class="row mt32 mb32 pb-2">
                                 <div class="col-12 bm-2">
-                                    <strong>Total Amount in Words:</strong>
-                                    <span t-esc="o.total_amount_word"/>
+                                    <strong class="small">Total Amount in Words:</strong>
+                                    <span class="small" t-esc="o.total_amount_word"/>
                                 </div>
                             </div>
-                            <br/>
                             <div id="informations" class="row mt32 mb32">
                                 <div class="col-12 bm-2">
-                                    <strong>I received the above goods/services in good
+                                    <strong class="small nopadding">I received the above goods/services in good
                                         condition._______________________________
                                     </strong>
                                 </div>
                             </div>
-                            <br/>
-                            <div id="informations" class="row mt32 mb32">
+                            <div id="informations" class="row mt32 mb32 pb-1">
                                 <div class="col-12 bm-2">
-                                    <span>Memo / Note:</span>
+                                    <span class="small">Memo / Note:</span>
                                 </div>
                             </div>
                             <hr></hr>
                             <div id="informations" class="row mt32 mb32">
                                 <div class="col-6 bm-2">
-                                    <span>Prepared By :</span>
-                                    <u t-esc="o.create_uid.name"/>
+                                    <span class="small">Prepared By :</span>
+                                    <u class="small" t-esc="o.create_uid.name"/>
                                 </div>
                                 <div class="col-6 bm-2">
-                                    <span>Checked By :________________________</span>
-                                </div>
-                            </div>
-                            <br/>
-                            <div id="informations" class="row mt32 mb32">
-                                <div class="col-6 bm-2">
-                                    <span>Approved By :________________________</span>
-                                </div>
-                                <div class="col-6 bm-2">
-                                    <span>Received By :________________________</span>
+                                    <span class="small">Checked By :________________________</span>
                                 </div>
                             </div>
-                            <br/>
                             <div id="informations" class="row mt32 mb32">
                                 <div class="col-6 bm-2">
-                                    <span>Signature :___________________________</span>
+                                    <span class="small">Approved By :________________________</span>
+                                </div>
+                                <div class="col-6 bm-2">
+                                    <span class="small">Received By :________________________</span>
+                                </div>
+                            </div>
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-6 bm-2">
+                                    <span class="small">Signature :___________________________</span>
                                 </div>
 
                             </div>
                             <hr></hr>
                             <div id="informations" class="row mt32 mb32">
                                 <div class="col-12 bm-2 text-center">
-                                    <strong>This receipt is not valid unless the fiscal receipt is attached!</strong>
+                                    <strong class="small">This receipt is not valid unless the fiscal receipt is
+                                        attached!
+                                    </strong>
 
                                 </div>
 
                             </div>
-                            <br/>
                             <div id="informations" class="row mt32 mb32">
                                 <div class="col-12 bm-2 text-center">
                                     <span t-esc="o.FPMachineID"/>
@@ -494,7 +555,7 @@
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
                         <t t-set="customer_name" t-value="sale_order.cust_name"/>
                         <t t-set="customer_id" t-value="sale_order.cust_id"/>
-
+                        <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                     </t>
 
                     <div class="header">
@@ -669,7 +730,10 @@
                                     <strong class="small">ID No.:</strong>
                                     <t class="small" t-esc="customer_id"/>
                                 </td>
-                                <td colspan="2"></td>
+                                <td colspan="2">
+                                    <strong>Payment Term.:</strong>
+                                    <span class="small" t-esc="o.invoice_payment_term_id.name"/>
+                                </td>
                             </tr>
                             <tr>
                                 <td colspan="2">
@@ -773,6 +837,28 @@
 
                                     <td colspan="5">
                                         <strong class="mr16">Grand Total</strong>
+
+                                    </td>
+                                    <td>
+                                        <strong t-esc="'{0:,.2f}'.format(o.amount_untaxed)"
+                                                class="small"/>
+                                    </td>
+                                </tr>
+                                <tr class="is-subtotal text-end">
+
+                                    <td colspan="5">
+                                        <strong class="mr16">Withholding</strong>
+
+                                    </td>
+                                    <td>
+                                        <strong t-esc="'{0:,.2f}'.format(withholding_amt)"
+                                                class="small"/>
+                                    </td>
+                                </tr>
+                                <tr class="is-subtotal text-end">
+
+                                    <td colspan="5">
+                                        <strong class="mr16">Net Total</strong>
 
                                     </td>
                                     <td>
