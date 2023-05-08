@@ -76,6 +76,6 @@
             name="Sales summary report"
             action="droga_sales_summary_action"
             parent="droga_sales.droga_sales_reports_menu"
-            groups="droga_crm.crm_sr"
+            groups="droga_crm.crm_sr,sales_team.group_sale_salesman"
             sequence="17"/>
 </odoo>

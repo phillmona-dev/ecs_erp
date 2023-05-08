@@ -26,7 +26,14 @@
         'views/droga_pharmacy_sales.xml',
         'reports/daily_sales.xml',
         'views/droga_physio_list.xml',
-        'views/customers.xml'
+        'views/customers.xml',
+        'views/children.xml',
+        'views/rewards/droga_pharma_reward_gain_settings.xml',
+        'views/rewards/droga_pharma_breast_feed_cont_type.xml',
+        'views/rewards/droga_pharma_reward_issue_settings.xml',
+        'views/rewards/droga_pharma_referral_gain_settings.xml',
+        'views/rewards/droga_pharma_higher_value_settings.xml',
+        'views/inventory/droga_pharma_inventory_menus.xml'
     ],
 
     # any module necessary for this one to work correctly

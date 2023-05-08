@@ -310,6 +310,13 @@ class droga_stock_move_extension(models.Model):
 
     reserved_qty=fields.Float('Reserved qty',default=0,tracking=True)
 
+    def update_stock_res_qty(self):
+        to_update=self.env['stock.move'].search([('reserve_indef','=',False),('reserved_qty','!=',0),
+                                                 ('state','not in',['done','cancel','draft'])])
+        for upd in to_update:
+            if upd['reservation_discard_time']<datetime.now():
+                upd.write({'reserved_qty':0})
+
     def _search_has_access(self, operator, value):
 
         if operator == '=':

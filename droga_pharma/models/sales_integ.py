@@ -7,6 +7,7 @@ class sales_integ(models.Model):
     _inherit = 'sale.order'
     cust_details = fields.Boolean(default=False, string='Customer Details')
     customer_emp=fields.Many2one('droga.pharma.cust.employees',string='Customer Name', domain="[('parent_customer','=',partner_id)]")
+    points_gained=fields.Float('Points gained')
     dob = fields.Date('Date of birth', default=datetime.date.today(),related='customer_emp.dob')
     age = fields.Integer(compute='_compute_age',related='customer_emp.age')
     sex = fields.Selection(

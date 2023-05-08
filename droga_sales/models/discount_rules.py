@@ -177,10 +177,11 @@ class sale_order_line(models.Model):
             #Order_type is used for import sales
             if self.order_id.order_type:
                 used_under = ['IM', 'All']
-            elif self.order_id.order_from.startswith('PH'):
-                used_under = ['PH', 'All']
-            else:
+            elif self.order_id.order_from:
                 used_under = ['PT', 'All']
+            else:
+                #For some reason, order from is coming up empty for pharmacy
+                used_under = ['PH', 'All']
 
         for line in self:
             if not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:

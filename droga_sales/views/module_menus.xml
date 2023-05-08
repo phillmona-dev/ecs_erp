@@ -13,7 +13,11 @@
               parent="sale.sale_order_menu"
               sequence="10"/>
 
-
+    <menuitem id="sale.menu_sale_report"
+            name="Reporting"
+            action="sale.action_order_report_all"
+            groups="droga_crm.non_existent_group"
+            sequence="40"/>
 
     <record id="droga_sales_matured_customers_action" model="ir.actions.act_window">
         <field name="name">Matured customers</field>

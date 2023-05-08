@@ -91,7 +91,7 @@
             id="droga_sales_reports_menu"
             name="Reports"
             parent="sale.sale_menu_root"
-            groups="droga_crm.crm_sr"
+            groups="droga_crm.crm_sr,sales_team.group_sale_salesman"
             sequence="21"/>
 
     <menuitem
@@ -99,6 +99,6 @@
             name="Sales detail report"
             action="droga_sales_detail_action"
             parent="droga_sales.droga_sales_reports_menu"
-            groups="droga_crm.crm_sr"
+            groups="droga_crm.crm_sr,sales_team.group_sale_salesman"
             sequence="17"/>
 </odoo>

@@ -110,6 +110,6 @@
             name="Sales waiter report"
             action="droga_sales_waiteraction"
             parent="droga_sales.droga_sales_reports_menu"
-            groups="droga_crm.crm_sr"
+            groups="droga_crm.crm_sr,sales_team.group_sale_salesman"
             sequence="17"/>
 </odoo>

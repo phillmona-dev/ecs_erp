@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="droga_pharma_discount_high_value_action" model="ir.actions.act_window">
+        <field name="name">Discount settings per high value</field>
+        <field name="res_model">droga.pharma.high.value.pruchase</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_pharma_discount_high_value_tree" model="ir.ui.view">
+        <field name="name">droga.pharma.high.value.pruchase.view.tree</field>
+        <field name="model">droga.pharma.high.value.pruchase</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="discount"></field>
+                <field name="from_amt"></field>
+                <field name="to_amt"></field>
+                <field name="status"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_pharma_discount_high_value_form" model="ir.ui.view">
+        <field name="name">droga.pharma.high.value.pruchase.view.form</field>
+        <field name="model">droga.pharma.high.value.pruchase</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <field name="from_amt"></field>
+                        <field name="to_amt"></field>
+                        <field name="discount"></field>
+                        <field name="status"></field>
+                    </group>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <menuitem
+            id="droga_pharma_discount_high_value_menu"
+            name="Discount settings per high value"
+            action="droga_pharma_discount_high_value_action"
+            parent="droga_pharma.droga_pharma_discount_settings"
+            sequence="12"/>
+</odoo>

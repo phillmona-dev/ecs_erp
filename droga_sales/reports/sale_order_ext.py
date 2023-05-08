@@ -40,11 +40,13 @@ class sales_report_det_fields(models.Model):
     itemdesc = fields.Char(related='product_id.name')
     itemcateg = fields.Many2one('product.category', related='product_id.categ_id')
 
-    invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount', store=True)
+    invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount', store=False)
     unit_cost=fields.Float('Unit Cost',compute='_get_cost')
     total_cost=fields.Float('Total Cost',compute='_get_cost')
     margin = fields.Float('Profit Margin', compute='_get_cost')
     margin_pct = fields.Float('Profit Margin %', compute='_get_cost')
+    fs_num=fields.Char(compute='_get_fs_num')
+
 
     def _get_cost(self):
         for rec in self:
@@ -60,6 +62,7 @@ class sales_report_det_fields(models.Model):
                 rec.total_cost=rec.qty_invoiced*rec.unit_cost
                 rec.margin=rec.invoiced_amt-rec.total_cost
                 rec.margin_pct=(rec.margin/rec.invoiced_amt)*100 if rec.invoiced_amt!=0 else 0
+    @api.depends('qty_invoiced','price_unit')
     def _get_invoiced_amount(self):
         for rec in self:
             rec.invoiced_amt = rec.qty_invoiced * rec.price_unit

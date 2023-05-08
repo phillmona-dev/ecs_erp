@@ -61,7 +61,7 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_inventory_stock_move_reservation_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('droga_inventory_stock_move_reservation_form')})]"/>
-        <field name="domain">[('has_read_access','=',True),('location_id.usage', '=', 'internal'),('location_dest_id.usage', '!=', 'internal'),('state','not in',['done','cancel','draft'])]</field>
+        <field name="domain">[('has_read_access','=',True),('origin','like','SO%'),('location_id.usage', '=', 'internal'),('location_dest_id.usage', '!=', 'internal'),('state','not in',['done','cancel','draft'])]</field>
     </record>
 
     <menuitem

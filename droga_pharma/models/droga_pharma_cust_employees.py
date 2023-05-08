@@ -26,7 +26,9 @@ class droga_pharma_customer_employees(models.Model):
         [('Male', 'Male'), ('Female', 'Female')],
         string='Gender',tracking=True)
     job_position = fields.Char(string='Job position')
-
+    profession=fields.Selection(
+        [('hp', 'Health professional'),('other', 'Other')],
+        string='Profession')
     age = fields.Integer(compute='_compute_age')
     dob = fields.Date('Date of birth', default=datetime.date.today(),tracking=True)
     additional_product_groups=fields.Many2many('product.category')
@@ -39,6 +41,22 @@ class droga_pharma_customer_employees(models.Model):
         [('Day', 'Day'), ('Month', 'Month'),('Year', 'Year')],
         string='Period type')
     remaining_amount_period=fields.Char(string='Remaining',compute='_remain_amount_period')
+    childs=fields.One2many('droga.pharma.child','parent',string='Childs')
+
+    def open_children(self):
+        return {
+            'name': 'Children',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.pharma.cust.employees',
+            'view_id': self.env.ref('droga_pharma.droga_pharma_children').id,
+            'type': 'ir.actions.act_window',
+
+            # This will pass the detail ID if a record is present
+            'res_id': self.id,
+            'target': 'new',
+        }
+
     def _remain_amount_period(self):
         for rec in self:
             rec.remaining_amount_period='FIX ME'
@@ -71,3 +89,13 @@ class droga_physiotherapist_list(models.Model):
     physiotherapist_name = fields.Many2one('hr.employee', string='Physiotherapist Name',required=True)
     branch=fields.Selection([('PT-4 Kilo', '4 kilo branch'), ('PT-Bole', 'Bole branch')], required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active')
+
+class droga_pharma_child_list(models.Model):
+    _name='droga.pharma.child'
+    gender = fields.Selection(
+        [('Male', 'Male'), ('Female', 'Female')],
+        string='Child gender', tracking=True)
+    child_dob= fields.Date('Child dob', default=datetime.date.today(),tracking=True)
+    child_name=fields.Char('Child name')
+    breast_feed_days=fields.Float('Breastfeed period in days',default=180)
+    parent=fields.Many2one('droga.pharma.cust.employees',string='Parent')

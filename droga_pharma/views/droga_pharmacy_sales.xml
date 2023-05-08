@@ -630,7 +630,7 @@
             action="droga_sales_pharmacy_action_to_invoice"
             parent="droga_pharma.pharma_main_menu"
             groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
-            sequence="21"/>
+            sequence="23"/>
 
     <menuitem
             id="droga_sales_pharmacy_menu_so_and_invoice"
@@ -638,7 +638,7 @@
             action="droga_sales_pharmacy_action_so_and_invoice"
             parent="droga_pharma.pharma_main_menu"
             groups="pharma_di_admin"
-            sequence="22"/>
+            sequence="25"/>
 
 </odoo>
 
