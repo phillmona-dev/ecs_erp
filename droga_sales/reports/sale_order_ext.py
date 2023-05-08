@@ -40,7 +40,7 @@ class sales_report_det_fields(models.Model):
     itemdesc = fields.Char(related='product_id.name')
     itemcateg = fields.Many2one('product.category', related='product_id.categ_id')
 
-    invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount', store=True)
+    invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount')
     unit_cost=fields.Float('Unit Cost',compute='_get_cost')
     total_cost=fields.Float('Total Cost',compute='_get_cost')
     margin = fields.Float('Profit Margin', compute='_get_cost')
