@@ -836,7 +836,7 @@
                                 <tr class="is-subtotal text-end">
 
                                     <td colspan="5">
-                                        <strong class="mr16">Grand Total</strong>
+                                        <strong class="mr16 small">Grand Total</strong>
 
                                     </td>
                                     <td>
@@ -847,7 +847,7 @@
                                 <tr class="is-subtotal text-end">
 
                                     <td colspan="5">
-                                        <strong class="mr16">Withholding</strong>
+                                        <strong class="mr16 small">Withholding</strong>
 
                                     </td>
                                     <td>
@@ -858,7 +858,7 @@
                                 <tr class="is-subtotal text-end">
 
                                     <td colspan="5">
-                                        <strong class="mr16">Net Total</strong>
+                                        <strong class="mr16 small">Net Total</strong>
 
                                     </td>
                                     <td>
