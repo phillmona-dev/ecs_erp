@@ -365,28 +365,32 @@
                                                     class="small"/>
                                         </td>
                                     </tr>
-                                    <tr class="is-subtotal text-end">
+                                    <t t-if="withholding_amt!=0">
+                                        <tr class="is-subtotal text-end">
 
-                                        <td colspan="7">
-                                            <strong class="mr16">Withholding</strong>
+                                            <td colspan="7">
+                                                <strong class="mr16">Withholding</strong>
 
-                                        </td>
-                                        <td>
-                                            <strong t-esc="'{0:,.2f}'.format(withholding_amt)"
-                                                    class="small"/>
-                                        </td>
-                                    </tr>
-                                    <tr class="is-subtotal text-end">
+                                            </td>
+                                            <td>
+                                                <strong t-esc="'{0:,.2f}'.format(withholding_amt)"
+                                                        class="small"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="withholding_amt!=0">
+                                        <tr class="is-subtotal text-end">
 
-                                        <td colspan="7">
-                                            <strong class="mr16">Net Total</strong>
+                                            <td colspan="7">
+                                                <strong class="mr16">Net Total</strong>
 
-                                        </td>
-                                        <td>
-                                            <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
-                                                    class="small"/>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                            <td>
+                                                <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
+                                                        class="small"/>
+                                            </td>
+                                        </tr>
+                                    </t>
 
                                 </tbody>
 
@@ -844,28 +848,32 @@
                                                 class="small"/>
                                     </td>
                                 </tr>
-                                <tr class="is-subtotal text-end">
+                                <t t-if="withholding_amt!=0">
+                                    <tr class="is-subtotal text-end">
 
-                                    <td colspan="5">
-                                        <strong class="mr16 small">Withholding</strong>
+                                        <td colspan="5">
+                                            <strong class="mr16 small">Withholding</strong>
 
-                                    </td>
-                                    <td>
-                                        <strong t-esc="'{0:,.2f}'.format(withholding_amt)"
-                                                class="small"/>
-                                    </td>
-                                </tr>
-                                <tr class="is-subtotal text-end">
+                                        </td>
+                                        <td>
+                                            <strong t-esc="'{0:,.2f}'.format(withholding_amt)"
+                                                    class="small"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="withholding_amt!=0">
+                                    <tr class="is-subtotal text-end">
 
-                                    <td colspan="5">
-                                        <strong class="mr16 small">Net Total</strong>
+                                        <td colspan="5">
+                                            <strong class="mr16 small">Net Total</strong>
 
-                                    </td>
-                                    <td>
-                                        <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
-                                                class="small"/>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td>
+                                            <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
+                                                    class="small"/>
+                                        </td>
+                                    </tr>
+                                </t>
 
                             </tbody>
 
