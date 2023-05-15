@@ -318,7 +318,7 @@
                             data-hotkey="v" invisible="1"/>
 
                     <button name="draft_request" type="object" states="CEO Approval" string="Draft" id="draft_request1"
-                            data-hotkey="v" invisible="1" confirm="Are you sure? Once the state is changed to draft the RFQ needs to be approved again. "/>
+                            data-hotkey="v" invisible="0" groups="droga_procurement.group_purchase_procurement_manager_group" confirm="Are you sure? Once the state is changed to draft the RFQ needs to be approved again. "/>
 
 
                     <button name="reject_request" type="object" states="Winner Picked,Checked,Operation Manager,Finance"
