@@ -107,7 +107,7 @@ class Rfq(models.Model):
     total_amount_etb = fields.Float("Total Amount ETB", compute='_compute_total_amount', store=True)
     total_amount_usd = fields.Float("Total Amount USD", compute='_compute_total_amount', store=True)
 
-    @api.depends("name", "purhcase_request_id")
+    @api.depends("name", "purhcase_request_id","rfq_lines.product_qty","rfq_lines.unit_price_foregin")
     def _compute_total_amount(self):
 
         for rec in self:
