@@ -107,10 +107,25 @@ class Rfq(models.Model):
     total_amount_etb = fields.Float("Total Amount ETB", compute='_compute_total_amount', store=True)
     total_amount_usd = fields.Float("Total Amount USD", compute='_compute_total_amount', store=True)
 
-    @api.depends("name", "purhcase_request_id","rfq_lines.product_qty","rfq_lines.unit_price_foregin")
+    @api.depends("name", "purhcase_request_id", "rfq_lines.product_qty", "rfq_lines.unit_price_foregin")
     def _compute_total_amount(self):
 
         for rec in self:
+            total_amount_etb = 0
+            total_amount_usd = 0
+
+            for record in rec.rfq_lines:
+                total_amount_etb += record.total_price
+                total_amount_usd += record.total_price_foregin
+
+            rec.total_amount_etb = total_amount_etb
+            rec.total_amount_usd = total_amount_usd
+
+    def update_total_amount(self):
+
+        records = self.env["droga.purhcase.request.rfq"].search([])
+
+        for rec in records:
             total_amount_etb = 0
             total_amount_usd = 0
 
