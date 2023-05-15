@@ -317,7 +317,7 @@
                     <button name="draft_request" type="object" states="Winner Picked" string="Draft" id="draft_request"
                             data-hotkey="v" invisible="1"/>
 
-                    <button name="draft_request1" type="object" states="CEO Approval" string="Draft" id="draft_request"
+                    <button name="draft_request" type="object" states="CEO Approval" string="Draft" id="draft_request1"
                             data-hotkey="v" invisible="1" confirm="Are you sure? Once the state is changed to draft the RFQ needs to be approved again. "/>
 
 
