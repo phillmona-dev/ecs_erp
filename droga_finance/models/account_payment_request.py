@@ -97,6 +97,8 @@ class PaymentRequest(models.Model):
     approvals = fields.One2many(
         'studio.approval.entry', 'res_id', string='Approvals')
 
+    budget_rem_balance = fields.Float("Remaining Balance", compute="_compute_budget_rem_balance")
+
     @api.model
     def create(self, vals):
 
@@ -383,3 +385,29 @@ class PaymentRequest(models.Model):
         word += " only"
 
         return word.title()
+
+    def _compute_budget_rem_balance(self):
+        now = datetime.today().date()
+
+        if now.month >= 7 and now.day >= 7:
+            date_from = datetime(now.year, 7, 8)
+            date_to = datetime(now.year + 1, 7, 7)
+        else:
+            date_from = datetime(now.year - 1, 7, 8)
+            date_to = datetime(now.year, 7, 7)
+
+        for record in self:
+            record.budget_rem_balance = 0
+            # get budget from remaining budget
+            if record.budgetary_position.id and record.costc.id and record.budget_account.id:
+                self.env.cr.execute("""select distinct b.account,a.general_budget_id,a.analytic_account_id,sum(b.remaining_balance) as remaining_balance from crossovered_budget_lines a 
+            inner join crossovered_budget_lines_detail b on a.id=b.budgetary_position_id 
+            where a.general_budget_id=%s and a.analytic_account_id=%s and b.account=%s and (a.date_from>=%s and a.date_to<=%s)
+            group by b.account,a.general_budget_id,a.analytic_account_id """, (
+                    record.budgetary_position.id, record.costc.id, record.budget_account.id,
+                    date_from, date_to))
+                res = self.env.cr.dictfetchone()
+
+                # update remaining balance
+                if res != None:
+                    record.budget_rem_balance = res['remaining_balance']
