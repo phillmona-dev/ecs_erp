@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.tools import drop_view_if_exists
 
 
 class ApproverName(models.Model):
@@ -7,14 +8,14 @@ class ApproverName(models.Model):
 
     res_id = fields.Integer("res_id")
     create_uid = fields.Many2one("res.users")
-    model = fields.Char("Model")
+    models = fields.Char("Model")
     state = fields.Char("State")
 
     def get_approver(self, res_id, model, state):
         name = ''
 
         self.env.cr.execute(
-            """select * from droga_approver_name_view where  res_id=%s and model=%s and state=%s """, (res_id, model, state))
+            """select * from droga_approver_name_view where  res_id=%s and models=%s and state=%s """, (res_id, model, state))
         results = self.env.cr.dictfetchall()
 
         if results:
@@ -24,10 +25,11 @@ class ApproverName(models.Model):
             return ''
 
     def init(self):
+        drop_view_if_exists(self.env.cr, 'droga_approver_name_view')
         self._cr.execute(""" 
               create or replace view droga_approver_name_view as 
               (
-                   select distinct res_id,max(a.create_uid) as create_uid,model,new_value_char as state from mail_message a inner join mail_tracking_value b on a.id=b.mail_message_id
+                   select distinct res_id,max(a.create_uid) as create_uid,model as models,new_value_char as state from mail_message a inner join mail_tracking_value b on a.id=b.mail_message_id
                     group by res_id,model,new_value_char
               )
            """)
