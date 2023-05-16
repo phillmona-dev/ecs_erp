@@ -29,7 +29,7 @@ class ApproverName(models.Model):
         self._cr.execute(""" 
               create or replace view droga_approver_name_view as 
               (
-                   select distinct res_id,max(a.create_uid) as create_uid,model as models,new_value_char as state from mail_message a inner join mail_tracking_value b on a.id=b.mail_message_id
+                   select distinct res_id,max(a.create_uid) as create_uid,models,new_value_char as state from mail_message a inner join mail_tracking_value b on a.id=b.mail_message_id
                     group by res_id,model,new_value_char
               )
            """)
