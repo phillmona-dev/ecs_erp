@@ -19,12 +19,13 @@
 
     # always loaded
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/droga_project_view.xml',
         'views/droga_subtask_veiw.xml',
         'views/droga_header_footer_template.xml',
-        'views/droga_setting_view.xml',
         'report/droga_project_list.xml',
+        'views/droga_contractor.xml',
     ],
     # any module necessary for this one to work correctly
 
