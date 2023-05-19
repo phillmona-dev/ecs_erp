@@ -415,6 +415,25 @@ class purhcase_request(models.Model):
                           author_id=self.env.user.partner_id.id, subtype_id=subtype_id,
                           notification_ids=notification_ids)
 
+    def change_product_from_droga_to_ema(self):
+        records = self.env['droga.purhcase.request.line'].search([('company_id', '=', 2)])
+
+        for rec in records:
+            # search product id from ema
+            products = self.env['product.product'].search([('name', '=', rec.product_id.name)])
+            for product in products:
+                if product.company_id.id == 2:
+                    rec.product_id = product
+
+        records1=self.env['droga.purhcase.request.rfq.line'].search([('company_id', '=', 2)])
+
+        for rec in records1:
+            # search product id from ema
+            products = self.env['product.product'].search([('name', '=', rec.product_id.name)])
+            for product in products:
+                if product.company_id.id == 2:
+                    rec.product_id = product
+
 
 class purhcase_request_line(models.Model):
     _name = "droga.purhcase.request.line"
