@@ -223,6 +223,7 @@ class Rfq_Local(models.Model):
             for supplier in suppliers:
                 vals = {'name': 'New', 'state': 'draft', 'date_order': datetime.now(),
                         'rfq_local_id': supplier.rfq_id.id,
+                        'company_id':self.company_id.id,
                         'partner_id': supplier.supplier_id.id, 'request_type': 'Local', 'order_line': []}
 
                 # get products the supplier won
