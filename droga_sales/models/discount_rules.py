@@ -87,20 +87,21 @@ class sale_order_line(models.Model):
 
     @api.depends('product_id', 'order_id.order_type', 'product_uom')
     def _is_prod_available(self):
-        for rec in self:
+        selfsud = self.sudo()
+        for rec in selfsud:
             rec.available_qty = 0
 
             if rec.order_id.order_from == 'PH':
                 wh_list = rec.order_id.wareh
             else:
-                wh_list = self.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
+                wh_list = selfsud.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
 
             for wh in wh_list:
                 rate = rec.product_uom.factor / (
                     rec.product_id.uom_id.factor if rec.product_id.uom_id.factor != 0 else (
                         rec.product_uom.factor if rec.product_uom.factor != 0 else 1))
-                rec.available_qty = rec.available_qty + ((self._get_avail_qty_per_warehouse(rec.product_id,
-                                                                                            wh) - self._get_outgoing_qty_per_warehouse(
+                rec.available_qty = rec.available_qty + ((selfsud._get_avail_qty_per_warehouse(rec.product_id,
+                                                                                               wh) - selfsud._get_outgoing_qty_per_warehouse(
                     rec.product_id, wh)) * (rate))
                 # rec.available_qty=rec.available_qty*(rec.product_uom.factor/rec.product_id.uom_id.factor)
                 rec.avail_char = str(rec.available_qty)
@@ -108,7 +109,7 @@ class sale_order_line(models.Model):
 
             if rec.product_id.detailed_type == 'service':
                 rec.is_prod_available = 'True'
-            elif not rec.product_id.bought_locally and rec.available_qty < rec.product_uom_qty:
+            elif (not rec.product_id.bought_locally) and rec.available_qty < rec.product_uom_qty:
                 rec.is_prod_available = 'False'
             # This is for out of stock products that are bought locally, they'll show up with orange color
             elif rec.product_id.bought_locally and rec.available_qty < rec.product_uom_qty:
@@ -117,8 +118,8 @@ class sale_order_line(models.Model):
                 rec.is_prod_available = 'True'
 
     def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
-        self = self.sudo()
-        moves = self.env['stock.move'].search(
+        selfsud = self.sudo()
+        moves = selfsud.env['stock.move'].search(
             [('product_id', '=', product_id.id), ('location_id.warehouse_id', '=', warehouse_id.id),
              ('location_id.usage', '=', 'internal'), ('location_dest_id.usage', '!=', 'internal'),
              ('state', 'not in', ['done', 'cancel', 'draft'])])
@@ -126,11 +127,11 @@ class sale_order_line(models.Model):
 
     def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):
 
-        self = self.sudo()
+        selfsud = self.sudo()
         tot_quantity = 0.0
-        for location_id in self.env['stock.location'].search(
+        for location_id in selfsud.env['stock.location'].search(
                 [('warehouse_id', '=', warehouse_id.id), ('usage', '=', 'internal')]):
-            quants = self.env['stock.quant'].search(
+            quants = selfsud.env['stock.quant'].search(
                 [('product_id', '=', product_id.id), ('location_id', '=', location_id.id)])
             tot_quantity = tot_quantity + sum(quants.mapped('quantity'))
         return tot_quantity
@@ -475,6 +476,8 @@ class sale_order_ext(models.Model):
         return returnv
 
     def validate_form(self):
+        if self.state=="sale":
+            return
         message = ''
 
         order_lines_nowareh = self.order_line.filtered(
