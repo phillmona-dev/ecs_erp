@@ -441,6 +441,7 @@ class Rfq(models.Model):
                     'rfq_id': self.id,
                     'partner_id': supplier.id,
                     'request_type': self.request_type,
+                    'company_id':self.company_id.id,
                     'bank': bank.id if bank else None,
                     'branch': bank_branch if bank_branch else None,
                     'currency_approved_date': approved_date if approved_date else None
