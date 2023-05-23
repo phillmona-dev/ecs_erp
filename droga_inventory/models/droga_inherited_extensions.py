@@ -501,6 +501,10 @@ class droga_stock_picking_extension(models.Model):
     def button_validate(self):
         if self.trans_issue_request:
             self.trans_issue_request.write({'state': 'processed'})
+        sender=self.env['stock.picking'].search([('name','=',self.origin)])
+        if len(sender)>0:
+            if sender[0].trans_issue_request.state=="processed":
+                sender[0].trans_issue_request.write({'state': 'done'})
         if self.office_request:
             self.office_request.write({'state': 'processed'})
         if self.cons_sample_issue_request:
