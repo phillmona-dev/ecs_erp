@@ -18,6 +18,11 @@
                 <field name="cust_location" string="City"></field>
                 <field name="qty_invoiced" string="Qty"></field>
                 <field name="invoiced_amt" string="Grand Total"></field>
+                <field name="qty_delivered"></field>
+                <field name="unit_cost" groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group"></field>
+                <field name="total_cost" groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group"></field>
+                <field name="margin" groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group"></field>
+                <field name="margin_pct" groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group"></field>
                 <field name="invoice_date" string="Invoice Date"></field>
 
                 <field name="product_uom" string="UOM" optional="hide"></field>
@@ -27,7 +32,6 @@
                 <field name="order_from_det" optional="hide"></field>
                 <field name="payment_term_det" optional="hide"></field>
 
-                <field name="qty_delivered" optional="hide"></field>
                 <field name="product_uom_qty" string="Qty ordered" optional="hide"></field>
 
                 <field name="store_placement" optional="hide"></field>
@@ -106,6 +110,6 @@
             name="Sales waiter report"
             action="droga_sales_waiteraction"
             parent="droga_sales.droga_sales_reports_menu"
-            groups="droga_crm.crm_sr"
+            groups="droga_crm.crm_sr,sales_team.group_sale_salesman"
             sequence="17"/>
 </odoo>

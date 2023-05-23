@@ -230,7 +230,9 @@ class droga_cons_inherit_detail(models.Model):
         for rec in self:
             rec.tot_cost=rec.proc_cost*rec.product_uom_qty
     def write(self, vals):
-        result = super(droga_cons_inherit_detail, self).create(vals)
+        if self.company_id!=2:
+            return super(droga_cons_inherit_detail, self).write(vals)
+        result = super(droga_cons_inherit_detail, self).write(vals)
         if result.cons_header.subcontract_issue_origin_form:
             sale_details = result.subcontract_issue_origin_form.order_line
             raw_materials = self.env['droga.export.items.composition.fin.goods'].search([('item', 'in',
@@ -243,6 +245,8 @@ class droga_cons_inherit_detail(models.Model):
 
     @api.model
     def create(self, vals):
+        if self.company_id!=2:
+            return super(droga_cons_inherit_detail, self).create(vals)
         result = super(droga_cons_inherit_detail, self).create(vals)
         if result.cons_header.subcontract_issue_origin_form:
             sale_details = result.cons_header.subcontract_issue_origin_form.order_line

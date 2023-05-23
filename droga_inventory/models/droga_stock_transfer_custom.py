@@ -94,6 +94,12 @@ class droga_stock_transfer_custom(models.Model):
     def action_cancel(self):
         self.state='cancel'
 
+    def reset_order(self):
+        self.ensure_one()
+        self.set_activity_done()
+        self.state = 'draft'
+        for rec in self.transfer_picking:
+            rec.action_cancel()
     def amend(self):
         self.ensure_one()
         self.set_activity_done()
@@ -210,12 +216,30 @@ class droga_stock_transfer_custom_detail(models.Model):
     @api.depends('location_source_id', 'product_uom_qty', 'product_id', 'product_uom')
     def get_count(self):
         for rec in self:
-            try:
-                rec.available_qty = self.env['stock.quant']._get_available_quantity(rec.product_id,
-                                                                                    rec.location_source_id) * rec.product_uom.factor
+            rate = rec.product_uom.factor / (
+                rec.product_id.uom_id.factor if rec.product_id.uom_id.factor != 0 else (
+                    rec.product_uom.factor if rec.product_uom.factor != 0 else 1))
+            rec.available_qty = rec.available_qty + ((self._get_avail_qty_per_warehouse(rec.product_id,
+                                                                                           rec.warehouse_id) - self._get_outgoing_qty_per_warehouse(
+                rec.product_id, rec.warehouse_id)) * (rate))
+    def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
+        selfsud = self.sudo()
+        moves = selfsud.env['stock.move'].search(
+            [('product_id', '=', product_id.id), ('location_id.warehouse_id', '=', warehouse_id.id),
+             ('location_id.usage', '=', 'internal'), ('location_dest_id.usage', '!=', 'internal'),
+             ('state', 'not in', ['done', 'cancel', 'draft'])])
+        return sum(moves.mapped('reserved_qty'))
 
-            except Exception as e:
-                rec.available_qty = 0
+    def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):
+
+        selfsud = self.sudo()
+        tot_quantity = 0.0
+        for location_id in selfsud.env['stock.location'].search(
+                [('warehouse_id', '=', warehouse_id.id), ('usage', '=', 'internal')]):
+            quants = selfsud.env['stock.quant'].search(
+                [('product_id', '=', product_id.id), ('location_id', '=', location_id.id)])
+            tot_quantity = tot_quantity + sum(quants.mapped('quantity'))
+        return tot_quantity
 
     @api.depends('product_id')
     def get_uom(self):

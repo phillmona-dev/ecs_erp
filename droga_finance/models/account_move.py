@@ -37,6 +37,8 @@ class AccountMove(models.Model):
     customer_category = fields.Char("Customer Category", store=True, compute='_get_sales_info')
     due_date_in_days = fields.Integer("Due Days", store=True, compute='update_due_days')
 
+    sales_type = fields.Char("Sales Type", readonly=True)
+
     # picking list for vendor invoice
     picking_list = fields.One2many('stock.picking', compute='get_picking_list')
 

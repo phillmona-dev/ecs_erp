@@ -20,15 +20,17 @@ class HrContract(models.Model):
 
     # get contract rate
     def get_employee_rate(self, payment_code):
-        rate = 0
+        amount = 0
         for record in self:
             if record.custom_salary_structure:  # get rate from custom salary structure
-                rates = record.salary_structure_custom.salary_detail.search([('payment_type.code', '=', payment_code)])
+                rates = record.salary_structure_custom.salary_detail
                 for rate in rates:
-                    rate = rate.amount
+                    if rate.payment_type.code == payment_code:
+                        amount = rate.amount
             else:  # get rate from main salary structure
-                rates = record.salary_structure.salary_detail.search([('payment_type.code', '=', payment_code)])
+                rates = record.salary_structure.salary_detail
                 for rate in rates:
-                    rate = rate.amount
+                    if rate.payment_type.code == payment_code:
+                        amount = rate.amount
 
-        return rate
+        return amount

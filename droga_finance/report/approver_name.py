@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.tools import drop_view_if_exists
 
 
 class ApproverName(models.Model):
@@ -24,10 +25,11 @@ class ApproverName(models.Model):
             return ''
 
     def init(self):
+        drop_view_if_exists(self.env.cr, 'droga_approver_name_view')
         self._cr.execute(""" 
               create or replace view droga_approver_name_view as 
               (
-                   select distinct res_id,max(a.create_uid) as create_uid,model,new_value_char as state from mail_message a inner join mail_tracking_value b on a.id=b.mail_message_id
-                    group by res_id,model,new_value_char
+                   select distinct res_id,max(a.create_uid) as create_uid,a.model,new_value_char as state from mail_message a inner join mail_tracking_value b on a.id=b.mail_message_id
+                    group by res_id,a.model,new_value_char
               )
            """)

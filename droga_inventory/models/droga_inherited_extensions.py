@@ -310,6 +310,13 @@ class droga_stock_move_extension(models.Model):
 
     reserved_qty=fields.Float('Reserved qty',default=0,tracking=True)
 
+    def update_stock_res_qty(self):
+        to_update=self.env['stock.move'].search([('reserve_indef','=',False),('reserved_qty','!=',0),
+                                                 ('state','not in',['done','cancel','draft'])])
+        for upd in to_update:
+            if upd['reservation_discard_time']<datetime.now():
+                upd.write({'reserved_qty':0})
+
     def _search_has_access(self, operator, value):
 
         if operator == '=':
@@ -494,6 +501,10 @@ class droga_stock_picking_extension(models.Model):
     def button_validate(self):
         if self.trans_issue_request:
             self.trans_issue_request.write({'state': 'processed'})
+        sender=self.env['stock.picking'].search([('name','=',self.origin)])
+        if len(sender)>0:
+            if sender[0].trans_issue_request.state=="processed":
+                sender[0].trans_issue_request.write({'state': 'done'})
         if self.office_request:
             self.office_request.write({'state': 'processed'})
         if self.cons_sample_issue_request:

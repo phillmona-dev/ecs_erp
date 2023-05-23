@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="droga_pharma_rewards_gain_action" model="ir.actions.act_window">
+        <field name="name">Rewards gain settings per purchase</field>
+        <field name="res_model">droga.pharma.reward.gain</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_pharma_rewards_gain_tree" model="ir.ui.view">
+        <field name="name">droga.pharma.reward.gain.view.tree</field>
+        <field name="model">droga.pharma.reward.gain</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="prod_group" widget="many2many_tags"></field>
+                <field name="points_to_gain"></field>
+                <field name="status"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_pharma_rewards_gain_form" model="ir.ui.view">
+        <field name="name">droga.pharma.reward.gain.view.form</field>
+        <field name="model">droga.pharma.reward.gain</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <field name="prod_group" widget="many2many_tags"></field>
+                        <field name="points_to_gain"></field>
+                        <field name="status"></field>
+                    </group>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <menuitem
+            id="droga_pharma_settings"
+            name="Settings"
+            parent="droga_pharma.pharma_main_menu"
+            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
+            sequence="35"/>
+
+    <menuitem
+            id="droga_pharma_reward_settings"
+            name="Reward settings"
+            parent="droga_pharma.droga_pharma_settings"
+            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
+            sequence="28"/>
+
+    <menuitem
+            id="droga_pharma_rewards_gain_menu"
+            name="Rewards gain settings per purchase"
+            action="droga_pharma_rewards_gain_action"
+            parent="droga_pharma.droga_pharma_reward_settings"
+            sequence="13"/>
+</odoo>

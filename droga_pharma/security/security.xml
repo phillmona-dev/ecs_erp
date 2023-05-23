@@ -1,32 +1,32 @@
 <odoo>
-    <record model="ir.module.category" id="crm_management">
+    <record model="ir.module.category" id="pharma_management">
         <field name="name">Pharmacy</field>
         <field name="description">User access level for Pharmacy branches</field>
         <field name="sequence">20</field>
     </record>
     <record id="pharma_br_admin" model="res.groups">
         <field name="name">Pharmacy branch admin</field>
-        <field name="category_id" ref="crm_management"/>
+        <field name="category_id" ref="pharma_management"/>
     </record>
 
     <record id="pharma_dp_admin" model="res.groups">
         <field name="name">Dispensing Pharmacist</field>
-        <field name="category_id" ref="crm_management"/>
+        <field name="category_id" ref="pharma_management"/>
     </record>
 
     <record id="pharma_ip_admin" model="res.groups">
         <field name="name">Invoicing Parmacist</field>
-        <field name="category_id" ref="crm_management"/>
+        <field name="category_id" ref="pharma_management"/>
     </record>
 
     <record id="pharma_di_admin" model="res.groups">
         <field name="name">DI Pharmacist</field>
-        <field name="category_id" ref="crm_management"/>
+        <field name="category_id" ref="pharma_management"/>
     </record>
 
       <record id="pharma_supply_chain_manager" model="res.groups">
         <field name="name">Supply Chain Manager</field>
-        <field name="category_id" ref="crm_management"/>
+        <field name="category_id" ref="pharma_management"/>
     </record>
 
 

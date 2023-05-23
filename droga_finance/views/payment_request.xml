@@ -128,6 +128,7 @@
                                    attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
                             <field name="budget_account" options="{'no_create':True,'no_open':True}"
                                    attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                            <field name="budget_rem_balance"/>
                         </group>
                     </group>
                 </sheet>

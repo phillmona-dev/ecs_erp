@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem
+            id="droga_pharma_inventory"
+            name="Inventory"
+            parent="droga_pharma.pharma_main_menu"
+            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
+            sequence="26"/>
+    <menuitem
+        action="stock.stock_picking_type_action"
+        id="droga_pharma_stock_picking_type_menu"
+        parent="droga_pharma.droga_pharma_inventory" sequence="0"
+        groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
+        name="Overview"/>
+    <menuitem
+            id="droga_pharma_transfer_menu"
+            name="Store transfer requests"
+            action="droga_inventory.droga_inventory_transfer_custom_action"
+            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
+            parent="droga_pharma.droga_pharma_inventory" sequence="1"/>
+</odoo>

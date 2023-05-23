@@ -10,7 +10,8 @@
                         icon="fa-list"/>
                 <button name="stockRequest" string="Stock Request" type="object" class="oe_stat_button"
                         icon="fa-list"/>
-
+                <button name="transferRequest" string="Transfer Request" type="object" class="oe_stat_button"
+                        icon="fa-list"/>
                 <button name="taskPaymentRequest" string="Task Payment Request" type="object" class="oe_stat_button"
                         icon="fa-list"/>
             </xpath>
@@ -22,12 +23,21 @@
                 <field name="sum_of_tasks" attrs="{'invisible': [('task_editable', '=', True)]}"/>
             </xpath>
 
+            <xpath expr="//form/sheet/group/group/field[@name='user_ids']" position="after">
+                <field name="contractor"/>
+            </xpath>
+
             <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field/tree/field[@name='milestone_id']"
                    position="after">
                 <field name="task_weight" readonly="1"/>
-                <field name="task_editable"/>
+                <field name="task_weight" groups="droga_project.proj_admin"/>
+                <field name="task_editable" invisible="1"/>
                 <field name="task_progress" attrs="{'readonly': [('task_editable', '=', False)]}"/>
 
+            </xpath>
+            <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field[@name='child_ids']"
+                   position="attributes">
+                <attribute name="widget"></attribute>
             </xpath>
 
         </field>
@@ -93,6 +103,25 @@
             <xpath expr="//field[@name='project_ids']" position="after">
                 <field name="task_sum"/>
             </xpath>
+        </field>
+    </record>
+
+    <record id="droga_project_stage_tasks_popup" model="ir.ui.view">
+        <field name="name">droga.project.task.stages.tree</field>
+        <field name="model">project.task.type</field>
+        <field name="arch" type="xml">
+            <form delete="0">
+                <notebook>
+                    <page string="Tasks">
+                        <field name="tasks" mode="tree">
+                            <tree editable="bottom" create="0">
+                                <field name="name"/>
+                                <field name="task_weight"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </form>
         </field>
     </record>
 </odoo>

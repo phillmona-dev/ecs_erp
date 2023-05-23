@@ -54,7 +54,7 @@ class ForeignCurrencyRequest(models.Model):
     total_amount = fields.Float("Total Amount USD")
     exchange_rate = fields.Float("Exchange Rate", default=1, digits=(12, 4))
     total_amount_etb = fields.Float(
-        "Total Amount ETB", compute="_compute_total", required=True, store=True)
+        "Total Amount ETB", compute="_compute_total", store=True)
     amount_in_word = fields.Char(
         "Amount in Word", compute="_compute_amount_to_word", store=True)
 

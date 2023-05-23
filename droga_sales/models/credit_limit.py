@@ -20,7 +20,25 @@ class cust_credit_limit(models.Model):
     @api.depends('debit', 'credit')
     def _compute_balance(self):
         for record in self:
-            record.unsettled_amount = record.credit - record.debit
+            if record.id in [15390,15488]:
+                matured_invoices=[]
+            elif record.vat != '0000000000':
+                matured_invoices = self.env['account.move'].search(
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
+                     ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', record.vat), '|',
+                     ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
+            else:
+                matured_invoices = self.env['account.move'].search(
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
+                     ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id', '=', record.id), '|',
+                     ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
+            tot_amount = 0
+            for mi in matured_invoices:
+                tot_amount = tot_amount + (
+                    mi['amount_total_signed'] if mi['amount_residual'] == 0 else mi['amount_residual'])
+            record.unsettled_amount = tot_amount
+            #record.unsettled_amount = record.credit - record.debit
+
             record.available_amount = record.cust_credit_limit - record.unsettled_amount
 
 
@@ -132,7 +150,7 @@ class cust_sales_credit_limit(models.Model):
             if not so.order_type and self.env.company.id==1:
                 if so.order_from.startswith('PH'):
                     if not so.wareh:
-                        raise ValidationError("User is not linked to a pharmacy chain branch.")
+                        raise ValidationError("Employee is not linked to a pharmacy chain branch.")
                     for res in so.order_line:
                         res.wareh = so.wareh
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
