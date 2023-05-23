@@ -137,7 +137,7 @@
                                            attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"
                                            string="GL Account"/>
                                     <field name="remaining_budget"
-                                           attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"
+
                                            decoration-danger="total_price &gt; remaining_budget"
                                            decoration-success="total_price &lt;= remaining_budget" widget="badge"/>
                                     <field name="remark" invisible="1"/>
@@ -166,7 +166,7 @@
                                                        attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"
                                                        string="GL Account"/>
                                                 <field name="remaining_budget"
-                                                       attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"
+
                                                        decoration-danger="total_price &gt; remaining_budget"
                                                        decoration-success="total_price &lt;= remaining_budget"
                                                        widget="badge"/>
@@ -480,7 +480,7 @@
                                            attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"
                                            string="GL Account"/>
                                     <field name="remaining_budget"
-                                           attrs="{'column_invisible': [('parent.state', 'not in', ('Verified'))]}"
+
                                            decoration-danger="total_price &gt; remaining_budget"
                                            decoration-success="total_price &lt;= remaining_budget" widget="badge"/>
                                     <field name="remark" width="10"/>
