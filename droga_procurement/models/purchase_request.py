@@ -103,7 +103,7 @@ class purhcase_request(models.Model):
 
     currency_id = fields.Many2one(
         "res.currency", string="Currency", required=True,
-        default=lambda self: self.env.ref('base.main_company').currency_id)
+        default=lambda self: self.env.company.currency_id)
 
     exchange_rate = fields.Float(
         "Exchange Rate", required=True, default=1.00, digits=(12, 4))
