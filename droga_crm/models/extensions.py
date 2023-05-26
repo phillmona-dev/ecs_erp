@@ -204,8 +204,12 @@ class crm_lead_extension(models.Model):
                                       default=_get_pr_sales_logged)
 
     def _get_areas(self):
-        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
-        return False if len(ses) == 0 else ses[0].pro_id[0].p_regions.ids
+        if self.env.user.has_group('droga_crm.crm_cust'):
+            return self.env['droga.crm.settings.city'].search([(1, '=', 1)]).ids
+        else:
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            return False if len(ses) == 0 else ses[0].pro_id[0].p_regions.ids
+
 
     pr_avail_areas = fields.Many2many('droga.crm.settings.city', default=_get_areas)
     partner_id = fields.Many2one(
