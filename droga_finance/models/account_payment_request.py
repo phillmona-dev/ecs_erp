@@ -65,7 +65,7 @@ class PaymentRequest(models.Model):
 
     currency_id = fields.Many2one(
         "res.currency", string="Currency", required=True,
-        default=lambda self: self.env.ref('base.main_company').currency_id)
+        default=lambda self: self.env.company.currency_id)
 
     total_amount = fields.Float("Total Amount")
     exchange_rate = fields.Float("Exchange Rate", default=1)

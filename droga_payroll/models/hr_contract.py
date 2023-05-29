@@ -13,6 +13,7 @@ class HrContract(models.Model):
     pension_contribution = fields.Boolean("Contribute Pension", default=True)
     sales = fields.Boolean("Sales",
                            help="For sales transport allowance upto 2200 is not taxable for others it is upto 600")
+    canteen = fields.Boolean("Uses Canteen Service", help="If the employee uses canteen service tick the check box");
 
     custom_salary_structure = fields.Boolean("Custom Salary Structure", default=False)
     salary_structure = fields.One2many(related="job_id.salary_structure")

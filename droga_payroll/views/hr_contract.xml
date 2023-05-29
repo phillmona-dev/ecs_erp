@@ -29,6 +29,7 @@
                         <field name="custom_salary_structure" string="Custom Salary"/>
                         <field name="pension_contribution"/>
                         <field name="sales"/>
+                        <field name="canteen"/>
                         <field name="job_id"/>
                     </group>
                     <field name="salary_structure" mode="tree"
