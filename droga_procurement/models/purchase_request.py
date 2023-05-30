@@ -163,8 +163,15 @@ class purhcase_request(models.Model):
 
     @api.depends("department")
     def _get_manager_id(self):
-        for record in self:
-            record.department_manager = record.request_by.parent_id
+        # for record in self:
+        # record.department_manager = record.request_by.parent_id
+
+        # get groups
+        group = self.env["res.groups"].search([('full_name', '=', 'Purchase Foreign Request Verify')])
+
+        for user in group.users:
+            for employee in user.employee_ids:
+                self.department_manager = employee
 
     @api.model
     def create(self, vals):
@@ -425,7 +432,7 @@ class purhcase_request(models.Model):
                 if product.company_id.id == 2:
                     rec.product_id = product
 
-        records1=self.env['droga.purhcase.request.rfq.line'].search([('company_id', '=', 2)])
+        records1 = self.env['droga.purhcase.request.rfq.line'].search([('company_id', '=', 2)])
 
         for rec in records1:
             # search product id from ema
