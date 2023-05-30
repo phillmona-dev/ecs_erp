@@ -553,10 +553,10 @@ class sale_order_ext(models.Model):
         if self.order_type == 'PT':
             self.action_confirm()
         # Manual price and discounts routing to price change approver
-        elif (self.manual_price and len(self.order_line.filtered(
-                lambda x: x.std_unit_price > x.price_unit > 0)) > 0) or self.tender_origin_form_tender:
+        elif ((self.manual_price and len(self.order_line.filtered(
+                lambda x: x.std_unit_price > x.price_unit > 0)) > 0) or self.tender_origin_form_tender) and self.state=='draft':
             self.state = 'price_request'
-        else:
+        elif self.state=='draft':
             self.state = 'req'
 
         # self.set_activity_done()
