@@ -136,7 +136,7 @@
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="after">
                 <field name="Vat_no" readonly="1" string="Tin No"></field>
-                <field name="cust_type_ext" readonly="1" string="Customer Type"></field>
+                <field name="cust_type_ext" options='{"no_create":True,"no_open":True}' readonly="1" string="Customer Type"></field>
                 <field name="company_id" invisible="1"></field>
                 <field name="supporters" attrs="{'invisible': [('company_id', '!=', 1)]}" widget="many2many_tags" string="Supporters"></field>
                 <field name="cust_id" widget="char" string="Cust ID" readonly="1" attrs="{'readonly':[(1,'=',1)],'invisible': [('Vat_no', '!=', '0000000000')]}"></field>
