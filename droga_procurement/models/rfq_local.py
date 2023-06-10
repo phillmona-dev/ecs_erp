@@ -95,6 +95,12 @@ class Rfq_Local(models.Model):
     # checked
     def checked(self):
         self.write({'state': 'Checked'})
+        if self.state=="Checked":
+            self.set_activity_done()
+            users = self.get_users_for_roles('Procurement Committee', self.company_id.id)
+            for user in users:
+                self.create_activity(user)
+
         return True
 
     # Committee Approval
@@ -194,6 +200,11 @@ class Rfq_Local(models.Model):
                     winner_supplier.write({'winner': 'Yes'})
 
             self.write({'state': 'Winner Picked'})
+
+            self.set_activity_done()
+            users = self.get_users_for_roles('Procurement Committee', self.company_id.id)
+            for user in users:
+                self.create_activity(user)
 
         return True
 
@@ -315,6 +326,30 @@ class Rfq_Local(models.Model):
             'res_id': self.id
         }
 
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        if activity:
+            activity.sudo().action_done()
+
+    def create_activity(self, user_id):
+        # create mail activity for the approval
+        todos = dict(res_id=self.id,
+                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.purchase.request.rfq.local')]).id,
+                     user_id=user_id, summary='Grant Approval', note='You have a request to approve',
+                     activity_type_id=4,
+                     date_deadline=datetime.now())
+
+        self.env['mail.activity'].sudo().create(todos)
+
+    def get_users_for_roles(self, role, company_id):
+        users = []
+        roles = self.env['res.groups'].search([('name', '=', role)])
+
+        for user in roles.users:
+            if user.company_id.id == company_id:
+                users.append(user.id)
+        return users
 
 class Rfq_Detail_local(models.Model):
     _name = 'droga.purchase.request.rfq.line.local'

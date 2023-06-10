@@ -6,7 +6,13 @@ from datetime import datetime
 import requests
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
+from io import BytesIO
 
+
+try:
+    from base64 import encodebytes
+except ImportError:
+    from base64 import encodestring as encodebytes
 
 class account_move(models.Model):
     _inherit = "account.move"
@@ -28,7 +34,10 @@ class account_move(models.Model):
     cust_id = fields.Char(compute='_compute_order_from', string='Customer Name')
 
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
+    pos_xml_folder = fields.Char("XML Folder Path", compute='get_pos_address')
     total_amount_word = fields.Char(compute="_get_total_amount_word")
+
+    fileout = fields.Binary('File', readonly=True)
 
     def _compute_order_from(self):
         for record in self:
@@ -80,6 +89,7 @@ class account_move(models.Model):
 
         # set pos ip address
         self.pos_device_ip_address = employee_rec.pos_device_ip_address
+        self.pos_xml_folder = employee_rec.pos_xml_folder
 
     @api.model
     def get_view(self, view_id=None, view_type='form', **options):
@@ -90,14 +100,18 @@ class account_move(models.Model):
 
     def generate_sales_xml(self):
 
+        file_io = BytesIO()
+        # get employee record
+
+        if not self.pos_xml_folder:
+            raise ValidationError(
+                "The POS device IP address is not set for the current user, please contact the system administrator to set it.")
+
         for record in self:
             m_encoding = 'UTF-8'
 
             # Get Payment Type
-            payment_type = "Cash"
-
-            if record.invoice_payment_term_id.deliv_after_payment:
-                payment_type = "Credit"
+            payment_type = record.sales_type
 
             Invoice = ET.Element("Invoice")
             # doc = ET.SubElement(Invoice, "status", date="20210123")
@@ -133,15 +147,29 @@ class account_move(models.Model):
             xml_string = dom.toprettyxml()
             part1, part2 = xml_string.split('?>')
 
+            self.fileout = encodebytes(xml_string.encode('utf-8'))
+
             # save path
-            save_path = 'C:/xml/'
+            save_path = record.pos_xml_folder
             name_of_file = record.name
             completeName = os.path.join(save_path, name_of_file + ".xml")
 
-            with open(completeName, 'w') as xfile:
-                xfile.write(
-                    part1 + 'encoding=\"{}\"?>\n'.format(m_encoding) + part2)
-                xfile.close()
+
+            ##with open(completeName, 'w') as xfile:
+                ##xfile.write(
+                    ##part1 + 'encoding=\"{}\"?>\n'.format(m_encoding) + part2)
+                ##xfile.close()
+
+
+            # change text into a binary array
+
+            # This downloads file. The file is fileout and the name if filename
+            return {
+                    'type': 'ir.actions.act_url',
+                    'target': 'new',
+                    'url': 'web/content/?model=' + self._name + '&id=' + str(
+                        self.id) + '&field=fileout&download=true&filename=' + name_of_file+".xml",
+            }
 
     def print_to_pos_peds(self):
 
