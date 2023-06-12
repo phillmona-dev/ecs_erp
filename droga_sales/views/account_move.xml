@@ -101,6 +101,11 @@
             <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
                 <field name="sales_type" optional="hide" string="Sales Type"/>
             </xpath>
+
+            <xpath expr="//field[@name='amount_total_in_currency_signed']" position="before">
+                <field name="core_amt"/>
+                <field name="non_core_amt"/>
+            </xpath>
         </field>
     </record>
 </odoo>
