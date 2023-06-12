@@ -95,6 +95,7 @@
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
+                <field name="cust_region" string="Region"></field>
                 <field name="FSInvoiceNumber" string="FS Number"/>
             </xpath>
 

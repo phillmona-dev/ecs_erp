@@ -38,8 +38,8 @@ class account_move(models.Model):
     total_amount_word = fields.Char(compute="_get_total_amount_word")
 
     fileout = fields.Binary('File', readonly=True)
-    core_amt = fields.Float('Core amount', compute="_get_core_amt")
-    non_core_amt = fields.Float('Non-core amount', compute="_get_core_amt")
+    core_amt = fields.Float('Core amount', compute="_get_core_amt",store=True)
+    non_core_amt = fields.Float('Non-core amount', compute="_get_core_amt",store=True)
 
     def _get_core_amt(self):
 
@@ -50,7 +50,7 @@ class account_move(models.Model):
                     core_sum = core_sum + records.price_subtotal
             rec.core_amt = core_sum
             rec.non_core_amt = rec.amount_total_in_currency_signed - core_sum
-            
+
     def _compute_order_from(self):
         for record in self:
             recs = self.env['sale.order'].search([('name', '=', record.invoice_origin)])
