@@ -41,6 +41,7 @@ class account_move(models.Model):
     core_amt = fields.Float('Core amount', compute="_get_core_amt",store=True)
     non_core_amt = fields.Float('Non-core amount', compute="_get_core_amt",store=True)
 
+    @api.depends ('invoice_line_ids.price_subtotal')
     def _get_core_amt(self):
 
         for rec in self:
