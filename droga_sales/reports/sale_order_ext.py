@@ -21,6 +21,14 @@ class sales_report_det_fields(models.Model):
                                        string="Payment Terms", related='order_id.payment_term_id', store=True)
     cash_or_credit = fields.Char(compute='_cash_or_credit')
 
+    invoice_ids = fields.Many2many(related="order_id.invoice_ids")
+    invoice_no = fields.Char(compute="_get_invoice_no")
+
+    def _get_invoice_no(self):
+        for record in self:
+            for invoice in record.invoice_ids:
+                record.invoice_no = invoice.name
+
     @api.depends('order_id.order_from')
     def _get_order_from(self):
         for rec in self:
@@ -40,29 +48,29 @@ class sales_report_det_fields(models.Model):
     itemdesc = fields.Char(related='product_id.name')
     itemcateg = fields.Many2one('product.category', related='product_id.categ_id')
 
-    invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount',store=True)
-    unit_cost=fields.Float('Unit Cost',compute='_get_cost')
-    total_cost=fields.Float('Total Cost',compute='_get_cost')
+    invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount', store=True)
+    unit_cost = fields.Float('Unit Cost', compute='_get_cost')
+    total_cost = fields.Float('Total Cost', compute='_get_cost')
     margin = fields.Float('Profit Margin', compute='_get_cost')
     margin_pct = fields.Float('Profit Margin %', compute='_get_cost')
-    fs_num=fields.Char(compute='_get_fs_num')
-
+    fs_num = fields.Char(compute='_get_fs_num')
 
     def _get_cost(self):
         for rec in self:
             uc = self.env['droga.sales.cost.of.sales'].search(
                 [('sale_line_id', '=', rec.id)])
             if not uc:
-                rec.unit_cost=0
-                rec.total_cost=0
-                rec.margin=0
-                rec.margin_pct=0
+                rec.unit_cost = 0
+                rec.total_cost = 0
+                rec.margin = 0
+                rec.margin_pct = 0
             else:
-                rec.unit_cost=uc[0].unit_cost
-                rec.total_cost=rec.qty_invoiced*rec.unit_cost
-                rec.margin=rec.invoiced_amt-rec.total_cost
-                rec.margin_pct=(rec.margin/rec.invoiced_amt)*100 if rec.invoiced_amt!=0 else 0
-    @api.depends('qty_invoiced','price_unit')
+                rec.unit_cost = uc[0].unit_cost
+                rec.total_cost = rec.qty_invoiced * rec.unit_cost
+                rec.margin = rec.invoiced_amt - rec.total_cost
+                rec.margin_pct = (rec.margin / rec.invoiced_amt) * 100 if rec.invoiced_amt != 0 else 0
+
+    @api.depends('qty_invoiced', 'price_unit')
     def _get_invoiced_amount(self):
         for rec in self:
             rec.invoiced_amt = rec.qty_invoiced * rec.price_unit
