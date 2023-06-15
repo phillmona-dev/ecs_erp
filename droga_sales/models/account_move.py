@@ -280,7 +280,7 @@ class account_move(models.Model):
                 if number[i] == '.':
                     int_side = number[:i]
                     dec_side = number[i + 1:]
-            user_choice = input()
+            #user_choice = input()
         int_length = len(int_side)
         ones = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ']
         teens = ['ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ',
