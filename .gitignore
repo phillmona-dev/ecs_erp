@@ -163,3 +163,4 @@ droga_procurement/models/__pycache__/rfq.cpython-37.pyc
 droga_sales/controllers/__pycache__/__init__.cpython-37.pyc
 droga_sales/models/__pycache__/__init__.cpython-37.pyc
 droga_sales/models/__pycache__/account_move.cpython-37.pyc
+__pycache__/
