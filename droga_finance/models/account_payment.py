@@ -13,7 +13,7 @@ class AccountPayment(models.Model):
     check_due_date = fields.Date("Check Due Date")
     vendor_supplier = fields.Char("Vendor/Customer Name")
 
-
+    is_check_printed = fields.Selection([('Yes', 'Yes'), ('No', 'No')], default='No')
 
     @api.model
     def create(self, vals):
@@ -88,6 +88,10 @@ class AccountPayment(models.Model):
             else:
                 raise ValidationError(
                     "Sequence is not defined for the transaction type")
+
+    def print_check(self):
+        res1 = self.env.ref('droga_finance.droga_account_check_printout_cbe_action').report_action(self)
+        return res1
 
 
 class AccountPaymentRegister(models.TransientModel):

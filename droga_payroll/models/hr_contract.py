@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from datetime import date
 
 
 class HrContract(models.Model):
@@ -24,14 +25,24 @@ class HrContract(models.Model):
         amount = 0
         for record in self:
             if record.custom_salary_structure:  # get rate from custom salary structure
-                rates = record.salary_structure_custom.salary_detail
-                for rate in rates:
-                    if rate.payment_type.code == payment_code:
-                        amount = rate.amount
+
+                salary_structures = record.salary_structure_custom
+
+                for salary_structure in salary_structures:
+                    if salary_structure.date_to <= date.today():
+                        rates = salary_structure.salary_detail
+                        for rate in rates:
+                            if rate.payment_type.code == payment_code:
+                                amount = rate.amount
             else:  # get rate from main salary structure
-                rates = record.salary_structure.salary_detail
-                for rate in rates:
-                    if rate.payment_type.code == payment_code:
-                        amount = rate.amount
+                salary_structures = record.salary_structure
+
+                for salary_structure in salary_structures:
+
+                    if salary_structure.date_to <= date.today():
+                        rates = salary_structure.salary_detail
+                        for rate in rates:
+                            if rate.payment_type.code == payment_code:
+                                amount = rate.amount
 
         return amount

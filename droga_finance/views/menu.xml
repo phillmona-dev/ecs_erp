@@ -126,4 +126,11 @@
 
 
     </menuitem>
+
+    <!-- check setting menu-->
+    <menuitem id="droga_check_setting_finance_menu" name="Check Setting" sequence="4"
+                  action="check_setting_action"
+                  groups="account.group_account_manager" parent="account.account_banks_menu"/>
+
+
 </odoo>
