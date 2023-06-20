@@ -57,6 +57,8 @@
                                t-value="o.journal_id.check_setting.amount_word_line_spacing"/>
 
                             <style type="text/css">
+
+
                                 .padding_date{
                                 padding-left:<t t-esc="date_left_p"/>mm;
                                 padding-top:<t t-esc="date_top_p"/>mm;
@@ -65,6 +67,7 @@
                                 .padding_name{
                                 padding-left:<t t-esc="name_left_p"/>mm;
                                 padding-top:<t t-esc="name_top_p"/>mm;
+                                width:400mm;
                                 }
 
                                 .padding_amount{
@@ -76,35 +79,49 @@
                                 padding-left:<t t-esc="amount_word_left_p"/>mm;
                                 padding-top:<t t-esc="amount_world_top_p"/>mm;
                                 width:<t t-esc="amount_word_width"/>mm;
+
+
+                                }
+
+                                .amount_word_line_spacing{
                                 line-height:<t t-esc="amount_word_line_spacing"/>;
+                                }
+
+                                p:first-line {
+                                line-height:100% !important;
                                 }
 
 
                             </style>
 
-
-                            <div class="position-absolute padding_date">**<t
-                                    t-esc="o.date" t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>**
-                            </div>
-
-                            <t t-if="o.partner_id.name=='One Time Vendor'">
-                                <div class="position-absolute padding_name">**<t
-                                        t-esc="o.vendor_supplier"/>**
+                            <div class="row">
+                                <div class="position-absolute padding_date">**
+                                    <t
+                                            t-esc="o.check_due_date"
+                                            t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                                    **
                                 </div>
-                            </t>
 
-                            <t t-if="o.partner_id.name!='One Time Vendor'">
-                                <div class="position-absolute padding_name">**<t
-                                        t-esc="o.partner_id.name"/>**
+                                <t t-if="o.partner_id.name=='One Time Vendor'">
+                                    <div class="position-absolute padding_name">**<t
+                                            t-esc="o.vendor_supplier"/>**
+                                    </div>
+                                </t>
+
+                                <t t-if="o.partner_id.name!='One Time Vendor'">
+                                    <div class="position-absolute padding_name">**<t
+                                            t-esc="o.partner_id.name"/>**
+                                    </div>
+                                </t>
+
+
+                                <div class="position-absolute text-wrap padding_amount_word">
+                                    <p class="amount_word_line_spacing">**<t t-esc="o.amount_total_word"/>**
+                                    </p>
                                 </div>
-                            </t>
-
-
-                            <div class="position-absolute text-wrap padding_amount_word">**<t
-                                    t-esc="o.amount_total_word"/>**
-                            </div>
-                            <div class="position-absolute padding_amount">**<t
-                                    t-esc="'{0:,.2f}'.format(o.amount)"/>**
+                                <div class="position-absolute padding_amount">**<t
+                                        t-esc="'{0:,.2f}'.format(o.amount)"/>**
+                                </div>
                             </div>
 
 
