@@ -1,6 +1,7 @@
 from odoo import _, api, fields, models
 from datetime import datetime
 from odoo.exceptions import ValidationError
+import textwrap
 
 
 class AccountPayment(models.Model):
@@ -14,6 +15,9 @@ class AccountPayment(models.Model):
     vendor_supplier = fields.Char("Vendor/Customer Name")
 
     is_check_printed = fields.Selection([('Yes', 'Yes'), ('No', 'No')], default='No')
+
+    first_line_amount_word = fields.Char(compute="_compute_check_print_word")
+    second_line_amount_word = fields.Char(compute="_compute_check_print_word")
 
     @api.model
     def create(self, vals):
@@ -92,6 +96,29 @@ class AccountPayment(models.Model):
     def print_check(self):
         res1 = self.env.ref('droga_finance.droga_account_check_printout_cbe_action').report_action(self)
         return res1
+
+    def _compute_check_print_word(self):
+        # get journal id
+        for record in self:
+            record.first_line_amount_word = ''
+            record.second_line_amount_word = ''
+            check_setting = record.journal_id.check_setting
+
+            if check_setting:
+                wrapper = textwrap.TextWrapper(width=check_setting.amount_word_width)
+                word_list = wrapper.wrap(text=record.amount_total_word)
+
+                if len(word_list) == 1:
+                    record.first_line_amount_word = word_list[0]
+                elif len(word_list) > 1:
+                    record.first_line_amount_word = word_list[0]
+                    second_items = word_list[1:]
+
+                    s_word = ''
+                    for item in second_items:
+                        s_word = s_word + " " + item
+
+                    record.second_line_amount_word = s_word
 
 
 class AccountPaymentRegister(models.TransientModel):

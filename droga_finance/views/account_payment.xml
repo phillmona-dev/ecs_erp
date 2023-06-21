@@ -69,6 +69,8 @@
                 <field name="check_due_date"/>
                 <field name="purpose"/>
                 <field name="is_check_printed" string="Check Printed"/>
+                <field name="first_line_amount_word" invisible="1"/>
+                <field name="second_line_amount_word" invisible="1"/>
             </xpath>
 
 
