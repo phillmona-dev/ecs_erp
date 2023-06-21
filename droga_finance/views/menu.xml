@@ -80,8 +80,6 @@
     </menuitem>
 
     <!-- withholding follow-up report -->
-
-
     <menuitem id="droga_reciveables_report" parent="account.menu_finance_receivables" name="Reports"
               groups="account.group_account_manager" sequence="1000">
         <menuitem id="droga_account_payment_customer_report_tree_menu" name="Payment Followup"
