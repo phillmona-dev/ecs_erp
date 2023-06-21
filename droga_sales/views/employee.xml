@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='pin']" position="after">
                 <field name="pos_device_ip_address"/>
+                <field name="pos_xml_folder"/>
             </xpath>
         </field>
     </record>

@@ -23,6 +23,7 @@
                         groups="droga_finance.account_payable_accountant_group,droga_finance.account_recivables_accountant_group,droga_finance.account_receivable_team_leader_group,droga_finance.account_recivables_cashier_accountant_group,droga_finance.account_chief_finance_officer_group,droga_finance.account_payable_team_leader_group"
                         attrs="{'invisible' : ['|',('show_reset_to_draft_button', '!=', False),('state','=','draft')]}"
                         data-hotkey="q"/>
+                <button name="generate_sales_xml" string="Generate XML" type="object" groups="droga_sales.maraki_pos_access"/>
             </xpath>
             <form position="attributes">
                 <attribute name="js_class">pos_form_view</attribute>
@@ -94,11 +95,17 @@
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
+                <field name="cust_region" string="Region"></field>
                 <field name="FSInvoiceNumber" string="FS Number"/>
             </xpath>
 
             <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
                 <field name="sales_type" optional="hide" string="Sales Type"/>
+            </xpath>
+
+            <xpath expr="//field[@name='amount_total_in_currency_signed']" position="before">
+                <field name="core_amt"/>
+                <field name="non_core_amt"/>
             </xpath>
         </field>
     </record>

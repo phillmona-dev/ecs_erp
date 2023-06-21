@@ -151,6 +151,7 @@ class cust_contact_extension(models.Model):
 class account_move_pr_sales(models.Model):
     _inherit = "account.move"
     cust_location=fields.Many2one('droga.crm.settings.city',related='partner_id.city_name')
+    cust_region = fields.Many2one('droga.crm.settings.region', related='partner_id.city_name.parent_id')
     is_cust_available = fields.Boolean(related='partner_id.is_cust_available')
     def _get_pr_sales_logged(self):
         sale = self.env['sale.order'].search([('name', '=', self.invoice_origin)])

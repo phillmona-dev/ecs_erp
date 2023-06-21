@@ -80,8 +80,6 @@
     </menuitem>
 
     <!-- withholding follow-up report -->
-
-
     <menuitem id="droga_reciveables_report" parent="account.menu_finance_receivables" name="Reports"
               groups="account.group_account_manager" sequence="1000">
         <menuitem id="droga_account_payment_customer_report_tree_menu" name="Payment Followup"
@@ -126,4 +124,11 @@
 
 
     </menuitem>
+
+    <!-- check setting menu-->
+    <menuitem id="droga_check_setting_finance_menu" name="Check Setting" sequence="4"
+                  action="check_setting_action"
+                  groups="account.group_account_manager" parent="account.account_banks_menu"/>
+
+
 </odoo>

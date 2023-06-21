@@ -114,7 +114,7 @@
                        decoration-success="due_days &lt;=0"/>
 
                 <field name="paid_passed_days" optional="hide"/>
-
+                <field name="company_id" optional="hide"/>
 
                 <!--<field name="state" widget="badge" decoration-info="state == 'draft'"
                        decoration-success="state == 'posted'"/>-->
@@ -216,6 +216,14 @@
                 by using installed facilities.
             </p>
         </field>
+    </record>
+
+     <!-- rule for filtering data specific data -->
+    <record model="ir.rule" id="droga_account_payment_report_rule">
+        <field name="name">Payment Report multi-company</field>
+        <field name="model_id" ref="model_droga_finance_payment_report"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
 
