@@ -123,9 +123,16 @@
                             <div class="position-absolute padding_amount_word">
                                 <p>**
                                     <t t-esc="o.first_line_amount_word"/>
+                                    <t t-if="o.second_line_amount_word==''">
+                                        **
+                                    </t>
                                 </p>
                                 <p class="amount_word_line_spacing">
-                                    <t t-esc="o.second_line_amount_word"/>**
+                                    <t t-if="o.second_line_amount_word!=''">
+                                        <t t-esc="o.second_line_amount_word"/>
+                                        **
+                                    </t>
+
                                 </p>
                             </div>
                             <div class="position-absolute padding_amount">**<t
