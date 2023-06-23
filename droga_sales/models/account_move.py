@@ -8,11 +8,11 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from io import BytesIO
 
-
 try:
     from base64 import encodebytes
 except ImportError:
     from base64 import encodestring as encodebytes
+
 
 class account_move(models.Model):
     _inherit = "account.move"
@@ -38,10 +38,10 @@ class account_move(models.Model):
     total_amount_word = fields.Char(compute="_get_total_amount_word")
 
     fileout = fields.Binary('File', readonly=True)
-    core_amt = fields.Float('Core amount', compute="_get_core_amt",store=True)
-    non_core_amt = fields.Float('Non-core amount', compute="_get_core_amt",store=True)
+    core_amt = fields.Float('Core amount', compute="_get_core_amt", store=True)
+    non_core_amt = fields.Float('Non-core amount', compute="_get_core_amt", store=True)
 
-    @api.depends ('invoice_line_ids.price_subtotal')
+    @api.depends('invoice_line_ids.price_subtotal')
     def _get_core_amt(self):
 
         for rec in self:
@@ -73,13 +73,7 @@ class account_move(models.Model):
 
     def _get_total_amount_word(self):
         for record in self:
-            # convert amount to word
-            amount_in_word = self.convert_to_word(record.amount_total)
-            last_word = self.lastWord(amount_in_word)
-            if last_word == 'Cents':
-                record.total_amount_word = amount_in_word + " Only"
-            else:
-                record.total_amount_word = amount_in_word + " Birr Only"
+            record.total_amount_word = self.convert_to_word(record.amount_total)
 
     # @api.depends("partner_id")
     def get_tin_no(self):
@@ -167,21 +161,19 @@ class account_move(models.Model):
             name_of_file = record.name
             completeName = os.path.join(save_path, name_of_file + ".xml")
 
-
             ##with open(completeName, 'w') as xfile:
-                ##xfile.write(
-                    ##part1 + 'encoding=\"{}\"?>\n'.format(m_encoding) + part2)
-                ##xfile.close()
-
+            ##xfile.write(
+            ##part1 + 'encoding=\"{}\"?>\n'.format(m_encoding) + part2)
+            ##xfile.close()
 
             # change text into a binary array
 
             # This downloads file. The file is fileout and the name if filename
             return {
-                    'type': 'ir.actions.act_url',
-                    'target': 'new',
-                    'url': 'web/content/?model=' + self._name + '&id=' + str(
-                        self.id) + '&field=fileout&download=true&filename=' + name_of_file+".xml",
+                'type': 'ir.actions.act_url',
+                'target': 'new',
+                'url': 'web/content/?model=' + self._name + '&id=' + str(
+                    self.id) + '&field=fileout&download=true&filename=' + name_of_file + ".xml",
             }
 
     def print_to_pos_peds(self):
@@ -263,99 +255,6 @@ class account_move(models.Model):
             res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_a5_action').report_action(self)
         return res1
 
-    def convert_to_word(self, number):
-        number = str(number)
-        int_side = number
-        dec_side = ''
-        for i in range(0, len(number)):
-            if number[i] == '.':
-                int_side = number[:i]
-                dec_side = number[i + 1:]
-                break
-        while not (int_side.isdigit()) or not (dec_side.isdigit()) and dec_side != '':
-            dec_side = ''
-            # print('Only numbers are allowed! (decimals included, but not fractions)')
-            int_side = number
-            for i in range(0, len(number)):
-                if number[i] == '.':
-                    int_side = number[:i]
-                    dec_side = number[i + 1:]
-            #user_choice = input()
-        int_length = len(int_side)
-        ones = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ']
-        teens = ['ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ',
-                 'eighteen ',
-                 'nineteen ']
-        decades = ['', '', 'twenty ', 'thirty ', 'forty ', 'fifty ', 'sixty ', 'seventy ', 'eighty ', 'ninety ']
-        hundreds = ['', 'one hundred ', 'two hundred ', 'three hundred ', 'four hundred ', 'five hundred ',
-                    'six hundred ',
-                    'seven hundred ', 'eight hundred ', 'nine hundred ']
-        comma = ['thousand ', 'million ', 'trillion ', 'quadrillion ']
-        word = ''
-        int_length = len(int_side)
-        dec_length = len(dec_side)
-        change = int_length
-        up_change = 0
-        while change > 0:
-            if int_side == '':
-                break
-            if number == '0':
-                word = 'zero'
-                break
-            elif change > 1 and int_side[change - 2] == '1':
-                for i in range(0, 10):
-                    if int_side[change - 1] == str(i):
-                        word = teens[i] + word
-            else:
-                if change > 0:
-                    for i in range(0, 10):
-                        if int_side[change - 1] == str(i):
-                            word = ones[i] + word
-                if change > 1:
-                    for i in range(0, 10):
-                        if int_side[change - 2] == str(i):
-                            word = decades[i] + word
-            if change > 2:
-                for i in range(0, 10):
-                    if int_side[change - 3] == str(i):
-                        word = hundreds[i] + word
-            if change > 3:
-                word = comma[up_change] + word
-            change -= 3
-            up_change += 1
-        # if dec_side == '':
-        # word += ' birr '
-
-        print(dec_side)
-        """
-        for i in range(0, len(dec_side)):
-            for x in range(0, 10):
-                if dec_side[i] == str(x):
-                    word += ones[x]"""
-
-        if dec_side not in ['', '0', '00']:
-            word += ' birr and '
-            word += self.convert_to_word(dec_side) + " cents"
-
-        # word += " only"
-
-        return word.title()
-
-    # Function which returns last word
-    def lastWord(self, string):
-        # taking empty string
-        newstring = ""
-        # calculating length of string
-        length = len(string)
-        # traversing from last
-        for i in range(length - 1, 0, -1):
-            # if space is occurred then return
-            if (string[i] == " "):
-                # return reverse of newstring
-                return newstring[::-1]
-            else:
-                newstring = newstring + string[i]
-
     def set_analytic_accounts(self):
         # get analytic account
         analytic_distribution = ""
@@ -378,6 +277,73 @@ class account_move(models.Model):
                 record.analytic_distribution = analytic_distribution
             if tax_ids != '':
                 record.tax_ids = tax_ids
+
+    def convert_to_word(self, num):
+        num_strings = str(num)
+        numbers = num_strings.split('.')
+
+        word = self.int_to_word(int(numbers[0])) + ' birr'
+
+        if len(numbers) == 2:
+            if int(numbers[1]) != 0:
+                word = self.int_to_word(int(numbers[0])) + ' birr and ' + self.int_to_word(int(numbers[1])) + ' cents'
+
+        return word.capitalize()
+
+    def int_to_word(self, num):
+        d = {0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
+             6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten',
+             11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen',
+             15: 'fifteen', 16: 'sixteen', 17: 'seventeen', 18: 'eighteen',
+             19: 'nineteen', 20: 'twenty',
+             30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty',
+             70: 'seventy', 80: 'eighty', 90: 'ninety'}
+        k = 1000
+        m = k * 1000
+        b = m * 1000
+        t = b * 1000
+
+        assert (0 <= num)
+
+        if (num < 20):
+            return d[num]
+
+        if (num < 100):
+            if num % 10 == 0:
+                return d[num]
+            else:
+                return d[num // 10 * 10] + '-' + d[num % 10]
+
+        if (num < k):
+            if num % 100 == 0:
+                return d[num // 100] + ' hundred'
+            else:
+                return d[num // 100] + ' hundred ' + self.int_to_word(num % 100)
+
+        if (num < m):
+            if num % k == 0:
+                return self.int_to_word(num // k) + ' thousand'
+            else:
+                return self.int_to_word(num // k) + ' thousand ' + self.int_to_word(num % k)
+
+        if (num < b):
+            if (num % m) == 0:
+                return self.int_to_word(num // m) + ' million'
+            else:
+                return self.int_to_word(num // m) + ' million ' + self.int_to_word(num % m)
+
+        if (num < t):
+            if (num % b) == 0:
+                return self.int_to_word(num // b) + ' billion'
+            else:
+                return self.int_to_word(num // b) + ' billion ' + self.int_to_word(num % b)
+
+        if (num % t == 0):
+            return self.int_to_word(num // t) + ' trillion'
+        else:
+            return self.int_to_word(num // t) + ' trillion ' + self.int_to_word(num % t)
+
+        raise AssertionError('num is too large: %s' % str(num))
 
 
 class account_move_line(models.Model):
