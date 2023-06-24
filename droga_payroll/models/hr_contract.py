@@ -24,25 +24,26 @@ class HrContract(models.Model):
     def get_employee_rate(self, payment_code):
         amount = 0
         for record in self:
-            if record.custom_salary_structure:  # get rate from custom salary structure
+            if record.state == 'open':
+                if record.custom_salary_structure:  # get rate from custom salary structure
 
-                salary_structures = record.salary_structure_custom
+                    salary_structures = record.salary_structure_custom
 
-                for salary_structure in salary_structures:
-                    if salary_structure.date_to <= date.today():
-                        rates = salary_structure.salary_detail
-                        for rate in rates:
-                            if rate.payment_type.code == payment_code:
-                                amount = rate.amount
-            else:  # get rate from main salary structure
-                salary_structures = record.salary_structure
+                    for salary_structure in salary_structures:
+                        if salary_structure.date_to >= date.today():
+                            rates = salary_structure.salary_detail
+                            for rate in rates:
+                                if rate.payment_type.code == payment_code:
+                                    amount = rate.amount
+                else:  # get rate from main salary structure
+                    salary_structures = record.salary_structure
 
-                for salary_structure in salary_structures:
+                    for salary_structure in salary_structures:
 
-                    if salary_structure.date_to <= date.today():
-                        rates = salary_structure.salary_detail
-                        for rate in rates:
-                            if rate.payment_type.code == payment_code:
-                                amount = rate.amount
+                        if salary_structure.date_to >= date.today():
+                            rates = salary_structure.salary_detail
+                            for rate in rates:
+                                if rate.payment_type.code == payment_code:
+                                    amount = rate.amount
 
         return amount
