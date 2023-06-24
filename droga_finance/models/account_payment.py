@@ -19,6 +19,9 @@ class AccountPayment(models.Model):
     first_line_amount_word = fields.Char(compute="_compute_check_print_word")
     second_line_amount_word = fields.Char(compute="_compute_check_print_word")
 
+    amount_total_word = fields.Char(
+        compute='_compute_amount_word')
+
     @api.model
     def create(self, vals):
         res = super(AccountPayment, self).create(vals)
@@ -96,6 +99,10 @@ class AccountPayment(models.Model):
     def print_check(self):
         res1 = self.env.ref('droga_finance.droga_account_check_printout_cbe_action').report_action(self)
         return res1
+
+    def _compute_amount_word(self):
+        for record in self:
+            record.amount_total_word = self.env['account.move'].convert_to_word(record.amount)
 
     def _compute_check_print_word(self):
         # get journal id
