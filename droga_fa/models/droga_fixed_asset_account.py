@@ -18,11 +18,19 @@ class AccountAsset(models.Model):
             # get sequence code
             asset_sub_category = self.env["account.asset.subcat"].search([('id', '=', vals['asset_sub_category'])])
             if asset_sub_category.sequence:
-                vals['name'] = asset_sub_category.sequence.next_by_id()
+                vals['asset_number'] = asset_sub_category.sequence.next_by_id()
 
         res = super(AccountAsset, self_comp).create(vals)
 
         return res
+
+    def generate_asset_id(self):
+
+        for record in self:
+            if record.asset_number == "":
+                asset_sub_category = self.env["account.asset.subcat"].search([('id', '=', record.asset_sub_category)])
+                if asset_sub_category.sequence:
+                    record.asset_number = asset_sub_category.sequence.next_by_id()
 
     @api.constrains('asset_number')
     def _check_asset_no_unique(self):

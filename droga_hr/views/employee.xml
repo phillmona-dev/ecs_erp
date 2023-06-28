@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="inherit_for_employee_form" model="ir.ui.view">
+        <field name="name">Employee</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//form/sheet/notebook/page[@name='hr_settings']" position="after">
+                <page string="Amharic Info">
+                    <group>
+                        <field name="amharic_name"/>
+                        <field name="amharic_position"/>
+                        <field name="hire_date_ec"/>
+                    </group>
+                </page>
+
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

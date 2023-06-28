@@ -244,6 +244,9 @@ class AccountMove(models.Model):
 
         if len(numbers) == 2:
             if int(numbers[1]) != 0:
+                if len(numbers[1]) == 1:
+                    numbers[1] = int(numbers[1]) * 10.0
+
                 word = self.int_to_word(int(numbers[0])) + ' birr and ' + self.int_to_word(int(numbers[1])) + ' cents'
 
         return word.capitalize()
