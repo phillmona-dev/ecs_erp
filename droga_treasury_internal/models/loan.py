@@ -29,6 +29,7 @@ class AccountLoanModifaied(models.Model):
     principal_paied_payment = fields.Float(  compute='_compute_principal_interest', string="Principal Payment") 
     arrears=fields.Float(  compute='_compute_principal_interest', string="Arrears")
    
+ 
     @api.depends('loan_repayment_ids','loan_repayment_ids','next_payment_date','future_payment')
     def _compute_principal_interest(self):
         
@@ -36,6 +37,15 @@ class AccountLoanModifaied(models.Model):
             payment=0
             arrears=0
             npayments=0
+            if allrecords.state!= 'done':
+                state=True
+            else:
+                state=False
+                if allrecords.next_payment_date or allrecords.future_payment:
+                    allrecords.next_payment_date = None
+                    allrecords.future_payment = None  
+            
+                
             
             if allrecords.next_payment_date and allrecords.future_payment and allrecords.next_payment_date < allrecords.future_payment:
                 payment=allrecords.future_payment.month-allrecords.future_payment.month
@@ -64,16 +74,13 @@ class AccountLoanModifaied(models.Model):
             # principal_recipt=arecipt   
 
     def compute_daily_cron_future_payment(self):
-
-      
         acount_loan = self.env['account.loan'].search(
             [('isactive', '=', True),('state','!=','done')])
 
         for record in acount_loan:
             current_date = datetime.today().date()
             valuedate=record.next_payment_date
-            if state=="done":
-                next_payment_date=null
+            
             if not record.future_payment:
                 record.future_payment=record.next_payment_date
             elif record.future_payment:
@@ -103,8 +110,7 @@ class AccountLoanModifaied(models.Model):
                         record.state="overdue"
                 else:
                      record.overdue_days=0
-                # if not predone.isactive and predone.interest_start_date and predone.overdue_days>0:
-                #     predone.state="overdue"
+                
                 if record.overdue_days==0 and record.isactive and record.interest_start_date:
                     record.state="active"    
                             
@@ -112,21 +118,24 @@ class AccountLoanModifaied(models.Model):
     @api.depends('name')
     def _commpute_description(self):
         for record in self:
-            num=record.id
+            name=""
+            if record.name and record.id:
+                num=record.id
 
-            string_num=str(num)
-            if len(string_num)<2:
-                string_num="0000"+string_num
-            elif len(string_num)<3:
-                string_num="000"+string_num
-            if len(string_num)<4:
-                string_num="00"+string_num
-            if len(string_num)<5:
-                string_num="0"+string_num
+                string_num=str(num)
+                if len(string_num)<2:
+                    string_num="0000"+string_num
+                elif len(string_num)<3:
+                    string_num="000"+string_num
+                if len(string_num)<4:
+                    string_num="00"+string_num
+                if len(string_num)<5:
+                    string_num="0"+string_num
 
-            name=record.loan_type.name
-            short_name=name[0:3].upper()
-            record.descrip=short_name+"/"+ record.name.name+ "/"+string_num         
+                name=record.loan_type.name
+                short_name=name[0:3].upper()
+                name=short_name+"/"+ record.name.name+ "/"+string_num
+            record.descrip=name             
 
 
 class AccountLoanRepayment(models.Model):
