@@ -35,9 +35,9 @@
               parent="self_service_main_menu">
         <menuitem id="self_service_head_count_request_menu" name="Head Count Request" sequence="1"
                   action="droga_hr_head_count_request_action" groups="self_service_group"/>
-         <menuitem id="self_service_letter_request_english_menu" name="Letter Request English" sequence="2"
+         <menuitem id="self_service_letter_request_english_menu" name="Letter Request-English" sequence="2"
                   action="droga_hr.droga_hr_letter_request_eng_action" groups="self_service_group"/>
-         <menuitem id="self_service_letter_request_amharic_menu" name="Letter Request Amharic" sequence="3"
+         <menuitem id="self_service_letter_request_amharic_menu" name="Letter Request-Amharic" sequence="3"
                   action="droga_hr.droga_hr_letter_request_amharic_action" groups="self_service_group"/>
     </menuitem>
 </odoo>
