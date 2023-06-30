@@ -56,7 +56,7 @@
                         </h1>
                     </div>
                     <group>
-                        <group string="General Infprmation">
+                        <group string="General Information">
                             <field name="requesting_department" options="{'no_create':True,'no_open':True}"
                                    string="Department" attrs="{'readonly': [('state', 'in', ('CEO', 'Cancelled'))]}"/>
                             <field name="request_by" options="{'no_create':True,'no_open':True}"

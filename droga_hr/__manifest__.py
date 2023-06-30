@@ -30,6 +30,7 @@
         'views/hr_job_salary_payment.xml',
         'views/hr_head_count_request.xml',
         'views/employee.xml',
+        'views/hr_letter.xml',
         'views/menu.xml',
     ],
     # only loaded in demonstration mode
