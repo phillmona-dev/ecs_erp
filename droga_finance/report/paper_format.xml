@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="paperformat_droga_check_print_a4" model="report.paperformat">
-        <field name="name">Droga A4 low margin</field>
+        <field name="name">Droga A4 low margin check printing</field>
         <field name="default" eval="True"/>
         <field name="format">A4</field>
         <field name="page_height">0</field>
