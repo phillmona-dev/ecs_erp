@@ -64,7 +64,6 @@
                             <style type="text/css">
 
 
-
                                 .padding_date{
                                 padding-left:<t t-esc="date_left_p"/>mm;
                                 padding-top:<t t-esc="date_top_p"/>mm;
@@ -134,10 +133,17 @@
                                         **
                                     </t>
                                 </p>
+
                                 <p class="amount_word_line_spacing">
+
+
                                     <t t-if="o.second_line_amount_word!=''">
                                         <t t-esc="o.second_line_amount_word"/>
-                                        **
+
+                                        <t t-if="o.third_line_amount_word==''">
+                                            **
+                                        </t>
+
                                     </t>
 
                                 </p>
