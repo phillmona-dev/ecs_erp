@@ -44,6 +44,8 @@
                         <div class="page">
 
                             <!-- get setting -->
+                            <t t-set="name_width" t-value="o.journal_id.check_setting.name_width"/>
+
                             <t t-set="date_left_p" t-value="o.journal_id.check_setting.date_left_p"/>
                             <t t-set="date_top_p" t-value="o.journal_id.check_setting.date_top_p"/>
                             <t t-set="name_left_p" t-value="o.journal_id.check_setting.name_left_p"/>
@@ -53,10 +55,15 @@
                             <t t-set="amount_word_left_p" t-value="o.journal_id.check_setting.amount_word_left_p"/>
                             <t t-set="amount_world_top_p" t-value="o.journal_id.check_setting.amount_world_top_p"/>
                             <t t-set="amount_word_width" t-value="o.journal_id.check_setting.amount_word_width"/>
+                            <t t-set="amount_word_width1" t-value="o.journal_id.check_setting.amount_word_width1"/>
+
+
                             <t t-set="amount_word_line_spacing"
                                t-value="o.journal_id.check_setting.amount_word_line_spacing"/>
 
                             <style type="text/css">
+
+
 
                                 .padding_date{
                                 padding-left:<t t-esc="date_left_p"/>mm;
@@ -66,7 +73,7 @@
                                 .padding_name{
                                 padding-left:<t t-esc="name_left_p"/>mm;
                                 padding-top:<t t-esc="name_top_p"/>mm;
-                                width:180mm;
+                                width:<t t-esc="name_width"/>mm;
                                 }
 
                                 .padding_amount{
@@ -134,6 +141,14 @@
                                     </t>
 
                                 </p>
+                                <p class="amount_word_line_spacing">
+                                    <t t-if="o.third_line_amount_word!=''">
+                                        <t t-esc="o.third_line_amount_word"/>
+                                        **
+                                    </t>
+
+                                </p>
+
                             </div>
                             <div class="position-absolute padding_amount">**<t
                                     t-esc="'{0:,.2f}'.format(o.amount)"/>**

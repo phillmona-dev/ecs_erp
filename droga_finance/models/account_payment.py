@@ -18,6 +18,7 @@ class AccountPayment(models.Model):
 
     first_line_amount_word = fields.Char(compute="_compute_check_print_word")
     second_line_amount_word = fields.Char(compute="_compute_check_print_word")
+    third_line_amount_word = fields.Char(compute="_compute_check_print_word")
 
     amount_total_word = fields.Char(
         compute='_compute_amount_word')
@@ -109,23 +110,37 @@ class AccountPayment(models.Model):
         for record in self:
             record.first_line_amount_word = ''
             record.second_line_amount_word = ''
+            record.third_line_amount_word = ''
             check_setting = record.journal_id.check_setting
 
             if check_setting:
-                wrapper = textwrap.TextWrapper(width=check_setting.amount_word_width)
-                word_list = wrapper.wrap(text=record.amount_total_word)
+                wrapper1 = textwrap.TextWrapper(width=check_setting.amount_word_width)
+                wrapper2 = textwrap.TextWrapper(width=check_setting.amount_word_width1)
 
-                if len(word_list) == 1:
-                    record.first_line_amount_word = word_list[0]
-                elif len(word_list) > 1:
-                    record.first_line_amount_word = word_list[0]
-                    second_items = word_list[1:]
+                first_word_list = wrapper1.wrap(text=record.amount_total_word)
 
-                    s_word = ''
-                    for item in second_items:
-                        s_word = s_word + " " + item
+                if len(first_word_list) == 1:
+                    record.first_line_amount_word = first_word_list[0]
+                elif len(first_word_list) > 1:
+                    second_word = first_word_list[1:]
+                    second_word = ' '.join(second_word)
 
-                    record.second_line_amount_word = s_word
+                    second_word_list = wrapper2.wrap(text=second_word)
+
+                    if len(second_word_list) > 1:
+                        record.first_line_amount_word = first_word_list[0]
+                        record.second_line_amount_word = second_word_list[0]
+
+                        third_items = second_word_list[1:]
+                        t_word = ' '.join(third_items)
+                        record.third_line_amount_word = t_word
+
+                    else:
+                        record.first_line_amount_word = first_word_list[0]
+                        second_items = first_word_list[1:]
+
+                        s_word = ' '.join(second_items)
+                        record.second_line_amount_word = s_word
 
 
 class AccountPaymentRegister(models.TransientModel):

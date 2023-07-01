@@ -8,10 +8,10 @@ class LcMargin(models.Model):
 
     purchase_order_id = fields.Many2one("purchase.order")
     margin_percent = fields.Integer("Margin %", required=True)
-    foreign_amount = fields.Float("Foreign Amount", required=True, digits=(12, 2), compute="compute_amount")
+    foreign_amount = fields.Float("Foreign Amount", digits=(12, 2), compute="compute_amount", store=True)
     exchange_rate = fields.Float("Exchange Rate", required=True, digits=(12, 6))
     amount_etb = fields.Float("ETB Amount", require=True, compute="compute_amount", digits=(12, 2))
-    margin_order = fields.Selection([('1', 'First Margin'), ('2', 'Last Margin')])
+    margin_order = fields.Selection([('1', 'First Margin'), ('2', 'Last Margin'), ('3', 'Partial Margin')])
     margin_calculation = fields.Selection([('1', 'Post full amount'), ('2', 'Post the Difference')])
     account = fields.Many2one("account.account", required=True)
     lc = fields.Many2one('account.analytic.account', domain=[
@@ -42,27 +42,31 @@ class LcMargin(models.Model):
                 for purchase_order in purchase_orders:
                     purchase_order.exchange_rate = vals['exchange_rate']
 
-    @api.depends('margin_percent', 'exchange_rate', 'margin_calculation', 'margin_order')
+    @api.depends('margin_percent', 'exchange_rate', 'margin_calculation', 'margin_order', 'foreign_amount')
     def compute_amount(self):
         for record in self:
-            # get usd total amount
-            usd_total_amount = record.purchase_order_id.amount_total_usd
-            record.foreign_amount = usd_total_amount * (record.margin_percent / 100)
-            record.amount_etb = (usd_total_amount * record.exchange_rate) * (record.margin_percent / 100)
 
-            if record.margin_order == '2':
-                if record.margin_calculation == '1':  # Calculate 100%
-                    usd_total_amount = record.purchase_order_id.amount_total_usd
-                    record.foreign_amount = usd_total_amount * (100 / 100)
-                    record.amount_etb = (usd_total_amount * record.exchange_rate) * (100 / 100)
-                elif record.margin_calculation == '2':  # Calculate the difference
-                    usd_total_amount = record.purchase_order_id.amount_total_usd
-                    # get first margin
-                    first_margin_amount_etb = self.get_first_margin_etb_amount(record.purchase_order_id.ids[0])
+            if record.margin_order == '3':
+                record.amount_etb = record.foreign_amount * record.exchange_rate
+            else:
+                # get usd total amount
+                usd_total_amount = record.purchase_order_id.amount_total_usd
+                record.foreign_amount = usd_total_amount * (record.margin_percent / 100)
+                record.amount_etb = (usd_total_amount * record.exchange_rate) * (record.margin_percent / 100)
 
-                    record.foreign_amount = usd_total_amount * (record.margin_percent / 100)
-                    record.amount_etb = ((usd_total_amount * record.exchange_rate) * (
-                            100 / 100)) - first_margin_amount_etb
+                if record.margin_order == '2':
+                    if record.margin_calculation == '1':  # Calculate 100%
+                        usd_total_amount = record.purchase_order_id.amount_total_usd
+                        record.foreign_amount = usd_total_amount * (100 / 100)
+                        record.amount_etb = (usd_total_amount * record.exchange_rate) * (100 / 100)
+                    elif record.margin_calculation == '2':  # Calculate the difference
+                        usd_total_amount = record.purchase_order_id.amount_total_usd
+                        # get first margin
+                        first_margin_amount_etb = self.get_first_margin_etb_amount(record.purchase_order_id.ids[0])
+
+                        record.foreign_amount = usd_total_amount * (record.margin_percent / 100)
+                        record.amount_etb = ((usd_total_amount * record.exchange_rate) * (
+                                100 / 100)) - first_margin_amount_etb
 
     def margin_percent_constraint(self):
         margin_percent = 0

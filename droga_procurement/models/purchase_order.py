@@ -187,6 +187,7 @@ class purchase_order(models.Model):
     request_type = fields.Selection(
         [("Local", "Local"), ("Foregin", "Foregin")], default="Local")
 
+    is_delivery_partial = fields.Boolean("Partial Delivery")
     lc_margins = fields.One2many("droga.purchase.lc.margin", "purchase_order_id")
 
     def open_lc_detail(self):

@@ -126,17 +126,22 @@
                             </field>
                         </page>
                         <page string="Margins" name="margins">
+                            <group>
+                                <field name="is_delivery_partial" invisible="1"/>
+                            </group>
+
                             <field name="lc_margins" mode="tree">
                                 <tree editable="bottom">
-                                    <field name="margin_percent" sum="Total" width="10"
-                                           attrs="{'readonly': [('move_id', '!=', False)]}"/>
                                     <field name="margin_order" width="15"
                                            attrs="{'readonly': [('move_id', '!=', False)]}"/>
+                                    <field name="margin_percent" sum="Total" width="10"
+                                           attrs="{'readonly': [('move_id', '!=', False)]}"/>
+
                                     <field name="margin_calculation"
-                                           attrs="{'readonly': ['|',('margin_order', 'in', ('1')),('move_id', '!=', False)],'required': [('margin_order', 'in', ('2'))]}"
+                                           attrs="{'readonly': ['|',('margin_order', 'in', ('1','3')),('move_id', '!=', False)],'required': [('margin_order', 'in', ('2'))]}"
                                            width="10"
                                            string="Calculation"/>
-                                    <field name="foreign_amount" sum="Total" width="15" string="USD"/>
+                                    <field name="foreign_amount" sum="Total" width="15" string="USD" attrs="{'readonly': ['|',('move_id', '!=', False),('margin_order', 'not in', ('3'))]}"/>
                                     <field name="exchange_rate" width="10"
                                            attrs="{'readonly': [('move_id', '!=', False)]}"/>
                                     <field name="amount_etb" sum="total" width="15" string="ETB"/>
