@@ -74,23 +74,48 @@ class AccountLoanModifaied(models.Model):
             # principal_recipt=arecipt   
 
     def compute_daily_cron_future_payment(self):
+        acount_loandraft = self.env['account.loan'].search(
+            [('state','=','draft')])
+        for rec in acount_loandraft:
+            
+            if rec.next_payment_date:
+                rec.future_payment= rec.next_payment_date
+                rec.state="active"
+                rec.isactive=True            
+
         acount_loan = self.env['account.loan'].search(
             [('isactive', '=', True),('state','!=','done')])
 
         for record in acount_loan:
+            
             current_date = datetime.today().date()
             valuedate=record.next_payment_date
-            
+            if record.next_payment_date>current_date:
+                record.state="active"
+            else:
+                payment=self.env['account.loan.repayment'].search(
+            [('value_date', '=', record.next_payment_date),('acount_loan_id','=',record.id)]) 
+                for pay in payment:
+                    payment_date=pay.expected_payment_date+relativedelta(months=record.payment_month)
+                    account_schedule=self.env['account.loan.schedule'].search([('acount_loan_id','=',record.id),('payment_date','=',payment_date)])
+                    if not account_schedule:
+                        account_schedule=self.env['account.loan.renew'].search([('acount_loan_id','=',record.id),('renew_date','=',payment_date)])
+                    if account_schedule:
+                        record.next_payment_date=payment_date
+
+                
             if not record.future_payment:
                 record.future_payment=record.next_payment_date
             elif record.future_payment:
                 if record.future_payment<current_date:
-                    while( record.future_payment<current_date):
-                        account_schedule=self.env['account.loan.schedule'].search([('acount_loan_id','=',record.id),('payment_date','=',record.future_payment+relativedelta(months=record.payment_month))])
+                    futurepay=record.future_payment
+                    while( futurepay<=current_date):
+                        futurepay=futurepay+relativedelta(months=record.payment_month)
+                        account_schedule=self.env['account.loan.schedule'].search([('acount_loan_id','=',record.id),('payment_date','=',futurepay)])
                         if not account_schedule:
-                            account_schedule=self.env['account.loan.renew'].search([('acount_loan_id','=',record.id),('renew_date','=',record.future_payment+relativedelta(months=record.payment_month))])
+                            account_schedule=self.env['account.loan.renew'].search([('acount_loan_id','=',record.id),('renew_date','=',futurepay)])
                         if account_schedule:
-                            record.future_payment=record.future_payment+relativedelta(months=record.payment_month)#-relativedelta(days=1)
+                            record.future_payment=futurepay#-relativedelta(days=1)
             for paymentws in record.loan_repayment_ids:
                 if paymentws.value_date:
                     if not record.next_payment_date:

@@ -170,7 +170,7 @@ class sale_order_line(models.Model):
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price')
     def _compute_price_unit(self):
-        if self.order_id.state in ('sale', 'cancel', 'done', 'fia'):
+        if self.order_id.state in ('sale', 'cancel', 'done', 'fia') or self.order_id.company_id.id == 2:
             return
         used_under = []
 

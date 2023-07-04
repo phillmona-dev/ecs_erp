@@ -70,7 +70,7 @@
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom_qty" string="Quantity"/>
-                                    <field name="price_unit"/>
+                                    <field name="price_unit_cons"/>
                                     <field name="amount" sum="Total"/>
                                     <field name="warehouse_id" options="{'no_create':True,'no_open':True}"
                                            string="Receipt warehouse"/>
