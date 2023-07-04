@@ -14,6 +14,8 @@ class Account_Check_Setting(models.Model):
 
     name = fields.Char("Bank Name", required=True)
 
+    name_width = fields.Float("Name Width")
+
     date_left_p = fields.Float("Date Left Padding")
     date_top_p = fields.Float("Date Top Padding")
 
@@ -25,7 +27,8 @@ class Account_Check_Setting(models.Model):
 
     amount_word_left_p = fields.Float("Amount Word Left Padding")
     amount_world_top_p = fields.Float("Amount Word Top Spacing")
-    amount_word_width = fields.Float("Amount Word Width")
+    amount_word_width = fields.Float("Amount Word Width 1")
+    amount_word_width1 = fields.Float("Amount Word Width 2")
 
     amount_word_line_spacing = fields.Float("Amount Word Line Spacing")
 

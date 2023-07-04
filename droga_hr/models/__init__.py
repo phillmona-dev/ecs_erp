@@ -3,3 +3,4 @@
 from . import hr_job
 from . import hr_head_count_request
 from . import employee
+from . import hr_letter
