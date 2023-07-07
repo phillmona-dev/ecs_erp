@@ -131,7 +131,7 @@ class droga_stock_cons_receive(models.Model):
                         'product_id': rec['product_id'].id,
                         'product_uom': rec['product_uom'].id,
                         'product_uom_qty': rec['product_uom_qty'],
-                        'price_unit': rec['price_unit'],
+                        'price_unit': rec['price_unit_cons'],
                         'location_id': cons_vendor,
                         'location_dest_id': def_loc_id,
                         'state': 'confirmed',
@@ -171,18 +171,18 @@ class droga_stock_cons_receive_detail(models.Model):
         'Request',
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True, state={'done': [('readonly', True)]})
-    price_unit = fields.Float('Unit price before VAT')
+    price_unit_cons = fields.Float('Unit price before VAT',store=True,precompute=True)
 
-    amount = fields.Float('Amount',compute='compute_amount',store=True)
+    amount = fields.Float('Amount',compute='compute_amount')
 
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
                                   domain="[('category_id', '=', product_uom_category_id)]")
 
-    @api.depends('price_unit', 'product_uom_qty')
+    @api.depends('price_unit_cons', 'product_uom_qty')
     def compute_amount(self):
         for rec in self:
             try:
-                rec.amount = rec.price_unit*rec.product_uom_qty
+                rec.amount = rec.price_unit_cons*rec.product_uom_qty
 
             except Exception as e:
                 rec.amount = 0
