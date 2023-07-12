@@ -66,7 +66,7 @@
             </xpath>
 
             <xpath expr="//field[@name='partner_bank_id']" position="after">
-                <field name="check_due_date"/>
+                <field name="check_due_date" required="1"/>
                 <field name="purpose"/>
                 <field name="is_check_printed" string="Check Printed"/>
                 <field name="first_line_amount_word" invisible="1"/>
