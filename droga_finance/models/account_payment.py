@@ -70,9 +70,9 @@ class AccountPayment(models.Model):
 
     def get_transaction_no(self, transaction_type, payment_method, res):
         transaction = {'transaction_type': '-', 'transaction_no': 'New'}
-        now = datetime.today().date()
+        payment_date = res.date
         fiscal_year = self.env['account.fiscal.year'].search(
-            [('date_from', '<=', now), ('date_to', '>=', now), ('company_id', '=', res.company_id.id)])
+            [('date_from', '<=', payment_date), ('date_to', '>=', payment_date), ('company_id', '=', res.company_id.id)])
 
         sequence = None
         if fiscal_year:
