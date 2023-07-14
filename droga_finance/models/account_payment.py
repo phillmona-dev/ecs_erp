@@ -72,7 +72,8 @@ class AccountPayment(models.Model):
         transaction = {'transaction_type': '-', 'transaction_no': 'New'}
         payment_date = res.date
         fiscal_year = self.env['account.fiscal.year'].search(
-            [('date_from', '<=', payment_date), ('date_to', '>=', payment_date), ('company_id', '=', res.company_id.id)])
+            [('date_from', '<=', payment_date), ('date_to', '>=', payment_date),
+             ('company_id', '=', res.company_id.id)])
 
         sequence = None
         if fiscal_year:
@@ -85,13 +86,16 @@ class AccountPayment(models.Model):
                     # get sequence
                     sequence = record.sequence
 
+            for rec in transaction_types:
+                transaction_type = rec
+
             if sequence:
                 # generate new sequence
                 # get sequence number for each company
                 # transaction_no = self.env['ir.sequence'].next_by_code(sequence.code) or '/'
                 transaction_no = sequence.next_by_id()
                 # update transaction
-                transaction.update({'transaction_type': transaction_types.id, 'transaction_no': transaction_no})
+                transaction.update({'transaction_type': transaction_type, 'transaction_no': transaction_no})
                 return transaction
             else:
                 raise ValidationError(
