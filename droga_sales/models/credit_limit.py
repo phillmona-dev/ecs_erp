@@ -119,8 +119,9 @@ class cust_sales_credit_limit(models.Model):
 
         for so in result:
 
-            if not so.order_from.startswith('P') and self.env.company.id == 1:
-                raise ValidationError('Sales is temporarly unavailable, please check later.'+so.order_from)
+            if not so.order_from:
+                if self.env.company.id == 1 and so.order_type.startswith('WS'):
+                    raise ValidationError('Sales is temporarly unavailable, please check later.')
 
             if not so.partner_id.vat:
                 message=message+"Tin No must be registered for customer!"
