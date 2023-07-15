@@ -118,11 +118,12 @@ class droga_stock_office_supplies(models.Model):
                 raise UserError(
                     "At least one product must be requested to save record.")
 
-            _name = self.env['ir.sequence'].next_by_code(
-                'droga.inventory.transfer.custom.sequence.of')
-            if not _name:
+                # generate transaction number
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('STR', vals_list['request_date'],
+                                                                                   vals_list['company_id'])
+            if not sequence_no:
                 raise UserError("Request sequence not found.")
-            vals_list['name'] = _name
+            vals_list['name'] = sequence_no or '/'
         return super(droga_stock_office_supplies, self).create(vals_list)
 
     # submit action

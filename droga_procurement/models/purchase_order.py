@@ -212,11 +212,17 @@ class purchase_order(models.Model):
         self_comp = self.with_company(company_id)
 
         if vals['request_type'] == 'Foregin':
-            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-                'purchase.order.foreign') or '/'
+            # generate transaction number
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('POF', vals['date_order'],
+                                                                               vals['company_id'])
+            vals['name'] = sequence_no or '/'
+
+
         elif vals['request_type'] == 'Local':
-            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-                'purchase.order.local') or '/'
+            # generate transaction number
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('POL', vals['date_order'],
+                                                                               vals['company_id'])
+            vals['name'] = sequence_no or '/'
 
         res = super(purchase_order, self_comp).create(vals)
 
