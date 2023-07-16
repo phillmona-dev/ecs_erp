@@ -106,8 +106,14 @@ class PaymentRequest(models.Model):
 
         # get sequence number for each company
         self_comp = self.with_company(self.company_id)
-        vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-            'droga.account.payment.request') or '/'
+
+        # generate transaction number
+        sequence_no = self.env['droga.finance.utility'].get_transaction_no('PMR', vals['request_date'],
+                                                                           vals['company_id'])
+        vals['name'] = sequence_no or '/'
+
+        # vals['name'] = self_comp.env['ir.sequence'].next_by_code(
+        # 'droga.account.payment.request') or '/'
         res = super(PaymentRequest, self_comp).create(vals)
 
         return res

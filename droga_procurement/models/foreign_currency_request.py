@@ -72,8 +72,10 @@ class ForeignCurrencyRequest(models.Model):
 
         self_comp = self.with_company(company_id)
 
-        vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-            'droga.currency.request') or '/'
+        # generate transaction number
+        sequence_no = self.env['droga.finance.utility'].get_transaction_no('FCR', vals['request_date'],
+                                                                           company_id)
+        vals['name'] = sequence_no or '/'
 
         res = super(ForeignCurrencyRequest, self_comp).create(vals)
         return res
