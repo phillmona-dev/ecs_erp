@@ -29,7 +29,7 @@
         <field name="implied_ids" eval="[(4, ref('crm_sr'))]"/>
     </record>
     <record id="crm_cust" model="res.groups">
-        <field name="name">CRM admin</field>
+        <field name="name">CRM admin (all customers access)</field>
         <field name="category_id" ref="crm_management"/>
     </record>
     <record id="tin_admin" model="res.groups">

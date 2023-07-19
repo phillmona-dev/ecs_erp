@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="droga_pharma_aliment_action" model="ir.actions.act_window">
+        <field name="name">Minor aliment session</field>
+        <field name="res_model">droga.pharma.minor.alignment</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_pharma_aliment_tree" model="ir.ui.view">
+        <field name="name">droga.pharma.minor.aliment.tree</field>
+        <field name="model">droga.pharma.minor.alignment</field>
+        <field name="arch" type="xml">
+            <tree string="" editable="bottom" create="1">
+                <field name="minor_align"></field>
+                <field name="decision"></field>
+                <field name="referral"></field>
+                <field name="treatment" widget="many2many_tags"></field>
+            </tree>
+        </field>
+    </record>
+</odoo>

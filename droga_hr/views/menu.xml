@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <record model="ir.ui.menu" id="hr_holidays.menu_hr_holidays_root">
         <field name="name">Leave Management</field>
     </record>
-
     <menuitem id="droga_hr_job_grade_menu" name="Job Grades" action="droga_hr_job_grade_action"
               groups="hr.group_hr_user" parent="hr.menu_config_recruitment" sequence="9"/>
     <menuitem id="droga_hr_job_salary_payment_menu" name="Payment Types" action="droga_hr_job_salary_payment_action"

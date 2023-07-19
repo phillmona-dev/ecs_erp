@@ -53,7 +53,9 @@ class account_move(models.Model):
             rec.non_core_amt = rec.amount_total_in_currency_signed - core_sum
 
     def _compute_order_from(self):
+
         for record in self:
+            record.order_from = ''
             recs = self.env['sale.order'].search([('name', '=', record.invoice_origin)])
             record.customer_name1 = ''
             record.cust_id = ''

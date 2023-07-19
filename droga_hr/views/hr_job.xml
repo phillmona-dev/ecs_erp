@@ -38,7 +38,7 @@
                         <field name="name"/>
                         <group>
                             <field name="date_from" required="1"/>
-                            <field name="date_to"/>
+                            <field name="date_to" required="1"/>
                         </group>
                         <group>
                             <field name="state"/>

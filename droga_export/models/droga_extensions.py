@@ -63,7 +63,7 @@ class inventory_return_extension(models.Model):
                         'product_id': rec['product_id'].id,
                         'product_uom': rec['product_uom'].id,
                         'product_uom_qty': rec['product_uom_qty'],
-                        'price_unit': rec['price_unit'],
+                        'price_unit': rec['price_unit_cons'],
                         'location_id': cons_vendor,
                         'location_dest_id': def_loc_id,
                         'state': 'confirmed',
@@ -197,7 +197,7 @@ class droga_cons_inherit(models.Model):
                         'product_uom_qty': det.product_uom_qty * it['rate_in_pct'] / 100,
                         'product_uom': it['item'].uom_id.id,
 
-                        'price_unit': it.items_header[0].raw_item.standard_price+det.proc_cost,  # FIX ME
+                        'price_unit_cons': it.items_header[0].raw_item.standard_price+det.proc_cost,  # FIX ME
 
                         'company_id': self.env.company.id,
                         'warehouse_id': det['warehouse_id'].id,
@@ -263,6 +263,19 @@ class droga_sale_inherit(models.Model):
     _inherit = 'sale.order'
 
     def subcontract_issue_open(self):
+        itemsdetail=[]
+        for ord in self.order_line:
+            if len(self.env['droga.export.items.composition.fin.goods'].search([('item','=',ord.product_template_id.id),('type','=','finish')]))>0:
+                prod_template=self.env['droga.export.items.composition.fin.goods'].search(
+                    [('item', '=', ord.product_template_id.id), ('type', '=', 'finish')])[0].items_header.raw_item.id
+                itemsdetail.append({
+                    'company_id':self.company_id.id,
+                    'product_id':self.env['product.product'].search(
+                    [('product_tmpl_id', '=', prod_template)])[0].id,
+                    'product_uom_qty':(ord.product_uom_qty*100)/self.env['droga.export.items.composition.fin.goods'].search([('item','=',ord.product_template_id.id),
+                                                                                                   ('type','=','finish')])[0]['rate_in_pct']
+
+                })
         return {
             'name': 'Cleaning unit issue',
             'view_type': 'form',
@@ -273,7 +286,8 @@ class droga_sale_inherit(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_issue_type': 'SUBL',
-                'default_subcontract_issue_origin_form': self.id
+                'default_subcontract_issue_origin_form': self.id,
+                'default_detail_entries':itemsdetail
             },
             'domain': [('subcontract_issue_origin_form', '=', self.id)],
         }

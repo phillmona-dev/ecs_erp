@@ -181,12 +181,10 @@ class purhcase_request(models.Model):
 
         self_comp = self.with_company(company_id)
 
-        if vals['request_type'] == 'Local':
-            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-                'droga.purchase.request.local') or '/'
-        else:
-            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-                'droga.purchase.request.foreign') or '/'
+        # generate transaction number
+        sequence_no = self.env['droga.finance.utility'].get_transaction_no('PRF', vals['request_date'],
+                                                                           vals['company_id'])
+        vals['name'] = sequence_no or '/'
 
         res = super(purhcase_request, self_comp).create(vals)
 

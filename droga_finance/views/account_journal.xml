@@ -9,6 +9,7 @@
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name="name" width="15"/>
+                <field name="name_width" width="15"/>
                 <field name="date_left_p" width="15"/>
                 <field name="date_top_p" width="15"/>
                 <field name="name_left_p" width="15"/>
@@ -18,6 +19,7 @@
                 <field name="amount_word_left_p" width="15"/>
                 <field name="amount_world_top_p" width="15"/>
                 <field name="amount_word_width" width="15"/>
+                <field name="amount_word_width1" width="15"/>
                 <field name="amount_word_line_spacing" width="15"/>
                 <field name="status"/>
             </tree>

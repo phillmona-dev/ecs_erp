@@ -20,7 +20,7 @@
     </record>
 
     <record id="pharma_di_admin" model="res.groups">
-        <field name="name">DI Pharmacist</field>
+        <field name="name">DI (dispense and invoice) Pharmacist</field>
         <field name="category_id" ref="pharma_management"/>
     </record>
 
@@ -29,6 +29,10 @@
         <field name="category_id" ref="pharma_management"/>
     </record>
 
+    <record id="pharma_settings_admin" model="res.groups">
+        <field name="name">Pharmacy settings administrator</field>
+        <field name="category_id" ref="pharma_management"/>
+    </record>
 
 
 

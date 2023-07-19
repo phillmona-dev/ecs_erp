@@ -41,11 +41,4 @@
             </form>
         </field>
     </record>
-
-    <menuitem
-            id="droga_pharma_discount_high_value_menu"
-            name="Discount settings per high value"
-            action="droga_pharma_discount_high_value_action"
-            parent="droga_pharma.droga_pharma_discount_settings"
-            sequence="12"/>
 </odoo>

@@ -1,12 +1,19 @@
 import datetime
 
 from odoo import models, fields, api
-
+from dateutil import relativedelta
 
 class sales_integ(models.Model):
     _inherit = 'sale.order'
     cust_details = fields.Boolean(default=False, string='Customer Details')
     customer_emp=fields.Many2one('droga.pharma.cust.employees',string='Customer Name', domain="[('parent_customer','=',partner_id)]")
+    emp_descr=fields.Char(compute='_get_emp_descr',string='Customer',store=True)
+    @api.depends('partner_id','customer_emp')
+    def _get_emp_descr(self):
+        for rec in self:
+            emp_name=(' - '+rec.customer_emp.descr) if rec.customer_emp.descr else ''
+            rec.emp_descr=rec.partner_id.name+emp_name
+    cust_id_linked=fields.Char('Employee ID',related='customer_emp.cust_id')
     points_gained=fields.Float('Points gained')
     dob = fields.Date('Date of birth', default=datetime.date.today(),related='customer_emp.dob')
     age = fields.Integer(compute='_compute_age',related='customer_emp.age')
@@ -16,7 +23,12 @@ class sales_integ(models.Model):
     weight = fields.Float('Weight')
     diagnosis = fields.Html('Diagnosis')
     physiotherapist = fields.Many2one('droga.physiotherapist.list')
-
+    mtm_count=fields.Integer('MTM count',default=1)
+    mtm_header=fields.One2many('droga.pharma.mtm.header','sales_origin')
+    counselling_count=fields.Integer('Counselling count',default=1)
+    counselling_header = fields.One2many('droga.pharma.counselling', 'sales_origin')
+    minor_align_header = fields.One2many('droga.pharma.minor.alignment', 'sales_origin')
+    membership_origin = fields.Many2one('droga.pharma.membership', readonly=True)
     @api.onchange('dob','sex')
     def _onchange_dob_weight_sex(self):
         for rec in self:
@@ -34,7 +46,8 @@ class sales_integ(models.Model):
                     record['age'] = today.year - record.dob.year - 1
             else:
                 record['age'] = 0
-
+    def action_done(self):
+        self.state='done'
     def disp_products(self):
         temp = self.invoice_status
         self.state = 'dispense'
@@ -46,13 +59,55 @@ class sales_integ(models.Model):
     def set_to_draft(self):
         self.write({'state': 'draft'})
 
+    def action_mtm_orders(self):
+        return {
+            'name': 'MTM sessions',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.pharma.mtm.header',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_sales_origin': self.id,
+            },
+            'res_id': self.mtm_header.id
+        }
+    def action_counselling_orders(self):
+        return {
+            'name': 'Counselling sessions',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.pharma.counselling',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_sales_origin': self.id,
+            },
+        }
+
+    def action_minor_aliments(self):
+        return {
+            'name': 'Minor aliments',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.pharma.minor.alignment',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_sales_origin': self.id,
+            },
+            'res_id': self.minor_align_header.id
+        }
 
 class sales_integ(models.Model):
     _inherit = 'sale.order.line'
-    duration = fields.Float('Duration', compute='get_duration', default=1)
-    frequency = fields.Float('Frequency', compute='get_freq', default=1)
-    rate_type = fields.Selection([("daily", "Daily"), ("weekly", "Weekly"), ('monthly', 'Monthly')], default='daily')
-
+    #duration = fields.Float('Duration', compute='get_duration', default=1)
+    #frequency = fields.Float('Frequency', compute='get_freq', default=1)
+    #rate_type = fields.Selection([("daily", "Daily"), ("weekly", "Weekly"), ('monthly', 'Monthly')], default='daily')
+    lot_id = fields.Many2one(
+        'stock.lot', 'Lot/Serial Number',
+        domain="[('product_id', '=', product_id), ('company_id', '=', company_id)]", check_company=True)
+    tracking = fields.Selection(related='product_id.tracking')
     @api.depends('frequency', 'product_uom_qty')
     def get_duration(self):
         for rec in self:
@@ -62,3 +117,26 @@ class sales_integ(models.Model):
     def get_freq(self):
         for rec in self:
             rec.frequency = rec.product_uom_qty / rec.duration if rec.duration != 0 else 1
+
+    @api.model
+    def create(self, vals):
+        #Validate if there are multiple membership/mtm sales and raise error off of it
+        res = super(sales_integ, self).create(vals)
+        for rec in res:
+            if rec.product_id.pharma_detailed_type=='membershipcard':
+
+                membership_vals = {
+                    'parent_customer': rec.order_id.partner_id.id if not rec.order_id.customer_emp.id else False,
+                    'parent_employee': rec.order_id.customer_emp.id,
+                    'prod': rec.product_id.default_code,
+                    'prod_descr': rec.product_id.name,
+                    'sales_ref': rec.order_id.name,
+                    'paid_amount': rec.price_subtotal,
+                    'left_amount':0,
+                    'date_from': datetime.datetime.now(),
+                    #'date_to': datetime.date.today()+relativedelta(months=rec.product_id.duration)
+                    'date_to':datetime.datetime(2024,1,19)
+                }
+
+                self.env['droga.pharma.membership'].sudo().create(membership_vals)
+        return res

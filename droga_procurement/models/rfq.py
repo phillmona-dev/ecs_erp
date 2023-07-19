@@ -209,12 +209,10 @@ class Rfq(models.Model):
         # get sequence number for each company
         self_comp = self.with_company(company_id)
 
-        if request_type == 'Local':
-            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-                'droga.purchase.request.rfq.local') or '/'
-        else:
-            vals['name'] = self_comp.env['ir.sequence'].next_by_code(
-                'droga.purchase.request.rfq.foreign') or '/'
+        # generate transaction number
+        sequence_no = self.env['droga.finance.utility'].get_transaction_no('RFQF', vals['date'],
+                                                                           vals['company_id'])
+        vals['name'] = sequence_no or '/'
 
         res = super(Rfq, self_comp).create(vals)
 

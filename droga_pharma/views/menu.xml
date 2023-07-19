@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem id="pharma_main_menu" name="Pharmacy chain"
+              web_icon="droga_pharma,static/description/icon.png"
+              sequence="10">
+
+        <menuitem
+                id="droga_sales_pharmacy_menu"
+                name="Sales order"
+                action="droga_sales_order_pharmacy_action"
+                groups="pharma_dp_admin,pharma_br_admin"
+                sequence="20"/>
+
+
+        <menuitem
+                id="droga_sales_pharmacy_menu_invoice"
+                name="To invoice"
+                action="droga_sales_pharmacy_action_to_invoice"
+                groups="pharma_br_admin,pharma_ip_admin"
+                sequence="23"/>
+
+        <menuitem
+                id="droga_sales_pharmacy_menu_so_and_invoice"
+                name="Sales and invoice"
+                action="droga_sales_pharmacy_action_so_and_invoice"
+                groups="pharma_di_admin"
+                sequence="25"/>
+
+        <menuitem
+                id="droga_pharma_reports"
+                name="Reports"
+                groups="pharma_settings_admin"
+                sequence="30">
+
+            <menuitem
+                    id="droga_pharma_system_reports"
+                    name="System reports"
+                    sequence="1">
+
+                <menuitem
+                        id="droga_pharma_follow_up_report_menu"
+                        name="Follow up detail"
+                        action="action_droga_pharma_mtm_schedule_detail_tree"
+                        sequence="2"/>
+            </menuitem>
+            <menuitem
+                    id="droga_pharma_excel_repots"
+                    name="Excel reports"
+                    sequence="2">
+
+                <menuitem
+                        id="droga_pharma_follo_up_excel_report"
+                        name="Follow up Excel Report"
+                        action="action_mtm_excel_report"
+                        sequence="12"/>
+
+            </menuitem>
+        </menuitem>
+
+        <menuitem id="menu_drug_information_query"
+                  name="DIS"
+                  action="action_drug_information_query"
+                  sequence="32"/>
+        <menuitem
+                id="droga_pharma_settings"
+                name="Settings"
+                groups="pharma_settings_admin"
+                sequence="35">
+
+            <menuitem
+                    id="droga_pharma_discount_settings"
+                    name="Discount settings"
+                    sequence="28">
+
+                <menuitem
+                        id="droga_pharma_breast_cont_type_menu"
+                        name="Discount for profession and mothers"
+                        action="droga_pharma_breast_cont_type_action"
+                        sequence="12"/>
+                <menuitem
+                        id="droga_pharma_discount_high_value_menu"
+                        name="Discount settings per high value"
+                        action="droga_pharma_discount_high_value_action"
+                        sequence="12"/>
+            </menuitem>
+
+            <menuitem
+                    id="droga_pharma_reward_settings"
+                    name="Reward settings"
+                    sequence="29">
+                <menuitem
+                        id="droga_pharma_referral_rewards_menu"
+                        name="Rewards gain settings per referral"
+                        action="droga_pharma_referral_rewards_action"
+                        sequence="12"/>
+
+
+                <menuitem
+                        id="droga_pharma_rewards_gain_menu"
+                        name="Rewards gain settings per purchase"
+                        action="droga_pharma_rewards_gain_action"
+                        sequence="13"/>
+
+                <menuitem
+                        id="droga_pharma_rewards_issue_menu"
+                        name="Rewards issue settings"
+                        action="droga_pharma_rewards_issue_action"
+                        sequence="12"/>
+
+                <menuitem
+                        id="droga_pharma_discount_high_value_menu"
+                        name="Rewards per high value"
+                        action="droga_pharma_discount_high_value_action"
+                        sequence="14"/>
+
+                <menuitem
+                        id="droga_pharma_breast_cont_type_menu"
+                        name="Rewards for breast feeders"
+                        action="droga_pharma_breast_cont_type_action"
+                        sequence="15"/>
+            </menuitem>
+
+            <menuitem
+                    id="droga_pharma_selection_settings"
+                    name="Selection settings"
+                    sequence="30">
+                <menuitem
+                        id="droga_pharma_current_status_menu"
+                        name="Current status list"
+                        action="droga_pharma_current_status_action"
+                        sequence="12"/>
+                <menuitem
+                        id="droga_pharma_drug_therapy_problem_menu"
+                        name="Drug therapy problems"
+                        action="droga_pharma_drug_therapy_problem_action"
+                        sequence="13"/>
+                <menuitem
+                        id="droga_pharma_drug_therapy_problem_cause_menu"
+                        name="Drug therapy causes"
+                        action="droga_pharma_drug_therapy_problem_cause_action"
+                        sequence="14"/>
+                <menuitem
+                        id="droga_pharma_intervention_menu"
+                        name="Intervention"
+                        action="droga_pharma_intervention_action"
+                        sequence="14"/>
+                <menuitem
+                        id="droga_pharma_area_coun_menu"
+                        name="Area of counsel"
+                        action="droga_pharma_area_coun_action"
+                        sequence="14"/>
+            </menuitem>
+        </menuitem>
+    </menuitem>
+</odoo>
