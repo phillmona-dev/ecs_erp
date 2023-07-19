@@ -1,12 +1,14 @@
 import datetime
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 class droga_pharma_customer(models.Model):
     _inherit='res.partner'
     allowed_product_groups = fields.Many2many('product.category')
     employees = fields.One2many('droga.pharma.cust.employees', 'parent_customer')
+    memberships_partner=fields.One2many('droga.pharma.membership', 'parent_customer')
 
 class droga_pharma_customer_employees(models.Model):
     _name = 'droga.pharma.cust.employees'
@@ -14,11 +16,13 @@ class droga_pharma_customer_employees(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
 
     _rec_name = 'descr'
+
+    memberships_employee = fields.One2many('droga.pharma.membership', 'parent_employee')
     sales=fields.One2many('sale.order','customer_emp')
     sales_detail=fields.One2many('sale.order.line',related='sales.order_line')
 
-    descr = fields.Char('descr', compute='_get_descr')
-    parent_customer = fields.Many2one('res.partner', string='Customer Name')
+    descr = fields.Char('descr', compute='_get_descr',store=True)
+    parent_customer = fields.Many2one('res.partner', string='Company Name')
     employer_name = fields.Char(related='parent_customer.name', store=True)
     employee_name = fields.Char('Employee Name', required=True)
     mobile = fields.Char('Mobile')
@@ -26,10 +30,12 @@ class droga_pharma_customer_employees(models.Model):
         [('Male', 'Male'), ('Female', 'Female')],
         string='Gender',tracking=True)
     job_position = fields.Char(string='Job position')
+    cust_id=fields.Char('Employee ID',required=True)
     profession=fields.Selection(
         [('hp', 'Health professional'),('other', 'Other')],
         string='Profession')
     age = fields.Integer(compute='_compute_age')
+    phone_no = fields.Char('Phone No',tracking=True)
     dob = fields.Date('Date of birth', default=datetime.date.today(),tracking=True)
     additional_product_groups=fields.Many2many('product.category')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
@@ -42,7 +48,14 @@ class droga_pharma_customer_employees(models.Model):
         string='Period type')
     remaining_amount_period=fields.Char(string='Remaining',compute='_remain_amount_period')
     childs=fields.One2many('droga.pharma.child','parent',string='Childs')
-
+    medical_history=fields.Html('Medical history',tracking=True)
+    medication_history = fields.Html('Medication history and adherance',tracking=True)
+    adr_allergy = fields.Html('ADRs and/or Allergies',tracking=True)
+    immunization = fields.Html('Immunization',tracking=True)
+    _sql_constraints = [
+        ('emp_id_company', 'unique (cust_id,parent_customer)',
+         'Employees ID must be unique per company.')
+    ]
     def open_children(self):
         return {
             'name': 'Children',
@@ -61,12 +74,13 @@ class droga_pharma_customer_employees(models.Model):
         for rec in self:
             rec.remaining_amount_period='FIX ME'
 
+    @api.depends('phone_no','employee_name')
     def _get_descr(self):
         for record in self:
             try:
-                name = (record.job_position + ' - ') if record.job_position else ''
+                name = ' - '+record.phone_no if record.phone_no else ''
 
-                record.descr = name + record.employee_name
+                record.descr = record.employee_name+name
             except:
                 record.descr = record.employee_name if record.employee_name else ' '
 
@@ -95,7 +109,14 @@ class droga_pharma_child_list(models.Model):
     gender = fields.Selection(
         [('Male', 'Male'), ('Female', 'Female')],
         string='Child gender', tracking=True)
-    child_dob= fields.Date('Child dob', default=datetime.date.today(),tracking=True)
+    child_dob= fields.Date('Child dob', default=datetime.datetime(2000,1,1),tracking=True)
     child_name=fields.Char('Child name')
     breast_feed_days=fields.Float('Breastfeed period in days',default=180)
     parent=fields.Many2one('droga.pharma.cust.employees',string='Parent')
+
+    @api.constrains('child_dob')
+    def _is_dob_valid(self):
+        for record in self:
+            if record.child_dob > datetime.date.today():
+                raise ValidationError(
+                    "Date of birth should not be greater than current date.")

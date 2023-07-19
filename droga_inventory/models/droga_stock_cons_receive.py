@@ -171,7 +171,7 @@ class droga_stock_cons_receive_detail(models.Model):
         'Request',
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True, state={'done': [('readonly', True)]})
-    price_unit_cons = fields.Float('Unit price before VAT',store=True,precompute=True)
+    price_unit_cons = fields.Float('Unit price before VAT',store=True)
 
     amount = fields.Float('Amount',compute='compute_amount')
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id="view_order_tree_pharmacy_invoice" model="ir.ui.view">
+    <record id="view_order_tree_physio_invoice" model="ir.ui.view">
         <field name="name">sale.order.tree.pharma.invoice</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
             <tree string="" create="0" delete="false">
                 <field name="name"></field>
-                <field name="partner_id"></field>
+                <field name="emp_descr"></field>
                 <field name="amount_total"></field>
                 <field name="invoice_status"
                     decoration-success="invoice_status == 'invoiced'"
@@ -21,13 +21,13 @@
         </field>
     </record>
 
-    <record id="view_order_tree_pharmacy_no_invoice" model="ir.ui.view">
+    <record id="view_order_tree_physio_no_invoice" model="ir.ui.view">
         <field name="name">sale.order.tree.pharma.no.invoice</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
             <tree string="" delete="false">
                 <field name="name"></field>
-                <field name="partner_id"></field>
+                <field name="emp_descr"></field>
                 <field name="amount_total"></field>
                 <field name="state"></field>
                 <field name="invoice_status"
@@ -41,13 +41,13 @@
         </field>
     </record>
 
-    <record id="droga_sales_pharmacy_search_bole_to_invoice" model="ir.ui.view">
+    <record id="droga_sales_physio_search_bole_to_invoice" model="ir.ui.view">
         <field name="name">sale.order.search.pharma.no.invoice</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
-            <search string="Upcoming Tenders">
+            <search string="Sales order">
                 <field name="name"></field>
-                <field name="partner_id"></field>
+                <field name="emp_descr"></field>
                 <field name="state" ></field>
                 <field name="invoice_status" ></field>
 
@@ -56,8 +56,8 @@
         </field>
     </record>
 
-    <record id="view_order_form_pharmacy" model="ir.ui.view">
-        <field name="name">sale.order.form.pharma</field>
+    <record id="view_order_form_physio" model="ir.ui.view">
+        <field name="name">sale.order.form.physio</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
             <form string="Sales Order" class="o_sale_order"  style="font-size:11pt">
@@ -167,10 +167,6 @@
                             >
                                 <form>
                                     <field name="display_type" invisible="1"/>
-                                    <!--
-                                        We need the sequence field to be here for new lines to be added at the correct position.
-                                        TODO: at some point we want to fix this in the framework so that an invisible field is not required.
-                                    -->
                                     <field name="sequence" invisible="1"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <group>
@@ -495,85 +491,85 @@
         </field>
     </record>
 
-    <record id="droga_sales_pharmacy_action_4k" model="ir.actions.act_window">
+    <record id="droga_sales_physio_action_4k" model="ir.actions.act_window">
         <field name="name">Sales order 4 Kilo</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_partner_id':15390,'default_payment_term_id':11,'default_order_from':'PT-4 Kilo'}</field>
         <field name="domain">[('order_from','=','PT-4 Kilo')]</field>
-        <field name="search_view_id" ref="droga_sales_pharmacy_search_bole_to_invoice"></field>
+        <field name="search_view_id" ref="droga_sales_physio_search_bole_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy_no_invoice')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharmacy')})]"/>
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_physio_no_invoice')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_physio')})]"/>
     </record>
 
-    <record id="droga_sales_pharmacy_action_4k_to_invoice" model="ir.actions.act_window">
+    <record id="droga_sales_physio_action_4k_to_invoice" model="ir.actions.act_window">
         <field name="name">Sales invoice 4 Kilo</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-4 Kilo','search_default_to_invoice':1}</field>
         <field name="domain">[('order_from','=','PT-4 Kilo'),('invoice_status','in',('to invoice','invoiced'))]</field>
-        <field name="search_view_id" ref="droga_sales_pharmacy_search_bole_to_invoice"></field>
+        <field name="search_view_id" ref="droga_sales_physio_search_bole_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy_invoice')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharmacy')})]"/>
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_physio_invoice')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_physio')})]"/>
     </record>
 
-    <record id="droga_sales_pharmacy_action_bole" model="ir.actions.act_window">
+    <record id="droga_sales_physio_action_bole" model="ir.actions.act_window">
         <field name="name">Sales order Bole</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_partner_id':15390,'default_payment_term_id':11,'default_order_from':'PT-Bole'}</field>
         <field name="domain">[('order_from','=','PT-Bole')]</field>
-        <field name="search_view_id" ref="droga_sales_pharmacy_search_bole_to_invoice"></field>
+        <field name="search_view_id" ref="droga_sales_physio_search_bole_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy_no_invoice')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharmacy')})]"/>
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_physio_no_invoice')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_physio')})]"/>
     </record>
 
-    <record id="droga_sales_pharmacy_action_bole_to_invoice" model="ir.actions.act_window">
+    <record id="droga_sales_physio_action_bole_to_invoice" model="ir.actions.act_window">
         <field name="name">Sales invoice Bole</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_payment_term_id':11,'default_order_from':'PT-Bole','search_default_to_invoice':1}</field>
         <field name="domain">[('order_from','=','PT-Bole'),('invoice_status','in',('to invoice','invoiced'))]</field>
-        <field name="search_view_id" ref="droga_sales_pharmacy_search_bole_to_invoice"></field>
+        <field name="search_view_id" ref="droga_sales_physio_search_bole_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharmacy_invoice')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharmacy')})]"/>
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_physio_invoice')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_physio')})]"/>
     </record>
 
     <menuitem id="physio_main_menu" name="Physiotherapy" groups="physio_user_4k,physio_user_bole,physio_user_4k_invoice,physio_user_bole_invoice" web_icon="droga_pharma,static/description/icon_physio.png"
               sequence="10"/>
 
     <menuitem
-            id="droga_sales_pharmacy_menu_4k"
+            id="droga_sales_physio_menu_4k"
             name="Sales order - 4 kilo"
-            action="droga_sales_pharmacy_action_4k"
+            action="droga_sales_physio_action_4k"
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_4k"
             sequence="20"/>
 
     <menuitem
-            id="droga_sales_pharmacy_menu_bole"
+            id="droga_sales_physio_menu_bole"
             name="Sales order - Bole"
-            action="droga_sales_pharmacy_action_bole"
+            action="droga_sales_physio_action_bole"
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_bole"
             sequence="20"/>
 
     <menuitem
-            id="droga_sales_pharmacy_menu_4k_invoice"
+            id="droga_sales_physio_menu_4k_invoice"
             name="To invoice - 4 kilo"
-            action="droga_sales_pharmacy_action_4k_to_invoice"
+            action="droga_sales_physio_action_4k_to_invoice"
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_4k_invoice"
             sequence="20"/>
 
     <menuitem
-            id="droga_sales_pharmacy_menu_bole_invoice"
+            id="droga_sales_physio_menu_bole_invoice"
             name="To invoice - Bole"
-            action="droga_sales_pharmacy_action_bole_to_invoice"
+            action="droga_sales_physio_action_bole_to_invoice"
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_bole_invoice"
             sequence="20"/>

@@ -42,10 +42,4 @@
         </field>
     </record>
 
-    <menuitem
-            id="droga_pharma_referral_rewards_menu"
-            name="Rewards gain settings per referral"
-            action="droga_pharma_referral_rewards_action"
-            parent="droga_pharma.droga_pharma_reward_settings"
-            sequence="12"/>
 </odoo>

@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <tree string="" create="0" delete="false">
                 <field name="name"></field>
-                <field name="partner_id"></field>
+                <field name="emp_descr"></field>
                 <field name="amount_total"></field>
                 <field name="invoice_status"
                        decoration-success="invoice_status == 'invoiced' or (invoice_status=='no' and state=='dispense')"
@@ -17,6 +17,7 @@
 
                 <button type="object" string="Create Invoice" name="create_inv_local"
                         attrs="{'invisible': ['|',('state', '!=', 'sale'),('invoice_status','!=','to invoice')]}"
+                        groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
                         class="oe_highlight"></button>
             </tree>
         </field>
@@ -28,7 +29,7 @@
         <field name="arch" type="xml">
             <tree string="" delete="false">
                 <field name="name"></field>
-                <field name="partner_id"></field>
+                <field name="emp_descr"></field>
                 <field name="amount_total"></field>
                 <field name="state"
                        decoration-success="state == 'dispense'"
@@ -53,7 +54,7 @@
         <field name="arch" type="xml">
             <tree string="" delete="false">
                 <field name="name"></field>
-                <field name="partner_id"></field>
+                <field name="emp_descr"></field>
                 <field name="amount_total"></field>
                 <field name="state"
                        decoration-success="state == 'dispense'"
@@ -78,7 +79,7 @@
         <field name="arch" type="xml">
             <search string="Sales order">
                 <field name="name"></field>
-                <field name="partner_id"></field>
+                <field name="emp_descr"></field>
                 <field name="state"></field>
                 <field name="invoice_status"></field>
 
@@ -99,7 +100,11 @@
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-
+                    <button name="action_done"
+                            string="Done" font-size="16px"
+                            groups="droga_pharma.physio_user_bole,droga_pharma.physio_user_4k"
+                            type="object" class="btn-primary" data-hotkey="q"
+                            attrs="{'invisible': [('state', '!=', 'memb')]}"/>
                     <button name="create_inv_local"
                             string="Create Invoice" font-size="16px"
                             groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
@@ -111,7 +116,6 @@
                             groups="droga_pharma.pharma_di_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-
 
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,sale,dispense"/>
@@ -127,9 +131,30 @@
                                 attrs="{'invisible': [('invoice_count', '=', 0)]}">
                             <field name="invoice_count" widget="statinfo" string="Invoices"/>
                         </button>
+                        <button name="action_mtm_orders"
+                                type="object"
+                                class="oe_stat_button"
+                                string="MTM orders"
+                                icon="fa-credit-card-alt"
+                                attrs="{'invisible': [('mtm_count', '=', 0)]}">
+                        </button>
+                        <button name="action_counselling_orders"
+                                type="object"
+                                class="oe_stat_button"
+                                string="Counselling orders"
+                                icon="fa-credit-card-alt"
+                                attrs="{'invisible': [('counselling_count', '=', 0)]}">
+                        </button>
+                        <button name="action_minor_aliments"
+                                type="object"
+                                class="oe_stat_button"
+                                string="Minor aliments"
+                                icon="fa-credit-card-alt">
+                        </button>
+                        <field name="mtm_count" invisible="1"/>counselling_count
+                        <field name="counselling_count" invisible="1"/>
                     </div>
                     <group>
-
                         <group>
                             <div style="white-space:nowrap">
                                 <h1>
@@ -151,8 +176,9 @@
                             <field name="partner_id" widget="res_partner_many2one"
                                    context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
                                    options='{"always_reload": True,"no_open":True,"no_create": True}'/>
-                            <field name="customer_emp" context="{'default_parent_customer':partner_id,'show_age': True}"></field>
-                            <field name="cust_id"></field>
+                            <field name="customer_emp" context="{'default_parent_customer':partner_id,'show_age': True}"
+                                   options="{'no_open':False,'no_create': False}"></field>
+                            <field name="cust_id_linked"></field>
                             <field name="cust_details"></field>
                             <field name="manual_price" invisible="1"></field>
                             <field name="show_invoice_button" invisible="1"></field>
@@ -205,9 +231,6 @@
                         </group>
 
 
-                    </group>
-                    <group>
-                        <field name="diagnosis" attrs="{'invisible': [('cust_details', '=', False)]}"></field>
                     </group>
                     <notebook>
                         <page string="Order Lines" name="order_lines">
@@ -297,7 +320,7 @@
                                             -->
                                             <field name="sequence" invisible="1"/>
                                         </group>
-                                        <group attrs="{'invisible': [('display_type', '!=', False)]}"
+                                        <group col="2" attrs="{'invisible': [('display_type', '!=', False)]}"
                                                style="font-size:11pt">>
                                             <field name="price_unit" readonly="True"/>
                                             <field name="tax_id" widget="many2many_tags" options="{'no_create': True}"
@@ -305,20 +328,11 @@
                                                    domain="[('type_tax_use','=','sale'), ('company_id','=',parent.company_id), ('country_id', '=', parent.tax_country_id)]"
                                                    attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
                                         </group>
-                                    </group>
-                                    <hr></hr>
-                                    <group colspan="2">
+                                        <hr></hr>
                                         <group>
-                                            <group>
-                                                <field name="duration"></field>
-                                            </group>
-                                            <group>
-                                                <field name="rate_type"></field>
-                                            </group>
-
-                                        </group>
-                                        <group>
-                                            <field name="frequency"></field>
+                                            <field name="tracking" invisible="1"></field>
+                                            <field name="lot_id" attrs="{'readonly': [('tracking', '!=', 'lot')]}"
+                                                   domain="[('product_id', '=', product_id)]"></field>
                                         </group>
                                     </group>
                                     <field name="state" invisible="1"/>
@@ -608,37 +622,6 @@
         (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharma_so_and_invoice')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharma')})]"/>
     </record>
-
-
-    <menuitem id="pharma_main_menu" name="Pharmacy chain"
-              groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_dp_admin,droga_pharma.pharma_ip_admin,droga_pharma.pharma_di_admin"
-              web_icon="droga_pharma,static/description/icon.png"
-              sequence="10"/>
-
-    <menuitem
-            id="droga_sales_pharmacy_menu"
-            name="Sales order"
-            action="droga_sales_order_pharmacy_action"
-            parent="droga_pharma.pharma_main_menu"
-            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
-            sequence="20"/>
-
-
-    <menuitem
-            id="droga_sales_pharmacy_menu_invoice"
-            name="To invoice"
-            action="droga_sales_pharmacy_action_to_invoice"
-            parent="droga_pharma.pharma_main_menu"
-            groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
-            sequence="23"/>
-
-    <menuitem
-            id="droga_sales_pharmacy_menu_so_and_invoice"
-            name="Sales and invoice"
-            action="droga_sales_pharmacy_action_so_and_invoice"
-            parent="droga_pharma.pharma_main_menu"
-            groups="pharma_di_admin"
-            sequence="25"/>
 
 </odoo>
 

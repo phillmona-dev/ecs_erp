@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="droga_pharma_counselling_action" model="ir.actions.act_window">
+        <field name="name">Counselling session</field>
+        <field name="res_model">droga.pharma.counselling</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="droga_pharma_counselling_tree" model="ir.ui.view">
+        <field name="name">droga.pharma.counselling.tree</field>
+        <field name="model">droga.pharma.counselling</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="client_descr"></field>
+                <field name="area_counsel"></field>
+                <field name="status"></field>
+                <field name="pharmacist_lev_understanding"></field>
+                <field name="ses_acceptance"></field>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="droga_pharma_counselling_form" model="ir.ui.view">
+        <field name="name">droga.pharma.counselling.form</field>
+        <field name="model">droga.pharma.counselling</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+
+                    <group string="Counselling">
+                        <group>
+                            <field name="client_descr"></field>
+                            <field name="date"></field>
+                            <field name="status"></field>
+                        </group>
+                        <group>
+                            <field name="area_counsel"></field>
+                            <field name="pharmacist_lev_understanding"></field>
+                            <field name="ses_acceptance"></field>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

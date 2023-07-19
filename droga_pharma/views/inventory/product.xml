@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="droga_pharma_product_tree" model="ir.ui.view">
+        <field name="name">droga.pharma.products.list</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <tree string="" create="false" delete="false" expand="1">
+                <field name="default_code" string="Internal reference"></field>
+                <field name="name"></field>
+                <field name="list_price"></field>
+                <field name="categ_id"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_pharma_product_form" model="ir.ui.view">
+        <field name="name">droga.pharma.product.template.form</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <form string="Product">
+                <sheet name="product_form">
+                    <field name='product_variant_count' invisible='1'/>
+                    <field name='is_product_variant' invisible='1'/>
+                    <field name='attribute_line_ids' invisible='1'/>
+                    <field name="type" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="id" invisible="True"/>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
+                    <div class="oe_title">
+                        <label for="name" string="Product Name"/>
+                        <h1>
+                            <div class="d-flex">
+                                <field name="priority" widget="priority" class="me-3"/>
+                                <field class="text-break" name="name" placeholder="e.g. Name, strength, dosage form)"/>
+                            </div>
+                        </h1>
+                    </div>
+                    <div name="options" readonly="True">
+                        <span class="d-inline-block">
+                            <field name="sale_ok"/>
+                            <label for="sale_ok"/>
+                        </span>
+                        <span class="d-inline-block">
+                            <field name="purchase_ok"/>
+                            <label for="purchase_ok"/>
+                        </span>
+                    </div>
+                    <notebook>
+                        <page string="General Information" name="general_information">
+                            <group>
+                                <group name="group_general">
+                                    <field name="active" invisible="1"/>
+                                    <field name="pharma_detailed_type"/>
+                                    <field name="pharma_prod_categ" string="Pharma Product Category" required="True"/>
+                                    <field name="categ_id" string="Import Product Category" invisible="True"/>
+                                </group>
+                                <group name="group_standard_price">
+                                    <label for="list_price"/>
+                                    <div name="pricing">
+                                        <field name="list_price" class="oe_inline" widget='monetary'
+                                               options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                                    </div>
+                                    <field name="default_code" string="Product code" required="True"></field>
+                                    <field name="pharma_uom" groups="uom.group_uom" options="{'no_create': True}"
+                                           required="True"/>
+                                    <field name="uom_id" groups="uom.group_uom" options="{'no_create': True}"
+                                           invisible="True"/>
+                                    <field name="pharma_filler" invisible="True"></field>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="cost_currency_id" invisible="1"/>
+                                    <field name="product_variant_id" invisible="1"/>
+                                </group>
+                            </group>
+                            <group string="Internal Notes">
+                                <field colspan="2" name="description" nolabel="1"
+                                       placeholder="This note is only for internal purposes."/>
+                            </group>
+                        </page>
+                        <page string="Membership E-Card information"
+                              attrs="{'invisible': [('pharma_detailed_type', '!=', 'membershipcard')]}">
+                            <group>
+                                <field name="duration"></field>
+                                <field name="min_amt"></field>
+                                <field name="mtm_discount" string="MTM / counsel discount in %"></field>
+                            </group>
+                        </page>
+                        <page string="MTM E-Card information"
+                              attrs="{'invisible': [('pharma_detailed_type', '!=', 'mtmcard')]}">
+                            <group>
+                                <field name="no_of_sessions"></field>
+                                <field name="tf_in_months"></field>
+                            </group>
+                        </page>
+                        <page string="Screening reagents"
+                              attrs="{'invisible': [('pharma_detailed_type', '!=', 'hthscreen')]}">
+                            <tree>
+                                <field name="screening_reagents"></field>
+                            </tree>
+                        </page>
+                        <page string="Inventory" name="inventory" groups="product.group_stock_packaging"
+                              attrs="{'invisible':[('type', '=', 'service')]}">
+                            <group name="inventory">
+                                <group name="group_lots_and_weight" string="Logistics"
+                                       attrs="{'invisible': [('type', 'not in', ['product', 'consu'])]}">
+                                    <label for="weight"
+                                           attrs="{'invisible':[('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}"/>
+                                    <div class="o_row" name="weight"
+                                         attrs="{'invisible':[('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}">
+                                        <field name="weight" class="oe_inline"/>
+                                        <field name="weight_uom_name"/>
+                                    </div>
+                                    <label for="volume"
+                                           attrs="{'invisible':[('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}"/>
+                                    <div class="o_row" name="volume"
+                                         attrs="{'invisible':[('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}">
+                                        <field name="volume" string="Volume" class="oe_inline"/>
+                                        <field name="volume_uom_name"/>
+                                    </div>
+                                </group>
+                            </group>
+                            <group name="packaging" string="Packaging"
+                                   colspan="4"
+                                   attrs="{'invisible':['|', ('type', 'not in', ['product', 'consu']), ('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}"
+                                   groups="product.group_stock_packaging">
+                                <field colspan="2" name="packaging_ids" nolabel="1"
+                                       context="{'tree_view_ref':'product.product_packaging_tree_view2', 'default_company_id': company_id}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+
+        </field>
+    </record>
+
+    <record id="droga_pharma_product_action" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'kanban', 'view_id': ref('product.product_template_kanban_view')}),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_pharma_product_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_pharma_product_form')})]"/>
+    </record>
+</odoo>

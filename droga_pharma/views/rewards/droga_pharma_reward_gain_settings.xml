@@ -39,25 +39,4 @@
             </form>
         </field>
     </record>
-
-    <menuitem
-            id="droga_pharma_settings"
-            name="Settings"
-            parent="droga_pharma.pharma_main_menu"
-            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
-            sequence="35"/>
-
-    <menuitem
-            id="droga_pharma_reward_settings"
-            name="Reward settings"
-            parent="droga_pharma.droga_pharma_settings"
-            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
-            sequence="28"/>
-
-    <menuitem
-            id="droga_pharma_rewards_gain_menu"
-            name="Rewards gain settings per purchase"
-            action="droga_pharma_rewards_gain_action"
-            parent="droga_pharma.droga_pharma_reward_settings"
-            sequence="13"/>
 </odoo>

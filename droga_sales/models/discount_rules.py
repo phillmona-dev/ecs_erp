@@ -302,6 +302,7 @@ class sale_order_ext(models.Model):
     non_core_sum = fields.Float('Non-core total', compute='_get_sub_totals')
     state = fields.Selection(
         selection=[
+            ('memb',"Member usage"),
             ('draft', "Quotation"),
             ('sent', "Quotation Sent"),
             ('price_request', "Price change approval"),
@@ -672,9 +673,9 @@ class sale_order_ext(models.Model):
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
                         'droga_sales.sales_import_approve_admin') or self.user_has_groups(
                     'droga_sales.sales_wholesale_approve_admin'):
-                    modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request')]]
+                    modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request','memb')]]
                 else:
-                    modifiers['readonly'] = [['state', 'not in', ('draft')]]
+                    modifiers['readonly'] = [['state', 'not in', ('draft','memb')]]
 
                 node.set('modifiers', simplejson.dumps(modifiers))
             res['arch'] = etree.tostring(doc)

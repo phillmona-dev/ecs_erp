@@ -39,18 +39,4 @@
             </form>
         </field>
     </record>
-
-    <menuitem
-            id="droga_pharma_discount_settings"
-            name="Discount settings"
-            parent="droga_pharma.droga_pharma_settings"
-            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
-            sequence="28"/>
-
-    <menuitem
-            id="droga_pharma_breast_cont_type_menu"
-            name="Discount for profession and mothers"
-            action="droga_pharma_breast_cont_type_action"
-            parent="droga_pharma.droga_pharma_discount_settings"
-            sequence="12"/>
 </odoo>

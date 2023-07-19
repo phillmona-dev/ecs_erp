@@ -45,11 +45,4 @@
             </form>
         </field>
     </record>
-
-    <menuitem
-            id="droga_pharma_rewards_issue_menu"
-            name="Rewards issue settings"
-            action="droga_pharma_rewards_issue_action"
-            parent="droga_pharma.droga_pharma_reward_settings"
-            sequence="12"/>
 </odoo>
