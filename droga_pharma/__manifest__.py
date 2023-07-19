@@ -29,6 +29,7 @@
         'views/droga_pharmacy_sales.xml',
         'reports/daily_sales.xml',
         'views/droga_physio_list.xml',
+        'views/companies.xml',
         'views/customers.xml',
         'views/children.xml',
         'views/rewards/droga_pharma_reward_gain_settings.xml',
