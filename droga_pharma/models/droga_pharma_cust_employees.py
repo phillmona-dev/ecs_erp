@@ -9,6 +9,8 @@ class droga_pharma_customer(models.Model):
     allowed_product_groups = fields.Many2many('product.category')
     employees = fields.One2many('droga.pharma.cust.employees', 'parent_customer')
     memberships_partner=fields.One2many('droga.pharma.membership', 'parent_customer')
+    company_type = fields.Selection(string='Company Type',
+                                    selection=[('person', 'Individual'), ('company', 'Company')])
 
 class droga_pharma_customer_employees(models.Model):
     _name = 'droga.pharma.cust.employees'
