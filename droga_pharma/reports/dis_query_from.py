@@ -4,6 +4,7 @@ from odoo.exceptions import Warning
 
 class DrugInformationQuery(models.Model):
     _name = 'drug.information.query'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Drug Information Query'
     state = fields.Selection([
         ('enquiry', 'Enquiry'),
@@ -124,15 +125,6 @@ class DrugInformationQuery(models.Model):
     ], string='Response Needed In', required=True)
     referral_required = fields.Boolean(string='Referral Required', required=True)
     additional_information = fields.Text(string='Additional Information', required=True)
-    requestor_initials = fields.Char(string='Initial of the Requestor', required=True)
-    requestor_date = fields.Date(string='Requestor Date', required=True)
-    enquiry_received_date = fields.Date(string='Enquiry Received On', required=True)
-    enquiry_received_time = fields.Char(string='Enquiry Received Time', required=True)
-    enquiry_received_by = fields.Char(string='Enquiry Received By', required=True)
-    enquiry_reference_no = fields.Char(string='Enquiry Reference No.', required=True)
-    response_given_date = fields.Date(string='Response Given To Requestor On', required=True)
-    response_given_time = fields.Char(string='Response Given Time', required=True)
-    response_made_by = fields.Char(string='Response Made By', required=True)
 
     # DIS RESPONSE FORM
     disclaimer = fields.Text(string='.',
