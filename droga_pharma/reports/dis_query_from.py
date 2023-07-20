@@ -175,11 +175,11 @@ class DrugInformationQuery(models.Model):
         self.state = "response"
 
     def open_respond_form(self):
-
-        if self.reference_no_reponce and self.date_reponce and self.inquirer_name_reponce and self.phone_no_reponce and self.email_reponce and self.message_reponce and self.question_reponce and self.answer_reponce and self.references_reponce and self.add_info_reponce and self.completed_by_reponce:
-            self.state = "feedback"
-        else:
-            raise Warning('Please fill in all the required fields.')
+        self.state = "feedback"
+        #if self.reference_no_reponce and self.date_reponce and self.inquirer_name_reponce and self.phone_no_reponce and self.email_reponce and self.message_reponce and self.question_reponce and self.answer_reponce and self.references_reponce and self.add_info_reponce and self.completed_by_reponce:
+        #    self.state = "feedback"
+        #else:
+        #    raise Warning('Please fill in all the required fields.')
 
     def open_feedback_form(self):
 
