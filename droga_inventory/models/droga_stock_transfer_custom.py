@@ -109,7 +109,7 @@ class droga_stock_transfer_custom(models.Model):
     def request(self):
         self.ensure_one()
         self._get_approvers()
-        self.state = 'stmg'
+        self.state = 'waiting'
 
     def stmg_approve(self):
         self.set_activity_done()
