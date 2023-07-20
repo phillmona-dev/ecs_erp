@@ -58,7 +58,7 @@
                             </page>
 
                             <!-- Page 2 -->
-                            <page string="Patient Information" attrs="{'invisible': [('state', '!=', 'feedback')]}">
+                            <page string="Patient Information">
                                 <group>
                                     <group>
                                         <field name="request_type"/>
