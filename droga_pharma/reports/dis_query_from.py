@@ -172,7 +172,6 @@ class DrugInformationQuery(models.Model):
     thanks = fields.Text(string='.', default='We thank you for your time and response ')
 
     def open_enquire_form(self):
-        self.set_activity_done()
         self.state = "response"
 
     def open_respond_form(self):
@@ -188,7 +187,7 @@ class DrugInformationQuery(models.Model):
             self.state = "completed"
         else:
             raise Warning('Please fill in all the required fields.')
-    
+
     def set_activity_done(self):
         self.set_activity_done()
         activity = self.env["mail.activity"].search(
