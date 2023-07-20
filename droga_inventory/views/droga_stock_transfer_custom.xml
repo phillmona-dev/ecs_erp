@@ -26,22 +26,23 @@
         <field name="arch" type="xml">
             <form string="Transfers">
                 <header>
+                    <field name="is_owner" invisible="1"></field>
                     <button name="request"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="stmg_approve"
-                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
-                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                            attrs="{'invisible': ['|',('state', 'not in', ('waiting')),('is_owner','=','YES')]}"
+                            string="Accpet" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
                             attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="reset_order"
-                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
+                            attrs="{'invisible': [('is_owner','=','YES')]}"
                             string="Reset to draft" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,waiting2,done"/>
                 </header>
                 <sheet>
                     <group string="Store transfer request">

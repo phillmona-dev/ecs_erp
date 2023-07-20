@@ -15,7 +15,8 @@ class droga_stock_transfer_custom(models.Model):
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
-        ('waiting', 'Requested'),   #When request is waiting for approval/response
+        ('waiting', 'Requested'),
+        ('waiting2', 'Waiting'),#When request is waiting for approval/response
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
         ('done', 'Received'),      #When request is received
@@ -34,9 +35,17 @@ class droga_stock_transfer_custom(models.Model):
 
     location_filter = fields.Char(compute='_filter_location_access',readonly=True,store=False)
     store_manager = fields.Many2one('res.users', compute='_get_approvers')
-
+    pharma_approver_branch_manager=fields.Many2one('res.users', compute='_get_approvers')
+    is_owner=fields.Char( compute='_get_approvers')
+    #user_id = fields.Integer("P.ID", default=lambda self: self.env.user.id, readonly=True, required=True)
     def _get_approvers(self):
         for rec in self:
+            if self.env.user.id!=rec.user_id:
+                rec.is_owner='YES'
+            else:
+                rec.is_owner = 'NOT'
+
+            rec.pharma_approver_branch_manager=self.env.user
 
             if len(rec.detail_entries) > 0:
                 if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
@@ -168,7 +177,7 @@ class droga_stock_transfer_custom(models.Model):
                     self.env['stock.move'].sudo().create(move_vals)
             picking_id.action_assign()
             picking_id.state='assigned'
-        self.state = 'waiting'
+        self.state = 'waiting2'
 
     def action_receive(self):
         #for record in self.transfer_picking:
