@@ -182,11 +182,11 @@ class DrugInformationQuery(models.Model):
         #    raise Warning('Please fill in all the required fields.')
 
     def open_feedback_form(self):
-
-        if self.reference_no_feedback and self.enquiry_date_feedback and self.message_feedback and self.provision_of_information_feedback and self.information_received_in_time_feedback and self.presentation_of_information_feedback and self.information_meet_expectation_feedback and self.information_used_feedback and self.email_feedback:
-            self.state = "completed"
-        else:
-            raise Warning('Please fill in all the required fields.')
+        self.state = "completed"
+        #if self.reference_no_feedback and self.enquiry_date_feedback and self.message_feedback and self.provision_of_information_feedback and self.information_received_in_time_feedback and self.presentation_of_information_feedback and self.information_meet_expectation_feedback and self.information_used_feedback and self.email_feedback:
+        #    self.state = "completed"
+        #else:
+        #    raise Warning('Please fill in all the required fields.')
 
     def set_activity_done(self):
 
