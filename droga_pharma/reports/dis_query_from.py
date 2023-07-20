@@ -172,16 +172,26 @@ class DrugInformationQuery(models.Model):
     thanks = fields.Text(string='.', default='We thank you for your time and response ')
 
     def open_enquire_form(self):
+        self.set_activity_done()
         self.state = "response"
 
     def open_respond_form(self):
+        self.set_activity_done()
         if self.reference_no_reponce and self.date_reponce and self.inquirer_name_reponce and self.phone_no_reponce and self.email_reponce and self.message_reponce and self.question_reponce and self.answer_reponce and self.references_reponce and self.add_info_reponce and self.completed_by_reponce:
             self.state = "feedback"
         else:
             raise Warning('Please fill in all the required fields.')
 
     def open_feedback_form(self):
+        self.set_activity_done()
         if self.reference_no_feedback and self.enquiry_date_feedback and self.message_feedback and self.provision_of_information_feedback and self.information_received_in_time_feedback and self.presentation_of_information_feedback and self.information_meet_expectation_feedback and self.information_used_feedback and self.email_feedback:
             self.state = "completed"
         else:
             raise Warning('Please fill in all the required fields.')
+    
+    def set_activity_done(self):
+        self.set_activity_done()
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        for act in activity:
+            act.sudo().action_done()
