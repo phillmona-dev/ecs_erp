@@ -170,7 +170,7 @@ class DrugInformationQuery(models.Model):
     ], string='Was the information used?')
     email_feedback = fields.Char(string='Email')
     thanks = fields.Text(string='.', default='We thank you for your time and response ')
-
+    create_user=fields.Many2one('res.users', default=lambda self: self.env.user.id)
     def open_enquire_form(self):
         self.state = "response"
 
