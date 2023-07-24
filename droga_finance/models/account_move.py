@@ -59,6 +59,12 @@ class AccountMove(models.Model):
         return super(AccountMove, self).write(vals)
 
     def _compute_amount_word(self):
+
+        self.untaxed_amount_word=''
+        self.amount_total_word=''
+        self.tax_amount_word=''
+        self.tax_amount_word=''
+
         for record in self:
             record.untaxed_amount_word = str(
                 self.convert_to_word(record.amount_untaxed))
