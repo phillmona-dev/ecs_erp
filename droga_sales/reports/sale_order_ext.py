@@ -67,7 +67,7 @@ class sales_report_det_fields(models.Model):
                 rec.margin = 0
                 rec.margin_pct = 0
             else:
-                rec.unit_cost = uc[0].unit_cost
+                rec.unit_cost = sum(uc.mapped('unit_cost'))/len(uc)
                 rec.total_cost = rec.qty_invoiced * rec.unit_cost
                 rec.margin = rec.invoiced_amt - rec.total_cost
                 rec.margin_pct = (rec.margin / rec.invoiced_amt) * 100 if rec.invoiced_amt != 0 else 0
@@ -105,19 +105,36 @@ class droga_sales_cost_of_sales_view(models.Model):
     _name = 'droga.sales.cost.of.sales'
 
     _auto = False
-
-    sale_line_id = fields.Many2one('sale.order.line')
-    amount = fields.Float("Total Amount")
+    product_id=fields.Integer('product_id')
+    product_code = fields.Char('Product Code')
+    product_descr = fields.Char('Product Description')
+    product_categ = fields.Char('Product Category')
+    sales_ref = fields.Char('Sales Ref')
+    sales_date=fields.Date('Sales Date')
+    sale_line_id = fields.Integer('sale_order_line')
+    invoiced_amt=fields.Float('Invoiced amount')
+    qty_invoiced=fields.Float('Quantity Invoiced')
+    price_unit = fields.Float('Unit Price')
+    profit = fields.Float('Profit')
+    profit_margin = fields.Float('Profit Margin')
+    amount = fields.Float("Total cost")
     quantity = fields.Float("Quantity")
-    unit_cost = fields.Integer("Unit Cost")
+    unit_cost = fields.Float("Unit Cost")
 
     def init(self):
         drop_view_if_exists(self.env.cr, 'droga_sales_cost_of_sales')
         self.env.cr.execute("""
                    create or replace view droga_sales_cost_of_sales as (
-
-                        select row_number() over () as id,g.* from (
-                        select a.sale_line_id,b.quantity,b.unit_cost,b.value as amount from stock_move a,stock_valuation_layer b where a.id=b.stock_move_id 
-                        and a.sale_line_id is not null) g 
-
+                        select row_number() over () as id,g.* from (select c.id as product_id,(select y.name->>'en_US' from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id)) as product_descr,
+(select m.default_code from product_product m where m.id=a.product_id) as product_code,(select m.name from sale_order m where m.id=c.order_id) as sales_ref,
+(select i.name from product_category i where i.id=(select y.categ_id from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id))) as product_categ,
+(c.date_order_det) as sales_date,invoiced_amt,qty_invoiced,c.price_unit,round((invoiced_amt+b.value)::decimal,2) as profit,case when invoiced_amt!=0 then round((((invoiced_amt+b.value)/invoiced_amt)*100)::decimal,2) else 0 end as profit_margin,
+a.sale_line_id,b.quantity*-1 as quantity,round(b.unit_cost::decimal,2) as unit_cost,round(b.value*-1::decimal,2) as amount from stock_move a,stock_valuation_layer b,sale_order_line c where a.id=b.stock_move_id 
+                        and a.sale_line_id is not null and c.id=a.sale_line_id) g 
                    )""")
+
+
+
+                        #update account_move_line set product_id=4823 where product_id=2222
+						#update sale_order_line set product_id=4823 where product_id=2222
+						#delete from product_product where id=2222

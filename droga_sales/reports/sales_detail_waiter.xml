@@ -20,10 +20,6 @@
                 <field name="qty_invoiced" string="Qty" optional="show"/>
                 <field name="invoiced_amt" string="Grand Total" optional="show"/>
                 <field name="qty_delivered" optional="show"/>
-                <field name="unit_cost" groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group" optional="show"/>
-                <field name="total_cost" groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group" optional="show"/>
-                <field name="margin" groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group" optional="show"/>
-                <field name="margin_pct" groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group" optional="show"/>
                 <field name="invoice_date" string="Invoice Date" optional="show"/>
 
                 <field name="product_uom" string="UOM" optional="hide"/>
