@@ -211,7 +211,7 @@ class Rfq(models.Model):
 
         # generate transaction number
         sequence_no = self.env['droga.finance.utility'].get_transaction_no('RFQF', vals['date'],
-                                                                           vals['company_id'])
+                                                                           company_id)
         vals['name'] = sequence_no or '/'
 
         res = super(Rfq, self_comp).create(vals)
