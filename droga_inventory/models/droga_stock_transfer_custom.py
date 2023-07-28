@@ -31,7 +31,9 @@ class droga_stock_transfer_custom(models.Model):
         'stock.location', "Destination location",
         required=True,
         state={'draft': [('readonly', False)]})
-
+    location_id = fields.Many2one(
+        'stock.warehouse', "Source warehouse",
+        required=True)
     location_filter = fields.Char(compute='_filter_location_access',readonly=True,store=False)
     store_manager = fields.Many2one('res.users', compute='_get_approvers')
 

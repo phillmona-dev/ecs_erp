@@ -15,7 +15,7 @@ class sales_report_det_fields(models.Model):
     date_order_det = fields.Datetime('droga.crm.settings.city', related='order_id.date_order', store=True)
     order_type_det = fields.Selection([
         ('IM', 'Import'),
-        ('WS', 'Wholesale'), ('PT', 'Physiotherapy')], string='Order from', related='order_id.order_type', store=True)
+        ('WS', 'Wholesale'), ('PT', 'Physiotherapy')], string='Order from (IMP/WHS)', related='order_id.order_type', store=True)
     order_from_det = fields.Char('Order from', compute='_get_order_from', store=True)
     payment_term_det = fields.Many2one('account.payment.term',
                                        string="Payment Terms", related='order_id.payment_term_id', store=True)

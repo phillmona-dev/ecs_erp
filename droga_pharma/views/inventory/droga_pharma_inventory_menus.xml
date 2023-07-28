@@ -13,12 +13,6 @@
             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
             name="Overview"/>
     <menuitem
-            id="droga_pharma_transfer_menu"
-            name="Store transfer requests"
-            action="droga_inventory.droga_inventory_transfer_custom_action"
-            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
-            parent="droga_pharma.droga_pharma_inventory" sequence="1"/>
-    <menuitem
             id="droga_pharma_compounding_menu"
             name="Compounding"
             action="droga_pharma_compounding_action"
