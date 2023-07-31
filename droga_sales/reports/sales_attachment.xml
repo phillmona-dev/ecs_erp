@@ -203,7 +203,7 @@
                                     <td>
                                         <strong>Date:</strong>
                                         <span class="small" t-esc="o.FTimeStamp"
-                                              t-options='{"widget": "datetime","format": "MM-dd-yyyy h:mm a"}'/>
+                                              t-options='{"widget": "datetime","format": "MM-dd-yyyy hh:mm a"}'/>
                                     </td>
                                     <td>
                                         <strong>Fs No.:</strong>
@@ -697,7 +697,7 @@
                                 <td>
                                     <strong class="small">Date:</strong>
                                     <span class="small" t-esc="o.FTimeStamp"
-                                          t-options='{"widget": "datetime","format": "MM-dd-yyyy h:mm a"}'/>
+                                          t-options='{"widget": "datetime","format": "MM-dd-yyyy hh:mm a"}'/>
                                 </td>
                                 <td>
                                     <strong class="small">Fs No.:</strong>
