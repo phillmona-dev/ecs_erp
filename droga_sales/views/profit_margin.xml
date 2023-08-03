@@ -22,6 +22,7 @@
                 <field name="price_unit"></field>
                 <field name="profit"></field>
                 <field name="profit_margin" widget="progressbar"></field>
+                <field name="profit_margin" string="Profit Margin Exact"></field>
                 <field name="amount"></field>
                 <field name="quantity"></field>
                 <field name="unit_cost"></field>
@@ -34,10 +35,10 @@
         <field name="model">droga.sales.cost.of.sales</field>
         <field name="arch" type="xml">
             <search string="">
+                <field name="sales_ref"></field>
                 <field name="product_descr"></field>
                 <field name="product_code"></field>
                 <field name="product_categ"></field>
-                <field name="sales_ref"></field>
                 <field name="sales_date"></field>
                 <field name="invoiced_amt"></field>
                 <field name="qty_invoiced"></field>
