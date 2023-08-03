@@ -21,7 +21,7 @@
                 <field name="qty_invoiced"></field>
                 <field name="price_unit"></field>
                 <field name="profit"></field>
-                <field name="profit_margin" widget="progressbar"></field>
+                <field name="profit_margin_progress_bar" widget="progressbar"></field>
                 <field name="profit_margin" string="Profit Margin Exact"></field>
                 <field name="amount"></field>
                 <field name="quantity"></field>
