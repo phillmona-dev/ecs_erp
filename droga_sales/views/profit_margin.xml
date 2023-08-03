@@ -29,6 +29,27 @@
         </field>
     </record>
 
+    <record id="droga_sales_cost_of_sales_search" model="ir.ui.view">
+        <field name="name">droga.sales.cost.of.sales.view.search</field>
+        <field name="model">droga.sales.cost.of.sales</field>
+        <field name="arch" type="xml">
+            <search string="">
+                <field name="product_descr"></field>
+                <field name="product_code"></field>
+                <field name="product_categ"></field>
+                <field name="sales_ref"></field>
+                <field name="sales_date"></field>
+                <field name="invoiced_amt"></field>
+                <field name="qty_invoiced"></field>
+                <field name="price_unit"></field>
+                <field name="profit"></field>
+                <field name="profit_margin" widget="progressbar"></field>
+                <field name="amount"></field>
+                <field name="quantity"></field>
+                <field name="unit_cost"></field>
+            </search>
+        </field>
+    </record>
 
     <menuitem
             id="droga_sales_cost_of_sales_menu"
