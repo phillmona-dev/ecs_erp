@@ -26,6 +26,7 @@
         'views/droga_tender_master_detail.xml',
         'views/droga_tender_security_detail.xml',
         'views/settings/media.xml',
+        'views/settings/tender_uom.xml',
         'views/settings/sec_type.xml',
         'views/settings/incoterm.xml',
         'views/settings/competitors.xml',

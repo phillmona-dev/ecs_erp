@@ -179,7 +179,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
             sheet.write(row_start, 0, rec.item_num,border)
             item=rec.item_pro if rec.item_pro else rec.type_item.type_or_item_name
             sheet.write(row_start, 1, item if item else ' ',border)
-            uom=rec.uom_free_field if rec.uom_free_field else rec.unit_of_measure
+            uom=rec.uom_reg_field
             sheet.write(row_start, 2, uom if uom else ' ',border)
             sheet.write(row_start, 3, rec.quantity,num_format)
             sheet.write(row_start, 4, rec.unit_price,num_format)
