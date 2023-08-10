@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 
@@ -39,3 +41,27 @@ class droga_pharma_prod_ext(models.Model):
         if not vals_list['default_code']:
             raise UserError("Default code can not be empty.")
         return res
+
+class droga_pharma_dispensary_type(models.Model):
+    _inherit='stock.location'
+
+    pharmacy_location_type=fields.Selection([('Dispensary', 'Dispensary'), ('Store', 'Store'), ('Mix Location', 'Mix Location')],
+                            default='Dispensary',string='Pharmacy Location')
+    parent_loc_type=fields.Selection([
+        ('IM','Import'),
+        ('WS', 'Wholesale'),('PT','Physiotherapy'),
+    ('PH', 'Pharmacy'),], string='Warehouse type.',related='warehouse_id.wh_type')
+
+class droga_pharma_wh_has_dispensary(models.Model):
+    _inherit='stock.warehouse'
+    has_dispensary_location=fields.Boolean("Has dispensary location")
+
+class droga_pharma_lot_extension(models.Model):
+    _inherit='stock.lot'
+    _rec_name='lot_descr'
+    _order = 'expiration_date asc, name, id'
+    lot_descr = fields.Char('Lot', compute='_get_lot_descr')
+
+    def _get_lot_descr(self):
+        for rec in self:
+            rec.lot_descr=rec.name+' - '+str(rec.expiration_date.strftime("%b %d, %Y"))+' - '+str((rec.expiration_date - datetime.today()).days) +' days left'

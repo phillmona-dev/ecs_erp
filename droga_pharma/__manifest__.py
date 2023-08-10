@@ -47,6 +47,7 @@
         'views/inventory/product.xml',
         'views/inventory/droga_pharma_inventory_menus.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
+        'views/inventory/location_extension.xml',
         'views/pcm/mtm.xml',
         'views/pcm/minor_alignment.xml',
         'views/pcm/counselling.xml',

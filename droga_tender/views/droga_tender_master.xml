@@ -46,6 +46,8 @@
                                 class="oe_stat_button"></button>
                         <button icon="fa-credit-card-alt" type="object" string="Payment request" name="pay_req_open"
                                 class="oe_stat_button"></button>
+                        <button icon="fa-credit-card-alt" type="object" string="Purchase request" name="pur_req_open"
+                                class="oe_stat_button"></button>
                         <button icon="fa-credit-card-alt" type="object" string="Submission details"
                                 name="sub_detail_open" class="oe_stat_button"></button>
 

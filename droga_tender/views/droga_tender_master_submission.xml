@@ -132,8 +132,10 @@
                                                 name="reg_products" class="oe_stat_button"/>
                                         <field name="ordered_qty"/>
                                         <field name="delivered_qty"/>
+                                        <field name="remaining_qty"/>
                                         <field name="init_sales_order"/>
                                         <field name="quantity" sum="Total"/>
+                                        <field name="award_quantity" sum="Total"/>
                                         <field name="unit_price" widget='monetary'/>
                                         <field name="amount" sum="Total" widget='monetary'/>
                                         <field name="award_cost" sum="Total"/>
@@ -146,6 +148,7 @@
                                     <tree editable="bottom">
                                         <field name="lot_number"/>
                                         <field name="type_item" options="{'no_create':True,'no_open':True}"/>
+                                        <field name="cont_num"/>
                                         <field name="signing_date"/>
                                         <field name="cont_period"/>
                                         <field name="agree_deadline"/>

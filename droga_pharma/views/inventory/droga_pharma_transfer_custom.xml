@@ -31,7 +31,7 @@
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,processed,done"/>
                 </header>
                 <sheet>
                     <group string="Store transfer request">

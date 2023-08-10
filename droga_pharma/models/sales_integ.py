@@ -49,11 +49,13 @@ class sales_integ(models.Model):
     def action_done(self):
         self.state='done'
     def disp_products(self):
-        temp = self.invoice_status
+        #temp = self.invoice_status
         self.state = 'dispense'
-        self.invoice_status = temp
+        #self.invoice_status = temp
 
         # FIX ME - dispense products here
+
+
 
     # set sales order if invoice is not created
     def set_to_draft(self):

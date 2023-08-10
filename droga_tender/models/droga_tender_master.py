@@ -199,6 +199,21 @@ class droga_tender_master(models.Model):
                 ([('tender_origin_form', '=', self.id)])
         }
 
+    def pur_req_open(self):
+        return {
+            'name': 'Purchase request',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.purchase.request.local',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_tender_origin_form_tender': self.id,
+            },
+            'domain':
+                ([('tender_origin_form_tender', '=', self.id)])
+        }
+
     def order_sales(self):
         if not self.customer.master_cust_id:
             raise ValidationError("Please register customer before raising a sales order.!")
@@ -245,7 +260,8 @@ class droga_tender_master(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_tender_origin_form': self.id,
-                'default_issue_type': 'SIF'
+                'default_issue_type': 'SIF',
+                'default_customer':self.customer.id
             },
             'domain':
                 ([('tender_origin_form', '=', self.id)])

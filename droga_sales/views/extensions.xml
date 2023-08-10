@@ -64,7 +64,7 @@
                        attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                 <field name="order_type" attrs="{'invisible': [('company_id', '!=', 1)],'required': [('company_id', '=', 1)]}" ></field>
                 <field name="company_id" invisible="1"></field>
-                <field name="manual_price" attrs="{'invisible': [('company_id', '!=', 1)]}"></field>
+                <field name="manual_price"></field>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="replace">
@@ -74,8 +74,8 @@
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page/group/group/field[@name='note']" position="replace">
-                <field name="core_sum" string="Core sum" readonly="1"/>
-                <field name="non_core_sum" string="Non-core sum" readonly="1"/>
+                <field name="core_sum" attrs="{'invisible': [('company_id', '!=', 1)]}" string="Core sum" readonly="1"/>
+                <field name="non_core_sum" attrs="{'invisible': [('company_id', '!=', 1)]}" string="Non-core sum" readonly="1"/>
                 <field name="total_discount"
                        attrs="{'invisible': ['|',('total_discount', '&lt;', 0),('total_discount', '=', 0)]}"
                        string="Total discount" invisible="" readonly="1"/>
