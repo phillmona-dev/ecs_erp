@@ -7,7 +7,7 @@ class HrJob(models.Model):
     salary_structure = fields.One2many("hr.job.salary", "job_id")
     job_grade = fields.Many2one("hr.job.grade")
 
-    _sql_constraints = [('name_unique', 'unique(name)', 'Job position must be unique')]
+    #_sql_constraints = [('name_unique', 'unique(name)', 'Job position must be unique')]
 
 
 class HrJobSalary(models.Model):
