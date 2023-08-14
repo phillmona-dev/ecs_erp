@@ -1,9 +1,3 @@
-
-import logging
-import math
-from datetime import datetime
-
-
 from odoo import api, fields, models
 
 class AccountLoanInterest(models.Model):
