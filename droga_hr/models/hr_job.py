@@ -9,7 +9,6 @@ class HrJob(models.Model):
 
     #_sql_constraints = [('name_unique', 'unique(name)', 'Job position must be unique')]
 
-
 class HrJobSalary(models.Model):
     _name = 'hr.job.salary'
 
