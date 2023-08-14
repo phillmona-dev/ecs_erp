@@ -25,7 +25,7 @@
     </record>
 
       <record id="pharma_supply_chain_manager" model="res.groups">
-        <field name="name">Supply Chain Manager</field>
+        <field name="name">Pharmacy supply Chain Manager</field>
         <field name="category_id" ref="pharma_management"/>
     </record>
 

@@ -219,7 +219,7 @@
             name="Clients"
             parent="droga_pharma.pharma_main_menu"
             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
-            sequence="29"/>
+            sequence="30"/>
 
     <menuitem
             id="droga_pharma_customers_list_menu"

@@ -80,11 +80,4 @@
          (0, 0, {'view_mode': 'form', 'view_id': ref('droga_pharma.droga_pharma_transfer_custom_view_form')})]"/>
         <field name="domain">[('create_uid','=',uid)]</field>
     </record>
-
-    <menuitem
-            id="droga_pharma_transfer_menu"
-            name="Store transfer requests"
-            action="droga_pharma_transfer_custom_action"
-            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
-            parent="droga_pharma.droga_pharma_inventory" sequence="1"/>
 </odoo>
