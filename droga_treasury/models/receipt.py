@@ -1,12 +1,9 @@
-import logging
-import math
 from datetime import datetime
-from xmlrpc.client import boolean
-from datetime import date, datetime, timedelta
-from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
-from odoo.exceptions import UserError,ValidationError
+from odoo.exceptions import ValidationError
+
+
 class AccountLoanReceipt(models.Model):
     _name = 'account.loan.receipt'
     

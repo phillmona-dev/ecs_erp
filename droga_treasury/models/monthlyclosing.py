@@ -1,7 +1,9 @@
-from odoo import api, fields, models
-from datetime import datetime, date, timedelta
+from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+
+from odoo import fields, models
+
 
 class DrogaMonthlyclose(models.Model):
 

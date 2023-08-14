@@ -1,9 +1,12 @@
-
-from copy import copy
 from odoo import api, fields, models
-from dateutil.relativedelta import relativedelta
-from datetime import datetime,date,time
-from odoo.exceptions import UserError,ValidationError
+from datetime import datetime
+from odoo.exceptions import ValidationError
+from datetime import datetime
+
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError
+
+
 class AccountLoanRenew(models.Model):
     _name = 'account.loan.renew'
     

@@ -48,6 +48,7 @@
                             <field name="customer_name1"/>
                         </group>
                         <group>
+
                             <field name="FPMachineID" string="MachineID" readonly="0"/>
                             <field name="EJNumber" string="EJ Number" readonly="0"/>
                             <field name="tin_no" invisible="1"/>

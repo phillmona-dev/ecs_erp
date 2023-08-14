@@ -1,18 +1,12 @@
-from distutils.log import debug
-from re import I
-from odoo import api, fields, models
-import calendar
 from datetime import date, datetime, timedelta
-
 
 from dateutil.relativedelta import relativedelta
 
-#from dateutil.relativedelta import relativedelta
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError, ValidationError
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DF
-from odoo.tools import float_compare, float_is_zero
+
+# from dateutil.relativedelta import relativedelta
 
 
 class AccountLoan(models.Model):
