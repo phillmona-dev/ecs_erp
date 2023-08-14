@@ -251,11 +251,16 @@ class account_move(models.Model):
         return True
 
     def print_sales_attachment(self):
-        if self.order_from in ('IM', 'WS', 'IM-IM', 'IM-WS'):
-            res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_action').report_action(self)
-        else:
-            res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_a5_action').report_action(self)
-        return res1
+
+        if self.company_id.id == 1:  # droga
+            if self.order_from in ('IM', 'WS', 'IM-IM', 'IM-WS'):
+                res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_action').report_action(self)
+            else:
+                res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_a5_action').report_action(self)
+                return res1
+        elif self.company_id.id == 2:
+            res1 = self.env.ref('droga_sales.ema_sales_pos_attachment_action').report_action(self)
+            return res1
 
     def set_analytic_accounts(self):
         # get analytic account

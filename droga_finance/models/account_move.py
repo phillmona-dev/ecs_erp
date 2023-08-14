@@ -31,6 +31,8 @@ class AccountMove(models.Model):
         compute='_compute_withholding_amount')
     withholding_thirty_percent = fields.Float(
         compute='_compute_withholding_amount')
+    vat_percent = fields.Float(
+        compute='_compute_withholding_amount')
 
     cost_center = fields.Char(string="Division", store=True, compute='_get_sales_info')
     sales_channel = fields.Char("Sales Channel", store=True, compute='_get_sales_info')
@@ -60,10 +62,10 @@ class AccountMove(models.Model):
 
     def _compute_amount_word(self):
 
-        self.untaxed_amount_word=''
-        self.amount_total_word=''
-        self.tax_amount_word=''
-        self.tax_amount_word=''
+        self.untaxed_amount_word = ''
+        self.amount_total_word = ''
+        self.tax_amount_word = ''
+        self.tax_amount_word = ''
 
         for record in self:
             record.untaxed_amount_word = str(
@@ -80,15 +82,24 @@ class AccountMove(models.Model):
     def _compute_withholding_amount(self):
         tax_amount1 = 0
         tax_amount2 = 0
+        vat_amount = 0
+
+        self.withholding_two_percent = 0
+        self.withholding_thirty_percent = 0
+        self.vat_percent = 0
+
         for record in self.invoice_line_ids:
             for tax_id in record.tax_ids:
-                if tax_id.name == 'Purchase Withholding 2%':
+                if tax_id.amount == -2:
                     tax_amount1 += abs(record.balance * tax_id.amount / 100)
-                elif tax_id.name == 'Purchase Withholding 30%':
+                elif tax_id.amount == -30:
                     tax_amount2 += abs(record.balance * tax_id.amount / 100)
+                elif tax_id.amount == 15:
+                    vat_amount += abs(record.balance * tax_id.amount / 100)
 
         self.withholding_two_percent = tax_amount1
         self.withholding_thirty_percent = tax_amount2
+        self.vat_percent = vat_amount
 
     # get sales person
     @api.depends('invoice_line_ids.analytic_distribution')
