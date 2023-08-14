@@ -168,6 +168,8 @@ class cust_sales_credit_limit(models.Model):
             #This is for import or wholesale sales under Droga
             elif so.order_type and self.env.company.id==1:
                 so.order_from='IM-'+so.order_type
+            elif self.env.company.id==2:
+                so.order_from = 'EM-EM'
 
             if result.user_id.name.startswith('CRM'):
                 result.sales_initiator='SR-'+result.pr_sales.p_name if result.pr_sales else result.user_id.name

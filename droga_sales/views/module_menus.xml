@@ -47,6 +47,10 @@
         </field>
     </record>
 
+    <record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
+        <field name="domain">[('invoice_status','=','to invoice'),('has_invoice_access','=',True)]</field>
+    </record>
+
     <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
         <field name="name">Quotations / Sales</field>
         <field name="domain">[('has_access','=',True),'|',('company_id','!=',1),('order_type','!=',False)]</field>

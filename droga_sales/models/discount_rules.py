@@ -352,6 +352,7 @@ class sale_order_ext(models.Model):
     final_approver = fields.Many2one('res.users', compute='_get_approvers')
     out_of_stock_items = fields.Char('Stock out items', compute='_get_stock_out')
     has_access = fields.Boolean(default=False, search='_has_access', compute='_compute_has_access')
+    has_invoice_access=fields.Boolean(default=False, search='_has_invoice_access', compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
     wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh')
 
@@ -362,6 +363,29 @@ class sale_order_ext(models.Model):
     def _get_pharma_wh(self):
         for rec in self:
             rec.wareh = self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)[0].id if len(self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)) > 0 else False
+    def _has_invoice_access(self, operator, value):
+        if operator=='=':
+            if self.env.user.has_group('droga_sales.sales_import_invoicer'):
+                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-IM')])])]
+            if self.env.user.has_group('droga_sales.sales_wholesale_invoicer'):
+                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-WS')])])]
+            if self.env.user.has_group('droga_sales.ema_invoicer'):
+                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'EM-EM')])])]
+            else:
+                return [('id', 'in', [])]
+        else:
+            return [('id', 'in', [])]
+
+    def _compute_has_invoice_access(self):
+        has_import_acc=self.env.user.has_group('droga_sales.sales_import_approve_admin')
+        has_ws_acc = self.env.user.has_group('droga_sales.sales_wholesale_invoicer')
+        has_ema_acc = self.env.user.has_group('droga_sales.ema_invoicer')
+
+        for rec in self:
+            if (rec.order_from=="IM-IM" and has_import_acc) or (rec.order_from=="IM-WS" and has_ws_acc) or (rec.order_from=="EM-EM" and has_ema_acc):
+                rec.has_access=True
+            else:
+                rec.has_access=False
 
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
