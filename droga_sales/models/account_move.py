@@ -257,7 +257,7 @@ class account_move(models.Model):
                 res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_action').report_action(self)
             else:
                 res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_a5_action').report_action(self)
-                return res1
+            return res1
         elif self.company_id.id == 2:
             res1 = self.env.ref('droga_sales.ema_sales_pos_attachment_action').report_action(self)
             return res1
