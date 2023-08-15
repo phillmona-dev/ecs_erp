@@ -238,8 +238,9 @@ class AccountMove(models.Model):
                 raise ValidationError("Internal withholding reference already generated")
             self_comp = self.with_company(record.company_id)
 
-            record.withholding_internal_ref = self_comp.env['ir.sequence'].next_by_code(
-                'withholding.internal.reference') or '/'
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('WH', record.invoice_date,
+                                                                               record.company_id.id)
+            record.withholding_internal_ref = sequence_no or '/'
 
     @api.constrains('crvs')
     def validate_crv(self):
