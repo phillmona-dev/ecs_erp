@@ -677,12 +677,14 @@ class droga_stock_product_extension(models.Model):
             }}
     @api.model
     def create(self, vals_list):
-
+        res=super(droga_stock_product_extension, self).create(vals_list)
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
         if not vals_list['default_code']:
             raise UserError("Default code can not be empty.")
-        return super(droga_stock_product_extension, self).create(vals_list)
+        if res.company_id.id==2:
+            res.order_type='ALL'
+        return res
 
 class product_selection_field(models.Model):
     _inherit = 'product.category'
