@@ -63,6 +63,9 @@ class droga_stock_office_supplies(models.Model):
     product_type = fields.Selection([('Technical', 'Technical'), ('Non Technical', 'Non Technical')],
                                     default='Non Technical')
 
+    request_type = fields.Selection(
+        [("Local", "Local"), ("Pharmacy", "Pharmacy")], default="Local", readonly=True)
+
     purpose = fields.Char("Purpose")
 
     detail_entries = fields.One2many(
@@ -118,9 +121,15 @@ class droga_stock_office_supplies(models.Model):
                 raise UserError(
                     "At least one product must be requested to save record.")
 
-                # generate transaction number
-            sequence_no = self.env['droga.finance.utility'].get_transaction_no('STR', vals_list['request_date'],
+            # generate transaction number
+            if vals_list['request_type'] == 'Local':
+                sequence_no = self.env['droga.finance.utility'].get_transaction_no('STR', vals_list['request_date'],
                                                                                    vals_list['company_id'])
+            elif vals_list['request_type'] == 'Pharmacy':
+                sequence_no = self.env['droga.finance.utility'].get_transaction_no('STRP', vals_list['request_date'],
+                                                                                   vals_list['company_id'])
+
+
             if not sequence_no:
                 raise UserError("Request sequence not found.")
             vals_list['name'] = sequence_no or '/'
@@ -189,7 +198,7 @@ class droga_stock_office_supplies(models.Model):
         def_location_id = self.env['stock.location'].search(
             [('complete_name', 'like', wh.code + '/Stock%'), ('usage', '=', 'internal')])[0].id
         def_dest_id = self.env['stock.location'].search(
-            [('name', 'like', 'Office%'),('con_type', '=', 'INC')])
+            [('name', 'like', 'Office%'), ('con_type', '=', 'INC')])
 
         if not def_location_id:
             raise UserError(
@@ -324,6 +333,7 @@ class droga_stock_office_supplies(models.Model):
                 'department': self.department.id,
                 'request_date': self.env.cr.now(),
                 'store_request_id': self.id,
+                'request_type':self.request_type,
                 'company_id': self.company_id.id,
 
             }
@@ -391,6 +401,9 @@ class droga_stock_office_supplies(models.Model):
                 record.department_manager = record.department.manager_id
             else:
                 record.department_manager = record.requested_by.parent_id
+
+
+
 
 
 class droga_stock_transfer_office_supplies_request_detail(models.Model):
@@ -514,3 +527,8 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
                  ('product_tmpl_id', '=', record.product_id.id)],
                 limit=1).available_quantity
             record.stock_balance = available_quantity
+
+    @api.onchange("product_id")
+    def get_standard_price(self):
+        for record in self:
+            record.unit_price=record.product_id.standard_price

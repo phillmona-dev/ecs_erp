@@ -791,7 +791,7 @@
         </field>
     </record>
 
-    <!-- action for approval local purcjase request -->
+    <!-- action for approval local purchase request -->
     <record id="droga_purhcase_request_for_approval_action" model="ir.actions.act_window">
         <field name="name">Purchase Request</field>
         <field name="res_model">droga.purhcase.request</field>
