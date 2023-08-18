@@ -137,6 +137,7 @@ class PaymentRequest(models.Model):
                 record.total_amount * record.exchange_rate))
 
     def submit_request(self):
+
         self.write({'state': 'Submitted', 'reject_message': ''})
         # check for requester manager
         self.set_activity_done()
@@ -151,6 +152,11 @@ class PaymentRequest(models.Model):
         self.return_to_tree_view()
 
     def approve_request(self):
+
+        if self.create_uid.id == self.get_current_user_id():
+            raise ValidationError(
+                "You can't approve your request!")
+
         self.write({'state': 'Approved'})
         # set activity done
         self.set_activity_done()

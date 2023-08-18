@@ -112,9 +112,9 @@ class account_move(models.Model):
         file_io = BytesIO()
         # get employee record
 
-        if not self.pos_xml_folder:
-            raise ValidationError(
-                "The POS device IP address is not set for the current user, please contact the system administrator to set it.")
+        # if not self.pos_xml_folder:
+        # raise ValidationError(
+        # "The POS device IP address is not set for the current user, please contact the system administrator to set it.")
 
         for record in self:
             m_encoding = 'UTF-8'
@@ -136,6 +136,9 @@ class account_move(models.Model):
             ET.SubElement(Invoice, "Invoice_DiscOrAdd_Amount").text = "0.00"
 
             for line in record.invoice_line_ids:
+
+                if line.price_unit == 0:
+                    continue
 
                 tax_percent = 0
                 # get tax id
@@ -161,7 +164,7 @@ class account_move(models.Model):
             # save path
             save_path = record.pos_xml_folder
             name_of_file = record.name
-            completeName = os.path.join(save_path, name_of_file + ".xml")
+            #completeName = os.path.join(save_path, name_of_file + ".xml")
 
             ##with open(completeName, 'w') as xfile:
             ##xfile.write(
