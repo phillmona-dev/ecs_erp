@@ -64,4 +64,12 @@
         </field>
     </record>
 
+     <!-- rule for filtering data specific data -->
+    <record model="ir.rule" id="droga_account_transaction_type_rule">
+        <field name="name">Transaction Type multi-company</field>
+        <field name="model_id" ref="model_account_transaction_type"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
 </odoo>

@@ -49,7 +49,7 @@ class purchase_request_local(models.Model):
     name = fields.Char('Request Reference', required=True,
                        index=True, copy=False, default='New')
     request_type = fields.Selection(
-        [("Local", "Local"), ("Foreign", "Foregin")], default="Local")
+        [("Local", "Local"), ("Foreign", "Foregin"), ("Pharmacy", "Pharmacy")], default="Local")
     purchase_type = fields.Selection([('product', 'Goods'), ('service', 'Service')],
                                      default="product")
     request_by = fields.Many2one(
@@ -113,9 +113,15 @@ class purchase_request_local(models.Model):
         self_comp = self.with_company(company_id)
 
         # generate transaction number
-        sequence_no = self.env['droga.finance.utility'].get_transaction_no('PRL', vals['request_date'],
-                                                                           vals['company_id'])
-        vals['name'] = sequence_no or '/'
+        if vals['request_type'] == 'Local':
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('PRL', vals['request_date'],
+                                                                               vals['company_id'])
+            vals['name'] = sequence_no or '/'
+        elif vals['request_type'] == 'Pharmacy':
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('PRP', vals['request_date'],
+                                                                               vals['company_id'])
+            vals['name'] = sequence_no or '/'
+
         res = super(purchase_request_local, self_comp).create(vals)
 
         return res
@@ -322,3 +328,8 @@ class purchase_request_line_local(models.Model):
                 # update remaining balance
                 if res != None:
                     record.remaining_budget = res['remaining_balance']
+
+    @api.onchange("product_id")
+    def get_standard_price(self):
+        for record in self:
+            record.unit_price = record.product_id.standard_price

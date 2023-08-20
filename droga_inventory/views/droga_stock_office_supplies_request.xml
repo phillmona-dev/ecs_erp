@@ -165,6 +165,7 @@
                             <field name="department_manager" readonly="1" invisible="1"/>
                             <field name="branch" options="{'no_create':True,'no_open':True}" required="1"
                                    attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                            <field name="request_type"/>
                         </group>
                         <group>
                             <field name="approve_dept_manger" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
@@ -283,6 +284,7 @@
                             <field name="department_manager" readonly="1" invisible="1"/>
                             <field name="branch" options="{'no_create':True,'no_open':True}" required="1"
                                    attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                            <field name="request_type"/>
                         </group>
                         <group>
                             <field name="approve_dept_manger" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
@@ -376,10 +378,25 @@
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_inventory_office_supplies_request_tree')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('droga_inventory_office_supplies_request_warehouse_form')}),
          (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_inventory_office_supplies_request_kanban')})]"/>
-        <field name="domain">[]</field>
-        <field name="context">{}</field>
-        <field name="domain">[]</field>
-        <field name="context">{}</field>
+        <field name="domain">[('request_type', '=', 'Local')]</field>
+        <field name="context">{'default_request_type': 'Local'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Store requisition found!
+            </p>
+        </field>
+    </record>
+
+    <record id="droga_inventory_office_supplies_request_pharmacy_warehouse_action" model="ir.actions.act_window">
+        <field name="name">Store Requisition</field>
+        <field name="res_model">droga.inventory.office.supplies.request</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_inventory_office_supplies_request_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_inventory_office_supplies_request_warehouse_form')}),
+         (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_inventory_office_supplies_request_kanban')})]"/>
+        <field name="domain">[('request_type', '=', 'Pharmacy')]</field>
+        <field name="context">{'default_request_type': 'Pharmacy'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No Store requisition found!

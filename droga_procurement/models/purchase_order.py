@@ -185,7 +185,7 @@ class purchase_order(models.Model):
     currency_approved_date = fields.Date("Currency Approved DateF")
 
     request_type = fields.Selection(
-        [("Local", "Local"), ("Foregin", "Foregin")], default="Local")
+        [("Local", "Local"), ("Foregin", "Foregin"), ("Pharmacy", "Pharmacy")], default="Local")
 
     is_delivery_partial = fields.Boolean("Partial Delivery")
     lc_margins = fields.One2many("droga.purchase.lc.margin", "purchase_order_id")
@@ -221,6 +221,12 @@ class purchase_order(models.Model):
         elif vals['request_type'] == 'Local':
             # generate transaction number
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('POL', vals['date_order'],
+                                                                               vals['company_id'])
+            vals['name'] = sequence_no or '/'
+
+        elif vals['request_type'] == 'Pharmacy':
+            # generate transaction number
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('POP', vals['date_order'],
                                                                                vals['company_id'])
             vals['name'] = sequence_no or '/'
 

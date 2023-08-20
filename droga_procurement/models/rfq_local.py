@@ -70,9 +70,14 @@ class Rfq_Local(models.Model):
         self_comp = self.with_company(company_id)
 
         # generate transaction number
-        sequence_no = self.env['droga.finance.utility'].get_transaction_no('RFQL', vals['date'],
-                                                                           vals['company_id'])
-        vals['name'] = sequence_no or '/'
+        if vals['request_type'] == 'Local':
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('RFQL', vals['date'],
+                                                                               vals['company_id'])
+            vals['name'] = sequence_no or '/'
+        elif vals['request_type'] == 'Pharmacy':
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('RFQP', vals['date'],
+                                                                               vals['company_id'])
+            vals['name'] = sequence_no or '/'
 
         res = super(Rfq_Local, self_comp).create(vals)
 
@@ -233,7 +238,7 @@ class Rfq_Local(models.Model):
                 vals = {'name': 'New', 'state': 'draft', 'date_order': datetime.now(),
                         'rfq_local_id': supplier.rfq_id.id,
                         'company_id':self.company_id.id,
-                        'partner_id': supplier.supplier_id.id, 'request_type': 'Local', 'order_line': []}
+                        'partner_id': supplier.supplier_id.id, 'request_type':self.request_type, 'order_line': []}
 
                 # get products the supplier won
                 for line in self.rfq_lines:
