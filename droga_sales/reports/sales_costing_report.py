@@ -152,6 +152,7 @@ class salesWizard(models.TransientModel):
         domain = [
             ('sales_date', '>=', self.date_from),
             ('sales_date', '<=', self.date_to),
+            ('company_id','=',self.env.company.id)
         ]
         excel_data = self.env['droga.sales.cost.of.sales'].search_read(domain)
         return self.action_get_sales_xls(excel_data)

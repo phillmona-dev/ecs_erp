@@ -155,7 +155,7 @@ class cust_sales_credit_limit(models.Model):
             if not so.order_type and self.env.company.id==1:
                 #Pharmacy
                 if so.order_from.startswith('PH'):
-                    if not so.wareh and False:
+                    if not so.wareh:
                         raise ValidationError("Employee is not linked to a pharmacy chain branch.")
                     for res in so.order_line:
                         res.wareh = so.wareh

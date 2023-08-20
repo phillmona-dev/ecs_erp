@@ -116,6 +116,7 @@ class droga_sales_cost_of_sales_view(models.Model):
     qty_invoiced=fields.Float('Quantity Invoiced')
     price_unit = fields.Float('Unit Price')
     profit = fields.Float('Profit')
+    company_id = fields.Integer('Company ID')
     profit_margin = fields.Float('Profit Margin')
     profit_margin_progress_bar = fields.Float('Profit Margin')
     amount = fields.Float("Total cost")
@@ -127,14 +128,14 @@ class droga_sales_cost_of_sales_view(models.Model):
         self.env.cr.execute("""
                    create or replace view droga_sales_cost_of_sales as (
                         select row_number() over () as id,g.* from (
-select m.product_id,m.product_descr,m.product_code,m.sales_ref,m.product_categ,m.sales_date,m.sale_line_id,avg(m.invoiced_amt) as invoiced_amt,avg(m.qty_invoiced) as qty_invoiced,avg(m.price_unit) as price_unit,round((avg(m.invoiced_amt)-sum(m.amount))::decimal,2) as profit,
+select m.company_id,m.product_id,m.product_descr,m.product_code,m.sales_ref,m.product_categ,m.sales_date,m.sale_line_id,avg(m.invoiced_amt) as invoiced_amt,avg(m.qty_invoiced) as qty_invoiced,avg(m.price_unit) as price_unit,round((avg(m.invoiced_amt)-sum(m.amount))::decimal,2) as profit,
 case when sum(m.invoiced_amt)!=0 then round((((avg(m.invoiced_amt)-sum(m.amount))/avg(m.invoiced_amt))*100)::decimal,2) else 0 end as profit_margin_progress_bar,case when sum(m.invoiced_amt)!=0 then round((((avg(m.invoiced_amt)-sum(m.amount))/avg(m.invoiced_amt))*100)::decimal,2) else 0 end as profit_margin,sum(m.quantity) as quantity,avg(m.unit_cost) as unit_cost,sum(m.amount) as amount from (											
 select c.id as product_id,(select y.name->>'en_US' from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id)) as product_descr,b.value,
-(select m.default_code from product_product m where m.id=a.product_id) as product_code,(select m.name from sale_order m where m.id=c.order_id) as sales_ref,
+(select m.default_code from product_product m where m.id=a.product_id) as product_code,(select m.name from sale_order m where m.id=c.order_id) as sales_ref,c.company_id,
 (select i.name from product_category i where i.id=(select y.categ_id from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id))) as product_categ,
 (c.date_order_det) as sales_date,invoiced_amt,qty_invoiced,c.price_unit,round((invoiced_amt+b.value)::decimal,2) as profit,case when invoiced_amt!=0 then round((((invoiced_amt+b.value)/invoiced_amt)*100)::decimal,2) else 0 end as profit_margin,
 a.sale_line_id,b.quantity*-1 as quantity,round(b.unit_cost::decimal,2) as unit_cost,round(b.value*-1::decimal,2) as amount from stock_move a,stock_valuation_layer b,sale_order_line c where a.id=b.stock_move_id 
-                        and a.sale_line_id is not null and c.id=a.sale_line_id) m group by m.product_id,m.product_descr,m.product_code,m.sales_ref,m.product_categ,m.sales_date,m.sale_line_id) g 
+                        and a.sale_line_id is not null and c.id=a.sale_line_id) m group by m.company_id,m.product_id,m.product_descr,m.product_code,m.sales_ref,m.product_categ,m.sales_date,m.sale_line_id) g 
                    )""")
 
 
