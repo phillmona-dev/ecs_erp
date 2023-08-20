@@ -63,7 +63,14 @@ class cust_contact_extension(models.Model):
         for rec in self:
             if 'vat' in vals and rec.vat and not self.env.user.has_group('droga_crm.tin_admin'):
                 raise UserError("You can not edit Tin no.")
+            rec.partner_latitude=rec.lati
+            rec.partner_longitude = rec.long
         return super(cust_contact_extension, self).write(vals)
+
+    def update_current_locations(self,latitude,longitude):
+        self.write({'partner_latitude': float(latitude)})
+        self.partner_latitude=float(latitude)
+        self.write({'partner_longitude': float(longitude)})
 
     @api.model
     def create(self, vals):

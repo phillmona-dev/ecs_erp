@@ -6,6 +6,9 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="js_class">js_form_view</attribute>
+            </xpath>
             <xpath expr="//form/sheet/notebook/page[@name='contact_addresses']" position="after">
                 <field name="customer_rank" invisible="1"></field>
                 <page string="Contacts" attrs="{'invisible': [('supplier_rank', '>', 0)]}">
@@ -159,4 +162,5 @@
                 </field>
             </field>
         </record>
+
 </odoo>

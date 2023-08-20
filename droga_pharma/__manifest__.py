@@ -22,7 +22,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/droga_export_emp_extension.xml',
-        'reports/dis_query_form.xml',
+        'views/dis_query_form.xml',
         'reports/mtm_report.xml',
         'reports/mtm_report_view.xml',
         'views/droga_physio_sales.xml',

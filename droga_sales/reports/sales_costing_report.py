@@ -1,7 +1,12 @@
+import io
+
+from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models
 from io import BytesIO
 import xlsxwriter
 import base64
+import datetime
 import re
 
 
@@ -10,11 +15,12 @@ class salesWizard(models.TransientModel):
     _description = "Print sales Excel Report"
     fileout = fields.Binary(string='File Output')
 
-    date_from = fields.Date(string='From Date')
-    date_to = fields.Date(string='To Date')
-    def action_get_sales_xls(self, data):
-        file_io = BytesIO()
+    date_to = fields.Date(string='From Date', default=datetime.date.today() + relativedelta(weeks=0, weekday=-1))
+    date_from = fields.Date(string='To Date', default=datetime.date.today() - relativedelta(weeks=1, weekday=0))
 
+    def action_get_sales_xls(self, data):
+
+        file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
         self.generate_sales_xls_report(workbook, data)
         workbook.close()
@@ -76,59 +82,71 @@ class salesWizard(models.TransientModel):
         # set header
         row_start = 1
         sheet.set_row(row_start + 1, 30)
-        sheet.merge_range('A' + str(row_start + 1) + ':L' + str(row_start + 1), 'DROGA PHARMA P.L.C', header_format)
-        sheet.merge_range('A' + str(row_start + 2) + ':L' + str(row_start + 2), 'Cost of Sales', main_title_format)
-        sheet.merge_range('A' + str(row_start + 3) + ':F' + str(row_start + 7), 'Date from : ' + str(self.date_from),
+        sheet.merge_range('A' + str(row_start + 1) + ':O' + str(row_start + 1), 'DROGA PHARMA P.L.C', header_format)
+        sheet.merge_range('A' + str(row_start + 2) + ':O' + str(row_start + 2), 'Cost of Sales', main_title_format)
+        sheet.merge_range('A' + str(row_start + 3) + ':G' + str(row_start + 7), 'Date from : ' + str(self.date_from),
                           parameter_format)
-        sheet.merge_range('G' + str(row_start + 4) + ':L' + str(row_start + 7), 'Date to : ' + str(self.date_to),
+        sheet.merge_range('H' + str(row_start + 3) + ':O' + str(row_start + 7), 'Date to : ' + str(self.date_to),
                           parameter_format)
 
-        # Set column widths
+        if self.env.company.logo_web:
+            company_image=io.BytesIO(base64.b64decode(self.env.company.logo_web))
+            sheet.insert_image(0,14,"test_image.png",{'image_data':company_image,'y_scale':0.6,'y_offset':1})
 
-        sheet.set_column(0, 0, 15)  # Client
-        sheet.set_column(1, 1, 15)  # Customer
-        sheet.set_column(2, 2, 20)  # Indication
-        sheet.set_column(3, 3, 25)  # Drug Therapy Problem
-        sheet.set_column(4, 4, 25)  # Drug Therapy Cause
-        sheet.set_column(5, 5, 20)  # Intervention
-        sheet.set_column(6, 6, 30)  # Intervention Implemented
-        sheet.set_column(7, 7, 30)  # Intervention Implemented
-        sheet.set_column(8, 8, 30)  # Intervention Implemented
+        sheet.set_column(1, 1, 30)
+        sheet.set_column(2, 2, 30)
+        sheet.set_column(3, 3, 25)
+        sheet.set_column(4, 4, 25)
+        sheet.set_column(5, 5, 20)
+        sheet.set_column(6, 6, 30)
+        sheet.set_column(7, 7, 30)
+        sheet.set_column(8, 8, 30)
+        sheet.set_column(9, 9, 30)
+        sheet.set_column(10, 10, 30)
+        sheet.set_column(11, 11, 30)
+        sheet.set_column(12, 12, 30)
+        sheet.set_column(13, 13, 30)
+        sheet.set_column(14, 14, 30)
 
-        row = 9
+        row = 8
         col = 0
-        sheet.write(row, col + 0, 'Product Code', bold)
-        sheet.write(row, col + 1, 'Product Description', bold)
-        sheet.write(row, col + 2, 'Product Category', bold)
-        sheet.write(row, col + 3, 'Sales Ref', bold)
-        sheet.write(row, col + 4, 'Sales Date', bold)
-        sheet.write(row, col + 5, 'Invoiced amount', bold)
-        sheet.write(row, col + 6, 'Quantity Invoiced', bold)
-        sheet.write(row, col + 7, 'Unit Price', bold)
-        sheet.write(row, col + 8, 'Profit', bold)
+        num = 1
 
-        # Iterate over excel_data and write the values to the sheet
+        sheet.write(row, col + 0, 'Index', title_format)
+        sheet.write(row, col + 1, 'Product Code', title_format)
+        sheet.write(row, col + 2, 'Product Description', title_format)
+        sheet.write(row, col + 3, 'Product Category', title_format)
+        sheet.write(row, col + 4, 'Sales Ref', title_format)
+        sheet.write(row, col + 5, 'Sales Date', title_format)
+        sheet.write(row, col + 6, 'Invoiced amount', title_format)
+        sheet.write(row, col + 7, 'Quantity Invoiced', title_format)
+        sheet.write(row, col + 8, 'Unit Cost', title_format)
+        sheet.write(row, col + 9, 'Unit Price', title_format)
+        sheet.write(row, col + 10, 'Quantity', title_format)
+        sheet.write(row, col + 11, 'Total Cost', title_format)
+        sheet.write(row, col + 12, 'Profit', title_format)
+        sheet.write(row, col + 13, 'Profit Margin', title_format)
+        sheet.write(row, col + 14, 'Profit Margin Progress Bar', title_format)
+
         for index, ed in enumerate(excel_data):
             row = row + 1
-            client_match = re.findall(r"'([^']*)'", str(ed.get('Product Code', '')))
-            client_value = client_match[0] if client_match else ''
-            sheet.write(row, col + 0, client_value, bold)
+            sheet.write(row, col + 1, num, bold)
+            num = num + 1
+            sheet.write(row, col + 1, ed.get('product_code'), bold)
+            sheet.write(row, col + 2, ed.get('product_descr'))
+            sheet.write(row, col + 3, ed.get('product_categ'))
+            sheet.write(row, col + 4, ed.get('sales_ref'))
+            sheet.write(row, col + 5, str(ed.get('sales_date')))
+            sheet.write(row, col + 6, ed.get('invoiced_amt'))
+            sheet.write(row, col + 7, ed.get('qty_invoiced'))
+            sheet.write(row, col + 8, ed.get('unit_cost'))
+            sheet.write(row, col + 9, ed.get('quantity'))
+            sheet.write(row, col + 10, ed.get('price_unit'))
+            sheet.write(row, col + 11, ed.get('amount'))
+            sheet.write(row, col + 12, ed.get('profit'))
+            sheet.write(row, col + 13, ed.get('profit_margin'))
+            sheet.write(row, col + 14, ed.get('profit_margin_progress_bar'))
 
-            customer_match = re.search(r"'([^']*)'", str(ed.get('Product Description', '')))
-            customer_value = customer_match.group(1) if customer_match else ''
-            sheet.write(row, col + 2, customer_value, bold)
-
-            sheet.write(row, col + 2, re.sub('<[^<]+?>', '', str(ed.get('Product Category', ''))))
-            sheet.write(row, col + 3, re.search(r"'([^']*)'", str(ed.get('Sales Ref', ''))))
-
-            drug_cause_match = re.search(r"'([^']*)'", str(ed.get('Sales Date', '')))
-            drug_cause_value = drug_cause_match.group(1) if drug_cause_match else ''
-            sheet.write(row, col + 4, drug_cause_value, bold)
-
-            sheet.write(row, col + 5, re.sub('<[^<]+?>', '', str(ed.get('Invoiced amount', ''))))
-            sheet.write(row, col + 6, re.sub('<[^<]+?>', '', str(ed.get('Quantity Invoiced', ''))))
-            sheet.write(row, col + 6, re.sub('<[^<]+?>', '', str(ed.get('Unit Price', ''))))
-            sheet.write(row, col + 6, re.sub('<[^<]+?>', '', str(ed.get('Profit', ''))))
 
     def action_wizard_print_sales_excel_report(self):
         domain = [
@@ -140,7 +158,3 @@ class salesWizard(models.TransientModel):
 
     def action_cancel(self):
         return {'type': 'ir.actions.act_window_close'}
-
-
-
-
