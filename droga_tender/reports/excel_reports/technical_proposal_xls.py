@@ -181,10 +181,10 @@ class tender_technical_proposal_master_xls(models.TransientModel):
 
         for rec in self.tender_id['detail_submissions_fin']:
             sheet.write(row_start, 0, rec.item_num)
-            item=rec.item_pro if rec.item_pro else rec.type_item
+            item=rec.item_pro if rec.item_pro else rec.type_item.type_or_item_name
             sheet.write(row_start, 1, item if item else ' ')
-            uom=rec.uom_free_field if rec.uom_free_field else rec.unit_of_measure
-            sheet.write(row_start, 2, uom if uom else ' ')
+            uom=rec.uom_reg_field
+            sheet.write(row_start, 2, uom.uom_name if uom else ' ')
 
             sheet.write(row_start, 3, rec.item_des if rec.item_des else ' ')
             sheet.write(row_start, 4, rec.item_pro if rec.item_pro else ' ')
