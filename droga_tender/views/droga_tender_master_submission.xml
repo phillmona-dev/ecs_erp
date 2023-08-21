@@ -97,6 +97,7 @@
                                         <field name="item_num"/>
                                         <field name="type_item" options="{'no_create':True,'no_open':True}"/>
                                         <field name="item_pro"/>
+                                        <field name="uom_reg_field"></field>
                                         <field name="quantity" sum="Total"/>
                                         <field name="unit_price" widget='monetary'/>
                                         <field name="amount" sum="Total" widget='monetary'/>

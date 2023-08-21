@@ -552,6 +552,7 @@ class droga_stock_product_extension(models.Model):
         ('BT', 'Import and wholesale'),
     ('PT', 'Physiotherapy only'),('PH', 'Pharmacy only'),('ALL','ALL')], string='Product used under')
     bought_locally=fields.Boolean('Bought Locally',default=False)
+    pharmacy_group_id=fields.Many2one('droga.prod.categ.pharma')
     list_price = fields.Float(
         'Sales Price', default=1.0,
         digits='Product Price',tracking=True,
@@ -685,6 +686,13 @@ class droga_stock_product_extension(models.Model):
         if res.company_id.id==2:
             res.order_type='ALL'
         return res
+
+class product_categ_pharmacy(models.Model):
+    _name='droga.prod.categ.pharma'
+    categ=fields.Char('Category')
+    id_sequence=fields.Char('ID starts with')
+    id_counter=fields.Integer('ID counter',default=0)
+    taxes_id=fields.Many2many('account.tax')
 
 class product_selection_field(models.Model):
     _inherit = 'product.category'
