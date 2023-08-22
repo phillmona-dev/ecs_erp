@@ -62,24 +62,25 @@ class Rfq_Local(models.Model):
     @api.model
     def create(self, vals):
 
-        request_type = self._context['request_type']
-
         company_id = vals.get('company_id', self.default_get(
             ['company_id'])['company_id'])
+
         # get sequence number for each company
         self_comp = self.with_company(company_id)
 
+        res = super(Rfq_Local, self_comp).create(vals)
+
+        request_type = res.request_type
+
         # generate transaction number
-        if vals['request_type'] == 'Local':
+        if request_type == 'Local':
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('RFQL', vals['date'],
                                                                                vals['company_id'])
-            vals['name'] = sequence_no or '/'
-        elif vals['request_type'] == 'Pharmacy':
+            res.name = sequence_no or '/'
+        elif request_type == 'Pharmacy':
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('RFQP', vals['date'],
                                                                                vals['company_id'])
-            vals['name'] = sequence_no or '/'
-
-        res = super(Rfq_Local, self_comp).create(vals)
+            res.name = sequence_no or '/'
 
         return res
 
@@ -98,7 +99,7 @@ class Rfq_Local(models.Model):
     # checked
     def checked(self):
         self.write({'state': 'Checked'})
-        if self.state=="Checked":
+        if self.state == "Checked":
             self.set_activity_done()
             users = self.get_users_for_roles('Procurement Committee', self.company_id.id)
             for user in users:
@@ -237,8 +238,8 @@ class Rfq_Local(models.Model):
             for supplier in suppliers:
                 vals = {'name': 'New', 'state': 'draft', 'date_order': datetime.now(),
                         'rfq_local_id': supplier.rfq_id.id,
-                        'company_id':self.company_id.id,
-                        'partner_id': supplier.supplier_id.id, 'request_type':self.request_type, 'order_line': []}
+                        'company_id': self.company_id.id,
+                        'partner_id': supplier.supplier_id.id, 'request_type': self.request_type, 'order_line': []}
 
                 # get products the supplier won
                 for line in self.rfq_lines:
@@ -353,6 +354,7 @@ class Rfq_Local(models.Model):
             if user.company_id.id == company_id:
                 users.append(user.id)
         return users
+
 
 class Rfq_Detail_local(models.Model):
     _name = 'droga.purchase.request.rfq.line.local'
