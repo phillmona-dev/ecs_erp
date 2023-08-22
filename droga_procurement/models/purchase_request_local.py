@@ -112,17 +112,19 @@ class purchase_request_local(models.Model):
 
         self_comp = self.with_company(company_id)
 
+        res = super(purchase_request_local, self_comp).create(vals)
+
+        request_type = res.request_type
+
         # generate transaction number
-        if vals['request_type'] == 'Local':
+        if request_type == 'Local':
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('PRL', vals['request_date'],
                                                                                vals['company_id'])
-            vals['name'] = sequence_no or '/'
-        elif vals['request_type'] == 'Pharmacy':
+            res.name = sequence_no or '/'
+        elif request_type == 'Pharmacy':
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('PRP', vals['request_date'],
                                                                                vals['company_id'])
-            vals['name'] = sequence_no or '/'
-
-        res = super(purchase_request_local, self_comp).create(vals)
+            res.name = sequence_no or '/'
 
         return res
 

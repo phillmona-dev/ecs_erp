@@ -121,19 +121,24 @@ class droga_stock_office_supplies(models.Model):
                 raise UserError(
                     "At least one product must be requested to save record.")
 
-            # generate transaction number
-            if vals_list['request_type'] == 'Local':
-                sequence_no = self.env['droga.finance.utility'].get_transaction_no('STR', vals_list['request_date'],
-                                                                                   vals_list['company_id'])
-            elif vals_list['request_type'] == 'Pharmacy':
-                sequence_no = self.env['droga.finance.utility'].get_transaction_no('STRP', vals_list['request_date'],
-                                                                                   vals_list['company_id'])
+        res = super(droga_stock_office_supplies, self).create(vals_list)
 
+        request_type = res.request_type
 
-            if not sequence_no:
-                raise UserError("Request sequence not found.")
-            vals_list['name'] = sequence_no or '/'
-        return super(droga_stock_office_supplies, self).create(vals_list)
+        # generate transaction number
+        if request_type == 'Local':
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('STR', vals_list['request_date'],
+                                                                               vals_list['company_id'])
+        elif request_type == 'Pharmacy':
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('STRP', vals_list['request_date'],
+                                                                               vals_list['company_id'])
+
+        if not sequence_no:
+            raise UserError("Request sequence not found.")
+
+        res.name = sequence_no or '/'
+
+        return res
 
     # submit action
     def action_submit(self):
@@ -333,7 +338,7 @@ class droga_stock_office_supplies(models.Model):
                 'department': self.department.id,
                 'request_date': self.env.cr.now(),
                 'store_request_id': self.id,
-                'request_type':self.request_type,
+                'request_type': self.request_type,
                 'company_id': self.company_id.id,
 
             }
@@ -401,9 +406,6 @@ class droga_stock_office_supplies(models.Model):
                 record.department_manager = record.department.manager_id
             else:
                 record.department_manager = record.requested_by.parent_id
-
-
-
 
 
 class droga_stock_transfer_office_supplies_request_detail(models.Model):
@@ -531,4 +533,4 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     @api.onchange("product_id")
     def get_standard_price(self):
         for record in self:
-            record.unit_price=record.product_id.standard_price
+            record.unit_price = record.product_id.standard_price

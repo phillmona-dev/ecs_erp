@@ -206,31 +206,34 @@ class purchase_order(models.Model):
     @api.model
     def create(self, vals):
         # get sequence number for each company
+
         company_id = vals.get('company_id', self.default_get(
             ['company_id'])['company_id'])
 
         self_comp = self.with_company(company_id)
 
-        if vals['request_type'] == 'Foregin':
+        res = super(purchase_order, self_comp).create(vals)
+
+        request_type = res.request_type
+
+        if request_type == 'Foregin':
             # generate transaction number
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('POF', vals['date_order'],
                                                                                vals['company_id'])
             vals['name'] = sequence_no or '/'
 
 
-        elif vals['request_type'] == 'Local':
+        elif request_type == 'Local':
             # generate transaction number
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('POL', vals['date_order'],
                                                                                vals['company_id'])
-            vals['name'] = sequence_no or '/'
+            res.name = sequence_no or '/'
 
-        elif vals['request_type'] == 'Pharmacy':
+        elif request_type == 'Pharmacy':
             # generate transaction number
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('POP', vals['date_order'],
                                                                                vals['company_id'])
-            vals['name'] = sequence_no or '/'
-
-        res = super(purchase_order, self_comp).create(vals)
+            res.name = sequence_no or '/'
 
         self.load_po_status(res.id)
         self.load_shipping_reconcilation(res.id)
