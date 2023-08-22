@@ -283,13 +283,15 @@ class payment_term_no_credit(models.Model):
         ('DR', 'Droga'),('PC', 'Pharmacy chain')], string='Term used under')
     allowed_cust=fields.Many2many('res.partner',string='Allowed customers',tracking=True)
     def write(self,vals_list):
-        raise UserError("You can not update payment term.")
+        if not self.env.user.has_group('droga_sales.payment_term_update'):
+            raise UserError("You can not update payment term.")
         return super(payment_term_no_credit, self).write(vals_list)
 
 class payment_term_no_credit_line(models.Model):
     _inherit = "account.payment.term.line"
     def write(self,vals_list):
-        raise UserError("You can not update payment term.")
+        if not self.env.user.has_group('droga_sales.payment_term_update'):
+            raise UserError("You can not update payment term.")
         return super(payment_term_no_credit_line, self).write(vals_list)
 
 class payment_term_no_credit_messages(models.Model):

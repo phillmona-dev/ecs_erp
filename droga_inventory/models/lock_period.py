@@ -40,7 +40,7 @@ class LockPeriod(models.Model):
 
     def unlink_(self):
         raise UserError(
-            "You can't delete lock period entries, change the date range instead..")
+            "You can't delete lock period entries, change the date range instead.")
 
 class StockMove(models.Model):
     """."""

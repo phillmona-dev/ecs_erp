@@ -38,7 +38,6 @@
         'views/settings/city.xml',
         'views/settings/area.xml',
         'views/lead_extension.xml',
-        'views/product_group.xml',
         'reports/plan_analysis.xml',
         'reports/doctors_schedule.xml',
         'reports/done_activities.xml',

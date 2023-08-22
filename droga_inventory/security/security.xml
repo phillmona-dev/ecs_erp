@@ -17,7 +17,7 @@
     </record>
 
     <record id="inv_prod_mi_manager" model="res.groups">
-        <field name="name">Product register access medical items</field>
+        <field name="name">Product register access medical items (pharmacy, import and ws)</field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
     </record>
     <record id="inv_prod_sc_manager" model="res.groups">

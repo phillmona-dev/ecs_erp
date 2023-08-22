@@ -547,8 +547,8 @@ class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
     company_id = fields.Many2one('res.company', string='Company',index=True, default=lambda self: self.env.company, required=False)
     order_type = fields.Selection([
-        ('IM', 'Import'),
-        ('WS', 'Wholesale'),
+        ('IM', 'Import and pharmacy'),
+        ('WS', 'Wholesale and pharmacy'),
         ('BT', 'Import and wholesale'),
     ('PT', 'Physiotherapy only'),('PH', 'Pharmacy only'),('ALL','ALL')], string='Product used under')
     bought_locally=fields.Boolean('Bought Locally',default=False)
@@ -568,17 +568,23 @@ class droga_stock_product_extension(models.Model):
         ('service', 'Service')], string='Product Type', default='product', required=True,store=True,
         help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
              'A service is a non-material product you provide.')
-
+    old_ref=fields.Char('Old reference')
     sub_categ_id=fields.Many2one(
         'product.category', 'Product Sub-Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
          help="Select sub-category for the current product")
     default_code = fields.Char('Internal Reference',compute='_compute_default_code',
-        inverse='_compute_default_code',
+        inverse='_inverse_default_code',
          store=True,required=False)
     prod_read_only=fields.Boolean(compute='is_prod_readonly')
     product_id_db=fields.Integer('Product product db id',compute='_get_prod_id')
-
+    list_price_phar = fields.Float(
+        'Sales price pharmacy', default=1.0,
+        digits='Product Price',
+        help="Price at which the product is sold to pharmacy customers.",
+    )
+    manufacturing=fields.Char('Manufacturing')
+    origin = fields.Many2one('res.country',string='Origin')
     def _get_prod_id(self):
         for rec in self:
             prods=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
@@ -586,6 +592,8 @@ class droga_stock_product_extension(models.Model):
                 rec.product_id_db=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])[0].id
             else:
                 rec.product_id_db=0
+    def _inverse_default_code(self):
+        pass
     def _compute_default_code(self):
         pass
 
@@ -597,7 +605,7 @@ class droga_stock_product_extension(models.Model):
                 rec.prod_read_only = False
 
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
-                                      company_dependent=True, check_company=True,required=True)
+                                      company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
@@ -646,24 +654,35 @@ class droga_stock_product_extension(models.Model):
             else:
                 rec.has_access = False
 
-    def write(self, vals_list):
+    def writee(self, vals_list):
 
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager') and 'seller_ids' not in vals_list and 'invoice_policy' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
         for rec in self:
             if 'default_code' in vals_list:
-                if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_':
-                    raise UserError("You can not edit product code.")
+                if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_' and rec.default_code:
+                    if rec.default_code[-1]!='_':
+                        raise UserError("You can not edit product code.")
                 to_update=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
                 for prod in to_update:
                     prod.write({'default_code':vals_list['default_code']})
+            if 'active' in vals_list:
+                if rec.active and not vals_list['active'] and rec.default_code[-1]!='_':
+                    rec.write({'default_code':rec.default_code+'_'})
+                if not rec.active and vals_list['active'] and rec.default_code[-1]=='_':
+                    rec.write({'default_code':rec.default_code[:-1]})
 
         return super(droga_stock_product_extension, self).write(vals_list)
+
+    @api.onchange('pharmacy_group_id')
+    def _onchange_pharma_group(self):
+        self.taxes_id=self.pharmacy_group_id.taxes_id.ids
 
     @api.onchange('default_code')
     def _onchange_default_code(self):
         if not self.default_code:
             return
+
         self.default_code=self.default_code.upper()
         domain = [('default_code', '=', self.default_code)]
         if self.id.origin:
@@ -676,11 +695,25 @@ class droga_stock_product_extension(models.Model):
                 'title': ("Note:"),
                 'message': ("The Internal Reference "+dc+" already exists."),
             }}
+        # If user has access to MI, automatically reject changes saying ID assignment is automatic
+        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self._origin.default_code:
+            self.default_code = self._origin.default_code
+            return {'warning': {
+                'title': ("Note:"),
+                'message': ("Assigned code can not be changed."),
+            }}
+
+
     @api.model
-    def create(self, vals_list):
+    def createe(self, vals_list):
         res=super(droga_stock_product_extension, self).create(vals_list)
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
+        #If user has access to MI group, automatically assign ID
+        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager'):
+            res.default_code=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
+            vals_list['default_code']=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
+            res.pharmacy_group_id.write({'id_counter': res.pharmacy_group_id.id_counter+1})
         if not vals_list['default_code']:
             raise UserError("Default code can not be empty.")
         if res.company_id.id==2:
@@ -689,10 +722,12 @@ class droga_stock_product_extension(models.Model):
 
 class product_categ_pharmacy(models.Model):
     _name='droga.prod.categ.pharma'
-    categ=fields.Char('Category')
+    _rec_name='categ'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    categ=fields.Char('Category',tracking=True)
     id_sequence=fields.Char('ID starts with')
-    id_counter=fields.Integer('ID counter',default=0)
-    taxes_id=fields.Many2many('account.tax')
+    id_counter=fields.Integer('ID counter',default=1,tracking=True)
+    taxes_id=fields.Many2many('account.tax',tracking=True)
 
 class product_selection_field(models.Model):
     _inherit = 'product.category'
