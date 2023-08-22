@@ -119,7 +119,7 @@
                     </group>
 
                     <group string="Categories">
-                        <field name="pharmacy_group_id" required="True" options="{'no_create':True,'no_open':True}"
+                        <field name="pharmacy_group_id" required="True" options="{'no_create':True,'no_open':True}" domain="[('id_counter','&lt;',1000)]"
                                groups="droga_inventory.inv_prod_mi_manager"></field>
                         <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
                                domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','MI')]"
