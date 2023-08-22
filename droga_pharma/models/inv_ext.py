@@ -8,7 +8,6 @@ class droga_pharma_prod_ext(models.Model):
     _inherit='product.template'
 
     pharma_prod_categ=fields.Many2one('droga.pharma.prod.categ',string='Product category')
-    pharma_uom=fields.Many2one('uom.uom',string='Pharma UOM')
     pharma_filler=fields.Char(compute='_fill_fields')
     pharma_detailed_type = fields.Selection([
         ('consu', 'Consumable'),('membershipcard', 'Membership E-Card'),('hthscreen','Health screening'),('mtmcard', 'MTM E-Card'),('product', 'Storable product'),
