@@ -41,16 +41,17 @@ class droga_stock_cons_issue(models.Model):
 
     consignment_reference = fields.Text(string='Order reference', default='', readonly=True)
     cons_ref=fields.One2many('stock.picking','cons_sample_issue_request',string='Store reference')
-    marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
-    store_manager = fields.Many2one('res.users', compute='_get_approvers')
+    marketting_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    store_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
 
     def _get_approvers(self):
         for rec in self:
             rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.ids[0] if len(
                 self.env.ref("droga_inventory.marketing_manager").users.ids) > 0 else None
-            if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
-                rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
-                    self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
+            if len(rec.detail_entries) >0:
+                if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
             else:
                 rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
                     self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
@@ -110,7 +111,7 @@ class droga_stock_cons_issue(models.Model):
 
             picking_vals = {
                 'partner_id': self.customer.id,
-                'company_id': self.company_id.id,
+                'company_id': self.env.user.company_id.id,
                 'picking_type_id': pick_type_id,
                 'location_id': def_loc_id,
                 'location_dest_id': cust_locat,
@@ -139,7 +140,7 @@ class droga_stock_cons_issue(models.Model):
                         'location_id': def_loc_id,
                         'location_dest_id': cust_locat,
                         'state': 'confirmed',
-                        'company_id': self.company_id.id
+                        'company_id': self.env.user.company_id.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)

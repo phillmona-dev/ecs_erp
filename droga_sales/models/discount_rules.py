@@ -347,9 +347,9 @@ class sale_order_ext(models.Model):
         default='draft')
     total_discount = fields.Float('Total discount')
     total_added = fields.Float('Total accrual')
-    price_change_approver = fields.Many2one('res.users', compute='_get_approvers')
-    operation_approver = fields.Many2one('res.users', compute='_get_approvers')
-    final_approver = fields.Many2one('res.users', compute='_get_approvers')
+    price_change_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    operation_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    final_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
     out_of_stock_items = fields.Char('Stock out items', compute='_get_stock_out')
     has_access = fields.Boolean(default=False, search='_has_access', compute='_compute_has_access')
     has_invoice_access=fields.Boolean(default=False, search='_has_invoice_access', compute='_compute_has_invoice_access')
@@ -472,23 +472,23 @@ class sale_order_ext(models.Model):
 
         for rec in self:
             rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
-                lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                lambda m: self.env.user.company_id.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
-                    lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+                    lambda m: self.env.user.company_id.id in m.company_ids.ids).ids) > 0 else None
             rec.final_approver = self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                lambda m: self.env.user.company_id.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                    lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+                    lambda m: self.env.user.company_id.id in m.company_ids.ids).ids) > 0 else None
             if rec.order_type == 'IM':
                 rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(
-                    lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                    lambda m: self.env.user.company_id.id in m.company_ids.ids).ids[0] if len(
                     self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(
-                        lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+                        lambda m: self.env.user.company_id.id in m.company_ids.ids).ids) > 0 else None
             else:
                 rec.operation_approver = self.env.ref("droga_sales.sales_wholesale_approve_admin").users.filtered(
-                    lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                    lambda m: self.env.user.company_id.id in m.company_ids.ids).ids[0] if len(
                     self.env.ref("droga_sales.sales_wholesale_approve_admin").users.filtered(
-                        lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+                        lambda m: self.env.user.company_id.id in m.company_ids.ids).ids) > 0 else None
 
     def _get_pr_sales_logged(self):
         if not request:

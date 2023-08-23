@@ -40,8 +40,8 @@ class droga_stock_cons_receive(models.Model):
 
     issue_type = fields.Selection([('CONR', 'Consignment recieve'), ('SIR', 'Sample return'),('SUBL','Cleaning unit return')],
                                   string='Return type', required=True)
-    marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
-    store_manager = fields.Many2one('res.users', compute='_get_approvers')
+    marketting_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    store_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
 
     def _get_approvers(self):
         for rec in self:
@@ -104,7 +104,7 @@ class droga_stock_cons_receive(models.Model):
 
             picking_vals = {
                 'partner_id': self.supplier.id,
-                'company_id': self.company_id.id,
+                'company_id': self.env.user.company_id.id,
                 'picking_type_id': pick_type_id,
                 'location_id': cons_vendor,
                 'location_dest_id': def_loc_id,
@@ -135,7 +135,7 @@ class droga_stock_cons_receive(models.Model):
                         'location_id': cons_vendor,
                         'location_dest_id': def_loc_id,
                         'state': 'confirmed',
-                        'company_id': self.company_id.id
+                        'company_id': self.env.user.company_id.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)

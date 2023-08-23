@@ -130,7 +130,7 @@ class droga_stock_transfer_custom(models.Model):
                 raise UserError("Default internal location is not configured for source warehouse.")
             picking_vals = {
                 'partner_id': self.company_id.partner_id.id,
-                'company_id': self.company_id.id,
+                'company_id': self.env.user.company_id.id,
                 'picking_type_id': pick_type_id,
                 'location_id': def_location_id,
                 'location_dest_id': self.location_dest_id.id,
@@ -164,7 +164,7 @@ class droga_stock_transfer_custom(models.Model):
                         #'state': 'waiting',
                         #'state': 'confirmed',
                         'state': 'draft',
-                        'company_id': self.company_id.id
+                        'company_id': self.env.user.company_id.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)

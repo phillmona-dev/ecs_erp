@@ -203,7 +203,7 @@ class droga_stock_picking_type_extension(models.Model):
             'search_default_picking_type_id': [self.id],
             'default_picking_type_id': self.id,
             'default_immediate_transfer': default_immediate_tranfer,
-            'default_company_id': self.company_id.id,
+            'default_company_id': self.env.user.company_id.id,
         }
         domain = [('has_access','=',True)]
 
