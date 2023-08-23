@@ -220,7 +220,7 @@ class purchase_order(models.Model):
             # generate transaction number
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('POF', vals['date_order'],
                                                                                vals['company_id'])
-            vals['name'] = sequence_no or '/'
+            res.name = sequence_no or '/'
 
 
         elif request_type == 'Local':
