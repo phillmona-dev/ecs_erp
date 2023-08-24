@@ -545,7 +545,7 @@ class sale_order_ext(models.Model):
             message = message + ('\n' if message else '') + "Please check if all warehouses are under " + dict(
                 self._fields['order_type'].selection).get(
                 self.order_type) + "."
-
+        self._get_approvers()
         if not self.price_change_approver:
             raise ValidationError("Price change approver is not configured for client.")
         if not self.final_approver:
