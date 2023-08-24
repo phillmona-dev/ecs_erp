@@ -37,8 +37,8 @@ class cust_contact_extension(models.Model):
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
 
-    lati_custom =fields.Float('Geo Latitude',digits=(10,7))
-    long_custom = fields.Float('Geo Longtude',digits=(10,7))
+    #lati_custom =fields.Float('Geo Latitude',digits=(10,7))
+    #long_custom = fields.Float('Geo Longtude',digits=(10,7))
 
     company_id = fields.Many2one(
         'res.company', 'Company', default=lambda self: self.env.company,index=True)
@@ -77,8 +77,8 @@ class cust_contact_extension(models.Model):
             if not self.env.user.has_group('droga_crm.crm_cust_loc'):
                 pass
 
-            res.lati_custom=float(latitude)
-            res.long_custom= float(longitude)
+            #res.lati_custom=float(latitude)
+            #res.long_custom= float(longitude)
 
     @api.model
     def create(self, vals):
