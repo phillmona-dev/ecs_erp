@@ -3,8 +3,12 @@
     <record id="crm_lead_extension" model="ir.ui.view">
         <field name="name">Lead extension</field>
         <field name="model">crm.lead</field>
+        <field name="priority" eval="1"/>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="js_class">check_in_form_view</attribute>
+            </xpath>
 
             <xpath expr="//form/header/button[@name='action_set_lost']" position="replace">
                 <button name="%(crm.crm_lead_lost_action)d" string="Lost" data-hotkey="l" title="Mark as lost"
@@ -42,7 +46,21 @@
                     <field name="description" string="Notes" placeholder="Add a description..."
                            options="{'collaborative': true}"/>
                 </page>
+                <page string="Follow up visits" name="follow_ups">
+                    <field name="follow_up_visits" mode="tree">
+                        <tree editable="bottom">
+                            <field name="visit_user" readonly="1"></field>
+                            <field name="visit_date"/>
+                            <field name="co_travel_crm"/>
+                            <field name="check_in_descr"/>
+                            <field name="check_out_descr"/>
+                        </tree>
+                    </field>
+                    <field name="description" string="Notes" placeholder="Add a description..."
+                           options="{'collaborative': true}"/>
+                </page>
             </xpath>
+
 
             <xpath expr="//form/sheet/group/group/field[@name='tag_ids']" position="attributes">
                 <attribute name="invisible">True</attribute>
@@ -76,6 +94,8 @@
                     <field name="contact_custom" options="{'no_create':True,'no_open':True}"></field>
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned" required="True"/>
+                    <field name="referral_distri" widget="many2many_tags"></field>
+                    <field name="check_in_descr" readonly="1"/>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'opportunity')]}">>
                     <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
@@ -84,6 +104,7 @@
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="phone" string="Mobile"/>
                     <field name="planned_visit_selection"/>
+                    <field name="check_out_descr" readonly="1"/>
                 </group>
             </xpath>
 

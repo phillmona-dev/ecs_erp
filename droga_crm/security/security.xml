@@ -13,6 +13,11 @@
         <field name="category_id" ref="crm_management"/>
         <field name="implied_ids" eval="[(4, ref('crm_mr'))]"/>
     </record>
+    <record id="crm_cust_loc" model="res.groups">
+        <field name="name">CRM customer location setter</field>
+        <field name="category_id" ref="crm_management"/>
+        <field name="implied_ids" eval="[(4, ref('crm_mr'))]"/>
+    </record>
     <record id="crm_rsm" model="res.groups">
         <field name="name">CRM or Sales regional area manager</field>
         <field name="category_id" ref="crm_management"/>

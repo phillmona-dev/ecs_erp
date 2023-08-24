@@ -21,6 +21,29 @@
             action="base.action_partner_form"
             sequence="5"/>
 
+    <menuitem
+            id="droga_mr_sales_requests_menu"
+            name="Requests"
+            parent="crm.crm_menu_sales"
+            groups="droga_crm.crm_mr"
+            sequence="20"/>
+
+    <menuitem
+            id="droga_sales_con_issue_mr_menu"
+            name="Stores Issue"
+            action="droga_inventory.droga_inventory_consignment_issue_action"
+            parent="droga_crm.droga_mr_sales_requests_menu"
+            groups="droga_crm.crm_mr"
+            sequence="30"/>
+
+    <menuitem
+            id="droga_sales_con_mr_receive_menu"
+            name="Stores Receive"
+            action="droga_inventory.droga_inventory_consignment_receipt_action"
+            parent="droga_crm.droga_mr_sales_requests_menu"
+            groups="droga_crm.crm_mr"
+            sequence="40"/>
+
     <!-- Customer action add domain to filter by region -->
     <record id="base.action_partner_form" model="ir.actions.act_window">
         <field name="domain">[('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]</field>

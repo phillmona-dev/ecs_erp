@@ -84,6 +84,7 @@ class sale_order_line(models.Model):
     std_unit_price = fields.Float(readonly=True, string='UP Default')
     has_access = fields.Boolean(related='order_id.has_access')
     order_from = fields.Char(related='order_id.order_from')
+    has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
 
     @api.depends('product_id', 'order_id.order_type', 'product_uom')
     def _is_prod_available(self):

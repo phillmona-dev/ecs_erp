@@ -18,13 +18,16 @@ var rpc = require('web.rpc')
 
 const { Component, onMounted, onWillUnmount, onWillUpdateProps, useState } = owl;
 
-export class PosFormController extends FormController {
+export class CheckinController extends FormController {
     setup() {
         super.setup();
     }
 
 
     onClickTestJavascript(){
+
+
+
         if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
 
@@ -32,22 +35,24 @@ export class PosFormController extends FormController {
           var longitude = position.coords.longitude.toFixed(13);
 
           var location = latitude + ', ' + longitude;
+          var res_id=this.model.root.data.id;
           rpc.query({
-                    model: 'res.partner',
-                    method: 'update_current_locations',
-                    args: [0,latitude,longitude]
+                    model: 'crm.lead',
+                    method: 'update_check_in_locations',
+                    args: [0,res_id,latitude,longitude]
                 });
+          window.location.reload();
         });
 
       } else {
         reject('Geolocation is not supported');
       }
-    }
-}
+       }
+   }
 
-PosFormController.template="droga_pharma.JsFormView";
+CheckinController.template="check_in.JsFormView";
 
-export class PosFormRenderer extends FormRenderer {
+export class CheckinRenderer extends FormRenderer {
     setup() {
 
         super.setup();
@@ -65,9 +70,9 @@ export class PosFormRenderer extends FormRenderer {
 
 }
 
-registry.category('views').add('js_form_view', {
+registry.category('views').add('check_in_form_view', {
     ...formView,
-    Controller: PosFormController,
-    Renderer: PosFormRenderer,
+    Controller: CheckinController,
+    Renderer: CheckinRenderer,
 });
 

@@ -657,11 +657,11 @@ class droga_stock_product_extension(models.Model):
 
     def write(self, vals_list):
 
-        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager') and 'seller_ids' not in vals_list and 'invoice_policy' not in vals_list:
+        if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager') and 'seller_ids' not in vals_list and 'invoice_policy' not in vals_list and 'crm_group' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
         for rec in self:
             if 'default_code' in vals_list:
-                if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_' and rec.default_code:
+                if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_' and rec.default_code and vals_list['default_code']:
                     if rec.default_code[-1]!='_':
                         raise UserError("You can not edit product code.")
                 to_update=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
@@ -711,7 +711,7 @@ class droga_stock_product_extension(models.Model):
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
         #If user has access to MI group, automatically assign ID
-        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager'):
+        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self.env.user.company_id.id==1:
             res.default_code=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             vals_list['default_code']=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             res.pharmacy_group_id.write({'id_counter': res.pharmacy_group_id.id_counter+1})

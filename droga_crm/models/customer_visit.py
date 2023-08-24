@@ -132,6 +132,7 @@ class customer_visit_header(models.Model):
 
 
     plan_detail=fields.One2many('droga.customer.visit.detail','visit_header')
+    last_updated_date = fields.Date(default=fields.Date.today())
 
     week_1_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',domain=([('week_num','=','Week-1')]))
     week_2_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
@@ -380,7 +381,9 @@ class customer_visit_detail(models.Model):
 
     date_from = fields.Date( related='visit_header.date_from')
     date_to = fields.Date(related='visit_header.date_to')
-    visit_date=fields.Date('Visit date')
+    def get_visit_date(self):
+        return self.visit_header.last_updated_date
+    visit_date=fields.Date('Visit date',default=get_visit_date)
     visit_date_descr=fields.Char('Day',compute='_get_date_descr',store=True)
     core_products=fields.Many2many('product.template',domain=[('is_core_product','=','true')])
 
@@ -441,6 +444,16 @@ class customer_visit_detail(models.Model):
             'target': 'new',
         }
 
+    def add_visit(self):
+
+
+        plan_vals = {
+            'visit_header': self.visit_header.id,
+            'visit_date': self.visit_date,
+            'week_num':self.week_num
+        }
+        #self.visit_header.append(plan_vals)
+        self.env['droga.customer.visit.detail'].sudo().create(plan_vals)
     def visit_contact_open(self):
         return {
             'name': str(self.visit_client.name)+' contacts visit' if str(self.visit_client.name) else ' Contacts visit',
@@ -454,6 +467,12 @@ class customer_visit_detail(models.Model):
             'target': 'new',
             'res_id': self.id,
         }
+    @api.model
+    def write(self, vals):
+        for rec in self:
+            rec.visit_header.last_updated_date=rec.visit_date
+        return super(customer_visit_detail, self).write(vals)
+
     @api.model
     def create(self, vals):
         res=super(customer_visit_detail, self).create(vals)
@@ -476,5 +495,7 @@ class customer_visit_detail(models.Model):
             res.week_num='Week-4'
         else:
             res.week_num='Week-5'
+
+        res.visit_header.last_updated_date=res.visit_date
 
         return res

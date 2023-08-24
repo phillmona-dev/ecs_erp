@@ -26,10 +26,11 @@ class sales_report_det_fields(models.Model):
 
     def _get_invoice_no(self):
         for record in self:
-            for invoice in record.invoice_ids:
-                if invoice.id == 45:
-                    x = 'x'
-                record.invoice_no = invoice.name[0]
+            if len(record.invoice_ids)>0:
+                for invoice in record.invoice_ids:
+                    record.invoice_no = invoice.name
+            else:
+                record.invoice_no='0'
 
     @api.depends('order_id.order_from')
     def _get_order_from(self):

@@ -55,8 +55,13 @@
 
     "assets": {
         "web.assets_backend": [
-            'droga_crm/static/src/droga_pharma.js',
-            'droga_crm/static/src/button.xml',
+            'droga_crm/static/src/droga_set_cust_location.js',
+            'droga_crm/static/src/res_partner_button.xml',
+
+            'droga_crm/static/src/check_in.js',
+            'droga_crm/static/src/check_in_template.xml',
+
+
         ],
 
     },

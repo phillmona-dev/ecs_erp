@@ -19,6 +19,7 @@
             groups="droga_crm.non_existent_group"
             sequence="40"/>
 
+
     <record id="droga_sales_matured_customers_action" model="ir.actions.act_window">
         <field name="name">Matured customers</field>
         <field name="res_model">account.move</field>

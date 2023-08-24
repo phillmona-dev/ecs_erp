@@ -1,4 +1,5 @@
 from datetime import datetime
+from math import radians, sin, cos, atan2, sqrt
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
@@ -35,6 +36,10 @@ class cust_contact_extension(models.Model):
     contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
+
+    lati_custom =fields.Float('Geo Latitude',digits=(10,7))
+    long_custom = fields.Float('Geo Longtude',digits=(10,7))
+
     company_id = fields.Many2one(
         'res.company', 'Company', default=lambda self: self.env.company,index=True)
     def _def_rec(self):
@@ -65,10 +70,15 @@ class cust_contact_extension(models.Model):
                 raise UserError("You can not edit Tin no.")
         return super(cust_contact_extension, self).write(vals)
 
-    def update_current_locations(self,latitude,longitude):
-        self.write({'partner_latitude': float(latitude)})
-        self.partner_latitude=float(latitude)
-        self.write({'partner_longitude': float(longitude)})
+    def update_current_locations(self,res_id,latitude,longitude):
+        for res in self.env['res.partner'].search([('id', '=', res_id)]):
+            #res.lati_custom=float(latitude)
+
+            if not self.env.user.has_group('droga_crm.crm_cust_loc'):
+                pass
+
+            res.write({'lati_custom': float(latitude)})
+            res.write({'long_custom': float(longitude)})
 
     @api.model
     def create(self, vals):
@@ -176,6 +186,7 @@ class crm_lead_extension(models.Model):
     plan_id = fields.Many2one('droga.customer.visit.detail')
     contacts_schedule_single = fields.Many2one('droga.crm.contacts.schedule')
     ordered_prods = fields.One2many('droga.lead.ordered.products', 'leads')
+    follow_up_visits=fields.One2many('droga.lead.follow_up.visits', 'leads')
     contact_custom = fields.Many2one('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]")
     city_name = fields.Many2one('droga.crm.settings.city', related='partner_id.city_name')
     core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])
@@ -195,6 +206,58 @@ class crm_lead_extension(models.Model):
     phone = fields.Char(
         'Phone', tracking=50,
         compute='_compute_phone', inverse='_inverse_phone', readonly=False, store=True)
+
+    check_in_lati=fields.Float('Geo Latitude',digits=(10,7))
+    check_in_long=fields.Float('Geo Longtude',digits=(10,7))
+    check_in_distance_meters = fields.Integer('Check in distance in meters',tracking=True)
+    check_in_time_and_date=fields.Datetime('Check in date and time')
+    check_in_descr=fields.Char('Check in')
+
+    check_out_lati = fields.Float('Geo Latitude', digits=(10, 7))
+    check_out_long = fields.Float('Geo Longtude', digits=(10, 7))
+    check_out_distance_meters = fields.Integer('Check out distance in meters',tracking=True)
+    check_out_time_and_date = fields.Datetime('Check out date and time')
+    check_out_descr = fields.Char('Check out')
+
+    referral_distri=fields.Many2one('res.partner','Referral to distributor')
+
+    def update_check_in_locations(self,res_id,lati,long):
+        for res in self.env['crm.lead'].search([('id', '=', res_id)]):
+            #res.lati_custom=float(latitude)
+            if res.check_in_lati==0:
+                res.check_in_lati= float(lati)
+                res.check_in_long=float(long)
+                dist=self.calculate_distance(float(lati),float(long),res.partner_id.lati_custom,res.partner_id.long_custom)
+                res.check_in_distance_meters=int(dist)
+                res.check_in_time_and_date=datetime.now()
+                res.check_in_descr=res.check_in_time_and_date.strftime("%H:%M")+' ('+str(res.check_in_distance_meters)+' m)'
+
+            elif res.check_out_lati == 0:
+                res.check_out_lati = float(lati)
+                res.check_out_long = float(long)
+                dist=self.calculate_distance(float(lati),float(long),res.partner_id.lati_custom,res.partner_id.long_custom)
+                res.check_out_distance_meters=int(dist)
+                res.check_out_time_and_date = datetime.now()
+                res.check_out_descr = res.check_out_time_and_date.strftime("%H:%M") + ' (' + str(
+                    res.check_out_distance_meters) + ' m)'
+
+    def calculate_distance(self, lat1, lon1, lat2, lon2):
+
+        lat1 = radians(lat1)
+        lon1 = radians(lon1)
+        lat2 = radians(lat2)
+        lon2 = radians(lon2)
+
+        R = 6371000
+
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+
+        a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        distance = R * c
+
+        return distance
 
     def _get_pr_sales_logged(self):
         if not request:
