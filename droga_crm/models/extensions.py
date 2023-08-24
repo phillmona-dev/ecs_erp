@@ -77,8 +77,8 @@ class cust_contact_extension(models.Model):
             if not self.env.user.has_group('droga_crm.crm_cust_loc'):
                 pass
 
-            res.write({'lati_custom': float(latitude)})
-            res.write({'long_custom': float(longitude)})
+            res.lati_custom=float(latitude)
+            res.long_custom= float(longitude)
 
     @api.model
     def create(self, vals):
