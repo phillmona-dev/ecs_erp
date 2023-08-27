@@ -36,6 +36,7 @@ class cust_contact_extension(models.Model):
     contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
+    is_follow_up=fields.Boolean(default=False)
 
     #lati_custom =fields.Float('Geo Latitude',digits=(10,7))
     #long_custom = fields.Float('Geo Longtude',digits=(10,7))
@@ -76,9 +77,8 @@ class cust_contact_extension(models.Model):
 
             if not self.env.user.has_group('droga_crm.crm_cust_loc'):
                 pass
-
-            #res.lati_custom=float(latitude)
-            #res.long_custom= float(longitude)
+            res.partner_longitude=float(longitude)
+            res.partner_latitude=float(latitude)
 
     @api.model
     def create(self, vals):
@@ -186,7 +186,8 @@ class crm_lead_extension(models.Model):
     plan_id = fields.Many2one('droga.customer.visit.detail')
     contacts_schedule_single = fields.Many2one('droga.crm.contacts.schedule')
     ordered_prods = fields.One2many('droga.lead.ordered.products', 'leads')
-    follow_up_visits=fields.One2many('droga.lead.follow_up.visits', 'leads')
+    follow_up_visits=fields.One2many('crm.lead', 'leads')
+    leads=fields.Many2one('crm.lead')
     contact_custom = fields.Many2one('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]")
     city_name = fields.Many2one('droga.crm.settings.city', related='partner_id.city_name')
     core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])
@@ -219,7 +220,7 @@ class crm_lead_extension(models.Model):
     check_out_time_and_date = fields.Datetime('Check out date and time')
     check_out_descr = fields.Char('Check out')
 
-    referral_distri=fields.Many2one('res.partner','Referral to distributor')
+    referral_distri=fields.Many2many('res.partner',string='Referral to distributor')
 
     def update_check_in_locations(self,res_id,lati,long):
         for res in self.env['crm.lead'].search([('id', '=', res_id)]):
@@ -227,19 +228,18 @@ class crm_lead_extension(models.Model):
             if res.check_in_lati==0:
                 res.check_in_lati= float(lati)
                 res.check_in_long=float(long)
-                dist=self.calculate_distance(float(lati),float(long),res.partner_id.lati_custom,res.partner_id.long_custom)
+                dist=self.calculate_distance(float(lati),float(long),res.partner_id.partner_latitude,res.partner_id.partner_longitude)
                 res.check_in_distance_meters=int(dist)
                 res.check_in_time_and_date=datetime.now()
-                res.check_in_descr=res.check_in_time_and_date.strftime("%H:%M")+' ('+str(res.check_in_distance_meters)+' m)'
+                res.check_in_descr=res.check_in_time_and_date.strftime("%d %b, %H:%M")+' ('+f"{int(dist):,}"+' m)'
 
             elif res.check_out_lati == 0:
                 res.check_out_lati = float(lati)
                 res.check_out_long = float(long)
-                dist=self.calculate_distance(float(lati),float(long),res.partner_id.lati_custom,res.partner_id.long_custom)
+                dist=self.calculate_distance(float(lati),float(long),res.partner_id.partner_latitude,res.partner_id.partner_longitude)
                 res.check_out_distance_meters=int(dist)
                 res.check_out_time_and_date = datetime.now()
-                res.check_out_descr = res.check_out_time_and_date.strftime("%H:%M") + ' (' + str(
-                    res.check_out_distance_meters) + ' m)'
+                res.check_out_descr = res.check_out_time_and_date.strftime("%d %b, %H:%M") + ' (' + f"{int(dist):,}" + ' m)'
 
     def calculate_distance(self, lat1, lon1, lat2, lon2):
 
@@ -338,6 +338,28 @@ class crm_lead_extension(models.Model):
     def unlink(self):
         raise UserError("You can not delete the record. Please mark it as lost instead.")
 
+    @api.model
+    def create(self, vals):
+        lead=self.env['crm.lead'].search([('id', '=', vals['leads'])])
+        if 'leads' in vals:
+            lead_vals = {
+                'name': lead.name.replace(" - Follow up", "")+' - Follow up',
+                'pr_sales': lead.pr_sales.id,
+                'pr_lead': lead.pr_sales.id,
+                'origin_user_id': lead.user_id.id,
+                'user_id': lead.user_id.id,
+                'company_id': self.env.company.id,
+                'type': 'lead',
+                'stage_id': 1,
+                'expected_revenue': 0,
+                'partner_id': lead.partner_id.id,
+                'planned_visit_selection': lead.planned_visit_selection,
+                'leads':vals['leads'],
+                'date_planned':vals['date_planned']
+                # 'contact_name': det['visit_contact'].name,
+            }
+
+        return super(crm_lead_extension, self).create(lead_vals)
 
 class crm_prod_template_extension(models.Model):
     _inherit = 'product.template'

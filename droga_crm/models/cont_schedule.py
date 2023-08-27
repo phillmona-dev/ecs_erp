@@ -31,30 +31,3 @@ class lead_ordred_products(models.Model):
     prod=fields.Many2one('product.template',string='Product')
     qty=fields.Float('Quantity')
 
-class follow_up_visits(models.Model):
-    _name='droga.lead.follow_up.visits'
-    leads=fields.Many2one('crm.lead')
-
-    co_travel_crm = fields.Many2many('droga.pro.sales.master', string='Co-travelers')
-
-    visit_date=fields.Datetime('Follow-up date', default=fields.Date.today())
-    def _get_pr_sales_logged(self):
-        if not request:
-            return False
-        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
-        return False if len(ses) == 0 else ses[0].pro_id.ids[0]
-    visit_user = fields.Many2one('droga.pro.sales.master', readonly=True, store=True, string="Visit user",
-                               default=_get_pr_sales_logged, required=True, tracking=True)
-
-    check_in_lati = fields.Float('Geo Latitude', digits=(10, 7))
-    check_in_long = fields.Float('Geo Longtude', digits=(10, 7))
-    check_in_distance_meters = fields.Integer('Check in distance in meters', tracking=True)
-    check_in_time_and_date = fields.Datetime('Check in date and time')
-    check_in_descr = fields.Char('Check in')
-
-    check_out_lati = fields.Float('Geo Latitude', digits=(10, 7))
-    check_out_long = fields.Float('Geo Longtude', digits=(10, 7))
-    check_out_distance_meters = fields.Integer('Check out distance in meters', tracking=True)
-    check_out_time_and_date = fields.Datetime('Check out date and time')
-    check_out_descr = fields.Char('Check out')
-
