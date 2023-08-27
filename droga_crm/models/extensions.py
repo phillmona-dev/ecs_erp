@@ -36,7 +36,6 @@ class cust_contact_extension(models.Model):
     contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
-    is_follow_up=fields.Boolean(default=False)
 
     #lati_custom =fields.Float('Geo Latitude',digits=(10,7))
     #long_custom = fields.Float('Geo Longtude',digits=(10,7))
