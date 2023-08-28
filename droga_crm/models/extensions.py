@@ -36,6 +36,9 @@ class cust_contact_extension(models.Model):
     contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
+    partner_latitude = fields.Float(string='Geo Latitude', digits=(10, 7),tracking=True)
+    partner_longitude = fields.Float(string='Geo Longitude', digits=(10, 7),tracking=True)
+    loc_history=fields.One2many('droga.crm.loc.history','partner')
 
     #lati_custom =fields.Float('Geo Latitude',digits=(10,7))
     #long_custom = fields.Float('Geo Longtude',digits=(10,7))
@@ -76,6 +79,23 @@ class cust_contact_extension(models.Model):
 
             if not self.env.user.has_group('droga_crm.crm_cust_loc'):
                 pass
+
+            if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])) > 0:
+                logged_user= self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[
+                    0].pro_id.p_name
+            else:
+                logged_user=self.env.user.name
+
+            loc_vals = {
+                'update_user_loc': logged_user,
+                'partner': res.id,
+                'old_lati': res.partner_latitude,
+                'new_lati':float(latitude),
+                'old_long':res.partner_longitude,
+                'new_long':float(longitude)
+            }
+
+            self.env['droga.crm.loc.history'].sudo().create(loc_vals)
             res.partner_longitude=float(longitude)
             res.partner_latitude=float(latitude)
 
@@ -160,6 +180,15 @@ class cust_contact_extension(models.Model):
                     """ update account_move set customer_category=%s where id=%s""",
                     (record.cust_type_ext.cust_org_type, account_move.id))
 
+class cust_history(models.Model):
+    _name='droga.crm.loc.history'
+    update_user_loc=fields.Char('Update user')
+    partner=fields.Many2one('res.partner')
+    update_date=fields.Datetime('Update date', default=fields.Datetime.now)
+    old_lati=fields.Float(string='Old Latitude', digits=(10, 7))
+    new_lati=fields.Float(string='New Latitude', digits=(10, 7))
+    old_long=fields.Float(string='Old Longitude', digits=(10, 7))
+    new_long=fields.Float(string='New Longitude', digits=(10, 7))
 
 class account_move_pr_sales(models.Model):
     _inherit = "account.move"

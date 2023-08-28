@@ -87,6 +87,18 @@
                         </kanban>
                     </field>
                 </page>
+                <page string="Location update history">
+                    <field name="loc_history">
+                        <tree create="0">
+                            <field name="update_user_loc" readonly="1"></field>
+                            <field name="update_date" readonly="1"></field>
+                            <field name="old_lati" readonly="1"></field>
+                            <field name="new_lati" readonly="1"></field>
+                            <field name="old_long" readonly="1"></field>
+                            <field name="new_long" readonly="1"></field>
+                        </tree>
+                    </field>
+                </page>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='contact_addresses']" position="attributes">

@@ -31,8 +31,8 @@ export class cusLocController extends FormController {
         if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
 
-          var latitude = position.coords.latitude.toFixed(13);
-          var longitude = position.coords.longitude.toFixed(13);
+          var latitude = position.coords.latitude;
+          var longitude = position.coords.longitude;
 
           var location = latitude + ', ' + longitude;
           var res_id=this.model.root.data.id;
