@@ -49,7 +49,7 @@
     # any module necessary for this one to work correctly
 
     'depends': ['base', 'hr',
-                'mail', 'stock', 'http_routing', 'sale',
+                'mail', 'stock', 'http_routing', 'sale','web_map',
                 'resource', 'stock', 'droga_inventory',
                 'web', 'crm'],
 
