@@ -159,13 +159,17 @@ class Rfq_Local(models.Model):
                     # genertare record with each supplier and product
                     for product in products:
                         # create rfq line
+                        unit_price = 0
+                        if self.request_type == "Pharmacy":
+                            unit_price = product.unit_price
+
                         rfq_line = {
                             'rfq_id': self.id,
                             'supplier_id': supplier.id,
                             'product_id': product.product_id.id,
                             'product_uom': product.product_uom.id,
                             'product_qty': product.product_qty,
-                            'unit_price': 0
+                            'unit_price': unit_price
                         }
                         # create rfq line
                         self.env['droga.purchase.request.rfq.line.local'].create(
@@ -206,9 +210,14 @@ class Rfq_Local(models.Model):
             self.write({'state': 'Winner Picked'})
 
             self.set_activity_done()
-            users = self.get_users_for_roles('Procurement Committee', self.company_id.id)
-            for user in users:
-                self.create_activity(user)
+
+            if self.request_type == "Pharmacy":
+                self.write({'wf_state': 'Approved'})
+                self.write({'state':'Committee Approval'})
+            else:
+                users = self.get_users_for_roles('Procurement Committee', self.company_id.id)
+                for user in users:
+                    self.create_activity(user)
 
         return True
 
