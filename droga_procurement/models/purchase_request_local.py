@@ -1,6 +1,7 @@
 from math import fabs
 from odoo import _, api, fields, models
 from datetime import datetime
+from odoo.exceptions import ValidationError
 
 
 class purchase_request_local(models.Model):
@@ -149,6 +150,15 @@ class purchase_request_local(models.Model):
             }
 
         self.write({'state': 'Submitted'})
+
+        self.set_activity_done()
+        self._get_manager_id()
+        if not self.department_manager:
+            raise ValidationError(
+                "A manager is not set for the requester, please contact HR to set manager for your employee record")
+        # create activity for the approver
+        self.create_activity(self.department_manager_user_id.id)
+
         return True
 
     # draft request
@@ -160,10 +170,12 @@ class purchase_request_local(models.Model):
     def verify_request(self):
         self.write({'state': 'Verified'})
         # mark activity as done
-        activity = self.env["mail.activity"].search(
-            [('res_name', '=', self.name)])
-        if activity:
-            activity.action_feedback()
+        self.set_activity_done()
+
+        users = self.get_users_for_roles('Business Control Specialist', self.company_id.id)
+        for user in users:
+            self.create_activity(user)
+
         return True
 
     # reject request
@@ -193,12 +205,30 @@ class purchase_request_local(models.Model):
 
         self.write({'state': 'Budget Approved'})
         self.record_commitment_budget()
+        self.set_activity_done()
+
+        if self.request_type == "Local":
+            users = self.get_users_for_roles('Procurement manager', self.company_id.id)
+            for user in users:
+                self.create_activity(user)
+        elif self.request_type == "Pharmacy":
+            users = self.get_users_for_roles('Pharmacy supply Chain Manager', self.company_id.id)
+            for user in users:
+                self.create_activity(user)
+
         return True
 
     def approve_request_pr_manager(self):
         self.write({'state': 'Procurement Manager'})
-        if self.total_amount <= 100000:
+        if self.total_amount <= 100000 and self.request_type == "Local":
             self.write({'wf_state': 'Approved'})
+        elif self.total_amount <= 500000 and self.request_type == "Pharmacy":
+            self.write({'wf_state': 'Approved'})
+        else:
+            self.set_activity_done()
+            users = self.get_users_for_roles('CEO', self.company_id.id)
+            for user in users:
+                self.create_activity(user)
         return True
 
     # approve request
@@ -250,6 +280,31 @@ class purchase_request_local(models.Model):
             [('purchase_request_id', '=', self.id), ('state', '=', 'Active')])
         for record in records:
             record.write({'state': 'Closed'})
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        if activity:
+            activity.sudo().action_done()
+
+    def create_activity(self, user_id):
+        # create mail activity for the approval
+        todos = dict(res_id=self.id,
+                     res_model_id=self.env['ir.model'].search([('model', '=', 'droga.purchase.request.local')]).id,
+                     user_id=user_id, summary='Grant Approval', note='You have a request to approve',
+                     activity_type_id=4,
+                     date_deadline=datetime.now())
+
+        self.env['mail.activity'].sudo().create(todos)
+
+    def get_users_for_roles(self, role, company_id):
+        users = []
+        roles = self.env['res.groups'].search([('name', '=', role)])
+
+        for user in roles.users:
+            if user.company_id.id == company_id:
+                users.append(user.id)
+        return users
 
 
 class purchase_request_line_local(models.Model):
