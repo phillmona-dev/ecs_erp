@@ -43,6 +43,10 @@ class cust_contact_extension(models.Model):
     #lati_custom =fields.Float('Geo Latitude',digits=(10,7))
     #long_custom = fields.Float('Geo Longtude',digits=(10,7))
 
+    @api.model
+    def update_latitude_longitude(self, partners):
+        pass
+
     company_id = fields.Many2one(
         'res.company', 'Company', default=lambda self: self.env.company,index=True)
     def _def_rec(self):
