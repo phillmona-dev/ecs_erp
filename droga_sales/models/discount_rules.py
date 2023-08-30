@@ -473,23 +473,23 @@ class sale_order_ext(models.Model):
 
         for rec in self:
             rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
-                lambda m: self.env.user.company_id.id in m.company_ids.ids).ids[0] if len(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
-                    lambda m: self.env.user.company_id.id in m.company_ids.ids).ids) > 0 else None
+                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             rec.final_approver = self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                lambda m: self.env.user.company_id.id in m.company_ids.ids).ids[0] if len(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                    lambda m: self.env.user.company_id.id in m.company_ids.ids).ids) > 0 else None
+                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             if rec.order_type == 'IM':
                 rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(
-                    lambda m: self.env.user.company_id.id in m.company_ids.ids).ids[0] if len(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                     self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(
-                        lambda m: self.env.user.company_id.id in m.company_ids.ids).ids) > 0 else None
+                        lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             else:
                 rec.operation_approver = self.env.ref("droga_sales.sales_wholesale_approve_admin").users.filtered(
-                    lambda m: self.env.user.company_id.id in m.company_ids.ids).ids[0] if len(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                     self.env.ref("droga_sales.sales_wholesale_approve_admin").users.filtered(
-                        lambda m: self.env.user.company_id.id in m.company_ids.ids).ids) > 0 else None
+                        lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
     def _get_pr_sales_logged(self):
         if not request:
