@@ -394,6 +394,7 @@ class crm_lead_extension(models.Model):
 
             return super(crm_lead_extension, self).create(lead_vals)
         else:
+            vals.update({'name': vals['partner_name']+"'s lead"})
             return super(crm_lead_extension, self).create(vals)
 
 class crm_prod_template_extension(models.Model):
