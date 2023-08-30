@@ -42,7 +42,7 @@ class droga_stock_cons_receive(models.Model):
                                   string='Return type', required=True)
     marketting_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
     store_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
-
+    menu_from = fields.Char('Menu opened from')
     def _get_approvers(self):
         for rec in self:
             rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.ids[0] if len(
@@ -104,7 +104,7 @@ class droga_stock_cons_receive(models.Model):
 
             picking_vals = {
                 'partner_id': self.supplier.id,
-                'company_id': self.env.user.company_id.id,
+                'company_id': self.env.company.id,
                 'picking_type_id': pick_type_id,
                 'location_id': cons_vendor,
                 'location_dest_id': def_loc_id,
@@ -135,7 +135,7 @@ class droga_stock_cons_receive(models.Model):
                         'location_id': cons_vendor,
                         'location_dest_id': def_loc_id,
                         'state': 'confirmed',
-                        'company_id': self.env.user.company_id.id
+                        'company_id': self.env.company.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)

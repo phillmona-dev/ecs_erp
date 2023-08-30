@@ -220,7 +220,7 @@ class droga_stock_office_supplies(models.Model):
         if item_lines_available != 0:
             picking_vals = {
                 'partner_id': self.company_id.partner_id.id,
-                'company_id': self.env.user.company_id.id,
+                'company_id': self.env.company.id,
                 'picking_type_id': pick_type_id,
                 'location_id': def_location_id,
                 'location_dest_id': def_dest_id[0].id,
@@ -251,7 +251,7 @@ class droga_stock_office_supplies(models.Model):
                     'location_dest_id': def_dest_id[0].id,
                     # 'state': 'draft',          Confirmed is waiting status
                     'state': 'waiting',
-                    'company_id': self.env.user.company_id.id
+                    'company_id': self.env.company.id
                 }
 
                 self.env['stock.move'].sudo().create(move_vals)
@@ -339,7 +339,7 @@ class droga_stock_office_supplies(models.Model):
                 'request_date': self.env.cr.now(),
                 'store_request_id': self.id,
                 'request_type': self.request_type,
-                'company_id': self.env.user.company_id.id,
+                'company_id': self.env.company.id,
 
             }
             vals['purchase_request_lines'] = []

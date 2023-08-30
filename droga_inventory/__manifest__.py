@@ -45,7 +45,7 @@
     # any module necessary for this one to work correctly
 
     'depends': ['base',
-                'mail',
+                'mail','stock',
                 'resource', 'droga_procurement',
                 'web', 'crm'],
     "license": "AGPL-3",

@@ -49,7 +49,7 @@
                             <field name="supplier"
                                    attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
                             <field name="issue_type" required="True"
-                                   attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                                   readonly="1"></field>
                             <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}"
                                    widget="many2many_tags" readonly="1"></field>
                         </group>
