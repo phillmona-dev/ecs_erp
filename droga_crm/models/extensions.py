@@ -372,8 +372,9 @@ class crm_lead_extension(models.Model):
 
     @api.model
     def create(self, vals):
-        lead=self.env['crm.lead'].search([('id', '=', vals['leads'])])
+
         if 'leads' in vals:
+            lead = self.env['crm.lead'].search([('id', '=', vals['leads'])])
             lead_vals = {
                 'name': lead.name.replace(" - Follow up", "")+' - Follow up',
                 'pr_sales': lead.pr_sales.id,
@@ -391,7 +392,9 @@ class crm_lead_extension(models.Model):
                 # 'contact_name': det['visit_contact'].name,
             }
 
-        return super(crm_lead_extension, self).create(lead_vals)
+            return super(crm_lead_extension, self).create(lead_vals)
+        else:
+            return super(crm_lead_extension, self).create(vals)
 
 class crm_prod_template_extension(models.Model):
     _inherit = 'product.template'
