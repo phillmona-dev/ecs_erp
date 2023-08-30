@@ -79,7 +79,7 @@ class droga_warehouse_extension(models.Model):
     wh_type=fields.Selection([
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
-    ('PH', 'Pharmacy'),], string='Warehouse type.')
+    ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.')
 
     def _search_has_access(self, operator, value):
 
@@ -203,7 +203,7 @@ class droga_stock_picking_type_extension(models.Model):
             'search_default_picking_type_id': [self.id],
             'default_picking_type_id': self.id,
             'default_immediate_transfer': default_immediate_tranfer,
-            'default_company_id': self.env.user.company_id.id,
+            'default_company_id': self.env.company.id,
         }
         domain = [('has_access','=',True)]
 
@@ -711,7 +711,7 @@ class droga_stock_product_extension(models.Model):
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
         #If user has access to MI group, automatically assign ID
-        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self.env.user.company_id.id==1:
+        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self.env.company.id==1:
             res.default_code=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             vals_list['default_code']=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             res.pharmacy_group_id.write({'id_counter': res.pharmacy_group_id.id_counter+1})
