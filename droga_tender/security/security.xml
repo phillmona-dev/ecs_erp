@@ -14,6 +14,11 @@
         <field name="category_id" ref="tender_management"/>
         <field name="implied_ids" eval="[(4, ref('tender_user'))]"/>
     </record>
+    <record id="bond_recepient" model="res.groups">
+        <field name="name">Tender bond request recipient</field>
+        <field name="category_id" ref="tender_management"/>
+        <field name="implied_ids" eval="[(4, ref('tender_user'))]"/>
+    </record>
 </odoo>
 
 

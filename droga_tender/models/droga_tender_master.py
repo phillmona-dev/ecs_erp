@@ -144,7 +144,7 @@ class droga_tender_master(models.Model):
     detail_tenders = fields.One2many('droga.tender.master.detail', 'parent_tender', required=True)
     detail_submissions_tec = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission',
                                              required=True)
-    detail_submissions_fin = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission')
+    detail_submissions_fin = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission',domain=[('item_pro', '!=', False)])
     detail_submissions_additional = fields.One2many('droga.tender.submission.detail', 'parent_tender_submission')
     bid_security = fields.One2many('droga.tender.security.detail', 'bid_security')
     detail_performance = fields.One2many('droga.tender.performance.evaluation', 'parent_tender_performance')
@@ -249,6 +249,24 @@ class droga_tender_master(models.Model):
                 'domain':
                     ([('tender_origin_form_tender','=', self.id)])
             }
+
+    def bond_request(self):
+        return {
+            'name': 'Bond request',
+            'view_type': 'tree',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.bond.requests',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_tender': self.id,
+                'default_client': self.customer.id,
+                'default_request_type': self.bid_type,
+                'default_po_number':self.customer_tender_no,
+            },
+            'domain':
+                ([('tender', '=', self.id)])
+        }
 
     def consignment_open(self):
         return {

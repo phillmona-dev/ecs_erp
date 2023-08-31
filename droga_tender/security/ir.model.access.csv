@@ -25,5 +25,4 @@ access_droga_sale_order,droga.sale.sale.order,sale.model_sale_order,droga_tender
 access_droga_sale_order_line,droga.sale.sale.order_line,sale.model_sale_order_line,droga_tender.tender_user,1,1,1,1
 access_droga_stock_picking,droga.stock.stock.picking,stock.model_stock_picking,droga_tender.tender_user,1,1,1,1
 access_droga_stock_move,droga.stock.stock.move,stock.model_stock_move,droga_tender.tender_user,1,1,1,1
-
-
+access_droga_bond_requests,droga.bond.requests,droga_tender.model_droga_bond_requests,droga_tender.tender_user,1,1,1,1

@@ -44,6 +44,7 @@
         'views/reports/total_awarded.xml',
         'views/reports/total_performance.xml',
         'views/droga_tender_detail_input.xml',
+        'views/droga_tender_bond_request.xml',
         'reports/excel_reports/financial_proposal.xml',
         'reports/excel_reports/technical_proposal.xml',
         'data/droga_tender_sequence.xml',
