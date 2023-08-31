@@ -42,7 +42,7 @@ class ModelName(models.Model):
     def _compute_status(self):
         for rec in self:
             if rec.starting_date:
-                if date.today()>(rec.starting_date + timedelta (days=rec.security_period_in_days)) and rec.security_type.exp_status=='Expire' and rec.status!='Expired':
+                if date.today()>(rec.starting_date + timedelta (days=rec.security_period_in_days)) and rec.security_type.exp_status=='Expire':
                     rec.status='Expired'
                 else:
                     rec.status='Active'
