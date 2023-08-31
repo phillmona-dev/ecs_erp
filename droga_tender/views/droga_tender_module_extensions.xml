@@ -30,6 +30,7 @@
         <field name="inherit_id" ref="droga_inventory.droga_inventory_consignment_issue_view_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//tree/field[@name='customer']" position="after">
+                <field name="issue_type" readonly="1"></field>
                 <field string='Tender origin' name="tender_origin_form"
                        attrs="{'invisible': [('tender_origin_form', '=', False)]}"></field>
             </xpath>

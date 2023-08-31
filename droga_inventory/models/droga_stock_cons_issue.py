@@ -47,18 +47,25 @@ class droga_stock_cons_issue(models.Model):
 
     def _get_approvers(self):
         for rec in self:
-            rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.ids[0] if len(
-                self.env.ref("droga_inventory.marketing_manager").users.ids) > 0 else None
+            rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                self.env.ref("droga_inventory.marketing_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             if len(rec.detail_entries) >0:
                 if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
-                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
-                        self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
-            else:
-                rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
-                    self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+                else:
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
+        self._get_approvers()
         if vals_list.get('name', 'New') == 'New':
             if 'detail_entries' in vals_list:
                 if len(vals_list['detail_entries'])==0:

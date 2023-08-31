@@ -261,7 +261,8 @@ class droga_tender_master(models.Model):
             'context': {
                 'default_tender_origin_form': self.id,
                 'default_issue_type': 'SIF',
-                'default_customer':self.customer.id
+                'default_customer':self.customer.id,
+                'default_menu_from':'SR'
             },
             'domain':
                 ([('tender_origin_form', '=', self.id)])
