@@ -24,6 +24,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'security/record_rules.xml',
+        'reports/sales_costing_excel_report.xml',
         'views/account_move.xml',
         'views/sale_order_extend.xml',
         'views/credit_limit.xml',
@@ -39,6 +40,7 @@
         'reports/sales_detail_waiter.xml',
         'reports/sales_summary.xml',
         'wizard/sales_report_view.xml',
+        'views/profit_margin.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -32,7 +32,9 @@ class droga_stock_transfer_custom(models.Model):
         'stock.location', "Destination location",
         required=True,
         state={'draft': [('readonly', False)]})
-
+    location_id = fields.Many2one(
+        'stock.warehouse', "Source warehouse",
+        required=True)
     location_filter = fields.Char(compute='_filter_location_access',readonly=True,store=False)
     store_manager = fields.Many2one('res.users', compute='_get_approvers')
     pharma_approver_branch_manager=fields.Many2one('res.users', compute='_get_approvers')
@@ -137,7 +139,7 @@ class droga_stock_transfer_custom(models.Model):
                 raise UserError("Default internal location is not configured for source warehouse.")
             picking_vals = {
                 'partner_id': self.company_id.partner_id.id,
-                'company_id': self.company_id.id,
+                'company_id': self.env.company.id,
                 'picking_type_id': pick_type_id,
                 'location_id': def_location_id,
                 'location_dest_id': self.location_dest_id.id,
@@ -171,7 +173,7 @@ class droga_stock_transfer_custom(models.Model):
                         #'state': 'waiting',
                         #'state': 'confirmed',
                         'state': 'draft',
-                        'company_id': self.company_id.id
+                        'company_id': self.env.company.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)

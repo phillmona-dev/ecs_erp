@@ -548,7 +548,7 @@
             action="droga_sales_physio_action_4k"
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_4k"
-            sequence="20"/>
+            sequence="2"/>
 
     <menuitem
             id="droga_sales_physio_menu_bole"
@@ -556,7 +556,7 @@
             action="droga_sales_physio_action_bole"
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_bole"
-            sequence="20"/>
+            sequence="2"/>
 
     <menuitem
             id="droga_sales_physio_menu_4k_invoice"
@@ -564,7 +564,7 @@
             action="droga_sales_physio_action_4k_to_invoice"
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_4k_invoice"
-            sequence="20"/>
+            sequence="3"/>
 
     <menuitem
             id="droga_sales_physio_menu_bole_invoice"
@@ -572,7 +572,7 @@
             action="droga_sales_physio_action_bole_to_invoice"
             parent="droga_pharma.physio_main_menu"
             groups="physio_user_bole_invoice"
-            sequence="20"/>
+            sequence="3"/>
 
 
 

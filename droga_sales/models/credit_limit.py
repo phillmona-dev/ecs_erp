@@ -84,17 +84,16 @@ class cust_sales_credit_limit(models.Model):
                 matured_invoices=[]
             elif rec.partner_id.vat != '0000000000':
                 matured_invoices = self.env['account.move'].search(
-                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('company_id','=',self.env.company.id),
                      ('invoice_date_due', '<=', datetime.now()),
                      ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', rec.partner_id.vat), '|',
                      ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
             else:
                 matured_invoices = self.env['account.move'].search(
-                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('company_id','=',self.env.company.id),
                      ('invoice_date_due', '<=', datetime.now()),
                      ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id', '=', rec.partner_id.id), '|',
                      ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
-
             tot_amount = 0
             for mi in matured_invoices:
                 tot_amount = tot_amount + (
@@ -154,12 +153,14 @@ class cust_sales_credit_limit(models.Model):
 
             # Pharmacy and physiotheraphy sales (so.order_type is false for pharmacy and physio as this field is used for import and wholesale)
             if not so.order_type and self.env.company.id==1:
+                #Pharmacy
                 if so.order_from.startswith('PH'):
                     if not so.wareh:
                         raise ValidationError("Employee is not linked to a pharmacy chain branch.")
                     for res in so.order_line:
                         res.wareh = so.wareh
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
+                #Physiotheray
                 else:
                     for res in so.order_line:
                         res.wareh = 32 if so.order_from == 'PT-Bole' else 31
@@ -167,6 +168,8 @@ class cust_sales_credit_limit(models.Model):
             #This is for import or wholesale sales under Droga
             elif so.order_type and self.env.company.id==1:
                 so.order_from='IM-'+so.order_type
+            elif self.env.company.id==2:
+                so.order_from = 'EM-EM'
 
             if result.user_id.name.startswith('CRM'):
                 result.sales_initiator='SR-'+result.pr_sales.p_name if result.pr_sales else result.user_id.name
@@ -280,8 +283,16 @@ class payment_term_no_credit(models.Model):
         ('DR', 'Droga'),('PC', 'Pharmacy chain')], string='Term used under')
     allowed_cust=fields.Many2many('res.partner',string='Allowed customers',tracking=True)
     def write(self,vals_list):
-        raise UserError("You can not update payment term.")
+        if not self.env.user.has_group('droga_sales.payment_term_update'):
+            raise UserError("You can not update payment term.")
         return super(payment_term_no_credit, self).write(vals_list)
+
+class payment_term_no_credit_line(models.Model):
+    _inherit = "account.payment.term.line"
+    def write(self,vals_list):
+        if not self.env.user.has_group('droga_sales.payment_term_update'):
+            raise UserError("You can not update payment term.")
+        return super(payment_term_no_credit_line, self).write(vals_list)
 
 class payment_term_no_credit_messages(models.Model):
     _name = 'account.payment.term'

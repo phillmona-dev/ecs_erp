@@ -40,22 +40,29 @@ class droga_stock_cons_receive(models.Model):
 
     issue_type = fields.Selection([('CONR', 'Consignment recieve'), ('SIR', 'Sample return'),('SUBL','Cleaning unit return')],
                                   string='Return type', required=True)
-    marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
-    store_manager = fields.Many2one('res.users', compute='_get_approvers')
-
+    marketting_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    store_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    menu_from = fields.Char('Menu opened from')
     def _get_approvers(self):
         for rec in self:
-            rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.ids[0] if len(
-                self.env.ref("droga_inventory.marketing_manager").users.ids) > 0 else None
+            rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                self.env.ref("droga_inventory.marketing_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
-                rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
-                    self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
+                rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             else:
-                rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
-                    self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+                rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_inventory.stores_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
+        self._get_approvers()
         if vals_list.get('name', 'New') == 'New':
             if len(vals_list['detail_entries'])==0:
                 raise UserError("At least one product must be requested to save record.")
@@ -104,7 +111,7 @@ class droga_stock_cons_receive(models.Model):
 
             picking_vals = {
                 'partner_id': self.supplier.id,
-                'company_id': self.company_id.id,
+                'company_id': self.env.company.id,
                 'picking_type_id': pick_type_id,
                 'location_id': cons_vendor,
                 'location_dest_id': def_loc_id,
@@ -135,7 +142,7 @@ class droga_stock_cons_receive(models.Model):
                         'location_id': cons_vendor,
                         'location_dest_id': def_loc_id,
                         'state': 'confirmed',
-                        'company_id': self.company_id.id
+                        'company_id': self.env.company.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)

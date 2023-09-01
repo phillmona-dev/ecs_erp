@@ -3,8 +3,12 @@
     <record id="crm_lead_extension" model="ir.ui.view">
         <field name="name">Lead extension</field>
         <field name="model">crm.lead</field>
+        <field name="priority" eval="1"/>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="js_class">check_in_form_view</attribute>
+            </xpath>
 
             <xpath expr="//form/header/button[@name='action_set_lost']" position="replace">
                 <button name="%(crm.crm_lead_lost_action)d" string="Lost" data-hotkey="l" title="Mark as lost"
@@ -42,7 +46,61 @@
                     <field name="description" string="Notes" placeholder="Add a description..."
                            options="{'collaborative': true}"/>
                 </page>
+                <page string="Follow up visits" name="follow_ups">
+                    <field name="follow_up_visits" mode="tree,kanban">
+                        <tree editable="bottom" >
+                            <field name="date_planned"/>
+                            <field name="check_in_descr" readonly="1"/>
+                            <field name="check_out_descr" readonly="1"/>
+                        </tree>
+
+
+                        <form string="Follow up visits">
+                            <group>
+                            <field name="date_planned"/>
+                            <field name="check_in_descr" readonly="1"/>
+                            <field name="check_out_descr" readonly="1"/>
+                            </group>
+                        </form>
+                        <kanban class="o_kanban_mobile" limit="500">
+                            <field name="date_planned"/>
+                            <field name="check_in_descr" readonly="1"/>
+                            <field name="check_out_descr" readonly="1"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
+                                        <div class="oe_kanban_details">
+                                            <ul>
+                                                <li>
+                                                    <strong class="o_kanban_record_title">Visit date:
+                                                        <field name="date_planned"></field>
+                                                    </strong>
+                                                </li>
+
+                                                <li>
+                                                    Check in:
+                                                    <field name="check_in_descr"></field>
+                                                </li>
+                                                <li>
+                                                    Check out:
+                                                    <field name="check_out_descr"></field>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+
+
+                        </kanban>
+
+
+                    </field>
+                    <field name="description" string="Notes" placeholder="Add a description..."
+                           options="{'collaborative': true}"/>
+                </page>
             </xpath>
+
 
             <xpath expr="//form/sheet/group/group/field[@name='tag_ids']" position="attributes">
                 <attribute name="invisible">True</attribute>
@@ -71,11 +129,14 @@
             <xpath expr="//form/sheet/group/group[@name='lead_partner']" position="replace">
                 <group name="lead_partner" attrs="{'invisible': [('type', '=', 'opportunity')]}">
                     <field name="pr_avail_areas" invisible="1"/>
-                    <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one" required="True" string="Customer"
+                    <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one"
+                           required="True" string="Customer"
                            invisible="True"/>
                     <field name="contact_custom" options="{'no_create':True,'no_open':True}"></field>
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned" required="True"/>
+                    <field name="referral_distri" widget="many2many_tags"></field>
+                    <field name="check_in_descr" readonly="1"/>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'opportunity')]}">>
                     <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
@@ -84,11 +145,15 @@
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="phone" string="Mobile"/>
                     <field name="planned_visit_selection"/>
+                    <field name="check_out_descr" readonly="1"/>
                 </group>
             </xpath>
 
             <xpath expr="//form/sheet/div/h1" position="after">
-                <h1><field class="text-break" name="partner_id" options="{'no_create':True,'no_open':True}" placeholder="Select customer"/></h1>
+                <h1>
+                    <field class="text-break" name="partner_id" options="{'no_create':True,'no_open':True}"
+                           placeholder="Select customer"/>
+                </h1>
             </xpath>
 
             <xpath expr="//form/sheet/div/h1" position="attributes">
@@ -98,13 +163,15 @@
             <xpath expr="//form/sheet/group/group[@name='opportunity_partner']" position="replace">
                 <group name="opportunity_partner" attrs="{'invisible': [('type', '=', 'lead')]}">
                     <field name="pr_avail_areas" invisible="1"/>
-                    <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one" required="True" string="Customer"
+                    <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one"
+                           required="True" string="Customer"
                            invisible="True"/>
                     <field name="contact_custom" domain="([('parent_customer','=',partner_id)])"
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned" required="True" string="Opportunity date"/>
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
-
+                    <field name="referral_distri" widget="many2many_tags"></field>
+                    <field name="check_in_descr" readonly="1"/>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'lead')]}">
                     <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
@@ -123,6 +190,7 @@
                     <!--<field name="partner_name" string="Opportunity Descr." />-->
                     <field name="phone" string="Mobile" widget="phone"/>
                     <field name="closed_sales" readonly="1"/>
+                    <field name="check_out_descr" readonly="1"/>
                     <label for="email_from" class="oe_inline"/>
                     <div class="o_row o_row_readonly" invisible="1">
                         <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger"
@@ -199,22 +267,23 @@
                     <field name="date_deadline" invisible="1"/>
                     <field name="create_date" optional="hide"/>
                     <field name="pr_sales"></field>
-                    <field name="is_record_owner"></field>
                     <field name="name" string="Lead" readonly="1"/>
                     <field name="contact_name" optional="hide"/>
                     <field name="partner_name" optional="hide"/>
                     <field name="email_from" optional="hide"/>
-                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
                     <field name="city" optional="hide"/>
                     <field name="state_id" optional="hide"/>
                     <field name="contact_custom" optional="show"/>
-                    <field name="specialty" optional="show"/>
-                    <field name="phone" optional="show" class="o_force_ltr"/>
+                    <field name="specialty" optional="hide"/>
+                    <field name="phone" optional="hide" class="o_force_ltr"/>
                     <field name="date_planned" string="Lead date" optional="show"/>
+                    <field name="check_in_descr" optional="show"/>
+                    <field name="check_out_descr" optional="show"/>
                     <field name="city_name" string="City/sub-city" optional="show"/>
                     <field name="country_id" optional="hide" options="{'no_open': True, 'no_create': True}"/>
                     <field name="partner_id" invisible="1"/>
-                    <field name="user_id" string="PR/Sales person" optional="show" widget="many2one_avatar_user"
+                    <field name="user_id" string="PR/Sales person" optional="hide" widget="many2one_avatar_user"
                            domain="[('share', '=', False)]"/>
                     <field name="team_id" optional="hide"/>
                     <field name="active" invisible="1"/>
@@ -294,4 +363,25 @@
             </xpath>
         </field>
     </record>
+
+    <record id="view_crm_case_override_my_activities_filter" model="ir.ui.view">
+            <field name="name">crm.lead.search.override.myactivities</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='activities_overdue']" position="replace">
+                    <filter string="Past Visits" name="activities_overdue"
+                        domain="[('date_planned', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all opportunities for which the next action date is before today"/>
+                </xpath>
+                <xpath expr="//filter[@name='activities_today']" position="replace">
+                    <filter string="Today Visits" name="activities_today"
+                        domain="[('date_planned', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                </xpath>
+                <xpath expr="//filter[@name='activities_upcoming_all']" position="replace">
+                    <filter string="Future Visits" name="activities_upcoming_all"
+                        domain="[('date_planned', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                </xpath>
+            </field>
+        </record>
 </odoo>

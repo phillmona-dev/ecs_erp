@@ -160,6 +160,9 @@
                                             name="visit_schedule_open" class="oe_stat_button"/>
 
                                     <field name="visit_date"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
@@ -176,9 +179,12 @@
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Schedule"
                                                 name="visit_schedule_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     </group>
                                 </form>
-                                <kanban class="o_kanban_mobile">
+                                <kanban class="o_kanban_mobile" limit="500">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
@@ -210,6 +216,9 @@
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
+                                                        <button icon="fa-credit-card-alt"
+                                                            type="object" string=" Add"
+                                                            name="add_visit" class="oe_stat_button"/>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -241,6 +250,9 @@
                                             name="visit_schedule_open" class="oe_stat_button"/>
 
                                     <field name="visit_date"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
@@ -257,9 +269,12 @@
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Schedule"
                                                 name="visit_schedule_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     </group>
                                 </form>
-                                <kanban class="o_kanban_mobile">
+                                <kanban class="o_kanban_mobile" limit="500">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
@@ -291,6 +306,9 @@
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
+                                                        <button icon="fa-credit-card-alt"
+                                                            type="object" string=" Add"
+                                                            name="add_visit" class="oe_stat_button"/>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -322,6 +340,9 @@
                                             name="visit_schedule_open" class="oe_stat_button"/>
 
                                     <field name="visit_date"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
@@ -338,9 +359,12 @@
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Schedule"
                                                 name="visit_schedule_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     </group>
                                 </form>
-                                <kanban class="o_kanban_mobile">
+                                <kanban class="o_kanban_mobile" limit="500">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
@@ -372,6 +396,9 @@
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
+                                                        <button icon="fa-credit-card-alt"
+                                                            type="object" string=" Add"
+                                                            name="add_visit" class="oe_stat_button"/>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -403,6 +430,9 @@
                                             name="visit_schedule_open" class="oe_stat_button"/>
 
                                     <field name="visit_date"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
@@ -419,9 +449,12 @@
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Schedule"
                                                 name="visit_schedule_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     </group>
                                 </form>
-                                <kanban class="o_kanban_mobile">
+                                <kanban class="o_kanban_mobile" limit="500">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
@@ -453,6 +486,9 @@
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
+                                                        <button icon="fa-credit-card-alt"
+                                                            type="object" string=" Add"
+                                                            name="add_visit" class="oe_stat_button"/>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -485,6 +521,9 @@
                                             name="visit_schedule_open" class="oe_stat_button"/>
 
                                     <field name="visit_date"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
@@ -501,9 +540,12 @@
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Schedule"
                                                 name="visit_schedule_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     </group>
                                 </form>
-                                <kanban class="o_kanban_mobile">
+                                <kanban class="o_kanban_mobile" limit="500">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
@@ -535,6 +577,9 @@
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
+                                                        <button icon="fa-credit-card-alt"
+                                                            type="object" string=" Add"
+                                                            name="add_visit" class="oe_stat_button"/>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -561,6 +606,9 @@
                                             name="visit_schedule_open" class="oe_stat_button"/>
 
                                     <field name="visit_date"></field>
+                                    <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     <field name="planned_visit_selection"></field>
                                     <field name="remark" string='Comment'></field>
                                 </tree>
@@ -577,9 +625,12 @@
                                         <button icon="fa-credit-card-alt"
                                                 type="object" string=" Schedule"
                                                 name="visit_schedule_open" class="oe_highlight"/>
+                                        <button icon="fa-credit-card-alt"
+                                            type="object" string=" Add"
+                                            name="add_visit" class="oe_stat_button"/>
                                     </group>
                                 </form>
-                                <kanban class="o_kanban_mobile">
+                                <kanban class="o_kanban_mobile" limit="500">
                                     <field name="visit_client" options="{'no_create':True,'no_open':True}"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
@@ -611,6 +662,9 @@
                                                             Comment:
                                                             <field name="remark"></field>
                                                         </li>
+                                                        <button icon="fa-credit-card-alt"
+                                                            type="object" string=" Add"
+                                                            name="add_visit" class="oe_stat_button"/>
                                                     </ul>
                                                 </div>
                                             </div>

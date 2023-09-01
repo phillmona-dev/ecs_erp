@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.http import request
 
 
 class contacts_schedule(models.Model):
@@ -29,3 +30,4 @@ class lead_ordred_products(models.Model):
     leads=fields.Many2one('crm.lead')
     prod=fields.Many2one('product.template',string='Product')
     qty=fields.Float('Quantity')
+

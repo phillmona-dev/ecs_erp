@@ -15,6 +15,7 @@ class droga_stock_cons_issue(models.Model):
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
         ('stmg', 'Store manager'),  #Issue sent to store manager for warehouse allocation
+        ('pmg','Project Engineer'),
         ('mg', 'Export manager'),
         ('waiting', 'Requested'),   #When consignment is waiting for storekeeper to issue at warehouse
         ('sc', 'Sent to CU'),
@@ -26,13 +27,13 @@ class droga_stock_cons_issue(models.Model):
         help=" * Requested: The consignment issue order is sent to warehouse.\n"
              " * Done: The consignment items are issued from warehouse.\n")
 
-    issue_type = fields.Selection([('CONI', 'Consignment'),('INC','Internal consumption'), ('SIF', 'Free sample'),('SIR', 'Sample issue to be returned'),('SUBL','Cleaning unit issue')],string='Issue type', required=True)
+    issue_type = fields.Selection([('CONI', 'Consignment'),('INC','Internal consumption'),('PRI','Project internal'),('PRC','Project contractor'), ('SIF', 'Free sample'),('SIR', 'Sample issue to be returned'),('SUBL','Cleaning unit issue')],string='Issue type', required=True)
     #SIF - Sample issue free        -   This will post under expense account (transfer to sample location)
     #SIR - Sample issue to return   -   This will post under sample receivable
     #CONI - Consignment issue       -   This will post under consignment receivable (transfer to consignment location)
 
     detail_entries = fields.One2many('droga.inventory.cons.issue.detail', 'cons_header')
-
+    menu_from=fields.Char('Menu opened from')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     user_id=fields.Many2one('res.users',default=lambda self: self.env.user.id)
     remark = fields.Char('Remark')
@@ -41,22 +42,30 @@ class droga_stock_cons_issue(models.Model):
 
     consignment_reference = fields.Text(string='Order reference', default='', readonly=True)
     cons_ref=fields.One2many('stock.picking','cons_sample_issue_request',string='Store reference')
-    marketting_manager = fields.Many2one('res.users', compute='_get_approvers')
-    store_manager = fields.Many2one('res.users', compute='_get_approvers')
+    marketting_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    store_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
 
     def _get_approvers(self):
         for rec in self:
-            rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.ids[0] if len(
-                self.env.ref("droga_inventory.marketing_manager").users.ids) > 0 else None
-            if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
-                rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
-                    self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
-            else:
-                rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
-                    self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+            rec.marketting_manager = self.env.ref("droga_inventory.marketing_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                self.env.ref("droga_inventory.marketing_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+            if len(rec.detail_entries) >0:
+                if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+                else:
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
+        self._get_approvers()
         if vals_list.get('name', 'New') == 'New':
             if 'detail_entries' in vals_list:
                 if len(vals_list['detail_entries'])==0:
@@ -75,6 +84,12 @@ class droga_stock_cons_issue(models.Model):
         self.ensure_one()
         self._get_approvers()
         self.state = 'stmg'
+
+    def request_pr(self):
+        self.set_activity_done()
+        self.ensure_one()
+        self._get_approvers()
+        self.state = 'pmg'
 
     def amend(self):
         self.set_activity_done()
@@ -110,7 +125,7 @@ class droga_stock_cons_issue(models.Model):
 
             picking_vals = {
                 'partner_id': self.customer.id,
-                'company_id': self.company_id.id,
+                'company_id': self.env.company.id,
                 'picking_type_id': pick_type_id,
                 'location_id': def_loc_id,
                 'location_dest_id': cust_locat,
@@ -139,7 +154,7 @@ class droga_stock_cons_issue(models.Model):
                         'location_id': def_loc_id,
                         'location_dest_id': cust_locat,
                         'state': 'confirmed',
-                        'company_id': self.company_id.id
+                        'company_id': self.env.company.id
                     }
 
                     self.env['stock.move'].sudo().create(move_vals)

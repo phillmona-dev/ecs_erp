@@ -1,14 +1,11 @@
-import logging
-import math
-from datetime import datetime,date,time
-from multiprocessing import context
+from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
-from datetime import date, datetime, timedelta
-from odoo.exceptions import UserError,ValidationError
-
-
 
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
+
+
 class AccountLoanRepayment(models.Model):
     
     _name='account.loan.repayment'

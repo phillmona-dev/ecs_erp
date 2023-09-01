@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 {
     'name': "Droga CRM",
 
@@ -37,7 +38,6 @@
         'views/settings/city.xml',
         'views/settings/area.xml',
         'views/lead_extension.xml',
-        'views/product_group.xml',
         'reports/plan_analysis.xml',
         'reports/doctors_schedule.xml',
         'reports/done_activities.xml',
@@ -48,13 +48,27 @@
 
     # any module necessary for this one to work correctly
 
-    'depends': ['base','hr',
-                'mail','stock','http_routing','sale',
-                'resource','stock','droga_inventory',
+    'depends': ['base', 'hr',
+                'mail', 'stock', 'http_routing', 'sale','web_map',
+                'resource', 'stock', 'droga_inventory',
                 'web', 'crm'],
+
+    "assets": {
+        "web.assets_backend": [
+            'droga_crm/static/src/droga_set_cust_location.js',
+            'droga_crm/static/src/res_partner_button.xml',
+
+            'droga_crm/static/src/check_in.js',
+            'droga_crm/static/src/check_in_template.xml',
+
+
+        ],
+
+    },
+
     "license": "AGPL-3",
     # only loaded in demonstration mode
     'installable': True,
     'application': True,
-    'post_init_hook':'create_days'
+    'post_init_hook': 'create_days'
 }

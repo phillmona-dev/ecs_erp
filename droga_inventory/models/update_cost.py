@@ -104,3 +104,18 @@ class update_cost(models.Model):
         if move_vals_list:
             account_moves = self.env['account.move'].sudo().create(move_vals_list)
             account_moves._post()
+
+
+    def update_temp_loc_to_suspense(self):
+        prod=self.env['product.template'].search(
+                [('company_id', '=', 1)]
+            )
+        for rec in prod:
+            rec.property_stock_inventory=315
+
+    def update_temp_loc_to_normal(self):
+        prod=self.env['product.template'].search(
+                [('company_id', '=', 1)]
+            )
+        for rec in prod:
+            rec.property_stock_inventory=14

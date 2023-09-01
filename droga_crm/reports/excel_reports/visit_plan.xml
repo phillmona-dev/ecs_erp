@@ -31,6 +31,14 @@
             sequence="19"/>
 
     <menuitem
+            id="droga_sales_mr_waiter_report_menu"
+            name="Sales waiter report"
+            action="droga_sales.droga_sales_waiteraction"
+            parent="droga_crm.menu_visit_reports"
+            groups="crm_mr"
+            sequence="17"/>
+
+    <menuitem
             id="menu_excel_vist_reports"
             name="Excel reports"
             parent="menu_visit_reports"

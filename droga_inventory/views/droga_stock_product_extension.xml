@@ -63,7 +63,11 @@
                         <field name="average_month_consumption"/>
                         <field name="is_core_product"/>
                     </group>
-
+                    <group string="Origin">
+                        <field name="manufacturing"></field>
+                        <field name="origin"
+                               options="{'no_create':True,'no_open':True}"/>
+                    </group>
                     <group string="Tracebility">
 
                         <field name="tracking" widget="radio" attrs="{'invisible': [('type', '=', 'service')]}"/>
@@ -101,45 +105,57 @@
 
             <!--> General info right side -->
             <xpath expr="//form/sheet/notebook/page/group/group[@name='group_standard_price']" position="replace">
-                <group name="group_standard_price">
+                <group name="group_standard_price" col="1">
+                    <group string="Taxes, cost and sales price">
+                        <field name="standard_price" groups="droga_inventory.inv_prod_fin" readonly="1"
+                               widget='monetary'/>
+                        <field name="list_price" widget='monetary'/>
+                        <field name="list_price_phar" widget='monetary'/>
+                        <field name="taxes_id" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
+                    </group>
+                    <group string="Unit of measures">
+                        <field name="uom_id" string="Import UOM" options="{'no_create': True}"/>
+                        <field name="pharma_uom" string="Pharmacy UOM" options="{'no_create': True}"/>
+                    </group>
 
-                    <field name="standard_price" groups="droga_inventory.inv_prod_fin" readonly="1" widget='monetary'/>
-                    <field name="list_price" widget='monetary'/>
+                    <group string="Categories">
+                        <field name="pharmacy_group_id" required="True" options="{'no_create':True,'no_open':True}" domain="[('id_counter','&lt;',1000)]"
+                               groups="droga_inventory.inv_prod_mi_manager"></field>
+                        <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
+                               domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','MI')]"
+                               groups="droga_inventory.inv_prod_mi_manager"/>
+                        <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
+                               domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','EX')]"
+                               groups="droga_inventory.inv_prod_ex_manager"/>
+                        <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
+                               domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','SC')]"
+                               groups="droga_inventory.inv_prod_sc_manager"/>
+                        <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
+                               domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','OS')]"
+                               groups="droga_inventory.inv_prod_os_manager"/>
+                        <field name="sub_categ_id" string="Product sub-category"
+                               options="{'no_create':True,'no_open':True}"
+                               domain="[('complete_name','not like','All%'),('parent_id','=',categ_id)]"/>
+                        <field name="categ_id" invisible="1" string="Product Category"
+                               options="{'no_create':True,'no_open':True}"
+                               domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
+                        <field name="product_tag_ids" invisible="1"/>
 
-                    <field name="default_warehouse" string="Default warehouse"
-                           options="{'no_create':True,'no_open':True}"/>
-                    <field name="uom_id" options="{'no_create': True}"/>
-                    <field name="categ_id" invisible="1" string="Product Category"
-                           options="{'no_create':True,'no_open':True}"
-                           domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
-                    <field name="product_tag_ids" invisible="1"/>
-
-                    <field name="company_id" groups="base.group_multi_company"
-                           options="{'no_create': True}"/>
-                    <field name="currency_id" invisible="1"/>
-                    <field name="cost_currency_id" invisible="1"/>
-                    <field name="product_variant_id" invisible="1"/>
-
-                    <field name="taxes_id" widget="many2many_tags" invisible="1"/>
-                    <field name="order_type" required="True"/>
-                    <field name="bought_locally"/>
-
+                        <field name="company_id" groups="base.group_multi_company"
+                               options="{'no_create': True}" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="cost_currency_id" invisible="1"/>
+                        <field name="product_variant_id" invisible="1"/>
+                    </group>
+                    <group string="Miscellaneous">
+                        <field name="order_type" required="True"/>
+                        <field name="default_warehouse" string="Default warehouse"
+                               options="{'no_create':True,'no_open':True}"/>
+                        <field name="bought_locally"/>
+                        <field name="old_ref"></field>
+                    </group>
                 </group>
             </xpath>
-
-            <xpath expr="//form/sheet/notebook/page/group/group/field[@name='taxes_id']" position="before">
-                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
-                       domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','MI')]" groups="droga_inventory.inv_prod_mi_manager"/>
-                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
-                       domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','EX')]" groups="droga_inventory.inv_prod_ex_manager"/>
-                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
-                       domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','SC')]" groups="droga_inventory.inv_prod_sc_manager"/>
-                <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
-                       domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','OS')]" groups="droga_inventory.inv_prod_os_manager"/>
-                <field name="sub_categ_id" string="Product sub-category" options="{'no_create':True,'no_open':True}"
-                       domain="[('complete_name','not like','All%'),('parent_id','=',categ_id)]"/>
-            </xpath>
-
         </field>
     </record>
 

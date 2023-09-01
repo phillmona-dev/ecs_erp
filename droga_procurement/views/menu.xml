@@ -25,7 +25,7 @@
 
     </menuitem>
 
-    <!-- Foregin Procurement -->
+    <!-- Foreign Procurement -->
     <menuitem id="droag_procurement_foregin" name="Foreign Procurement" sequence="0"
               parent="purchase.menu_purchase_root"
               groups="purchase.group_purchase_manager,purchase.group_purchase_user">
@@ -44,6 +44,24 @@
                   groups="account.group_account_manager"
                   sequence="4"/>
 
+    </menuitem>
+
+    <!--Pharmacy Procurement -->
+    <menuitem id="droag_procurement_pharmacy" name="Pharmacy Procurement" sequence="0"
+              parent="purchase.menu_purchase_root"
+              groups="purchase.group_purchase_manager,purchase.group_purchase_user">
+        <menuitem id="droga_store_request_pharmacy_menu" name="Store Requisition" sequence="1"
+                  action="droga_inventory.droga_inventory_office_supplies_request_pharmacy_warehouse_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+        <menuitem id="droga_purhcase_request_pharmacy_menu" name="Purchase Request" sequence="2"
+                  action="droga_purchase_request_pharmacy_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+        <menuitem id="droga_purhcase_rfq_pharmacy_menu" name="Request for Quotation" sequence="3"
+                  action="droga_purchase_request_rfq_pharmacy_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+        <menuitem id="droga_purchase_order_pharmacy_menu" name="Purchase Order" sequence="4"
+                  action="purchase_form_pharmacy_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
     </menuitem>
 
     <!-- reporting -->

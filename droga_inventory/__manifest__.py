@@ -24,6 +24,7 @@
         'data/droga_inv_sequence.xml',
         'security/ir.model.access.csv',
         'views/droga_stock_transfer_custom.xml',
+        'views/pharma_prod_categ.xml',
         'views/droga_stock_consignment_receipt.xml',
         'views/droga_stock_consignment_issue.xml',
         'views/droga_stock_extensions.xml',
@@ -44,7 +45,7 @@
     # any module necessary for this one to work correctly
 
     'depends': ['base',
-                'mail',
+                'mail','stock',
                 'resource', 'droga_procurement',
                 'web', 'crm'],
     "license": "AGPL-3",

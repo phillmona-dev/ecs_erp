@@ -24,7 +24,13 @@
             <field name="model">drug.information.query</field>
             <field name="arch" type="xml">
                 <form>
+                    <html>
 
+                            <script>
+                                alert("Test");
+                            </script>
+
+                    </html>
                     <header>
 
                         <button name="open_enquire_form" string="Enquire" type="object" class="oe_highlight"

@@ -16,11 +16,22 @@ class droga_tender_master(models.Model):
     item_pro = fields.Char("Item proposed",related='parent_tender_performance_detail.item_pro')
 
     # decimal fields
-    quantity = fields.Float("Awarded qty",related='parent_tender_performance_detail.quantity')
+    quantity = fields.Float("Award qty",related='parent_tender_performance_detail.quantity')
+
+    award_quantity = fields.Float("Revised qty", compute='get_award_qty', store=True,inverse='_inverse_award_qty')
+
+    def _inverse_award_qty(self):
+        pass
+
+    def get_award_qty(self):
+        for rec in self:
+            rec.award_quantity = rec.quantity
+
     unit_price = fields.Float("Unit price",related='parent_tender_performance_detail.unit_price')
     amount = fields.Float("Amount quoted",related='parent_tender_performance_detail.amount')
 
     droga_product=fields.Many2one('product.template')
+    droga_old_product = fields.Many2one('product.template')
 
     award_cost = fields.Float("Awarded cost")
     perf_pct=fields.Float('% of Performance',compute="compute_performance")
@@ -28,16 +39,21 @@ class droga_tender_master(models.Model):
 
     ordered_qty=fields.Float('Ordered qty',compute='_compute_ordered_delivered_qty')
     delivered_qty = fields.Float('Delivered qty', compute='_compute_ordered_delivered_qty')
+    remaining_qty = fields.Float('Remaining qty', compute='_compute_ordered_delivered_qty')
+
     def _compute_ordered_delivered_qty(self):
         for rec in self:
-            prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id)])[0].id
-            ten_sales=self.env['sale.order'].search([('state','=','sale'),('tender_origin_form_tender','=',rec.parent_tender_performance.id)]).ids
-            if not prod_id:
+            if len(self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id),('product_tmpl_id','=',rec.droga_old_product.id)]))==0:
                 rec.ordered_qty = 0
                 rec.delivered_qty = 0
+                rec.remaining_qty=rec.award_quantity
             else:
-                rec.ordered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','=',prod_id)]).mapped('product_uom_qty'))
-                rec.delivered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','=',prod_id)]).mapped('qty_delivered'))
+                prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id),('product_tmpl_id','=',rec.droga_old_product.id)]).ids
+                ten_sales=self.env['sale.order'].search([('state','=','sale'),('tender_origin_form_tender','=',rec.parent_tender_performance.id)]).ids
+
+                rec.ordered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','in',prod_id)]).mapped('product_uom_qty'))
+                rec.delivered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','in',prod_id)]).mapped('qty_delivered'))
+                rec.remaining_qty = rec.award_quantity-rec.ordered_qty
     def _get_order_status(self):
         for rec in self:
             if self.env['sale.order.line'].search([('tender_line','=',rec.id)]):

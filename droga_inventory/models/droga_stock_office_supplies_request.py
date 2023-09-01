@@ -63,6 +63,9 @@ class droga_stock_office_supplies(models.Model):
     product_type = fields.Selection([('Technical', 'Technical'), ('Non Technical', 'Non Technical')],
                                     default='Non Technical')
 
+    request_type = fields.Selection(
+        [("Local", "Local"), ("Pharmacy", "Pharmacy")], default="Local", readonly=True)
+
     purpose = fields.Char("Purpose")
 
     detail_entries = fields.One2many(
@@ -118,13 +121,24 @@ class droga_stock_office_supplies(models.Model):
                 raise UserError(
                     "At least one product must be requested to save record.")
 
-                # generate transaction number
+        res = super(droga_stock_office_supplies, self).create(vals_list)
+
+        request_type = res.request_type
+
+        # generate transaction number
+        if request_type == 'Local':
             sequence_no = self.env['droga.finance.utility'].get_transaction_no('STR', vals_list['request_date'],
-                                                                                   vals_list['company_id'])
-            if not sequence_no:
-                raise UserError("Request sequence not found.")
-            vals_list['name'] = sequence_no or '/'
-        return super(droga_stock_office_supplies, self).create(vals_list)
+                                                                               vals_list['company_id'])
+        elif request_type == 'Pharmacy':
+            sequence_no = self.env['droga.finance.utility'].get_transaction_no('STRP', vals_list['request_date'],
+                                                                               vals_list['company_id'])
+
+        if not sequence_no:
+            raise UserError("Request sequence not found.")
+
+        res.name = sequence_no or '/'
+
+        return res
 
     # submit action
     def action_submit(self):
@@ -137,7 +151,7 @@ class droga_stock_office_supplies(models.Model):
                 "A manager is not set for the requester, please contact HR to set manager for your employee record")
         # create activity for the approver
         # self.create_activity(self.department_manager_user_id.id)
-        self.create_activity(self.requested_by.parent_id.user_id.id)
+        self.create_activity(self.department_manager_user_id.id)
 
     # verify request
     def action_verify(self):
@@ -189,7 +203,7 @@ class droga_stock_office_supplies(models.Model):
         def_location_id = self.env['stock.location'].search(
             [('complete_name', 'like', wh.code + '/Stock%'), ('usage', '=', 'internal')])[0].id
         def_dest_id = self.env['stock.location'].search(
-            [('name', 'like', 'Office%'),('con_type', '=', 'INC')])
+            [('name', 'like', 'Office%'), ('con_type', '=', 'INC')])
 
         if not def_location_id:
             raise UserError(
@@ -206,7 +220,7 @@ class droga_stock_office_supplies(models.Model):
         if item_lines_available != 0:
             picking_vals = {
                 'partner_id': self.company_id.partner_id.id,
-                'company_id': self.company_id.id,
+                'company_id': self.env.company.id,
                 'picking_type_id': pick_type_id,
                 'location_id': def_location_id,
                 'location_dest_id': def_dest_id[0].id,
@@ -237,7 +251,7 @@ class droga_stock_office_supplies(models.Model):
                     'location_dest_id': def_dest_id[0].id,
                     # 'state': 'draft',          Confirmed is waiting status
                     'state': 'waiting',
-                    'company_id': self.company_id.id
+                    'company_id': self.env.company.id
                 }
 
                 self.env['stock.move'].sudo().create(move_vals)
@@ -324,7 +338,8 @@ class droga_stock_office_supplies(models.Model):
                 'department': self.department.id,
                 'request_date': self.env.cr.now(),
                 'store_request_id': self.id,
-                'company_id': self.company_id.id,
+                'request_type': self.request_type,
+                'company_id': self.env.company.id,
 
             }
             vals['purchase_request_lines'] = []
@@ -514,3 +529,8 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
                  ('product_tmpl_id', '=', record.product_id.id)],
                 limit=1).available_quantity
             record.stock_balance = available_quantity
+
+    @api.onchange("product_id")
+    def get_standard_price(self):
+        for record in self:
+            record.unit_price = record.product_id.standard_price

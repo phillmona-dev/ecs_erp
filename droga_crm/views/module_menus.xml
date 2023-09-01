@@ -21,9 +21,103 @@
             action="base.action_partner_form"
             sequence="5"/>
 
+    <menuitem
+            id="droga_mr_sales_requests_menu"
+            name="Requests"
+            parent="crm.crm_menu_sales"
+            groups="droga_crm.crm_mr"
+            sequence="20"/>
+
+
+    <record id="droga_crm_free_sample_consignment_issue_action" model="ir.actions.act_window">
+        <field name="name">Free sample request</field>
+        <field name="res_model">droga.inventory.consignment.issue</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_issue_type': 'SIF','default_menu_from':'SR'}</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
+    </record>
+
+    <record id="droga_crm_cons_consignment_issue_action" model="ir.actions.act_window">
+        <field name="name">Consignment issue request</field>
+        <field name="res_model">droga.inventory.consignment.issue</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_issue_type': 'CONI','default_menu_from':'SR'}</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
+    </record>
+
+    <record id="droga_crm_sir_consignment_issue_action" model="ir.actions.act_window">
+        <field name="name">Sample to be returned request</field>
+        <field name="res_model">droga.inventory.consignment.issue</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_issue_type': 'SIR','default_menu_from':'SR'}</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
+    </record>
+
+
+    <record id="droga_crm_consignment_receipt_action" model="ir.actions.act_window">
+        <field name="name">Store consignment receipt order</field>
+        <field name="res_model">droga.inventory.consignment.receive</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_issue_type': 'CONR','default_menu_from':'SR'}</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
+    </record>
+
+    <record id="droga_crm_sir_receipt_action" model="ir.actions.act_window">
+        <field name="name">Sample return order</field>
+        <field name="res_model">droga.inventory.consignment.receive</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_issue_type': 'SIR','default_menu_from':'SR'}</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
+    </record>
+
+
+    <menuitem
+            id="droga_sales_con_issue_mr_menu"
+            name="Stores Issue"
+            parent="droga_crm.droga_mr_sales_requests_menu"
+            groups="droga_crm.crm_mr"
+            sequence="30">
+
+        <menuitem
+                id="droga_crm_free_issue_menu"
+                name="Free sample"
+                action="droga_crm.droga_crm_free_sample_consignment_issue_action"
+                sequence="1"/>
+        <menuitem
+                id="droga_crm_sir_issue_menu"
+                name="Sample to be returned"
+                action="droga_crm.droga_crm_sir_consignment_issue_action"
+                sequence="2"/>
+        <menuitem
+                id="droga_crm_cons_issue_menu"
+                name="Consignment"
+                action="droga_crm.droga_crm_cons_consignment_issue_action"
+                sequence="3"/>
+    </menuitem>
+
+
+    <menuitem
+            id="droga_sales_con_mr_receive_menu"
+            name="Stores Receive"
+            parent="droga_crm.droga_mr_sales_requests_menu"
+            groups="droga_crm.crm_mr"
+            sequence="40">
+        <menuitem
+                id="droga_crm_free_return_menu"
+                name="Sample return"
+                action="droga_crm.droga_crm_sir_receipt_action"
+                sequence="1"/>
+        <menuitem
+                id="droga_crm_cons_return_menu"
+                name="Consignment return"
+                action="droga_crm.droga_crm_consignment_receipt_action"
+                sequence="2"/>
+    </menuitem>
+
     <!-- Customer action add domain to filter by region -->
     <record id="base.action_partner_form" model="ir.actions.act_window">
         <field name="domain">[('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]</field>
+        <field name="view_mode">kanban,tree,form,activity,map</field>
     </record>
 
     <!-- Hide default reporting menu -->
@@ -35,9 +129,28 @@
     <!-- Lead menu domain -->
     <record model="ir.actions.act_window" id="crm.crm_lead_all_leads">
         <field name="domain">['&amp;',('is_record_owner','=',True),'|', ('type','=','lead'), ('type','=',False)]</field>
+        <field name="context">{'search_default_activities_today': 1}</field>
     </record>
     <!-- Pipeline menu domain -->
     <record model="ir.actions.act_window" id="crm.crm_lead_action_pipeline">
         <field name="domain">[('is_record_owner','=',True),('type','=','opportunity')]</field>
+        <field name="context">{'search_default_activities_today': 1}</field>
     </record>
+    <!-- Leads menu rename -->
+    <record model="ir.ui.menu" id="crm.crm_menu_leads">
+        <field name="name">Visits/Leads</field>
+    </record>
+
+    <!-- Leads report view mode -->
+    <record id="crm.crm_opportunity_report_action_lead" model="ir.actions.act_window">
+        <field name="view_mode">tree,graph,pivot</field>
+    </record>
+
+    <!-- Leads report move menu -->
+    <menuitem
+        id="crm_opportunity_report_menu_lead"
+        name="Leads"
+        parent="droga_crm.menu_inq_vist_reports"
+        action="crm.crm_opportunity_report_action_lead"
+        sequence="3"/>
 </odoo>

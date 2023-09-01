@@ -3,6 +3,7 @@ access_tender_settings_competitor,droga.tender.settings.competitor,model_droga_t
 access_tender_settings_type_item,droga.tender.settings.type.item,model_droga_tender_settings_type_item,droga_tender.tender_manager,1,1,1,1
 access_tender_settings_incoterm,droga.tender.settings.incoterm,model_droga_tender_settings_incoterm,droga_tender.tender_manager,1,1,1,1
 access_tender_settings_media,droga.tender.settings.media,model_droga_tender_settings_media,droga_tender.tender_manager,1,1,1,1
+access_tender_uom,droga.tender.uom,model_droga_tender_uom,droga_tender.tender_user,1,1,1,1
 access_tender_settings_sec_type,droga.tender.settings.sec.type,model_droga_tender_settings_sec_type,droga_tender.tender_manager,1,1,1,1
 access_tender_settings_submission_place,droga.tender.settings.submission.place,model_droga_tender_settings_submission_place,droga_tender.tender_manager,1,1,1,1
 access_tender_settings_customer,droga.tender.settings.customers,model_droga_tender_settings_customers,droga_tender.tender_manager,1,1,1,1
@@ -24,5 +25,4 @@ access_droga_sale_order,droga.sale.sale.order,sale.model_sale_order,droga_tender
 access_droga_sale_order_line,droga.sale.sale.order_line,sale.model_sale_order_line,droga_tender.tender_user,1,1,1,1
 access_droga_stock_picking,droga.stock.stock.picking,stock.model_stock_picking,droga_tender.tender_user,1,1,1,1
 access_droga_stock_move,droga.stock.stock.move,stock.model_stock_move,droga_tender.tender_user,1,1,1,1
-
-
+access_droga_bond_requests,droga.bond.requests,droga_tender.model_droga_bond_requests,droga_tender.tender_user,1,1,1,1

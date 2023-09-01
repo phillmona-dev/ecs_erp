@@ -34,6 +34,14 @@
         <field name="name">Droga wholesale invoicer</field>
         <field name="category_id" ref="sales_management"/>
     </record>
+    <record id="ema_invoicer" model="res.groups">
+        <field name="name">EMA invoicer</field>
+        <field name="category_id" ref="sales_management"/>
+    </record>
+    <record id="payment_term_update" model="res.groups">
+        <field name="name">Payment term update access</field>
+        <field name="category_id" ref="sales_management"/>
+    </record>
     <record id="sales_import_invoicer" model="res.groups">
         <field name="name">Droga import invoicer</field>
         <field name="category_id" ref="sales_management"/>

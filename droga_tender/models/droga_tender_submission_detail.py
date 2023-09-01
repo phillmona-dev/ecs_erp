@@ -20,6 +20,7 @@ class droga_tender_submission_detail(models.Model):
     award_fold_num = fields.Char("Award folder number")
     supplier_new=fields.Char('Supplier')
     uom_free_field=fields.Char('UOM unregistered')
+    uom_reg_field = fields.Many2one('droga.tender.uom',string='UOM')
     item_num=fields.Integer('Item Number')
     deliv_period_text = fields.Char("Delivery period")
 

@@ -112,9 +112,9 @@ class account_move(models.Model):
         file_io = BytesIO()
         # get employee record
 
-        if not self.pos_xml_folder:
-            raise ValidationError(
-                "The POS device IP address is not set for the current user, please contact the system administrator to set it.")
+        # if not self.pos_xml_folder:
+        # raise ValidationError(
+        # "The POS device IP address is not set for the current user, please contact the system administrator to set it.")
 
         for record in self:
             m_encoding = 'UTF-8'
@@ -136,6 +136,9 @@ class account_move(models.Model):
             ET.SubElement(Invoice, "Invoice_DiscOrAdd_Amount").text = "0.00"
 
             for line in record.invoice_line_ids:
+
+                if line.price_unit == 0:
+                    continue
 
                 tax_percent = 0
                 # get tax id
@@ -161,7 +164,7 @@ class account_move(models.Model):
             # save path
             save_path = record.pos_xml_folder
             name_of_file = record.name
-            completeName = os.path.join(save_path, name_of_file + ".xml")
+            #completeName = os.path.join(save_path, name_of_file + ".xml")
 
             ##with open(completeName, 'w') as xfile:
             ##xfile.write(
@@ -251,11 +254,16 @@ class account_move(models.Model):
         return True
 
     def print_sales_attachment(self):
-        if self.order_from in ('IM', 'WS', 'IM-IM', 'IM-WS'):
-            res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_action').report_action(self)
-        else:
-            res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_a5_action').report_action(self)
-        return res1
+
+        if self.env.company.id == 1:  # droga
+            if self.order_from in ('IM', 'WS', 'IM-IM', 'IM-WS'):
+                res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_action').report_action(self)
+            else:
+                res1 = self.env.ref('droga_sales.droga_sales_pos_attachment_a5_action').report_action(self)
+            return res1
+        elif self.env.company.id == 2:
+            res1 = self.env.ref('droga_sales.ema_sales_pos_attachment_action').report_action(self)
+            return res1
 
     def set_analytic_accounts(self):
         # get analytic account

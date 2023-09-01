@@ -35,22 +35,30 @@
         <field name="arch" type="xml">
             <form string="Consignment issue">
                 <header>
+                    <!-- Sales and crm header part  -->
+                    <field name="menu_from" invisible="1"></field>
                     <button name="request"
-                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
+                            attrs="{'invisible': ['|',('state', 'not in', ('draft')),('menu_from','!=','SR')]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="stmg_approve"
-                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
+                            attrs="{'invisible': ['|',('state', 'not in', ('stmg')),('menu_from','!=','SR')]}"
                             groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
-                            attrs="{'invisible': [('state', 'not in', ('stmg','mtmg'))]}"
+                            attrs="{'invisible': ['|',('state', 'not in', ('stmg','mtmg')),('menu_from','!=','SR')]}"
                             groups="droga_inventory.stores_manager,droga_inventory.marketing_manager,droga_inventory.stores_manager_ws"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
-                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
+                            attrs="{'invisible': ['|',('state', 'not in', ('draft')),('menu_from','!=','SR')]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
 
-                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,processed"/>
+                    <field name="state" widget="statusbar" attrs="{'invisible': [('menu_from','!=','SR')]}" statusbar_visible="draft,stmg,waiting,processed"/>
+
+
+
+
+
+
                 </header>
                 <sheet>
                     <group string="Store issue request">
@@ -58,7 +66,7 @@
                             <field name="customer"
                                    attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
                             <field name="issue_type" required="True"
-                                   attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
+                                   readonly="1"></field>
                         </group>
                         <group>
                             <field name="issue_date"

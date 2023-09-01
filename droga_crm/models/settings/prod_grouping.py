@@ -9,6 +9,10 @@ class droga_crm_settings_prod_groups(models.Model):
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
+class product_link_group(models.Model):
+    _inherit = 'product.category'
+    crm_group=fields.Many2one('droga.crm.settings.prod_group')
+
 class droga_product_template(models.Model):
     _inherit='product.template'
     crm_group=fields.Many2one('droga.crm.settings.prod_group',string='CRM Product Group',domain=[('status', '=', 'Active')])
@@ -42,3 +46,10 @@ class droga_product_template(models.Model):
                 [('crm_group', 'in', ses[0].pro_id[0].p_groups.ids)])
 
         return [('id', 'in', [x.id for x in is_prod_avail] if is_prod_avail else False)]
+
+    @api.model
+    def create(self,vals):
+        res=super(droga_product_template, self).create(vals)
+        #res.crm_group=res.categ_id.crm_group
+        res.crm_group = res.categ_id.crm_group
+        return res

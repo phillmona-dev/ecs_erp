@@ -84,6 +84,7 @@ class sale_order_line(models.Model):
     std_unit_price = fields.Float(readonly=True, string='UP Default')
     has_access = fields.Boolean(related='order_id.has_access')
     order_from = fields.Char(related='order_id.order_from')
+    has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
 
     @api.depends('product_id', 'order_id.order_type', 'product_uom')
     def _is_prod_available(self):
@@ -170,70 +171,109 @@ class sale_order_line(models.Model):
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price')
     def _compute_price_unit(self):
-        if self.order_id.state in ('sale', 'cancel', 'done', 'fia') or self.order_id.company_id.id == 2:
+        if self.order_id.state in ('sale', 'cancel', 'done', 'fia'):
             return
-        used_under = []
+        if self.order_id.company_id.id == 2:
+            for line in self:
+                if not line.product_uom or not line.product_id or not line.order_id.pricelist_id:
+                    line.price_unit = 0.0
+                else:
+                    if not line.tender_origin_form_tender and not line.manual_price:
+                        price = line.with_company(line.company_id)._get_display_price()
+                        line.price_unit = line.product_id._get_tax_included_unit_price(
+                            line.company_id,
+                            line.order_id.currency_id,
+                            line.order_id.date_order,
+                            'sale',
+                            fiscal_position=line.order_id.fiscal_position_id,
+                            product_price_unit=price,
+                            product_currency=line.currency_id
+                        )
+                    price = line.with_company(line.company_id)._get_display_price()
+                    line.std_unit_price = line.product_id._get_tax_included_unit_price(
+                        line.company_id,
+                        line.order_id.currency_id,
+                        line.order_id.date_order,
+                        'sale',
+                        fiscal_position=line.order_id.fiscal_position_id,
+                        product_price_unit=price,
+                        product_currency=line.currency_id
+                    )
+        else:
 
-        if self.order_id.order_line and self.order_id.company_id.id == 1:
-            #Order_type is used for import sales
-            if self.order_id.order_type:
-                used_under = ['IM', 'All']
-            elif self.order_id.order_from:
-                used_under = ['PT', 'All']
-            else:
-                #For some reason, order from is coming up empty for pharmacy
-                used_under = ['PH', 'All']
+            used_under = []
 
-        for line in self:
-            if not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
-                line.wareh = line.product_id.default_warehouse
+            if self.order_id.order_line:
+                #Order_type is used for import sales
+                if self.order_id.order_type:
+                    used_under = ['IM', 'All']
+                elif self.order_id.order_from:
+                    used_under = ['PT', 'All']
+                else:
+                    #For some reason, order from is coming up empty for pharmacy
+                    used_under = ['PH', 'All']
 
-            # Get discounts/additional payments per type
-            type_rates = self.env['droga.price.discount.per.type'].search(
-                [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id), ('status', '=', 'Active'),
-                 ('product_group', '=', line.product_id.categ_id.id), ('used_under', 'in', used_under)])
-            core_rate = 0  # Discount rate for core products defined
-            non_core_rate = 0  # Discount rate for non-core products defined
-            all_rate = 0  # Discount rate for all products defined
+            for line in self:
+                if not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
+                    line.wareh = line.product_id.default_warehouse
 
-            for rate in type_rates:
-                if rate['core_products_or_all'] == 'Core':
-                    core_rate = core_rate + rate['percent']
-                elif rate['core_products_or_all'] == 'Noncore':
-                    non_core_rate = non_core_rate + rate['percent']
-                elif rate['core_products_or_all'] == 'All':
+                # Get discounts/additional payments per type
+                type_rates = self.env['droga.price.discount.per.type'].search(
+                    [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id), ('status', '=', 'Active'),
+                     ('product_group', '=', line.product_id.categ_id.id), ('used_under', 'in', used_under)])
+                core_rate = 0  # Discount rate for core products defined
+                non_core_rate = 0  # Discount rate for non-core products defined
+                all_rate = 0  # Discount rate for all products defined
+
+                for rate in type_rates:
+                    if rate['core_products_or_all'] == 'Core':
+                        core_rate = core_rate + rate['percent']
+                    elif rate['core_products_or_all'] == 'Noncore':
+                        non_core_rate = non_core_rate + rate['percent']
+                    elif rate['core_products_or_all'] == 'All':
+                        all_rate = all_rate + rate['percent']
+
+                # Product and customer combination discount rules
+                product_customer = self.env['droga.price.discount.per.product.customer'].search(
+                    ['|', ('payment_term', '=', self.order_id['payment_term_id'].id), ('payment_term', '=', False),
+                     ('product', '=', line.product_id.id), ('status', '=', 'Active'),
+                     ('cust', '=', self.order_id['partner_id'].id), ('used_under', 'in', used_under)])
+                for rate in product_customer:
                     all_rate = all_rate + rate['percent']
 
-            # Product and customer combination discount rules
-            product_customer = self.env['droga.price.discount.per.product.customer'].search(
-                ['|', ('payment_term', '=', self.order_id['payment_term_id'].id), ('payment_term', '=', False),
-                 ('product', '=', line.product_id.id), ('status', '=', 'Active'),
-                 ('cust', '=', self.order_id['partner_id'].id), ('used_under', 'in', used_under)])
-            for rate in product_customer:
-                all_rate = all_rate + rate['percent']
+                uom_rate = line.product_uom.factor / (
+                    line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else (
+                        line.product_uom.factor if line.product_uom.factor != 0 else 1))
+                # Product and quantity discount rules
+                product_qty = self.env['droga.price.discount.per.product.qty'].search(
+                    ['|', ('payment_term', '=', self.order_id['payment_term_id'].id), ('payment_term', '=', False),
+                     ('product', '=', line.product_id.id), ('status', '=', 'Active'),
+                     ('from_qty', '<=', line.product_uom_qty * uom_rate), ('to_qty', '>=', line.product_uom_qty * uom_rate),
+                     ('used_under', 'in', used_under)])
+                for rate in product_qty:
+                    all_rate = all_rate + rate['percent']
 
-            uom_rate = line.product_uom.factor / (
-                line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else (
-                    line.product_uom.factor if line.product_uom.factor != 0 else 1))
-            # Product and quantity discount rules
-            product_qty = self.env['droga.price.discount.per.product.qty'].search(
-                ['|', ('payment_term', '=', self.order_id['payment_term_id'].id), ('payment_term', '=', False),
-                 ('product', '=', line.product_id.id), ('status', '=', 'Active'),
-                 ('from_qty', '<=', line.product_uom_qty * uom_rate), ('to_qty', '>=', line.product_uom_qty * uom_rate),
-                 ('used_under', 'in', used_under)])
-            for rate in product_qty:
-                all_rate = all_rate + rate['percent']
+                if line.store_placement:
+                    line.price_unit = 0.0
+                    continue
+                if not line.product_uom or not line.product_id or not line.order_id.pricelist_id:
+                    line.price_unit = 0.0
+                    line.std_unit_price = 0.0
+                else:
+                    price = line.with_company(line.company_id)._get_display_price()
+                    if not line.tender_origin_form_tender and not line.manual_price:
+                        line.price_unit = line.product_id._get_tax_included_unit_price(
+                            line.company_id,
+                            line.order_id.currency_id,
+                            line.order_id.date_order,
+                            'sale',
+                            fiscal_position=line.order_id.fiscal_position_id,
+                            product_price_unit=price,
+                            product_currency=line.currency_id
+                        ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
+                                    1 + ((non_core_rate + all_rate) / 100)))
 
-            if line.store_placement:
-                line.price_unit = 0.0
-                continue
-            if not line.product_uom or not line.product_id or not line.order_id.pricelist_id:
-                line.price_unit = 0.0
-                line.std_unit_price = 0.0
-            else:
-                price = line.with_company(line.company_id)._get_display_price()
-                if not line.tender_origin_form_tender and not line.manual_price:
-                    line.price_unit = line.product_id._get_tax_included_unit_price(
+                    line.std_unit_price = line.product_id._get_tax_included_unit_price(
                         line.company_id,
                         line.order_id.currency_id,
                         line.order_id.date_order,
@@ -244,56 +284,45 @@ class sale_order_line(models.Model):
                     ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
                                 1 + ((non_core_rate + all_rate) / 100)))
 
-                line.std_unit_price = line.product_id._get_tax_included_unit_price(
-                    line.company_id,
-                    line.order_id.currency_id,
-                    line.order_id.date_order,
-                    'sale',
-                    fiscal_position=line.order_id.fiscal_position_id,
-                    product_price_unit=price,
-                    product_currency=line.currency_id
-                ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
-                            1 + ((non_core_rate + all_rate) / 100)))
+                line.price_unit_before_discount = line.std_unit_price
 
-            line.price_unit_before_discount = line.std_unit_price
+            self.calc_sales_totals()
 
-        self.calc_sales_totals()
+            core_sum = self.order_id.core_sum
+            non_core_sum = self.order_id.non_core_sum
 
-        core_sum = self.order_id.core_sum
-        non_core_sum = self.order_id.non_core_sum
+            amount_rates = self.env['droga.price.discount.per.amount'].search(
+                [('payment_term', '=', self.order_id['payment_term_id'].id), ('status', '=', 'Active'),
+                 ('used_under', 'in', used_under)])
 
-        amount_rates = self.env['droga.price.discount.per.amount'].search(
-            [('payment_term', '=', self.order_id['payment_term_id'].id), ('status', '=', 'Active'),
-             ('used_under', 'in', used_under)])
+            core_rate = 0
+            non_core_rate = 0
+            all_rate = 0
+            for rate in amount_rates:
+                if rate['core_products_or_all'] == 'Core' and rate['from_amt'] <= core_sum <= rate['to_amt']:
+                    core_rate = core_rate + rate['percent']
+                elif rate['core_products_or_all'] == 'Noncore' and rate['from_amt'] <= non_core_sum <= rate['to_amt']:
+                    non_core_rate = non_core_rate + rate['percent']
+                elif rate['core_products_or_all'] == 'All' and rate['from_amt'] <= core_sum + non_core_sum <= rate[
+                    'to_amt']:
+                    all_rate = all_rate + rate['percent']
 
-        core_rate = 0
-        non_core_rate = 0
-        all_rate = 0
-        for rate in amount_rates:
-            if rate['core_products_or_all'] == 'Core' and rate['from_amt'] <= core_sum <= rate['to_amt']:
-                core_rate = core_rate + rate['percent']
-            elif rate['core_products_or_all'] == 'Noncore' and rate['from_amt'] <= non_core_sum <= rate['to_amt']:
-                non_core_rate = non_core_rate + rate['percent']
-            elif rate['core_products_or_all'] == 'All' and rate['from_amt'] <= core_sum + non_core_sum <= rate[
-                'to_amt']:
-                all_rate = all_rate + rate['percent']
+            for lin in self.order_id.order_line.filtered(
+                    lambda x: x.product_id.is_core_product):
+                if core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
+                    lin.price_unit = lin.price_unit * (1 + ((core_rate + all_rate) / 100))
+                lin.std_unit_price = lin.std_unit_price * (1 + ((core_rate + all_rate) / 100))
 
-        for lin in self.order_id.order_line.filtered(
-                lambda x: x.product_id.is_core_product):
-            if core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
-                lin.price_unit = lin.price_unit * (1 + ((core_rate + all_rate) / 100))
-            lin.std_unit_price = lin.std_unit_price * (1 + ((core_rate + all_rate) / 100))
+            for lin in self.order_id.order_line.filtered(
+                    lambda x: not x.product_id.is_core_product):
+                if non_core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
+                    lin.price_unit = lin.price_unit * (1 + ((non_core_rate + all_rate) / 100))
+                lin.std_unit_price = lin.std_unit_price * (1 + ((non_core_rate + all_rate) / 100))
 
-        for lin in self.order_id.order_line.filtered(
-                lambda x: not x.product_id.is_core_product):
-            if non_core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
-                lin.price_unit = lin.price_unit * (1 + ((non_core_rate + all_rate) / 100))
-            lin.std_unit_price = lin.std_unit_price * (1 + ((non_core_rate + all_rate) / 100))
+            # self.order_id._get_sub_totals()
+            super(sale_order_line, self)._compute_amount()
 
-        # self.order_id._get_sub_totals()
-        super(sale_order_line, self)._compute_amount()
-
-        self.calc_sales_totals()
+            self.calc_sales_totals()
 
 
 class sale_order_ext(models.Model):
@@ -319,11 +348,12 @@ class sale_order_ext(models.Model):
         default='draft')
     total_discount = fields.Float('Total discount')
     total_added = fields.Float('Total accrual')
-    price_change_approver = fields.Many2one('res.users', compute='_get_approvers')
-    operation_approver = fields.Many2one('res.users', compute='_get_approvers')
-    final_approver = fields.Many2one('res.users', compute='_get_approvers')
+    price_change_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    operation_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    final_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
     out_of_stock_items = fields.Char('Stock out items', compute='_get_stock_out')
     has_access = fields.Boolean(default=False, search='_has_access', compute='_compute_has_access')
+    has_invoice_access=fields.Boolean(default=False, search='_has_invoice_access', compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
     wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh')
 
@@ -333,7 +363,30 @@ class sale_order_ext(models.Model):
 
     def _get_pharma_wh(self):
         for rec in self:
-            rec.wareh = self.env.user.warehouse_ids_ph[0].id if len(self.env.user.warehouse_ids_ph) > 0 else False
+            rec.wareh = self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)[0].id if len(self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)) > 0 else False
+    def _has_invoice_access(self, operator, value):
+        if operator=='=':
+            if self.env.user.has_group('droga_sales.sales_import_invoicer'):
+                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-IM')])])]
+            if self.env.user.has_group('droga_sales.sales_wholesale_invoicer'):
+                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-WS')])])]
+            if self.env.user.has_group('droga_sales.ema_invoicer'):
+                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'EM-EM')])])]
+            else:
+                return [('id', 'in', [])]
+        else:
+            return [('id', 'in', [])]
+
+    def _compute_has_invoice_access(self):
+        has_import_acc=self.env.user.has_group('droga_sales.sales_import_approve_admin')
+        has_ws_acc = self.env.user.has_group('droga_sales.sales_wholesale_invoicer')
+        has_ema_acc = self.env.user.has_group('droga_sales.ema_invoicer')
+
+        for rec in self:
+            if (rec.order_from=="IM-IM" and has_import_acc) or (rec.order_from=="IM-WS" and has_ws_acc) or (rec.order_from=="EM-EM" and has_ema_acc):
+                rec.has_access=True
+            else:
+                rec.has_access=False
 
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
@@ -420,23 +473,23 @@ class sale_order_ext(models.Model):
 
         for rec in self:
             rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
-                lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
-                    lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             rec.final_approver = self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                    lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             if rec.order_type == 'IM':
                 rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(
-                    lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                     self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(
-                        lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+                        lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             else:
                 rec.operation_approver = self.env.ref("droga_sales.sales_wholesale_approve_admin").users.filtered(
-                    lambda m: self.company_id.id in m.company_ids.ids).ids[0] if len(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                     self.env.ref("droga_sales.sales_wholesale_approve_admin").users.filtered(
-                        lambda m: self.company_id.id in m.company_ids.ids).ids) > 0 else None
+                        lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
     def _get_pr_sales_logged(self):
         if not request:
@@ -493,7 +546,7 @@ class sale_order_ext(models.Model):
             message = message + ('\n' if message else '') + "Please check if all warehouses are under " + dict(
                 self._fields['order_type'].selection).get(
                 self.order_type) + "."
-
+        self._get_approvers()
         if not self.price_change_approver:
             raise ValidationError("Price change approver is not configured for client.")
         if not self.final_approver:

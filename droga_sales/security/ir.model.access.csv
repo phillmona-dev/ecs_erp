@@ -16,9 +16,10 @@ access_droga_price_discount_per_prod_cust_crm_sr,droga_crm.droga_price_discount_
 
 access_droga_sales_order_line,sale.sale_order_line,model_sale_order_line,droga_crm.crm_sr,1,1,1,1
 
-access_crm_inventory_cons_request,droga.inventory.consignment.issue,droga_inventory.model_droga_inventory_consignment_issue,droga_crm.crm_sr,1,1,1,1
-access_crm_inventory_cons_request_detail,droga.inventory.cons.issue.detail,droga_inventory.model_droga_inventory_cons_issue_detail,droga_crm.crm_sr,1,1,1,1
+access_crm_inventory_cons_request,droga.inventory.consignment.issue,droga_inventory.model_droga_inventory_consignment_issue,droga_crm.crm_mr,1,1,1,1
+access_crm_inventory_cons_request_detail,droga.inventory.cons.issue.detail,droga_inventory.model_droga_inventory_cons_issue_detail,droga_crm.crm_mr,1,1,1,1
 
-access_crm_inventory_cons_receive,droga.inventory.consignment.receive,droga_inventory.model_droga_inventory_consignment_receive,droga_crm.crm_sr,1,1,1,1
-access_crm_inventory_cons_receive_detail,droga.inventory.cons.receive.detail,droga_inventory.model_droga_inventory_cons_receive_detail,droga_crm.crm_sr,1,1,1,1
+access_crm_inventory_cons_receive,droga.inventory.consignment.receive,droga_inventory.model_droga_inventory_consignment_receive,droga_crm.crm_mr,1,1,1,1
+access_crm_inventory_cons_receive_detail,droga.inventory.cons.receive.detail,droga_inventory.model_droga_inventory_cons_receive_detail,droga_crm.crm_mr,1,1,1,1
 
+access_droga_report_sales_excel,droga_sales.report.costing.wizard,model_sales_report_costing_wizard,base.group_user,1,1,1,1
