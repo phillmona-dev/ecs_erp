@@ -42,8 +42,8 @@ export class cusLocController extends FormController {
                     args: [0,res_id,latitude,longitude]
                 });
           window.location.reload();
-        });
-
+        },
+{maximumAge:10000, timeout:5000, enableHighAccuracy: true});
       } else {
         reject('Geolocation is not supported');
       }
