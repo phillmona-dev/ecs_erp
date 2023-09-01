@@ -27,6 +27,11 @@ export class CheckinController extends FormController {
     onClickTestJavascript(){
 
 
+        const options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+        };
 
         if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
@@ -42,7 +47,9 @@ export class CheckinController extends FormController {
                     args: [0,res_id,latitude,longitude]
                 });
           window.location.reload();
-        });
+        },
+        function(error) {console.log(error);  },
+        options);
 
       } else {
         reject('Geolocation is not supported');

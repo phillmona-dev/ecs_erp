@@ -152,5 +152,6 @@
         name="Leads"
         parent="droga_crm.menu_inq_vist_reports"
         action="crm.crm_opportunity_report_action_lead"
+        groups="crm_nsm,crm_rsm"
         sequence="3"/>
 </odoo>
