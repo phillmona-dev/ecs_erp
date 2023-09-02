@@ -185,7 +185,7 @@ class purchase_order(models.Model):
     currency_approved_date = fields.Date("Currency Approved DateF")
 
     request_type = fields.Selection(
-        [("Local", "Local"), ("Foregin", "Foregin"), ("Pharmacy", "Pharmacy")], default="Local")
+        [("Local", "Local"), ("Foregin", "Foregin"), ("Pharmacy", "Pharmacy")],readonly=True)
 
     is_delivery_partial = fields.Boolean("Partial Delivery")
     lc_margins = fields.One2many("droga.purchase.lc.margin", "purchase_order_id")
