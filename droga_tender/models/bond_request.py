@@ -27,6 +27,8 @@ class droga_bond_requests(models.Model):
     request_type = fields.Selection([('f', 'Foreign'), ('l', 'Local'), ('F+L', 'F+L')])
     on_behalf_of = fields.Char(string='On Behalf Of') #For international tenders only
     bond_approver=fields.Many2one('res.users', compute='_get_approvers',store=True)
+    is_extension=fields.Boolean('Is extension')
+    to_be_extended_bond=fields.Many2one('droga.bond.requests',string='To be extended bond')
 
     def _get_approvers(self):
         for rec in self:

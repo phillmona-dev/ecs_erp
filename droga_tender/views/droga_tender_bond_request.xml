@@ -52,23 +52,24 @@
                         <page string=" Bond Request Details">
                             <group>
                                 <group>
-                                    <field name="bank"/>
-                                    <field name="client"/>
+                                    <field name="bank" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="client" readonly="1"/>
                                     <field name="security_type"/>
-                                    <field name="security_form"/>
+                                    <field name="security_form" options="{'no_create':True,'no_open':True}"/>
                                     <field name="purpose"/>
-                                    <field name="tender"/>
-                                    <field name="po_number"/>
+                                    <field name="tender" readonly="1"/>
+                                    <field name="po_number" readonly="1"/>
                                 </group>
 
                                 <group>
                                     <field name="starting_date"/>
                                     <field name="validity_period"/>
                                     <field name="amount"/>
-                                    <field name="letter_number"/>
-                                    <field name="request_type"/>
+                                    <field name="letter_number" readonly="1"/>
+                                    <field name="request_type" readonly="1"/>
                                     <field name="on_behalf_of"/>
-
+                                    <field name="is_extension"></field>
+                                    <field name="to_be_extended_bond" options="{'no_create':True,'no_open':True}" attrs="{'invisible': [('is_extension', '=', False)]}"></field>
                                 </group>
                             </group>
                         </page>

@@ -20,9 +20,13 @@ class droga_items_composition(models.Model):
             if len(vals_list['items_detail']) == 0:
                 raise UserError("At least one product must be registered to save record.")
 
+            prod_to_update=[]
+
             pct_sum=0
             for item in vals_list['items_detail']:
                 pct_sum+=item[2]['rate_in_pct']
+                if item[2]['type']=='finish':
+                    prod_to_update.append(item[2]['item'])
 
             if pct_sum != 100:
                 raise UserError("The summation of percentage should equal 100%.")
@@ -31,6 +35,10 @@ class droga_items_composition(models.Model):
             if not _name:
                 raise UserError("Order sequence not found.")
             vals_list['name'] = _name
+
+            for item in prod_to_update:
+                self.env['product.template'].search([('id', '=', item)])[0].bought_locally=True
+
         return super(droga_items_composition, self).create(vals_list)
 
     def write(self, vals):

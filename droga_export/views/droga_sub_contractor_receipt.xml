@@ -39,7 +39,7 @@
                 <sheet>
                     <group string="Store receive request">
                         <group>
-                            <field name="supplier" string="Cleaning unit"
+                            <field name="supplier" required="1" string="Cleaning unit"
                                    attrs="{'readonly': True}"></field>
                             <field name="issue_type" required="True"
                                    attrs="{'readonly': [('issue_type', '=', 'SUBL')]}"></field>
@@ -62,6 +62,7 @@
                                            required="1"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
                                     <field name="product_uom_category_id" invisible="1"/>
+                                    <field name="product_uom_qty_esti" string="Qty Estimated" readonly="1"/>
                                     <field name="product_uom_qty" string="Quantity"/>
                                     <field name="price_unit_cons" readonly="True" force_save="True"/>
                                     <field name="amount" sum="Total"/>
