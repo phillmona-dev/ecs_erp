@@ -186,9 +186,6 @@ class purchase_order(models.Model):
 
     request_type = fields.Selection(
         [("Local", "Local"), ("Foregin", "Foregin"), ("Pharmacy", "Pharmacy")], default="Local")
-    #picking_type_id = fields.Many2one('stock.picking.type', 'Deliver To',
-    #                                  required=True,
-    #                                  help="This will determine operation type of incoming shipment")
     is_delivery_partial = fields.Boolean("Partial Delivery")
     lc_margins = fields.One2many("droga.purchase.lc.margin", "purchase_order_id")
 
