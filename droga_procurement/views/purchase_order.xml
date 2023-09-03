@@ -591,7 +591,7 @@
         ]"/>
         <field name="domain">[('request_type','=','Local')]</field>
         <field name="search_view_id" ref="purchase.purchase_order_view_search"/>
-        <field name="context">{}</field>
+        <field name="context">{'default_request_type':'Local'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No purchase order found. Let's create one!
@@ -616,7 +616,6 @@
         <field name="domain">[('request_type','=','Pharmacy')]</field>
         <field name="context">{'default_request_type': 'Pharmacy'}</field>
         <field name="search_view_id" ref="purchase.purchase_order_view_search"/>
-        <field name="context">{}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No purchase order found. Let's create one!
