@@ -9,3 +9,4 @@ access_droga_project_assumption,project.assumption,model_project_assumption,base
 access_droga_project_approval,project.approval,model_project_approval,base.group_user,1,1,1,1
 access_droga_project_constraints,project.constraints,model_project_constraints,base.group_user,1,1,1,1
 access_droga_project_scope_version,droga.project.scope.version,model_project_scope_version,base.group_user,1,1,1,1
+access_droga_project_task_problems,droga.project.task.problems,model_project_task_problems,base.group_user,1,1,1,1

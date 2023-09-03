@@ -5,6 +5,17 @@ class drogaanalyticext(models.Model):
     _inherit='account.analytic.account'
     project=fields.Many2one('project.project')
 
+class droga_project_task_problems(models.Model):
+    _name='project.task.problems'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    task=fields.Many2one('project.task')
+    problem=fields.Char('Problem')
+    severity = fields.Selection([('High', 'High'), ('Medium', 'Medium'),('Low','Low')])
+    problem_date=fields.Date('Date occurred')
+    proposed_solution=fields.Char('Proposed resolution')
+    action_taken=fields.Char('Action taken')
+    current_status=fields.Selection([('Open', 'Open'), ('In Progress', 'In Progress'),('Done','Done')],tracking=True)
+
 class drogaSubTask(models.Model):
     _inherit = 'project.task'
 
@@ -15,6 +26,7 @@ class drogaSubTask(models.Model):
     parent_stage=fields.Many2one('parent.task.type')
     contractor=fields.Many2one('res.partner')
     cost_center=fields.Many2one('account.analytic.account',domain=[('project', '=', False)])
+    problems=fields.One2many('project.task.problems','task')
 
     @api.depends('child_ids')
     def _compute_editable(self):
@@ -138,6 +150,9 @@ class drogaSubTask(models.Model):
         }
 
     def taskPaymentRequest(self):
+        if not self.cost_center:
+            raise UserError(
+                "Cost center must be filled to initiate a payment request.")
         return {
             'name': 'Payment Request',
             'view_type': 'tree',
@@ -147,6 +162,8 @@ class drogaSubTask(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_task_payment_request_reference': self.id,
+                'default_costc':self.cost_center.id,
+                'default_department':45
                 # 'default_issue_type': 'SIF'
             },
             'domain':
