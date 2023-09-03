@@ -1,16 +1,20 @@
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 
+class drogaanalyticext(models.Model):
+    _inherit='account.analytic.account'
+    project=fields.Many2one('project.project')
 
 class drogaSubTask(models.Model):
     _inherit = 'project.task'
 
     task_progress = fields.Float(compute='_task_weight', store=True)
     sum_of_tasks = fields.Float(compute='_task_weight', string="Sum Of Task weight", store=True)
-    task_editable = fields.Boolean(compute='_compute_editable', store=True)
-    task_weight = fields.Float()
+    task_editable = fields.Boolean(compute='_compute_editable',search='_task_editable', store=True)
+    task_weight = fields.Float(default=100)
     parent_stage=fields.Many2one('parent.task.type')
-    contractor=fields.Many2one('droga.project.contractors')
+    contractor=fields.Many2one('res.partner')
+    cost_center=fields.Many2one('account.analytic.account',domain=[('project', '=', False)])
 
     @api.depends('child_ids')
     def _compute_editable(self):
@@ -31,11 +35,17 @@ class drogaSubTask(models.Model):
         else:
             return [('id', 'in', [])]
 
-    def write(self, vals):
-        res = super(drogaSubTask, self).write(vals)
-        if self.parent_id.sum_of_tasks!=100 and len(self.parent_id)>0:
-            raise UserError("Sum of sub-tasks weight should be 100.")
-        return res
+    @api.constrains('sum_of_tasks')
+    def _check_subtask_weight_sum(self):
+        for task in self:
+            if task.child_ids:
+                if task.sum_of_tasks > 100:
+                    raise UserError('The sum of subtask weights cannot be greater than 100.')
+                if task.sum_of_tasks < 100:
+                    raise UserError('The sum of subtask weights cannot be less than 100.')
+            else:
+                if self.task_weight < 100 or self.task_weight > 100:
+                    raise UserError('Task Weight must equal to 100')
 
     @api.depends('child_ids', 'child_ids.child_ids', 'child_ids.child_ids.child_ids',
                  'child_ids.child_ids.child_ids.child_ids', 'child_ids.child_ids.child_ids.child_ids.child_ids',
@@ -91,9 +101,9 @@ class drogaSubTask(models.Model):
             'domain':
                 ([('stock_request_reference', '=', self.id)])
         }
-    def stockRequest(self):
+    def stockRequestcont(self):
         return {
-            'name': 'Stock Request',
+            'name': 'Stock request for contractor',
             'view_type': 'tree',
             'view_mode': 'tree,form',
             'res_model': 'droga.inventory.consignment.issue',
@@ -101,7 +111,27 @@ class drogaSubTask(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_stock_request_reference': self.id,
-                # 'default_issue_type': 'SIF'
+                'default_issue_type': 'PRC',
+                'default_customer':self.contractor.id,
+                'default_menu_from': 'PR'
+            },
+            'domain':
+                ([('stock_request_reference', '=', self.id)])
+        }
+
+    def stockRequestint(self):
+        return {
+            'name': 'Stock request for internal',
+            'view_type': 'tree',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.inventory.consignment.issue',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_stock_request_reference': self.id,
+                'default_issue_type': 'PRI',
+                'default_customer':1,
+                'default_menu_from':'PR'
             },
             'domain':
                 ([('stock_request_reference', '=', self.id)])
@@ -109,7 +139,7 @@ class drogaSubTask(models.Model):
 
     def taskPaymentRequest(self):
         return {
-            'name': 'Task Payment Request',
+            'name': 'Payment Request',
             'view_type': 'tree',
             'view_mode': 'tree,form',
             'res_model': 'droga.account.payment.request',

@@ -58,6 +58,10 @@ class cust_sales_credit_limit(models.Model):
     supporters=fields.Many2many('droga.pro.sales.master',string='Supporters')
     cust_name=fields.Char('Customer Name')
     cust_id = fields.Char('Customer ID')
+    sales_order_type = fields.Selection([
+        ('Local', 'Local'),
+        ('Foreign', 'Foreign')], string='Order type')
+    contract_num=fields.Char('Contract number')
 
     def _cust_type_inv(self):
         pass
@@ -178,6 +182,17 @@ class cust_sales_credit_limit(models.Model):
             else:
                 result.sales_initiator = result.user_id.name
 
+
+            if self.env.company.id==2:
+                if so.sales_order_type=='Local':
+                    _name = self.env['ir.sequence'].next_by_code('sale.order.emma.local')
+                else:
+                    _name = self.env['ir.sequence'].next_by_code('sale.order.emma.foreign')
+
+                if not _name:
+                    raise UserError("Order sequence not found.")
+                vals['name'] = _name
+                so.name=_name
         return result
 
 

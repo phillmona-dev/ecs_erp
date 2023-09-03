@@ -9,6 +9,7 @@
                 <field name='has_read_access' invisible="1"></field>
                 <field name='has_access' invisible="1"></field>
             </xpath>
+
         </field>
     </record>
 

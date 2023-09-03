@@ -7,7 +7,8 @@ class drogaProject(models.Model):
     parent_project = fields.Many2one('project.project')
     project_progress = fields.Float(compute="_project_progress")
     stages_sum=fields.Char('Stages sum',compute='_project_progress')
-    warehouses=fields.Many2many('stock.warehouse',tracking=True)
+    warehouses=fields.Many2many('stock.warehouse',tracking=True, domain=[
+        ('wh_type', '=', 'PR')])
     project_forman = fields.Many2one('res.users',tracking=True)
     project_engineer = fields.Many2one('res.users',tracking=True)
 

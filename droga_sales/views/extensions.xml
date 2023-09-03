@@ -67,6 +67,8 @@
                        attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                 <field name="order_type"
                        attrs="{'invisible': [('company_id', '!=', 1)],'required': [('company_id', '=', 1)]}"></field>
+                <field name="sales_order_type"
+                       attrs="{'invisible': [('company_id', '!=', 2)],'required': [('company_id', '=', 2)]}"></field>
                 <field name="company_id" invisible="1"></field>
                 <field name="manual_price"></field>
             </xpath>
@@ -147,6 +149,8 @@
                 <field name="cust_type_ext" options='{"no_create":True,"no_open":True}' readonly="1"
                        string="Customer Type"></field>
                 <field name="company_id" invisible="1"></field>
+                <field name="contract_num"
+                       attrs="{'invisible': [('company_id', '!=', 2)],'required': [('company_id', '=', 2)]}"></field>
                 <field name="supporters" attrs="{'invisible': [('company_id', '!=', 1)]}" widget="many2many_tags"
                        string="Supporters"></field>
                 <field name="cust_id" widget="char" string="Cust ID" readonly="1"

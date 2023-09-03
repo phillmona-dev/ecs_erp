@@ -24,6 +24,17 @@
                             <span class="o_stat_text">Cleaning unit</span>
                         </div>
                     </button>
+                <button name="items_issue_order"
+                        type="object"
+                        class="oe_stat_button"
+                        attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"
+                        groups="droga_export.export_user"
+                        icon="fa-cog icon">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Bag issue</span>
+                            <span class="o_stat_text">Order</span>
+                        </div>
+                    </button>
                 <button name="export_status_list"
                         type="object"
                         class="oe_stat_button"

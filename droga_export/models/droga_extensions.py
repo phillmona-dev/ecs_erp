@@ -1,11 +1,16 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
+class droga_export_detail_ext(models.Model):
+    _inherit='droga.inventory.cons.receive.detail'
+    product_uom_qty_esti = fields.Float(
+        'Request',
+        digits='Product Unit of Measure', store=True,
+        default=1.0, required=True)
 
 class inventory_return_extension(models.Model):
     _inherit = 'droga.inventory.consignment.receive'
     subcontractor_return_origin_form = fields.Many2one('droga.inventory.consignment.issue', readonly=True)
-
     def request_mg(self):
         self.set_activity_done()
         self.ensure_one()
@@ -87,10 +92,42 @@ class purchase_order_extension(models.Model):
     _inherit = 'purchase.order'
     export_origin_form = fields.Many2one('sale.order', readonly=True)
 
+class droga_cost_buildup(models.Model):
+    _name = 'droga.export.cost.buildup'
+    type=fields.Many2one('droga.export.cost.type')
+    type_apply=fields.Selection([('Finished', 'Finished'), ('By-product', 'By-product'),('All','All')],related='type.type_apply')
+    issue_export_origin_form = fields.Many2one('droga.inventory.consignment.issue', readonly=True)
+    payment_ref = fields.Many2one('account.move')
+    currency_id = fields.Many2one('res.currency',related='payment_ref.currency_id')
+    amount = fields.Monetary(related='payment_ref.amount_total_in_currency_signed',string='Amount',currency_field='currency_id')
+    amount_for_order = fields.Float('Amount for order', required=True)
+    remark = fields.Char('Remark')
+
+    @api.onchange("payment_ref")
+    def _on_ref_change(self):
+        for record in self:
+            record.amount_for_order = record.amount
+
 class droga_cons_inherit(models.Model):
     _inherit = 'droga.inventory.consignment.issue'
 
     subcontract_issue_origin_form = fields.Many2one('sale.order', readonly=True,string='Cleaning unit origin')
+    bag_issue_order = fields.Many2one('sale.order', readonly=True, string='Bag issue order')
+
+    def cost_buildup(self):
+        return {
+            'name': 'Cost build-up (do not include processing cost)',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'droga.export.cost.buildup',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_issue_export_origin_form': self.id,
+            },
+            'domain':
+                ([('issue_export_origin_form', '=', self.id)])
+        }
 
     def pay_req_open(self):
         return {
@@ -187,17 +224,47 @@ class droga_cons_inherit(models.Model):
         for det in self.detail_entries:
             raw_details = self.env['droga.export.items.composition'].search(
                 [('raw_item', 'in', det.product_id.product_tmpl_id.ids)])
+
+            #Total number of finished goods
+            total_qty_finished=det.product_uom_qty*sum(self.env['droga.export.items.composition.fin.goods'].search(
+                [('id', 'in', raw_details[0].items_detail.ids),('type','=','finish')]).mapped('rate_in_pct'))/100
+            # Total number of byproduct goods
+            total_qty_byproduct = det.product_uom_qty * sum(self.env['droga.export.items.composition.fin.goods'].search(
+                [('id', 'in', raw_details[0].items_detail.ids), ('type', '=', 'byproduct')]).mapped('rate_in_pct')) / 100
+            #Total number sent to cleaning unit
+            total_qty = det.product_uom_qty
+
+            # Total cost for finished goods
+            total_cost_build_finish=sum(self.env['droga.export.cost.buildup'].search([('issue_export_origin_form','=',self.id),('type_apply','=','Finished')]).mapped('amount_for_order'))
+            # Total cost for byproduct goods
+            total_cost_build_byproduct = sum(self.env['droga.export.cost.buildup'].search(
+                [('issue_export_origin_form', '=', self.id), ('type_apply', '=', 'By-product')]).mapped('amount_for_order'))
+            # Total cost for common costs
+            total_cost_common = sum(self.env['droga.export.cost.buildup'].search(
+                [('issue_export_origin_form', '=', self.id), ('type_apply', '=', 'All')]).mapped(
+                'amount_for_order'))
+
+            #This variable is used to add markup and accomodate waste material cost and priorate them to finished and by-products
+            waste_increase_rate=total_qty/(total_qty_finished+total_qty_byproduct)
+
             if len(raw_details) > 0:
-                for it in raw_details.items_detail:
-                    #if self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
-                            #    0].id in self.subcontract_issue_origin_form.order_line.mapped('product_id').ids:
+                for it in raw_details[0].items_detail:
+                    if it['type'] == 'waste':
+                        continue
+                    if it['type'] == 'finish':
+                        unit_cost=(it.items_header[0].raw_item.standard_price*waste_increase_rate) +(det.proc_cost*waste_increase_rate)+(total_cost_build_finish/total_qty_finished)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
+                    else:
+                        unit_cost = (it.items_header[0].raw_item.standard_price*waste_increase_rate) + (det.proc_cost*waste_increase_rate) +(total_cost_build_byproduct/total_qty_byproduct)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
+
                     items.append({
                         'product_id': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
                             0].id,
                         'product_uom_qty': det.product_uom_qty * it['rate_in_pct'] / 100,
+                        'product_uom_qty_esti': det.product_uom_qty * it['rate_in_pct'] / 100,
                         'product_uom': it['item'].uom_id.id,
 
-                        'price_unit_cons': it.items_header[0].raw_item.standard_price+det.proc_cost,  # FIX ME
+
+                        'price_unit_cons': unit_cost,
 
                         'company_id': self.env.company.id,
                         'warehouse_id': det['warehouse_id'].id,
@@ -290,6 +357,22 @@ class droga_sale_inherit(models.Model):
                 'default_detail_entries':itemsdetail
             },
             'domain': [('subcontract_issue_origin_form', '=', self.id)],
+        }
+
+    def items_issue_order(self):
+        return {
+            'name': 'Bag items inventory issue order',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'droga.inventory.consignment.issue',
+            'views': [[self.env.ref('droga_export.droga_sales_bag_issue_view_tree').id, 'tree'],
+                      [self.env.ref('droga_export.droga_sales_bag_issue_view_form').id, 'form']],
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_issue_type': 'BAGI',
+                'default_bag_issue_order': self.id
+            },
+            'domain': [('bag_issue_order', '=', self.id)],
         }
     def export_status_list(self):
         if len(self.env['droga.export.status'].search([('status_origin_sales','=',self.id)]))==0:
