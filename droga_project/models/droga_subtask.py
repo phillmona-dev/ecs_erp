@@ -27,6 +27,7 @@ class drogaSubTask(models.Model):
     contractor=fields.Many2one('res.partner')
     cost_center=fields.Many2one('account.analytic.account',domain=[('project', '=', False)])
     problems=fields.One2many('project.task.problems','task')
+    planned_date_begin = fields.Datetime("Start date", tracking=True, task_dependency_tracking=True,default=fields.date.today())
 
     @api.depends('child_ids')
     def _compute_editable(self):
