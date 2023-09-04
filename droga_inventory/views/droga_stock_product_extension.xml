@@ -56,11 +56,12 @@
                     <group col="1">
                         <field name="detailed_type"/>
 
-                        <field name="emergency_order_point"/>
+                        <field name="emergency_order_point" readonly="1"/>
 
                         <field name="maximum_stock_level"/>
 
                         <field name="average_month_consumption"/>
+                        <field name="lead_time_in_days"></field>
                         <field name="is_core_product"/>
                     </group>
                     <group string="Origin">
