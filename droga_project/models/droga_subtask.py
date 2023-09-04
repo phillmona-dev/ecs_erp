@@ -56,9 +56,9 @@ class drogaSubTask(models.Model):
                     raise UserError('The sum of subtask weights cannot be greater than 100.')
                 if task.sum_of_tasks < 100:
                     raise UserError('The sum of subtask weights cannot be less than 100.')
-            else:
-                if self.task_weight < 100 or self.task_weight > 100:
-                    raise UserError('Task Weight must equal to 100')
+            #else:
+                #if task.task_weight < 100 or task.task_weight > 100:
+                    #raise UserError('Task Weight must equal to 100')
 
     @api.depends('child_ids', 'child_ids.child_ids', 'child_ids.child_ids.child_ids',
                  'child_ids.child_ids.child_ids.child_ids', 'child_ids.child_ids.child_ids.child_ids.child_ids',
