@@ -22,7 +22,7 @@ class drogaSubTask(models.Model):
     task_progress = fields.Float(compute='_task_weight', store=True)
     sum_of_tasks = fields.Float(compute='_task_weight', string="Sum Of Task weight", store=True)
     task_editable = fields.Boolean(compute='_compute_editable',search='_task_editable', store=True)
-    task_weight = fields.Float(default=100)
+    task_weight = fields.Float(default=0)
     parent_stage=fields.Many2one('parent.task.type')
     contractor=fields.Many2one('res.partner')
     cost_center=fields.Many2one('account.analytic.account',domain=[('project', '=', False)])
@@ -56,9 +56,9 @@ class drogaSubTask(models.Model):
                     raise UserError('The sum of subtask weights cannot be greater than 100.')
                 if task.sum_of_tasks < 100:
                     raise UserError('The sum of subtask weights cannot be less than 100.')
-            else:
-                if self.task_weight < 100 or self.task_weight > 100:
-                    raise UserError('Task Weight must equal to 100')
+            #else:
+            #    if task.task_weight < 100 or self.task_weight > 100:
+            #        raise UserError('Task Weight must equal to 100')
 
     @api.depends('child_ids', 'child_ids.child_ids', 'child_ids.child_ids.child_ids',
                  'child_ids.child_ids.child_ids.child_ids', 'child_ids.child_ids.child_ids.child_ids.child_ids',
@@ -198,11 +198,17 @@ class droga_stock_request_issue(models.Model):
 
 class droga_task_stage_progress(models.Model):
     _inherit = 'project.task.type'
+    _rec_name='stage_descr'
+    stage_descr=fields.Char('Stage',compute='get_stage_name')
     task_stage_weight = fields.Float()
     task_stage_progress = fields.Float(compute='_task_stage_progress')
     task_sum = fields.Float(compute='_task_stage_progress', string="Sum of Task Weight under this stage")
     from_project_auto=fields.Boolean(default=False)
-    tasks=fields.One2many('project.task','parent_stage',string='Tasks',compute='_compute_child_tasks')
+    tasks=fields.One2many('project.task','stage_id',string='Tasks',domain=([('parent_id', '=', False)]))
+
+    def get_stage_name(self):
+        for rec in self:
+            rec.stage_descr=rec.name +' : '+str(rec.task_stage_progress)+' %'
 
     def tasks_weight(self):
         return {
@@ -232,8 +238,13 @@ class droga_task_stage_progress(models.Model):
 
     def write(self, vals):
         res = super(droga_task_stage_progress, self).write(vals)
-        if 'project_ids' in vals or 'name' in vals or 'sequence' in vals:
-            raise UserError("You can not update task manually.")
+        #if 'project_ids' in vals or 'name' in vals or 'sequence' in vals:
+            #raise UserError("You can not update task manually.")
+        sum_tasks=0
+        for task in self.tasks:
+            sum_tasks=sum_tasks+task.task_weight
+        if sum_tasks!=0 and sum_tasks!=100:
+            raise UserError("Sum of tasks weight under stage should be 100.")
         return res
 
     def _task_stage_progress(self):
