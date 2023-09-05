@@ -38,16 +38,27 @@
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="priority">27</field>
         <field name="arch" type="xml">
-            <xpath expr="//form/sheet/group" position="inside">
-                <group>
+            <xpath expr="//form/sheet/group/group/field[@name='company_id']" position="before">
                     <field name="parent_project"/>
                     <field name="project_progress"/>
-                </group>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='user_id']" position="after">
                 <field name="project_forman"/>
                 <field name="project_engineer"/>
+            </xpath>
+
+            <xpath expr="//field[@name='label_tasks']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//form/sheet/group/group/field[@name='company_id']" position="attributes">
+                <attribute name="readonly">True</attribute>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='description']" position="before">

@@ -37,8 +37,8 @@
                             <field name="remark"/>
                         </group>
                         <group>
-                            <field name="source_location_id" domain="['|',('complete_name','like','Partners/'),('has_access','=',True)]" options="{'no_create':True,'no_open':True}"/>
-                            <field name="dest_location_id" domain="['|',('complete_name','like','Partners/'),('has_access','=',True)]" options="{'no_create':True,'no_open':True}"/>
+                            <field name="source_location_id" domain="['|',('complete_name','like','Partners/'),'|',('has_access','=',True),('con_type','=','DIL')]" options="{'no_create':True,'no_open':True}"/>
+                            <field name="dest_location_id" domain="['|',('complete_name','like','Partners/'),'|',('has_access','=',True),('con_type','=','DIL')]" options="{'no_create':True,'no_open':True}"/>
                         </group>
                     </group>
                     <notebook>
@@ -123,5 +123,4 @@
               groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf"
               sequence="21"
               action="droga_stock_adjustment_request_view_fin_id"/>
-
 </odoo>

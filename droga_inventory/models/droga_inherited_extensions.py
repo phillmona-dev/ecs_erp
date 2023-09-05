@@ -105,6 +105,12 @@ class droga_warehouse_extension(models.Model):
             else:
                 rec.has_access = False
 
+    def write(self, vals):
+        for rec in self:
+            if not self.env.user.has_group('droga_inventory.inv_prod_fin'):
+                raise UserError("You can not edit warehouse.")
+        return super(droga_warehouse_extension, self).write(vals)
+
 class droga_location_extension(models.Model):
     _inherit = 'stock.location'
     con_type = fields.Selection([
@@ -179,6 +185,12 @@ class droga_location_extension(models.Model):
                 rec.has_read_access = True
             else:
                 rec.has_read_access = False
+
+    def write(self, vals):
+        for rec in self:
+            if not self.env.user.has_group('droga_inventory.inv_prod_fin'):
+                raise UserError("You can not edit location.")
+        return super(droga_location_extension, self).write(vals)
 
 class droga_stock_picking_type_extension(models.Model):
     _inherit = 'stock.picking.type'
@@ -611,6 +623,7 @@ class droga_stock_product_extension(models.Model):
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
+    lead_time_in_days = fields.Integer('Lead time in days')
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
     is_core_product = fields.Boolean('Is core product for promoters',tracking=True)
