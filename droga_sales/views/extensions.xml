@@ -207,7 +207,7 @@
         <field name="res_model">droga.inventory.consignment.issue</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_issue_type': 'SIF','default_menu_from':'SR'}</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">[('create_uid','=',uid),('issue_type','=','SIF')]</field>
     </record>
 
     <record id="droga_sales_cons_consignment_issue_action" model="ir.actions.act_window">
@@ -215,7 +215,7 @@
         <field name="res_model">droga.inventory.consignment.issue</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_issue_type': 'CONI','default_menu_from':'SR'}</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">[('create_uid','=',uid),('issue_type','=','CONI')]</field>
     </record>
 
     <record id="droga_sales_sir_consignment_issue_action" model="ir.actions.act_window">
@@ -223,7 +223,7 @@
         <field name="res_model">droga.inventory.consignment.issue</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_issue_type': 'SIR','default_menu_from':'SR'}</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">[('create_uid','=',uid),('issue_type','=','SIR')]</field>
     </record>
 
 
@@ -232,7 +232,7 @@
         <field name="res_model">droga.inventory.consignment.receive</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_issue_type': 'CONR','default_menu_from':'SR'}</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">[('create_uid','=',uid),('issue_type','=','CONR')]</field>
     </record>
 
     <record id="droga_sales_sir_receipt_action" model="ir.actions.act_window">
@@ -240,7 +240,7 @@
         <field name="res_model">droga.inventory.consignment.receive</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_issue_type': 'SIR','default_menu_from':'SR'}</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">[('create_uid','=',uid),,('issue_type','=','SIR')]</field>
     </record>
 
 

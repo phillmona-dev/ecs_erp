@@ -107,7 +107,7 @@ class droga_warehouse_extension(models.Model):
 
     def write(self, vals):
         for rec in self:
-            if not self.env.user.has_group('droga_inventory.inv_prod_fin'):
+            if not self.env.user.has_group('droga_inventory.inv_prod_fin_wareloc'):
                 raise UserError("You can not edit warehouse.")
         return super(droga_warehouse_extension, self).write(vals)
 
@@ -188,7 +188,7 @@ class droga_location_extension(models.Model):
 
     def write(self, vals):
         for rec in self:
-            if not self.env.user.has_group('droga_inventory.inv_prod_fin'):
+            if not self.env.user.has_group('droga_inventory.inv_prod_fin_wareloc'):
                 raise UserError("You can not edit location.")
         return super(droga_location_extension, self).write(vals)
 
