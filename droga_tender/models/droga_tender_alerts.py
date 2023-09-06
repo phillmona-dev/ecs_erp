@@ -10,7 +10,7 @@ class droga_tender_activity_generate(models.Model):
     def generate_activity(self):
         # recs = self.env['droga.tender.master'].search([('closing_date_gre','>=','datetime.datetime.combine(context_today(), datetime.time(0,0,0))')])
 
-        tender_users = self.env['res.groups'].search([('name', '=', 'Tender User')])[0]['users']
+        tender_users = self.env['res.groups'].search([('name', '=', 'Tender Alert Receiver')])[0]['users']
 
         #region submission alerts
         compare_date_addis = datetime.date.today() + datetime.timedelta(days=3)

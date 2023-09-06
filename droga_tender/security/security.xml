@@ -9,6 +9,10 @@
             <field name="name">Tender User</field>
             <field name="category_id" ref="tender_management"/>
         </record>
+    <record id="tender_alert_receiver" model="res.groups">
+            <field name="name">Tender Alert Receiver</field>
+            <field name="category_id" ref="tender_management"/>
+        </record>
     <record id="tender_manager" model="res.groups">
         <field name="name">Tender Manager</field>
         <field name="category_id" ref="tender_management"/>
