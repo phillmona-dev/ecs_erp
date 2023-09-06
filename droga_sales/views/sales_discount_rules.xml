@@ -20,7 +20,7 @@
         <field name="name">droga.price.discount.per.type.form</field>
         <field name="model">droga.price.discount.per.type</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <sheet>
                     <group>
                         <field name="cust_type" options="{'no_create':True,'no_open':True}"></field>
@@ -86,7 +86,7 @@
         <field name="name">droga.price.discount.per.amount.form</field>
         <field name="model">droga.price.discount.per.amount</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <sheet>
                     <group>
                         <field name="payment_term" options="{'no_create':True,'no_open':True}"></field>
@@ -151,7 +151,7 @@
         <field name="name">droga.price.discount.per.product.qty.form</field>
         <field name="model">droga.price.discount.per.product.qty</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <sheet>
                     <group>
                         <field name="payment_term" options="{'no_create':True,'no_open':True}"></field>
@@ -215,7 +215,7 @@
         <field name="name">droga.price.discount.per.product.customer.form</field>
         <field name="model">droga.price.discount.per.product.customer</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <sheet>
                     <group>
                         <field name="payment_term" options="{'no_create':True,'no_open':True}"></field>

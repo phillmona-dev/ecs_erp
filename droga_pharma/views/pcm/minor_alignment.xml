@@ -10,7 +10,7 @@
         <field name="name">droga.pharma.minor.aliment.tree</field>
         <field name="model">droga.pharma.minor.alignment</field>
         <field name="arch" type="xml">
-            <tree string="" editable="bottom" create="1">
+            <tree string="" editable="bottom" create="1" delete="0">
                 <field name="minor_align"></field>
                 <field name="decision"></field>
                 <field name="referral"></field>

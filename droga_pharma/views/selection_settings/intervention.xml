@@ -11,7 +11,7 @@
         <field name="name">droga.pharma.intervention.view.tree</field>
         <field name="model">droga.pharma.intervention</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="intervention"></field>
                 <field name="descr"></field>
                 <field name="status"></field>

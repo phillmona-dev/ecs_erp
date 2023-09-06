@@ -11,7 +11,7 @@
         <field name="name">droga.crm.sales.target.header.tree</field>
         <field name="model">droga.crm.sales.target.header</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="sales_team" options="{'no_create':True,'no_open':True}" ></field>
                 <field name="type"></field>
                 <field name="date_from"></field>
@@ -28,9 +28,9 @@
         <field name="name">droga.crm.sales.target.header.form</field>
         <field name="model">droga.crm.sales.target.header</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <field name="target_detail" mode="tree">
-                    <tree string="" editable="top">
+                    <tree string="" editable="top" delete="0">
                         <field name="indicator" ></field>
                         <field name="target_qty"></field>
                         <field name="target_amt"></field>

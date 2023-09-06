@@ -29,7 +29,11 @@
                 <field name="procurement_title"></field>
                 <field name="amount"></field>
                 <field name="status"></field>
-                <filter string="Status cancelled" domain="[('status', 'in',['cancelled','faiten','lost'])]"
+                <filter string="Lost and cancelled" domain="[('status', 'in',['cancelled','lost'])]"
+                        name="status_cancelled_lost"></filter>
+                <filter string="Lost" domain="[('status', 'in',['lost'])]"
+                        name="status_lost"></filter>
+                <filter string="Cancelled" domain="[('status', 'in',['cancelled'])]"
                         name="status_cancelled"></filter>
                 <filter name="group_type_customer" string="Customer" context="{'group_by':'customer'}"/>
                 <filter name="group_type_status" string="Status" context="{'group_by':'status'}"/>

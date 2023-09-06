@@ -11,7 +11,7 @@
         <field name="name">droga.physiotherapist.list.view.tree</field>
         <field name="model">droga.physiotherapist.list</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="physiotherapist_name"></field>
                 <field name="branch"></field>
                 <field name="status"></field>
@@ -23,7 +23,7 @@
         <field name="name">droga.physiotherapist.list.view.form</field>
         <field name="model">droga.physiotherapist.list</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="physiotherapist_name" options="{'no_create':True,'no_open':True}"></field>

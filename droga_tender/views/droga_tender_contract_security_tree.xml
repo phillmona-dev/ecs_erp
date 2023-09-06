@@ -4,7 +4,7 @@
         <field name="name">droga.tender.perormance.view.form</field>
         <field name="model">droga.tender.contract</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <notebook>
                         <page name="name" string="Performance Security">
@@ -33,7 +33,7 @@
         <field name="name">droga.tender.advance.view.form</field>
         <field name="model">droga.tender.contract</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <notebook>
                         <page name="name" string="Advance Security">
@@ -62,7 +62,7 @@
         <field name="name">droga.tender.bid.view.form</field>
         <field name="model">droga.tender.master</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <notebook>
                         <page name="name" string="Bid Security">

@@ -4,7 +4,7 @@
         <field name="name">droga.crm.done.activity.tree</field>
         <field name="model">droga.crm.done.activity</field>
         <field name="arch" type="xml">
-            <tree string="" expand="1" create="0">
+            <tree string="" expand="1" create="0" delete="0">
                 <field name="source_name"/>
                 <field name="sales_rep"/>
                 <field name="activity_date" string="Plan date"/>

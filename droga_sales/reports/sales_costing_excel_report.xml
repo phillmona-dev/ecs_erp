@@ -6,7 +6,7 @@
         <field name="name">sales.excel.report.form</field>
         <field name="model">sales.report.costing.wizard</field>
         <field name="arch" type="xml">
-            <form string=" Print Sales Excel Report">
+            <form string=" Print Sales Excel Report" delete="0">
                 <group>
 
                     <field name="date_from"/>

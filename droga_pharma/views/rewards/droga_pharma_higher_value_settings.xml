@@ -11,7 +11,7 @@
         <field name="name">droga.pharma.high.value.pruchase.view.tree</field>
         <field name="model">droga.pharma.high.value.pruchase</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="discount"></field>
                 <field name="from_amt"></field>
                 <field name="to_amt"></field>
@@ -24,7 +24,7 @@
         <field name="name">droga.pharma.high.value.pruchase.view.form</field>
         <field name="model">droga.pharma.high.value.pruchase</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="from_amt"></field>

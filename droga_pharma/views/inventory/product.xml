@@ -17,7 +17,7 @@
         <field name="name">droga.pharma.product.template.form</field>
         <field name="model">product.template</field>
         <field name="arch" type="xml">
-            <form string="Product">
+            <form string="Product" delete="0">
                 <sheet name="product_form">
                     <field name='product_variant_count' invisible='1'/>
                     <field name='is_product_variant' invisible='1'/>

@@ -7,7 +7,7 @@
         <field name="name">droga.pharma.mtm.follow_up.detail.tree</field>
         <field name="model">droga.pharma.mtm.follow_up.detail</field>
         <field name="arch" type="xml">
-            <tree create="0">
+            <tree create="0" delete="0">
                 <field name="client"/>
                 <field name="customer"/>
                 <field name="indication"/>

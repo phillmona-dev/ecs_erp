@@ -20,7 +20,7 @@ class ModelName(models.Model):
     #date fields
     issue_date=fields.Date('Issue date')
     starting_date = fields.Date('Starting date')
-    dead_line_date = fields.Date('Deadline date',compute="compute_deadline")
+    dead_line_date = fields.Date('Deadline date',compute="compute_deadline",store=True)
     @api.depends("starting_date","security_period_in_days")
     def compute_deadline(self):
         for record in self:

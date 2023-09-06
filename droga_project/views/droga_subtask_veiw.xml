@@ -167,7 +167,7 @@
         <field name="name">droga.project.task.stages.tree</field>
         <field name="model">project.task.type</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <notebook>
                     <page string="Tasks">
                         <field name="tasks" mode="tree">

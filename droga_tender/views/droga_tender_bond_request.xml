@@ -4,7 +4,7 @@
         <field name="name">droga.bond.requests.tree</field>
         <field name="model">droga.bond.requests</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree delete="0">
                 <field name="letter_number" string="Request Number"/>
                 <field name="bank"/>
                 <field name="client"/>
@@ -28,7 +28,7 @@
         <field name="name">droga.bond.requests.form</field>
         <field name="model">droga.bond.requests</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <header>
                     <button name="request"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"

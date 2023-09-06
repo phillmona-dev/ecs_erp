@@ -5,7 +5,7 @@
         <field name="name">droga.pharma.cust.employees.view.tree</field>
         <field name="model">droga.pharma.cust.employees</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="employee_name"></field>
                 <field name="parent_customer"></field>
                 <field name="phone_no"></field>
@@ -21,7 +21,7 @@
         <field name="model">droga.pharma.cust.employees</field>
         <field name="priority">300</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
 

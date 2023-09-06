@@ -38,7 +38,7 @@
         <field name="model">droga.pharma.cust.employees</field>
         <field name="priority">200</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
 

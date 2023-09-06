@@ -4,7 +4,7 @@
         <field name="name">mtm.excel.report.form</field>
         <field name="model">mtm.report.wizard</field>
         <field name="arch" type="xml">
-            <form string=" Print Excel Report">
+            <form string=" Print Excel Report" delete="0">
                 <group>
                     <field name="client"/>
                     <field name="date_from"/>

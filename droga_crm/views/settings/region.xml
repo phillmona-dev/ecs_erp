@@ -11,7 +11,7 @@
         <field name="name">droga.crm.settings.region.view.tree</field>
         <field name="model">droga.crm.settings.region</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="region_name"></field>
                 <field name="region_descr"></field>
                 <field name="status"></field>

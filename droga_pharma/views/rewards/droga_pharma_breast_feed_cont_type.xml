@@ -11,7 +11,7 @@
         <field name="name">droga.breast.feed.reward.contact.type.view.tree</field>
         <field name="model">droga.breast.feed.reward.contact.type</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="cont_type"></field>
                 <field name="discount"></field>
                 <field name="status"></field>
@@ -23,7 +23,7 @@
         <field name="name">droga.breast.feed.reward.contact.type.view.form</field>
         <field name="model">droga.breast.feed.reward.contact.type</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="cont_type"></field>

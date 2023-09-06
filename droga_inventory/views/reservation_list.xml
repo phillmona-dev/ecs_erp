@@ -6,7 +6,7 @@
         <field name="name">stock.move.reservation.form</field>
         <field name="model">stock.move</field>
         <field name="arch" type="xml">
-            <form create="False">
+            <form create="False" delete="0">
                 <div class="oe_chatter">
                     <field name="message_follower_ids"/>
                     <field name="activity_ids"/>
@@ -21,7 +21,7 @@
         <field name="name">stock.move.reservation.tree</field>
         <field name="model">stock.move</field>
         <field name="arch" type="xml">
-            <tree editable="bottom" create="0">
+            <tree editable="bottom" create="0" delete="0">
                 <field name="product_id" readonly="1"></field>
                 <field name="reference" readonly="1"></field>
                 <field name="origin" readonly="1"></field>

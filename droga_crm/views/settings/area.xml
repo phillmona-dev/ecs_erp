@@ -11,7 +11,7 @@
         <field name="name">droga.crm.settings.area.view.tree</field>
         <field name="model">droga.crm.settings.area</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="parent_id" options="{'no_create':True,'no_open':True}"  domain="([('status','=','Active')])"></field>
                 <field name="area_name"></field>
                 <field name="area_descr"></field>

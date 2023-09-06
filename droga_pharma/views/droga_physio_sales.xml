@@ -60,7 +60,7 @@
         <field name="name">sale.order.form.physio</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
-            <form string="Sales Order" class="o_sale_order"  style="font-size:11pt">
+            <form string="Sales Order" class="o_sale_order"  style="font-size:11pt" delete="0">
                 <header>
                     <field name="invoice_status" invisible="1"></field>
                     <button name="action_confirm"

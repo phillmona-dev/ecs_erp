@@ -11,7 +11,7 @@
         <field name="name">droga.tender.settings.media.view.tree</field>
         <field name="model">droga.tender.settings.media</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="media_name"></field>
                 <field name="media_descr"></field>
                 <field name="status"></field>
@@ -23,7 +23,7 @@
         <field name="name">droga.tender.settings.media.view.form</field>
         <field name="model">droga.tender.settings.media</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="media_name"></field>

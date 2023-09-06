@@ -38,7 +38,7 @@
             <xpath expr="//form/sheet/notebook/page[@name='internal_notes']" position="replace">
                 <page string="Items" name="ord_qty">
                     <field name="ordered_prods" mode="tree">
-                        <tree editable="bottom">
+                        <tree editable="bottom" delete="0">
                             <field name="prod" options="{'no_create':True,'no_open':True}"/>
                             <field name="qty"/>
                         </tree>
@@ -48,7 +48,7 @@
                 </page>
                 <page string="Follow up visits" name="follow_ups">
                     <field name="follow_up_visits" mode="tree,kanban">
-                        <tree editable="bottom" >
+                        <tree editable="bottom" delete="0">
                             <field name="date_planned"/>
                             <field name="check_in_descr" readonly="1"/>
                             <field name="check_out_descr" readonly="1"/>
@@ -262,7 +262,7 @@
         <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
         <field name="arch" type="xml">
             <xpath expr="//tree" position="replace">
-                <tree string="Leads" sample="1" multi_edit="1">
+                <tree string="Leads" sample="1" multi_edit="1" delete="0">
                     <field name="company_id" invisible="1"/>
                     <field name="date_deadline" invisible="1"/>
                     <field name="create_date" optional="hide"/>

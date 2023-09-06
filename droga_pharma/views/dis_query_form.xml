@@ -6,7 +6,7 @@
         <field name="name">drug.information.query.tree</field>
         <field name="model">drug.information.query</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree delete="0">
                 <field name="date"/>
                 <field name="requestor_name"/>
                 <field name="request_type"/>

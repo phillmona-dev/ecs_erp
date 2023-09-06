@@ -14,7 +14,7 @@
                 <field name="customer_rank" invisible="1"></field>
                 <page string="Contacts" attrs="{'invisible': [('supplier_rank', '>', 0)]}">
                     <field name="contacts" mode="tree,kanban">
-                        <tree editable="1" create="1">
+                        <tree editable="1" create="1" delete="0">
                             <field name="specialty" domain="([('status','=','Active')])"
                                    options="{'no_create':True,'no_open':True}"/>
                             <field name="contact_name"/>

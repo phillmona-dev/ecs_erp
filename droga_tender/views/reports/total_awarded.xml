@@ -29,6 +29,8 @@
                 <field name="awarded_amt_total" ></field>
                 <filter string="Awarded tenders" domain="[('awarded_amt_total', '>',0)]" name="awarded_tenders"></filter>
 
+                <filter name="group_type_customer_type" string="Customer type" context="{'group_by':'customer_type'}"/>
+
                 <separator/>
 
                 <filter string="Current week closed tenders"
