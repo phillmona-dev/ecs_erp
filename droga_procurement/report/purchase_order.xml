@@ -3,6 +3,9 @@
 
     <!-- Inherit Purchase  report (from module purchase) -->
     <template id="report_purchase_order_inherit" inherit_id="purchase.report_purchaseorder_document">
+        <xpath expr="/t[1]/t[1]/div[1]/table[1]/tbody[1]/t[2]/tr[1]/t[1]/td[4]/span[2]" position="replace">
+            <span t-field="line.product_uom.uom_title" groups="uom.group_uom"/>
+        </xpath>
         <xpath expr="//div[@id='total']" position="after">
             <t t-if="o.request_type=='Foregin'">
                 <div class="row">
