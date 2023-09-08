@@ -99,7 +99,19 @@ class drogaSubTask(models.Model):
         }
 
     def tasks_prob(self):
-        pass
+        return {
+            'name': 'Problems',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'project.task',
+            'view_id': self.env.ref('droga_project.droga_report_tasks_list_form_problems').id,
+            'type': 'ir.actions.act_window',
+             'target': 'new',
+            'res_id': self.id,
+            'context': {
+                'default_project': self.id,
+            }
+        }
 
     def transferRequest(self):
         return {
