@@ -177,6 +177,7 @@ class customer_visit_header(models.Model):
         }
 
     def request_approval(self):
+        self._get_approver()
         self.state='requested'
 
     def revise(self):
