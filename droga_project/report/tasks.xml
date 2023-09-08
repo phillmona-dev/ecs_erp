@@ -34,6 +34,7 @@
             <tree string="" create="false" delete="false" expand="1">
                 <field name="project_name" string="Project"></field>
                 <field name="stage_name" string="Stage"></field>
+                <field name="parent_id" string="Parent"></field>
                 <field name="company_id" string="Company"></field>
                 <field name="name" string="Task"></field>
                 <field name="contractor" string="Contractor"></field>
@@ -64,6 +65,7 @@
 
                 <filter name="group_type_project" string="Project" context="{'group_by':'project_name'}"/>
                 <filter name="group_type_stage" string="Stage" context="{'group_by':'stage_name'}"/>
+                <filter name="group_type_parent" string="Parent task" context="{'group_by':'parent_id'}"/>
                 <filter name="group_type_company" string="Company" context="{'group_by':'company_id'}"/>
 
                 <separator/>
@@ -97,7 +99,7 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_report_tasks_list_tree')})]"/>
         <field name="search_view_id" ref="droga_report_tasks_list_search"></field>
-        <field name="context">{'search_default_group_type_project': 1,'search_default_group_type_stage':1}</field>
+        <field name="context">{'search_default_group_type_project': 1,'search_default_group_type_stage':1,'search_default_group_type_parent':1}</field>
     </record>
 
     <menuitem id="menu_project_report_task_list"
