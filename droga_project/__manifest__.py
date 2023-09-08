@@ -29,7 +29,10 @@
         'report/droga_project_list.xml',
         'views/droga_contractor.xml',
         'views/droga_store_issue.xml',
-        'views/analytic_inherit.xml'
+        'views/analytic_inherit.xml',
+        'report/tasks.xml',
+        'report/projects.xml',
+        'report/droga_project_list.xml'
     ],
     # any module necessary for this one to work correctly
 

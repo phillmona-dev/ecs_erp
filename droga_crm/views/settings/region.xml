@@ -19,6 +19,13 @@
         </field>
     </record>
 
+    <record model="ir.rule" id="droga_crm_region_rule">
+        <field name="name">Region multi-company</field>
+        <field name="model_id" ref="model_droga_crm_settings_region"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
     <menuitem
         id="customer_settings_sub_menu"
         name="Customer location settings"
