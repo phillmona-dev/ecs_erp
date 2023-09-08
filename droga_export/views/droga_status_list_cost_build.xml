@@ -4,7 +4,7 @@
         <field name="name">droga.export.cost.buildup.tree</field>
         <field name="model">droga.export.cost.buildup</field>
         <field name="arch" type="xml">
-            <tree string="" editable="bottom" create="1">
+            <tree string="" editable="bottom" create="1" delete="0">
                 <field name="type" options="{'no_create':True,'no_open':True}" required="True"></field>
                 <field name="payment_ref" options="{'no_create':True,'no_open':True}" required="True"></field>
                 <field name="amount"></field>
@@ -21,7 +21,7 @@
         <field name="name">droga.export.status.list.tree</field>
         <field name="model">droga.export.status.list</field>
         <field name="arch" type="xml">
-            <tree string="" editable="bottom" create="1">
+            <tree string="" editable="bottom" create="1" delete="0">
                 <field name="status_list"></field>
                 <field name="status"></field>
             </tree>

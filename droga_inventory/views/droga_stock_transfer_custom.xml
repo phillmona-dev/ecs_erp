@@ -11,7 +11,7 @@
         <field name="name">droga.inventory.transfer.custom.view.tree</field>
         <field name="model">droga.inventory.transfer.custom</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="name"></field>
                 <field name="transfer_picking" widget="many2many_tags"></field>
                 <field name="location_dest_id"></field>
@@ -24,7 +24,7 @@
         <field name="name">droga.inventory.transfer.custom.view.form</field>
         <field name="model">droga.inventory.transfer.custom</field>
         <field name="arch" type="xml">
-            <form string="Transfers">
+            <form string="Transfers" delete="0">
                 <header>
                     <field name="is_owner" invisible="1"></field>
                     <button name="request"

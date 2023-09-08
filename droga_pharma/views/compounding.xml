@@ -5,7 +5,7 @@
         <field name="name">droga.pharma.compounding.tree</field>
         <field name="model">droga.pharma.compounding</field>
         <field name="arch" type="xml">
-            <tree string="" create="1">
+            <tree string="" create="1" delete="0">
                 <field name="item_to_prepare"></field>
                 <field name="calc_applied"/>
                 <field name="mixing_inst"/>
@@ -18,7 +18,7 @@
         <field name="name">droga.pharma.compounding.form</field>
         <field name="model">droga.pharma.compounding</field>
         <field name="arch" type="xml">
-            <form string="Compounding">
+            <form string="Compounding" delete="0">
                 <sheet>
                     <group string="Compounded item">
                         <group>

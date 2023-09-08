@@ -11,12 +11,19 @@
         <field name="name">droga.crm.settings.region.view.tree</field>
         <field name="model">droga.crm.settings.region</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="region_name"></field>
                 <field name="region_descr"></field>
                 <field name="status"></field>
             </tree>
         </field>
+    </record>
+
+    <record model="ir.rule" id="droga_crm_region_rule">
+        <field name="name">Region multi-company</field>
+        <field name="model_id" ref="model_droga_crm_settings_region"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
     <menuitem

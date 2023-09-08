@@ -11,7 +11,7 @@
         <field name="name">droga.tender.settings.customers.view.tree</field>
         <field name="model">droga.tender.settings.customers</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="name"></field>
                 <field name="customer_type"></field>
                 <field name="tin_no"></field>
@@ -26,7 +26,7 @@
         <field name="name">droga.tender.settings.customer.view.form</field>
         <field name="model">droga.tender.settings.customers</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="name"></field>

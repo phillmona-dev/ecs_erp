@@ -11,7 +11,7 @@
         <field name="name">droga.project.contractors.view.tree</field>
         <field name="model">droga.project.contractors</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="contractor_name"></field>
                 <field name="contractor_descr"></field>
                 <field name="status"></field>
@@ -23,7 +23,7 @@
         <field name="name">droga.project.contractors.view.form</field>
         <field name="model">droga.project.contractors</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="contractor_name"></field>

@@ -1,1 +1,1 @@
-from . import stock_card_xls
+from . import stock_card_xls,consignment_report

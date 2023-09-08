@@ -11,7 +11,7 @@
         <field name="name">droga.pro.sales.master.entry.visit.form</field>
         <field name="model">droga.pro.sales.master.entry.visit</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <group>
                     <field name="pro_id" widget="selection" domain="([('employee_access_users','=',uid),('status','=','Active')])" options="{'no_create':True,'no_open':True}"></field>
                     <field name="p_id"></field>
@@ -36,7 +36,7 @@
         <field name="name">droga.pro.sales.master.entry.visit.form.pop.pip</field>
         <field name="model">droga.pro.sales.master.entry.visit</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <group>
                     <field name="pro_id" widget="selection" domain="([('employee_access_users','=',uid),('status','=','Active')])"
                            options="{'no_create':True,'no_open':True}"/>

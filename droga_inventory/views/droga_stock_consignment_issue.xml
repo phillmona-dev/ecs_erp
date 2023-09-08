@@ -5,7 +5,7 @@
         <field name="name">droga.inventory.consignment.issue.view.tree</field>
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="arch" type="xml">
-            <tree string="" create="1">
+            <tree string="" create="1" delete="0">
                 <field name="name"></field>
                 <field name="customer"></field>
                 <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}" widget="many2many_tags"
@@ -19,7 +19,7 @@
         <field name="name">droga.inventory.consignment.issue.view.tree.sales</field>
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="arch" type="xml">
-            <tree string="" create="1">
+            <tree string="" create="1" delete="0">
                 <field name="name"></field>
                 <field name="customer"></field>
                 <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}" widget="many2many_tags"
@@ -33,7 +33,7 @@
         <field name="name">droga.inventory.consignment.issue.view.form</field>
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="arch" type="xml">
-            <form string="Consignment issue">
+            <form string="Consignment issue" delete="0">
                 <header>
                     <!-- Sales and crm header part  -->
                     <field name="menu_from" invisible="1"></field>

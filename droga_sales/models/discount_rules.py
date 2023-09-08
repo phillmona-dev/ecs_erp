@@ -175,6 +175,9 @@ class sale_order_line(models.Model):
             return
         if self.order_id.company_id.id == 2:
             for line in self:
+                if line.store_placement:
+                    line.price_unit = 0.0
+                    continue
                 if not line.product_uom or not line.product_id or not line.order_id.pricelist_id:
                     line.price_unit = 0.0
                 else:

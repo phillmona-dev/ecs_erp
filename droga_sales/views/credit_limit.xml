@@ -5,7 +5,7 @@
         <field name="name">res.partner.credit.limit.tree</field>
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
-            <tree create="0" editable="bottom">
+            <tree create="0" editable="bottom" delete="0">
                 <field name="name" readonly="1"></field>
                 <field name="vat" string="Tin No"></field>
                 <field name="city_name" string="City/sub-city"></field>

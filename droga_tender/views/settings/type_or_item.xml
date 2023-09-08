@@ -11,7 +11,7 @@
         <field name="name">droga.tender.settings.type_or_item.view.tree</field>
         <field name="model">droga.tender.settings.type.item</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="type_or_item_name"></field>
                 <field name="type_or_item_descr"></field>
                 <field name="status"></field>
@@ -23,7 +23,7 @@
         <field name="name">droga.tender.settings.type_or_item.view.form</field>
         <field name="model">droga.tender.settings.type.item</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="type_or_item_name"></field>

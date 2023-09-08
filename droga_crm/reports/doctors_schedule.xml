@@ -74,7 +74,7 @@
         <field name="name">droga.crm.contacts.tree</field>
         <field name="model">droga.crm.contacts</field>
         <field name="arch" type="xml">
-            <tree string="" expand="1" create="0">
+            <tree string="" expand="1" create="0" delete="0">
                 <field name="parent_customer"></field>
                 <field name="specialty"></field>
                 <field name="job_position"></field>

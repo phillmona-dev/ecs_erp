@@ -6,7 +6,7 @@
         <field name="name">droga.account.payment.request.view.tree</field>
         <field name="model">droga.account.payment.request</field>
         <field name="arch" type="xml">
-            <tree string="Payment Request">
+            <tree string="Payment Request" delete="0">
                 <field name="name"/>
                 <field name="payment_type"/>
                 <field name="request_by"/>

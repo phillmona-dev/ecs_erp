@@ -11,7 +11,7 @@
         <field name="name">droga.pharma.reward.issue.view.tree</field>
         <field name="model">droga.pharma.reward.issue</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="reward_pct"></field>
                 <field name="prod_group" widget="many2many_tags"></field>
                 <field name="prod_template" widget="many2many_tags"></field>
@@ -26,7 +26,7 @@
         <field name="name">droga.pharma.reward.issue.view.form</field>
         <field name="model">droga.pharma.reward.issue</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="reward_pct"></field>

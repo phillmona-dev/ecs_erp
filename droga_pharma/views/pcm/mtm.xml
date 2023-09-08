@@ -10,7 +10,7 @@
         <field name="name">droga.pharma.mtm.tree</field>
         <field name="model">droga.pharma.mtm.header</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="sales_origin"></field>
                 <field name="client_descr"></field>
                 <field name="asses_care_plan"></field>
@@ -26,7 +26,7 @@
         <field name="name">droga.pharma.mtm.form</field>
         <field name="model">droga.pharma.mtm.header</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <notebook>
                         <page string="Drugs list">

@@ -4,7 +4,7 @@
         <field name="name">droga.pharma.mtm.follow_up.form</field>
         <field name="model">droga.pharma.mtm.follow_up</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <group>

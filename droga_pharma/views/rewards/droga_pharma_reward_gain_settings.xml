@@ -11,7 +11,7 @@
         <field name="name">droga.pharma.reward.gain.view.tree</field>
         <field name="model">droga.pharma.reward.gain</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="prod_group" widget="many2many_tags"></field>
                 <field name="points_to_gain"></field>
                 <field name="status"></field>
@@ -23,7 +23,7 @@
         <field name="name">droga.pharma.reward.gain.view.form</field>
         <field name="model">droga.pharma.reward.gain</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="prod_group" widget="many2many_tags"></field>

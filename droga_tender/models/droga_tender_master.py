@@ -137,6 +137,7 @@ class droga_tender_master(models.Model):
     media = fields.Many2one('droga.tender.settings.media', string='Media')
     bid_submit_place = fields.Many2one('droga.tender.settings.submission.place', string="Bid submission place")
     customer = fields.Many2one('droga.tender.settings.customers', string='Customer', required=True)
+    customer_type=fields.Many2one('droga.cust.type',string='Customer type',related='customer.customer_type',store=True)
     assigned_person = fields.Many2one('hr.employee', string='Assigned Person')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
@@ -212,6 +213,18 @@ class droga_tender_master(models.Model):
             },
             'domain':
                 ([('tender_origin_form_tender', '=', self.id)])
+        }
+
+    def open_tender(self):
+        test=''
+        return {
+            'name': 'Tender',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.tender.master',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'res_id':self.id
         }
 
     def order_sales(self):

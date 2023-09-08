@@ -4,7 +4,7 @@
         <field name="name">droga.pharma.transfer.custom.view.tree</field>
         <field name="model">droga.inventory.transfer.custom</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="name"></field>
                 <field name="transfer_picking" widget="many2many_tags"></field>
                 <field name="location_dest_id"></field>
@@ -20,7 +20,7 @@
         <field name="model">droga.inventory.transfer.custom</field>
         <field name="priority">1000</field>
         <field name="arch" type="xml">
-            <form string="Transfers">
+            <form string="Transfers" delete="0">
                 <header>
                     <button name="request_ph"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"

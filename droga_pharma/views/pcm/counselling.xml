@@ -10,7 +10,7 @@
         <field name="name">droga.pharma.counselling.tree</field>
         <field name="model">droga.pharma.counselling</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="client_descr"></field>
                 <field name="area_counsel"></field>
                 <field name="status"></field>
@@ -25,7 +25,7 @@
         <field name="name">droga.pharma.counselling.form</field>
         <field name="model">droga.pharma.counselling</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
 
                     <group string="Counselling">

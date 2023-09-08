@@ -73,3 +73,32 @@ class drogaProject(models.Model):
 
         return res
 
+    def proj_tasks(self):
+        return {
+            'name': 'Tasks',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'project.task',
+            'view_id': self.env.ref('droga_project.droga_report_tasks_list_tree').id,
+            'type': 'ir.actions.act_window',
+            #'target': 'new',
+            'res_id': self.id,
+            'context': {
+                'default_project_id': self.id,
+            }
+        }
+
+    def proj_scopes(self):
+        return {
+            'name': 'Scopes',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'project.scope.version',
+            'view_id': self.env.ref('droga_project.view_project_project_tree').id,
+            'type': 'ir.actions.act_window',
+            # 'target': 'new',
+            'res_id': self.id,
+            'context': {
+                'default_project': self.id,
+            }
+        }

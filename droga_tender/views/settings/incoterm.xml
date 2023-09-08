@@ -11,7 +11,7 @@
         <field name="name">droga.tender.settings.incoterm.view.tree</field>
         <field name="model">droga.tender.settings.incoterm</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="incoterm_name"></field>
                 <field name="incoterm_descr"></field>
                 <field name="status"></field>
@@ -23,7 +23,7 @@
         <field name="name">droga.tender.settings.incoterm.view.form</field>
         <field name="model">droga.tender.settings.incoterm</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="incoterm_name"></field>

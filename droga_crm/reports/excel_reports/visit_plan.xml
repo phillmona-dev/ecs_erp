@@ -11,7 +11,7 @@
         <field name="name">droga.crm.reports.visit.log.form</field>
         <field name="model">droga.crm.reports.visit.log</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <group>
                     <field name="visit" string="Visit" options="{'no_create':True,'no_open':True}"></field>
                     <field name="week_num" options="{'no_create':True,'no_open':True}"></field>

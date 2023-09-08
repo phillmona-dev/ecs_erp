@@ -5,7 +5,7 @@
         <field name="name">droga.inventory.consignment.issue.view.tree</field>
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="arch" type="xml">
-            <tree string="" create="1">
+            <tree string="" create="1" delete="0">
                 <field name="name"></field>
                 <field name="customer" string="Cleaning unit"></field>
                 <field name="state"></field>
@@ -17,7 +17,7 @@
         <field name="name">droga.inventory.consignment.issue.view.tree</field>
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="arch" type="xml">
-            <tree string="" create="1">
+            <tree string="" create="1" delete="0">
                 <field name="name"></field>
                 <field name="consignment_reference"></field>
                 <field name="state"></field>
@@ -30,7 +30,7 @@
         <field name="name">droga.inventory.consignment.issue.view.form</field>
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="arch" type="xml">
-            <form string="Subcontractor issue">
+            <form string="Subcontractor issue" delete="0">
                 <header>
                     <button name="request_mg"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
@@ -109,7 +109,7 @@
         <field name="name">droga.inventory.consignment.issue.view.form</field>
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="arch" type="xml">
-            <form string="Bag issue">
+            <form string="Bag issue" delete="0">
                 <header>
                     <button name="request_mg"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"

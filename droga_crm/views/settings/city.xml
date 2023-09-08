@@ -11,7 +11,7 @@
         <field name="name">droga.crm.settings.city.view.tree</field>
         <field name="model">droga.crm.settings.city</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="parent_id" options="{'no_create':True,'no_open':True}" domain="([('status','=','Active')])"></field>
                 <field name="city_name"></field>
                 <field name="city_descr"></field>
@@ -20,6 +20,12 @@
         </field>
     </record>
 
+    <record model="ir.rule" id="droga_crm_city_rule">
+        <field name="name">City multi-company</field>
+        <field name="model_id" ref="model_droga_crm_settings_city"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
 
     <menuitem
         id="droga_crm_customer_settings_city"

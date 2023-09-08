@@ -4,7 +4,7 @@
         <field name="model">droga.stock.adjustment.request</field>
         <field name="name">Stock Adjustment</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <header>
                     <button name="request"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
@@ -70,7 +70,7 @@
         <field name="model">droga.stock.adjustment.request</field>
         <field name="name">Stock Adjustment request</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree delete="0">
                 <field name="name"/>
                 <field name="to_correct_ref"/>
                 <field name="operation_type"/>

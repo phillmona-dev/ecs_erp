@@ -11,7 +11,7 @@
         <field name="name">droga.sales.cost.of.sales.view.tree</field>
         <field name="model">droga.sales.cost.of.sales</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="product_descr"></field>
                 <field name="product_code"></field>
                 <field name="product_categ"></field>

@@ -6,7 +6,7 @@
         <field name="name">droga.customer.visit.header.view.tree</field>
         <field name="model">droga.customer.visit.header</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="pr_sales" options='{"no_open": True, "no_create": True}'></field>
                 <field name="pr_sales_logged" invisible="1"></field>
                 <field name="is_record_owner" invisible="1"/>
@@ -111,7 +111,7 @@
         <field name="name">droga.customer.visit.header.view.form</field>
         <field name="model">droga.customer.visit.header</field>
         <field name="arch" type="xml">
-            <form>
+            <form delete="0">
                 <group>
                     <field name="pr_sales" options='{"no_open": True, "no_create": True}' readonly="1"></field>
                     <field name="pr_sales_logged" invisible="1"></field>
@@ -690,7 +690,7 @@
                     <notebook>
                         <page string="Contacts schedule">
                             <field name="contacts_schedule" mode="tree,kanban">
-                                <tree editable="bottom">
+                                <tree editable="bottom" delete="0">
                                     <field name="cust"/>
                                     <field name="contact_custom" domain="([('parent_customer','=',cust)])"
                                            options="{'no_create':True,'no_open':True}"></field>

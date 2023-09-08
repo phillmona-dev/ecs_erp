@@ -11,7 +11,7 @@
         <field name="name">droga.tender.settings.sec.type.view.tree</field>
         <field name="model">droga.tender.settings.sec.type</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="sec_type_name"></field>
                 <field name="sec_type_descr"></field>
                 <field name="exp_status"></field>
@@ -24,7 +24,7 @@
         <field name="name">droga.tender.settings.sec.type.view.form</field>
         <field name="model">droga.tender.settings.sec.type</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="sec_type_name"></field>

@@ -11,7 +11,7 @@
         <field name="name">droga.pharma.referral.reward.view.tree</field>
         <field name="model">droga.pharma.referral.reward</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="points_to_gain"></field>
                 <field name="from_qty"></field>
                 <field name="to_qty"></field>
@@ -24,7 +24,7 @@
         <field name="name">droga.pharma.referral.reward.view.form</field>
         <field name="model">droga.pharma.referral.reward</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <sheet>
                     <group>
                         <field name="from_qty"></field>

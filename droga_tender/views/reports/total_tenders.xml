@@ -6,9 +6,12 @@
             <field name="arch" type="xml">
                 <tree string="" create="false" delete="false" expand="1">
                     <field name="customer" ></field>
+                    <field name="customer_type"></field>
                     <field name="ten_id" string="Tender ID"></field>
-                    <field name="posted_date_gre" string="Floated date"></field>
+                    <button icon="fa-edit" string="" type="object"
+                                                name="open_tender" class="oe_stat_button"/>
                     <field name="item_types"></field>
+                    <field name="posted_date_gre" string="Floated date"></field>
                     <field name="closing_date_gre" string="Closing date"></field>
                     <field name="bid_security_amount_char"></field>
                     <field name="bid_doc_purch_price"></field>

@@ -36,7 +36,35 @@
                 <field name="security_period_in_days"></field>
                 <field name="dead_line_date"></field>
                 <field name="status"></field>
+
+                <filter string="Bid security" domain="[('security_for', '=','Bid security')]"
+                        name="bid_security"></filter>
+                <filter string="Advance security" domain="[('security_for', '=','Advance security')]"
+                        name="advance_security"></filter>
+                <filter string="Performance security" domain="[('security_for', '=','Performance Security')]"
+                        name="performance_security"></filter>
+
+                <separator/>
+                
+                <filter string="Current week deadlines"
+                        domain="[('dead_line_date', '&lt;=', (context_today() + relativedelta(weeks=0,weekday=-1)).strftime('%Y-%m-%d')),('dead_line_date', '&gt;=', (context_today() - relativedelta(weeks=1,weekday=0)).strftime('%Y-%m-%d'))]"
+                        name="current_week_tenders"></filter>
+                <filter string="Current month deadlines"
+                        domain="[('dead_line_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('dead_line_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
+                        name="current_month_tenders"></filter>
+                <filter string="Previous week deadlines"
+                        domain="[('dead_line_date', '&lt;=', (context_today() - relativedelta(weeks=1,weekday=-1)).strftime('%Y-%m-%d')),('dead_line_date', '&gt;=', (context_today() - relativedelta(weeks=2,weekday=0)).strftime('%Y-%m-%d'))]"
+                        name="previous_week_tenders"></filter>
+                <filter string="Previous month deadlines"
+                        domain="[('dead_line_date', '&lt;=', (context_today() + relativedelta(months=-1,day=31)).strftime('%Y-%m-%d')),('dead_line_date', '&gt;=', (context_today() - relativedelta(months=1,day=1)).strftime('%Y-%m-%d'))]"
+                        name="previous_month_tenders"></filter>
+                <filter string="Next month deadlines"
+                        domain="[('dead_line_date', '&lt;=', (context_today() + relativedelta(months=1,day=31)).strftime('%Y-%m-%d')),('dead_line_date', '&gt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"
+                        name="next_month_tenders"></filter>
+                
                 <filter name="group_type" string="Security type" context="{'group_by':'security_type'}"/>
+                <filter name="group_status" string="Status" context="{'group_by':'status'}"/>
+                <filter name="group_bank" string="Bank" context="{'group_by':'bank'}"/>
             </search>
         </field>
     </record>

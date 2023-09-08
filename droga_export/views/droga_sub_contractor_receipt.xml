@@ -5,7 +5,7 @@
         <field name="name">droga.sub.contract.receive.view.tree</field>
         <field name="model">droga.inventory.consignment.receive</field>
         <field name="arch" type="xml">
-            <tree string="">
+            <tree string="" delete="0">
                 <field name="name"></field>
                 <field name="supplier" string="Cleaning unit"></field>
                 <field name="state"></field>
@@ -17,7 +17,7 @@
         <field name="name">droga.sub.contract.receive.view.form</field>
         <field name="model">droga.inventory.consignment.receive</field>
         <field name="arch" type="xml">
-            <form string="Consignment receipt">
+            <form string="Consignment receipt" delete="0">
                 <header>
                     <button name="request_mg"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"

@@ -98,6 +98,8 @@ class drogaSubTask(models.Model):
                 ([('subtask_reference', '=', self.id)])
         }
 
+    def tasks_prob(self):
+        pass
 
     def transferRequest(self):
         return {

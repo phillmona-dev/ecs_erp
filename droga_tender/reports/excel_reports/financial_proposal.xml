@@ -11,7 +11,7 @@
         <field name="name">droga.tender.reports.financial.proposal.form</field>
         <field name="model">droga.tender.reports.financial.proposal</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="" delete="0">
                 <group>
                     <group>
                         <field name="tender_id" options="{'no_create':True,'no_open':True}"></field>

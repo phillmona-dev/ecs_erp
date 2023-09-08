@@ -11,7 +11,7 @@
         <field name="name">droga.pharma.prod.categ.tree</field>
         <field name="model">droga.pharma.prod.categ</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="prod_categ"></field>
                 <field name="descr"></field>
                 <field name="categ_id" string="Import Product Category"></field>

@@ -11,7 +11,7 @@
         <field name="name">droga.crm.contacts.view.tree</field>
         <field name="model">droga.crm.contacts</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top">
+            <tree string="" editable="top" delete="0">
                 <field name="parent_customer"></field>
                 <field name="specialty"></field>
                 <field name="contact_name"></field>
