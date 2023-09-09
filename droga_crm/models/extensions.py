@@ -271,7 +271,7 @@ class crm_lead_extension(models.Model):
                 dist=self.calculate_distance(float(lati),float(long),res.partner_id.partner_latitude,res.partner_id.partner_longitude)
                 res.check_out_distance_meters=int(dist)
                 res.check_out_time_and_date = datetime.now()
-                res.check_out_descr = (res.check_in_time_and_date+timedelta(hours=3)).strftime("%d %b, %H:%M")+' ('+f"{int(dist):,}"+' m)'
+                res.check_out_descr = (res.check_out_time_and_date+timedelta(hours=3)).strftime("%d %b, %H:%M")+' ('+f"{int(dist):,}"+' m)'
 
     def calculate_distance(self, lat1, lon1, lat2, lon2):
 

@@ -34,3 +34,5 @@ access_droga_crm_loc_history,droga_crm.droga.crm.loc.history,droga_crm.model_dro
 access_droga_res_partner,crm.res_partner,base.model_res_partner,droga_crm.crm_sr,1,1,1,1
 access_droga_res_partner_mr,crm.res_partner,base.model_res_partner,droga_crm.crm_mr,1,1,0,0
 access_droga_res_partner_readonly,crm.res_partner_read,base.model_res_partner,base.group_user,1,0,0,0
+
+access_droga_update_location,crm_update_location,model_crm_update_location,base.group_user,1,1,1,1

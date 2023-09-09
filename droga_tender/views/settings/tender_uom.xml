@@ -11,7 +11,7 @@
         <field name="name">droga.tender.uom.tree</field>
         <field name="model">droga.tender.uom</field>
         <field name="arch" type="xml">
-            <tree create="1" string="" delete="0">
+            <tree create="1" string="" delete="0" editable="top">
                 <field name="uom_name"></field>
                 <field name="status"></field>
             </tree>
