@@ -792,7 +792,7 @@
             name="Customer visit log to approve"
             action="droga_crm_customer_visit_to_approve_action"
             parent="menu_vist_log"
-            groups="crm_rsm,crm_nsm"
+            groups="crm_rsm,crm_nsm,"
             sequence="18"/>
 
 

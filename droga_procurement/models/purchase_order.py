@@ -1,4 +1,5 @@
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class purchase_order(models.Model):
@@ -214,6 +215,16 @@ class purchase_order(models.Model):
         res = super(purchase_order, self_comp).create(vals)
 
         request_type = res.request_type
+
+        #Check if there are old items in PO
+        message=''
+        for line in res.order_line:
+            new_items=self.env['product.template'].search([('old_ref','=',line.product_id.default_code)])
+            if len(new_items)>0:
+                message=message+'Product '+line.product_id.default_code+' has been updated with '+new_items[0].default_code+', '
+
+        if len(message)>5:
+            raise UserError(message)
 
         if request_type == 'Foregin':
             # generate transaction number

@@ -24,6 +24,12 @@
         </field>
     </record>
 
+    <record id="crm_emp_per_company" model="ir.rule">
+        <field name="name">CRM employees per company</field>
+        <field name="model_id" ref="model_droga_pro_sales_master"/>
+        <field eval="True" name="global"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+    </record>
 
     <menuitem
         id="droga_pro_sales_master_menu"

@@ -57,7 +57,7 @@ class crm_visit_plan_report(models.TransientModel):
         sheet.set_column('B:B', 25)
         sheet.set_column('C:C', 15)
         sheet.set_column('D:D', 18)
-        sheet.set_column('E:E', 15)
+        sheet.set_column('E:E', 17)
         sheet.set_column('F:F', 25)
 
         row_start=0
@@ -120,10 +120,10 @@ class crm_visit_plan_report(models.TransientModel):
 
         if self.env.company.logo_web:
             company_image=io.BytesIO(base64.b64decode(self.env.company.logo_web))
-            sheet.insert_image(1,5,"test_image.png",{'image_data':company_image,'y_scale':0.7,'y_offset':0.1})
+            sheet.insert_image(0,5,"test_image.png",{'image_data':company_image,'y_scale':0.3})
 
-        sheet.merge_range('A' + str(row_start + 1) + ':F' + str(row_start + 1), 'Droga Pharma P.L.C - Activity plan', header_format)
-        sheet.merge_range('B' + str(row_start + 2) + ':D' + str(row_start + 2), (str(self.pr_sales.p_name) + ' : ' + self.visit.city_name.city_descr) if self.visit.city_name else str(self.pr_sales.p_name),main_title_format)
+        sheet.merge_range('A' + str(row_start + 1) + ':F' + str(row_start + 1), 'Droga Pharma P.L.C - CRM Activity plan', header_format)
+        sheet.merge_range('B' + str(row_start + 2) + ':D' + str(row_start + 2), (str(self.visit.pr_sales.p_name) + ' : ' + self.visit.city_name.city_descr) if self.visit.city_name else str(self.visit.pr_sales.p_name),main_title_format)
         #sheet.merge_range('C' + str(row_start + 3) + ':C' + str(row_start + 3), 'Role...... ',main_title_format)
 
         descr=''
