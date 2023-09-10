@@ -26,7 +26,9 @@
         <field name="view_mode">tree</field>
         <field name="domain">[('move_type','=','out_invoice'),('is_cust_available','=',True),('cost_center','in',('Tender Division','Import division','Wholesales Division'))]</field>
         <field name="context">{"search_default_late":1}</field>
-        <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('account.view_out_invoice_tree')})]"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('account.view_out_invoice_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_sales.account_read_only_sales')})]"/>
     </record>
 
 

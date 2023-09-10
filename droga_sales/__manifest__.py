@@ -35,6 +35,7 @@
         'reports/sales_attachment.xml',
         'reports/daily_sales.xml',
         'reports/request_report.xml',
+        'reports/account_form_readonly.xml',
         'views/module_menus.xml',
         'reports/sales_detail.xml',
         'reports/sales_detail_waiter.xml',

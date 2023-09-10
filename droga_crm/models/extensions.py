@@ -252,6 +252,8 @@ class crm_lead_extension(models.Model):
     check_out_time_and_date = fields.Datetime('Check out date and time')
     check_out_descr = fields.Char('Check out')
 
+    visit_status = fields.Char('Visit status')
+
     referral_distri=fields.Many2many('res.partner',string='Referral to distributor')
 
     def update_check_in_locations(self,res_id,lati,long):
@@ -376,7 +378,7 @@ class crm_lead_extension(models.Model):
         if 'leads' in vals:
             lead = self.env['crm.lead'].search([('id', '=', vals['leads'])])
             lead_vals = {
-                'name': lead.name.replace(" - Follow up", "")+' - Follow up',
+                'name': lead.name.replace(" - Follow up", "").replace("opportunity's","").replace("opportunity","")+' - Follow up',
                 'pr_sales': lead.pr_sales.id,
                 'pr_lead': lead.pr_sales.id,
                 'origin_user_id': lead.user_id.id,
@@ -394,7 +396,7 @@ class crm_lead_extension(models.Model):
 
             return super(crm_lead_extension, self).create(lead_vals)
         else:
-            vals.update({'name': vals['name']+"'s lead"})
+            vals.update({'name': vals['name'].replace("opportunity","")+"'s lead"})
             return super(crm_lead_extension, self).create(vals)
 
 class crm_prod_template_extension(models.Model):

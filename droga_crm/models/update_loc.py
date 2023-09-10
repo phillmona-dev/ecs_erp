@@ -23,9 +23,6 @@ class update_crm_visit_per_customer(models.Model):
         leads = self.env['crm.lead'].search(
             [ ('check_out_distance_meters', '!=', False)])
 
-        for lead in leads:
-            lead.check_out_descr = (lead.check_out_time_and_date + timedelta(hours=3)).strftime(
-                "%d %b, %H:%M") + ' (' + f"{int(lead.check_out_distance_meters):,}" + ' m)'
 
     def calculate_distance(self, lat1, lon1, lat2, lon2):
         lat1 = radians(lat1)

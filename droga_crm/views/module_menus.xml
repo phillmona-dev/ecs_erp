@@ -141,17 +141,12 @@
         <field name="name">Visits/Leads</field>
     </record>
 
-    <!-- Leads report view mode -->
-    <record id="crm.crm_opportunity_report_action_lead" model="ir.actions.act_window">
-        <field name="view_mode">tree,graph,pivot</field>
-    </record>
-
     <!-- Leads report move menu -->
     <menuitem
         id="crm_opportunity_report_menu_lead"
         name="Leads"
         parent="droga_crm.menu_inq_vist_reports"
-        action="crm.crm_opportunity_report_action_lead"
-        groups="crm_nsm,crm_rsm"
+        action="droga_crm.crm_leads_action"
+        groups="crm_nsm,crm_rsm,crm_sr"
         sequence="3"/>
 </odoo>
