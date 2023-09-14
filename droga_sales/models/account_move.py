@@ -41,6 +41,12 @@ class account_move(models.Model):
     core_amt = fields.Float('Core amount', compute="_get_core_amt", store=True)
     non_core_amt = fields.Float('Non-core amount', compute="_get_core_amt", store=True)
 
+    #To add tracking to tax field
+    amount_tax = fields.Monetary(
+        string='Tax',
+        compute='_compute_amount', store=True, readonly=True,tracking=True
+    )
+
     @api.depends('invoice_line_ids.price_subtotal')
     def _get_core_amt(self):
 
@@ -370,6 +376,18 @@ class account_move_line(models.Model):
     item_code = fields.Char(compute="get_item_code", string="Item Code", store=True)
     item_description_alternate = fields.Char("Item Description Alternate")
     item_uom_alternate = fields.Char("UoM Alternate", default="")
+
+    origin_ref=fields.Char(compute="get_origin_ref",string="Origin reference",store=True)
+    def get_origin_ref(self):
+        for record in self:
+            if record.name and record.journal_id.id in (2,201):
+                stock_move_line=self.env['stock.move.line'].search([('reference', '=', record.name.split(' - ')[0])])
+                if len(stock_move_line)>0:
+                    record.origin_ref=stock_move_line[0].move_id.origin
+                else:
+                    record.origin_ref = '-'
+            else:
+                record.origin_ref='-'
 
     @api.onchange('analytic_distribution')
     def analytic_distribution(self):
