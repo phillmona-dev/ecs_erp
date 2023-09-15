@@ -377,7 +377,7 @@ class account_move_line(models.Model):
     item_description_alternate = fields.Char("Item Description Alternate")
     item_uom_alternate = fields.Char("UoM Alternate", default="")
 
-    origin_ref=fields.Char(string="Origin reference",store=True)
+    origin_ref=fields.Char(compute="get_origin_ref",string="Origin reference",store=True)
     def get_origin_ref(self):
         for record in self:
             if record.name and record.journal_id.id in (2,201):
