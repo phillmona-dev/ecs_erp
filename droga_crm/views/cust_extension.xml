@@ -150,8 +150,7 @@
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="after">
                 <field name="vat"  string="Tin No"></field>
                 <field name="key_account"></field>
-                <field name="woreda" attrs="{'invisible': [('customer_rank', '>', 0)]}"/>
-                <field name="house_no" attrs="{'invisible': [('customer_rank', '>', 0)]}"/>
+                
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="attributes">
