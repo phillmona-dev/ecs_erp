@@ -150,7 +150,7 @@
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="after">
                 <field name="vat"  string="Tin No"></field>
                 <field name="key_account"></field>
-                
+
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='website']" position="attributes">
