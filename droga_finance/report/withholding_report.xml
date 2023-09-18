@@ -363,6 +363,9 @@
                             <div class="col-2 bm-2 ">
                                 <h6 class="small nopadding">አድራሻ</h6>
                                 <h6 class="small ">Address</h6>
+                                <b>
+                                    <t class="small" t-esc="o.partner_id.contact_address"/>
+                                </b>
                             </div>
                             <div class="col-3 bm-2">
                                 <h6 class="small nopadding">ክልል</h6>
@@ -385,6 +388,7 @@
                                 <h6 class="small nopadding">ቀበሌ</h6>
                                 <h6 class="small ">Kebele:
                                     <b>
+                                        <t class="small" t-esc="o.partner_id.woreda"/>
                                     </b>
                                 </h6>
                             </div>
@@ -392,6 +396,7 @@
                                 <h6 class="small nopadding">የቤት ቁጥር</h6>
                                 <h6 class="small ">House No:-
                                     <b>
+                                        <t class="small" t-esc="o.partner_id.house_no"/>
                                     </b>
                                 </h6>
                             </div>
