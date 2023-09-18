@@ -360,12 +360,15 @@
                             </div>
                         </div>
                         <div class="row mt32 mb32">
-                            <div class="col-2 bm-2 ">
+
+
+                            <div class="col-3 bm-2">
                                 <h6 class="small nopadding">አድራሻ</h6>
-                                <h6 class="small ">Address</h6>
-                                <b>
-                                    <t class="small" t-esc="o.partner_id.contact_address"/>
-                                </b>
+                                <h6 class="small ">Address:
+                                    <b>
+                                        <t class="small" t-esc="o.partner_id.street2"/>
+                                    </b>
+                                </h6>
                             </div>
                             <div class="col-3 bm-2">
                                 <h6 class="small nopadding">ክልል</h6>
@@ -375,7 +378,7 @@
                                     </b>
                                 </h6>
                             </div>
-                            <div class="col-3 bm-2">
+                            <div class="col-2 bm-2">
 
                                 <h6 class="small nopadding">ክፍለ ከተማ</h6>
                                 <h6 class="small ">Sub-City:
@@ -388,7 +391,7 @@
                                 <h6 class="small nopadding">ቀበሌ</h6>
                                 <h6 class="small ">Kebele:
                                     <b>
-
+                                        <t class="small" t-esc="o.partner_id.x_wereda"/>
                                     </b>
                                 </h6>
                             </div>
@@ -396,7 +399,7 @@
                                 <h6 class="small nopadding">የቤት ቁጥር</h6>
                                 <h6 class="small ">House No:-
                                     <b>
-
+                                        <t class="small" t-esc="o.partner_id.x_house_no"/>
                                     </b>
                                 </h6>
                             </div>
@@ -544,13 +547,21 @@
                             </div>
                         </div>
                         <div class="row mt32 mb32">
+
                             <div class="col-6 bm-2">
                                 <h6 class="small">ስም</h6>
-                                <h6 class="small">Name</h6>
+                                <h6 class="small">Name:-
+                                    <b>
+                                        <t class="small" t-esc="user.name"/>
+                                    </b>
+                                </h6>
+
                             </div>
                             <div class="col-6 bm-2">
                                 <h6 class="small">የስራ ሃላፊነት</h6>
-                                <h6 class="small">Position</h6>
+                                <h6 class="small">Position:-
+                                    <b>Accountant</b>
+                                </h6>
                             </div>
 
                         </div>

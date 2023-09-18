@@ -11,10 +11,11 @@ class cust_contact_extension(models.Model):
     name = fields.Char(index=True, default_export_compatible=True, tracking=True)
     display_name = fields.Char(compute='_compute_display_name', recursive=True, store=True, index=True, tracking=True)
     company_type = fields.Selection(string='Company Type',
-                                    selection=[('company', 'Company'),('person', 'Individual')],default='company')
-    cust_grade=fields.Many2one('droga.cust.grade',string='Customer grade')
-    cust_type_ext=fields.Many2one('droga.cust.type',string='Customer type',tracking=True)
-    contact_tobe_accessed_by=fields.Selection([('Promotors', 'Promotors'),('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
+                                    selection=[('company', 'Company'), ('person', 'Individual')], default='company')
+    cust_grade = fields.Many2one('droga.cust.grade', string='Customer grade')
+    cust_type_ext = fields.Many2one('droga.cust.type', string='Customer type', tracking=True)
+    contact_tobe_accessed_by = fields.Selection(
+        [('Promotors', 'Promotors'), ('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
     type = fields.Selection(
         [('contact', 'Contact'),
          ('invoice', 'Invoice Address'),
@@ -36,20 +37,22 @@ class cust_contact_extension(models.Model):
     contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
-    partner_latitude = fields.Float(string='Geo Latitude', digits=(10, 7),tracking=True)
-    partner_longitude = fields.Float(string='Geo Longitude', digits=(10, 7),tracking=True)
-    loc_history=fields.One2many('droga.crm.loc.history','partner')
+    partner_latitude = fields.Float(string='Geo Latitude', digits=(10, 7), tracking=True)
+    partner_longitude = fields.Float(string='Geo Longitude', digits=(10, 7), tracking=True)
+    loc_history = fields.One2many('droga.crm.loc.history', 'partner')
 
 
-    #lati_custom =fields.Float('Geo Latitude',digits=(10,7))
-    #long_custom = fields.Float('Geo Longtude',digits=(10,7))
+
+    # lati_custom =fields.Float('Geo Latitude',digits=(10,7))
+    # long_custom = fields.Float('Geo Longtude',digits=(10,7))
 
     @api.model
     def update_latitude_longitude(self, partners):
         pass
 
     company_id = fields.Many2one(
-        'res.company', 'Company', default=lambda self: self.env.company,index=True)
+        'res.company', 'Company', default=lambda self: self.env.company, index=True)
+
     def _def_rec(self):
         cid = self.env.company.id
         acc = self.env['account.account'].search([('company_id', '=', cid), ('code', '=', '114001')])
@@ -78,40 +81,40 @@ class cust_contact_extension(models.Model):
                 raise UserError("You can not edit Tin no.")
         return super(cust_contact_extension, self).write(vals)
 
-    def update_current_locations(self,res_id,latitude,longitude):
+    def update_current_locations(self, res_id, latitude, longitude):
         for res in self.env['res.partner'].search([('id', '=', res_id)]):
-            #res.lati_custom=float(latitude)
+            # res.lati_custom=float(latitude)
 
             if not self.env.user.has_group('droga_crm.crm_cust_loc'):
                 pass
 
             if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])) > 0:
-                logged_user= self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[
+                logged_user = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[
                     0].pro_id.p_name
             else:
-                logged_user=self.env.user.name
+                logged_user = self.env.user.name
 
             loc_vals = {
                 'update_user_loc': logged_user,
                 'partner': res.id,
                 'old_lati': res.partner_latitude,
-                'new_lati':float(latitude),
-                'old_long':res.partner_longitude,
-                'new_long':float(longitude)
+                'new_lati': float(latitude),
+                'old_long': res.partner_longitude,
+                'new_long': float(longitude)
             }
 
             self.env['droga.crm.loc.history'].sudo().create(loc_vals)
-            res.partner_longitude=float(longitude)
-            res.partner_latitude=float(latitude)
+            res.partner_longitude = float(longitude)
+            res.partner_latitude = float(latitude)
 
     @api.model
     def create(self, vals):
         if 'supplier_rank' in vals and 'vat' in vals:
             if not self.env.user.has_group('droga_crm.crm_cust_create') and vals['supplier_rank'] == 0:
                 raise UserError("You don't have access to create a customer.")
-            #if vals['supplier_rank'] == 0:
-                #if len(vals['vat']) == 0:
-                    #raise UserError("Please enter Tin no. It is mandatory")
+            # if vals['supplier_rank'] == 0:
+            # if len(vals['vat']) == 0:
+            # raise UserError("Please enter Tin no. It is mandatory")
             if vals['supplier_rank'] == 0 and vals['vat']:
                 if (len(vals['vat']) < 10 or len(vals['vat']) > 14):
                     raise UserError("Length of Tin no should either be 10 or 13, please amend accordingly.")
@@ -185,21 +188,24 @@ class cust_contact_extension(models.Model):
                     """ update account_move set customer_category=%s where id=%s""",
                     (record.cust_type_ext.cust_org_type, account_move.id))
 
+
 class cust_history(models.Model):
-    _name='droga.crm.loc.history'
-    update_user_loc=fields.Char('Update user')
-    partner=fields.Many2one('res.partner')
-    update_date=fields.Datetime('Update date', default=fields.Datetime.now)
-    old_lati=fields.Float(string='Old Latitude', digits=(10, 7))
-    new_lati=fields.Float(string='New Latitude', digits=(10, 7))
-    old_long=fields.Float(string='Old Longitude', digits=(10, 7))
-    new_long=fields.Float(string='New Longitude', digits=(10, 7))
+    _name = 'droga.crm.loc.history'
+    update_user_loc = fields.Char('Update user')
+    partner = fields.Many2one('res.partner')
+    update_date = fields.Datetime('Update date', default=fields.Datetime.now)
+    old_lati = fields.Float(string='Old Latitude', digits=(10, 7))
+    new_lati = fields.Float(string='New Latitude', digits=(10, 7))
+    old_long = fields.Float(string='Old Longitude', digits=(10, 7))
+    new_long = fields.Float(string='New Longitude', digits=(10, 7))
+
 
 class account_move_pr_sales(models.Model):
     _inherit = "account.move"
-    cust_location=fields.Many2one('droga.crm.settings.city',related='partner_id.city_name')
+    cust_location = fields.Many2one('droga.crm.settings.city', related='partner_id.city_name')
     cust_region = fields.Many2one('droga.crm.settings.region', related='partner_id.city_name.parent_id')
     is_cust_available = fields.Boolean(related='partner_id.is_cust_available')
+
     def _get_pr_sales_logged(self):
         sale = self.env['sale.order'].search([('name', '=', self.invoice_origin)])
         return False if len(sale) == 0 else sale[0].pr_sales
@@ -219,8 +225,8 @@ class crm_lead_extension(models.Model):
     plan_id = fields.Many2one('droga.customer.visit.detail')
     contacts_schedule_single = fields.Many2one('droga.crm.contacts.schedule')
     ordered_prods = fields.One2many('droga.lead.ordered.products', 'leads')
-    follow_up_visits=fields.One2many('crm.lead', 'leads')
-    leads=fields.Many2one('crm.lead')
+    follow_up_visits = fields.One2many('crm.lead', 'leads')
+    leads = fields.Many2one('crm.lead')
     contact_custom = fields.Many2one('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]")
     city_name = fields.Many2one('droga.crm.settings.city', related='partner_id.city_name')
     core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])
@@ -241,40 +247,44 @@ class crm_lead_extension(models.Model):
         'Phone', tracking=50,
         compute='_compute_phone', inverse='_inverse_phone', readonly=False, store=True)
 
-    check_in_lati=fields.Float('Geo Latitude',digits=(10,7))
-    check_in_long=fields.Float('Geo Longtude',digits=(10,7))
-    check_in_distance_meters = fields.Integer('Check in distance in meters',tracking=True)
-    check_in_time_and_date=fields.Datetime('Check in date and time')
-    check_in_descr=fields.Char('Check in')
+    check_in_lati = fields.Float('Geo Latitude', digits=(10, 7))
+    check_in_long = fields.Float('Geo Longtude', digits=(10, 7))
+    check_in_distance_meters = fields.Integer('Check in distance in meters', tracking=True)
+    check_in_time_and_date = fields.Datetime('Check in date and time')
+    check_in_descr = fields.Char('Check in')
 
     check_out_lati = fields.Float('Geo Latitude', digits=(10, 7))
     check_out_long = fields.Float('Geo Longtude', digits=(10, 7))
-    check_out_distance_meters = fields.Integer('Check out distance in meters',tracking=True)
+    check_out_distance_meters = fields.Integer('Check out distance in meters', tracking=True)
     check_out_time_and_date = fields.Datetime('Check out date and time')
     check_out_descr = fields.Char('Check out')
 
     visit_status = fields.Char('Visit status')
 
-    referral_distri=fields.Many2many('res.partner',string='Referral to distributor')
+    referral_distri = fields.Many2many('res.partner', string='Referral to distributor')
 
-    def update_check_in_locations(self,res_id,lati,long):
+    def update_check_in_locations(self, res_id, lati, long):
         for res in self.env['crm.lead'].search([('id', '=', res_id)]):
-            #res.lati_custom=float(latitude)
-            if res.check_in_lati==0:
-                res.check_in_lati= float(lati)
-                res.check_in_long=float(long)
-                dist=self.calculate_distance(float(lati),float(long),res.partner_id.partner_latitude,res.partner_id.partner_longitude)
-                res.check_in_distance_meters=int(dist)
-                res.check_in_time_and_date=datetime.now()
-                res.check_in_descr=(res.check_in_time_and_date+timedelta(hours=3)).strftime("%d %b, %H:%M")+' ('+f"{int(dist):,}"+' m)'
+            # res.lati_custom=float(latitude)
+            if res.check_in_lati == 0:
+                res.check_in_lati = float(lati)
+                res.check_in_long = float(long)
+                dist = self.calculate_distance(float(lati), float(long), res.partner_id.partner_latitude,
+                                               res.partner_id.partner_longitude)
+                res.check_in_distance_meters = int(dist)
+                res.check_in_time_and_date = datetime.now()
+                res.check_in_descr = (res.check_in_time_and_date + timedelta(hours=3)).strftime(
+                    "%d %b, %H:%M") + ' (' + f"{int(dist):,}" + ' m)'
 
             elif res.check_out_lati == 0:
                 res.check_out_lati = float(lati)
                 res.check_out_long = float(long)
-                dist=self.calculate_distance(float(lati),float(long),res.partner_id.partner_latitude,res.partner_id.partner_longitude)
-                res.check_out_distance_meters=int(dist)
+                dist = self.calculate_distance(float(lati), float(long), res.partner_id.partner_latitude,
+                                               res.partner_id.partner_longitude)
+                res.check_out_distance_meters = int(dist)
                 res.check_out_time_and_date = datetime.now()
-                res.check_out_descr = (res.check_out_time_and_date+timedelta(hours=3)).strftime("%d %b, %H:%M")+' ('+f"{int(dist):,}"+' m)'
+                res.check_out_descr = (res.check_out_time_and_date + timedelta(hours=3)).strftime(
+                    "%d %b, %H:%M") + ' (' + f"{int(dist):,}" + ' m)'
 
     def calculate_distance(self, lat1, lon1, lat2, lon2):
 
@@ -288,7 +298,7 @@ class crm_lead_extension(models.Model):
         dlat = lat2 - lat1
         dlon = lon2 - lon1
 
-        a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
         c = 2 * atan2(sqrt(a), sqrt(1 - a))
         distance = R * c
 
@@ -312,7 +322,6 @@ class crm_lead_extension(models.Model):
         else:
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             return False if len(ses) == 0 else ses[0].pro_id[0].p_regions.ids
-
 
     pr_avail_areas = fields.Many2many('droga.crm.settings.city', default=_get_areas)
     partner_id = fields.Many2one(
@@ -379,7 +388,8 @@ class crm_lead_extension(models.Model):
         if 'leads' in vals:
             lead = self.env['crm.lead'].search([('id', '=', vals['leads'])])
             lead_vals = {
-                'name': lead.name.replace(" - Follow up", "").replace("opportunity's","").replace("opportunity","")+' - Follow up',
+                'name': lead.name.replace(" - Follow up", "").replace("opportunity's", "").replace("opportunity",
+                                                                                                   "") + ' - Follow up',
                 'pr_sales': lead.pr_sales.id,
                 'pr_lead': lead.pr_sales.id,
                 'origin_user_id': lead.user_id.id,
@@ -390,15 +400,16 @@ class crm_lead_extension(models.Model):
                 'expected_revenue': 0,
                 'partner_id': lead.partner_id.id,
                 'planned_visit_selection': lead.planned_visit_selection,
-                'leads':vals['leads'],
-                'date_planned':vals['date_planned']
+                'leads': vals['leads'],
+                'date_planned': vals['date_planned']
                 # 'contact_name': det['visit_contact'].name,
             }
 
             return super(crm_lead_extension, self).create(lead_vals)
         else:
-            vals.update({'name': vals['name'].replace("opportunity","")+"'s lead"})
+            vals.update({'name': vals['name'].replace("opportunity", "") + "'s lead"})
             return super(crm_lead_extension, self).create(vals)
+
 
 class crm_prod_template_extension(models.Model):
     _inherit = 'product.template'
