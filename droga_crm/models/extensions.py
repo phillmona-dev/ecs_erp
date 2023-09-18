@@ -41,6 +41,7 @@ class cust_contact_extension(models.Model):
     loc_history=fields.One2many('droga.crm.loc.history','partner')
 
     woreda=fields.Char("Woreda")
+    
     house_no=fields.Char("House No")
 
     #lati_custom =fields.Float('Geo Latitude',digits=(10,7))
