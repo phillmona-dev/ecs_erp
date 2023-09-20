@@ -302,10 +302,10 @@ class account_move(models.Model):
             if record.analytic_distribution:
                 analytic_distribution = record.analytic_distribution
 
-            if analytic_distribution != '' and tax_ids != '':
+            if analytic_distribution != '':
                 break
 
-        if analytic_distribution == '' and tax_ids == '':
+        if analytic_distribution == '':
             ValidationError("At least fill the first line!")
 
         # fill empty analytic lines
