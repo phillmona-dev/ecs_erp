@@ -294,6 +294,25 @@ class account_move(models.Model):
             if tax_ids != '':
                 record.tax_ids = tax_ids
 
+    def set_analytic_accounts_only(self):
+        # get analytic account
+        analytic_distribution = ""
+        tax_ids = ''
+        for record in self.invoice_line_ids:
+            if record.analytic_distribution:
+                analytic_distribution = record.analytic_distribution
+
+            if analytic_distribution != '' and tax_ids != '':
+                break
+
+        if analytic_distribution == '' and tax_ids == '':
+            ValidationError("At least fill the first line!")
+
+        # fill empty analytic lines
+        for record in self.invoice_line_ids:
+            if analytic_distribution != '':
+                record.analytic_distribution = analytic_distribution
+
     def convert_to_word(self, num):
         num_strings = str(num)
         numbers = num_strings.split('.')

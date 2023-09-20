@@ -32,7 +32,9 @@
             <xpath expr="//button[@name='button_set_checked']" position="after">
                 <button type="object" name="print_sales_attachment" string="Sales Attachment"
                         attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}"/>
-                <button type="object" name="set_analytic_accounts" string="Fill Analytic-Tax"
+                <button type="object" name="set_analytic_accounts" string="Fill Analytic-Tax" groups="droga_sales.analytic_tax_access"
+                        attrs="{'invisible': ['|',('move_type', 'not in', ('out_invoice','in_invoice')),('state', '!=', 'draft')]}"/>
+                <button type="object" name="set_analytic_accounts_only" string="Fill Analytic-Account only"
                         attrs="{'invisible': ['|',('move_type', 'not in', ('out_invoice','in_invoice')),('state', '!=', 'draft')]}"/>
             </xpath>
 

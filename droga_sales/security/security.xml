@@ -52,6 +52,10 @@
         <field name="category_id" ref="sales_management"/>
     </record>
 
+    <record id="analytic_tax_access" model="res.groups">
+        <field name="name">Analytic tax access</field>
+        <field name="category_id" ref="sales_management"/>
+    </record>
 </odoo>
 
 
