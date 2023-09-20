@@ -468,7 +468,7 @@ class customer_visit_detail(models.Model):
             'target': 'new',
             'res_id': self.id,
         }
-    @api.model
+
     def write(self, vals):
         for rec in self:
             rec.visit_header.last_updated_date=rec.visit_date

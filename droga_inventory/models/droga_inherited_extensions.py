@@ -188,7 +188,7 @@ class droga_location_extension(models.Model):
 
     def write(self, vals):
         for rec in self:
-            if not self.env.user.has_group('droga_inventory.inv_prod_fin_wareloc'):
+            if not self.env.user.has_group('droga_inventory.inv_prod_fin_wareloc') and (len(vals)!=1 or 'last_inventory_date' not in vals):
                 raise UserError("You can not edit location.")
         return super(droga_location_extension, self).write(vals)
 
