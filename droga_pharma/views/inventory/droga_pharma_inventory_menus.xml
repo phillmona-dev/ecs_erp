@@ -19,16 +19,22 @@
                 groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
                 sequence="2"/>
         <menuitem
+                id="droga_pharma_inter_transfer_menu"
+                name="Inter-pharmacy transfers"
+                action="droga_pharma_inter_store_transfer_custom_action"
+                groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                sequence="3"/>
+        <menuitem
                 id="droga_pharma_compounding_menu"
                 name="Compounding"
                 action="droga_pharma_compounding_action"
                 groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
-                sequence="3"/>
+                sequence="5"/>
         <menuitem
                 id="droga_pharma_reports_menu"
                 name="Reports"
                 groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
-                sequence="3">
+                sequence="7">
 
             <menuitem
                     id="droga_pharma_stock_on_hand_reports_menu"

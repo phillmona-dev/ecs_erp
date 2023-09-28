@@ -8,8 +8,15 @@ from odoo.exceptions import UserError
 
 class picking_inherit(models.Model):
     _inherit = 'stock.picking'
-    pharma_transfer=fields.Boolean('Pharmacy transfer',default=False)
+    from_pharmacy_menu=fields.Boolean('Pharmacy transfer',default=False)
+    picking_type_id_pharmacy=fields.Many2one(
+        'stock.picking.type', 'Operation Type',
+        required=False, check_company=True)
 
+    @api.onchange("picking_type_id_pharmacy")
+    def _on_picking_type_id_pharmacy(self):
+        for record in self:
+            record.picking_type_id = record.picking_type_id_pharmacy
 
 class transfer_request_inherit(models.Model):
     _inherit='droga.inventory.transfer.custom'
