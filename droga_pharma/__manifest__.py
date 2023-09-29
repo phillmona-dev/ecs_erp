@@ -52,7 +52,6 @@
         'views/inventory/product.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
         'views/inventory/location_extension.xml',
-        'views/inventory/inter_pharmacy_transfer_custom.xml',
         'views/inventory/droga_pharma_inventory_menus.xml',
     ],
 
