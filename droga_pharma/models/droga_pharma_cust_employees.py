@@ -1,7 +1,7 @@
 import datetime
 
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class droga_pharma_customer(models.Model):
@@ -32,7 +32,7 @@ class droga_pharma_customer_employees(models.Model):
         [('Male', 'Male'), ('Female', 'Female')],
         string='Gender',tracking=True)
     job_position = fields.Char(string='Job position')
-    cust_id=fields.Char('Employee ID',required=True)
+    cust_id=fields.Char('Employee ID')
     profession=fields.Selection(
         [('hp', 'Health professional'),('other', 'Other')],
         string='Profession')
@@ -54,10 +54,25 @@ class droga_pharma_customer_employees(models.Model):
     medication_history = fields.Html('Medication history and adherance',tracking=True)
     adr_allergy = fields.Html('ADRs and/or Allergies',tracking=True)
     immunization = fields.Html('Immunization',tracking=True)
-    _sql_constraints = [
-        ('emp_id_company', 'unique (cust_id,parent_customer)',
-         'Employees ID must be unique per company.')
-    ]
+
+    @api.model
+    def create(self, vals):
+        res=super(droga_pharma_customer_employees, self).create(vals)
+        for rec in res:
+            if rec.parent_customer.id!=15488 and rec.cust_id==False:
+                raise UserError("Customer name must be entered.")
+            if len(rec.env['droga.pharma.cust.employees'].sudo().search(
+                    [('cust_id', '=',rec.cust_id), ('parent_customer', '!=', 15488),('id','!=',rec.ids[0]), ('parent_customer', '=', rec.parent_customer.id)]))>0:
+                raise UserError("Employees ID must be unique per company.")
+        return res
+
+    def write(self,vals):
+        for rec in self:
+            if len(rec.env['droga.pharma.cust.employees'].sudo().search(
+                    [('cust_id', '=',rec.cust_id), ('parent_customer', '!=', 15488),('id','!=',rec.ids[0]), ('parent_customer', '=', rec.parent_customer.id)]))>0:
+                raise UserError("Employees ID must be unique per company.")
+        return super(droga_pharma_customer_employees, self).write(vals)
+
     def open_children(self):
         return {
             'name': 'Children',

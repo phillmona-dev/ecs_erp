@@ -75,11 +75,26 @@ class droga_warehouse_extension(models.Model):
     _inherit = 'stock.warehouse'
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
-
+    has_no_access=fields.Boolean('is_loc_not_accessible', default=False, compute='_compute_has_access',
+                                search='_search_has_no_access')
     wh_type=fields.Selection([
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.')
+
+    def _search_has_no_access(self, operator, value):
+
+        compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
+
+        if operator == '=':
+            if len(compiled_wh_domain) == 0:
+                return [('id', 'in', self.env['stock.warehouse'])]
+            else:
+                has_access = self.env['stock.warehouse'].sudo().search(
+                    [('code', 'in', compiled_wh_domain)])
+                return [('id', 'not in', [x.id for x in has_access] if has_access else False)]
+        else:
+            return [('id', 'in', self.env['stock.warehouse'])]
 
     def _search_has_access(self, operator, value):
 
@@ -102,8 +117,10 @@ class droga_warehouse_extension(models.Model):
         for rec in self:
             if rec.code in compiled_wh_domain:
                 rec.has_access = True
+                rec.has_no_access = False
             else:
                 rec.has_access = False
+                rec.has_no_access = True
 
     def write(self, vals):
         for rec in self:
@@ -424,6 +441,7 @@ class droga_stock_picking_extension(models.Model):
     to_correct_pick = fields.Many2one('stock.picking',string='To correct reference')
     request_no=fields.Char('Request No')
     remark = fields.Char('Remark')
+    requested_by=fields.Char('Requested by')
     location_id_type=fields.Selection([
         ('CONI', 'Consignment customer location'),
         ('CONR', 'Consignment vendor location'),

@@ -15,6 +15,7 @@ class droga_stock_transfer_custom(models.Model):
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
+        ('phmg', 'Supply chain manager'),
         ('waiting', 'Requested'),   #When request is waiting for approval/response
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
@@ -134,6 +135,7 @@ class droga_stock_transfer_custom(models.Model):
                 'picking_type_id': pick_type_id,
                 'location_id': def_location_id,
                 'location_dest_id': self.location_dest_id.id,
+                'requested_by': self.create_uid,
                 #'auto_generated': True,
                 #'origin': self.name,
                 #'state': 'waiting',

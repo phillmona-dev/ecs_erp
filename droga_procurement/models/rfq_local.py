@@ -247,7 +247,7 @@ class Rfq_Local(models.Model):
             for supplier in suppliers:
                 vals = {'name': 'New', 'state': 'draft', 'date_order': datetime.now(),
                         'rfq_local_id': supplier.rfq_id.id,
-                        'company_id': self.company_id.id,
+                        'company_id': self.company_id.id,'from_rfq': True,
                         'partner_id': supplier.supplier_id.id, 'request_type': self.request_type, 'order_line': []}
 
                 # get products the supplier won
@@ -260,7 +260,7 @@ class Rfq_Local(models.Model):
                             'product_id': line.product_id.id,
                             'product_qty': line.product_qty,
                             'product_uom': line.product_uom.id,
-                            'taxes_id': [(6, 0, line.tax_id.ids)],
+                            'taxes_id': [(6, 0, line.tax_id.ids)]
                         })
 
                         vals['order_line'].append(order_line_vals)

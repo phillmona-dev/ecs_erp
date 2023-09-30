@@ -148,7 +148,7 @@
                         <button name="action_minor_aliments"
                                 type="object"
                                 class="oe_stat_button"
-                                string="Minor aliments"
+                                string="Minor ailments"
                                 icon="fa-credit-card-alt">
                         </button>
                         <field name="mtm_count" invisible="1"/>counselling_count
@@ -307,10 +307,9 @@
                                                    context="{'default_product_id': product_id, 'tree_view_ref':'product.product_packaging_tree_view', 'form_view_ref':'product.product_packaging_form_view'}"
                                                    groups="product.group_stock_packaging"/>
 
-                                            <label for="discount" groups="product.group_discount_per_so_line"/>
-                                            <div name="discount" groups="product.group_discount_per_so_line">
-                                                <field name="discount" class="oe_inline"/>
-                                                %
+                                            <label for="discount" invisible="1" groups="product.group_discount_per_so_line"/>
+                                            <div name="discount" invisible="1" groups="product.group_discount_per_so_line">
+                                                <field name="discount" class="oe_inline" invisible="1"/>
                                             </div>
                                             <!--
                                                 We need the sequence field to be here
@@ -326,7 +325,7 @@
                                             <field name="tax_id" widget="many2many_tags" options="{'no_create': True}"
                                                    context="{'search_view_ref': 'account.account_tax_view_search'}"
                                                    domain="[('type_tax_use','=','sale'), ('company_id','=',parent.company_id), ('country_id', '=', parent.tax_country_id)]"
-                                                   attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                                                   readonly="1"/>
                                         </group>
                                         <hr></hr>
                                         <group>
@@ -474,7 +473,7 @@
                                             options="{'no_create': True}"
                                             domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id), ('country_id', '=', parent.tax_country_id)]"
                                             context="{'active_test': True}"
-                                            attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"
+                                            readonly="1"
                                             optional="show"
                                     />
                                     <field name="discount" string="Disc.%" groups="product.group_discount_per_so_line"

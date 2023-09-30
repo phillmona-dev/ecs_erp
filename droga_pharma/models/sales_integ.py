@@ -89,7 +89,7 @@ class sales_integ(models.Model):
 
     def action_minor_aliments(self):
         return {
-            'name': 'Minor aliments',
+            'name': 'Minor ailments',
             'view_type': 'form',
             'view_mode': 'tree,form',
             'res_model': 'droga.pharma.minor.alignment',

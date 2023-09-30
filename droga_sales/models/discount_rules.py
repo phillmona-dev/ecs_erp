@@ -723,7 +723,7 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'age'):
+                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'tax_id','age'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(

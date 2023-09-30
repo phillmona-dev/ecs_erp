@@ -8,8 +8,8 @@ from odoo.exceptions import UserError
 
 class picking_inherit(models.Model):
     _inherit = 'stock.picking'
-    from_pharmacy_menu=fields.Boolean('Pharmacy transfer',default=False)
-    picking_type_id_pharmacy=fields.Many2one(
+    from_pharmacy_menu = fields.Boolean('Pharmacy transfer', default=False)
+    picking_type_id_pharmacy = fields.Many2one(
         'stock.picking.type', 'Operation Type',
         required=False, check_company=True)
 
@@ -18,19 +18,38 @@ class picking_inherit(models.Model):
         for record in self:
             record.picking_type_id = record.picking_type_id_pharmacy
 
+
 class transfer_request_inherit(models.Model):
-    _inherit='droga.inventory.transfer.custom'
+    _inherit = 'droga.inventory.transfer.custom'
+    pharmacy_manager = fields.Many2one('res.users', compute='_get_pharma_approvers', store=True)
+
+    def _get_pharma_approvers(self):
+        for rec in self:
+            rec.pharmacy_manager = self.env.ref("droga_pharma.pharma_supply_chain_manager").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                self.env.ref("droga_pharma.pharma_supply_chain_manager").users.filtered(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
     def request_ph(self):
+        self.set_activity_done()
+        self.ensure_one()
+        self._get_pharma_approvers()
+        if not self.pharmacy_manager:
+            raise UserError("Pharmacy operations manager not configured, please contact IT.")
+        self.state = 'phmg'
+
+    def confirm_ph(self):
+        self.set_activity_done()
         for wh in self['location_id']:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'MTOV'),('warehouse_id', 'like', wh.id)]).id
-            if not pick_type_id :
+                [('sequence_code', '=', 'MTOV'), ('warehouse_id', 'like', wh.id)]).id
+            if not pick_type_id:
                 raise UserError("Picking type 'MTOV' is not configured for source warehouse.")
 
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
-            def_location_id=self.env['stock.location'].search([('usage','=','internal'),('con_type', '=', False),('wcode','=',wh.code)])[0].id
+            def_location_id = self.env['stock.location'].search(
+                [('usage', '=', 'internal'), ('con_type', '=', False), ('wcode', '=', wh.code)])[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")
             picking_vals = {
@@ -40,8 +59,9 @@ class transfer_request_inherit(models.Model):
                 'location_id': def_location_id,
                 'location_dest_id': self.location_dest_id.id,
                 'state': 'draft',
-                'trans_issue_request':self.id,
-                'scheduled_date': self.request_date
+                'trans_issue_request': self.id,
+                'scheduled_date': self.request_date,
+                'requested_by':self.create_uid
             }
             picking_id = self.env['stock.picking'].sudo().create(picking_vals)
 
@@ -51,7 +71,6 @@ class transfer_request_inherit(models.Model):
                 self.transfer_reference = self.transfer_reference + picking_id.name + '\n'
 
             for rec in self.detail_entries:
-
                 move_vals = {
                     'picking_id': picking_id.id,
                     'picking_type_id': pick_type_id,
@@ -61,13 +80,13 @@ class transfer_request_inherit(models.Model):
                     'product_uom_qty': rec['product_uom_qty'],
                     'location_id': def_location_id,
                     'location_dest_id': self.location_dest_id.id,
-                    #'state': 'waiting',
-                    #'state': 'confirmed',
+                    # 'state': 'waiting',
+                    # 'state': 'confirmed',
                     'state': 'draft',
                     'company_id': self.company_id.id
                 }
 
                 self.env['stock.move'].sudo().create(move_vals)
             picking_id.action_assign()
-            picking_id.state='assigned'
+            picking_id.state = 'assigned'
         self.state = 'waiting'

@@ -302,6 +302,12 @@ class payment_term_no_credit(models.Model):
             raise UserError("You can not update payment term.")
         return super(payment_term_no_credit, self).write(vals_list)
 
+    @api.model
+    def create(self, vals):
+        if not self.env.user.has_group('droga_sales.payment_term_update'):
+            raise UserError("You can not create payment term.")
+        return super(payment_term_no_credit, self).create(vals)
+
 class payment_term_no_credit_line(models.Model):
     _inherit = "account.payment.term.line"
     def write(self,vals_list):
