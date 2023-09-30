@@ -60,7 +60,7 @@ class droga_pharma_customer_employees(models.Model):
         res=super(droga_pharma_customer_employees, self).create(vals)
         for rec in res:
             if rec.parent_customer.id!=15488 and rec.cust_id==False:
-                raise UserError("Customer name must be entered.")
+                raise UserError("Employee id must be entered.")
             if len(rec.env['droga.pharma.cust.employees'].sudo().search(
                     [('cust_id', '=',rec.cust_id), ('parent_customer', '!=', 15488),('id','!=',rec.ids[0]), ('parent_customer', '=', rec.parent_customer.id)]))>0:
                 raise UserError("Employees ID must be unique per company.")

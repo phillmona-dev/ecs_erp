@@ -3,6 +3,8 @@ from datetime import datetime
 import simplejson
 from lxml import etree
 
+import json
+
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 from odoo.http import request
@@ -207,13 +209,13 @@ class sale_order_line(models.Model):
             used_under = []
 
             if self.order_id.order_line:
-                #Order_type is used for import sales
+                # Order_type is used for import sales
                 if self.order_id.order_type:
                     used_under = ['IM', 'All']
                 elif self.order_id.order_from:
                     used_under = ['PT', 'All']
                 else:
-                    #For some reason, order from is coming up empty for pharmacy
+                    # For some reason, order from is coming up empty for pharmacy
                     used_under = ['PH', 'All']
 
             for line in self:
@@ -251,7 +253,8 @@ class sale_order_line(models.Model):
                 product_qty = self.env['droga.price.discount.per.product.qty'].search(
                     ['|', ('payment_term', '=', self.order_id['payment_term_id'].id), ('payment_term', '=', False),
                      ('product', '=', line.product_id.id), ('status', '=', 'Active'),
-                     ('from_qty', '<=', line.product_uom_qty * uom_rate), ('to_qty', '>=', line.product_uom_qty * uom_rate),
+                     ('from_qty', '<=', line.product_uom_qty * uom_rate),
+                     ('to_qty', '>=', line.product_uom_qty * uom_rate),
                      ('used_under', 'in', used_under)])
                 for rate in product_qty:
                     all_rate = all_rate + rate['percent']
@@ -274,7 +277,7 @@ class sale_order_line(models.Model):
                             product_price_unit=price,
                             product_currency=line.currency_id
                         ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
-                                    1 + ((non_core_rate + all_rate) / 100)))
+                                1 + ((non_core_rate + all_rate) / 100)))
 
                     line.std_unit_price = line.product_id._get_tax_included_unit_price(
                         line.company_id,
@@ -285,7 +288,7 @@ class sale_order_line(models.Model):
                         product_price_unit=price,
                         product_currency=line.currency_id
                     ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
-                                1 + ((non_core_rate + all_rate) / 100)))
+                            1 + ((non_core_rate + all_rate) / 100)))
 
                 line.price_unit_before_discount = line.std_unit_price
 
@@ -334,7 +337,7 @@ class sale_order_ext(models.Model):
     non_core_sum = fields.Float('Non-core total', compute='_get_sub_totals')
     state = fields.Selection(
         selection=[
-            ('memb',"Member usage"),
+            ('memb', "Member usage"),
             ('draft', "Quotation"),
             ('sent', "Quotation Sent"),
             ('price_request', "Price change approval"),
@@ -351,12 +354,13 @@ class sale_order_ext(models.Model):
         default='draft')
     total_discount = fields.Float('Total discount')
     total_added = fields.Float('Total accrual')
-    price_change_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
-    operation_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
-    final_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    price_change_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
+    operation_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
+    final_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
     out_of_stock_items = fields.Char('Stock out items', compute='_get_stock_out')
     has_access = fields.Boolean(default=False, search='_has_access', compute='_compute_has_access')
-    has_invoice_access=fields.Boolean(default=False, search='_has_invoice_access', compute='_compute_has_invoice_access')
+    has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
+                                        compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
     wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh')
 
@@ -366,30 +370,37 @@ class sale_order_ext(models.Model):
 
     def _get_pharma_wh(self):
         for rec in self:
-            rec.wareh = self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)[0].id if len(self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)) > 0 else False
+            rec.wareh = self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)[
+                0].id if len(
+                self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)) > 0 else False
+
     def _has_invoice_access(self, operator, value):
-        if operator=='=':
+        if operator == '=':
             if self.env.user.has_group('droga_sales.sales_import_invoicer'):
-                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-IM')])])]
+                return [
+                    ('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-IM')])])]
             if self.env.user.has_group('droga_sales.sales_wholesale_invoicer'):
-                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-WS')])])]
+                return [
+                    ('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-WS')])])]
             if self.env.user.has_group('droga_sales.ema_invoicer'):
-                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'EM-EM')])])]
+                return [
+                    ('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'EM-EM')])])]
             else:
                 return [('id', 'in', [])]
         else:
             return [('id', 'in', [])]
 
     def _compute_has_invoice_access(self):
-        has_import_acc=self.env.user.has_group('droga_sales.sales_import_approve_admin')
+        has_import_acc = self.env.user.has_group('droga_sales.sales_import_approve_admin')
         has_ws_acc = self.env.user.has_group('droga_sales.sales_wholesale_invoicer')
         has_ema_acc = self.env.user.has_group('droga_sales.ema_invoicer')
 
         for rec in self:
-            if (rec.order_from=="IM-IM" and has_import_acc) or (rec.order_from=="IM-WS" and has_ws_acc) or (rec.order_from=="EM-EM" and has_ema_acc):
-                rec.has_access=True
+            if (rec.order_from == "IM-IM" and has_import_acc) or (rec.order_from == "IM-WS" and has_ws_acc) or (
+                    rec.order_from == "EM-EM" and has_ema_acc):
+                rec.has_access = True
             else:
-                rec.has_access=False
+                rec.has_access = False
 
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
@@ -452,7 +463,7 @@ class sale_order_ext(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
 
         context = {
-            'default_move_type': 'out_invoice',
+            'default_move_type': 'out_invoice'
         }
         if len(self) == 1:
             context.update({
@@ -463,6 +474,7 @@ class sale_order_ext(models.Model):
                                                        ['invoice_payment_term_id']).get('invoice_payment_term_id'),
                 'default_invoice_origin': self.name,
                 'default_user_id': self.user_id.id,
+
             })
         action['context'] = context
         return action
@@ -533,7 +545,7 @@ class sale_order_ext(models.Model):
         return returnv
 
     def validate_form(self):
-        if self.state=="sale":
+        if self.state == "sale":
             return
         message = ''
 
@@ -585,7 +597,7 @@ class sale_order_ext(models.Model):
             if so.payment_term_id.allowed_cust:
                 if so.partner_id.id not in so.payment_term_id.allowed_cust.ids:
                     message = message + ('\n' if message else '') + "%s is not eligible for %s!" % (
-                    so.partner_id.name, so.payment_term_id.name)
+                        so.partner_id.name, so.payment_term_id.name)
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 message = message + ('\n' if message else '') + "Please login before requesting a sales order!"
                 # raise ValidationError("Please login before registering a sales order!")
@@ -611,9 +623,9 @@ class sale_order_ext(models.Model):
             self.action_confirm()
         # Manual price and discounts routing to price change approver
         elif ((self.manual_price and len(self.order_line.filtered(
-                lambda x: x.std_unit_price > x.price_unit > 0)) > 0) or self.tender_origin_form_tender) and self.state=='draft':
+                lambda x: x.std_unit_price > x.price_unit > 0)) > 0) or self.tender_origin_form_tender) and self.state == 'draft':
             self.state = 'price_request'
-        elif self.state=='draft':
+        elif self.state == 'draft':
             self.state = 'req'
 
         # self.set_activity_done()
@@ -723,15 +735,15 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'tax_id','age'):
+                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'tax_id', 'age'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
                         'droga_sales.sales_import_approve_admin') or self.user_has_groups(
                     'droga_sales.sales_wholesale_approve_admin'):
-                    modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request','memb')]]
+                    modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request', 'memb')]]
                 else:
-                    modifiers['readonly'] = [['state', 'not in', ('draft','memb')]]
+                    modifiers['readonly'] = [['state', 'not in', ('draft', 'memb')]]
 
                 node.set('modifiers', simplejson.dumps(modifiers))
             res['arch'] = etree.tostring(doc)
@@ -742,3 +754,26 @@ class sale_order_ext(models.Model):
 class sale_order_line_mail_inherit(models.Model):
     _name = 'sale.order.line'
     _inherit = ['sale.order.line', 'mail.thread', 'mail.activity.mixin', 'image.mixin']
+
+
+class account_move_inherit(models.Model):
+    _inherit='account.move'
+    analytic_distribution_custom=fields.Json('Analytic distribution')
+    analytic_distribution_custom_string = fields.Char('Analytic distribution')
+
+    @api.model
+    def create(self, vals):
+        if 'invoice_origin' in vals:
+            if vals['invoice_origin'].startswith('SO'):
+                sale_order=self.env['sale.order'].search([('name','=',str(vals['invoice_origin'])),('company_id','=',1)])
+                if len(sale_order)>0:
+                    for line in vals['invoice_line_ids']:
+                        if sale_order[0].order_from.startswith('PH'):
+                            line[2]['analytic_distribution'] = {25: 100,sale_order[0].wareh.linked_analytic.id: 100}
+                        elif sale_order[0].tender_origin_form_tender:
+                            line[2]['analytic_distribution'] = {23: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
+                        else:
+                            line[2]['analytic_distribution'] = {24: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
+                #get order type and fill analytic
+
+        return super(account_move_inherit, self).create(vals)

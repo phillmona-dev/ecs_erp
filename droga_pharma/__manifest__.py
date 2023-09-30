@@ -53,7 +53,8 @@
         'views/inventory/droga_pharma_transfer_custom.xml',
         'views/inventory/location_extension.xml',
         'views/inventory/droga_pharma_inventory_menus.xml',
-        'views/inventory_delivery_slip_extension.xml',
+        'views/inventory/inventory_delivery_slip_extension.xml',
+        'views/inventory/inter_pharmacy_transfer_custom.xml',
     ],
 
     # any module necessary for this one to work correctly

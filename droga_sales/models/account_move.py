@@ -306,7 +306,7 @@ class account_move(models.Model):
                 break
 
         if analytic_distribution == '':
-            ValidationError("At least fill the first line!")
+            raise ValidationError("At least fill the first line!")
 
         # fill empty analytic lines
         for record in self.invoice_line_ids:

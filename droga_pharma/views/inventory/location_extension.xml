@@ -31,6 +31,7 @@
             <xpath expr="//form/sheet/group/group/field[@name='code']" position="after">
                 <field name="wh_type" invisible="1"></field>
                 <field name="has_dispensary_location" attrs="{'invisible': [('wh_type', '!=', 'PH')]}"/>
+                <field name="linked_analytic" domain="[('plan_id', '=',2)]" options="{'no_create':True,'no_open':True}"/>
             </xpath>
         </field>
     </record>
