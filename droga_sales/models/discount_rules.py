@@ -769,7 +769,7 @@ class account_move_inherit(models.Model):
                 if len(sale_order)>0:
                     for line in vals['invoice_line_ids']:
                         if sale_order[0].order_from.startswith('PH'):
-                            line[2]['analytic_distribution'] = {25: 100,sale_order[0].wareh.linked_analytic.id: 100}
+                            line[2]['analytic_distribution'] = {241: 100,sale_order[0].order_line.wareh.linked_analytic.id: 100}
                         elif sale_order[0].tender_origin_form_tender:
                             line[2]['analytic_distribution'] = {23: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
                         else:
