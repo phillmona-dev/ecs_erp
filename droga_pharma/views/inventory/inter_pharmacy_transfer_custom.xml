@@ -49,18 +49,14 @@
                 <field name="location_id" groups="stock.group_stock_multi_locations" string="From location" domain="([('usage','=','internal'),('parent_loc_type','=','PH'),('has_access','=',True),('con_type','!=','SRL'),('pharmacy_location_type','in',('Store','Dispensary'))])"
                        options="{'no_create':True,'no_open':True}" attrs="{'invisible':[('from_pharmacy_menu', '=', False)],'readonly':[('from_pharmacy_menu', '=', False)]}"/>
             </xpath>
-            <xpath expr="//form/sheet/group/group/field[@name='from_wh']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
+
 
             <xpath expr="//form/sheet/group/group/field[@name='location_dest_id'][2]" position="replace">
                 <field name="from_pharmacy_menu" invisible="1"></field>
                 <field name="location_dest_id" groups="stock.group_stock_multi_locations" string="To location" domain="([('usage','=','internal'),('parent_loc_type','=','PH'),('has_access','=',True),('con_type','!=','SRL'),('pharmacy_location_type','in',('Store','Dispensary'))])"
                        options="{'no_create':True,'no_open':True}" attrs="{'invisible':[('from_pharmacy_menu', '=', False)],'readonly':[('from_pharmacy_menu', '=', False)]}"/>
             </xpath>
-            <xpath expr="//form/sheet/group/group/field[@name='to_wh']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
+
         </field>
     </record>
 </odoo>
