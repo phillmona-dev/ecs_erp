@@ -193,9 +193,9 @@ class sale_order_line(models.Model):
     def _compute_price_unit(self):
         if self.order_id.state in ('sale', 'cancel', 'done', 'fia'):
             return
-        if self.order_from:
-            if self.order_from.startswith('PH'):
-                for line in self:
+        for line in self:
+            if line.order_from:
+                if line.order_from.startswith('PH'):
                     line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
                     line.selling_price = line.product_id.list_price_phar
                 return
