@@ -11,5 +11,8 @@ access_droga_finance_customer_balance_excel_report,droga.finance.customer.balanc
 access_droga_account_move_crv,account.move.crv,model_account_move_crv,droga_finance.finance_self_service_group,1,1,1,1
 access_droga_finance_payment_report,droga.finance.payment.report,model_droga_finance_payment_report,droga_finance.finance_self_service_group,1,1,1,1
 access_droga_account_check_setting,droga.account.check.setting,model_droga_account_check_setting,droga_finance.finance_self_service_group,1,1,1,1
+access_droga_sales_branch_address,droga.sales.branch.address,model_droga_sales_branch_address,droga_finance.finance_self_service_group,1,1,1,1
+
+
 
 

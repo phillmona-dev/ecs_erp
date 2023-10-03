@@ -47,6 +47,8 @@ class AccountMove(models.Model):
     # crv
     crvs = fields.One2many('account.move.crv', 'move_id_crv')
 
+    branch_address = fields.Many2one('droga.sales.branch.address', compute='get_branch_address')
+
     @api.model
     def create(self, vals):
         # Check withholding
@@ -229,6 +231,16 @@ class AccountMove(models.Model):
                 picking_lists = self.env['stock.picking'].search([('origin', '=', record.invoice_origin)])
                 if picking_lists:
                     record.picking_list = picking_lists
+
+    def get_branch_address(self):
+        for record in self:
+            record.branch_address = None
+            for line in record.line_ids:
+                # get profit center
+                for line1 in line.analytic_line_ids:
+                    branch_address = self.env['droga.sales.branch.address'].search([('id', '=', line1.id)])
+                    record.branch_address = branch_address
+                    break
 
     # Generate withholding reference
     def generate_withholding_ref(self):
