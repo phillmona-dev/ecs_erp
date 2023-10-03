@@ -89,7 +89,7 @@ class sale_order_line(models.Model):
     order_from = fields.Char(related='order_id.order_from')
     has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
     product_uom_pharma_qty=fields.Float('Quantity',default=1)
-    product_uom_pharma_measure=fields.Many2one('uom.uom',compute='_get_uom_pharma',store=True)
+    product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
 
     @api.onchange('product_id')
     def _prod_change(self):
