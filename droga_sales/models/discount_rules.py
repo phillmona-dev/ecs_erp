@@ -556,7 +556,7 @@ class sale_order_ext(models.Model):
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
                 else:
                     for res in rec.order_line:
-                        res.wareh =  32 if rec.order_from == 'PT-Bole' else 31
+                        #res.wareh =  32 if rec.order_from == 'PT-Bole' else 31
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
             else:
                 if rec.order_type:
