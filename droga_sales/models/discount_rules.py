@@ -94,8 +94,10 @@ class sale_order_line(models.Model):
     @api.onchange('product_id')
     def _prod_change(self):
         for rec in self:
-            rec.product_uom_pharma_measure=rec.product_id.pharma_uom
-            rec.product_uom_qty=rec.product_id.uom_id/(rec.product_uom_pharma_measure.factor if rec.product_uom_pharma_measure.factor != 0 else 1) * rec.product_uom_pharma_qty
+            if rec.order_from:
+                if rec.order_from.starts_with('PH'):
+                    rec.product_uom_pharma_measure=rec.product_id.pharma_uom
+                    rec.product_uom_qty=(rec.product_id.uom_id.factor/(rec.product_uom_pharma_measure.factor if rec.product_uom_pharma_measure.factor != 0 else 1)) * rec.product_uom_pharma_qty
 
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
