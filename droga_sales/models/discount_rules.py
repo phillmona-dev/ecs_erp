@@ -92,13 +92,6 @@ class sale_order_line(models.Model):
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
     product_uom_pharma_measure_descr=fields.Char(related='product_uom_pharma_measure.uom_title',string='Unit')
 
-    @api.onchange('product_id')
-    def _prod_change(self):
-        for rec in self:
-            if rec.order_from:
-                if rec.order_from.startswith('PH'):
-                    rec.product_uom_pharma_measure=rec.product_id.pharma_uom
-                    rec.product_uom_qty=(rec.product_id.uom_id.factor/(rec.product_uom_pharma_measure.factor if rec.product_uom_pharma_measure.factor != 0 else 1)) * rec.product_uom_pharma_qty
 
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
@@ -126,8 +119,7 @@ class sale_order_line(models.Model):
                 rec.is_prod_available = 'True'
                 return
             if rec.order_id.order_from:
-                if (not rec.product_id.bought_locally or rec.order_id.order_from.startswith(
-                    'PH')) and rec.available_qty < rec.product_uom_qty:
+                if rec.order_id.order_from.startswith('PH') and rec.available_qty < rec.product_uom_qty:
                     rec.is_prod_available = 'False'
                     return
 
@@ -192,7 +184,7 @@ class sale_order_line(models.Model):
 
 
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
-                 'order_id.payment_term_id', 'manual_price')
+                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty')
     def _compute_price_unit(self):
         if self.order_id.state in ('sale', 'cancel', 'done', 'fia'):
             return
@@ -201,7 +193,11 @@ class sale_order_line(models.Model):
                 if line.order_from.startswith('PH'):
                     line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
                     line.selling_price = line.product_id.list_price_phar
-                return
+
+                    line.product_uom_pharma_measure = line.product_id.pharma_uom
+                    line.product_uom_qty = (line.product_id.uom_id.factor / (
+                        line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor != 0 else 1)) * line.product_uom_pharma_qty
+                    return
         if self.order_id.company_id.id == 2:
             for line in self:
                 if line.store_placement:
