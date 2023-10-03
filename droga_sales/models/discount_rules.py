@@ -77,9 +77,10 @@ class sale_order_line(models.Model):
         inverse='_inverse_price',
         digits='Product Price',
         store=True, required=True, tracking=True)
-    is_prod_available = fields.Char(compute='_is_prod_available')
-    available_qty = fields.Float('Available', default=0, compute='_is_prod_available')
-    avail_char = fields.Char('Available', readonly=True, compute="_is_prod_available")
+    is_prod_available = fields.Char(compute='is_prod_available_method')
+    selling_price=fields.Float(related='product_id.list_price_phar')
+    available_qty = fields.Float('Available', default=0, compute='is_prod_available_method')
+    avail_char = fields.Char('Available', readonly=True, compute="is_prod_available_method")
     price_unit_before_discount = fields.Float('')
     wareh = fields.Many2one('stock.warehouse')
     store_placement = fields.Boolean('Placement', default=False)
@@ -87,9 +88,17 @@ class sale_order_line(models.Model):
     has_access = fields.Boolean(related='order_id.has_access')
     order_from = fields.Char(related='order_id.order_from')
     has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
+    product_uom_pharma_qty=fields.Float('Quantity',default=1)
+    product_uom_pharma_measure=fields.Many2one('uom.uom',compute='_get_uom_pharma',store=True)
 
-    @api.depends('product_id', 'order_id.order_type', 'product_uom')
-    def _is_prod_available(self):
+    @api.onchange('product_id')
+    def _prod_change(self):
+        for rec in self:
+            rec.product_uom_pharma_measure=rec.product_id.pharma_uom
+            rec.product_uom_qty=rec.product_id.uom_id/(rec.product_uom_pharma_measure.factor if rec.product_uom_pharma_measure.factor != 0 else 1) * rec.product_uom_pharma_qty
+
+    @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
+    def is_prod_available_method(self):
         selfsud = self.sudo()
         for rec in selfsud:
             rec.available_qty = 0
@@ -110,6 +119,11 @@ class sale_order_line(models.Model):
                 rec.avail_char = str(rec.available_qty)
             # rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
 
+            if rec.order_id.order_from:
+                if (not rec.product_id.bought_locally or rec.order_id.order_from.startswith(
+                    'PH')) and rec.available_qty < rec.product_uom_qty:
+                    rec.is_prod_available = 'False'
+                    return
             if rec.product_id.detailed_type == 'service':
                 rec.is_prod_available = 'True'
             elif (not rec.product_id.bought_locally) and rec.available_qty < rec.product_uom_qty:
@@ -133,7 +147,7 @@ class sale_order_line(models.Model):
         selfsud = self.sudo()
         tot_quantity = 0.0
         for location_id in selfsud.env['stock.location'].search(
-                [('warehouse_id', '=', warehouse_id.id), ('usage', '=', 'internal')]):
+                [('warehouse_id', '=', warehouse_id.id), ('usage', '=', 'internal'),('con_type','!=','SRL')]):
             quants = selfsud.env['stock.quant'].search(
                 [('product_id', '=', product_id.id), ('location_id', '=', location_id.id)])
             tot_quantity = tot_quantity + sum(quants.mapped('quantity'))
@@ -170,11 +184,19 @@ class sale_order_line(models.Model):
         self.order_id.total_discount = total_before_discount - (core_sum + non_core_sum)
         self.order_id.total_added = (core_sum + non_core_sum) - total_before_discount
 
+
+
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price')
     def _compute_price_unit(self):
         if self.order_id.state in ('sale', 'cancel', 'done', 'fia'):
             return
+        if self.order_from:
+            if self.order_from.startswith('PH'):
+                for line in self:
+                    line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
+                    line.selling_price = line.product_id.list_price_phar
+                return
         if self.order_id.company_id.id == 2:
             for line in self:
                 if line.store_placement:
@@ -521,9 +543,9 @@ class sale_order_ext(models.Model):
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
 
     def action_confirm(self):
-        returnv = super(sale_order_ext, self).action_confirm()
 
         for rec in self:
+            rec.validate_form()
             if not rec.order_type and self.env.company.id == 1:
                 if rec.order_from.startswith('PH'):
                     if not rec.wareh:
@@ -533,7 +555,7 @@ class sale_order_ext(models.Model):
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
                 else:
                     for res in rec.order_line:
-                        res.wareh = 32 if rec.order_from == 'PT-Bole' else 31
+                        res.wareh = rec.wareh
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
             else:
                 if rec.order_type:
@@ -541,8 +563,7 @@ class sale_order_ext(models.Model):
                 for res in rec.order_line:
                     res.product_id.product_tmpl_id.invoice_policy = 'delivery'
 
-            rec.validate_form()
-        return returnv
+        return super(sale_order_ext, self).action_confirm()
 
     def validate_form(self):
         if self.state == "sale":
@@ -568,6 +589,8 @@ class sale_order_ext(models.Model):
             raise ValidationError("Final approver is not configured for client.")
         if not self.operation_approver:
             raise ValidationError("Operation manager is not configured for client.")
+        for rec in self.order_line:
+            rec.is_prod_available_method()
         order_lines_negative = self.order_line.filtered(
             lambda x: x.is_prod_available == 'False')
         if (len(order_lines_negative) > 0):
@@ -735,7 +758,7 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'tax_id', 'age'):
+                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'selling_price','product_uom','tax_id', 'age'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(

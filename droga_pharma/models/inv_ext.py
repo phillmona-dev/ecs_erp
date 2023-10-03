@@ -58,10 +58,13 @@ class droga_pharma_wh_has_dispensary(models.Model):
 
 class droga_pharma_lot_extension(models.Model):
     _inherit='stock.lot'
-    #_rec_name='lot_descr'
+    _rec_name='lot_descr'
     _order = 'expiration_date asc, name, id'
-    #lot_descr = fields.Char('Lot', compute='_get_lot_descr')
+    lot_descr = fields.Char('Lot', compute='_get_lot_descr')
 
     def _get_lot_descr(self):
         for rec in self:
-            rec.lot_descr=rec.name+' - '+str(rec.expiration_date.strftime("%b %d, %Y"))+' - '+str((rec.expiration_date - datetime.today()).days) +' days left'
+            if rec.expiration_date:
+                rec.lot_descr=rec.name+' - '+str(rec.expiration_date.strftime("%b %d, %Y"))+' - '+str((rec.expiration_date - datetime.today()).days) +' days left'
+            else:
+                rec.lot_descr = rec.name

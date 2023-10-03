@@ -47,6 +47,16 @@ class account_move(models.Model):
         compute='_compute_amount', store=True, readonly=True,tracking=True
     )
 
+    @api.onchange("is_invoice_printed_pos")
+    def _invoice_print_status_changed(self):
+        for rec in self:
+            sales=self.env['sale.order'].search([('name','=',rec.invoice_origin)])
+            for sale in sales:
+                if rec.is_invoice_printed_pos:
+                    sale.write({'invoice_printed':'Yes'})
+                else:
+                    sale.write({'invoice_printed': 'o'})
+
     @api.depends('invoice_line_ids.price_subtotal')
     def _get_core_amt(self):
 
