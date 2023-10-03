@@ -106,6 +106,19 @@ export class PosFormController extends FormController {
             let tax_percent = 0;
             let line_no = 0;
 
+
+            let tax_ids=currentElement.data.tax_ids.records;
+
+            console.log(tax_ids);
+
+
+            tax_ids.forEach((taxItem)=>{
+                tax_percent=15.00;
+                }
+            )
+
+
+
             if (currentElement.data.price_unit !== 0) {
 
                 let lineItem = {
