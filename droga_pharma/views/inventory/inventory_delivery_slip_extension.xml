@@ -31,26 +31,4 @@
             <span t-field="move.product_uom.uom_title"/>
         </xpath>
     </template>
-
-    <record id="droga_inventory_custom_inherit" model="ir.ui.view">
-        <field name="name">droga.inventory.transfer.custom.inherit</field>
-        <field name="model">droga.inventory.transfer.custom</field>
-        <field name="inherit_id" ref="droga_inventory.droga_inventory_transfer_custom_view_form"/>
-        <field name="priority" eval="1"/>
-        <field name="arch" type="xml">
-            <xpath expr="//form/header/button[@name='action_cancel']" position="after">
-                <button name="confirm_ph"
-                            attrs="{'invisible': [('state', 'not in', ('phmg'))]}"
-                            groups="droga_pharma.pharma_supply_chain_manager"
-                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="reset_order"
-                            attrs="{'invisible': [('state', 'not in', ('phmg'))]}"  groups="droga_pharma.pharma_supply_chain_manager"
-                            string="Reset to draft" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
-            </xpath>
-
-            <xpath expr="//form/sheet/group/group/field[@name='request_date']" position="before">
-                <field name="location_id" options="{'no_create':True,'no_open':True}" domain="([('wh_type','=','PH'),('has_no_access','=',True)])" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
-            </xpath>
-        </field>
-    </record>
 </odoo>

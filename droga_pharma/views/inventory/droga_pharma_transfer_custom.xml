@@ -25,6 +25,13 @@
                     <button name="confirm_ph"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="confirm_ph"
+                            attrs="{'invisible': [('state', 'not in', ('phmg'))]}"
+                            groups="droga_pharma.pharma_supply_chain_manager"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="reset_order"
+                            attrs="{'invisible': [('state', 'not in', ('phmg'))]}"  groups="droga_pharma.pharma_supply_chain_manager"
+                            string="Reset to draft" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
