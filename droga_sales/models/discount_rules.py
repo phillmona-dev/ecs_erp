@@ -805,4 +805,4 @@ class account_move_inherit(models.Model):
                 #get order type and fill analytic
         res=super(account_move_inherit, self).create(vals)
         res.account_move_linked_analytic=analytic
-        return super(account_move_inherit, self).create(vals)
+        return res
