@@ -90,6 +90,7 @@ class sale_order_line(models.Model):
     has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
     product_uom_pharma_qty=fields.Float('Quantity',default=1)
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
+    product_uom_pharma_measure_descr=fields.Char(related='product_uom_pharma_measure.uom_title',string='Unit')
 
     @api.onchange('product_id')
     def _prod_change(self):
@@ -121,14 +122,16 @@ class sale_order_line(models.Model):
                 rec.avail_char = str(rec.available_qty)
             # rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
 
+            if rec.product_id.detailed_type == 'service':
+                rec.is_prod_available = 'True'
+                return
             if rec.order_id.order_from:
                 if (not rec.product_id.bought_locally or rec.order_id.order_from.startswith(
                     'PH')) and rec.available_qty < rec.product_uom_qty:
                     rec.is_prod_available = 'False'
                     return
-            if rec.product_id.detailed_type == 'service':
-                rec.is_prod_available = 'True'
-            elif (not rec.product_id.bought_locally) and rec.available_qty < rec.product_uom_qty:
+
+            if (not rec.product_id.bought_locally) and rec.available_qty < rec.product_uom_qty:
                 rec.is_prod_available = 'False'
             # This is for out of stock products that are bought locally, they'll show up with orange color
             elif rec.product_id.bought_locally and rec.available_qty < rec.product_uom_qty:

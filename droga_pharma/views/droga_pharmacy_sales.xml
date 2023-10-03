@@ -288,7 +288,7 @@
                                                         name="product_uom_qty" invisible="1"/>
                                                 <strong>Unit</strong>
                                                 <field name="product_uom" invisible="1" groups="!uom.group_uom"/>
-                                                <field name="product_uom_pharma_measure" readonly="1"/>
+                                                <field name="product_uom_pharma_measure_descr" readonly="1"/>
                                                 <field
                                                         name="product_uom"  invisible="1"
                                                         force_save="1" options="{'no_open':True,'no_create': True}"
