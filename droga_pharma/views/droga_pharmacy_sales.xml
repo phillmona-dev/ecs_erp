@@ -205,6 +205,7 @@
 
                             </div>
                             <field name="date_order" nolabel="1"/>
+                            <field name="wareh" readonly="1" string="Pharmacy branch" />
                             <field name="mature_amount" style="color:red"
                                    attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                             <field name="show_update_pricelist" invisible="1"/>
@@ -589,6 +590,8 @@
                     </notebook>
                     <div class="oe_chatter">
                         <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
                     </div>
                 </sheet>
             </form>

@@ -614,7 +614,7 @@ class droga_stock_product_extension(models.Model):
     list_price_phar = fields.Float(
         'Sales price pharmacy', default=1.0,
         digits='Product Price',
-        help="Price at which the product is sold to pharmacy customers.",
+        help="Price at which the product is sold to pharmacy customers.",tracking=True
     )
     manufacturing=fields.Char('Manufacturer')
     origin = fields.Many2one('res.country',string='Origin')

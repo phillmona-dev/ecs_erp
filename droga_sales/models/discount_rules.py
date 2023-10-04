@@ -386,7 +386,11 @@ class sale_order_ext(models.Model):
     has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
                                         compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
-    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh')
+    def get_wareh(self):
+        return self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)[
+                0].id if len(
+                self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)) > 0 else False
+    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh',default=get_wareh)
 
     def unlink(self):
         raise ValidationError(
