@@ -1090,16 +1090,16 @@
                                 </div>
                             </t>
 
-                            <t t-if="pharmacy_order_from=='Pharmacy - Ayat'">
+                            <t t-if="order_from=='PH'">
 
 
                                 <div class="col-4 bm-2">
 
                                     <h6 class="small nopadding">
-                                        Sub City: Lemi Kura
+                                        Sub City: <span t-esc="o.branch_address.sub_city"/>
                                     </h6>
                                     <h6 class="small nopadding">
-                                        Tel 1 : +251 908 01 04 14
+                                        Tel 1 : <span t-esc="o.branch_address.telephone1"/>
                                     </h6>
                                     <h6 class="small nopadding">
                                         TIN: 0045080232
@@ -1109,10 +1109,10 @@
                                 <div class="col-4 bm-2">
 
                                     <h6 class="small nopadding">
-                                        Woreda: 10
+                                        Woreda: <span t-esc="o.branch_address.woreda"/>
                                     </h6>
                                     <h6 class="small nopadding">
-                                        Tel 2 : +251 913 66 75 37
+                                        Tel 2 : <span t-esc="o.branch_address.telephone2"/>
                                     </h6>
                                     <h6 class="small nopadding">
                                         VAT Reg. No. :
@@ -1122,10 +1122,10 @@
                                 <div class="col-4 bm-2">
 
                                     <h6 class="small nopadding">
-                                        Bldg/H.NO. New
+                                        Bldg/H.NO. <span t-esc="o.branch_address.house_no"/>
                                     </h6>
                                     <h6 class="small nopadding">
-                                        Fax: +000 000 000 000
+                                        Fax: <span t-esc="o.branch_address.fax"/>
                                     </h6>
                                 </div>
 
@@ -1329,7 +1329,7 @@
                                     <tr class="is-subtotal text-end">
 
                                         <td colspan="5">
-                                            <strong class="mr16 small">Withholding</strong>
+                                            <strong class="mr16 small">Vat</strong>
 
                                         </td>
                                         <td>
