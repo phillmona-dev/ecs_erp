@@ -111,7 +111,7 @@
                         <field name="standard_price" groups="droga_inventory.inv_prod_fin" readonly="1"
                                widget='monetary'/>
                         <field name="list_price" widget='monetary'/>
-                        <field name="list_price_phar" widget='monetary'/>
+                        <field name="list_price_phar" widget='monetary' groups="droga_inventory.pharmacy_price_change"/>
                         <field name="taxes_id" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
                     </group>
                     <group string="Unit of measures">

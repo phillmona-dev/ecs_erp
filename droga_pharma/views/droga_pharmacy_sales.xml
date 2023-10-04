@@ -7,6 +7,7 @@
             <tree string="" create="0" delete="false">
                 <field name="name"></field>
                 <field name="emp_descr"></field>
+                <field name="wareh" string="Branch"></field>
                 <field name="amount_total"></field>
                 <field name="invoice_status"
                        decoration-success="invoice_status == 'invoiced' or (invoice_status=='no' and state=='dispense')"
@@ -30,6 +31,7 @@
             <tree string="" delete="false">
                 <field name="name"></field>
                 <field name="emp_descr"></field>
+                <field name="wareh" string="Branch"></field>
                 <field name="amount_total"></field>
                 <field name="state"
                        decoration-success="state == 'dispense'"
@@ -45,37 +47,8 @@
                        decoration-success="invoice_printed == 'Yes'"
                        decoration-warning="invoice_printed == 'No'"
                        widget="badge" optional="show"/>
-                <button type="object" string="Dispense products" name="disp_products"
+                <button type="object" string="Dispense products" name="disp_products" groups="droga_inventory.inventory_stk"
                         attrs="{'invisible': ['|',('state', '!=', 'sale'),('invoice_printed','=','No')]}"
-                        class="oe_highlight"></button>
-            </tree>
-        </field>
-    </record>
-
-    <record id="view_order_tree_pharma_so_and_invoice" model="ir.ui.view">
-        <field name="name">sale.order.tree.pharmacy.no.invoice</field>
-        <field name="model">sale.order</field>
-        <field name="arch" type="xml">
-            <tree string="" delete="false">
-                <field name="name"></field>
-                <field name="emp_descr"></field>
-                <field name="amount_total"></field>
-                <field name="state"
-                       decoration-success="state == 'dispense'"
-                       decoration-info="state == 'sale'"
-                       decoration-warning="state == 'draft'"
-                       widget="badge"></field>
-                <field name="invoice_status"
-                       decoration-success="invoice_status == 'invoiced' or (invoice_status=='no' and state=='dispense')"
-                       decoration-info="invoice_status == 'to invoice'"
-                       decoration-warning="invoice_status == 'upselling'"
-                       widget="badge" optional="show"/>
-                <field name="invoice_printed"
-                       decoration-success="invoice_printed == 'Yes'"
-                       decoration-warning="invoice_printed == 'No'"
-                       widget="badge" optional="show"/>
-                <button type="object" string="Dispense products" name="disp_products"
-                        attrs="{'invisible': ['|',('state', '!=', 'sale'),('invoice_status','not in',('upselling','invoiced'))]}"
                         class="oe_highlight"></button>
             </tree>
         </field>
@@ -118,7 +91,11 @@
                             groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'sale')]}"/>
-
+                    <button name="set_to_draft"
+                            string="Set to Draft" font-size="16px"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
+                            type="object" class="btn-primary" data-hotkey="q"
+                            attrs="{'invisible': ['|',('state','not in',('draft','sale')),('invoice_status', '!=', 'to invoice')]}"/>
                     <button name="conf_and_invoice"
                             string="Confirm and create invoice" font-size="16px"
                             groups="droga_pharma.pharma_di_admin"
@@ -205,7 +182,7 @@
 
                             </div>
                             <field name="date_order" nolabel="1"/>
-                            <field name="wareh" readonly="1" string="Pharmacy branch" />
+                            <field name="wareh" readonly="1" string="Pharmacy branch" options="{'no_open':True,'no_create': True}"/>
                             <field name="mature_amount" style="color:red"
                                    attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                             <field name="show_update_pricelist" invisible="1"/>
@@ -605,7 +582,7 @@
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_partner_id':15488,'default_order_from':'PH','default_payment_term_id':11}
         </field>
-        <field name="domain">[('order_from','like','PH')]</field>
+        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True)]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharma_no_invoice')}),
@@ -618,23 +595,10 @@
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_payment_term_id':11,'default_order_from':'PH','search_default_to_invoice':1}
         </field>
-        <field name="domain">[('order_from','like','PH'),('invoice_status','in',('to invoice','invoiced'))]</field>
+        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to invoice','invoiced'))]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharma_to_invoice')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharma')})]"/>
-    </record>
-
-    <record id="droga_sales_pharmacy_action_so_and_invoice" model="ir.actions.act_window">
-        <field name="name">Sales and invoice</field>
-        <field name="res_model">sale.order</field>
-        <field name="view_mode">tree,form</field>
-        <field name="context">{'default_partner_id':15488,'default_order_from':'PH','default_payment_term_id':11}
-        </field>
-        <field name="domain">[('order_from','like','PH')]</field>
-        <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharma_so_and_invoice')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharma')})]"/>
     </record>
 

@@ -16,6 +16,12 @@
         <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
     </record>
 
+    <record id="pharmacy_price_change" model="res.groups">
+        <field name="name">Pharmacy price controller</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+    </record>
+
     <record id="inv_prod_mi_manager" model="res.groups">
         <field name="name">Product register access medical items (pharmacy, import and ws)</field>
         <field name="category_id" ref="base.module_category_inventory_inventory"/>

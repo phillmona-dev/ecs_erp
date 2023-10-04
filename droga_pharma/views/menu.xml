@@ -20,13 +20,6 @@
                 sequence="23"/>
 
         <menuitem
-                id="droga_sales_pharmacy_menu_so_and_invoice"
-                name="Sales and invoice"
-                action="droga_sales_pharmacy_action_so_and_invoice"
-                groups="pharma_di_admin"
-                sequence="25"/>
-
-        <menuitem
                 id="droga_pharma_reports"
                 name="Reports"
                 groups="pharma_settings_admin"

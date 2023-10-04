@@ -77,6 +77,7 @@ class droga_warehouse_extension(models.Model):
                                 search='_search_has_access')
     has_no_access=fields.Boolean('is_loc_not_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_no_access')
+    has_dispensary_location = fields.Boolean("Has dispensary location")
     wh_type=fields.Selection([
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
@@ -785,3 +786,6 @@ class ResUsers(models.Model):
     warehouse_ids_ph = fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph', 'uid', 'warehouse_id',
                                            domain="[('wh_type', '=', 'PH')]",
                                            string='Stock warehouse access')
+    warehouse_ids_ph_disp=fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph_disp', 'uid', 'warehouse_id',
+                                           domain="[('wh_type', '=', 'PH'),('has_dispensary_location','=',True)]",
+                                           string='Pharmacy sales access')
