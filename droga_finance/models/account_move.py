@@ -264,7 +264,7 @@ class AccountMove(models.Model):
             raise ValidationError("You can't print CRV amount greater than the invoice amount")
 
     def convert_to_word(self, num):
-        num_strings = str(num)
+        num_strings = str(abs(num))
         numbers = num_strings.split('.')
 
         word = self.int_to_word(int(numbers[0])) + ' birr'
