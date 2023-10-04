@@ -90,7 +90,7 @@ class sale_order_line(models.Model):
     has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
     product_uom_pharma_qty=fields.Float('Quantity',default=1)
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
-    product_uom_pharma_measure_descr=fields.Char(related='product_uom_pharma_measure.uom_title',string='Unit')
+    product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
 
 
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
@@ -191,12 +191,13 @@ class sale_order_line(models.Model):
         for line in self:
             if line.order_from:
                 if line.order_from.startswith('PH'):
-                    line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
+                    #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
+                    line.price_unit = line.product_id.list_price_phar
                     line.selling_price = line.product_id.list_price_phar
 
                     line.product_uom_pharma_measure = line.product_id.pharma_uom
-                    line.product_uom_qty = (line.product_id.uom_id.factor / (
-                        line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor != 0 else 1)) * line.product_uom_pharma_qty
+                    line.product_uom = line.product_id.pharma_uom
+                    line.product_uom_qty = line.product_uom_pharma_qty
                     return
         if self.order_id.company_id.id == 2:
             for line in self:

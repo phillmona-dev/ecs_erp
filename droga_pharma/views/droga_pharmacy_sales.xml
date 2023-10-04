@@ -336,8 +336,7 @@
 
                                             <label for="price_unit" string="Unit price"/>
                                             <div class="o_row">
-                                                <field name="price_unit" readonly="1" invisible="1"/>
-                                                <field name="selling_price" readonly="1"/>
+                                                <field name="price_unit" readonly="1"/>
                                                 <strong>Taxes</strong>
                                                 <field name="tax_id" widget="many2many_tags"
                                                        readonly="1"/>
