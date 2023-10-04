@@ -235,12 +235,9 @@ class AccountMove(models.Model):
     def get_branch_address(self):
         for record in self:
             record.branch_address = None
-            for line in record.line_ids:
-                # get profit center
-                for line1 in line.analytic_line_ids:
-                    branch_address = self.env['droga.sales.branch.address'].search([('id', '=', line1.id)])
-                    record.branch_address = branch_address
-                    break
+            branch_address = self.env['droga.sales.branch.address'].search(
+                [('profit_center', '=', record.account_move_linked_analytic.id)])
+            record.branch_address = branch_address
 
     # Generate withholding reference
     def generate_withholding_ref(self):

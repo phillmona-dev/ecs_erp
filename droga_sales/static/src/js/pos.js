@@ -34,6 +34,12 @@ export class PosFormController extends FormController {
 
     PrintToPos() {
 
+        //get sales order id
+         var invoice_origin=this.model.root.data.invoice_origin;
+
+
+
+
 
 
         console.log(this.model.root.data);
@@ -166,7 +172,6 @@ export class PosFormController extends FormController {
                     let ts = new Date();
                     let timeStamp = ts.getUTCFullYear() + "-" + ("0" + (ts.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + ts.getUTCDate()).slice(-2) + " " + ("0" + ts.getUTCHours()).slice(-2) + ":" + ("0" + ts.getUTCMinutes()).slice(-2) + ":" + ("0" + ts.getUTCSeconds()).slice(-2);
 
-
                     rpc
                         .query({
                             model: "account.move", method: "write", args: [[this.model.root.data.id], {
@@ -179,6 +184,31 @@ export class PosFormController extends FormController {
                         }, {timeout: 60000})
                         .then(function (data) {
                             Dialog.alert(this, _t("Invoice has been successfully printed!"));
+
+                                //update sales order status
+                                var domain = [['name', '=', invoice_origin]];
+
+                                rpc.query({
+                                    model: 'sale.order',
+                                    method: 'search',
+                                    args: [domain],
+                                })
+                                .then(function (data){
+                                    var sales_order_id=data[0];
+
+                                                   rpc.query({
+                                                        model: 'sale.order',
+                                                        method: 'write',
+                                                        args: [[sales_order_id],{
+                                                            invoice_printed:"Yes"
+                                                        }],
+                                                       })
+                                                    .then(function (data){
+
+                                                    });
+                                });
+
+
                             browser.location.reload();
                         }, function (data) {
                             Dialog.alert(this, _t("Invoice has not been successfully printed!"));
