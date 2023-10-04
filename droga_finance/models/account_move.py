@@ -99,9 +99,9 @@ class AccountMove(models.Model):
                 elif tax_id.amount == 15:
                     vat_amount += abs(record.balance * tax_id.amount / 100)
 
-        self.withholding_two_percent = tax_amount1
-        self.withholding_thirty_percent = tax_amount2
-        self.vat_percent = vat_amount
+        self.withholding_two_percent = round(tax_amount1, 2)
+        self.withholding_thirty_percent = round(tax_amount2, 2)
+        self.vat_percent = round(vat_amount, 2)
 
     # get sales person
     @api.depends('invoice_line_ids.analytic_distribution')
@@ -264,7 +264,7 @@ class AccountMove(models.Model):
             raise ValidationError("You can't print CRV amount greater than the invoice amount")
 
     def convert_to_word(self, num):
-        num_strings = str(num)
+        num_strings = str(abs(num))
         numbers = num_strings.split('.')
 
         word = self.int_to_word(int(numbers[0])) + ' birr'
