@@ -99,8 +99,11 @@ class sale_order_line(models.Model):
         for rec in selfsud:
             rec.available_qty = 0
 
-            if rec.order_id.order_from == 'PH' or rec.order_id.order_from.startswith('PT'):
-                wh_list = rec.order_id.wareh
+            if type(rec.order_id.order_from) is str:
+                if rec.order_id.order_from == 'PH' or rec.order_id.order_from.startswith('PT'):
+                    wh_list = rec.order_id.wareh
+                else:
+                    wh_list = selfsud.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
             else:
                 wh_list = selfsud.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
 
@@ -786,7 +789,7 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'selling_price','product_uom','wareh','tax_id', 'age'):
+                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'selling_price','product_uom','wareh','date_order','tax_id', 'age'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
