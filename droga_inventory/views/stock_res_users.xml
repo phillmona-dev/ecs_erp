@@ -24,6 +24,14 @@
                             </tree>
                         </field>
                     </page>
+                    <page string="Pharmacy sales access">
+                        <field name="warehouse_ids_ph_disp" mode="tree">
+                            <tree create="0">
+                                <field name="name"></field>
+                                <field name="code"></field>
+                            </tree>
+                        </field>
+                    </page>
                 </xpath>
             </field>
         </record>

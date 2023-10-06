@@ -99,8 +99,11 @@ class sale_order_line(models.Model):
         for rec in selfsud:
             rec.available_qty = 0
 
-            if rec.order_id.order_from == 'PH':
-                wh_list = rec.order_id.wareh
+            if type(rec.order_id.order_from) is str:
+                if rec.order_id.order_from == 'PH' or rec.order_id.order_from.startswith('PT'):
+                    wh_list = rec.order_id.wareh
+                else:
+                    wh_list = selfsud.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
             else:
                 wh_list = selfsud.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
 
@@ -383,14 +386,17 @@ class sale_order_ext(models.Model):
     final_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
     out_of_stock_items = fields.Char('Stock out items', compute='_get_stock_out')
     has_access = fields.Boolean(default=False, search='_has_access', compute='_compute_has_access')
+    has_pharma_access = fields.Boolean(default=False, search='_has_pharma_access', compute='_compute_has_pharma_access')
     has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
                                         compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
     def get_wareh(self):
-        return self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)[
-                0].id if len(
-                self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)) > 0 else False
-    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh',default=get_wareh)
+        list=self.env.user.warehouse_ids_ph_disp+self.env.user.warehouse_ids_im_ws
+        return list[
+            0].id if len(
+            list) > 0 else False
+
+    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', default=get_wareh,compute='_get_pharma_wh',store=True)
 
     def unlink(self):
         raise ValidationError(
@@ -398,9 +404,14 @@ class sale_order_ext(models.Model):
 
     def _get_pharma_wh(self):
         for rec in self:
-            rec.wareh = self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)[
-                0].id if len(
-                self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)) > 0 else False
+            if rec.order_from=="PH":
+                rec.wareh = self.env.user.warehouse_ids_ph_disp[
+                    0].id if len(
+                    self.env.user.warehouse_ids_ph_disp) > 0 else False
+            else:
+                rec.wareh = self.env.user.warehouse_ids_im_ws[
+                    0].id if len(
+                    self.env.user.warehouse_ids_im_ws) > 0 else False
 
     def _has_invoice_access(self, operator, value):
         if operator == '=':
@@ -429,6 +440,13 @@ class sale_order_ext(models.Model):
                 rec.has_access = True
             else:
                 rec.has_access = False
+
+    def _compute_has_pharma_access(self):
+        for rec in self:
+            if rec.wareh in self.env.user.warehouse_ids_ph_disp.ids:
+                return True
+            else:
+                return False
 
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
@@ -460,6 +478,13 @@ class sale_order_ext(models.Model):
                 is_rec_inside_self = self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
                 return ['|', ('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),
                         ('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+        else:
+            return [('id', 'in', [])]
+
+    def _has_pharma_access(self,operator,value):
+        if operator=='=':
+            sales = self.env['sale.order'].sudo().search([('wareh', 'in', self.env.user.warehouse_ids_ph_disp.ids)])
+            return [('id', 'in', [x.id for x in sales])]
         else:
             return [('id', 'in', [])]
 
@@ -764,7 +789,7 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'selling_price','product_uom','tax_id', 'age'):
+                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'selling_price','product_uom','wareh','date_order','tax_id', 'age'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
