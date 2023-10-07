@@ -246,7 +246,9 @@ class sale_order_line(models.Model):
                     used_under = ['PH', 'All']
 
             for line in self:
-                if not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
+                if self.order_id.order_from.startswith('PH'):
+                    line.wareh = line.order_id.wareh
+                elif not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
                     line.wareh = line.product_id.default_warehouse
 
                 # Get discounts/additional payments per type

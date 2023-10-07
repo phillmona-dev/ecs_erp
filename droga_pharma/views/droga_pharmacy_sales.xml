@@ -7,6 +7,7 @@
             <tree string="" create="0" delete="false">
                 <field name="name"></field>
                 <field name="emp_descr"></field>
+                <field name="order_date"></field>
                 <field name="wareh" string="Branch"></field>
                 <field name="amount_total"></field>
                 <field name="invoice_status"
@@ -64,6 +65,27 @@
                 <field name="state"></field>
                 <field name="invoice_status"></field>
 
+                <filter string="Today sales"
+                        domain="[('order_date', '=', context_today().strftime('%Y-%m-%d'))]"
+                        name="today_leads"></filter>
+                <filter string="Current week sales"
+                        domain="[('order_date', '&lt;=', (context_today() + relativedelta(weeks=0,weekday=-1)).strftime('%Y-%m-%d')),('order_date', '&gt;=', (context_today() - relativedelta(weeks=1,weekday=0)).strftime('%Y-%m-%d'))]"
+                        name="current_week_leads"></filter>
+                <filter string="Current month sales"
+                        domain="[('order_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('order_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
+                        name="current_month_leads"></filter>
+                <filter string="Previous week sales"
+                        domain="[('order_date', '&lt;=', (context_today() - relativedelta(weeks=1,weekday=-1)).strftime('%Y-%m-%d')),('order_date', '&gt;=', (context_today() - relativedelta(weeks=2,weekday=0)).strftime('%Y-%m-%d'))]"
+                        name="previous_week_leads"></filter>
+                <filter string="Previous month sales"
+                        domain="[('order_date', '&lt;=', (context_today() + relativedelta(months=-1,day=31)).strftime('%Y-%m-%d')),('order_date', '&gt;=', (context_today() - relativedelta(months=1,day=1)).strftime('%Y-%m-%d'))]"
+                        name="previous_month_leads"></filter>
+                <filter string="Next month sales"
+                        domain="[('order_date', '&lt;=', (context_today() + relativedelta(months=1,day=31)).strftime('%Y-%m-%d')),('order_date', '&gt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"
+                        name="next_month_leads"></filter>
+                
+                <separator/>
+                
                 <filter string="To Invoice" domain="[('invoice_status', '=','to invoice')]" name="to_invoice"></filter>
             </search>
         </field>
