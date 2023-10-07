@@ -183,7 +183,7 @@ export class PosFormController extends FormController {
                             }],
                         }, {timeout: 60000})
                         .then(function (data) {
-                            Dialog.alert(this, _t("Invoice has been successfully printed!"));
+
 
                                 //update sales order status
                                 var domain = [['name', '=', invoice_origin]];
@@ -192,7 +192,7 @@ export class PosFormController extends FormController {
                                     model: 'sale.order',
                                     method: 'search',
                                     args: [domain],
-                                })
+                                }, {timeout: 60000})
                                 .then(function (data){
                                     var sales_order_id=data[0];
 
@@ -202,13 +202,13 @@ export class PosFormController extends FormController {
                                                         args: [[sales_order_id],{
                                                             invoice_printed:"Yes"
                                                         }],
-                                                       })
+                                                       }, {timeout: 60000})
                                                     .then(function (data){
 
                                                     });
                                 });
 
-
+                            Dialog.alert(this, _t("Invoice has been successfully printed!"));
                             browser.location.reload();
                         }, function (data) {
                             Dialog.alert(this, _t("Invoice has not been successfully printed!"));
