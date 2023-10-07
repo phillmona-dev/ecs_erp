@@ -632,9 +632,9 @@ class sale_order_ext(models.Model):
             # raise ValidationError("Product quantity is out of stock for " + products)
 
         for so in self:
-            if not so.partner_id.cust_type_ext:
+            if not so.partner_id.cust_type_ext and not so.order_from.startswith('P'):
                 message = message + "Customer type must be registered for customer!"
-            if not so.partner_id.city_name:
+            if not so.partner_id.city_name and not so.order_from.startswith('P'):
                 message = message + ('\n' if message else '') + message + "City must be registered for customer!"
             if not so.partner_id.vat:
                 message = message + ('\n' if message else '') + message + "Tin No must be registered for customer!"
