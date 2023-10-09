@@ -21,6 +21,9 @@
         <field name="name">Driver</field>
         <field name="category_id" ref="droga_fleet"/>
     </record>
-
+    <record id="sales_request" model="res.groups">
+        <field name="name">Sales vehicle request access</field>
+        <field name="category_id" ref="droga_fleet"/>
+    </record>
 
 </odoo>
