@@ -37,7 +37,7 @@ class cust_contact_extension(models.Model):
     contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
-    exclude_maturity_for_reconciliation = fields.Boolean('Temporarly exclude maturity for reconciliation',tracking=True)
+    exclude_maturity_for_recon = fields.Boolean('Temporarly exclude maturity for reconciliation',tracking=True)
     partner_latitude = fields.Float(string='Geo Latitude', digits=(10, 7), tracking=True)
     partner_longitude = fields.Float(string='Geo Longitude', digits=(10, 7), tracking=True)
     loc_history = fields.One2many('droga.crm.loc.history', 'partner')
