@@ -143,7 +143,7 @@
                            string="City/sub-city team"></field>
                     <field name="area" options="{'no_create':True,'no_open':True}" string="Area"
                            domain="([('parent_id','=',city_name),('status','=','Active')])"></field>
-                    
+
                 </group>
 
             </xpath>
