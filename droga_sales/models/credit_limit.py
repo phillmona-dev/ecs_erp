@@ -87,7 +87,7 @@ class cust_sales_credit_limit(models.Model):
     @api.depends('partner_id')
     def _get_mature_amount(self):
         for rec in self:
-            if rec.partner_id.id in [15390, 15488]:
+            if rec.partner_id.id in [15390, 15488] or rec.partner_id.exclude_maturity_for_reconciliation:
                 matured_invoices = []
             elif rec.partner_id.vat != '0000000000':
                 matured_invoices = self.env['account.move'].search(
