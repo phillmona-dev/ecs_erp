@@ -827,16 +827,17 @@ class account_move_inherit(models.Model):
                 if vals['invoice_origin'].startswith('SO'):
                     sale_order=self.env['sale.order'].search([('name','=',str(vals['invoice_origin'])),('company_id','=',1)])
                     if len(sale_order)>0:
-                        for line in vals['invoice_line_ids']:
-                            if sale_order[0].order_from.startswith('PH'):
-                                line[2]['analytic_distribution'] = {241: 100,sale_order[0].order_line.wareh.linked_analytic.id: 100}
-                                analytic=sale_order[0].order_line.wareh.linked_analytic.id
-                            elif sale_order[0].tender_origin_form_tender:
-                                line[2]['analytic_distribution'] = {23: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
-                                analytic = sale_order[0].order_line.wareh.linked_analytic.id
-                            else:
-                                line[2]['analytic_distribution'] = {24: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
-                                analytic = sale_order[0].order_line.wareh.linked_analytic.id
+                        if 'invoice_line_ids' in vals:
+                            for line in vals['invoice_line_ids']:
+                                if sale_order[0].order_from.startswith('PH'):
+                                    line[2]['analytic_distribution'] = {241: 100,sale_order[0].order_line.wareh.linked_analytic.id: 100}
+                                    analytic=sale_order[0].order_line.wareh.linked_analytic.id
+                                elif sale_order[0].tender_origin_form_tender:
+                                    line[2]['analytic_distribution'] = {23: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
+                                    analytic = sale_order[0].order_line.wareh.linked_analytic.id
+                                else:
+                                    line[2]['analytic_distribution'] = {24: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
+                                    analytic = sale_order[0].order_line.wareh.linked_analytic.id
                 #get order type and fill analytic
         res=super(account_move_inherit, self).create(vals)
         res.account_move_linked_analytic=analytic
