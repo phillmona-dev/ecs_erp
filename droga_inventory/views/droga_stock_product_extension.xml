@@ -117,6 +117,7 @@
                     <group string="Unit of measures">
                         <field name="uom_id" string="Import UOM" options="{'no_create': True}"/>
                         <field name="pharma_uom" string="Pharmacy UOM" options="{'no_create': True}"/>
+                        <field name="uom_po_id" string="Purchase UOM"  options="{'no_create': True}"/>
                     </group>
 
                     <group string="Categories">
