@@ -615,8 +615,21 @@ class sale_order_ext(models.Model):
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
         if (len(order_lines_nowareh) > 0):
-            message = message + ('\n' if message else '') + "Warehouse must be filled for each order line."
-            # raise ValidationError("Warehouse must be filled for each order line.")
+
+            for ln in self.order_line:
+                if self.order_from:
+                    if self.order_from.startswith('PH'):
+                        ln.wareh = ln.order_id.wareh
+                    elif not ln.wareh and ln.product_id.default_warehouse.wh_type == self.order_type:
+                        ln.wareh = ln.product_id.default_warehouse
+                elif not ln.wareh and ln.product_id.default_warehouse.wh_type == self.order_type:
+                    ln.wareh = ln.product_id.default_warehouse
+
+            order_lines_nowareh = self.order_line.filtered(
+                lambda x: not x.wareh)
+
+            if (len(order_lines_nowareh) > 0):
+                message = message + ('\n' if message else '') + "Warehouse must be filled for each order line."
 
         order_lines_nowareh = self.order_line.filtered(
             lambda x: x.wareh.wh_type != self.order_type)
