@@ -9,7 +9,6 @@
                 <field name="location_id"/>
                 <field name="storage_category_id" optional="hide"/>
                 <field name="product_id" widget="many2one"/>
-                <field name="product_categ_id" optional="show"/>
                 <field name='company_id' optional="hidden"/>
                 <field name="package_id"/>
                 <field name="lot_id"/>
@@ -27,11 +26,9 @@
             <search string="Stock on hand">
                 <field name="product_id"></field>
                 <field name="lot_id"></field>
-                <field name="product_categ_id"></field>
                 <field name="location_id"></field>
                 <field name="quantity"></field>
                 <field name="warehouse_id"></field>
-                <filter name="group_category" string="Group by category" context="{'group_by':'product_categ_id'}"/>
                 <filter name="group_warehouse_id" string="Group by warehouse" context="{'group_by':'warehouse_id'}"/>
 
                 <searchpanel>

@@ -117,4 +117,3 @@ class droga_stock_quant(models.Model):
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')], related='warehouse_id.wh_type',store=True)
-    categ_pharma=fields.Many2one('uom.uom',related='product_tmpl_id.pharmacy_group_id',store=True)
