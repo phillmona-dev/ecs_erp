@@ -214,8 +214,7 @@ class droga_stock_transfer_custom_detail(models.Model):
         default=1.0, required=True, state={'done': [('readonly', True)]})
     available_qty = fields.Float('Available', readonly=True, compute="get_count")
 
-    product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
-                                  domain="[('category_id', '=', product_uom_category_id)]")
+    product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True)
 
     @api.depends('location_source_id', 'product_uom_qty', 'product_id', 'product_uom')
     def get_count(self):
@@ -255,3 +254,5 @@ class droga_stock_transfer_custom_detail(models.Model):
 
     # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
+    import_uom = fields.Many2one(related='product_id.uom_id', store=True)
+    pharma_uom = fields.Many2one(related='product_id.pharma_uom', store=True)

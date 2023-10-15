@@ -63,6 +63,7 @@
                                                options="{'currency_field': 'currency_id', 'field_digits': True}"/>
                                     </div>
                                     <field name="default_code" string="Product code" required="True"></field>
+                                    <field name="categ" readonly="1" invisible="1"></field>
                                     <field name="pharma_uom" groups="uom.group_uom" options="{'no_create': True}"
                                            required="True"/>
                                     <field name="uom_id" groups="uom.group_uom" options="{'no_create': True}"
@@ -140,14 +141,20 @@
         </field>
     </record>
 
+
     <record id="droga_pharma_product_action" model="ir.actions.act_window">
         <field name="name">Products</field>
+        <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.template</field>
         <field name="view_mode">kanban,tree,form</field>
-
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'kanban', 'view_id': ref('product.product_template_kanban_view')}),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_pharma_product_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('product.product_template_form_view')})]"/>
+        <field name="search_view_id" ref="stock.product_template_search_form_view_stock"/>
+        <field name="context">{"search_default_consumable": 1, 'default_detailed_type': 'product','default_read_only':True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No product found. Let's create one!
+            </p><p>
+                Track your stock quantities by creating storable products.
+            </p>
+        </field>
     </record>
 </odoo>

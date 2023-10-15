@@ -47,14 +47,17 @@
         'views/pcm/minor_alignment.xml',
         'views/pcm/counselling.xml',
         'views/pcm/follow_up_detail.xml',
+        'views/inventory/product.xml',
+        'reports/sales_report.xml',
+        'reports/inventory_report.xml',
         'views/menu.xml',
         'views/customers.xml',
-        'views/inventory/product.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
         'views/inventory/location_extension.xml',
         'views/inventory/droga_pharma_inventory_menus.xml',
         'views/inventory/inventory_delivery_slip_extension.xml',
         'views/inventory/inter_pharmacy_transfer_custom.xml',
+        'views/procurement_extension.xml'
     ],
 
     # any module necessary for this one to work correctly

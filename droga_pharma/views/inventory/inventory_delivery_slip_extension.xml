@@ -7,7 +7,8 @@
                 <div id="informations" class="row mt32 mb32" t-if="o.picking_type_id.sequence_code in ('MTOV','MTIV')">
                     <div class="col-auto">
                         <strong>Issued By:</strong>
-                        <p t-field="o.write_uid" class="m-0"/>
+                        <p t-field="o.from_wh_rep" class="m-0"/>
+                        <p t-field="o.from_user" class="m-0"/>
                         <br></br>
                         <br></br>
                         <td>_____________________________________</td>
@@ -15,7 +16,8 @@
 
                     <div class="col-auto">
                         <strong>Received By:</strong>
-                        <p t-field="o.requested_by" class="m-0"/>
+                        <p t-field="o.to_wh_rep" class="m-0"/>
+                        <p t-field="o.to_user" class="m-0"/>
                         <br></br>
                         <br></br>
                         <td>_____________________________________</td>

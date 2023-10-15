@@ -1,4 +1,8 @@
+import json
 from datetime import datetime
+
+import simplejson
+from lxml import etree
 
 from odoo import fields, models, api
 from odoo.exceptions import UserError
@@ -41,6 +45,30 @@ class droga_pharma_prod_ext(models.Model):
             raise UserError("Default code can not be empty.")
         return res
 
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+
+        res = super().get_view(view_id, view_type, **options)
+
+        doc = etree.XML(res['arch'])
+
+        if view_type == 'form':
+            if 'default_read_only' in self.env.context:
+                if self.env.context['default_read_only']:
+
+                    for node in doc.xpath("//field"):
+                        if type(node.get("modifiers")) is str:
+                            modifiers = json.loads(node.get("modifiers"))
+                            modifiers['readonly'] = True
+                            node.set("modifiers", json.dumps(modifiers))
+                        else:
+                            modifiers={}
+                            modifiers['readonly'] = True
+                            node.set("modifiers", json.dumps(modifiers))
+                    res['arch'] = etree.tostring(doc, encoding='unicode')
+
+        return res
+
 class droga_pharma_dispensary_type(models.Model):
     _inherit='stock.location'
 
@@ -67,3 +95,25 @@ class droga_pharma_lot_extension(models.Model):
                 rec.lot_descr=rec.name+' - '+str(rec.expiration_date.strftime("%b %d, %Y"))+' - '+str((rec.expiration_date - datetime.today()).days) +' days left'
             else:
                 rec.lot_descr = rec.name
+
+class droga_purchase_uom_extension(models.Model):
+    _inherit='purchase.order.line'
+    import_uom = fields.Many2one(related='product_id.uom_id', store=True)
+    pharma_uom = fields.Many2one(related='product_id.pharma_uom', store=True)
+    request_type=fields.Selection(related='order_id.request_type')
+    def _get_default_uom(self):
+        return self.product_id.uom_id
+    product_uom_pharma=fields.Many2one('uom.uom',default=_get_default_uom)
+
+    @api.onchange('product_uom_pharma', 'product_id')
+    def _on_change_uom(self):
+        for rec in self:
+            rec.product_uom=rec.product_uom_pharma
+
+class droga_stock_quant(models.Model):
+    _inherit='stock.quant'
+    warehouse_id = fields.Many2one('stock.warehouse', related='location_id.warehouse_id',store=True)
+    wh_type = fields.Selection([
+        ('IM','Import'),
+        ('WS', 'Wholesale'),('PT','Physiotherapy'),
+    ('PH', 'Pharmacy'),('PR','Project')], related='warehouse_id.wh_type',store=True)

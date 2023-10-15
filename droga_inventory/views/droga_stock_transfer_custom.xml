@@ -64,6 +64,8 @@
                                     <field name="product_uom_qty" string="Request"/>
                                     <field name="available_qty" groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"/>
                                     <field name="product_uom_category_id" invisible="1"/>
+                                    <field name="import_uom" invisible="1"/>
+                                    <field name="pharma_uom" invisible="1"/>
                                     <!--
                                     <field name="location_source_id" domain="([('usage','=','internal')])" string="Source location"/>
                                     -->

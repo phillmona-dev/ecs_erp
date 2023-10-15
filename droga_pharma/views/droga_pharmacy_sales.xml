@@ -9,14 +9,17 @@
                 <field name="emp_descr"></field>
                 <field name="date_order"></field>
                 <field name="wareh" string="Branch"></field>
-                <field name="amount_total"></field>
+                <field name="amount_total" sum="Total"></field>
                 <field name="invoice_status"
                        decoration-success="invoice_status == 'invoiced' or (invoice_status=='no' and state=='dispense')"
                        decoration-info="invoice_status == 'to invoice'"
                        decoration-warning="invoice_status == 'upselling'"
                        widget="badge" optional="show"/>
                 <field name="state" invisible="1"></field>
-
+                <field name="invoice_printed"
+                       decoration-success="invoice_printed == 'Yes'"
+                       decoration-warning="invoice_printed == 'No'"
+                       widget="badge" optional="show"/>
                 <button type="object" string="Create Invoice" name="create_inv_local"
                         attrs="{'invisible': ['|',('state', '!=', 'sale'),('invoice_status','!=','to invoice')]}"
                         groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
@@ -68,23 +71,28 @@
                 <field name="invoice_status"></field>
 
                 <filter string="Today sales"
-                        domain="[('date_order', '=', context_today().strftime('%Y-%m-%d'))]"
+                        domain="[('date_order', '&gt;=', context_today().strftime('%Y-%m-%d'))]"
                         name="today_sales"></filter>
                 <filter string="Current week sales"
                         domain="[('date_order', '&lt;=', (context_today() + relativedelta(weeks=0,weekday=-1)).strftime('%Y-%m-%d')),('date_order', '&gt;=', (context_today() - relativedelta(weeks=1,weekday=0)).strftime('%Y-%m-%d'))]"
                         name="current_week_sales"></filter>
-                <filter string="Current month sales"
-                        domain="[('date_order', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('date_order', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
-                        name="current_month_sales"></filter>
                 <filter string="Previous week sales"
                         domain="[('date_order', '&lt;=', (context_today() - relativedelta(weeks=1,weekday=-1)).strftime('%Y-%m-%d')),('date_order', '&gt;=', (context_today() - relativedelta(weeks=2,weekday=0)).strftime('%Y-%m-%d'))]"
                         name="previous_week_sales"></filter>
+                <filter string="Current month sales"
+                        domain="[('date_order', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('date_order', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
+                        name="current_month_sales"></filter>
                 <filter string="Previous month sales"
                         domain="[('date_order', '&lt;=', (context_today() + relativedelta(months=-1,day=31)).strftime('%Y-%m-%d')),('date_order', '&gt;=', (context_today() - relativedelta(months=1,day=1)).strftime('%Y-%m-%d'))]"
                         name="previous_month_sales"></filter>
                 <separator/>
                 
                 <filter string="To Invoice" domain="[('invoice_status', '=','to invoice')]" name="to_invoice"></filter>
+
+                <separator/>
+
+                <filter string="Printed not dispensed" domain="[('invoice_printed', '=','Yes'),('state','=','sale')]" name="to_dispense"></filter>
+                <filter string="Invoiced not printed" domain="[('invoice_status', '=','invoiced'),('invoice_printed','=','No')]" name="invoiced_not_printed"></filter>
             </search>
         </field>
     </record>
@@ -606,7 +614,7 @@
         <field name="name">Sales order</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_partner_id':15488,'default_order_from':'PH','default_payment_term_id':11}
+        <field name="context">{'default_partner_id':15488,'default_order_from':'PH','default_payment_term_id':11,'search_default_today_sales':1}
         </field>
         <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True)]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
@@ -619,7 +627,7 @@
         <field name="name">Sales invoice</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_payment_term_id':11,'default_order_from':'PH','search_default_to_invoice':1}
+        <field name="context">{'default_payment_term_id':11,'default_order_from':'PH','search_default_to_invoice':1,'search_default_today_sales':1}
         </field>
         <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to invoice','invoiced'))]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>

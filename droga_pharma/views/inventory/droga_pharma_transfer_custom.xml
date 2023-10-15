@@ -55,10 +55,12 @@
                                 <tree editable="bottom">
                                     <field name="company_id" invisible="1"/>
                                     <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
-                                    <field name="product_uom"/>
+                                    <field name="product_uom" domain="['|',('id', '=', import_uom),('id','=',pharma_uom)]"/>
                                     <field name="product_uom_qty" string="Request"/>
                                     <field name="available_qty" groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"/>
                                     <field name="product_uom_category_id" invisible="1"/>
+                                    <field name="import_uom" invisible="1"/>
+                                    <field name="pharma_uom" invisible="1"/>
                                 </tree>
                             </field>
                         </page>
@@ -79,6 +81,7 @@
         <field name="name">Store transfer request</field>
         <field name="res_model">droga.inventory.transfer.custom</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{'show_title': True}</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_pharma.droga_pharma_transfer_custom_view_tree')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('droga_pharma.droga_pharma_transfer_custom_view_form')})]"/>

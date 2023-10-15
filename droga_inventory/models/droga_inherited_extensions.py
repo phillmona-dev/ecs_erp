@@ -292,6 +292,16 @@ class droga_stock_uom_extension(models.Model):
             raise UserError("You can not update a unit of measure. Please contact your supervisor.")
         return super(droga_stock_uom_extension, self).write(vals_list)
 
+    def name_get(self):
+        result = []
+        for record in self:
+            if self.env.context.get('show_title', False):
+                # Only goes off when the custom_search is in the context values.
+                result.append((record.id, record.uom_title))
+            else:
+                result.append((record.id, record.name))
+        return result
+
 class stock_move_mail_added(models.Model):
     _name = "stock.move"
     _inherit = ['stock.move','mail.thread', 'mail.activity.mixin', 'image.mixin']
@@ -554,25 +564,6 @@ class droga_stock_picking_extension(models.Model):
 
         return super(droga_stock_picking_extension, self).button_validate()
 
-    @api.model
-    def get_view_(self, view_id=None, view_type='form', **options):
-
-        res = super().get_view(view_id, view_type, **options)
-
-        doc = etree.XML(res['arch'])
-
-        if view_type == 'form':
-
-            for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name'):
-                    continue
-                modifiers = simplejson.loads(node.get("modifiers"))
-                modifiers['readonly'] = [['state', 'not in', ('draft', 'waiting', 'confirmed','assigned')]]
-                node.set('modifiers', simplejson.dumps(modifiers))
-            res['arch'] = etree.tostring(doc)
-
-        return res
-
 class purchase_request_extension(models.Model):
     _inherit = 'droga.purhcase.request'
     store_origin_form=fields.Many2one('stock.picking',readonly=True)
@@ -638,7 +629,8 @@ class droga_stock_product_extension(models.Model):
             else:
                 rec.prod_read_only = False
 
-    pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM')
+    categ=fields.Many2one('uom.category',related='uom_id.category_id')
+    pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',domain="[('category_id', '=', categ)]")
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')

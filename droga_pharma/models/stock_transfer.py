@@ -18,6 +18,38 @@ class picking_inherit(models.Model):
         for record in self:
             record.picking_type_id = record.picking_type_id_pharmacy
 
+    from_wh_rep=fields.Char('From warehouse',compute='_get_info')
+    to_wh_rep = fields.Char('To warehouse', compute='_get_info')
+    from_user = fields.Char('From user', compute='_get_info')
+    to_user = fields.Char('To user', compute='_get_info')
+
+    def _get_info(self):
+        for rec in self:
+            if rec.picking_type_id.sequence_code=="MTOV":
+                rec.from_wh_rep=rec.from_wh
+                rec.to_wh_rep = rec.to_wh
+
+                rec_message_ids = self.env['mail.message'].search([('res_id', '=', rec.id)]).ids
+                rec.from_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)]) else '-'
+                receiver_pick = self.env['stock.picking'].search([('origin', '=', rec.name)])
+                receiver_message_ids = self.env['mail.message'].search([('res_id', '=', receiver_pick.id)]).ids
+                rec.to_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',receiver_message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',receiver_message_ids)]) else '-'
+            else:
+                sender_pick = self.env['stock.picking'].search([('name', '=', rec.origin)])
+                if sender_pick and rec.picking_type_id.sequence_code=="MTIV":
+                    message_ids=self.env['mail.message'].search([('res_id', '=', sender_pick.id)]).ids
+
+                    rec.from_wh_rep = sender_pick.from_wh
+                    rec.from_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',message_ids)]) else '-'
+
+                    rec_message_ids = self.env['mail.message'].search([('res_id', '=', rec.id)]).ids
+                    rec.to_wh_rep = sender_pick.to_wh
+                    rec.to_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)]) else '-'
+                else:
+                    rec.from_wh_rep = '-'
+                    rec.from_user = '-'
+                    rec.to_wh_rep = '-'
+                    rec.to_user = '-'
 
 class transfer_request_inherit(models.Model):
     _inherit = 'droga.inventory.transfer.custom'
@@ -90,3 +122,5 @@ class transfer_request_inherit(models.Model):
             picking_id.action_assign()
             picking_id.state = 'assigned'
         self.state = 'waiting'
+
+

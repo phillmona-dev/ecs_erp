@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="droga_pharma_inv_onhand_warehouse_tree" model="ir.ui.view">
+        <field name="name">stock.quant.tree.bywareh</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <tree string="Stock on hand" delete="false" create="false">
+                <field name="warehouse_id" optional="hide"/>
+                <field name="location_id"/>
+                <field name="storage_category_id" optional="hide"/>
+                <field name="product_id" widget="many2one"/>
+                <field name="product_categ_id" optional="show"/>
+                <field name='company_id' optional="hidden"/>
+                <field name="package_id"/>
+                <field name="lot_id"/>
+                <field name="owner_id" />
+                <field name="quantity" string="On Hand Quantity" sum="Total On Hand"/>
+                <field name="product_uom_id" string="Unit" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_pharma_inv_onhand_warehouse_search" model="ir.ui.view">
+        <field name="name">stock.quant.pharma.by.warehouse.search</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <search string="Stock on hand">
+                <field name="product_id"></field>
+                <field name="lot_id"></field>
+                <field name="product_categ_id"></field>
+                <field name="location_id"></field>
+                <field name="quantity"></field>
+                <field name="warehouse_id"></field>
+                <filter name="group_category" string="Group by category" context="{'group_by':'product_categ_id'}"/>
+                <filter name="group_warehouse_id" string="Group by warehouse" context="{'group_by':'warehouse_id'}"/>
+
+                <searchpanel>
+                    <field name="warehouse_id" string="Warehouses"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+
+    <record model="ir.actions.act_window" id="droga_pharma_inv_onhand_warehouse_action">
+        <field name="domain">[('quantity', '!=', 0),('has_access','=',True),('wh_type','=','PH')]</field>
+        <field name="name">Stock on hand by warehouse</field>
+        <field name="res_model">stock.quant</field>
+        <field name="search_view_id" ref="droga_pharma_inv_onhand_warehouse_search"></field>
+        <field name="view_id" ref="droga_pharma_inv_onhand_warehouse_tree"/>
+    </record>
+</odoo>
