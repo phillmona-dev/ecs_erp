@@ -9,9 +9,9 @@
                 <field name="emp_descr"></field>
                 <field name="date_order"></field>
                 <field name="wareh" string="Branch"></field>
-                <field name="amount_untaxed"></field>
-                <field name="amount_tax"></field>
-                <field name="amount_total"></field>
+                <field name="amount_untaxed" total="Total before tax"></field>
+                <field name="amount_tax" total="Total tax"></field>
+                <field name="amount_total" total="Total"></field>
                 <field name="state"
                        decoration-success="state == 'dispense'"
                        decoration-info="state == 'sale'"
