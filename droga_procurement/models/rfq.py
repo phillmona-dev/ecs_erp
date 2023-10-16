@@ -457,6 +457,7 @@ class Rfq(models.Model):
                         'product_id': line.product_id.id,
                         'product_qty': line.product_qty,
                         'product_uom': line.product_uom.id,
+                        'product_uom_pharma': line.product_uom.id,
                         'unit_price_foregin': line.unit_price_foregin,
                         'taxes_id': [(6, 0, line.tax_id.ids)]
                     })

@@ -260,6 +260,7 @@ class Rfq_Local(models.Model):
                             'product_id': line.product_id.id,
                             'product_qty': line.product_qty,
                             'product_uom': line.product_uom.id,
+                            'product_uom_pharma': line.product_uom.id,
                             'taxes_id': [(6, 0, line.tax_id.ids)]
                         })
 
