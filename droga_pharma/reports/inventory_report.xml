@@ -8,12 +8,34 @@
                 <field name="warehouse_id" optional="hide"/>
                 <field name="location_id"/>
                 <field name="storage_category_id" optional="hide"/>
+
                 <field name="product_id" widget="many2one"/>
                 <field name='company_id' optional="hidden"/>
-                <field name="package_id"/>
                 <field name="lot_id"/>
-                <field name="owner_id" />
+                <field name='branch_id' optional="hidden"/>
                 <field name="quantity" string="On Hand Quantity" sum="Total On Hand"/>
+                <field name="unit_cost" string="Unit price"/>
+                <field name="total_amount" string="Amount" sum="Total amount"/>
+                <field name="product_uom_id" string="UOM" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_pharma_inv_onhand_warehouse_tree_no_batch" model="ir.ui.view">
+        <field name="name">stock.quant.tree.bywareh</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <tree string="Stock on hand" delete="false" create="false">
+                <field name="warehouse_id" optional="hide"/>
+
+                <field name="location_id"/>
+                <field name="product_id" widget="many2one"/>
+
+                <field name='company_id' optional="hidden"/>
+                <field name='branch_id' optional="hidden"/>
+                <field name="quantity" string="On Hand Quantity" sum="Total On Hand"/>
+                <field name="unit_cost" string="Unit price"/>
+                <field name="total_amount" string="Amount" sum="Total amount"/>
                 <field name="product_uom_id" string="Unit" />
             </tree>
         </field>
@@ -29,10 +51,13 @@
                 <field name="location_id"></field>
                 <field name="quantity"></field>
                 <field name="warehouse_id"></field>
+                <field name="branch_id"></field>
                 <filter name="group_warehouse_id" string="Group by warehouse" context="{'group_by':'warehouse_id'}"/>
+                <filter name="group_product" string="Group by product" context="{'group_by':'product_id'}"/>
 
                 <searchpanel>
                     <field name="warehouse_id" string="Warehouses"/>
+                    <field name="branch_id" string="Branches"/>
                 </searchpanel>
             </search>
         </field>
@@ -45,5 +70,14 @@
         <field name="res_model">stock.quant</field>
         <field name="search_view_id" ref="droga_pharma_inv_onhand_warehouse_search"></field>
         <field name="view_id" ref="droga_pharma_inv_onhand_warehouse_tree"/>
+    </record>
+
+    <record model="ir.actions.act_window" id="droga_pharma_inv_onhand_no_batch__warehouse_action">
+        <field name="domain">[('quantity', '!=', 0),('has_access','=',True),('wh_type','=','PH')]</field>
+        <field name="name">Stock on hand no batch by warehouse</field>
+        <field name="context">{'group_by_no_leaf':1,'group_by':['product_id','location_id']}</field>
+        <field name="res_model">stock.quant</field>
+        <field name="search_view_id" ref="droga_pharma_inv_onhand_warehouse_search"></field>
+        <field name="view_id" ref="droga_pharma_inv_onhand_warehouse_tree_no_batch"/>
     </record>
 </odoo>

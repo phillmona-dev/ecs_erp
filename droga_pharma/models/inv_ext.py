@@ -113,7 +113,75 @@ class droga_purchase_uom_extension(models.Model):
 class droga_stock_quant(models.Model):
     _inherit='stock.quant'
     warehouse_id = fields.Many2one('stock.warehouse', related='location_id.warehouse_id',store=True)
+    branch_id=fields.Many2one('account.analytic.account', related='warehouse_id.linked_analytic',store=True)
     wh_type = fields.Selection([
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')], related='warehouse_id.wh_type',store=True)
+    unit_cost=fields.Float('Unit price',compute='get_cost')
+    total_amount=fields.Float('Amount',compute='get_cost')
+
+    def get_cost(self):
+        for rec in self:
+            rec.unit_cost=rec.product_id.standard_price
+            rec.total_amount=rec.unit_cost*rec.quantity
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        res = super(droga_stock_quant, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby,
+                                                 lazy=lazy)
+        if 'total_amount' in fields:
+            for line in res:
+                if '__domain' in line:
+                    lines = self.search(line['__domain'])
+                    total_amt = 0.0
+                    for record in lines:
+                        total_amt += record.total_amount
+                    line['total_amount'] = total_amt
+
+        return res
+
+class droga_stock_move_line(models.Model):
+    _inherit = 'stock.move'
+    type=fields.Char('Type',compute='_get_type',store=True)
+    unit_price=fields.Float('Unit price',compute='_get_up',store=True)
+
+    @api.depends('state')
+    def _get_up(self):
+        for rec in self:
+            layer=self.env['stock.valuation.layer'].search([('stock_move_id','=',rec.id)])
+            rec.unit_price=layer[0].unit_cost if layer else 0
+
+    @api.depends('location_id','location_dest_id','state')
+    def _get_type(self):
+        for rec in self:
+            if rec.location_id.usage=='internal' and rec.location_dest_id.usage=='customer':
+                rec.type='Sales issue'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.usage=='supplier':
+                rec.type = 'Return'
+            elif (rec.location_id.usage=='internal' and rec.location_dest_id.usage=='inventory') or (rec.location_id.usage=='inventory' and rec.location_dest_id.usage=='internal'):
+                rec.type = 'Adjustement'
+            elif rec.location_id.usage=='supplier' and rec.location_dest_id.usage=='internal':
+                rec.type = 'Purchase receipt'
+            elif rec.location_id.usage == 'internal' and rec.location_dest_id.usage == 'internal':
+                rec.type = 'Transfer'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.usage=='internal' and rec.location_dest_id.con_type=='SRL':
+                rec.type = 'Transfer issue'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.usage=='internal' and rec.location_id.con_type=='SRL':
+                rec.type = 'Transfer receive'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.usage=='internal' and rec.location_dest_id.con_type=='DIL':
+                rec.type = 'Dispatch issue'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.usage=='internal' and rec.location_id.con_type=='DIL':
+                rec.type = 'Dispatch return'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='CONI':
+                rec.type = 'Consigment issue'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='SAR':
+                rec.type = 'Sample issue'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='SIR':
+                rec.type = 'Sample issue to return'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='INC':
+                rec.type = 'Internal location'
+            elif rec.location_dest_id.usage=='internal' and rec.location_id.con_type=='SIR':
+                rec.type = 'Sales return'
+            else:
+                rec.type='-'

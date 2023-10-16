@@ -60,4 +60,13 @@
             groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group"
             sequence="25"/>
 
+
+
+    <menuitem id="droga_reciveables_profit_report" parent="account.menu_finance_receivables" name="Profit margin"
+              groups="droga_finance.business_control_specialist_group" sequence="1001">
+        <menuitem id="droga_sales_cost_of_sales_menu_finance" name="Profit margin by item"
+                  action="droga_sales_cost_of_sales_action"
+                  groups="droga_finance.business_control_specialist_group" sequence="1"/>
+    </menuitem>
+
 </odoo>
