@@ -14,7 +14,7 @@
                                         attrs="{
                                         'column_invisible':[('parent.request_type','!=','Pharmacy')],
                                             'readonly': [('state', 'in', ('purchase', 'done', 'cancel'))],
-                                            'required': [('display_type', '=', False)]
+                                            'required': [('parent.request_type','=','Pharmacy')]
                                         }"
                                         force_save="1" optional="show"/>
                 <field name="product_uom" string="UoM" groups="uom.group_uom" options="{'no_create':True,'no_open':True}"

@@ -101,14 +101,14 @@ class droga_purchase_uom_extension(models.Model):
     import_uom = fields.Many2one(related='product_id.uom_id', store=True)
     pharma_uom = fields.Many2one(related='product_id.pharma_uom', store=True)
     request_type=fields.Selection(related='order_id.request_type')
-    def _get_default_uom(self):
-        return self.product_id.uom_id
-    product_uom_pharma=fields.Many2one('uom.uom',default=_get_default_uom)
+
+    product_uom_pharma=fields.Many2one('uom.uom')
 
     @api.onchange('product_uom_pharma', 'product_id')
     def _on_change_uom(self):
         for rec in self:
-            rec.product_uom=rec.product_uom_pharma
+            if rec.order_id.request_type=='Pharmacy':
+                rec.product_uom=rec.product_uom_pharma
 
 class droga_stock_quant(models.Model):
     _inherit='stock.quant'

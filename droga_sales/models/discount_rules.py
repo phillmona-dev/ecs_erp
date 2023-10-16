@@ -545,11 +545,12 @@ class sale_order_ext(models.Model):
     def _get_approvers(self):
 
         for rec in self:
-            if rec.order_from.startswith("P"):
-                rec.price_change_approver=self.env.user.id
-                rec.final_approver = self.env.user.id
-                rec.operation_approver = self.env.user.id
-                return
+            if rec.order_from:
+                if rec.order_from.startswith("P"):
+                    rec.price_change_approver=self.env.user.id
+                    rec.final_approver = self.env.user.id
+                    rec.operation_approver = self.env.user.id
+                    return
 
             rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
                 lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
