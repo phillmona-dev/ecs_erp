@@ -79,7 +79,7 @@
                             string="Set to Draft" font-size="16px"
                             groups="droga_pharma.physio_user_bole_invoice,droga_pharma.physio_user_4k_invoice"
                             type="object" class="btn-primary" data-hotkey="q"
-                            attrs="{'invisible': ['|',('state','=','draft')('invoice_status', '!=', 'to invoice')]}"/>
+                            attrs="{'invisible': ['|',('state','=','draft'),('invoice_status', '!=', 'to invoice')]}"/>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,sale"/>
 
