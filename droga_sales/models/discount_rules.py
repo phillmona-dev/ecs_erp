@@ -858,6 +858,9 @@ class account_move_inherit(models.Model):
                                 else:
                                     line[2]['analytic_distribution'] = {24: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
                                     analytic = sale_order[0].order_line.wareh.linked_analytic.id
+
+                        for so_line in sale_order.order_line:
+                            so_line.invoice_date=datetime.now()
                 #get order type and fill analytic
         res=super(account_move_inherit, self).create(vals)
         res.account_move_linked_analytic=analytic
