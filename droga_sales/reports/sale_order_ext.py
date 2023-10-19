@@ -92,7 +92,7 @@ class sales_report_det_fields(models.Model):
             else:
                 rec.sales_dept = 'Employee'
 
-    invoice_date = fields.Date('Invoice date', compute='_get_invoice_date')
+    invoice_date = fields.Date('Invoice date', compute='_get_invoice_date',store=True)
 
     def _get_invoice_date(self):
         for rec in self:
