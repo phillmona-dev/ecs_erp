@@ -6,6 +6,7 @@ from lxml import etree
 
 from odoo import fields, models, api
 from odoo.exceptions import UserError
+from odoo.tools import get_lang
 
 
 class droga_pharma_prod_ext(models.Model):
@@ -110,6 +111,26 @@ class droga_purchase_uom_extension(models.Model):
             if rec.order_id.request_type=='Pharmacy':
                 rec.product_uom=rec.product_uom_pharma
 
+    def _product_id_change(self):
+        if not self.product_id:
+            return
+
+        # TODO: Remove when onchanges are replaced with computes
+        if not (self.env.context.get('origin_po_id') and self.product_uom and self.product_id.uom_id.category_id == self.product_uom_category_id):
+            if self.order_id.request_type=='Pharmacy':
+                self.product_uom=self.product_uom_pharma
+                self.product_uom_pharma=False
+            else:
+                self.product_uom = self.product_id.uom_po_id or self.product_id.uom_id
+        product_lang = self.product_id.with_context(
+            lang=get_lang(self.env, self.partner_id.lang).code,
+            partner_id=self.partner_id.id,
+            company_id=self.company_id.id,
+        )
+        self.name = self._get_product_purchase_description(product_lang)
+
+        self._compute_tax_id()
+
 class droga_stock_quant(models.Model):
     _inherit='stock.quant'
     warehouse_id = fields.Many2one('stock.warehouse', related='location_id.warehouse_id',store=True)
@@ -145,12 +166,18 @@ class droga_stock_move_line(models.Model):
     _inherit = 'stock.move'
     type=fields.Char('Type',compute='_get_type',store=True)
     unit_price=fields.Float('Unit price',compute='_get_up',store=True)
+    tot_price=fields.Float('Total amount',compute='_get_up',store=True)
+    warehouse_id = fields.Many2one('stock.warehouse', related='location_id.warehouse_id', store=True)
+    warehouse_dest_id = fields.Many2one('stock.warehouse', related='location_dest_id.warehouse_id', store=True)
+    branch_id = fields.Many2one('account.analytic.account', related='warehouse_id.linked_analytic', store=True)
+    branch_dest_id = fields.Many2one('account.analytic.account', related='warehouse_dest_id.linked_analytic', store=True)
 
     @api.depends('state')
     def _get_up(self):
         for rec in self:
             layer=self.env['stock.valuation.layer'].search([('stock_move_id','=',rec.id)])
             rec.unit_price=layer[0].unit_cost if layer else 0
+            rec.tot_price=rec.unit_price*rec.quantity_done
 
     @api.depends('location_id','location_dest_id','state')
     def _get_type(self):
@@ -176,11 +203,11 @@ class droga_stock_move_line(models.Model):
             elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='CONI':
                 rec.type = 'Consigment issue'
             elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='SAR':
-                rec.type = 'Sample issue'
-            elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='SIR':
                 rec.type = 'Sample issue to return'
+            elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='SIR':
+                rec.type = 'Sample issue'
             elif rec.location_id.usage=='internal' and rec.location_dest_id.con_type=='INC':
-                rec.type = 'Internal location'
+                rec.type = 'Internal transaction'
             elif rec.location_dest_id.usage=='internal' and rec.location_id.con_type=='SIR':
                 rec.type = 'Sales return'
             else:
