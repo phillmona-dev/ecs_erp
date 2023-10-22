@@ -22,7 +22,7 @@
         <menuitem
                 id="droga_pharma_reports"
                 name="Reports"
-                groups="pharma_settings_admin"
+                groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
                 sequence="30">
 
             <menuitem
@@ -63,13 +63,20 @@
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
                             sequence="2"/>
 
+
                     <menuitem
-                            id="droga_pharma_stock_transactions_reports_menu"
-                            name="Stock transactions"
-                            action="stock.stock_move_line_action"
+                            id="droga_pharma_stock_issue_transactions_menu"
+                            name="Stock transactions - issue"
+                            action="droga_pharma_inv_transaction_issue_warehouse_action"
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
                             sequence="3"/>
 
+                    <menuitem
+                            id="droga_pharma_stock_all_transactions_menu"
+                            name="Stock transactions - All"
+                            action="droga_pharma_inv_transaction_all_warehouse_action"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                            sequence="3"/>
                 </menuitem>
                 <menuitem
                         id="droga_pharma_report_mtm"

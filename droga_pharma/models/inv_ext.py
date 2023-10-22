@@ -169,7 +169,7 @@ class droga_stock_move_line(models.Model):
     tot_price=fields.Float('Total amount',compute='_get_up',store=True)
     warehouse_id = fields.Many2one('stock.warehouse', related='location_id.warehouse_id', store=True)
     warehouse_dest_id = fields.Many2one('stock.warehouse', related='location_dest_id.warehouse_id', store=True)
-    branch_id = fields.Many2one('account.analytic.account', related='warehouse_id.linked_analytic', store=True)
+    branch_id = fields.Many2one('account.analytic.account',string='Branch', related='warehouse_id.linked_analytic', store=True)
     branch_dest_id = fields.Many2one('account.analytic.account', related='warehouse_dest_id.linked_analytic', store=True)
 
     @api.depends('state')

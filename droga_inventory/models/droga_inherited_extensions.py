@@ -312,6 +312,16 @@ class droga_stock_move_extension(models.Model):
     reservation_discard_time=fields.Datetime(string='Reservation cancel time',compute='_compute_res_discard',inverse='_inverse_res_discard')
     reserve_indef=fields.Boolean('Reserve indefinitely',default=False,tracking=True)
     source_wh=fields.Char(related='location_id.warehouse_id.name')
+    trans_type=fields.Many2one('droga.inventory.transaction.types',string='Type',compute='_get_trans_type',store=True)
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type', compute='_get_trans_type',
+                                 store=True)
+
+    @api.depends('state')
+    def _get_trans_type(self):
+        for rec in self:
+            rec.trans_type=False
+            rec.trans_type_detail = False
+
     def _inverse_res_discard(self):
         pass
 

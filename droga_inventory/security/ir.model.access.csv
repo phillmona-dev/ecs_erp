@@ -21,3 +21,4 @@ access_inventory_adj_request,droga.stock.adjustment.request,model_droga_stock_ad
 access_inventory_adj_request_detail,droga.stock.adjustment.request.detail,model_droga_stock_adjustment_request_detail,stock.group_stock_user,1,1,1,1
 
 access_inventory_lock_date,droga.inv.lock_period,model_droga_inv_lock_period,base.group_user,1,1,1,1
+access_inventory_trans_type,droga.inv.trans_type,model_droga_inventory_transaction_types,base.group_user,1,1,1,1

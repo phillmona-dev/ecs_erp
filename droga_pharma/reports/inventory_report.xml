@@ -80,4 +80,81 @@
         <field name="search_view_id" ref="droga_pharma_inv_onhand_warehouse_search"></field>
         <field name="view_id" ref="droga_pharma_inv_onhand_warehouse_tree_no_batch"/>
     </record>
+
+
+
+
+
+
+
+
+
+
+
+    <record id="stock_transactions_pharma_tree" model="ir.ui.view">
+        <field name="name">stock.move.tree.transaction.tree</field>
+        <field name="model">stock.move</field>
+        <field name="arch" type="xml">
+            <tree string="Stock transactions - Issue" delete="false" create="false">
+                <field name="date" />
+
+                <field name="origin"/>
+                <field name="partner_id" optional="show"/>
+                <field name='company_id' optional="hidden"/>
+                <field name='name'/>
+                <field name='product_id'/>
+                <field name='location_id'/>
+                <field name='location_dest_id'/>
+                <field name="trans_type_detail"></field>
+                <field name='branch_id' optional="hidden"/>
+                <field name="quantity_done" string="Quantity" sum="Total Qty"/>
+                <field name="unit_price" string="Unit price"/>
+                <field name="tot_price" string="Amount" sum="Total amount"/>
+                <field name='state'/>
+                <field name="product_uom" string="UOM"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="stock_transactions_pharma_all_search" model="ir.ui.view">
+        <field name="name">stock.move.tree.transaction.search</field>
+        <field name="model">stock.move</field>
+        <field name="arch" type="xml">
+            <search string="Stock on hand">
+                <field name="origin"/>
+                <field name="partner_id" optional="show"/>
+                <field name='company_id' optional="hidden"/>
+                <field name='name'/>
+                <field name='product_id'/>
+                <field name='location_id'/>
+                <field name='location_dest_id'/>
+                <field name="trans_type"></field>
+                <field name="trans_type_detail"></field>
+
+                <searchpanel>
+                    <field name="branch_id" string="Branches"/>
+                    <field name="trans_type_detail"></field>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="droga_pharma_inv_transaction_issue_warehouse_action">
+        <field name="domain">[('trans_type', 'in', ('Sales issue','Sample issue','Sample issue to return','Dispatch issue','Consigment issue')),('state','=','done'),('has_access','=',True)]</field>
+        <field name="name">Stock transactions - issue</field>
+        <field name="res_model">stock.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="stock_transactions_pharma_all_search"></field>
+        <field name="view_id" ref="stock_transactions_pharma_tree"/>
+    </record>
+
+    <record model="ir.actions.act_window" id="droga_pharma_inv_transaction_all_warehouse_action">
+        <field name="domain">[('state','=','done'),('has_access','=',True)]</field>
+        <field name="name">Stock transactions - All</field>
+        <field name="res_model">stock.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="stock_transactions_pharma_all_search"></field>
+        <field name="view_id" ref="stock_transactions_pharma_tree"/>
+    </record>
+
 </odoo>

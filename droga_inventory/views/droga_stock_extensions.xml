@@ -160,7 +160,7 @@
         </field>
     </record>
 
-    <!--<record id="stock_move_tree_extension" model="ir.ui.view">
+    <record id="stock_move_tree_extension" model="ir.ui.view">
         <field name="name">droga.stock.move.tree.inherited</field>
         <field name="model">stock.move</field>
         <field name="inherit_id" ref="stock.view_move_tree"/>
@@ -170,7 +170,7 @@
                 <field name="reserved_availability" sum="Total Quantity"></field>
             </xpath>
         </field>
-    </record>-->
+    </record>
 
 
     <record model="ir.ui.view" id="view_stock_quant_tree_editable_inherit_disable_create_update">
