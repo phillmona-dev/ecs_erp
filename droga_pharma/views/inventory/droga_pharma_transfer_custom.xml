@@ -42,7 +42,7 @@
                         <group>
                             <field name="location_filter" invisible="1"></field>
                             <field name="location_dest_id" options="{'no_create':True,'no_open':True}" domain="([('has_access','=',True),('con_type','=','SRL')])" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
-                            <field name="location_id" options="{'no_create':True,'no_open':True}" domain="([('wh_type','=','PH'),('has_no_access','=',True)])" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="location_id" options="{'no_create':True,'no_open':True}" domain="([('has_no_access','=',True)])" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
                         </group>
                         <group>
                             <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
