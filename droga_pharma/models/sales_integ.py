@@ -54,7 +54,7 @@ class sales_integ(models.Model):
         #self.invoice_status = temp
 
         for rec in self:
-            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','done')])
+            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
             for pick in pickings:
                 for move in pick.move_ids:
                     move.quantity_done=move.product_uom_qty
