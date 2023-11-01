@@ -302,6 +302,10 @@ class droga_stock_uom_extension(models.Model):
                 result.append((record.id, record.name))
         return result
 
+class val_layer(models.Model):
+    _inherit='stock.valuation.layer'
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move', related='stock_move_id.trans_type_detail')
+
 class stock_move_mail_added(models.Model):
     _name = "stock.move"
     _inherit = ['stock.move','mail.thread', 'mail.activity.mixin', 'image.mixin']
