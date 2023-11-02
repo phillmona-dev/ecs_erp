@@ -611,7 +611,7 @@ class sale_order_ext(models.Model):
         return super(sale_order_ext, self).action_confirm()
 
     def validate_form(self):
-        if self.state == "sale":
+        if self.state == "sale" or self.env.company.id not in (1,2,3):
             return
         message = ''
 

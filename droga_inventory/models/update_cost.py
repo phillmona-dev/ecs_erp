@@ -49,11 +49,11 @@ class update_cost(models.Model):
             account_moves = self.env['account.move'].sudo().create(move_vals_list)
             account_moves._post()
 
-    def out1(self,trans_type_out):
+    def out1(self,trans_type_out,month):
         Product = self.env['product.product']
         # For sales issue
         move_vals_list = []
-        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False),('trans_type_detail', 'like', trans_type_out)])
+        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False),('create_date','<',datetime(2023,11,1)),('date_month','=',month),('trans_type_detail', 'like', trans_type_out)])
         move_vals_list += Product._svl_empty_stock_am(in_stock_valuation_layers)
         if move_vals_list:
             account_moves = self.env['account.move'].sudo().create(move_vals_list)
