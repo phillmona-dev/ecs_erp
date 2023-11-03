@@ -66,7 +66,10 @@ class account_move(models.Model):
                 if records.product_id.product_tmpl_id.is_core_product:
                     core_sum = core_sum + records.price_subtotal
             rec.core_amt = core_sum
-            rec.non_core_amt = rec.amount_total_in_currency_signed - core_sum
+            if rec.amount_untaxed==0:
+                rec.non_core_amt = rec.amount_total - core_sum
+            else:
+                rec.non_core_amt = rec.amount_untaxed - core_sum
 
     def _compute_order_from(self):
 

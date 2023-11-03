@@ -8,6 +8,7 @@
                 <field name="id"/>
                 <field name="order_id"/>
                 <field name="partner_id"/>
+                <field name="product_id"/>
                 <field name="product_uom"/>
                 <field name="product_uom_qty" sum="Total"/>
                 <field name='price_unit' sum="Total"/>
@@ -27,6 +28,7 @@
                 <field name="id"/>
                 <field name="order_id"/>
                 <field name="partner_id"/>
+                <field name="product_id"/>
                 <field name="product_uom"/>
                 <field name="product_uom_qty" sum="Total"/>
                 <field name='price_unit' sum="Total"/>
@@ -57,7 +59,7 @@
                         domain="[('date_order','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
                         ('date_order','&lt;',time.strftime('%%Y-%%m-01'))]"
                         name="previous_month_trans"></filter>
-                
+
             </search>
         </field>
     </record>
