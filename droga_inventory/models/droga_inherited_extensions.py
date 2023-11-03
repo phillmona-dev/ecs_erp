@@ -304,9 +304,13 @@ class droga_stock_uom_extension(models.Model):
 
 class val_layer(models.Model):
     _inherit='stock.valuation.layer'
-    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move', related='stock_move_id.trans_type_detail')
-    move_date=fields.Date('Stock move date, used for manual update',store=True)
+    reference = fields.Char(related='stock_move_id.reference',store=True)
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move', related='stock_move_id.trans_type_detail',store=True)
+    trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move Detail',
+                                        related='stock_move_id.trans_type', store=True)
+    move_date=fields.Date('Stock move date',store=True)
     date_month = fields.Char(string='Date Month', compute='_get_date_month', store=True, readonly=True)
+    warehouse=fields.Many2one('stock.warehouse',store=True)
 
     @api.depends('move_date')
     def _get_date_month(self):
