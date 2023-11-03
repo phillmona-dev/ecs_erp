@@ -311,6 +311,7 @@ class val_layer(models.Model):
     move_date=fields.Date('Stock move date',store=True)
     date_month = fields.Char(string='Date Month', compute='_get_date_month', store=True, readonly=True)
     warehouse=fields.Many2one('stock.warehouse',store=True)
+    origin=fields.Char(related='stock_move_id.origin',store=True)
 
     @api.depends('move_date')
     def _get_date_month(self):
