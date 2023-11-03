@@ -10,9 +10,9 @@
                 <field name='product_id'/>
                 <field name='categ_id'/>
                 <field name='uom_id'/>
-                <field name='quantity'/>
-                <field name='unit_cost'/>
-                <field name='value'/>
+                <field name='quantity' sum="Total"/>
+                <field name='unit_cost' sum="Total"/>
+                <field name='value' sum="Total"/>
                 <field name='warehouse'/>
                 <field name="trans_type"></field>
                 <field name="trans_type_detail"></field>
