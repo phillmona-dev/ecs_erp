@@ -32,13 +32,7 @@ class AccountAsset(models.Model):
                 if asset_sub_category.sequence:
                     record.asset_number = asset_sub_category.sequence.next_by_id()
 
-    @api.constrains('asset_number')
-    def _check_asset_no_unique(self):
-        counts = self.search_count(
-            [('asset_number', '=', self.asset_number)])
 
-        if counts > 2:
-            raise ValidationError("Asset code must be unique")
 
 
 class AssetSubCategory(models.Model):
