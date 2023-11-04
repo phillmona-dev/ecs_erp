@@ -37,7 +37,7 @@ class AccountAsset(models.Model):
         counts = self.search_count(
             [('asset_number', '=', self.asset_number)])
 
-        if counts > 1:
+        if counts > 2:
             raise ValidationError("Asset code must be unique")
 
 
