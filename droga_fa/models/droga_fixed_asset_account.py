@@ -13,7 +13,7 @@ class AccountAsset(models.Model):
         # get sequence number for each company
         self_comp = self.with_company(self.company_id)
 
-        if 'asset_number' not in vals and 'asset_sub_category' in vals:
+        if 'asset_sub_category' in vals:
             # generate asset cod automatically
             # get sequence code
             asset_sub_category = self.env["account.asset.subcat"].search([('id', '=', vals['asset_sub_category'])])
@@ -32,7 +32,13 @@ class AccountAsset(models.Model):
                 if asset_sub_category.sequence:
                     record.asset_number = asset_sub_category.sequence.next_by_id()
 
+    @api.constrains('asset_number')
+    def _check_asset_no_unique(self):
+        counts = self.search_count(
+            [('asset_number', '=', self.asset_number)])
 
+        if counts > 1:
+            raise ValidationError("Asset code must be unique")
 
 
 class AssetSubCategory(models.Model):
