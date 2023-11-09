@@ -136,7 +136,7 @@ select c.id as product_id,(select y.name->>'en_US' from product_template y where
 (select i.name from product_category i where i.id=(select y.categ_id from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id))) as product_categ,
 (c.date_order_det) as sales_date,invoiced_amt,qty_invoiced,c.price_unit,round((invoiced_amt+b.value)::decimal,2) as profit,case when invoiced_amt!=0 then round((((invoiced_amt+b.value)/invoiced_amt)*100)::decimal,2) else 0 end as profit_margin,
 a.sale_line_id,b.quantity*-1 as quantity,round(b.unit_cost::decimal,2) as unit_cost,round(b.value*-1::decimal,2) as amount from stock_move a,stock_valuation_layer b,sale_order_line c where a.id=b.stock_move_id 
-                        and a.sale_line_id is not null and c.id=a.sale_line_id) where m.company_id=1 m group by m.company_id,m.product_id,m.product_descr,m.product_code,m.sales_ref,m.product_categ,m.sales_date,m.sale_line_id) g 
+                        and a.sale_line_id is not null and c.id=a.sale_line_id) m where m.company_id=1 group by m.company_id,m.product_id,m.product_descr,m.product_code,m.sales_ref,m.product_categ,m.sales_date,m.sale_line_id) g 
                    )""")
 
 
