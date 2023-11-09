@@ -305,8 +305,8 @@ class droga_stock_uom_extension(models.Model):
 class val_layer(models.Model):
     _inherit='stock.valuation.layer'
     reference = fields.Char(related='stock_move_id.reference',store=True)
-    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move', related='stock_move_id.trans_type_detail',store=True)
-    trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move Detail',
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move Detail', related='stock_move_id.trans_type_detail',store=True)
+    trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move',
                                         related='stock_move_id.trans_type', store=True)
     move_date=fields.Date('Stock move date',store=True)
     date_month = fields.Char(string='Date Month', compute='_get_date_month', store=True, readonly=True)
@@ -332,7 +332,7 @@ class droga_stock_move_extension(models.Model):
     reserve_indef=fields.Boolean('Reserve indefinitely',default=False,tracking=True)
     source_wh=fields.Char(related='location_id.warehouse_id.name')
     trans_type=fields.Many2one('droga.inventory.transaction.types',string='Type',compute='_get_trans_type',store=True)
-    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type', compute='_get_trans_type',
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type Detail', compute='_get_trans_type',
                                  store=True)
 
     @api.depends('state')

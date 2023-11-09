@@ -83,6 +83,6 @@
             name="Stock valuation by type"
             action="stock_valuation_transactions_import_action"
             parent="droga_finance.droga_reciveables_report"
-            groups="droga_finance.business_control_specialist_group"
+            groups="droga_finance.business_control_specialist_group,droga_inventory.inv_prod_fin"
             sequence="25"/>
 </odoo>
