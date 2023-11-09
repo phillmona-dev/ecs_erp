@@ -15,8 +15,8 @@ class salesWizard(models.TransientModel):
     _description = "Print sales Excel Report"
     fileout = fields.Binary(string='File Output')
 
-    date_to = fields.Date(string='From Date', default=datetime.date.today() + relativedelta(weeks=0, weekday=-1))
-    date_from = fields.Date(string='To Date', default=datetime.date.today() - relativedelta(weeks=1, weekday=0))
+    date_to = fields.Date(string='To Date', default=datetime.date.today() + relativedelta(weeks=0, weekday=-1))
+    date_from = fields.Date(string='From Date', default=datetime.date.today() - relativedelta(weeks=1, weekday=0))
 
     def action_get_sales_xls(self, data):
 
