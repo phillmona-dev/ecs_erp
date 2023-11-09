@@ -16,6 +16,7 @@
                 <field name="product_code"></field>
                 <field name="product_categ"></field>
                 <field name="sales_ref"></field>
+                <field name="order_from"></field>
                 <field name="sales_date"></field>
                 <field name="invoiced_amt"></field>
                 <field name="qty_invoiced"></field>
