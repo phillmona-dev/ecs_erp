@@ -13,7 +13,7 @@ class AccountAsset(models.Model):
         # get sequence number for each company
         self_comp = self.with_company(self.company_id)
 
-        if 'asset_number' not in vals and 'asset_sub_category' in vals:
+        if 'asset_sub_category' in vals:
             # generate asset cod automatically
             # get sequence code
             asset_sub_category = self.env["account.asset.subcat"].search([('id', '=', vals['asset_sub_category'])])
