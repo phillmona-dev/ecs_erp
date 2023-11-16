@@ -7,6 +7,7 @@
             <tree string="" create="false" delete="false" expand="1">
                 <field name="default_code" string="Internal reference"></field>
                 <field name="name"></field>
+                <field name="pharma_uom"></field>
                 <field name="list_price_phar"></field>
                 <field name="categ_id"></field>
             </tree>
