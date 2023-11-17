@@ -599,6 +599,7 @@ class purchase_request_extension(models.Model):
 
 class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
+    name = fields.Char('Name', index='trigram', required=True, translate=True,tracking=True)
     company_id = fields.Many2one('res.company', string='Company',index=True, default=lambda self: self.env.company, required=False)
     order_type = fields.Selection([
         ('IM', 'Import and pharmacy'),
@@ -659,7 +660,7 @@ class droga_stock_product_extension(models.Model):
                 rec.prod_read_only = False
 
     categ=fields.Many2one('uom.category',related='uom_id.category_id')
-    pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',domain="[('category_id', '=', categ)]")
+    pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',domain="[('category_id', '=', categ)]",tracking=True)
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
