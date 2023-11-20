@@ -73,9 +73,10 @@ class droga_stock_office_supplies(models.Model):
 
     company_id = fields.Many2one(
         'res.company', string='Company', default=lambda self: self.env.company, required=True)
+
     currency_id = fields.Many2one(
-        "res.currency", string="Currency", required=True,
-        default=lambda self: self.env.ref('base.main_company').currency_id)
+        "res.currency", string="Currency",
+        default=lambda self: self.env.company.currency_id)
 
     # request_reference = fields.Text(string='Request reference', readonly=True)
     request_picking = fields.One2many('stock.picking', 'office_request')
