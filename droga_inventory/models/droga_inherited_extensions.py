@@ -606,6 +606,7 @@ class droga_stock_product_extension(models.Model):
         ('WS', 'Wholesale and pharmacy'),
         ('BT', 'Import and wholesale'),
     ('PT', 'Physiotherapy only'),('PH', 'Pharmacy only'),('ALL','ALL')], string='Product used under')
+    from_pharma=fields.Boolean('Created from pharmacy menu',default=False,store=False)
     bought_locally=fields.Boolean('Bought Locally',default=False)
     pharmacy_group_id=fields.Many2one('droga.prod.categ.pharma')
     list_price = fields.Float(
@@ -660,7 +661,7 @@ class droga_stock_product_extension(models.Model):
                 rec.prod_read_only = False
 
     categ=fields.Many2one('uom.category',related='uom_id.category_id')
-    pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',domain="[('category_id', '=', categ)]",tracking=True)
+    pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',tracking=True)
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
@@ -674,6 +675,12 @@ class droga_stock_product_extension(models.Model):
 
     has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
+
+    @api.onchange("pharma_uom")
+    def _on_change_pharma_uom(self):
+        for rec in self:
+            if rec.from_pharma:
+                rec.uom_id=rec.pharma_uom
 
     def _search_has_access(self, operator, value):
 
