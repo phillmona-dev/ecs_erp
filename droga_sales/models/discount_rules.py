@@ -126,7 +126,7 @@ class sale_order_line(models.Model):
                     rec.is_prod_available = 'False'
                     return
 
-            prodqty=sum(self.order_id.order_line.filtered(lambda x: x.product_id == rec.product_id.id).mapped(
+            prodqty=sum(self.order_id.order_line.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
                 'product_uom_qty'))
             if (not rec.product_id.bought_locally) and rec.available_qty < prodqty:
                 rec.is_prod_available = 'False'
