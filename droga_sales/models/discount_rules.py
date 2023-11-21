@@ -615,6 +615,11 @@ class sale_order_ext(models.Model):
             return
         message = ''
 
+        if self.order_from.startswith('PH'):
+            price_changed=self.order_line.filtered(lambda x: x.price_unit!=x.selling_price or x.price_unit==0)
+            if len(price_changed)>0:
+                message = message + ('\n' if message else '') + "Price can not be edited or be zero."
+
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
         if (len(order_lines_nowareh) > 0):
