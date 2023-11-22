@@ -641,7 +641,7 @@ class droga_stock_product_extension(models.Model):
     )
     manufacturing=fields.Char('Manufacturer')
     origin = fields.Many2one('res.country',string='Origin')
-    reg_status=fields.Char('Registration status',default='waiting')
+    reg_status=fields.Char('Registration status',default='draft')
 
     def _get_prod_id(self):
         for rec in self:
@@ -681,6 +681,13 @@ class droga_stock_product_extension(models.Model):
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
     is_core_product = fields.Boolean('Is core product for promoters',tracking=True)
+    prod_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
+
+    def _get_approvers(self):
+        for rec in self:
+            rec.prod_approver = self.env.ref("droga_inventory.droga_prod_app").users.ids[0] if len(
+                self.env.ref("droga_inventory.droga_prod_app").users.ids) > 0 else None
+
     def _get_avg_monthly_consumption(self):
         for rec in self:
             rec.average_month_consumption=0
@@ -736,7 +743,7 @@ class droga_stock_product_extension(models.Model):
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager') and 'seller_ids' not in vals_list and 'invoice_policy' not in vals_list and 'crm_group' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
         for rec in self:
-            if rec.reg_status=='rejected':
+            if rec.reg_status=='rejected' and not self.env.user.has_group('droga_inventory.droga_prod_app'):
                 raise UserError("You can not edit the product as it's rejected.")
             if 'default_code' in vals_list:
                 if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_' and rec.default_code and vals_list['default_code']:
@@ -746,6 +753,9 @@ class droga_stock_product_extension(models.Model):
                 for prod in to_update:
                     prod.write({'default_code':vals_list['default_code']})
             if 'active' in vals_list:
+                if rec.reg_status == 'waiting' and not self.env.user.has_group('droga_inventory.droga_prod_app') and vals_list['active']:
+                    raise UserError("You can not edit the product as it's awaiting approval.")
+
                 if rec.active and not vals_list['active'] and rec.default_code[-1]!='_':
                     rec.write({'default_code':rec.default_code+'_'})
                 if not rec.active and vals_list['active'] and rec.default_code[-1]=='_':
