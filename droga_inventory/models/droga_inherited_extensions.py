@@ -666,12 +666,18 @@ class droga_stock_product_extension(models.Model):
     def approve(self):
         for res in self:
             res.reg_status = 'approved'
-            res.active = True
+            prods = self.env['product.product'].sudo().search(
+                [('product_tmpl_id', '=', res.id),('active','=',False)])
+            for pr in prods:
+                pr.active = True
 
     def reject(self):
         for res in self:
             res.reg_status = 'rejected'
-            res.active = False
+            prods = self.env['product.product'].sudo().search(
+                [('product_tmpl_id', '=', res.id),('active','=',True)])
+            for pr in prods:
+                pr.active = False
 
     categ=fields.Many2one('uom.category',related='uom_id.category_id')
     pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',tracking=True)
@@ -805,7 +811,10 @@ class droga_stock_product_extension(models.Model):
             res.order_type='ALL'
         if res.reg_status=='draft' and not res.categ_id.name.startswith('Office') and res.company_id.id==1 and not res.from_pharma:
             res.reg_status='waiting'
-            #res.active=False
+            prods=self.env['product.product'].sudo().search(
+                    [('product_tmpl_id', '=', res.id)])
+            for pr in prods:
+                pr.active=False
         else:
             res.reg_status='approved'
 
