@@ -141,7 +141,7 @@ class sale_order_line(models.Model):
         moves = selfsud.env['stock.move'].search(
             [('product_id', '=', product_id.id), ('location_id.warehouse_id', '=', warehouse_id.id),
              ('location_id.usage', '=', 'internal'), ('location_dest_id.usage', '!=', 'internal'),
-             ('state', 'not in', ['done', 'cancel', 'draft'])])
+             ('state', 'not in', ['done', 'cancel', 'draft','waiting','confirmed'])])
         return sum(moves.mapped('reserved_qty'))
 
     def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):
@@ -607,6 +607,11 @@ class sale_order_ext(models.Model):
                     rec.order_from = 'IM-' + rec.order_type
                 for res in rec.order_line:
                     res.product_id.product_tmpl_id.invoice_policy = 'delivery'
+
+        for rec in self:
+            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
+            for pick in pickings:
+                pick.action_assign()
 
         return super(sale_order_ext, self).action_confirm()
 
