@@ -62,6 +62,10 @@ class sales_integ(models.Model):
 
     # set sales order if invoice is not created
     def set_to_draft(self):
+        for rec in self:
+            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
+            for pick in pickings:
+                pick.do_unreserve()
         self.write({'state': 'draft'})
 
     def action_mtm_orders(self):
