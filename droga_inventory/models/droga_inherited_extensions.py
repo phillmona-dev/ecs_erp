@@ -641,7 +641,8 @@ class droga_stock_product_extension(models.Model):
     )
     manufacturing=fields.Char('Manufacturer')
     origin = fields.Many2one('res.country',string='Origin')
-    reg_status=fields.Char('Registration status',default='draft')
+    reg_status=fields.Selection([('draft', 'draft'), ('waiting', 'waiting'),('rejected', 'rejected'),('approved', 'approved')],
+                            default='draft')
 
     def _get_prod_id(self):
         for rec in self:
@@ -681,12 +682,7 @@ class droga_stock_product_extension(models.Model):
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
     is_core_product = fields.Boolean('Is core product for promoters',tracking=True)
-    prod_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
-
-    def _get_approvers(self):
-        for rec in self:
-            rec.prod_approver = self.env.ref("droga_inventory.droga_prod_app").users.ids[0] if len(
-                self.env.ref("droga_inventory.droga_prod_app").users.ids) > 0 else None
+    prod_approver = fields.Many2one('res.users', store=True)
 
     def _get_avg_monthly_consumption(self):
         for rec in self:
@@ -809,9 +805,12 @@ class droga_stock_product_extension(models.Model):
             res.order_type='ALL'
         if res.reg_status=='draft' and not res.categ_id.name.startswith('Office') and res.company_id.id==1 and not res.from_pharma:
             res.reg_status='waiting'
-            res.active=False
+            #res.active=False
         else:
-            res.reg_status='done'
+            res.reg_status='approved'
+
+        res.prod_approver = self.env.ref("droga_inventory.droga_prod_app").users.ids[0] if len(
+            self.env.ref("droga_inventory.droga_prod_app").users.ids) > 0 else None
         return res
 
 class product_categ_pharmacy(models.Model):
