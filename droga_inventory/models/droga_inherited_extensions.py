@@ -641,6 +641,8 @@ class droga_stock_product_extension(models.Model):
     )
     manufacturing=fields.Char('Manufacturer')
     origin = fields.Many2one('res.country',string='Origin')
+    reg_status=fields.Char('Registration status',default='waiting')
+
     def _get_prod_id(self):
         for rec in self:
             prods=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
@@ -659,6 +661,16 @@ class droga_stock_product_extension(models.Model):
                 rec.prod_read_only=True
             else:
                 rec.prod_read_only = False
+
+    def approve(self):
+        for res in self:
+            res.reg_status = 'approved'
+            res.active = True
+
+    def reject(self):
+        for res in self:
+            res.reg_status = 'rejected'
+            res.active = False
 
     categ=fields.Many2one('uom.category',related='uom_id.category_id')
     pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',tracking=True)
@@ -724,6 +736,8 @@ class droga_stock_product_extension(models.Model):
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager') and 'seller_ids' not in vals_list and 'invoice_policy' not in vals_list and 'crm_group' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
         for rec in self:
+            if rec.reg_status=='rejected':
+                raise UserError("You can not edit the product as it's rejected.")
             if 'default_code' in vals_list:
                 if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_' and rec.default_code and vals_list['default_code']:
                     if rec.default_code[-1]!='_':
@@ -783,7 +797,11 @@ class droga_stock_product_extension(models.Model):
             raise UserError("Default code can not be empty.")
         if res.company_id.id==2:
             res.order_type='ALL'
-
+        if res.reg_status=='draft' and not res.categ_id.name.startswith('Office') and res.company_id.id==1 and not res.from_pharma:
+            res.reg_status='waiting'
+            res.active=False
+        else:
+            res.reg_status='done'
         return res
 
 class product_categ_pharmacy(models.Model):

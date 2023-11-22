@@ -9,8 +9,18 @@
         <field name="arch" type="xml">
 
             <!--> Hide print and replinsh buttons -->
-            <xpath expr="//form/header" position="attributes">
+            <xpath expr="//form/header/button[@name='action_open_label_layout']" position="attributes">
                 <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/header" position="inside">
+                <field name="reg_status" invisible="1"/>
+                <button name="approve" type="object" class="btn-primary"
+                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}"
+                    string="Approve"/>
+                <button name="reject" type="object" class="btn-primary"
+                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}"
+                    string="Reject"/>
             </xpath>
 
             <!--> Hide button box -->
