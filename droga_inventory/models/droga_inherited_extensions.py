@@ -664,6 +664,7 @@ class droga_stock_product_extension(models.Model):
                 rec.prod_read_only = False
 
     def approve(self):
+        self.set_activity_done()
         for res in self:
             res.reg_status = 'approved'
             prods = self.env['product.product'].sudo().search(
@@ -672,12 +673,19 @@ class droga_stock_product_extension(models.Model):
                 pr.active = True
 
     def reject(self):
+        self.set_activity_done()
         for res in self:
             res.reg_status = 'rejected'
             prods = self.env['product.product'].sudo().search(
                 [('product_tmpl_id', '=', res.id),('active','=',True)])
             for pr in prods:
                 pr.active = False
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.display_name)])
+        for act in activity:
+            act.sudo().action_done()
 
     categ=fields.Many2one('uom.category',related='uom_id.category_id')
     pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',tracking=True)
