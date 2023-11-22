@@ -2,6 +2,7 @@ from datetime import datetime
 
 import simplejson
 from lxml import etree
+import math
 
 import json
 
@@ -621,7 +622,7 @@ class sale_order_ext(models.Model):
         message = ''
 
         if self.order_from.startswith('PH'):
-            price_changed=self.order_line.filtered(lambda x: round(x.price_unit,2)!=round(x.selling_price,2) or x.price_unit==0)
+            price_changed=self.order_line.filtered(lambda x: math.ceil(x.price_unit)!=math.ceil(x.selling_price) or x.price_unit==0)
             if len(price_changed)>0:
                 message = message + ('\n' if message else '') + "Price can not be edited or be zero."
 
