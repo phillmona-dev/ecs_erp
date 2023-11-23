@@ -805,6 +805,8 @@ class droga_stock_product_extension(models.Model):
 
     @api.model
     def create(self, vals_list):
+        vals_list["prod_approver"] = self.env.ref("droga_inventory.droga_prod_app").users.ids[0] if len(
+            self.env.ref("droga_inventory.droga_prod_app").users.ids) > 0 else None
         res=super(droga_stock_product_extension, self).create(vals_list)
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
@@ -826,8 +828,6 @@ class droga_stock_product_extension(models.Model):
         else:
             res.reg_status='approved'
 
-        res.prod_approver = self.env.ref("droga_inventory.droga_prod_app").users.ids[0] if len(
-            self.env.ref("droga_inventory.droga_prod_app").users.ids) > 0 else None
         return res
 
 class product_categ_pharmacy(models.Model):
