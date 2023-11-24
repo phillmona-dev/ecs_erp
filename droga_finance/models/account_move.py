@@ -49,6 +49,9 @@ class AccountMove(models.Model):
 
     branch_address = fields.Many2one('droga.sales.branch.address', compute='get_branch_address')
 
+    payment_request_id=fields.Integer(related='payment_id.payment_request_id.id')
+
+
     @api.model
     def create(self, vals):
         # Check withholding

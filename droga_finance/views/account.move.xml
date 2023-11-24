@@ -42,6 +42,7 @@
 
                 <field name="purpose"/>
 
+
             </xpath>
             <xpath expr="//field[@name='partner_bank_id']" position="attributes">
                 <attribute name="invisible">1</attribute>

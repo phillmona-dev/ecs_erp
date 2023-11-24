@@ -7,6 +7,14 @@
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
 
+            <xpath expr="//div[@class='oe_title']" position="before">
+                <div class="oe_title">
+                    <h1>
+                        <field name="barcode" placeholder="Badge ID" readonly="1"/>
+                    </h1>
+                </div>
+            </xpath>
+
             <xpath expr="//form/sheet/notebook/page[@name='hr_settings']" position="after">
                 <page string="Amharic Info">
                     <group>
@@ -16,6 +24,41 @@
                     </group>
                 </page>
 
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page[@name='personal_information']//field[@name='birthday']"
+                   position="before">
+
+                <field name="hire_date"/>
+
+
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page[@name='personal_information']//field[@name='birthday']"
+                   position="after">
+
+                <field name="retire_date"/>
+
+
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page[@name='hr_settings']//field[@name='barcode']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+
+        </field>
+    </record>
+
+
+    <record id="inherit_for_employee_tree" model="ir.ui.view">
+        <field name="name">Employee</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='name']" position="before">
+                <field name="barcode" optional="show"/>
             </xpath>
         </field>
     </record>

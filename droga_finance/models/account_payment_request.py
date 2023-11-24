@@ -67,7 +67,7 @@ class PaymentRequest(models.Model):
         "res.currency", string="Currency", required=True,
         default=lambda self: self.env.company.currency_id)
 
-    total_amount = fields.Float("Total Amount")
+    total_amount = fields.Float("Total Amount", tracking=True)
     exchange_rate = fields.Float("Exchange Rate", default=1)
     total_amount_etb = fields.Float(
         "Total Amount ETB", compute="_compute_total", required=True)
