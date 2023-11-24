@@ -13,7 +13,7 @@ class Employee(models.Model):
 
     hire_date = fields.Date("Hire Date")
     retire_date = fields.Date("Retire Date", compute="compute_retire_date")
-
+    department_name = fields.Char(related='department_id.name')
 
     @api.model
     def create(self, vals):

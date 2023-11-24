@@ -60,6 +60,9 @@
             <xpath expr="//tree/field[@name='name']" position="before">
                 <field name="barcode" optional="show"/>
             </xpath>
+             <xpath expr="//tree/field[@name='job_id']" position="after">
+                <field name="department_name" optional="show"/>
+            </xpath>
         </field>
     </record>
 </odoo>
