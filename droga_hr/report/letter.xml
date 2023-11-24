@@ -116,7 +116,7 @@
 
 
     <record id="droga_hr_work_experience_report_action" model="ir.actions.report">
-        <field name="name">Guarantee Letter</field>
+        <field name="name">Work Experience Letter</field>
         <field name="model">droga.hr.letter</field>
         <field name="report_type">qweb-html</field>
         <field name="report_name">droga_hr.droga_hr_work_experience_report_report</field>
@@ -194,10 +194,7 @@
                                 </p>
 
                                 <p>
-                                    <h5>ስለሆነም አቶ
-                                        <u>
-                                            <span t-field="o.employee.amharic_name" class="m-0"/>
-                                        </u>
+                                    <h5>
 
 
                                         በዚህም መሠረት አቶ/ ወ/ሮ / ወ/ት
@@ -209,8 +206,11 @@
                                             <span t-field="o.employee.hire_date_ec" class="m-0"/>
                                         </u>
                                         ዓ.ም ጀምሮ የህ ደብዳቤ
-                                        እስከተጻፈበት ድረስ ___________________ የስራ መደብ በወር ያልተጣራ<span
-                                                t-field="o.employee_salary"/>(<span t-field="o.employee_salary_word"/>)
+                                        እስከተጻፈበት ድረስ
+                                        <span
+                                                t-field="o.employee.amharic_position"/>
+                                        የስራ መደብ በወር ያልተጣራ<span
+                                            t-field="o.employee_salary"/>(<span t-field="o.employee_salary_word"/>)
                                         እየተከፈላቸው
                                         እያገለገሉ እንደሚገኙ እያሳወቅን የሚጠበቅባቸውን የመንግስት የስራ ግብር እና የጡረታ መዋጮ መምሪያው በሚያዘው መሠረት
                                         እየተቀነሰ ለሚመለከተው የመንግስት

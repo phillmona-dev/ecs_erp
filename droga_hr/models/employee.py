@@ -44,4 +44,4 @@ class EmployeePublic(models.Model):
     hire_date_ec = fields.Char("የቅጥር ቀን")
 
     hire_date = fields.Date("Hire Date")
-    
+
