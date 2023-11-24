@@ -26,6 +26,10 @@ class Letter(models.Model):
     status = fields.Selection([("Not Issued", "Not Issued"), ("Issued", "Issued")], defualt="Not Issued")
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
+    guarantee_for = fields.Char("Guarantee For")
+    company_name = fields.Char("Company Name")
+    employee_salary = fields.Float("Salary", compute="compute_salary")
+    employee_salary_word = fields.Char("Salary Word", compute="compute_salary")
 
     @api.model
     def create(self, vals):
@@ -74,6 +78,68 @@ class Letter(models.Model):
                      date_deadline=datetime.now())
 
         self.env['mail.activity'].sudo().create(todos)
+
+    def number_to_words(self, number):
+        # Define lists of words for units, teens, and tens
+        units = ["", "አንድ", "ሁለት", "ሶስት", "አራት", "አምስት", "ስድስት", "ሰባት", "ስምንት", "ዘጠኝ"]
+        teens = ["", "አስራ አንድ", "አስራ ሁለት", "አስራ ሶስት", "አስራ አራት", "አስራ አምስት", "አስራ ስድስት", "አስራ ሳባት", "አስራ ስምንት",
+                 "አስራ ዘጠኝ"]
+        tens = ["", "አስር", "ሃያ", "ሰላሳ", "አርባ", "ሃምሳ", "ስልሳ", "ሰባ", "ሰማንያ", "ዘጠና"]
+
+        # Function to convert a three-digit number to words
+        def convert_three_digits(num):
+            num = int(num)
+            result = ""
+            if num // 100 > 0:
+                result += units[num // 100] + " መቶ "
+                num %= 100
+            if num > 0:
+                if num < 10:
+                    result += units[num]
+                elif num < 20:
+                    result += teens[num - 10]
+                else:
+                    result += tens[num // 10]
+                    if num % 10 > 0:
+                        result += "-" + units[num % 10]
+            return result
+
+        # Special case for zero
+        if number == 0:
+            return "Zero"
+
+        # Split the number into billions, millions, thousands, and the remaining three digits
+        billions = number // 1_000_000_000
+        millions = (number % 1_000_000_000) // 1_000_000
+        thousands = (number % 1_000_000) // 1_000
+        remainder = number % 1_000
+
+        result = ""
+        if billions > 0:
+            result += convert_three_digits(billions) + " ቢሊዮን "
+        if millions > 0:
+            result += convert_three_digits(millions) + " ሚሊዮን "
+        if thousands > 0:
+            result += convert_three_digits(thousands) + " ሺ "
+        if remainder > 0:
+            result += convert_three_digits(remainder)
+
+        return result.strip()
+
+    def compute_salary(self):
+        for record in self:
+            record.employee_salary = 0
+            record.employee_salary_word = ''
+
+            # get employee contract
+            emp_contracts = self.env["hr.contract"].search([('employee_id', '=', record.employee.id)])
+
+            for emp_contract in emp_contracts:
+                if emp_contract.state == 'open':
+                    # get basic salary
+                    basic_salary = emp_contract.get_employee_rate("P001")
+                    record.employee_salary = basic_salary
+                    record.employee_salary_word = self.number_to_words(basic_salary)
 
 
 class LetterType(models.Model):

@@ -42,3 +42,6 @@ class EmployeePublic(models.Model):
     amharic_name = fields.Char("ሙሉ ስም")
     amharic_position = fields.Char("የስራ መደብ")
     hire_date_ec = fields.Char("የቅጥር ቀን")
+
+    hire_date = fields.Date("Hire Date")
+    

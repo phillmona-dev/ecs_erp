@@ -94,6 +94,9 @@
                         <group>
                             <field name="employee"/>
                             <field name="letter_type"/>
+                            <field name="guarantee_for"/>
+                            <field name="company_name"/>
+                            <field name="employee_salary"/>
 
                         </group>
                         <group>
@@ -179,6 +182,8 @@
                         <group>
                             <field name="employee"/>
                             <field name="letter_type"/>
+                            <field name="guarantee_for"/>
+                            <field name="company_name"/>
 
                         </group>
                         <group>

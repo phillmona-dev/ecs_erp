@@ -31,6 +31,7 @@
         'views/hr_head_count_request.xml',
         'views/employee.xml',
         'views/hr_letter.xml',
+        'report/letter.xml',
         'views/menu.xml',
     ],
     # only loaded in demonstration mode
