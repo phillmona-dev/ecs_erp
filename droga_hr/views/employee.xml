@@ -26,6 +26,17 @@
 
             </xpath>
 
+            <xpath expr="//form/sheet/notebook/page[@name='hr_settings']" position="after">
+                <page string="Bank Info">
+                    <group>
+                        <field name="bank" options="{'no_create':True,'no_open':True}"/>
+                        <field name="bank_account"/>
+                    </group>
+                </page>
+
+            </xpath>
+
+
             <xpath expr="//form/sheet/notebook/page[@name='personal_information']//field[@name='birthday']"
                    position="before">
 
@@ -60,7 +71,7 @@
             <xpath expr="//tree/field[@name='name']" position="before">
                 <field name="barcode" optional="show"/>
             </xpath>
-             <xpath expr="//tree/field[@name='job_id']" position="after">
+            <xpath expr="//tree/field[@name='job_id']" position="after">
                 <field name="department_name" optional="show"/>
             </xpath>
         </field>

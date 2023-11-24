@@ -15,6 +15,9 @@ class Employee(models.Model):
     retire_date = fields.Date("Retire Date", compute="compute_retire_date")
     department_name = fields.Char(related='department_id.name')
 
+    bank = fields.Many2one('res.bank', string="Bank")
+    bank_account = fields.Char("Bank Account")
+
     @api.model
     def create(self, vals):
         # get sequence number for each company
@@ -45,3 +48,5 @@ class EmployeePublic(models.Model):
 
     hire_date = fields.Date("Hire Date")
 
+    bank = fields.Many2one('res.bank', string="Bank")
+    bank_account = fields.Char("Bank Account")
