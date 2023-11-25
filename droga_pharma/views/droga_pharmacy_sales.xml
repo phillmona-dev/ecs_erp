@@ -7,14 +7,19 @@
             <tree string="" create="0" delete="false">
                 <field name="name"></field>
                 <field name="emp_descr"></field>
-                <field name="amount_total"></field>
+                <field name="date_order"></field>
+                <field name="wareh" string="Branch"></field>
+                <field name="amount_total" sum="Total"></field>
                 <field name="invoice_status"
                        decoration-success="invoice_status == 'invoiced' or (invoice_status=='no' and state=='dispense')"
                        decoration-info="invoice_status == 'to invoice'"
                        decoration-warning="invoice_status == 'upselling'"
                        widget="badge" optional="show"/>
                 <field name="state" invisible="1"></field>
-
+                <field name="invoice_printed"
+                       decoration-success="invoice_printed == 'Yes'"
+                       decoration-warning="invoice_printed == 'No'"
+                       widget="badge" optional="show"/>
                 <button type="object" string="Create Invoice" name="create_inv_local"
                         attrs="{'invisible': ['|',('state', '!=', 'sale'),('invoice_status','!=','to invoice')]}"
                         groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
@@ -30,6 +35,8 @@
             <tree string="" delete="false">
                 <field name="name"></field>
                 <field name="emp_descr"></field>
+                <field name="date_order"></field>
+                <field name="wareh" string="Branch"></field>
                 <field name="amount_total"></field>
                 <field name="state"
                        decoration-success="state == 'dispense'"
@@ -41,33 +48,12 @@
                        decoration-info="invoice_status == 'to invoice'"
                        decoration-warning="invoice_status == 'upselling'"
                        widget="badge" optional="show"/>
-                <button type="object" string="Dispense products" name="disp_products"
-                        attrs="{'invisible': ['|',('state', '!=', 'sale'),('invoice_status','not in',('upselling','invoiced'))]}"
-                        class="oe_highlight"></button>
-            </tree>
-        </field>
-    </record>
-
-    <record id="view_order_tree_pharma_so_and_invoice" model="ir.ui.view">
-        <field name="name">sale.order.tree.pharmacy.no.invoice</field>
-        <field name="model">sale.order</field>
-        <field name="arch" type="xml">
-            <tree string="" delete="false">
-                <field name="name"></field>
-                <field name="emp_descr"></field>
-                <field name="amount_total"></field>
-                <field name="state"
-                       decoration-success="state == 'dispense'"
-                       decoration-info="state == 'sale'"
-                       decoration-warning="state == 'draft'"
-                       widget="badge"></field>
-                <field name="invoice_status"
-                       decoration-success="invoice_status == 'invoiced' or (invoice_status=='no' and state=='dispense')"
-                       decoration-info="invoice_status == 'to invoice'"
-                       decoration-warning="invoice_status == 'upselling'"
+                <field name="invoice_printed"
+                       decoration-success="invoice_printed == 'Yes'"
+                       decoration-warning="invoice_printed == 'No'"
                        widget="badge" optional="show"/>
-                <button type="object" string="Dispense products" name="disp_products"
-                        attrs="{'invisible': ['|',('state', '!=', 'sale'),('invoice_status','not in',('upselling','invoiced'))]}"
+                <button type="object" string="Dispense products" name="disp_products" groups="droga_inventory.inventory_stk"
+                        attrs="{'invisible': ['|',('state', '!=', 'sale'),('invoice_printed','=','No')]}"
                         class="oe_highlight"></button>
             </tree>
         </field>
@@ -81,9 +67,40 @@
                 <field name="name"></field>
                 <field name="emp_descr"></field>
                 <field name="state"></field>
+                <field name="date_order"></field>
                 <field name="invoice_status"></field>
 
+                <filter string="Today sales"
+                        domain="[('date_order', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date_order', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
+                        name="today_sales"></filter>
+
+                <filter string="Current week sales"
+                    domain="[('date_order', '&lt;=', ((context_today()+relativedelta(weeks=0, weekday=-1)).strftime('%Y-%m-%d'))),
+                    ('date_order', '&gt;=', ((context_today()-relativedelta(weeks=1, weekday=0)).strftime('%Y-%m-%d')))]"
+                    name="current_week_sales"></filter>
+
+                <filter string="Previous week sales"
+                       domain="[('date_order', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),
+                       ('date_order', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]"
+                        name="previous_week_sales"></filter>
+
+                <filter string="Current month sales"
+                        domain="[('date_order','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
+                        ('date_order','&gt;=',time.strftime('%%Y-%%m-01'))]"
+                        name="current_month_sales"></filter>
+
+                <filter string="Previous month sales"
+                        domain="[('date_order','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
+                        ('date_order','&lt;',time.strftime('%%Y-%%m-01'))]"
+                name="previous_month_sales"></filter>
+                <separator/>
+                
                 <filter string="To Invoice" domain="[('invoice_status', '=','to invoice')]" name="to_invoice"></filter>
+
+                <separator/>
+
+                <filter string="Printed not dispensed" domain="[('invoice_printed', '=','Yes'),('state','=','sale')]" name="to_dispense"></filter>
+                <filter string="Invoiced not printed" domain="[('invoice_status', '=','invoiced'),('invoice_printed','=','No')]" name="invoiced_not_printed"></filter>
             </search>
         </field>
     </record>
@@ -110,13 +127,25 @@
                             groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+                    <button name="set_to_draft"
+                            string="Set to Draft" font-size="16px"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
+                            type="object" class="btn-primary" data-hotkey="q"
+                            attrs="{'invisible': ['|',('state','not in',('draft','sale')),('invoice_status', '!=', 'to invoice')]}"/>
+                    <button name="action_cancel"
+                            string="Cancel" font-size="16px"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
+                            type="object" class="btn-primary" data-hotkey="q"
+                            attrs="{'invisible': ['|',('state','not in',('draft','sale')),('invoice_status', '!=', 'to invoice')]}"/>
 
                     <button name="conf_and_invoice"
                             string="Confirm and create invoice" font-size="16px"
                             groups="droga_pharma.pharma_di_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-
+                    <button type="object" string="Dispense for manual sales" name="disp_products" groups="droga_inventory.inventory_stk"
+                        attrs="{'invisible': ['|',('state','=','dispense'),'|',('invoice_status','!=','invoiced'),('state', '!=', 'sale')]}"
+                        class="oe_highlight"></button>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,sale,dispense"/>
 
@@ -148,7 +177,7 @@
                         <button name="action_minor_aliments"
                                 type="object"
                                 class="oe_stat_button"
-                                string="Minor aliments"
+                                string="Minor ailments"
                                 icon="fa-credit-card-alt">
                         </button>
                         <field name="mtm_count" invisible="1"/>counselling_count
@@ -162,6 +191,7 @@
                                         Total -
                                         <field style="color:#89C35C" name="amount_total" readonly="1"/>
                                         <field name="name" invisible="1"></field>
+                                        <field name="order_from" invisible="1"></field>
                                     </div>
                                 </h1>
                             </div>
@@ -196,6 +226,7 @@
 
                             </div>
                             <field name="date_order" nolabel="1"/>
+                            <field name="wareh" readonly="1" string="Pharmacy branch" options="{'no_open':True,'no_create': True}"/>
                             <field name="mature_amount" style="color:red"
                                    attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                             <field name="show_update_pricelist" invisible="1"/>
@@ -247,12 +278,13 @@
                                         TODO: at some point we want to fix this in the framework so that an invisible field is not required.
                                     -->
                                     <field name="sequence" invisible="1"/>
+                                    <field name="available_qty" invisible="1"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <group>
                                         <group attrs="{'invisible': [('display_type', '!=', False)]}"
                                                style="font-size:11pt">
                                             <field name="product_updatable" invisible="1"/>
-                                            <field name="product_id"
+                                            <field name="product_id" options="{'no_open':True,'no_create': True}"
                                                    domain="[('order_type','in',('IM','WS','BT','PH','ALL')),('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                                    context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
                                                    attrs="{
@@ -270,22 +302,21 @@
                                             <field name="price_tax" invisible="1"/>
                                             <field name="price_subtotal" invisible="1"/>
                                             <field name="product_uom_readonly" invisible="1"/>
-                                            <label for="product_uom_qty"/>
+                                            <label for="product_uom_pharma_qty"/>
                                             <div class="o_row" name="ordered_qty">
+                                                <field name="product_uom_pharma_qty"></field>
                                                 <field
                                                         context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'uom_qty_change':True, 'company_id': parent.company_id}"
-                                                        name="product_uom_qty"/>
+                                                        name="product_uom_qty" invisible="1"/>
                                                 <strong>Unit</strong>
                                                 <field name="product_uom" invisible="1" groups="!uom.group_uom"/>
+                                                <field name="product_uom_pharma_measure_descr" readonly="1"/>
                                                 <field
-                                                        name="product_uom"
-                                                        force_save="1"
+                                                        name="product_uom"  invisible="1"
+                                                        force_save="1" options="{'no_open':True,'no_create': True}"
+                                                        readonly="1"
                                                         groups="uom.group_uom"
                                                         class="oe_no_button"
-                                                        attrs="{
-                                                    'readonly': [('product_uom_readonly', '=', True)],
-                                                    'required': [('display_type', '=', False)],
-                                                }"
                                                 />
                                             </div>
                                             <label for="qty_delivered" string="Delivered"
@@ -304,13 +335,15 @@
                                             </div>
                                             <field name="product_packaging_id"
                                                    attrs="{'invisible': [('product_id', '=', False)]}"
+                                                   options="{'no_open':True,'no_create': True}"
                                                    context="{'default_product_id': product_id, 'tree_view_ref':'product.product_packaging_tree_view', 'form_view_ref':'product.product_packaging_form_view'}"
                                                    groups="product.group_stock_packaging"/>
 
-                                            <label for="discount" groups="product.group_discount_per_so_line"/>
-                                            <div name="discount" groups="product.group_discount_per_so_line">
-                                                <field name="discount" class="oe_inline"/>
-                                                %
+                                            <label for="discount" invisible="1"
+                                                   groups="product.group_discount_per_so_line"/>
+                                            <div name="discount" invisible="1"
+                                                 groups="product.group_discount_per_so_line">
+                                                <field name="discount" class="oe_inline" invisible="1"/>
                                             </div>
                                             <!--
                                                 We need the sequence field to be here
@@ -320,18 +353,22 @@
                                             -->
                                             <field name="sequence" invisible="1"/>
                                         </group>
-                                        <group col="2" attrs="{'invisible': [('display_type', '!=', False)]}"
+                                        <group attrs="{'invisible': [('display_type', '!=', False)]}"
                                                style="font-size:11pt">>
-                                            <field name="price_unit" readonly="True"/>
-                                            <field name="tax_id" widget="many2many_tags" options="{'no_create': True}"
-                                                   context="{'search_view_ref': 'account.account_tax_view_search'}"
-                                                   domain="[('type_tax_use','=','sale'), ('company_id','=',parent.company_id), ('country_id', '=', parent.tax_country_id)]"
-                                                   attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+
+                                            <label for="price_unit" string="Unit price"/>
+                                            <div class="o_row">
+                                                <field name="price_unit" readonly="1"/>
+                                                <strong>Taxes</strong>
+                                                <field name="tax_id" widget="many2many_tags"
+                                                       readonly="1"/>
+                                            </div>
                                         </group>
                                         <hr></hr>
                                         <group>
                                             <field name="tracking" invisible="1"></field>
-                                            <field name="lot_id" attrs="{'readonly': [('tracking', '!=', 'lot')]}" options="{'no_open':True,'no_create': True}"
+                                            <field name="lot_id" attrs="{'readonly': [('tracking', '!=', 'lot')]}"
+                                                   options="{'no_open':True,'no_create': True}"
                                                    domain="[('product_id', '=', product_id)]"></field>
                                         </group>
                                     </group>
@@ -349,7 +386,7 @@
                                         <create name="add_note_control" string="Add a note"
                                                 context="{'default_display_type': 'line_note'}"/>
                                     </control>
-
+                                    <field name="available_qty" invisible="1"/>
                                     <field name="sequence" widget="handle"/>
                                     <!-- We do not display the type because we don't want the user to be bothered with that information if he has no section or note. -->
                                     <field name="display_type" invisible="1"/>
@@ -372,9 +409,7 @@
                                         'default_lst_price': price_unit,
                                         'default_description_sale': name
                                     }"
-                                            options="{
-                                        'no_open': True,
-                                    }"
+                                            options="{'no_open':True,'no_create': True}"
                                             domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                             widget="sol_product_many2one"
                                     />
@@ -474,7 +509,7 @@
                                             options="{'no_create': True}"
                                             domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id), ('country_id', '=', parent.tax_country_id)]"
                                             context="{'active_test': True}"
-                                            attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"
+                                            readonly="1"
                                             optional="show"
                                     />
                                     <field name="discount" string="Disc.%" groups="product.group_discount_per_so_line"
@@ -499,6 +534,7 @@
                                     <field name="product_uom"/>
                                     <field name="price_subtotal"/>
                                     <field name="price_total"/>
+                                    <field name="available_qty"/>
                                     <field name="price_tax" invisible="1"/>
                                     <field name="price_total" invisible="1"/>
                                     <field name="price_unit"/>
@@ -542,10 +578,8 @@
                                                                 </div>
                                                                 <div class="col-12 text-muted">
                                                                     Available:
-                                                                    <t t-out="available_qty"/>
+                                                                    <t t-out="record.available_qty.value"/>
                                                                 </div>
-                                                            </div>
-                                                            <div class="row">
                                                                 <div class="col-12 text-muted">
                                                                     Unit Price:
                                                                     <t t-out="record.price_unit.value"/>
@@ -577,6 +611,8 @@
                     </notebook>
                     <div class="oe_chatter">
                         <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
                     </div>
                 </sheet>
             </form>
@@ -588,9 +624,9 @@
         <field name="name">Sales order</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_partner_id':15488,'default_order_from':'PH','default_payment_term_id':11}
+        <field name="context">{'default_partner_id':15488,'default_order_from':'PH','default_payment_term_id':11,'search_default_today_sales':1}
         </field>
-        <field name="domain">[('order_from','like','PH')]</field>
+        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True)]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharma_no_invoice')}),
@@ -601,25 +637,12 @@
         <field name="name">Sales invoice</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_payment_term_id':11,'default_order_from':'PH','search_default_to_invoice':1}
+        <field name="context">{'default_payment_term_id':11,'default_order_from':'PH','search_default_to_invoice':1,'search_default_today_sales':1}
         </field>
-        <field name="domain">[('order_from','like','PH'),('invoice_status','in',('to invoice','invoiced'))]</field>
+        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to invoice','invoiced'))]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharma_to_invoice')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharma')})]"/>
-    </record>
-
-    <record id="droga_sales_pharmacy_action_so_and_invoice" model="ir.actions.act_window">
-        <field name="name">Sales and invoice</field>
-        <field name="res_model">sale.order</field>
-        <field name="view_mode">tree,form</field>
-        <field name="context">{'default_partner_id':15488,'default_order_from':'PH','default_payment_term_id':11}
-        </field>
-        <field name="domain">[('order_from','like','PH')]</field>
-        <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_order_tree_pharma_so_and_invoice')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_form_pharma')})]"/>
     </record>
 

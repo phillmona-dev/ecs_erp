@@ -94,6 +94,7 @@ class PayrollMasterReports(models.Model):
         file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
         self.payroll_sheet_report(workbook)
+
         self.payroll_net_report(workbook)
         self.deductions_report(workbook)
         self.payroll_reconciliation_report(workbook)
@@ -352,33 +353,11 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 20, pen2_sub_total, num_format_sub_total)
 
     def payroll_net_report(self, workbook):
-        sheet = workbook.add_worksheet('Net Pay')
 
-        sheet.set_column('A:A', 5)
-        sheet.set_column('B:B', 30)
-        sheet.set_column('C:C', 15)
-        sheet.set_column('D:D', 15)
-
-        row_start = 13
-        date_format = workbook.add_format(
-            {'num_format': 'mm/dd/yyyy', 'border': 7})
         num_format = workbook.add_format({'num_format': 43, 'border': 1})
         num_format_sub_total = workbook.add_format({'num_format': 43, 'border': 1, 'bold': 1})
-        cent_format = workbook.add_format({'num_format': 41, 'border': 1})
         border = workbook.add_format({'border': 1})
-        bold = workbook.add_format({'bold': True})
-        header_format = workbook.add_format({
-            'bold': 1,
-            'border': 7,
-            'align': 'center',
-            'valign': 'vcenter',
-            'font_size': 22})
-        medium_header_format = workbook.add_format({
-            'bold': 1,
-            'border': 0,
-            'align': 'left',
-            'valign': 'vcenter',
-            'font_size': 23})
+
         big_header_format = workbook.add_format({
             'bold': 1,
             'border': 0,
@@ -392,35 +371,12 @@ class PayrollMasterReports(models.Model):
             'align': 'left',
             'valign': 'vcenter',
             'font_size': 11})
-
         small1_header_format = workbook.add_format({
             'bold': 0,
             'border': 0,
             'align': 'left',
             'valign': 'vcenter',
             'font_size': 11})
-        main_title_format = workbook.add_format({
-            'bold': 1,
-            'border': 0,
-            'align': 'center',
-            'valign': 'vcenter',
-            'font_size': 16})
-        parameter_format = workbook.add_format({
-            'bold': 1,
-            'border': 7,
-            'align': 'left',
-            'valign': 'vcenter',
-            'font_size': 12,
-            'fg_color': '#F6F5F5'})
-
-        separator_format = workbook.add_format({
-            'bold': 1,
-            'border': 7,
-            'align': 'left',
-            'valign': 'vcenter',
-            'font_size': 12,
-            'fg_color': '#D9D9D9'})
-
         title_format = workbook.add_format({
             'bold': 1,
             'border': 1,
@@ -429,76 +385,102 @@ class PayrollMasterReports(models.Model):
             'font_size': 11,
             'text_wrap': 1,
             'fg_color': '#F6F5F5'})
-        title_format_num = workbook.add_format({
-            'bold': 1,
-            'border': 1,
-            'num_format': 43,
-            'align': 'center',
-            'valign': 'vcenter',
-            'font_size': 11,
-            'text_wrap': 1,
-            'fg_color': '#F6F5F5'})
 
-        # add titles
-        sheet.merge_range('A1:G1', self.batch.company_id.name, big_header_format)
-        sheet.merge_range('A2:G2', 'Date:' + str(datetime.date.today()), small_header_format)
-        sheet.merge_range('A3:G3', 'Our Ref. No.: DR/FI/794/14', small_header_format)
-        sheet.merge_range('A4:G4', '', small_header_format)
+        # get unique bank accounts
+        bank_accounts = self.env['hr.employee'].read_group([], ['bank'], groupby=['bank'])
 
-        sheet.merge_range('A5:G5', 'Addis International Bank', small_header_format)
-        sheet.merge_range('A6:G6', 'Main Office', small_header_format)
-        sheet.merge_range('A7:G7', '', small_header_format)
-        sheet.merge_range('A8:G8', 'Re: PAYMENT TRANSFER', small_header_format)
-        sheet.merge_range('A9:G9', '', small_header_format)
-        sheet.merge_range('A10:G10', 'Dear Sir/ Madam- Please prepare the below payment from our Account No:114335 ',
-                          small1_header_format)
-        sheet.merge_range('A11:G11', '', small_header_format)
+        for bank_account in bank_accounts:
 
-        sheet.write(row_start, 0, 'No', title_format)
-        sheet.write(row_start, 1, 'Employee Name', title_format)
-        sheet.write(row_start, 2, 'Account', title_format)
-        sheet.write(row_start, 3, 'Amount', title_format)
-        row_start += 1
-        total_net_pay = 0
+            bank_id = False
+            bank_name = ''
+            bank_account_number = ''
 
-        # search based on cost center
-        if self.cost_center.ids:
-            slips = self.batch.slip_ids.search([('employee_id.department_id', 'in', self.cost_center.ids)])
-        else:
-            slips = self.batch.slip_ids
+            if bank_account['bank']:
+                bank_id = bank_account['bank'][0]
+                bank_name = str(bank_account['bank'][1])
 
-        for record in slips:
-            sheet.write(row_start, 0, row_start - 13, border)
-            sheet.write(row_start, 1, record.employee_id.name, border)
-            sheet.write(row_start, 2, '-', border)
-            sheet.write(row_start, 3, record.net_wage, num_format)
+                # get bank account number
+                bank_account = self.env['res.bank'].search([('id', '=', bank_id)])
+
+                if bank_account:
+                    bank_account_number = bank_account.bic
+
+            sheet_name = bank_name + ' - Net Pay'
+            sheet = workbook.add_worksheet(sheet_name)
+
+            sheet.set_column('A:A', 5)
+            sheet.set_column('B:B', 30)
+            sheet.set_column('C:C', 15)
+            sheet.set_column('D:D', 15)
+
+            row_start = 13
+
+            # add titles
+            sheet.merge_range('A1:G1', self.batch.company_id.name, big_header_format)
+            sheet.merge_range('A2:G2', 'Date:' + str(datetime.date.today()), small_header_format)
+            sheet.merge_range('A3:G3', 'Our Ref. No.: ', small_header_format)
+            sheet.merge_range('A4:G4', '', small_header_format)
+
+            sheet.merge_range('A5:G5', bank_name, small_header_format)
+            sheet.merge_range('A6:G6', 'Main Office', small_header_format)
+            sheet.merge_range('A7:G7', '', small_header_format)
+            sheet.merge_range('A8:G8', 'Re: PAYMENT TRANSFER', small_header_format)
+            sheet.merge_range('A9:G9', '', small_header_format)
+            sheet.merge_range('A10:G10',
+                              'Dear Sir/ Madam- Please prepare the below payment from our Account No: ' + bank_account_number,
+                              small1_header_format)
+            sheet.merge_range('A11:G11', '', small_header_format)
+
+            sheet.write(row_start, 0, 'No', title_format)
+            sheet.write(row_start, 1, 'Employee Name', title_format)
+            sheet.write(row_start, 2, 'Account', title_format)
+            sheet.write(row_start, 3, 'Amount', title_format)
             row_start += 1
-            # total net pay
-            total_net_pay += record.net_wage
+            total_net_pay = 0
 
-        # get total amount in word
-        amount_in_word = self.convert_to_word(total_net_pay)
+            # search based on cost center
+            if self.cost_center.ids:
+                slips = self.batch.slip_ids.search([('employee_id.department_id', 'in', self.cost_center.ids)])
+            else:
+                slips = self.batch.slip_ids
 
-        sheet.merge_range('A12:G12', 'AMOUNT IN WORDS:' + str(amount_in_word),
-                          small1_header_format)
+            for record in slips:
+                if record.employee_id.bank.id == bank_id:
+                    bank_account = record.employee_id.bank_account if record.employee_id.bank_account else ''
 
-        sheet.write(row_start, 2, "Total", num_format_sub_total)
-        sheet.write(row_start, 3, total_net_pay, num_format_sub_total)
+                    sheet.write(row_start, 0, row_start - 13, border)
+                    sheet.write(row_start, 1, record.employee_id.name, border)
+                    sheet.write(row_start, 2, bank_account, border)
+                    sheet.write(row_start, 3, record.net_wage, num_format)
+                    row_start += 1
+                    # total net pay
+                    total_net_pay += record.net_wage
 
-        row_start += 2
-        row = 'A' + str(row_start) + ':G' + str(row_start)
+            # get total amount in word
+            # amount_in_word = self.convert_to_word(total_net_pay)
+            amount_in_word = self.env['account.move'].convert_to_word(round(total_net_pay, 2))
 
-        sheet.merge_range(row, 'Please debit our bank account with you for any of your regular bank service charges',
-                          small1_header_format)
+            sheet.merge_range('A12:G12', 'AMOUNT IN WORDS:' + str(amount_in_word),
+                              small1_header_format)
 
-        row_start += 2
-        row = 'A' + str(row_start) + ':G' + str(row_start)
-        sheet.merge_range(row, 'Name: Henok Teka', small_header_format)
+            sheet.write(row_start, 2, "Total", num_format_sub_total)
+            sheet.write(row_start, 3, total_net_pay, num_format_sub_total)
 
-        row_start += 2
-        row = 'A' + str(row_start) + ':G' + str(row_start)
-        sheet.merge_range(row, 'Position: Chief Executive Officer       ________________________________',
-                          small_header_format)
+            row_start += 2
+            row = 'A' + str(row_start) + ':G' + str(row_start)
+
+            sheet.merge_range(row,
+                              'Please debit our bank account with you for any of your regular bank service charges',
+                              small1_header_format)
+
+            row_start += 2
+            row = 'A' + str(row_start) + ':G' + str(row_start)
+            sheet.merge_range(row, 'Name: Henok Teka', small_header_format)
+
+            row_start += 2
+            row = 'A' + str(row_start) + ':G' + str(row_start)
+            sheet.merge_range(row, 'Position: Chief Executive Officer       ________________________________',
+                              small_header_format)
 
     def deductions_report(self, workbook):
         sheet = workbook.add_worksheet('Deductions')

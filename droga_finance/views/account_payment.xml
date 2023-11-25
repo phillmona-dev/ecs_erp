@@ -58,7 +58,7 @@
 
             <xpath expr="//field[@name='payment_method_line_id']" position="after">
                 <field name="transaction_type" options="{'no_create':True,'no_open':True}" invisible="1"/>
-                <field name="payment_request_id" options="{'no_create':True}" readonly="1"/>
+                <field name="payment_request_id" options="{'no_create':True}" readonly="0"/>
             </xpath>
 
             <xpath expr="//field[@name='partner_id']" position="after">

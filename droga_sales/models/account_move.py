@@ -41,6 +41,22 @@ class account_move(models.Model):
     core_amt = fields.Float('Core amount', compute="_get_core_amt", store=True)
     non_core_amt = fields.Float('Non-core amount', compute="_get_core_amt", store=True)
 
+    #To add tracking to tax field
+    amount_tax = fields.Monetary(
+        string='Tax',
+        compute='_compute_amount', store=True, readonly=True,tracking=True
+    )
+
+    @api.onchange("is_invoice_printed_pos")
+    def _invoice_print_status_changed(self):
+        for rec in self:
+            sales=self.env['sale.order'].search([('name','=',rec.invoice_origin)])
+            for sale in sales:
+                if rec.is_invoice_printed_pos:
+                    sale.write({'invoice_printed':'Yes'})
+                else:
+                    sale.write({'invoice_printed': 'o'})
+
     @api.depends('invoice_line_ids.price_subtotal')
     def _get_core_amt(self):
 
@@ -50,7 +66,10 @@ class account_move(models.Model):
                 if records.product_id.product_tmpl_id.is_core_product:
                     core_sum = core_sum + records.price_subtotal
             rec.core_amt = core_sum
-            rec.non_core_amt = rec.amount_total_in_currency_signed - core_sum
+            if rec.amount_untaxed==0:
+                rec.non_core_amt = rec.amount_total - core_sum
+            else:
+                rec.non_core_amt = rec.amount_untaxed - core_sum
 
     def _compute_order_from(self):
 
@@ -288,6 +307,25 @@ class account_move(models.Model):
             if tax_ids != '':
                 record.tax_ids = tax_ids
 
+    def set_analytic_accounts_only(self):
+        # get analytic account
+        analytic_distribution = ""
+        tax_ids = ''
+        for record in self.invoice_line_ids:
+            if record.analytic_distribution:
+                analytic_distribution = record.analytic_distribution
+
+            if analytic_distribution != '':
+                break
+
+        if analytic_distribution == '':
+            raise ValidationError("At least fill the first line!")
+
+        # fill empty analytic lines
+        for record in self.invoice_line_ids:
+            if analytic_distribution != '':
+                record.analytic_distribution = analytic_distribution
+
     def convert_to_word(self, num):
         num_strings = str(num)
         numbers = num_strings.split('.')
@@ -370,6 +408,18 @@ class account_move_line(models.Model):
     item_code = fields.Char(compute="get_item_code", string="Item Code", store=True)
     item_description_alternate = fields.Char("Item Description Alternate")
     item_uom_alternate = fields.Char("UoM Alternate", default="")
+    account=fields.Char(related='account_id.code',store=True)
+    origin_ref=fields.Char(compute="get_origin_ref",string="Origin reference",store=True)
+    def get_origin_ref(self):
+        for record in self:
+            if record.name and record.journal_id.id in (2,201):
+                stock_move_line=self.env['stock.move.line'].search([('reference', '=', record.name.split(' - ')[0])])
+                if len(stock_move_line)>0:
+                    record.origin_ref=stock_move_line[0].move_id.origin
+                else:
+                    record.origin_ref = '-'
+            else:
+                record.origin_ref='-'
 
     @api.onchange('analytic_distribution')
     def analytic_distribution(self):

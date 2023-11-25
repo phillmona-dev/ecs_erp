@@ -79,7 +79,7 @@
                             string="Set to Draft" font-size="16px"
                             groups="droga_pharma.physio_user_bole_invoice,droga_pharma.physio_user_4k_invoice"
                             type="object" class="btn-primary" data-hotkey="q"
-                            attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                            attrs="{'invisible': [('invoice_status', 'not in', ('no','to invoice'))]}"/>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,sale"/>
 
@@ -173,7 +173,7 @@
                                         <group attrs="{'invisible': [('display_type', '!=', False)]}" style="font-size:11pt">
                                             <field name="product_updatable" invisible="1"/>
                                             <field name="product_id"
-                                                   domain="[('order_type','=','PT'),('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
+                                                   domain="[('order_type','in',('PT','ALL')),('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
                                                    context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
                                                    attrs="{
                                                 'readonly': [('product_updatable', '=', False)],

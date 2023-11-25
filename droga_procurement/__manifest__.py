@@ -49,6 +49,7 @@
         'report/estimated_landed_cost.xml',
         'data/mail_template.xml',
         'views/menu.xml',
+        'report/purchase_items_list.xml'
 
     ],
     # only loaded in demonstration mode

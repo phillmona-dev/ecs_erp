@@ -75,11 +75,27 @@ class droga_warehouse_extension(models.Model):
     _inherit = 'stock.warehouse'
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
-
+    has_no_access=fields.Boolean('is_loc_not_accessible', default=False, compute='_compute_has_access',
+                                search='_search_has_no_access')
+    has_dispensary_location = fields.Boolean("Has dispensary location")
     wh_type=fields.Selection([
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.')
+
+    def _search_has_no_access(self, operator, value):
+
+        compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
+
+        if operator == '=':
+            if len(compiled_wh_domain) == 0:
+                return [('id', 'in', self.env['stock.warehouse'])]
+            else:
+                has_access = self.env['stock.warehouse'].sudo().search(
+                    [('code', 'in', compiled_wh_domain)])
+                return [('id', 'not in', [x.id for x in has_access] if has_access else False)]
+        else:
+            return [('id', 'in', self.env['stock.warehouse'])]
 
     def _search_has_access(self, operator, value):
 
@@ -102,8 +118,10 @@ class droga_warehouse_extension(models.Model):
         for rec in self:
             if rec.code in compiled_wh_domain:
                 rec.has_access = True
+                rec.has_no_access = False
             else:
                 rec.has_access = False
+                rec.has_no_access = True
 
     def write(self, vals):
         for rec in self:
@@ -188,7 +206,7 @@ class droga_location_extension(models.Model):
 
     def write(self, vals):
         for rec in self:
-            if not self.env.user.has_group('droga_inventory.inv_prod_fin_wareloc'):
+            if not self.env.user.has_group('droga_inventory.inv_prod_fin_wareloc') and (len(vals)!=1 or 'last_inventory_date' not in vals):
                 raise UserError("You can not edit location.")
         return super(droga_location_extension, self).write(vals)
 
@@ -274,6 +292,35 @@ class droga_stock_uom_extension(models.Model):
             raise UserError("You can not update a unit of measure. Please contact your supervisor.")
         return super(droga_stock_uom_extension, self).write(vals_list)
 
+    def name_get(self):
+        result = []
+        for record in self:
+            if self.env.context.get('show_title', False):
+                # Only goes off when the custom_search is in the context values.
+                result.append((record.id, record.uom_title))
+            else:
+                result.append((record.id, record.name))
+        return result
+
+class val_layer(models.Model):
+    _inherit='stock.valuation.layer'
+    reference = fields.Char(related='stock_move_id.reference',store=True)
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move Detail', related='stock_move_id.trans_type_detail',store=True)
+    trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move',
+                                        related='stock_move_id.trans_type', store=True)
+    move_date=fields.Date('Stock move date',store=True)
+    date_month = fields.Char(string='Date Month', compute='_get_date_month', store=True, readonly=True)
+    warehouse=fields.Many2one('stock.warehouse',store=True)
+    origin=fields.Char(related='stock_move_id.origin',store=True)
+
+    @api.depends('move_date')
+    def _get_date_month(self):
+        for rec in self:
+            if rec.move_date:
+                rec.date_month = rec.move_date.month
+            else:
+                rec.date_month='0'
+
 class stock_move_mail_added(models.Model):
     _name = "stock.move"
     _inherit = ['stock.move','mail.thread', 'mail.activity.mixin', 'image.mixin']
@@ -284,6 +331,16 @@ class droga_stock_move_extension(models.Model):
     reservation_discard_time=fields.Datetime(string='Reservation cancel time',compute='_compute_res_discard',inverse='_inverse_res_discard')
     reserve_indef=fields.Boolean('Reserve indefinitely',default=False,tracking=True)
     source_wh=fields.Char(related='location_id.warehouse_id.name')
+    trans_type=fields.Many2one('droga.inventory.transaction.types',string='Type',compute='_get_trans_type',store=True)
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type Detail', compute='_get_trans_type',
+                                 store=True)
+
+    @api.depends('state')
+    def _get_trans_type(self):
+        for rec in self:
+            rec.trans_type=False
+            rec.trans_type_detail = False
+
     def _inverse_res_discard(self):
         pass
 
@@ -424,6 +481,7 @@ class droga_stock_picking_extension(models.Model):
     to_correct_pick = fields.Many2one('stock.picking',string='To correct reference')
     request_no=fields.Char('Request No')
     remark = fields.Char('Remark')
+    requested_by=fields.Char('Requested by')
     location_id_type=fields.Selection([
         ('CONI', 'Consignment customer location'),
         ('CONR', 'Consignment vendor location'),
@@ -535,37 +593,20 @@ class droga_stock_picking_extension(models.Model):
 
         return super(droga_stock_picking_extension, self).button_validate()
 
-    @api.model
-    def get_view_(self, view_id=None, view_type='form', **options):
-
-        res = super().get_view(view_id, view_type, **options)
-
-        doc = etree.XML(res['arch'])
-
-        if view_type == 'form':
-
-            for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name'):
-                    continue
-                modifiers = simplejson.loads(node.get("modifiers"))
-                modifiers['readonly'] = [['state', 'not in', ('draft', 'waiting', 'confirmed','assigned')]]
-                node.set('modifiers', simplejson.dumps(modifiers))
-            res['arch'] = etree.tostring(doc)
-
-        return res
-
 class purchase_request_extension(models.Model):
     _inherit = 'droga.purhcase.request'
     store_origin_form=fields.Many2one('stock.picking',readonly=True)
 
 class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
+    name = fields.Char('Name', index='trigram', required=True, translate=True,tracking=True)
     company_id = fields.Many2one('res.company', string='Company',index=True, default=lambda self: self.env.company, required=False)
     order_type = fields.Selection([
         ('IM', 'Import and pharmacy'),
         ('WS', 'Wholesale and pharmacy'),
         ('BT', 'Import and wholesale'),
     ('PT', 'Physiotherapy only'),('PH', 'Pharmacy only'),('ALL','ALL')], string='Product used under')
+    from_pharma=fields.Boolean('Created from pharmacy menu',default=False,store=False)
     bought_locally=fields.Boolean('Bought Locally',default=False)
     pharmacy_group_id=fields.Many2one('droga.prod.categ.pharma')
     list_price = fields.Float(
@@ -596,10 +637,13 @@ class droga_stock_product_extension(models.Model):
     list_price_phar = fields.Float(
         'Sales price pharmacy', default=1.0,
         digits='Product Price',
-        help="Price at which the product is sold to pharmacy customers.",
+        help="Price at which the product is sold to pharmacy customers.",tracking=True
     )
     manufacturing=fields.Char('Manufacturer')
     origin = fields.Many2one('res.country',string='Origin')
+    reg_status=fields.Selection([('draft', 'draft'), ('waiting', 'waiting'),('rejected', 'rejected'),('approved', 'approved')],
+                            default='draft')
+
     def _get_prod_id(self):
         for rec in self:
             prods=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
@@ -619,7 +663,32 @@ class droga_stock_product_extension(models.Model):
             else:
                 rec.prod_read_only = False
 
-    pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM')
+    def approve(self):
+        self.set_activity_done()
+        for res in self:
+            res.reg_status = 'approved'
+            prods = self.env['product.product'].sudo().search(
+                [('product_tmpl_id', '=', res.id),('active','=',False)])
+            for pr in prods:
+                pr.active = True
+
+    def reject(self):
+        self.set_activity_done()
+        for res in self:
+            res.reg_status = 'rejected'
+            prods = self.env['product.product'].sudo().search(
+                [('product_tmpl_id', '=', res.id),('active','=',True)])
+            for pr in prods:
+                pr.active = False
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.display_name)])
+        for act in activity:
+            act.sudo().action_done()
+
+    categ=fields.Many2one('uom.category',related='uom_id.category_id')
+    pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',tracking=True)
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
@@ -627,12 +696,20 @@ class droga_stock_product_extension(models.Model):
     maximum_stock_level = fields.Float('Maximum stock level')
     average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
     is_core_product = fields.Boolean('Is core product for promoters',tracking=True)
+    prod_approver = fields.Many2one('res.users', store=True)
+
     def _get_avg_monthly_consumption(self):
         for rec in self:
             rec.average_month_consumption=0
 
     has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
+
+    @api.onchange("pharma_uom")
+    def _on_change_pharma_uom(self):
+        for rec in self:
+            if rec.from_pharma:
+                rec.uom_id=rec.pharma_uom
 
     def _search_has_access(self, operator, value):
 
@@ -676,6 +753,8 @@ class droga_stock_product_extension(models.Model):
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager') and 'seller_ids' not in vals_list and 'invoice_policy' not in vals_list and 'crm_group' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
         for rec in self:
+            if rec.reg_status=='rejected' and not self.env.user.has_group('droga_inventory.droga_prod_app'):
+                raise UserError("You can not edit the product as it's rejected.")
             if 'default_code' in vals_list:
                 if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_' and rec.default_code and vals_list['default_code']:
                     if rec.default_code[-1]!='_':
@@ -684,6 +763,9 @@ class droga_stock_product_extension(models.Model):
                 for prod in to_update:
                     prod.write({'default_code':vals_list['default_code']})
             if 'active' in vals_list:
+                if rec.reg_status == 'waiting' and not self.env.user.has_group('droga_inventory.droga_prod_app') and vals_list['active']:
+                    raise UserError("You can not edit the product as it's awaiting approval.")
+
                 if rec.active and not vals_list['active'] and rec.default_code[-1]!='_':
                     rec.write({'default_code':rec.default_code+'_'})
                 if not rec.active and vals_list['active'] and rec.default_code[-1]=='_':
@@ -723,6 +805,8 @@ class droga_stock_product_extension(models.Model):
 
     @api.model
     def create(self, vals_list):
+        vals_list["prod_approver"] = self.env.ref("droga_inventory.droga_prod_app").users.ids[0] if len(
+            self.env.ref("droga_inventory.droga_prod_app").users.ids) > 0 else None
         res=super(droga_stock_product_extension, self).create(vals_list)
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
@@ -735,6 +819,14 @@ class droga_stock_product_extension(models.Model):
             raise UserError("Default code can not be empty.")
         if res.company_id.id==2:
             res.order_type='ALL'
+        if res.reg_status=='draft' and not res.categ_id.name.startswith('Office') and res.company_id.id==1 and not res.from_pharma:
+            res.reg_status='waiting'
+            prods=self.env['product.product'].sudo().search(
+                    [('product_tmpl_id', '=', res.id)])
+            for pr in prods:
+                pr.active=False
+        else:
+            res.reg_status='approved'
 
         return res
 
@@ -767,3 +859,6 @@ class ResUsers(models.Model):
     warehouse_ids_ph = fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph', 'uid', 'warehouse_id',
                                            domain="[('wh_type', '=', 'PH')]",
                                            string='Stock warehouse access')
+    warehouse_ids_ph_disp=fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph_disp', 'uid', 'warehouse_id',
+                                           domain="[('wh_type', '=', 'PH'),('has_dispensary_location','=',True)]",
+                                           string='Pharmacy sales access')

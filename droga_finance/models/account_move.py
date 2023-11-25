@@ -47,6 +47,11 @@ class AccountMove(models.Model):
     # crv
     crvs = fields.One2many('account.move.crv', 'move_id_crv')
 
+    branch_address = fields.Many2one('droga.sales.branch.address', compute='get_branch_address')
+
+    payment_request_id=fields.Integer(related='payment_id.payment_request_id.id')
+
+
     @api.model
     def create(self, vals):
         # Check withholding
@@ -97,9 +102,9 @@ class AccountMove(models.Model):
                 elif tax_id.amount == 15:
                     vat_amount += abs(record.balance * tax_id.amount / 100)
 
-        self.withholding_two_percent = tax_amount1
-        self.withholding_thirty_percent = tax_amount2
-        self.vat_percent = vat_amount
+        self.withholding_two_percent = round(tax_amount1, 2)
+        self.withholding_thirty_percent = round(tax_amount2, 2)
+        self.vat_percent = round(vat_amount, 2)
 
     # get sales person
     @api.depends('invoice_line_ids.analytic_distribution')
@@ -230,6 +235,13 @@ class AccountMove(models.Model):
                 if picking_lists:
                     record.picking_list = picking_lists
 
+    def get_branch_address(self):
+        for record in self:
+            record.branch_address = None
+            branch_address = self.env['droga.sales.branch.address'].search(
+                [('profit_center', '=', record.account_move_linked_analytic.id)])
+            record.branch_address = branch_address
+
     # Generate withholding reference
     def generate_withholding_ref(self):
         # get sequence number for each company
@@ -255,7 +267,7 @@ class AccountMove(models.Model):
             raise ValidationError("You can't print CRV amount greater than the invoice amount")
 
     def convert_to_word(self, num):
-        num_strings = str(num)
+        num_strings = str(abs(num))
         numbers = num_strings.split('.')
 
         word = self.int_to_word(int(numbers[0])) + ' birr'

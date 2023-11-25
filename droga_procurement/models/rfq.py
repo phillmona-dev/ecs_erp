@@ -442,8 +442,8 @@ class Rfq(models.Model):
                     'company_id':self.company_id.id,
                     'bank': bank.id if bank else None,
                     'branch': bank_branch if bank_branch else None,
-                    'currency_approved_date': approved_date if approved_date else None
-
+                    'currency_approved_date': approved_date if approved_date else None,
+                    'from_rfq': True
                 }
                 vals['order_line'] = []
 
@@ -457,8 +457,9 @@ class Rfq(models.Model):
                         'product_id': line.product_id.id,
                         'product_qty': line.product_qty,
                         'product_uom': line.product_uom.id,
+                        'product_uom_pharma': line.product_uom.id,
                         'unit_price_foregin': line.unit_price_foregin,
-                        'taxes_id': [(6, 0, line.tax_id.ids)],
+                        'taxes_id': [(6, 0, line.tax_id.ids)]
                     })
 
                     vals['order_line'].append(order_line_vals)

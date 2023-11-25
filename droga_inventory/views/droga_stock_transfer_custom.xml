@@ -26,52 +26,46 @@
         <field name="arch" type="xml">
             <form string="Transfers" delete="0">
                 <header>
-                    <field name="is_owner" invisible="1"></field>
                     <button name="request"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="stmg_approve"
-                            attrs="{'invisible': ['|',('state', 'not in', ('waiting')),('is_owner','=','YES')]}"
-                            string="Accpet" type="object" class="oe_highlight" data-hotkey="v"/>
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
-                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="reset_order"
-                            attrs="{'invisible': [('is_owner','=','YES')]}"
+                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
                             string="Reset to draft" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,waiting2,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
                     <group string="Store transfer request">
                         <group>
                             <field name="location_filter" invisible="1"></field>
-                            <field name="location_dest_id" options="{'no_create':True,'no_open':True}"
-                                   domain="([('has_access','=',True),('con_type','=','SRL')])"
-                                   attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
-                            <field name="transfer_picking" readonly="1" widget="many2many_tags"
-                                   attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
+                            <field name="location_dest_id" options="{'no_create':True,'no_open':True}" domain="(['|',('has_read_access','=',True),('has_access','=',True),('con_type','=','SRL')])" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="transfer_picking" readonly="1" widget="many2many_tags" attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
                         </group>
                         <group>
-                            <field name="request_date"
-                                   attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
+                            <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
                         </group>
                     </group>
                     <notebook>
                         <page string="Product Details">
-                            <field name="detail_entries"
-                                   attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done','processed'))]}">
+                            <field name="detail_entries" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done','processed'))]}">
                                 <tree editable="bottom">
                                     <field name="company_id" invisible="1"/>
-                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}"
-                                           context="{'default_detailed_type': 'product'}"/>
+                                    <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
                                     <field name="product_uom"/>
                                     <field name="product_uom_qty" string="Request"/>
-                                    <field name="available_qty"
-                                           groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"/>
+                                    <field name="available_qty" groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"/>
                                     <field name="product_uom_category_id" invisible="1"/>
+                                    <field name="import_uom" invisible="1"/>
+                                    <field name="pharma_uom" invisible="1"/>
                                     <!--
                                     <field name="location_source_id" domain="([('usage','=','internal')])" string="Source location"/>
                                     -->
@@ -82,10 +76,10 @@
 
                     </notebook>
                     <div class="oe_chatter">
-                        <field name="message_follower_ids"/>
-                        <field name="activity_ids"/>
-                        <field name="message_ids"/>
-                    </div>
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
                 </sheet>
 
             </form>

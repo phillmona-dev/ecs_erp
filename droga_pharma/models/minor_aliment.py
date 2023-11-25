@@ -5,7 +5,7 @@ class droga_pharma_minor_alignment(models.Model):
     _name = 'droga.pharma.minor.alignment'
 
     #Text fields
-    minor_align=fields.Char("Minor aliment",required=True)
+    minor_align=fields.Char("Minor ailment",required=True)
     decision = fields.Selection(
         [('Advice only', 'Advice only'), ('Advice and treatment', 'Advice and treatment')])
     referral=fields.Selection(

@@ -66,8 +66,13 @@
 
     <menuitem id="droga_account_check_followup_menu" name="Check Followup" action="droga_account_check_followup_action"
               groups="account.group_account_manager" parent="account_accountant.menu_accounting" sequence="10"/>
+
     <menuitem id="droga_account_transaction_type_menu" name="Transaction Type" action="account_transaction_type_action"
               groups="account.group_account_manager" parent="account.account_account_menu" sequence="1"/>
+
+    <menuitem id="droga_sales_branch_address_view_menu" name="Branch Address"
+              action="droga_sales_branch_address_view_action"
+              groups="account.group_account_manager" parent="account.account_account_menu" sequence="2"/>
 
     <menuitem id="droga_purchase_order_finance" parent="account.menu_finance_payables" name="Purchase Order"
               groups="account.group_account_manager" sequence="900">
@@ -122,13 +127,23 @@
                   groups="account.group_account_manager"
                   sequence="4"/>
 
+        <menuitem id="droga_trial_balance_report_tree_menu" name="Trial Balance by Cost Center"
+                  action="view_move_line_trial_balance_action"
+                  groups="account.group_account_manager"
+                  sequence="5"/>
+
+         <menuitem id="droga_trial_balance_report_by_analytics_tree_menu" name="Trial Balance by Analytics"
+                  action="view_trial_balance_by_analytics_action"
+                  groups="account.group_account_manager"
+                  sequence="6"/>
+
 
     </menuitem>
 
     <!-- check setting menu-->
     <menuitem id="droga_check_setting_finance_menu" name="Check Setting" sequence="4"
-                  action="check_setting_action"
-                  groups="account.group_account_manager" parent="account.account_banks_menu"/>
+              action="check_setting_action"
+              groups="account.group_account_manager" parent="account.account_banks_menu"/>
 
 
 </odoo>

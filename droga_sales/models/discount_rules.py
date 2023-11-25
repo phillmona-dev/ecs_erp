@@ -2,6 +2,9 @@ from datetime import datetime
 
 import simplejson
 from lxml import etree
+import math
+
+import json
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
@@ -75,9 +78,10 @@ class sale_order_line(models.Model):
         inverse='_inverse_price',
         digits='Product Price',
         store=True, required=True, tracking=True)
-    is_prod_available = fields.Char(compute='_is_prod_available')
-    available_qty = fields.Float('Available', default=0, compute='_is_prod_available')
-    avail_char = fields.Char('Available', readonly=True, compute="_is_prod_available")
+    is_prod_available = fields.Char(compute='is_prod_available_method')
+    selling_price=fields.Float(related='product_id.list_price_phar')
+    available_qty = fields.Float('Available', default=0, compute='is_prod_available_method')
+    avail_char = fields.Char('Available', readonly=True, compute="is_prod_available_method")
     price_unit_before_discount = fields.Float('')
     wareh = fields.Many2one('stock.warehouse')
     store_placement = fields.Boolean('Placement', default=False)
@@ -85,15 +89,22 @@ class sale_order_line(models.Model):
     has_access = fields.Boolean(related='order_id.has_access')
     order_from = fields.Char(related='order_id.order_from')
     has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
+    product_uom_pharma_qty=fields.Float('Quantity',default=1)
+    product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
+    product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
 
-    @api.depends('product_id', 'order_id.order_type', 'product_uom')
-    def _is_prod_available(self):
+
+    @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
+    def is_prod_available_method(self):
         selfsud = self.sudo()
         for rec in selfsud:
             rec.available_qty = 0
 
-            if rec.order_id.order_from == 'PH':
-                wh_list = rec.order_id.wareh
+            if type(rec.order_id.order_from) is str:
+                if rec.order_id.order_from == 'PH' or rec.order_id.order_from.startswith('PT'):
+                    wh_list = rec.order_id.wareh
+                else:
+                    wh_list = selfsud.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
             else:
                 wh_list = selfsud.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
 
@@ -110,10 +121,18 @@ class sale_order_line(models.Model):
 
             if rec.product_id.detailed_type == 'service':
                 rec.is_prod_available = 'True'
-            elif (not rec.product_id.bought_locally) and rec.available_qty < rec.product_uom_qty:
+                return
+            if rec.order_id.order_from:
+                if rec.order_id.order_from.startswith('PH') and rec.available_qty < rec.product_uom_qty:
+                    rec.is_prod_available = 'False'
+                    return
+
+            prodqty=sum(self.order_id.order_line.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
+                'product_uom_qty'))
+            if (not rec.product_id.bought_locally) and rec.available_qty < prodqty:
                 rec.is_prod_available = 'False'
             # This is for out of stock products that are bought locally, they'll show up with orange color
-            elif rec.product_id.bought_locally and rec.available_qty < rec.product_uom_qty:
+            elif rec.product_id.bought_locally and rec.available_qty < prodqty:
                 rec.is_prod_available = 'Kinda'
             else:
                 rec.is_prod_available = 'True'
@@ -123,7 +142,7 @@ class sale_order_line(models.Model):
         moves = selfsud.env['stock.move'].search(
             [('product_id', '=', product_id.id), ('location_id.warehouse_id', '=', warehouse_id.id),
              ('location_id.usage', '=', 'internal'), ('location_dest_id.usage', '!=', 'internal'),
-             ('state', 'not in', ['done', 'cancel', 'draft'])])
+             ('state', 'not in', ['done', 'cancel', 'draft','waiting','confirmed'])])
         return sum(moves.mapped('reserved_qty'))
 
     def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):
@@ -131,7 +150,7 @@ class sale_order_line(models.Model):
         selfsud = self.sudo()
         tot_quantity = 0.0
         for location_id in selfsud.env['stock.location'].search(
-                [('warehouse_id', '=', warehouse_id.id), ('usage', '=', 'internal')]):
+                [('warehouse_id', '=', warehouse_id.id), ('usage', '=', 'internal'),('con_type','!=','SRL')]):
             quants = selfsud.env['stock.quant'].search(
                 [('product_id', '=', product_id.id), ('location_id', '=', location_id.id)])
             tot_quantity = tot_quantity + sum(quants.mapped('quantity'))
@@ -168,11 +187,24 @@ class sale_order_line(models.Model):
         self.order_id.total_discount = total_before_discount - (core_sum + non_core_sum)
         self.order_id.total_added = (core_sum + non_core_sum) - total_before_discount
 
+
+
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
-                 'order_id.payment_term_id', 'manual_price')
+                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty')
     def _compute_price_unit(self):
         if self.order_id.state in ('sale', 'cancel', 'done', 'fia'):
             return
+        for line in self:
+            if line.order_from:
+                if line.order_from.startswith('PH'):
+                    #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
+                    line.price_unit = line.product_id.list_price_phar
+                    line.selling_price = line.product_id.list_price_phar
+
+                    line.product_uom_pharma_measure = line.product_id.pharma_uom
+                    line.product_uom = line.product_id.pharma_uom
+                    line.product_uom_qty = line.product_uom_pharma_qty
+                    return
         if self.order_id.company_id.id == 2:
             for line in self:
                 if line.store_placement:
@@ -207,17 +239,22 @@ class sale_order_line(models.Model):
             used_under = []
 
             if self.order_id.order_line:
-                #Order_type is used for import sales
+                # Order_type is used for import sales
                 if self.order_id.order_type:
                     used_under = ['IM', 'All']
                 elif self.order_id.order_from:
                     used_under = ['PT', 'All']
                 else:
-                    #For some reason, order from is coming up empty for pharmacy
+                    # For some reason, order from is coming up empty for pharmacy
                     used_under = ['PH', 'All']
 
             for line in self:
-                if not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
+                if self.order_id.order_from:
+                    if self.order_id.order_from.startswith('PH'):
+                        line.wareh = line.order_id.wareh
+                    elif not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
+                        line.wareh = line.product_id.default_warehouse
+                elif not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
                     line.wareh = line.product_id.default_warehouse
 
                 # Get discounts/additional payments per type
@@ -251,7 +288,8 @@ class sale_order_line(models.Model):
                 product_qty = self.env['droga.price.discount.per.product.qty'].search(
                     ['|', ('payment_term', '=', self.order_id['payment_term_id'].id), ('payment_term', '=', False),
                      ('product', '=', line.product_id.id), ('status', '=', 'Active'),
-                     ('from_qty', '<=', line.product_uom_qty * uom_rate), ('to_qty', '>=', line.product_uom_qty * uom_rate),
+                     ('from_qty', '<=', line.product_uom_qty * uom_rate),
+                     ('to_qty', '>=', line.product_uom_qty * uom_rate),
                      ('used_under', 'in', used_under)])
                 for rate in product_qty:
                     all_rate = all_rate + rate['percent']
@@ -274,7 +312,7 @@ class sale_order_line(models.Model):
                             product_price_unit=price,
                             product_currency=line.currency_id
                         ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
-                                    1 + ((non_core_rate + all_rate) / 100)))
+                                1 + ((non_core_rate + all_rate) / 100)))
 
                     line.std_unit_price = line.product_id._get_tax_included_unit_price(
                         line.company_id,
@@ -285,7 +323,7 @@ class sale_order_line(models.Model):
                         product_price_unit=price,
                         product_currency=line.currency_id
                     ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
-                                1 + ((non_core_rate + all_rate) / 100)))
+                            1 + ((non_core_rate + all_rate) / 100)))
 
                 line.price_unit_before_discount = line.std_unit_price
 
@@ -334,7 +372,7 @@ class sale_order_ext(models.Model):
     non_core_sum = fields.Float('Non-core total', compute='_get_sub_totals')
     state = fields.Selection(
         selection=[
-            ('memb',"Member usage"),
+            ('memb', "Member usage"),
             ('draft', "Quotation"),
             ('sent', "Quotation Sent"),
             ('price_request', "Price change approval"),
@@ -351,14 +389,22 @@ class sale_order_ext(models.Model):
         default='draft')
     total_discount = fields.Float('Total discount')
     total_added = fields.Float('Total accrual')
-    price_change_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
-    operation_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
-    final_approver = fields.Many2one('res.users', compute='_get_approvers',store=True)
+    price_change_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
+    operation_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
+    final_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
     out_of_stock_items = fields.Char('Stock out items', compute='_get_stock_out')
     has_access = fields.Boolean(default=False, search='_has_access', compute='_compute_has_access')
-    has_invoice_access=fields.Boolean(default=False, search='_has_invoice_access', compute='_compute_has_invoice_access')
+    has_pharma_access = fields.Boolean(default=False, search='_has_pharma_access', compute='_compute_has_pharma_access')
+    has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
+                                        compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
-    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh')
+    def get_wareh(self):
+        list=self.env.user.warehouse_ids_ph_disp+self.env.user.warehouse_ids_im_ws
+        return list[
+            0].id if len(
+            list) > 0 else False
+
+    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', default=get_wareh,compute='_get_pharma_wh',store=True)
 
     def unlink(self):
         raise ValidationError(
@@ -366,30 +412,49 @@ class sale_order_ext(models.Model):
 
     def _get_pharma_wh(self):
         for rec in self:
-            rec.wareh = self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)[0].id if len(self.env.user.warehouse_ids_ph.filtered(lambda x: x.has_dispensary_location == True)) > 0 else False
+            if rec.order_from=="PH":
+                rec.wareh = self.env.user.warehouse_ids_ph_disp[
+                    0].id if len(
+                    self.env.user.warehouse_ids_ph_disp) > 0 else False
+            else:
+                rec.wareh = self.env.user.warehouse_ids_im_ws[
+                    0].id if len(
+                    self.env.user.warehouse_ids_im_ws) > 0 else False
+
     def _has_invoice_access(self, operator, value):
-        if operator=='=':
+        if operator == '=':
             if self.env.user.has_group('droga_sales.sales_import_invoicer'):
-                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-IM')])])]
+                return [
+                    ('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-IM')])])]
             if self.env.user.has_group('droga_sales.sales_wholesale_invoicer'):
-                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-WS')])])]
+                return [
+                    ('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'IM-WS')])])]
             if self.env.user.has_group('droga_sales.ema_invoicer'):
-                return [('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'EM-EM')])])]
+                return [
+                    ('id', 'in', [x.id for x in self.env['sale.order'].sudo().search([('order_from', '=', 'EM-EM')])])]
             else:
                 return [('id', 'in', [])]
         else:
             return [('id', 'in', [])]
 
     def _compute_has_invoice_access(self):
-        has_import_acc=self.env.user.has_group('droga_sales.sales_import_approve_admin')
+        has_import_acc = self.env.user.has_group('droga_sales.sales_import_approve_admin')
         has_ws_acc = self.env.user.has_group('droga_sales.sales_wholesale_invoicer')
         has_ema_acc = self.env.user.has_group('droga_sales.ema_invoicer')
 
         for rec in self:
-            if (rec.order_from=="IM-IM" and has_import_acc) or (rec.order_from=="IM-WS" and has_ws_acc) or (rec.order_from=="EM-EM" and has_ema_acc):
-                rec.has_access=True
+            if (rec.order_from == "IM-IM" and has_import_acc) or (rec.order_from == "IM-WS" and has_ws_acc) or (
+                    rec.order_from == "EM-EM" and has_ema_acc):
+                rec.has_access = True
             else:
-                rec.has_access=False
+                rec.has_access = False
+
+    def _compute_has_pharma_access(self):
+        for rec in self:
+            if rec.wareh in self.env.user.warehouse_ids_ph_disp.ids:
+                return True
+            else:
+                return False
 
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
@@ -421,6 +486,13 @@ class sale_order_ext(models.Model):
                 is_rec_inside_self = self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
                 return ['|', ('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),
                         ('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+        else:
+            return [('id', 'in', [])]
+
+    def _has_pharma_access(self,operator,value):
+        if operator=='=':
+            sales = self.env['sale.order'].sudo().search([('wareh', 'in', self.env.user.warehouse_ids_ph_disp.ids)])
+            return [('id', 'in', [x.id for x in sales])]
         else:
             return [('id', 'in', [])]
 
@@ -463,6 +535,7 @@ class sale_order_ext(models.Model):
                                                        ['invoice_payment_term_id']).get('invoice_payment_term_id'),
                 'default_invoice_origin': self.name,
                 'default_user_id': self.user_id.id,
+
             })
         action['context'] = context
         return action
@@ -475,6 +548,13 @@ class sale_order_ext(models.Model):
     def _get_approvers(self):
 
         for rec in self:
+            if rec.order_from:
+                if rec.order_from.startswith("P"):
+                    rec.price_change_approver=self.env.user.id
+                    rec.final_approver = self.env.user.id
+                    rec.operation_approver = self.env.user.id
+                    return
+
             rec.price_change_approver = self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
                 lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
@@ -509,9 +589,9 @@ class sale_order_ext(models.Model):
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
 
     def action_confirm(self):
-        returnv = super(sale_order_ext, self).action_confirm()
 
         for rec in self:
+            rec.validate_form()
             if not rec.order_type and self.env.company.id == 1:
                 if rec.order_from.startswith('PH'):
                     if not rec.wareh:
@@ -521,7 +601,7 @@ class sale_order_ext(models.Model):
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
                 else:
                     for res in rec.order_line:
-                        res.wareh = 32 if rec.order_from == 'PT-Bole' else 31
+                        #res.wareh =  32 if rec.order_from == 'PT-Bole' else 31
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
             else:
                 if rec.order_type:
@@ -529,19 +609,41 @@ class sale_order_ext(models.Model):
                 for res in rec.order_line:
                     res.product_id.product_tmpl_id.invoice_policy = 'delivery'
 
-            rec.validate_form()
-        return returnv
+        for rec in self:
+            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
+            for pick in pickings:
+                pick.action_assign()
+
+        return super(sale_order_ext, self).action_confirm()
 
     def validate_form(self):
-        if self.state=="sale":
+        if self.state == "sale" or self.env.company.id not in (1,2,3):
             return
         message = ''
+
+        if self.order_from.startswith('PH'):
+            price_changed=self.order_line.filtered(lambda x: math.ceil(x.price_unit)!=math.ceil(x.selling_price) or x.price_unit==0)
+            if len(price_changed)>0:
+                message = message + ('\n' if message else '') + "Price can not be edited or be zero."
 
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
         if (len(order_lines_nowareh) > 0):
-            message = message + ('\n' if message else '') + "Warehouse must be filled for each order line."
-            # raise ValidationError("Warehouse must be filled for each order line.")
+
+            for ln in self.order_line:
+                if self.order_from:
+                    if self.order_from.startswith('PH'):
+                        ln.wareh = ln.order_id.wareh
+                    elif not ln.wareh and ln.product_id.default_warehouse.wh_type == self.order_type:
+                        ln.wareh = ln.product_id.default_warehouse
+                elif not ln.wareh and ln.product_id.default_warehouse.wh_type == self.order_type:
+                    ln.wareh = ln.product_id.default_warehouse
+
+            order_lines_nowareh = self.order_line.filtered(
+                lambda x: not x.wareh)
+
+            if (len(order_lines_nowareh) > 0):
+                message = message + ('\n' if message else '') + "Warehouse must be filled for each order line."
 
         order_lines_nowareh = self.order_line.filtered(
             lambda x: x.wareh.wh_type != self.order_type)
@@ -556,6 +658,8 @@ class sale_order_ext(models.Model):
             raise ValidationError("Final approver is not configured for client.")
         if not self.operation_approver:
             raise ValidationError("Operation manager is not configured for client.")
+        for rec in self.order_line:
+            rec.is_prod_available_method()
         order_lines_negative = self.order_line.filtered(
             lambda x: x.is_prod_available == 'False')
         if (len(order_lines_negative) > 0):
@@ -566,9 +670,9 @@ class sale_order_ext(models.Model):
             # raise ValidationError("Product quantity is out of stock for " + products)
 
         for so in self:
-            if not so.partner_id.cust_type_ext:
+            if not so.partner_id.cust_type_ext and not so.order_from.startswith('P'):
                 message = message + "Customer type must be registered for customer!"
-            if not so.partner_id.city_name:
+            if not so.partner_id.city_name and not so.order_from.startswith('P'):
                 message = message + ('\n' if message else '') + message + "City must be registered for customer!"
             if not so.partner_id.vat:
                 message = message + ('\n' if message else '') + message + "Tin No must be registered for customer!"
@@ -585,7 +689,7 @@ class sale_order_ext(models.Model):
             if so.payment_term_id.allowed_cust:
                 if so.partner_id.id not in so.payment_term_id.allowed_cust.ids:
                     message = message + ('\n' if message else '') + "%s is not eligible for %s!" % (
-                    so.partner_id.name, so.payment_term_id.name)
+                        so.partner_id.name, so.payment_term_id.name)
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 message = message + ('\n' if message else '') + "Please login before requesting a sales order!"
                 # raise ValidationError("Please login before registering a sales order!")
@@ -611,9 +715,9 @@ class sale_order_ext(models.Model):
             self.action_confirm()
         # Manual price and discounts routing to price change approver
         elif ((self.manual_price and len(self.order_line.filtered(
-                lambda x: x.std_unit_price > x.price_unit > 0)) > 0) or self.tender_origin_form_tender) and self.state=='draft':
+                lambda x: x.std_unit_price > x.price_unit > 0)) > 0) or self.tender_origin_form_tender) and self.state == 'draft':
             self.state = 'price_request'
-        elif self.state=='draft':
+        elif self.state == 'draft':
             self.state = 'req'
 
         # self.set_activity_done()
@@ -723,15 +827,15 @@ class sale_order_ext(models.Model):
         if view_type == 'form':
 
             for node in doc.xpath("//field"):
-                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'age'):
+                if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'selling_price','product_uom','wareh','date_order','tax_id', 'age'):
                     continue
                 modifiers = simplejson.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
                         'droga_sales.sales_import_approve_admin') or self.user_has_groups(
                     'droga_sales.sales_wholesale_approve_admin'):
-                    modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request','memb')]]
+                    modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request', 'memb')]]
                 else:
-                    modifiers['readonly'] = [['state', 'not in', ('draft','memb')]]
+                    modifiers['readonly'] = [['state', 'not in', ('draft', 'memb')]]
 
                 node.set('modifiers', simplejson.dumps(modifiers))
             res['arch'] = etree.tostring(doc)
@@ -742,3 +846,35 @@ class sale_order_ext(models.Model):
 class sale_order_line_mail_inherit(models.Model):
     _name = 'sale.order.line'
     _inherit = ['sale.order.line', 'mail.thread', 'mail.activity.mixin', 'image.mixin']
+
+
+class account_move_inherit(models.Model):
+    _inherit='account.move'
+    account_move_linked_analytic = fields.Many2one('account.analytic.account')
+
+    @api.model
+    def create(self, vals):
+        analytic=0
+        if 'invoice_origin' in vals:
+            if type(vals['invoice_origin']) is str:
+                if vals['invoice_origin'].startswith('SO'):
+                    sale_order=self.env['sale.order'].search([('name','=',str(vals['invoice_origin'])),('company_id','=',1)])
+                    if len(sale_order)>0:
+                        if 'invoice_line_ids' in vals:
+                            for line in vals['invoice_line_ids']:
+                                if sale_order[0].order_from.startswith('PH'):
+                                    line[2]['analytic_distribution'] = {241: 100,sale_order[0].order_line.wareh.linked_analytic.id: 100}
+                                    analytic=sale_order[0].order_line.wareh.linked_analytic.id
+                                elif sale_order[0].tender_origin_form_tender:
+                                    line[2]['analytic_distribution'] = {23: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
+                                    analytic = sale_order[0].order_line.wareh.linked_analytic.id
+                                else:
+                                    line[2]['analytic_distribution'] = {24: 100, sale_order[0].order_line.wareh.linked_analytic.id: 100}
+                                    analytic = sale_order[0].order_line.wareh.linked_analytic.id
+
+                        for so_line in sale_order.order_line:
+                            so_line.invoice_date=datetime.now()
+                #get order type and fill analytic
+        res=super(account_move_inherit, self).create(vals)
+        res.account_move_linked_analytic=analytic
+        return res

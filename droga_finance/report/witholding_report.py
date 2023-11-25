@@ -59,6 +59,7 @@ class WitholdingReport(models.TransientModel):
         sheet.set_column('E:E', 15)
         sheet.set_column('F:F', 20)
         sheet.set_column('G:G', 20)
+        sheet.set_column('H:H', 20)
         row_start = 0
         date_format = workbook.add_format(
             {'num_format': 'mm/dd/yyyy', 'border': 7})
@@ -130,6 +131,7 @@ class WitholdingReport(models.TransientModel):
         sheet.write(row_start, 4, 'Receipt Date', title_format)
         sheet.write(row_start, 5, 'Taxable Amount', title_format)
         sheet.write(row_start, 6, 'Tax Withheld', title_format)
+        sheet.write(row_start, 7, 'Receipt No Internal', title_format)
         row_start += 1
 
         for record in withholdings:
@@ -137,6 +139,7 @@ class WitholdingReport(models.TransientModel):
             witholdee_name = record.move_id.partner_id.name if record.move_id.partner_id.name else ''
             witholdee_tin = record.move_id.partner_id.vat if record.move_id.partner_id.vat else ''
             reciept_no = record.move_id.withholding_no if record.move_id.withholding_no else ''
+            internal_ref = record.move_id.withholding_internal_ref if record.move_id.withholding_internal_ref else ''
 
             sheet.write(row_start, 0, "9063340002", border)
             sheet.write(row_start, 1, witholdee_tin, border)
@@ -145,6 +148,7 @@ class WitholdingReport(models.TransientModel):
             sheet.write(row_start, 4, record.date, date_format)
             sheet.write(row_start, 5, record.tax_base_amount, num_format)
             sheet.write(row_start, 6, abs(record.balance), num_format)
+            sheet.write(row_start, 7, internal_ref, border)
             row_start += 1
 
     def generate_receivable_xlsx_report(self, workbook):
@@ -157,6 +161,7 @@ class WitholdingReport(models.TransientModel):
         sheet.set_column('E:E', 15)
         sheet.set_column('F:F', 20)
         sheet.set_column('G:G', 20)
+        sheet.set_column('H:H', 20)
         row_start = 0
         date_format = workbook.add_format(
             {'num_format': 'dd/mm/yyyy', 'border': 7})
@@ -228,6 +233,7 @@ class WitholdingReport(models.TransientModel):
         sheet.write(row_start, 4, 'Receipt Date', title_format)
         sheet.write(row_start, 5, 'Taxable Amount', title_format)
         sheet.write(row_start, 6, 'Tax Withheld', title_format)
+        sheet.write(row_start, 7, 'Receipt No Internal', title_format)
         row_start += 1
 
         for record in withholdings:
@@ -235,6 +241,7 @@ class WitholdingReport(models.TransientModel):
             witholdee_name = record.move_id.partner_id.name if record.move_id.partner_id.name else ''
             witholdee_tin = record.move_id.partner_id.vat if record.move_id.partner_id.vat else ''
             reciept_no = record.move_id.withholding_no if record.move_id.withholding_no else ''
+            internal_ref = record.move_id.withholding_internal_ref if record.move_id.withholding_internal_ref else ''
 
             sheet.write(row_start, 0, "9063340002", border)
             sheet.write(row_start, 1, witholdee_tin, border)
@@ -243,4 +250,5 @@ class WitholdingReport(models.TransientModel):
             sheet.write(row_start, 4, record.date, date_format)
             sheet.write(row_start, 5, record.tax_base_amount, num_format)
             sheet.write(row_start, 6, abs(record.balance), num_format)
+            sheet.write(row_start, 7, internal_ref, border)
             row_start += 1

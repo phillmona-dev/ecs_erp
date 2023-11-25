@@ -24,11 +24,12 @@ class AccountLoanReceipt(models.Model):
             cu_payment = self.env['account.loan.repayment'].search([('value_date', '>', payment.value_date),('acount_loan_id','=',payment.acount_loan_id.id)])
             current_date=datetime.today()
             cday = current_date.date()
-            if cu_payment:
-                raise ValidationError("The Value Date cannot be set in the past of The Previous recod Value Date")
+
+            ##if cu_payment:
+                ##raise ValidationError("The Value Date cannot be set in the past of The Previous record Value Date")
               
             if payment.value_date>cday:
-                raise ValidationError("The Value Date cannot be set in the Furure")
+                raise ValidationError("The Value Date cannot be set in the Future")
               
     def compute_postt(self):
         for record in self:

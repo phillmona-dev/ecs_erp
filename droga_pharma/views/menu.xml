@@ -20,28 +20,84 @@
                 sequence="23"/>
 
         <menuitem
-                id="droga_sales_pharmacy_menu_so_and_invoice"
-                name="Sales and invoice"
-                action="droga_sales_pharmacy_action_so_and_invoice"
-                groups="pharma_di_admin"
-                sequence="25"/>
-
-        <menuitem
                 id="droga_pharma_reports"
                 name="Reports"
-                groups="pharma_settings_admin"
+                groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
                 sequence="30">
 
             <menuitem
                     id="droga_pharma_system_reports"
-                    name="System reports"
+                    name="Enquiries"
                     sequence="1">
-
                 <menuitem
-                        id="droga_pharma_follow_up_report_menu"
-                        name="Follow up detail"
-                        action="action_droga_pharma_mtm_schedule_detail_tree"
-                        sequence="2"/>
+                        id="droga_pharma_report_sales"
+                        name="Sales"
+                        sequence="1">
+                    <menuitem
+                            id="droga_pharma_sales_pharmacy"
+                            name="Sales per pharmacy - today"
+                            action="droga_pharma_sales_pharmacy_action"
+                            sequence="3"/>
+
+                </menuitem>
+                <menuitem
+                        id="droga_pharma_report_inventory"
+                        name="Inventory"
+                        sequence="1">
+
+                    <menuitem
+                            id="droga_pharma_products_view"
+                            name="Products"
+                            action="droga_pharma_product_action"
+                            sequence="0"/>
+                    <menuitem
+                            id="droga_pharma_stock_on_hand_reports_menu"
+                            name="Stock on hand"
+                            action="droga_pharma_inv_onhand_warehouse_action"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                            sequence="1"/>
+                    <menuitem
+                            id="droga_pharma_stock_on_hand_no_batch_reports_menu"
+                            name="Stock on hand - no batch"
+                            action="droga_pharma_inv_onhand_no_batch__warehouse_action"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                            sequence="2"/>
+
+
+                    <menuitem
+                            id="droga_pharma_stock_issue_transactions_menu"
+                            name="Stock transactions - issue"
+                            action="droga_pharma_inv_transaction_issue_warehouse_action"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                            sequence="3"/>
+
+                    <menuitem
+                            id="droga_pharma_stock_receipts_transactions_menu"
+                            name="Stock transactions - receipts"
+                            action="droga_pharma_inv_transaction_receipts_warehouse_action"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                            sequence="4"/>
+
+                    <menuitem
+                            id="droga_pharma_stock_all_transactions_menu"
+                            name="Stock transactions - All"
+                            action="droga_pharma_inv_transaction_all_warehouse_action"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                            sequence="5"/>
+                </menuitem>
+                <menuitem
+                        id="droga_pharma_report_mtm"
+                        name="MTM"
+                        sequence="1">
+
+                    <menuitem
+                            id="droga_pharma_follow_up_report_menu"
+                            name="Follow up detail"
+                            action="action_droga_pharma_mtm_schedule_detail_tree"
+                            sequence="2"/>
+                </menuitem>
+
+
             </menuitem>
             <menuitem
                     id="droga_pharma_excel_repots"

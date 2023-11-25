@@ -6,12 +6,12 @@ from datetime import datetime, timedelta, date
 class update_cost(models.Model):
     _name = "update.cost"
 
-    def in1(self):
+    def in1(self,trans_type_in):
         Product = self.env['product.product']
 
         #For local purchase GRN
         move_vals_list = []
-        in_stock_valuation_layers=self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('description', 'like', 'GRN%'),  ('description', 'like', '%/LP/%')])
+        in_stock_valuation_layers=self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('trans_type_detail', 'like', trans_type_in)])
         move_vals_list += Product._svl_replenish_stock_am(in_stock_valuation_layers)
         if move_vals_list:
             account_moves = self.env['account.move'].sudo().create(move_vals_list)
@@ -49,11 +49,11 @@ class update_cost(models.Model):
             account_moves = self.env['account.move'].sudo().create(move_vals_list)
             account_moves._post()
 
-    def out1(self):
+    def out1(self,trans_type_out,month):
         Product = self.env['product.product']
         # For sales issue
         move_vals_list = []
-        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False), ('stock_move_id.location_id.usage', '=', 'internal'),  ('stock_move_id.location_dest_id.name', '=', 'Customers')])
+        in_stock_valuation_layers = self.env['stock.valuation.layer'].search([('stock_move_id', '!=', False),('create_date','<',datetime(2023,11,1)),('date_month','=',month),('trans_type_detail', 'like', trans_type_out)])
         move_vals_list += Product._svl_empty_stock_am(in_stock_valuation_layers)
         if move_vals_list:
             account_moves = self.env['account.move'].sudo().create(move_vals_list)

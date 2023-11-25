@@ -20,6 +20,8 @@ class purchase_order(models.Model):
 
     supplier_country = fields.Many2one(related='partner_id.country_id', store=True)
 
+    from_rfq=fields.Boolean(default=False)
+
     shipping_reconcilations = fields.One2many(
         'droga.purchase.shipping.reconcilation', 'purchase_order_id')
     lcs = fields.One2many('droga.purchase.lc', 'purchase_order_id')
@@ -203,6 +205,19 @@ class purchase_order(models.Model):
             'res_id': self.id
         }
 
+    def button_confirm(self):
+        message = ''
+        for res in self:
+            for line in res.order_line:
+                new_items=self.env['product.template'].search([('old_ref','=',line.product_id.default_code)])
+                if len(new_items)>0:
+                    message=message+'Product '+line.product_id.default_code+' has been updated with '+new_items[0].default_code+', '
+
+        if len(message)>5:
+            raise UserError(message)
+
+        return super(purchase_order, self).button_confirm()
+
     @api.model
     def create(self, vals):
         # get sequence number for each company
@@ -220,7 +235,7 @@ class purchase_order(models.Model):
         message=''
         for line in res.order_line:
             new_items=self.env['product.template'].search([('old_ref','=',line.product_id.default_code)])
-            if len(new_items)>0:
+            if len(new_items)>0 and not res.from_rfq:
                 message=message+'Product '+line.product_id.default_code+' has been updated with '+new_items[0].default_code+', '
 
         if len(message)>5:

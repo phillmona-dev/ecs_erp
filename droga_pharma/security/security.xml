@@ -34,7 +34,10 @@
         <field name="category_id" ref="pharma_management"/>
     </record>
 
-
+    <record id="pharma_director" model="res.groups">
+        <field name="name">Pharmacy director</field>
+        <field name="category_id" ref="pharma_management"/>
+    </record>
 
 
 

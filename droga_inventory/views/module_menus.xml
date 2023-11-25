@@ -15,7 +15,7 @@
     <!-- Stock transfers default filter per warehouse access -->
     <record id="stock.action_picking_tree_ready" model="ir.actions.act_window">
         <field name="domain">[('has_access','=',True)]</field>
-        <field name="context">{'create': False,'contact_display': 'partner_address', 'search_default_available': 1}</field>
+        <field name="context">{'show_title': True,'create': False,'contact_display': 'partner_address', 'search_default_available': 1}</field>
     </record>
 
     <!-- Location report filter per warehouse access -->

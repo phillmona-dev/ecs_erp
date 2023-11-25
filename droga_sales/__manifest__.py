@@ -42,6 +42,8 @@
         'reports/sales_summary.xml',
         'wizard/sales_report_view.xml',
         'views/profit_margin.xml',
+        'views/account_move_origin.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [

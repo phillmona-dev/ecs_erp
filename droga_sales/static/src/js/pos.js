@@ -34,6 +34,12 @@ export class PosFormController extends FormController {
 
     PrintToPos() {
 
+        //get sales order id
+         var invoice_origin=this.model.root.data.invoice_origin;
+
+
+
+
 
 
         console.log(this.model.root.data);
@@ -106,6 +112,19 @@ export class PosFormController extends FormController {
             let tax_percent = 0;
             let line_no = 0;
 
+
+            let tax_ids=currentElement.data.tax_ids.records;
+
+            console.log(tax_ids);
+
+
+            tax_ids.forEach((taxItem)=>{
+                tax_percent=15.00;
+                }
+            )
+
+
+
             if (currentElement.data.price_unit !== 0) {
 
                 let lineItem = {
@@ -153,7 +172,6 @@ export class PosFormController extends FormController {
                     let ts = new Date();
                     let timeStamp = ts.getUTCFullYear() + "-" + ("0" + (ts.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + ts.getUTCDate()).slice(-2) + " " + ("0" + ts.getUTCHours()).slice(-2) + ":" + ("0" + ts.getUTCMinutes()).slice(-2) + ":" + ("0" + ts.getUTCSeconds()).slice(-2);
 
-
                     rpc
                         .query({
                             model: "account.move", method: "write", args: [[this.model.root.data.id], {
@@ -165,6 +183,31 @@ export class PosFormController extends FormController {
                             }],
                         }, {timeout: 60000})
                         .then(function (data) {
+
+
+                                //update sales order status
+                                var domain = [['name', '=', invoice_origin]];
+
+                                rpc.query({
+                                    model: 'sale.order',
+                                    method: 'search',
+                                    args: [domain],
+                                }, {timeout: 60000})
+                                .then(function (data){
+                                    var sales_order_id=data[0];
+
+                                                   rpc.query({
+                                                        model: 'sale.order',
+                                                        method: 'write',
+                                                        args: [[sales_order_id],{
+                                                            invoice_printed:"Yes"
+                                                        }],
+                                                       }, {timeout: 60000})
+                                                    .then(function (data){
+
+                                                    });
+                                });
+
                             Dialog.alert(this, _t("Invoice has been successfully printed!"));
                             browser.location.reload();
                         }, function (data) {

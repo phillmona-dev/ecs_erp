@@ -53,12 +53,19 @@ class sales_integ(models.Model):
         self.state = 'dispense'
         #self.invoice_status = temp
 
-        # FIX ME - dispense products here
-
-
+        for rec in self:
+            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
+            for pick in pickings:
+                for move in pick.move_ids:
+                    move.quantity_done=move.product_uom_qty
+                pick.button_validate()
 
     # set sales order if invoice is not created
     def set_to_draft(self):
+        for rec in self:
+            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
+            for pick in pickings:
+                pick.do_unreserve()
         self.write({'state': 'draft'})
 
     def action_mtm_orders(self):
@@ -89,7 +96,7 @@ class sales_integ(models.Model):
 
     def action_minor_aliments(self):
         return {
-            'name': 'Minor aliments',
+            'name': 'Minor ailments',
             'view_type': 'form',
             'view_mode': 'tree,form',
             'res_model': 'droga.pharma.minor.alignment',

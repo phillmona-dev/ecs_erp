@@ -15,8 +15,8 @@ class droga_stock_transfer_custom(models.Model):
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
-        ('waiting', 'Requested'),
-        ('waiting2', 'Waiting'),#When request is waiting for approval/response
+        ('phmg', 'Supply chain manager'),
+        ('waiting', 'Requested'),   #When request is waiting for approval/response
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
         ('done', 'Received'),      #When request is received
@@ -37,17 +37,9 @@ class droga_stock_transfer_custom(models.Model):
         required=True)
     location_filter = fields.Char(compute='_filter_location_access',readonly=True,store=False)
     store_manager = fields.Many2one('res.users', compute='_get_approvers')
-    pharma_approver_branch_manager=fields.Many2one('res.users', compute='_get_approvers')
-    is_owner=fields.Char( compute='_get_approvers')
-    #user_id = fields.Integer("P.ID", default=lambda self: self.env.user.id, readonly=True, required=True)
+
     def _get_approvers(self):
         for rec in self:
-            if self.env.user.id!=rec.user_id:
-                rec.is_owner='YES'
-            else:
-                rec.is_owner = 'NOT'
-
-            rec.pharma_approver_branch_manager=self.env.user
 
             if len(rec.detail_entries) > 0:
                 if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
@@ -120,7 +112,7 @@ class droga_stock_transfer_custom(models.Model):
     def request(self):
         self.ensure_one()
         self._get_approvers()
-        self.state = 'waiting'
+        self.state = 'stmg'
 
     def stmg_approve(self):
         self.set_activity_done()
@@ -143,6 +135,7 @@ class droga_stock_transfer_custom(models.Model):
                 'picking_type_id': pick_type_id,
                 'location_id': def_location_id,
                 'location_dest_id': self.location_dest_id.id,
+                'requested_by': self.create_uid,
                 #'auto_generated': True,
                 #'origin': self.name,
                 #'state': 'waiting',
@@ -179,7 +172,7 @@ class droga_stock_transfer_custom(models.Model):
                     self.env['stock.move'].sudo().create(move_vals)
             picking_id.action_assign()
             picking_id.state='assigned'
-        self.state = 'waiting2'
+        self.state = 'waiting'
 
     def action_receive(self):
         #for record in self.transfer_picking:
@@ -221,8 +214,7 @@ class droga_stock_transfer_custom_detail(models.Model):
         default=1.0, required=True, state={'done': [('readonly', True)]})
     available_qty = fields.Float('Available', readonly=True, compute="get_count")
 
-    product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
-                                  domain="[('category_id', '=', product_uom_category_id)]")
+    product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True)
 
     @api.depends('location_source_id', 'product_uom_qty', 'product_id', 'product_uom')
     def get_count(self):
@@ -262,3 +254,5 @@ class droga_stock_transfer_custom_detail(models.Model):
 
     # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
+    import_uom = fields.Many2one(related='product_id.uom_id', store=True)
+    pharma_uom = fields.Many2one(related='product_id.pharma_uom', store=True)

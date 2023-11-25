@@ -78,6 +78,7 @@
                         <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                     </t>
 
+
                     <div class="header">
                         <div class="row">
                             <div class="col-2 bm-2">
@@ -141,7 +142,6 @@
                                 </div>
                             </t>
 
-
                             <t t-if="order_from=='PT-4 Kilo'">
                                 <div class="col-10 bm-2">
                                     <h2>
@@ -160,9 +160,11 @@
                                 </div>
                             </t>
 
+
                         </div>
 
                     </div>
+
                     <div class="mt-5">
                         <div class="page">
 
@@ -544,6 +546,7 @@
                     <t t-set="sales_representative" t-value=""/>
                     <t t-set="order_type" t-value=""/>
 
+
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
                        t-as="sale_order">
                         <t t-set="sales_order_no" t-value="sale_order.name"/>
@@ -587,6 +590,8 @@
                         </div>
 
                     </div>
+
+
                     <div class="mt-5">
                         <div class="page">
 
@@ -778,8 +783,8 @@
 
                                         </td>
                                         <td>
-                                             <strong t-esc="'{0:,.2f}'.format(o.vat_percent)"
-                                                        class="small"/>
+                                            <strong t-esc="'{0:,.2f}'.format(o.vat_percent)"
+                                                    class="small"/>
                                         </td>
                                     </tr>
                                     <tr class="is-subtotal text-end">
@@ -978,6 +983,7 @@
                     <t t-set="store" t-value=""/>
                     <t t-set="sales_representative" t-value=""/>
                     <t t-set="order_type" t-value=""/>
+                    <t t-set="pharmacy_order_from" t-value="o.cost_center"/>
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
                        t-as="sale_order">
@@ -1082,6 +1088,48 @@
 
 
                                 </div>
+                            </t>
+
+                            <t t-if="order_from=='PH'">
+
+
+                                <div class="col-4 bm-2">
+
+                                    <h6 class="small nopadding">
+                                        Sub City: <span t-esc="o.branch_address.sub_city"/>
+                                    </h6>
+                                    <h6 class="small nopadding">
+                                        Tel 1 : <span t-esc="o.branch_address.telephone1"/>
+                                    </h6>
+                                    <h6 class="small nopadding">
+                                        TIN: 0045080232
+                                    </h6>
+
+                                </div>
+                                <div class="col-4 bm-2">
+
+                                    <h6 class="small nopadding">
+                                        Woreda: <span t-esc="o.branch_address.woreda"/>
+                                    </h6>
+                                    <h6 class="small nopadding">
+                                        Tel 2 : <span t-esc="o.branch_address.telephone2"/>
+                                    </h6>
+                                    <h6 class="small nopadding">
+                                        VAT Reg. No. :
+                                    </h6>
+
+                                </div>
+                                <div class="col-4 bm-2">
+
+                                    <h6 class="small nopadding">
+                                        Bldg/H.NO. <span t-esc="o.branch_address.house_no"/>
+                                    </h6>
+                                    <h6 class="small nopadding">
+                                        Fax: <span t-esc="o.branch_address.fax"/>
+                                    </h6>
+                                </div>
+
+
                             </t>
 
 
@@ -1281,7 +1329,7 @@
                                     <tr class="is-subtotal text-end">
 
                                         <td colspan="5">
-                                            <strong class="mr16 small">Withholding</strong>
+                                            <strong class="mr16 small">Vat</strong>
 
                                         </td>
                                         <td>

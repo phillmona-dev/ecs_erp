@@ -13,6 +13,20 @@
                 <attribute name="invisible">True</attribute>
             </xpath>
 
+
+
+            <xpath expr="//form/sheet" position="before">
+                <header>
+                <field name="reg_status" invisible="1"/>
+                <button name="approve" type="object" class="btn-primary"
+                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app"
+                    string="Approve"/>
+                <button name="reject" type="object" class="btn-danger"
+                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app"
+                    string="Reject"/>
+                </header>
+            </xpath>
+
             <!--> Hide button box -->
             <xpath expr="//form/sheet/div[@name='button_box']" position="attributes">
                 <attribute name="invisible">False</attribute>
@@ -111,12 +125,14 @@
                         <field name="standard_price" groups="droga_inventory.inv_prod_fin" readonly="1"
                                widget='monetary'/>
                         <field name="list_price" widget='monetary'/>
-                        <field name="list_price_phar" widget='monetary'/>
+                        <field name="list_price_phar" widget='monetary' groups="droga_inventory.pharmacy_price_change"/>
                         <field name="taxes_id" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
                     </group>
                     <group string="Unit of measures">
-                        <field name="uom_id" string="Import UOM" options="{'no_create': True}"/>
-                        <field name="pharma_uom" string="Pharmacy UOM" options="{'no_create': True}"/>
+                        <field name="from_pharma" invisible="1"></field>
+                        <field name="uom_id" string="Import UOM" options="{'no_create': True}" attrs="{'readonly': [('from_pharma', '=', True)]}"/>
+                        <field name="categ" readonly="1" invisible="1"></field>
+                        <field name="pharma_uom" string="Pharmacy UOM" options="{'no_create': True}" attrs="{'required': [('from_pharma', '=', True)]}"/>/>
                     </group>
 
                     <group string="Categories">
@@ -160,6 +176,21 @@
         </field>
     </record>
 
+    <record id="droga_pharma_only_product_action" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="stock.product_template_search_form_view_stock"/>
+        <field name="context">{"search_default_consumable": 1, 'default_detailed_type': 'product','default_from_pharma':True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No product found. Let's create one!
+            </p><p>
+                Track your stock quantities by creating storable products.
+            </p>
+        </field>
+    </record>
 </odoo>
 
 

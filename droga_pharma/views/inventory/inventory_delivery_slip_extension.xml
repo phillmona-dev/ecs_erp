@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="droga_deliv_slip_inherit" inherit_id="stock.report_delivery_document">
+        <xpath expr="//div[@class='page']"
+                   position="after">
+                <div id="informations" class="row mt32 mb32" t-if="o.picking_type_id.sequence_code in ('MTOV','MTIV')">
+                    <div class="col-auto">
+                        <strong>Issued By:</strong>
+                        <p t-field="o.from_wh_rep" class="m-0"/>
+                        <p t-field="o.from_user" class="m-0"/>
+                        <br></br>
+                        <br></br>
+                        <td>_____________________________________</td>
+                    </div>
+
+                    <div class="col-auto">
+                        <strong>Received By:</strong>
+                        <p t-field="o.to_wh_rep" class="m-0"/>
+                        <p t-field="o.to_user" class="m-0"/>
+                        <br></br>
+                        <br></br>
+                        <td>_____________________________________</td>
+                    </div>
+                </div>
+            </xpath>
+
+        <xpath expr="//t/t/div/table/tbody/tr/td[2]/span[2]" position="replace">
+            <span t-field="move.product_uom.uom_title"/>
+        </xpath>
+
+        <xpath expr="//t/t/div/table/tbody/tr/td[3]/span[2]" position="replace">
+            <span t-field="move.product_uom.uom_title"/>
+        </xpath>
+    </template>
+</odoo>
