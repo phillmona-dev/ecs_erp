@@ -103,8 +103,7 @@
                 <field name='company_id' optional="hidden"/>
                 <field name='name'/>
                 <field name='product_id'/>
-                <field name='location_id'/>
-                <field name='location_dest_id'/>
+                <field name='trans_warehouse'/>
                 <field name="trans_type_detail"></field>
                 <field name='branch_id' optional="hidden"/>
                 <field name="quantity_done" string="Quantity" sum="Total Qty"/>
@@ -128,6 +127,7 @@
                 <field name='product_id'/>
                 <field name='location_id'/>
                 <field name='location_dest_id'/>
+                <field name='trans_warehouse'/>
                 <field name="trans_type"></field>
                 <field name="trans_type_detail"></field>
 
@@ -156,22 +156,14 @@
                 name="previous_month_trans"></filter>
 
                 <searchpanel>
-                    <field name="branch" string="Branches"/>
+                    <field name="branch_id" string="Branches"/>
                     <field name="trans_type_detail"></field>
                 </searchpanel>
             </search>
         </field>
     </record>
 
-    <record model="ir.actions.act_window" id="droga_pharma_inv_transaction_issue_warehouse_action">
-        <field name="domain">[('quantity_done','!=',0),('branch','like','Phar%'),('trans_type', 'in', ('Sales issue','Sample issue','Sample issue to return','Dispatch issue','Consigment issue')),('state','=','done'),('has_access','=',True)]</field>
-        <field name="name">Stock transactions - issue</field>
-        <field name="res_model">stock.move</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="stock_transactions_pharma_all_search"></field>
-        <field name="view_id" ref="stock_transactions_pharma_tree"/>
-    </record>
-
+    <!-->
     <record model="ir.actions.act_window" id="droga_pharma_inv_transaction_issue_warehouse_action">
         <field name="domain">[('quantity_done','!=',0),('branch','like','Phar%'),('trans_type', 'in', ('Sales issue',	'Adjustment shortage',	'Store issues',	'Goods return',	'Internal transfer - issue',	'Consignment issue',	'Internal consumption',	'Sales placement issue',	'Free sample issue',	'Sample to be returned issue')),('state','=','done'),('has_access','=',True)]</field>
         <field name="name">Stock transactions - issue</field>
@@ -189,7 +181,7 @@
         <field name="search_view_id" ref="stock_transactions_pharma_all_search"></field>
         <field name="view_id" ref="stock_transactions_pharma_tree"/>
     </record>
-
+    <-->
     <record model="ir.actions.act_window" id="droga_pharma_inv_transaction_all_warehouse_action">
         <field name="domain">[('quantity_done','!=',0),('branch','like','Phar%'),('state','=','done'),('has_access','=',True)]</field>
         <field name="name">Stock transactions - All</field>

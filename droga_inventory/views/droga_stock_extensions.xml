@@ -169,6 +169,37 @@
                 <field name="reservation_discard_time"></field>
                 <field name="reserved_availability" sum="Total Quantity"></field>
             </xpath>
+
+            <xpath expr="//tree/field[@name='location_id']" position="attributes">
+                <attribute name='invisible'>1</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='location_dest_id']" position="attributes">
+                <attribute name='invisible'>1</attribute>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='product_id']" position="after">
+                <field name="trans_type_detail" optional="show"/>
+                <field name="trans_warehouse" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_move_line_tree_extension" model="ir.ui.view">
+        <field name="name">droga.stock.move.line.tree.inherited</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_move_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='location_id']" position="attributes">
+                <attribute name='invisible'>1</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='location_dest_id']" position="attributes">
+                <attribute name='invisible'>1</attribute>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='product_id']" position="after">
+                <field name="trans_type_detail" string="Transactinon type" optional="show"/>
+                <field name="trans_warehouse" string="Warehouse" optional="show"/>
+            </xpath>
         </field>
     </record>
 

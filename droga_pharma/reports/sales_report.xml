@@ -9,6 +9,7 @@
                 <field name="emp_descr"></field>
                 <field name="date_order"></field>
                 <field name="wareh" string="Branch"></field>
+                <field name="payment_term_id" string="Branch"></field>
                 <field name="amount_untaxed" sum="Total before tax"></field>
                 <field name="amount_tax" sum="Total tax"></field>
                 <field name="amount_total" sum="Total"></field>
@@ -47,7 +48,7 @@
                         name="today_sales"></filter>
 
                 <filter string="Yesterday sales"
-                        domain="[('date_order', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date_order', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
+                        domain="[('date_order', '&gt;=', (context_today()-relativedelta(days=1)).strftime('%Y-%m-%d')), ('date_order', '&lt;', context_today().strftime('%Y-%m-%d'))]"
                         name="today_sales"></filter>
 
                 <filter string="Current week sales"

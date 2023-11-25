@@ -27,10 +27,6 @@
                 </header>
             </xpath>
 
-            <!--> Hide button box -->
-            <xpath expr="//form/sheet/div[@name='button_box']" position="attributes">
-                <attribute name="invisible">False</attribute>
-            </xpath>
 
             <!--> Hide sales page -->
             <xpath expr="//form/sheet/notebook/page[@name='sales']" position="attributes">

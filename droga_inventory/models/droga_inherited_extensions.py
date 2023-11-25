@@ -362,6 +362,7 @@ class droga_stock_move_extension(models.Model):
     trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type Detail', compute='_get_trans_type',
                                  store=True)
     trans_warehouse=fields.Many2one('stock.warehouse',compute='_get_wareh',store=True)
+    from_to=fields.Many2one('stock.warehouse',string='From/To (Inter-store)',compute='_get_trans_type',store=True)
 
     @api.depends('state')
     def _get_wareh(self):
@@ -375,26 +376,69 @@ class droga_stock_move_extension(models.Model):
                 rec.trans_warehouse = rec.location_dest_id.warehouse_id.id
             else:
                 rec.trans_warehouse = rec.location_id.warehouse_id.id
+
+    def get_nth_char(self,type_str, n):
+        if n < 1:
+            return 'L'
+
+        if n > len(type_str):
+            return 'L'
+
+        return type_str[n - 1]
+
     @api.depends('state')
     def _get_trans_type(self):
         for rec in self:
             trans_type = self.env["droga.inventory.transaction.types"].search(
-                [('from_loc', '=', rec.location_id.usage),('to_loc', '=', rec.location_dest_id.usage),('summary_detail','=','summary')])
+                [('from_loc', '=', rec.location_id.usage),('to_loc', '=', rec.location_dest_id.usage),('summary_detail','=','summary'),('id','not in',(45,47))])
             if len(trans_type)==0:
                 rec.trans_type=False
                 rec.trans_type_detail = False
             else:
                 rec.trans_type=trans_type[0].id
                 if trans_type[0].has_detail:
-                    trans_type_det = self.env["droga.inventory.transaction.types"].search(
-                        [('from_loc', '=', rec.location_id.usage), ('to_loc', '=', rec.location_dest_id.usage),
-                         ('summary_detail', '=', 'detail'),'|',('from_con_type','=',rec.location_id.con_type),('to_con_type','=',rec.location_dest_id.con_type)])
-                    if len(trans_type_det)==0:
-                        rec.trans_type_detail = False
+                    if trans_type[0].id==26:
+                        if rec.origin:
+                            if self.get_nth_char(rec.origin, 5)== 'F':
+                                rec.trans_type_detail = 43
+                            else:
+                                rec.trans_type_detail = 44
+                        else:
+                            rec.trans_type_detail = 44
+                    elif trans_type[0].id==29:
+                        if rec.origin:
+                            if self.get_nth_char(rec.origin,5)=='F':
+                                rec.trans_type_detail = 41
+                            else:
+                                rec.trans_type_detail = 42
+                        else:
+                            rec.trans_type_detail = 42
                     else:
-                        rec.trans_type_detail = trans_type_det[0].id
+                        trans_type_det = self.env["droga.inventory.transaction.types"].search(
+                            [('from_loc', '=', rec.location_id.usage), ('to_loc', '=', rec.location_dest_id.usage),
+                             ('summary_detail', '=', 'detail'),'|',('from_con_type','=',rec.location_id.con_type),('to_con_type','=',rec.location_dest_id.con_type)])
+                        if len(trans_type_det)==0:
+                            rec.trans_type_detail = trans_type[0].id
+                        else:
+                            rec.trans_type_detail = trans_type_det[0].id
                 else:
-                    rec.trans_type_detail = False
+                    rec.trans_type_detail = trans_type[0].id
+
+            if rec.trans_type_detail.id==31:
+                #If it's inter store issue, other warehouse is receiver
+                rec.from_to=rec.location_dest_id.warehouse_id.id
+            elif rec.trans_type_detail.id==30:
+                #Get sender moves cause it's inter-store receive
+                origin=self.env["stock.move"].search(
+                    [('reference','=',rec.origin)]
+                )
+                if len(origin)==0:
+                    rec.from_to = rec.location_id.warehouse_id.id
+                else:
+                    rec.from_to = origin[0].location_id.warehouse_id.id     #Sender location
+                rec.from_to = rec.location_dest_id.warehouse_id.id
+            else:
+                rec.from_to=False
 
     def _inverse_res_discard(self):
         pass

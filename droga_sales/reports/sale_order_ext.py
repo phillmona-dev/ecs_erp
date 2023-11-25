@@ -47,8 +47,8 @@ class sales_report_det_fields(models.Model):
     crm_group1 = fields.Many2one('droga.crm.settings.prod_group', related='product_id.crm_group', store=True)
     is_core = fields.Boolean(related='product_id.is_core_product', store=True)
 
-    itemcode = fields.Char(related='product_id.default_code')
-    itemdesc = fields.Char(related='product_id.name')
+    itemcode = fields.Char(related='product_id.default_code',store=True)
+    itemdesc = fields.Char(related='product_id.name',store=True)
     itemcateg = fields.Many2one('product.category', related='product_id.categ_id')
 
     invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount', store=True)
@@ -94,6 +94,7 @@ class sales_report_det_fields(models.Model):
 
     invoice_date = fields.Date('Invoice date', compute='_get_invoice_date',store=True)
 
+    @api.depends('invoice_lines')
     def _get_invoice_date(self):
         for rec in self:
             if len(rec.invoice_lines) > 0:
