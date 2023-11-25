@@ -26,6 +26,22 @@ class droga_stock_move_line_extension(models.Model):
                                 search='_search_has_access')
     has_read_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_read_access',
                                 search='_search_has_read_access')
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move Detail',
+                                        compute='_get_trans_type', store=True)
+    trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move',
+                                 compute='_get_trans_type', store=True)
+    trans_warehouse = fields.Many2one('stock.warehouse', compute='_get_trans_type',store=True)
+    @api.depends('move_id.trans_type', 'move_id.trans_type_detail')
+    def _get_trans_type(self):
+        for rec in self:
+            if rec.move_id:
+                rec.trans_type = rec.move_id.trans_type
+                rec.trans_type_detail = rec.move_id.trans_type_detail
+                rec.trans_warehouse=rec.move_id.trans_warehouse
+            else:
+                rec.trans_type = False
+                rec.trans_type_detail = False
+                rec.trans_warehouse=False
     @api.onchange('result_package_id', 'product_id', 'product_uom_id', 'qty_done')
     def _onchange_putaway_location(self):
         if not self.id and self.user_has_groups(
@@ -305,13 +321,24 @@ class droga_stock_uom_extension(models.Model):
 class val_layer(models.Model):
     _inherit='stock.valuation.layer'
     reference = fields.Char(related='stock_move_id.reference',store=True)
-    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move Detail', related='stock_move_id.trans_type_detail',store=True)
+    trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move Detail', compute='_get_trans_type',store=True)
     trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move',
-                                        related='stock_move_id.trans_type', store=True)
+                                        compute='_get_trans_type', store=True)
     move_date=fields.Date('Stock move date',store=True)
     date_month = fields.Char(string='Date Month', compute='_get_date_month', store=True, readonly=True)
-    warehouse=fields.Many2one('stock.warehouse',store=True)
+    warehouse=fields.Many2one('stock.warehouse',store=True,compute='_get_trans_type')
     origin=fields.Char(related='stock_move_id.origin',store=True)
+    @api.depends('stock_move_id.trans_type','stock_move_id.trans_type_detail')
+    def _get_trans_type(self):
+        for rec in self:
+            if rec.stock_move_id:
+                rec.trans_type=rec.stock_move_id.trans_type
+                rec.trans_type_detail = rec.stock_move_id.trans_type_detail
+                rec.warehouse=rec.stock_move_id.trans_warehouse
+            else:
+                rec.trans_type = False
+                rec.trans_type_detail = False
+                rec.warehouse = False
 
     @api.depends('move_date')
     def _get_date_month(self):
@@ -334,12 +361,40 @@ class droga_stock_move_extension(models.Model):
     trans_type=fields.Many2one('droga.inventory.transaction.types',string='Type',compute='_get_trans_type',store=True)
     trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type Detail', compute='_get_trans_type',
                                  store=True)
+    trans_warehouse=fields.Many2one('stock.warehouse',compute='_get_wareh',store=True)
 
+    @api.depends('state')
+    def _get_wareh(self):
+        for rec in self:
+            if rec.location_id.usage=='internal' and rec.location_dest_id.usage!='internal':
+                rec.trans_warehouse=rec.location_id.warehouse_id.id
+            elif rec.location_id.usage!='internal' and rec.location_dest_id.usage=='internal':
+                rec.trans_warehouse = rec.location_dest_id.warehouse_id.id
+            #If sender has con_type, it's probably store issue return else it's consigment... so warehouse will be set accordingly
+            elif rec.location_id.con_type:
+                rec.trans_warehouse = rec.location_dest_id.warehouse_id.id
+            else:
+                rec.trans_warehouse = rec.location_id.warehouse_id.id
     @api.depends('state')
     def _get_trans_type(self):
         for rec in self:
-            rec.trans_type=False
-            rec.trans_type_detail = False
+            trans_type = self.env["droga.inventory.transaction.types"].search(
+                [('from_loc', '=', rec.location_id.usage),('to_loc', '=', rec.location_dest_id.usage),('summary_detail','=','summary')])
+            if len(trans_type)==0:
+                rec.trans_type=False
+                rec.trans_type_detail = False
+            else:
+                rec.trans_type=trans_type[0].id
+                if trans_type[0].has_detail:
+                    trans_type_det = self.env["droga.inventory.transaction.types"].search(
+                        [('from_loc', '=', rec.location_id.usage), ('to_loc', '=', rec.location_dest_id.usage),
+                         ('summary_detail', '=', 'detail'),'|',('from_con_type','=',rec.location_id.con_type),('to_con_type','=',rec.location_dest_id.con_type)])
+                    if len(trans_type_det)==0:
+                        rec.trans_type_detail = False
+                    else:
+                        rec.trans_type_detail = trans_type_det[0].id
+                else:
+                    rec.trans_type_detail = False
 
     def _inverse_res_discard(self):
         pass

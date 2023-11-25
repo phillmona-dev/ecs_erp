@@ -35,4 +35,5 @@ class inventory_trans_types(models.Model):
                                ('supplier','Vendor location'),('inventory','Inventory loss'),('internal','Internal location')])
     type=fields.Char(string='Transaction type')
     contra_account=fields.Many2one('account.account')
-
+    summary_detail=fields.Selection([('summary','summary'),('detail','detail')])
+    has_detail=fields.Boolean('Has detail type')
