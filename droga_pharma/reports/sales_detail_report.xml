@@ -34,7 +34,7 @@
             <tree string="Sales order" delete="false" create="false">
                 <field name="name" optional="hide"></field>
                 <field name="order_id"></field>
-                <field name="itemcode" string="Product"></field>
+                <field name="itemcode" string="Code"></field>
                 <field name="itemdesc" string="Description"></field>
                 <field name="qty_invoiced" sum="Total qty" string="Qauntity"></field>
                 <field name="price_unit" string="Unit price"></field>
@@ -53,7 +53,7 @@
         <field name="arch" type="xml">
             <search string="Sales order">
                 <field name="name"></field>
-                <field name="itemcode" string="Product"></field>
+                <field name="itemcode" string="Code"></field>
                 <field name="itemdesc" string="Description"></field>
                 <field name="qty_invoiced"></field>
                 <field name="price_unit"></field>

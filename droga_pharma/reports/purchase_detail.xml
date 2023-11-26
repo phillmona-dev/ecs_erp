@@ -34,7 +34,7 @@
             <tree string="Sales order" delete="false" create="false">
                 <field name="name" optional="hide"></field>
                 <field name="order_id"></field>
-                <field name="itemcode"></field>
+                <field name="itemcode" string="Code"></field>
                 <field name="itemdesc"></field>
                 <field name="partner_id" string="Supplier"></field>
                 <field name="product_uom" string="UOM"></field>
@@ -54,8 +54,9 @@
         <field name="arch" type="xml">
             <search string="Sales order">
                 <field name="name" optional="hide"></field>
+                <field name="partner_id" string="Supplier"></field>
                 <field name="order_id"></field>
-                <field name="product_id"></field>
+                <field name="product_id" string="Code"></field>
                 <field name="product_qty" sum="Total qty" string="Qauntity"></field>
                 <field name="price_subtotal" sum="Total amt" string="Amount"></field>
                 
@@ -91,6 +92,10 @@
 
                 <filter string="Received"
                         domain="[('qty_received','&gt;',0)]"
+                name="received"></filter>
+
+                <filter string="Ordered not received"
+                        domain="[('qty_received','=',0)]"
                 name="received"></filter>
 
             </search>
