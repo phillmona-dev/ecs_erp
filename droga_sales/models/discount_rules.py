@@ -92,7 +92,7 @@ class sale_order_line(models.Model):
     product_uom_pharma_qty=fields.Float('Quantity',default=1)
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
-
+    has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
 
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
@@ -451,7 +451,7 @@ class sale_order_ext(models.Model):
 
     def _compute_has_pharma_access(self):
         for rec in self:
-            if rec.wareh in self.env.user.warehouse_ids_ph_disp.ids:
+            if rec.wareh in self.env.user.warehouse_ids_ph_disp.ids or rec.wareh in self.env.user.warehouse_ids_ph.ids:
                 return True
             else:
                 return False
@@ -491,7 +491,7 @@ class sale_order_ext(models.Model):
 
     def _has_pharma_access(self,operator,value):
         if operator=='=':
-            sales = self.env['sale.order'].sudo().search([('wareh', 'in', self.env.user.warehouse_ids_ph_disp.ids)])
+            sales = self.env['sale.order'].sudo().search(['|',('wareh', 'in', self.env.user.warehouse_ids_ph.ids),('wareh', 'in', self.env.user.warehouse_ids_ph_disp.ids)])
             return [('id', 'in', [x.id for x in sales])]
         else:
             return [('id', 'in', [])]

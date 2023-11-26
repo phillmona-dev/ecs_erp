@@ -16,8 +16,8 @@ class ReportWizard(models.TransientModel):
 
     customer = fields.Many2one('droga.pharma.cust.employees', string='Customer')
     client = fields.Many2one('res.partner', string='Client')
-    date_to = fields.Date(string='From Date',default=datetime.date.today() + relativedelta(weeks=0,weekday=-1))
-    date_from= fields.Date(string='To Date',default=datetime.date.today() - relativedelta(weeks=1,weekday=0))
+    date_to = fields.Date(string='To Date',default=datetime.date.today() + relativedelta(weeks=0,weekday=-1))
+    date_from= fields.Date(string='From Date',default=datetime.date.today() - relativedelta(weeks=1,weekday=0))
 
     def action_get_xls(self, data):
 

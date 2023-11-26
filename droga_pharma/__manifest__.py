@@ -49,6 +49,7 @@
         'views/pcm/follow_up_detail.xml',
         'views/inventory/product.xml',
         'reports/sales_report.xml',
+        'reports/purchase_detail.xml',
         'reports/sales_detail_report.xml',
         'reports/inventory_report.xml',
         'views/menu.xml',

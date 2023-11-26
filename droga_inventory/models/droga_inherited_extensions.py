@@ -187,7 +187,7 @@ class droga_location_extension(models.Model):
 
     def _search_has_read_access(self, operator, value):
 
-        compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
+        compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')+self.env.user.warehouse_ids_ph_disp.mapped('code')
 
         if operator == '=':
             if len(compiled_wh_domain) == 0 or not self.env.user.has_group('droga_inventory.inventory_report'):
@@ -362,7 +362,10 @@ class droga_stock_move_extension(models.Model):
     trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type Detail', compute='_get_trans_type',
                                  store=True)
     trans_warehouse=fields.Many2one('stock.warehouse',compute='_get_wareh',store=True)
-    from_to=fields.Many2one('stock.warehouse',string='From/To (Inter-store)',store=True)
+    from_to=fields.Many2one('stock.warehouse',string='From/To (Inter-store)',compute='_get_trans_type',store=True)
+
+    itemcode = fields.Char(related='product_id.default_code', store=True,string="Product")
+    itemdesc = fields.Char(related='product_id.name', store=True,string="Description")
 
     @api.depends('state')
     def _get_wareh(self):
@@ -535,6 +538,12 @@ class droga_stock_move_extension(models.Model):
     @api.model
     def create(self, vals_list):
         vals_list['reserved_qty']=vals_list['product_uom_qty']
+        if 'origin' in vals_list:
+            if vals_list["origin"].startswith('PO-'):
+                sup=self.env['purchase.order'].search(
+                [('name', '=', vals_list["origin"])])
+                vals_list["partner_id"]=sup[0]["partner_id"].id
+
         return super(droga_stock_move_extension, self).create(vals_list)
 
     def unlink_(self):

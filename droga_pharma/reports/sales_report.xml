@@ -34,8 +34,8 @@
                 <field name="wareh" string="Branch"></field>
                 <field name="payment_term_id" string="Branch"></field>
                 <field name="amount_untaxed" sum="Total before tax"></field>
-                <field name="amount_tax" sum="Total tax"></field>
-                <field name="amount_total" sum="Total"></field>
+                <field name="amount_tax" sum="Total tax" optional="hide"></field>
+                <field name="amount_total" sum="Total" optional="hide"></field>
                 <field name="state"
                        decoration-success="state == 'dispense'"
                        decoration-info="state == 'sale'"
@@ -72,7 +72,7 @@
 
                 <filter string="Yesterday sales"
                         domain="[('date_order', '&gt;=', (context_today()-relativedelta(days=1)).strftime('%Y-%m-%d')), ('date_order', '&lt;', context_today().strftime('%Y-%m-%d'))]"
-                        name="today_sales"></filter>
+                        name="yesterday_sales"></filter>
 
                 <filter string="Current week sales"
                     domain="[('date_order', '&lt;=', ((context_today()+relativedelta(weeks=0, weekday=-1)).strftime('%Y-%m-%d'))),
@@ -118,9 +118,9 @@
     </record>
 
     <record id="droga_pharma_sales_pharmacy_action" model="ir.actions.act_window">
-        <field name="name">Sales order per pharmacy - daily</field>
+        <field name="name">Sales order per pharmacy - summary</field>
         <field name="res_model">sale.order</field>
-        <field name="view_mode">tree,pivot,graph</field>
+        <field name="view_mode">tree,pivot,graph,form</field>
         <field name="limit">200</field>
         <field name="context">{'search_default_today_sales':1,'search_default_inv_printed':1}
         </field>
@@ -130,6 +130,7 @@
                    eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'graph', 'view_id': ref('droga_pharma_sales_pharmacy_graph')}),
                           (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_pharma_sales_pharmacy_pivot')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_tree_pharma_no_invoice')}),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_pharma_sales_pharmacy_tree')})]"/>
     </record>
 

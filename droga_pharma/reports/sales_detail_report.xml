@@ -5,8 +5,11 @@
         <field name="model">sale.order.line</field>
         <field name="arch" type="xml">
             <pivot>
-                <field name="wareh" type="row"/>
-                <field name="invoiced_amt" type="measure"/>
+                <field name="name" type="row"/>
+                <field name="wareh" type="col"/>
+
+
+                <field name="invoiced_amt" string="Amount" type="measure"/>
             </pivot>
         </field>
     </record>
@@ -17,7 +20,9 @@
         <field name="model">sale.order.line</field>
         <field name="arch" type="xml">
             <graph>
-                <field name="wareh"/>
+                <field name="name" />
+                <field name="wareh" />
+
                 <field name="invoiced_amt" type="measure"/>
             </graph>
         </field>
@@ -27,14 +32,15 @@
         <field name="model">sale.order.line</field>
         <field name="arch" type="xml">
             <tree string="Sales order" delete="false" create="false">
-                <field name="name"></field>
-                <field name="itemcode"></field>
-                <field name="itemdesc"></field>
-                <field name="qty_invoiced"></field>
-                <field name="price_unit"></field>
-                <field name="invoiced_amt"></field>
-                <field name="wareh"></field>
-                <field name="date_order_det"></field>
+                <field name="name" optional="hide"></field>
+                <field name="order_id"></field>
+                <field name="itemcode" string="Product"></field>
+                <field name="itemdesc" string="Description"></field>
+                <field name="qty_invoiced" sum="Total qty" string="Qauntity"></field>
+                <field name="price_unit" string="Unit price"></field>
+                <field name="invoiced_amt" sum="Total amt" string="Amount"></field>
+                <field name="wareh" string="Warehouse"></field>
+                <field name="date_order_det" string="Date"></field>
             </tree>
         </field>
     </record>
@@ -45,8 +51,8 @@
         <field name="arch" type="xml">
             <search string="Sales order">
                 <field name="name"></field>
-                <field name="itemcode"></field>
-                <field name="itemdesc"></field>
+                <field name="itemcode" string="Product"></field>
+                <field name="itemdesc" string="Description"></field>
                 <field name="qty_invoiced"></field>
                 <field name="price_unit"></field>
                 <field name="invoiced_amt"></field>
@@ -59,7 +65,7 @@
 
                 <filter string="Yesterday sales"
                         domain="[('date_order_det', '&gt;=', (context_today()-relativedelta(days=1)).strftime('%Y-%m-%d')), ('date_order_det', '&lt;', context_today().strftime('%Y-%m-%d'))]"
-                        name="today_sales"></filter>
+                        name="yest_sales"></filter>
 
                 <filter string="Current week sales"
                     domain="[('date_order_det', '&lt;=', ((context_today()+relativedelta(weeks=0, weekday=-1)).strftime('%Y-%m-%d'))),

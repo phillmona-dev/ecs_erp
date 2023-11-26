@@ -12,7 +12,7 @@ class sales_report_det_fields(models.Model):
     cust_location = fields.Many2one('droga.crm.settings.city', related='order_id.cust_location', store=True)
     cust_type_ext_det = fields.Many2one('droga.cust.type', string='Customer type', related='order_id.cust_type_ext',
                                         store=True)
-    date_order_det = fields.Datetime('droga.crm.settings.city', related='order_id.date_order', store=True)
+    date_order_det = fields.Datetime('Date', related='order_id.date_order', store=True)
     order_type_det = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'), ('PT', 'Physiotherapy')], string='Order from (IMP/WHS)', related='order_id.order_type', store=True)

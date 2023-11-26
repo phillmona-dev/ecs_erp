@@ -46,6 +46,20 @@
                             sequence="3"/>
 
                 </menuitem>
+
+                <menuitem
+                        id="droga_pharma_report_purchase"
+                        name="Purchasing"
+                        sequence="1">
+                    <menuitem
+                            id="droga_pharma_purchase_pharmacy"
+                            name="Purchase per supplier"
+                            action="droga_pharma_purchases_detail_pharmacy_action"
+                            sequence="3"/>
+
+
+                </menuitem>
+
                 <menuitem
                         id="droga_pharma_report_inventory"
                         name="Inventory"
