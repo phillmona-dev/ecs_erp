@@ -41,7 +41,7 @@
                 <field name="product_qty" sum="Total qty" string="Qauntity"></field>
                 <field name="qty_received" sum="Total received" string="Received"></field>
                 <field name="price_unit" string="Unit price"></field>
-                <field name="price_subtotal" string="Amount" type="measure"/>
+                <field name="price_subtotal" string="Amount" sum="Total amount" type="measure"/>
                 <button icon="fa-credit-card-alt" type="object" name="open_purchase"
                         class="oe_stat_button"></button>
             </tree>
@@ -89,6 +89,10 @@
 
                 <separator/>
 
+                <filter string="Received"
+                        domain="[('qty_received','&gt;',0)]"
+                name="received"></filter>
+
             </search>
         </field>
     </record>
@@ -98,7 +102,7 @@
         <field name="res_model">purchase.order.line</field>
         <field name="view_mode">tree,pivot,graph</field>
         <field name="limit">200</field>
-        <field name="context">{'search_default_today_purchases':1}
+        <field name="context">{'search_default_current_week_purchases':1}
         </field>
         <field name="domain">[('order_id','like','PO-DP')]</field>
         <field name="search_view_id" ref="droga_pharma_purchases_detail_pharmacy_search"></field>
