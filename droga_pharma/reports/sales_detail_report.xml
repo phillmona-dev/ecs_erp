@@ -14,7 +14,7 @@
     <!-- graph -->
     <record id="droga_pharma_sales_line_pharmacy_graph" model="ir.ui.view">
         <field name="name">sale.order.line.graph.pharmacy.invoice</field>
-        <field name="model">sale.order</field>
+        <field name="model">sale.order.line</field>
         <field name="arch" type="xml">
             <graph>
                 <field name="wareh"/>
