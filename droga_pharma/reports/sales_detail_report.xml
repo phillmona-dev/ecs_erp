@@ -41,6 +41,8 @@
                 <field name="invoiced_amt" sum="Total amt" string="Amount"></field>
                 <field name="wareh" string="Warehouse"></field>
                 <field name="date_order_det" string="Date"></field>
+                <button icon="fa-credit-card-alt" type="object" name="open_sales"
+                        class="oe_stat_button"></button>
             </tree>
         </field>
     </record>

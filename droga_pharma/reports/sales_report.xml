@@ -50,6 +50,8 @@
                        decoration-success="invoice_printed == 'Yes'"
                        decoration-warning="invoice_printed == 'No'"
                        widget="badge" optional="show"/>
+                <button icon="fa-credit-card-alt" type="object" name="open_sales"
+                        class="oe_stat_button"></button>
             </tree>
         </field>
     </record>
@@ -120,7 +122,7 @@
     <record id="droga_pharma_sales_pharmacy_action" model="ir.actions.act_window">
         <field name="name">Sales order per pharmacy - summary</field>
         <field name="res_model">sale.order</field>
-        <field name="view_mode">tree,pivot,graph,form</field>
+        <field name="view_mode">tree,pivot,graph</field>
         <field name="limit">200</field>
         <field name="context">{'search_default_today_sales':1,'search_default_inv_printed':1}
         </field>
@@ -130,7 +132,6 @@
                    eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'graph', 'view_id': ref('droga_pharma_sales_pharmacy_graph')}),
                           (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_pharma_sales_pharmacy_pivot')}),
-                          (0, 0, {'view_mode': 'form', 'view_id': ref('view_order_tree_pharma_no_invoice')}),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_pharma_sales_pharmacy_tree')})]"/>
     </record>
 
