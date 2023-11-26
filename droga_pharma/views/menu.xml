@@ -114,6 +114,11 @@
                         name="Follow up Excel Report"
                         action="action_mtm_excel_report"
                         sequence="12"/>
+                <menuitem
+                        id="droga_inventory_reports_pharma_excel"
+                        name="Stock card - Excel"
+                        action="droga_inventory.droga_inventory_reports_excel_action"
+                        sequence="10000"/>
 
             </menuitem>
         </menuitem>

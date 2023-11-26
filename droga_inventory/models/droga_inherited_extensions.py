@@ -364,8 +364,8 @@ class droga_stock_move_extension(models.Model):
     trans_warehouse=fields.Many2one('stock.warehouse',compute='_get_wareh',store=True)
     from_to=fields.Many2one('stock.warehouse',string='From/To (Inter-store)',compute='_get_trans_type',store=True)
 
-    itemcode = fields.Char( store=True,string="Product")
-    itemdesc = fields.Char(store=True,string="Description")
+    itemcode = fields.Char(related='product_id.default_code', store=True,string="Product")
+    itemdesc = fields.Char(related='product_id.name', store=True,string="Description")
 
     @api.depends('state')
     def _get_wareh(self):
