@@ -362,7 +362,7 @@ class droga_stock_move_extension(models.Model):
     trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type Detail', compute='_get_trans_type',
                                  store=True)
     trans_warehouse=fields.Many2one('stock.warehouse',compute='_get_wareh',store=True)
-    from_to=fields.Many2one('stock.warehouse',string='From/To (Inter-store)',compute='_get_trans_type',store=True)
+    from_to=fields.Many2one('stock.warehouse',string='From/To (Inter-store)',store=True)
 
     @api.depends('state')
     def _get_wareh(self):
