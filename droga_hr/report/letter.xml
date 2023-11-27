@@ -30,9 +30,9 @@
                     /* Default left, right, top, bottom margin is 2cm */
                     @page {
                     size: A4 portrait;
-                    margin-top: 5cm;
-                    margin-left:1.5cm;
-                    margin-right:1.5cm;
+                    margin-top: 9cm;
+                    margin-left:2cm;
+                    margin-right:2cm;
                     margin-bottom:0cm;
                     }
 
@@ -69,7 +69,7 @@
 
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <p>
+                                <p class="text-justify">
                                     <h5>የድርጀታችን የስራ ባልደረባ የሆኑት አቶ/ ወ/ሮ / ወ/ት
                                         <u>
                                             <span t-field="o.employee.amharic_name" class="m-0"/>
@@ -84,7 +84,7 @@
                                     </h5>
                                 </p>
 
-                                <p>
+                                <p class="text-justify">
                                     <h5>ስለሆነም አቶ
                                         <u>
                                             <span t-field="o.employee.amharic_name" class="m-0"/>
@@ -143,9 +143,9 @@
                     /* Default left, right, top, bottom margin is 2cm */
                     @page {
                     size: A4 portrait;
-                    margin-top: 5cm;
-                    margin-left:1.5cm;
-                    margin-right:1.5cm;
+                    margin-top: 9cm;
+                    margin-left:2cm;
+                    margin-right:2cm;
                     margin-bottom:0cm;
                     }
 
@@ -182,7 +182,7 @@
 
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <p>
+                                <p class="text-justify">
                                     <h5>
                                         የድርጀታችን ድሮጋ ፋርማ ኃ/የተ/የግ/ማህበር የስራ ባልደረባ የሆኑት አቶ/ ወ/ሮ / ወ/ት
                                         <u>
@@ -193,10 +193,9 @@
                                     </h5>
                                 </p>
 
-                                <p>
+                                <p class="text-justify">
                                     <h5>
-
-
+                                        
                                         በዚህም መሠረት አቶ/ ወ/ሮ / ወ/ት
                                         <u>
                                             <span t-field="o.employee.amharic_name" class="m-0"/>
