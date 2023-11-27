@@ -539,10 +539,11 @@ class droga_stock_move_extension(models.Model):
     def create(self, vals_list):
         vals_list['reserved_qty']=vals_list['product_uom_qty']
         if 'origin' in vals_list:
-            if vals_list["origin"].startswith('PO-'):
-                sup=self.env['purchase.order'].search(
-                [('name', '=', vals_list["origin"])])
-                vals_list["partner_id"]=sup[0]["partner_id"].id
+            if type(vals_list['origin']) is str:
+                if vals_list["origin"].startswith('PO-'):
+                    sup = self.env['purchase.order'].search(
+                    [('name', '=', vals_list["origin"])])
+                    vals_list["partner_id"]=sup[0]["partner_id"].id
 
         return super(droga_stock_move_extension, self).create(vals_list)
 
