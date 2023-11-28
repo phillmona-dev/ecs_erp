@@ -125,7 +125,6 @@ class sale_order_line(models.Model):
             if rec.order_id.order_from:
                 if rec.order_id.order_from.startswith('PH') and rec.available_qty < rec.product_uom_qty:
                     rec.is_prod_available = 'False'
-                    return
 
             prodqty=sum(self.order_id.order_line.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
                 'product_uom_qty'))

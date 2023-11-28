@@ -52,8 +52,10 @@
                         domain="[('date_planned', '=', context_today().strftime('%Y-%m-%d'))]"
                         name="today_leads"></filter>
                 <filter string="Current week leads"
-                        domain="[('date_planned', '&lt;=', (context_today() + relativedelta(weeks=0,weekday=-1)).strftime('%Y-%m-%d')),('date_planned', '&gt;=', (context_today() - relativedelta(weeks=1,weekday=0)).strftime('%Y-%m-%d'))]"
-                        name="current_week_leads"></filter>
+                    domain="[
+                        ('date_planned', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('date_planned', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
+                    name="current_week_leads"></filter>
                 <filter string="Current month leads"
                         domain="[('date_planned', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('date_planned', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
                         name="current_month_leads"></filter>

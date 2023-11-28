@@ -78,8 +78,9 @@
                         name="today_sales"></filter>
 
                 <filter string="Current week sales"
-                    domain="[('date_order_det', '&lt;=', ((context_today()+relativedelta(weeks=0, weekday=-1)).strftime('%Y-%m-%d'))),
-                    ('date_order_det', '&gt;=', ((context_today()-relativedelta(weeks=1, weekday=0)).strftime('%Y-%m-%d')))]"
+                    domain="[
+                        ('date_order_det', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('date_order_det', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
                     name="current_week_sales"></filter>
 
                 <filter string="Previous week sales"

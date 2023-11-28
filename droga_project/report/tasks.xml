@@ -73,8 +73,10 @@
                         name="late_tasks"></filter>
 
                 <filter string="Current week tasks"
-                        domain="[('planned_date_end', '&lt;=', (context_today() + relativedelta(weeks=0,weekday=-1)).strftime('%Y-%m-%d')),('planned_date_end', '&gt;=', (context_today() - relativedelta(weeks=1,weekday=0)).strftime('%Y-%m-%d'))]"
-                        name="current_week_tasks"></filter>
+                    domain="[
+                        ('planned_date_end', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('planned_date_end', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
+                    name="current_week_tasks"></filter>
                 <filter string="Current month tasks"
                         domain="[('planned_date_end', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('planned_date_end', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
                         name="current_month_tasks"></filter>
