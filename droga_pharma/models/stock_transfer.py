@@ -32,7 +32,7 @@ class picking_inherit(models.Model):
                 rec_message_ids = self.env['mail.message'].search([('res_id', '=', rec.id)]).ids
                 rec.from_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)]) else '-'
                 receiver_pick = self.env['stock.picking'].search([('origin', '=', rec.name)])[0] if self.env['stock.picking'].search([('origin', '=', rec.name)]) else False
-                if receiver_pick.id:
+                if receiver_pick:
                     receiver_message_ids = self.env['mail.message'].search([('res_id', '=', receiver_pick.id)]).ids
                     rec.to_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',receiver_message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',receiver_message_ids)]) else '-'
                 else:
