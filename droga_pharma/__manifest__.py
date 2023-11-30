@@ -44,6 +44,7 @@
         'views/selection_settings/prod_categ.xml',
         'views/compounding.xml',
         'views/pcm/mtm.xml',
+        'views/credit_limit_pharma.xml',
         'views/pcm/minor_alignment.xml',
         'views/pcm/counselling.xml',
         'views/pcm/follow_up_detail.xml',

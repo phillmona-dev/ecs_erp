@@ -80,15 +80,6 @@
                             </tree>
                         </field>
                     </page>
-                    <page string="Customers">
-                    <field name="allowed_cust" mode="tree">
-                            <tree create="0" string="Allowed Customers">
-                                <field name="name"></field>
-                                <field name="city_name"></field>
-                                <field name="vat"></field>
-                            </tree>
-                    </field>
-                    </page>
                 </notebook>
             </xpath>
         </field>
