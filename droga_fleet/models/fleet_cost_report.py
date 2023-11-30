@@ -100,6 +100,14 @@ class ReportWizard(models.TransientModel):
         sheet.set_column(6, 6, 15)  # Date of maintenance
         sheet.set_column(7, 7, 15)  # cost of maintenance
 
+        sheet.set_column(7, 7, 20)  # Date of refuel
+        sheet.set_column(8, 8, 20)  # cost of refuel
+        sheet.set_column(9, 9, 20)  # Date of maintenance
+        sheet.set_column(10, 10, 20)  # cost of maintenance
+
+
+
+
 
         row = 9
         col = 0
@@ -133,13 +141,13 @@ class ReportWizard(models.TransientModel):
             total_monthly_rent_cost = total_monthly_rent_cost + vehicle.rent_fee
 
         row = row + 2
-        sheet.write(row, col + 0, 'Total Monthly Fuel Quota Cost', title_format)
-        sheet.write(row + 1 , col + 0, 'Total Monthly Rent Cost', title_format)
-        sheet.write(row + 2, col + 0, 'Total Monthly Cost', title_format)
+        sheet.write(9, 7, 'Total Monthly Fuel Quota Cost', title_format)
+        sheet.write(9 , 8, 'Total Monthly Rent Cost', title_format)
+        sheet.write(9, 9, 'Total Monthly Cost', title_format)
 
-        sheet.write(row, col + 1, str(total_monthly_fuel_quota_cost))
-        sheet.write(row + 1, col + 1 , str(total_monthly_rent_cost))
-        sheet.write(row + 2, col + 1, str(total_monthly_cost))
+        sheet.write(10, 7, str(total_monthly_fuel_quota_cost))
+        sheet.write(10 ,8 , str(total_monthly_rent_cost))
+        sheet.write(10 ,9, str(total_monthly_cost))
 
 
 
@@ -166,6 +174,11 @@ class ReportWizard(models.TransientModel):
         sheet.set_column(2, 2, 20)  # total maintainance
         sheet.set_column(4, 4, 15)  # total cose
 
+        sheet.set_column(7, 7, 20)  # Date of refuel
+        sheet.set_column(8, 8, 20)  # cost of refuel
+        sheet.set_column(9, 9, 20)  # Date of maintenance
+        sheet.set_column(10, 10, 20)  # cost of maintenance
+
 
         row = 9
         col = 0
@@ -176,18 +189,17 @@ class ReportWizard(models.TransientModel):
         sheet.write(row, col + 3, 'Cost', title_format)
 
 
-
-
-
-
         dmn = [
             ('date', '>=', self.date_from),
             ('date', '<=', self.date_to),
+
 
         ]
 
         data = self.env['vehicle.maintenance.fee'].search(dmn)
         unique_vehicles = list(set(data.mapped('vehicle_id.license_plate')))
+
+
 
 
         total_maintenance_costs_by_license_plate = {}
@@ -215,19 +227,24 @@ class ReportWizard(models.TransientModel):
             row = row + 1
             sheet.write(row, col + 0, vehicle.vehicle_id.license_plate)
             sheet.write(row, col + 1, vehicle.type)
-            sheet.write(row, col + 2, vehicle.date)
+            sheet.write(row, col + 2, str(vehicle.date))
             sheet.write(row, col + 3, vehicle.cost)
 
         row = row + 2
-        sheet.write(row , col + 0, 'Total Vehicle Maintenance Cost', title_format)
-        sheet.write(row , col + 1, 'Total Vehicle Fuel Cost', title_format)
-        sheet.write(row, col + 1, 'Total Vehicle Fuel Cost', title_format)
+
+        rw = 9
+        cl = 7
+        sheet.write(rw , cl + 0, 'Vehicle License Plate', title_format)
+        sheet.write(rw , cl + 1, 'Total Vehicle Maintenance Cost', title_format)
+        sheet.write(rw , cl + 2, 'Total Vehicle Fuel Cost', title_format)
+        sheet.write(rw, cl + 3, 'Total Vehicle Cost', title_format)
 
         for vehicle in unique_vehicles:
-            row = row + 1
-            sheet.write(row, col + 0, str(total_maintenance_costs_by_license_plate[vehicle]))
-            sheet.write(row, col + 1, str(total_fuel_costs_by_license_plate[vehicle]))
-            sheet.write(row, col + 2, str(total_costs_by_license_plate[vehicle]))
+            rw = rw + 1
+            sheet.write(rw, cl + 0, str(vehicle))
+            sheet.write(rw, cl + 1, str(total_maintenance_costs_by_license_plate[vehicle]))
+            sheet.write(rw, cl + 2, str(total_fuel_costs_by_license_plate[vehicle]))
+            sheet.write(rw, cl + 3, str(total_costs_by_license_plate[vehicle]))
 
         # Calculate total maintenance costs of all license plates
         total_maintenance_costs_all = sum(total_maintenance_costs_by_license_plate.values())
@@ -238,13 +255,13 @@ class ReportWizard(models.TransientModel):
         # Calculate total costs of all license plates
         total_costs_all = sum(total_costs_by_license_plate.values())
 
-        sheet.write(row + 2, col + 0, 'Total Maintenance cost  ', title_format)
-        sheet.write(row + 3, col + 0, 'Total Fuel cost  ', title_format)
-        sheet.write(row + 4, col + 0, 'Total cost  ', title_format)
+        sheet.write(9, 11 + 1 , 'Total Maintenance cost  ', title_format)
+        sheet.write(9  ,12  + 1 , 'Total Fuel cost  ', title_format)
+        sheet.write(9 , 13 + 1 , 'Total cost  ', title_format)
 
-        sheet.write(row + 2, col + 1, str(total_maintenance_costs_all))
-        sheet.write(row + 3, col + 1, str(total_fuel_costs_all))
-        sheet.write(row + 4, col + 1, str(total_costs_all))
+        sheet.write(10, 11 + 1 , str(total_maintenance_costs_all))
+        sheet.write(10,12 + 1 , str(total_fuel_costs_all))
+        sheet.write(10, 13 + 1 , str(total_costs_all))
 
 
     def action_wizard_print_excel_report(self):
