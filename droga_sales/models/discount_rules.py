@@ -685,10 +685,6 @@ class sale_order_ext(models.Model):
                     '\n' if message else '') + "Minimum order amount for " + so.payment_term_id.name + " is " + str(
                     so.payment_term_id.min_amount)
                 # raise ValidationError("Minimum order amount for "+so.payment_term_id.name+" is "+str(so.payment_term_id.min_amount))
-            if so.payment_term_id.allowed_cust:
-                if so.partner_id.id not in so.payment_term_id.allowed_cust.ids:
-                    message = message + ('\n' if message else '') + "%s is not eligible for %s!" % (
-                        so.partner_id.name, so.payment_term_id.name)
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 message = message + ('\n' if message else '') + "Please login before requesting a sales order!"
                 # raise ValidationError("Please login before registering a sales order!")

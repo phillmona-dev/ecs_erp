@@ -24,12 +24,12 @@ class cust_credit_limit(models.Model):
                 matured_invoices = []
             elif record.vat != '0000000000':
                 matured_invoices = self.env['account.move'].search(
-                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('cost_center','not like','Pharmacy%'),
                      ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', record.vat), '|',
                      ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
             else:
                 matured_invoices = self.env['account.move'].search(
-                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('cost_center','not like','Pharmacy%'),
                      ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id', '=', record.id), '|',
                      ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
             tot_amount = 0
@@ -93,14 +93,14 @@ class cust_sales_credit_limit(models.Model):
                 matured_invoices = self.env['account.move'].search(
                     [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
                      ('company_id', '=', self.env.company.id),
-                     ('invoice_date_due', '<=', datetime.now()),
+                     ('invoice_date_due', '<', datetime.now().date()),
                      ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', rec.partner_id.vat), '|',
                      ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
             else:
                 matured_invoices = self.env['account.move'].search(
                     [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
                      ('company_id', '=', self.env.company.id),
-                     ('invoice_date_due', '<=', datetime.now()),
+                     ('invoice_date_due', '<', datetime.now().date()),
                      ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id', '=', rec.partner_id.id), '|',
                      ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
             tot_amount = 0
@@ -137,10 +137,6 @@ class cust_sales_credit_limit(models.Model):
             if not so.pr_sales and (self.env.user.name.startswith('CRM') or self.env.user.name.startswith('Tender')):
                 message = message + ('\n' if message else '') + "Please login before registering a sales order!"
                 # raise ValidationError("Please login before registering a sales order!")
-            if so.payment_term_id.allowed_cust:
-                if so.partner_id.id not in so.payment_term_id.allowed_cust.ids:
-                    message = message + ('\n' if message else '') + "%s is not eligible for %s!" % (
-                        so.partner_id.name, so.payment_term_id.name)
             if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [
                 15390]:
                 message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
@@ -310,7 +306,6 @@ class payment_term_no_credit(models.Model):
     used_under = fields.Selection([
         ('BT', 'Both'),
         ('DR', 'Droga'), ('PC', 'Pharmacy chain')], string='Term used under')
-    allowed_cust = fields.Many2many('res.partner', string='Allowed customers', tracking=True)
 
     def write(self, vals_list):
         if not self.env.user.has_group('droga_sales.payment_term_update'):
