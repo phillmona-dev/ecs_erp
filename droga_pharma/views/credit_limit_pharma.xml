@@ -39,7 +39,7 @@
 
     <menuitem
             id="droga_sales_pharma_credit_limit_menu"
-            name="Credit limit"
+            name="Credit limit for Pharmacy"
             action="droga_pharma_credit_limit_action"
             parent="droga_pharma.droga_pharma_customers_comp_list_menu"
             sequence="200"/>
