@@ -195,7 +195,7 @@
 
                                 <p class="text-justify">
                                     <h5>
-                                        
+
                                         በዚህም መሠረት አቶ/ ወ/ሮ / ወ/ት
                                         <u>
                                             <span t-field="o.employee.amharic_name" class="m-0"/>
