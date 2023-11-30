@@ -18,6 +18,8 @@
                 <field name="to_con_type"></field>
                 <field name="type"></field>
                 <field name="contra_account"></field>
+                <field name="summary_detail"></field>
+                <field name="has_detail"></field>
             </tree>
         </field>
     </record>

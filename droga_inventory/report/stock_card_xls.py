@@ -181,8 +181,19 @@ class inventory_stock_card_xls(models.TransientModel):
 
     def get_droga_stockcard_sheet_with_header(self, sheet,workbook,prod,row_start):
 
-        sheet.set_column('B:B', 10)
-        sheet.set_column('A:A', 10.5)
+        sheet.set_column('A:A', 12)
+        sheet.set_column('B:B', 15)
+        sheet.set_column('C:C', 30)
+        sheet.set_column('D:D', 10)
+        sheet.set_column('E:E', 10)
+        sheet.set_column('F:F', 10)
+        sheet.set_column('G:G', 10)
+        sheet.set_column('H:H', 10)
+        sheet.set_column('I:I', 10)
+        sheet.set_column('J:J', 15)
+        sheet.set_column('K:K', 12)
+        sheet.set_column('L:L', 12)
+
         #region excel_formats
         bold = workbook.add_format({'bold': True})
         header_format = workbook.add_format({
@@ -232,7 +243,7 @@ class inventory_stock_card_xls(models.TransientModel):
 
         sheet.merge_range('A'+str(row_start+1)+':L'+str(row_start+1), 'DROGA PHARMA P.L.C', header_format)
         sheet.merge_range('A'+str(row_start+2)+':L'+str(row_start+2), 'Stock record card', main_title_format)
-        sheet.merge_range('A'+str(row_start+3)+':L'+str(row_start+3), 'Product name, strength and dosage form : '+prod.name, parameter_format)
+        sheet.merge_range('A'+str(row_start+3)+':L'+str(row_start+3), 'Product name, strength and dosage form : '+prod.default_code+'-'+prod.name, parameter_format)
 
         sheet.merge_range('A'+str(row_start+4)+':F'+str(row_start+4), 'Unit of measure : '+prod.product_tmpl_id.uom_id.name, parameter_format)
         sheet.merge_range('G'+str(row_start+4)+':L'+str(row_start+4), 'Location : '+self.warehouse.name, parameter_format)

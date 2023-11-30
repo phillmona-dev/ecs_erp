@@ -47,8 +47,10 @@
                 <separator/>
                 
                 <filter string="Current week deadlines"
-                        domain="[('dead_line_date', '&lt;=', (context_today() + relativedelta(weeks=0,weekday=-1)).strftime('%Y-%m-%d')),('dead_line_date', '&gt;=', (context_today() - relativedelta(weeks=1,weekday=0)).strftime('%Y-%m-%d'))]"
-                        name="current_week_tenders"></filter>
+                    domain="[
+                        ('dead_line_date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('dead_line_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
+                    name="current_week_tenders"></filter>
                 <filter string="Current month deadlines"
                         domain="[('dead_line_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('dead_line_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
                         name="current_month_tenders"></filter>

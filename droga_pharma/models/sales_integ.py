@@ -29,6 +29,18 @@ class sales_integ(models.Model):
     counselling_header = fields.One2many('droga.pharma.counselling', 'sales_origin')
     minor_align_header = fields.One2many('droga.pharma.minor.alignment', 'sales_origin')
     membership_origin = fields.Many2one('droga.pharma.membership', readonly=True)
+
+    def open_sales(self):
+        return {
+            'name': 'Sales order',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sale.order',
+            'view_id': self.env.ref('droga_pharma.view_order_form_pharma').id,
+            'type': 'ir.actions.act_window',
+
+            'res_id': self.id,
+        }
     @api.onchange('dob','sex')
     def _onchange_dob_weight_sex(self):
         for rec in self:
@@ -121,6 +133,18 @@ class sales_integ(models.Model):
     def get_duration(self):
         for rec in self:
             rec.duration = rec.product_uom_qty / rec.frequency if rec.frequency != 0 else 1
+
+    def open_sales(self):
+        return {
+            'name': 'Sales order',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sale.order',
+            'view_id': self.env.ref('droga_pharma.view_order_form_pharma').id,
+            'type': 'ir.actions.act_window',
+
+            'res_id': self.order_id.id,
+        }
 
     @api.depends('duration', 'product_uom_qty')
     def get_freq(self):

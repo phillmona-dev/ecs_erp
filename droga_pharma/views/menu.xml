@@ -35,15 +35,35 @@
                         sequence="1">
                     <menuitem
                             id="droga_pharma_sales_pharmacy"
-                            name="Sales per pharmacy - today"
+                            name="Sales per pharmacy - summary"
                             action="droga_pharma_sales_pharmacy_action"
                             sequence="3"/>
 
+                    <menuitem
+                            id="droga_pharma_sales_detail_pharmacy"
+                            name="Sales per pharmacy - detail"
+                            action="droga_pharma_sales_detail_pharmacy_action"
+                            sequence="3"/>
+
                 </menuitem>
+
+                <menuitem
+                        id="droga_pharma_report_purchase"
+                        name="Purchasing"
+                        sequence="2">
+                    <menuitem
+                            id="droga_pharma_purchase_pharmacy"
+                            name="Purchase per supplier"
+                            action="droga_pharma_purchases_detail_pharmacy_action"
+                            sequence="3"/>
+
+
+                </menuitem>
+
                 <menuitem
                         id="droga_pharma_report_inventory"
                         name="Inventory"
-                        sequence="1">
+                        sequence="3">
 
                     <menuitem
                             id="droga_pharma_products_view"
@@ -63,21 +83,6 @@
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
                             sequence="2"/>
 
-
-                    <menuitem
-                            id="droga_pharma_stock_issue_transactions_menu"
-                            name="Stock transactions - issue"
-                            action="droga_pharma_inv_transaction_issue_warehouse_action"
-                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
-                            sequence="3"/>
-
-                    <menuitem
-                            id="droga_pharma_stock_receipts_transactions_menu"
-                            name="Stock transactions - receipts"
-                            action="droga_pharma_inv_transaction_receipts_warehouse_action"
-                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
-                            sequence="4"/>
-
                     <menuitem
                             id="droga_pharma_stock_all_transactions_menu"
                             name="Stock transactions - All"
@@ -88,7 +93,7 @@
                 <menuitem
                         id="droga_pharma_report_mtm"
                         name="MTM"
-                        sequence="1">
+                        sequence="4">
 
                     <menuitem
                             id="droga_pharma_follow_up_report_menu"
@@ -109,6 +114,11 @@
                         name="Follow up Excel Report"
                         action="action_mtm_excel_report"
                         sequence="12"/>
+                <menuitem
+                        id="droga_inventory_reports_pharma_excel"
+                        name="Stock card - Excel"
+                        action="droga_inventory.droga_inventory_reports_excel_action"
+                        sequence="10000"/>
 
             </menuitem>
         </menuitem>

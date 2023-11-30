@@ -103,8 +103,22 @@ class droga_purchase_uom_extension(models.Model):
     pharma_uom = fields.Many2one(related='product_id.pharma_uom', store=True)
     request_type=fields.Selection(related='order_id.request_type')
 
+    itemcode = fields.Char(related='product_id.default_code', store=True, string="Product")
+    itemdesc = fields.Char(related='product_id.name', store=True, string="Description")
+
     product_uom_pharma=fields.Many2one('uom.uom')
 
+    def open_purchase(self):
+        return {
+            'name': 'Purchase order',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'purchase.order',
+            'view_id': self.env.ref('purchase.purchase_order_form').id,
+            'type': 'ir.actions.act_window',
+
+            'res_id': self.order_id.id,
+        }
     @api.onchange('product_uom_pharma', 'product_id')
     def _on_change_uom(self):
         for rec in self:
@@ -169,7 +183,7 @@ class droga_stock_move_line(models.Model):
     tot_price=fields.Float('Total amount',compute='_get_up',store=True)
     warehouse_id = fields.Many2one('stock.warehouse', related='location_id.warehouse_id', store=True)
     warehouse_dest_id = fields.Many2one('stock.warehouse', related='location_dest_id.warehouse_id', store=True)
-    branch_id = fields.Many2one('account.analytic.account',string='Branch', related='warehouse_id.linked_analytic', store=True)
+    branch_id = fields.Many2one('account.analytic.account',string='Branch', related='trans_warehouse.linked_analytic', store=True)
     branch_dest_id = fields.Many2one('account.analytic.account', related='warehouse_dest_id.linked_analytic', store=True)
     branch=fields.Many2one('account.analytic.account', compute='get_branch', store=True)
 
