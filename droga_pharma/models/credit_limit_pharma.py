@@ -3,12 +3,12 @@ from odoo import models, fields, api
 class pharma_credit(models.Model):
     _inherit = 'res.partner'
     cust_credit_limit_pharma = fields.Float(string='Credit limit', tracking=True)
-    unsettled_amount_pharma = fields.Monetary(compute='_compute_balance', string='Unsettled amount')
-    available_amount_pharma = fields.Float(string='Credit balance', compute='_compute_balance')
+    unsettled_amount_pharma = fields.Monetary(compute='_compute_balance_pharma', string='Unsettled amount')
+    available_amount_pharma = fields.Float(string='Credit balance', compute='_compute_balance_pharma')
     allowed_credit_terms=fields.Many2many('account.payment.term')
 
     @api.depends('debit', 'credit')
-    def _compute_balance(self):
+    def _compute_balance_pharma(self):
         for record in self:
             if record.id in [15390, 15488]:
                 matured_invoices = []
