@@ -222,10 +222,6 @@ class FleetVehicle(models.Model):
 
 
 
-
-
-
-
     maintenance_fees = fields.One2many('vehicle.maintenance.fee',
                                        'vehicle_id', string='Maintenance Fees')
 
