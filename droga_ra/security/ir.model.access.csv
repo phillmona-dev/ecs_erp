@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_droga_ra_droga_ra,droga_ra.droga_ra,model_droga_ra_droga_ra,base.group_user,1,1,1,1
