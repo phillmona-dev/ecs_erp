@@ -5,9 +5,13 @@
             <field name="name">Fleet request</field>
             <field name="res_model">droga.fleet.request</field>
             <field name="view_mode">tree,form,kanban</field>
+        </record>
+        <record id="droga_fleet_request_tree_action_user_only" model="ir.actions.act_window">
+            <field name="name">Fleet request</field>
+            <field name="res_model">droga.fleet.request</field>
+            <field name="view_mode">tree,form,kanban</field>
             <field name="domain">[('create_uid','=',uid)]</field>
         </record>
-
         <record id="droga_fleet_request_form" model="ir.ui.view">
             <field name="name">Fleet Request</field>
             <field name="model">droga.fleet.request</field>

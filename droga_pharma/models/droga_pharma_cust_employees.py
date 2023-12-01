@@ -20,7 +20,7 @@ class droga_pharma_customer_employees(models.Model):
     _rec_name = 'descr'
 
     memberships_employee = fields.One2many('droga.pharma.membership', 'parent_employee')
-    sales=fields.One2many('sale.order','customer_emp')
+    sales=fields.One2many(  'sale.order','customer_emp')
     sales_detail=fields.One2many('sale.order.line',related='sales.order_line')
 
     descr = fields.Char('descr', compute='_get_descr',store=True)
@@ -32,6 +32,8 @@ class droga_pharma_customer_employees(models.Model):
         [('Male', 'Male'), ('Female', 'Female')],
         string='Gender',tracking=True)
     job_position = fields.Char(string='Job position')
+    company_limit= fields.Float(string='Credit limit', tracking=True,related='parent_customer.cust_credit_limit_pharma')
+    employee_credit_limit=fields.Float('Credit limit',default=0)
     cust_id=fields.Char('Employee ID')
     profession=fields.Selection(
         [('hp', 'Health professional'),('other', 'Other')],

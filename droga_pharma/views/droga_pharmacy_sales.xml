@@ -208,12 +208,29 @@
                             <field name="partner_id" widget="res_partner_many2one"
                                    context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
                                    options='{"always_reload": True,"no_open":True,"no_create": True}'/>
-                            <field name="customer_emp" context="{'default_parent_customer':partner_id,'show_age': True}"
-                                   options="{'no_open':False,'no_create': False}"></field>
-                            <field name="cust_id_linked"></field>
+
+
+                            <field name="pay_type" invisible="1"/>
+
+                            <field name="customer_emp" attrs="{'invisible': [('pay_type', '=', True)]}" context="{'default_parent_customer':partner_id}"
+                                            options="{'no_open':False,'no_create': False}"></field>
+                            <field name="cust_id_linked" attrs="{'invisible': [('pay_type', '=', True)]}" ></field>
+
+                            <label for="customer_emp"  string="Customer Name" attrs="{'invisible': [('pay_type', '=', False)]}"/>
+                            <div class="o_row" attrs="{'invisible': [('pay_type', '=', False)]}">
+
+                                <field name="customer_emp"  class="oe_inline" context="{'default_parent_customer':partner_id}"
+                                    options="{'no_open':False,'no_create': False}"></field>
+
+                                <label for="cust_id_linked" string="Employee ID"/>
+                                <field name="cust_id_linked" class="oe_inline"></field>
+                            </div>
+
+                            <field name="available_amount_pharma" attrs="{'invisible': [('pay_type', '=', False)]}" string="Available balance" options="{'no_create': True}"/>
+
                             <field name="cust_details"></field>
                             <field name="manual_price" invisible="1"></field>
-                            <field name="show_invoice_button" invisible="1"></field>
+                            <field name="show_invoice_button_pharma" invisible="1"></field>
                             <field name="partner_invoice_id" groups="account.group_delivery_invoice_address"
                                    context="{'default_type':'invoice'}" options='{"always_reload": True}'/>
                             <field name="partner_shipping_id" groups="account.group_delivery_invoice_address"
@@ -221,7 +238,8 @@
                         </group>
                         <group name="order_details">
                             <field name="Vat_no" readonly="1" string="Tin No"></field>
-                            <field name="payment_term_id" domain="[('used_under', 'in', ('BT','PC'))]"
+                            <field name="cust_availed_payment_term_ids" invisible="1"></field>
+                            <field name="payment_term_id" domain="['|',('id','in',cust_availed_payment_term_ids),('used_under', 'in', ('BT','PC'))]"
                                    options="{'no_open':True,'no_create': True}"/>
                             <div class="o_td_label">
                                 <label for="date_order" string="Order Date"/>
@@ -229,8 +247,8 @@
                             </div>
                             <field name="date_order" nolabel="1"/>
                             <field name="wareh" readonly="1" string="Pharmacy branch" options="{'no_open':True,'no_create': True}"/>
-                            <field name="mature_amount" style="color:red"
-                                   attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
+                            <field name="mature_amount_pharma" style="color:red"
+                                   attrs="{'invisible': [('show_invoice_button_pharma', '=', False)]}"></field>
                             <field name="show_update_pricelist" invisible="1"/>
                             <label for="pricelist_id" invisible="1" groups="product.group_product_pricelist"/>
                             <div groups="product.group_product_pricelist" invisible="1" class="o_row">

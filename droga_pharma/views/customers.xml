@@ -37,10 +37,21 @@
                             <field name="cust_id"></field>
                         </group>
                         <group>
-                            <field name="dob"></field>
-                            <field name="age"></field>
+
+                            <label for="dob"  string="Date of birth"/>
+                            <div class="o_row">
+
+                                <field name="dob"  class="oe_inline"></field>
+
+                                <label for="age" string="Age"/>
+                                <field name="age" class="oe_inline"></field>
+                            </div>
+
                             <field name="gender"></field>
                             <field name="profession"></field>
+
+                            <field name="company_limit" invisible="1"></field>
+                            <field name="employee_credit_limit" attrs="{'invisible': [('company_limit', '=', 0)]}"></field>
                         </group>
                     </group>
 

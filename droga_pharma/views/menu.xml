@@ -94,12 +94,17 @@
                         id="droga_pharma_report_mtm"
                         name="MTM"
                         sequence="4">
+                    <menuitem
+                            id="droga_pharma_points_earned_report_menu"
+                            name="Customer points"
+                            action="action_droga_pharma_points_earned_action"
+                            sequence="3"/>
 
                     <menuitem
                             id="droga_pharma_follow_up_report_menu"
                             name="Follow up detail"
                             action="action_droga_pharma_mtm_schedule_detail_tree"
-                            sequence="2"/>
+                            sequence="5"/>
                 </menuitem>
 
 
