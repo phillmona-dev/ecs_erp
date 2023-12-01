@@ -34,6 +34,22 @@
                                     </strong>
 
                                     <br/>
+
+
+                                    Requested by:
+                                    <strong class="o_kanban_record_title">
+                                        <field name="requested_for"/>
+                                    </strong>
+
+                                    <br/>
+
+                                      Request time:
+                                    <strong class="o_kanban_record_title">
+                                        <field name="service_time"/>
+                                    </strong>
+                                    <br/>
+
+
                                     <hr/>
 
                                     <button type="object" name="delivered" string="Delivered" class="oe_highlight"/>

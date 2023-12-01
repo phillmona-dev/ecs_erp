@@ -166,7 +166,7 @@ class FleetRequest(models.Model):
             if req.requested_by.id == self.env.user.id:
 
                 for partner in req.task_ids:
-                    chauffeur = str(partner.chauffeur.name)
+                    chauffeur = str(partner.chauffeur_drivers.p_name)
                     if (chauffeur != 'False'):
                         result = result + chauffeur+ ","
                 req.chauffeur = result
@@ -544,6 +544,7 @@ class RequestTasks(models.Model):
     #EMPLOYEE
 
     chauffeur = fields.Many2one("hr.employee", string=" Driver (If Needed)")
+    chauffeur_drivers=fields.Many2one('droga.pro.sales.master',string=" Driver (If Needed)",domain="[('employee_access_users', 'like', 'Driver%')]")
 
     request_id = fields.Many2one('droga.fleet.request')
 

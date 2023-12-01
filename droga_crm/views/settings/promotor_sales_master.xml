@@ -13,7 +13,7 @@
         <field name="arch" type="xml">
             <tree string="" editable="top" delete="0">
                 <field name="p_name"></field>
-                <field name="employee_access_users" domain="(['|',('name','like','Tender%'),('name','like','CRM%')])" options="{'no_create':True,'no_open':True}"></field>
+                <field name="employee_access_users" domain="(['|',('name','like','Tender%'),'|',('name','like','CRM%'),('name','like','Driver%')])" options="{'no_create':True,'no_open':True}"></field>
                 <field name="p_regions" widget="many2many_tags" string="City/sub-city" options="{'no_create':True,'no_open':True}"></field>
                 <field name="p_groups" domain="([('status','=','Active')])" widget="many2many_tags" string="Product groups" options="{'no_create':True,'no_open':True}"></field>
                 <field name="status"></field>

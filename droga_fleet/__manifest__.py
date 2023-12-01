@@ -25,7 +25,7 @@ Main Features
 """,
     'depends': ['base', 'hr',
                 'mail', 'stock', 'http_routing', 'sale',
-                'resource', 'stock',
+                'resource', 'stock','droga_crm',
                 'fleet'
                 ],
     'data': [

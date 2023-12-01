@@ -11,7 +11,7 @@
 
     <menuitem parent="fleet.menu_root"
               id="form_menu_fleet_kanban"
-              name="Kanban"
+              name="Drivers menu"
               action="action_droga_fleet_task"
               groups="fleet.fleet_group_user"
               sequence="67"/>
