@@ -6,7 +6,7 @@
               id="form_menu_fleet_requests"
               name="Fleet Requests"
               action="droga_fleet_request_tree_action"
-              groups="fleet.fleet_group_user"
+              groups="droga_fleet.droga_fleet_manager"
               sequence="65"/>
 
     <menuitem parent="fleet.menu_root"

@@ -126,8 +126,8 @@
                                                attrs="{'readonly':[('parent.status', '!=', 'approved')]}"
                                                groups="droga_fleet.droga_fleet_manager"/>
 
-                                        <field name="is_delivered"
-                                               attrs="{'invisible':[('parent.status', '!=', 'assigned')]}"
+                                        <field name="time_taken"
+                                               attrs="{'readonly':[('parent.status', '!=', 'draft')]}"
                                                groups="droga_fleet.droga_fleet_manager"/>
 
                                     </tree>

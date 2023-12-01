@@ -10,7 +10,7 @@
                     <field name="from_location"/>
                     <field name="to_location"/>
                     <field name="active_status"/>
-
+                    <field name="task_stage"></field>
 
                     <templates>
                         <t t-name="kanban-box">
@@ -52,8 +52,12 @@
 
                                     <hr/>
 
-                                    <button type="object" name="delivered" string="Delivered" class="oe_highlight"/>
 
+                                    <button type="object" name="delivered" string="Delivered" class="oe_highlight"
+                                    attrs="{'invisible':[('task_stage', '!=', 'delivered')]}"/>
+
+                                    <button type="object" name="start" string="Start" class="btn-danger"
+                                    attrs="{'invisible':[('task_stage', '!=', 'start')]}"/>
 
                                 </div>
                             </div>

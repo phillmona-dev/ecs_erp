@@ -352,7 +352,7 @@ class FleetRequest(models.Model):
 
                 #ADD TASK FOR THE DRIVER
                 employee = task.chauffeur
-                user = self.env['res.users'].search([('id', '=', employee.user_id.id)])
+                user = self.env['res.users'].search([('name', 'like', 'Driver%')])
 
                 self.create_driver_activity(user.id, task)
                 self.status = 'assigned'
@@ -458,6 +458,16 @@ class RequestTasks(models.Model):
     _description = "Droga fleet request task"
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
     _rec_name = 'travel_log'
+    task_stage = fields.Selection([("start", "Start"), ("delivered", "Delivered")], default='start')
+    start_time = fields.Datetime('start time')
+
+    time_taken = fields.Char('Time Taken')
+
+    def start(self):
+        for task in self:
+            current_time = fields.datetime.now()
+            task.start_time = current_time
+            task.task_stage = 'delivered'
 
     fleet_request_id = fields.Many2one('droga.fleet.request', string="Fleet Request")
     vehicle_id = fields.Many2one('fleet.vehicle')
@@ -488,6 +498,10 @@ class RequestTasks(models.Model):
 
     def delivered(self):
         for task in self:
+                current_time = fields.datetime.now()
+                time_difference = current_time - task.start_time
+                task.time_taken = time_difference
+
                 print("In task")
                 task.is_delivered = True
 
