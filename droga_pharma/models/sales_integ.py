@@ -43,7 +43,7 @@ class sales_integ(models.Model):
                 matured_invoices = []
             elif rec.partner_id.vat != '0000000000':
                 matured_invoices = self.env['account.move'].search(
-                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('cost_center','like','Pharmacy%'),
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('invoice_payment_term_id','!=',11),('cost_center','like','Pharmacy%'),
                      ('company_id', '=', self.env.company.id),
                      ('invoice_date_due', '<', datetime.now().date()),
                      ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', rec.partner_id.vat),
@@ -51,7 +51,7 @@ class sales_integ(models.Model):
                      ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
             else:
                 matured_invoices = self.env['account.move'].search(
-                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('cost_center','like','Pharmacy%'),
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('invoice_payment_term_id','!=',11),('cost_center','like','Pharmacy%'),
                      ('company_id', '=', self.env.company.id),
                      ('invoice_date_due', '<', datetime.now().date()),
                      ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id', '=', rec.partner_id.id), '|',
