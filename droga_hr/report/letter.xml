@@ -30,9 +30,9 @@
                     /* Default left, right, top, bottom margin is 2cm */
                     @page {
                     size: A4 portrait;
-                    margin-top: 9cm;
+                    margin-top: 7cm;
                     margin-left:1.5cm;
-                    margin-right:1.5cm;
+                    margin-right:1cm;
                     margin-bottom:0cm;
                     }
 
@@ -50,12 +50,12 @@
 
                         <h5 style="text-align: right;">ቁጥር:
                             <u>
-                                <spam t-field="o.company_name"/>
+                                <spam t-field="o.name"/>
                             </u>
                         </h5>
                         <h5 style="text-align: right;">ቀን:
                             <u>
-                                <spam t-field="o.company_name"/>
+
                             </u>
                         </h5>
 
@@ -153,9 +153,9 @@
                     /* Default left, right, top, bottom margin is 2cm */
                     @page {
                     size: A4 portrait;
-                    margin-top: 9cm;
+                    margin-top: 7cm;
                     margin-left:1.5cm;
-                    margin-right:1.5cm;
+                    margin-right:1cm;
                     margin-bottom:0cm;
                     }
 
@@ -170,7 +170,16 @@
 
                     <div class="page">
                         <div class="oe_structure"/>
+                        <h5 style="text-align: right;">ቁጥር:
+                            <u>
+                                <spam t-field="o.name"/>
+                            </u>
+                        </h5>
+                        <h5 style="text-align: right;">ቀን:
+                            <u>
 
+                            </u>
+                        </h5>
 
                         <h5>ለ:
                             <u>
