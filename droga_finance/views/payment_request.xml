@@ -90,44 +90,44 @@
                             <field name="purchase_order_id" readonly="1"/>
                             <field name="payment_type" readonly="0" required="1"/>
                             <field name="request_by" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                             <field name="department" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                             <field name="costc" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
 
                             <field name="request_date"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                             <field name="requester" invisible="1"/>
                         </group>
                         <group>
                             <field name="approve_dept_manger"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                            <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled','Approved'))]}"/>
                             <field name="company_id" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}" invisible="0"/>
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled','Approved'))]}" invisible="0"/>
                             <field name="currency_id" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled','Approved'))]}"/>
                         </group>
                         <group string="Pay To">
                             <field name="pay_to" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                             <field name="payment_due_date"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                         </group>
                         <group string="Amount">
                             <field name="total_amount"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                             <field name="exchange_rate"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                             <field name="total_amount_etb" readonly="1"/>
                             <field name="amount_in_word" readonly="1"/>
                         </group>
                         <group string="Budget Category">
                             <field name="budgetary_position" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                             <field name="budget_account" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
                             <field name="budget_rem_balance"/>
                         </group>
                     </group>
