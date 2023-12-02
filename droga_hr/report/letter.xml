@@ -31,8 +31,8 @@
                     @page {
                     size: A4 portrait;
                     margin-top: 9cm;
-                    margin-left:2cm;
-                    margin-right:2cm;
+                    margin-left:1.5cm;
+                    margin-right:1.5cm;
                     margin-bottom:0cm;
                     }
 
@@ -48,6 +48,16 @@
                     <div class="page">
                         <div class="oe_structure"/>
 
+                        <h5 style="text-align: right;">ቁጥር:
+                            <u>
+                                <spam t-field="o.company_name"/>
+                            </u>
+                        </h5>
+                        <h5 style="text-align: right;">ቀን:
+                            <u>
+                                <spam t-field="o.company_name"/>
+                            </u>
+                        </h5>
 
                         <h5>ለ:
                             <u>
@@ -69,7 +79,7 @@
 
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <p class="text-justify">
+                                <p style="text-align: justify;">
                                     <h5>የድርጀታችን የስራ ባልደረባ የሆኑት አቶ/ ወ/ሮ / ወ/ት
                                         <u>
                                             <span t-field="o.employee.amharic_name" class="m-0"/>
@@ -84,7 +94,7 @@
                                     </h5>
                                 </p>
 
-                                <p class="text-justify">
+                                <p style="text-align: justify;">
                                     <h5>ስለሆነም አቶ
                                         <u>
                                             <span t-field="o.employee.amharic_name" class="m-0"/>
@@ -144,8 +154,8 @@
                     @page {
                     size: A4 portrait;
                     margin-top: 9cm;
-                    margin-left:2cm;
-                    margin-right:2cm;
+                    margin-left:1.5cm;
+                    margin-right:1.5cm;
                     margin-bottom:0cm;
                     }
 
@@ -182,7 +192,7 @@
 
                         <div id="informations" class="row mt32 mb32">
                             <div class="col-12 bm-2">
-                                <p class="text-justify">
+                                <p style="text-align: justify;">
                                     <h5>
                                         የድርጀታችን ድሮጋ ፋርማ ኃ/የተ/የግ/ማህበር የስራ ባልደረባ የሆኑት አቶ/ ወ/ሮ / ወ/ት
                                         <u>
@@ -193,7 +203,7 @@
                                     </h5>
                                 </p>
 
-                                <p class="text-justify">
+                                <p style="text-align: justify;">
                                     <h5>
 
                                         በዚህም መሠረት አቶ/ ወ/ሮ / ወ/ት
