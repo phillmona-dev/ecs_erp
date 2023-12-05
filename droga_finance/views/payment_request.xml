@@ -46,7 +46,7 @@
                             id="cancel_request1" data-hotkey="v"
                             confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form"
                             class="oe_highlight btn-danger"
-                            attrs="{'invisible':['|',('requester','!=',False),('state','not in',('Draft','Authorized'))]}"/>
+                            attrs="{'invisible':[('state','not in',('Draft','Authorized'))]}"/>
 
                     <button name="reject_box" type="object"
                             string="Reject" id="reject_request1"
