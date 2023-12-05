@@ -55,6 +55,9 @@ class purchase_request_local(models.Model):
                                      default="product")
     request_by = fields.Many2one(
         "hr.employee", string="Requested By", required=True, default=_get_employee_id)
+
+    work_location=fields.Char(related="request_by.work_location_id.name")
+
     request_date = fields.Datetime(
         "Request Date", required=True, default=datetime.today())
     department = fields.Many2one(

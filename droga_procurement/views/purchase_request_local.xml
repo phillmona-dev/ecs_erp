@@ -27,6 +27,7 @@
             <tree string="Purchase Request" delete="0">
                 <field name="name"/>
                 <field name="request_by"/>
+                <field name="work_location"/>
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
