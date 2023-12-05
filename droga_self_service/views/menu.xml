@@ -40,4 +40,11 @@
          <menuitem id="self_service_letter_request_amharic_menu" name="Letter Request-Amharic" sequence="3"
                   action="droga_hr.droga_hr_letter_request_amharic_action" groups="self_service_group"/>
     </menuitem>
+
+
+    <menuitem id="self_service_fleet_menu" name="Fleet request" groups="self_service_group" sequence="5"
+              parent="self_service_main_menu">
+        <menuitem id="self_service_fleet_request_menu" name="Fleet request" sequence="1"
+                  action="droga_fleet.droga_fleet_request_tree_action_user_only" groups="self_service_group"/>
+    </menuitem>
 </odoo>

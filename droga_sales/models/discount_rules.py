@@ -620,10 +620,14 @@ class sale_order_ext(models.Model):
             return
         message = ''
 
+        #Pharmacy validations below
         if self.order_from.startswith('PH'):
             price_changed=self.order_line.filtered(lambda x: math.ceil(x.price_unit)!=math.ceil(x.selling_price) or x.price_unit==0)
             if len(price_changed)>0:
                 message = message + ('\n' if message else '') + "Price can not be edited or be zero."
+            if self.customer_emp:
+                if self.customer_emp.parent_customer.id!=self.partner_id.id:
+                    message = message + ('\n' if message else '') + "Please make sure employee is under stated customer."
 
         order_lines_nowareh = self.order_line.filtered(
             lambda x: not x.wareh)
@@ -676,10 +680,24 @@ class sale_order_ext(models.Model):
             if not so.partner_id.vat:
                 message = message + ('\n' if message else '') + message + "Tin No must be registered for customer!"
                 # raise ValidationError("Tin No must be registered for customer!")
-            if so.partner_id.available_amount + so.cash_upfront < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [
-                15390]:
-                message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
-                # raise ValidationError("You cannot exceed credit limit!")
+            if so.order_from.startswith('PH'):
+                if so.partner_id.available_amount_pharma < so.amount_total and so.payment_term_id.apply_credit_limit:
+                    message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
+                    # raise ValidationError("You cannot exceed credit limit!")
+                if so.customer_emp:
+                    if so.customer_emp.employee_credit_limit!=0 and so.customer_emp.employee_credit_limit <so.amount_total and so.payment_term_id.apply_credit_limit:
+                        message = message + ('\n' if message else '') + "Maximum credit limit for employee is "+str(so.customer_emp.employee_credit_limit)
+                if so.mature_amount_pharma > 0:
+                    message = message + (
+                        '\n' if message else '') + "Please settle matured amounts before initiating another sales!"
+            else:
+                if so.partner_id.available_amount < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [
+                    15390]:
+                    message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
+                    # raise ValidationError("You cannot exceed credit limit!")
+                if so.mature_amount > 0:
+                    message = message + (
+                        '\n' if message else '') + "Please settle matured amounts before initiating another sales!"
             if so.amount_total < so.payment_term_id.min_amount and not so.tender_origin_form_tender and not so.order_from:
                 message = message + (
                     '\n' if message else '') + "Minimum order amount for " + so.payment_term_id.name + " is " + str(
@@ -688,9 +706,7 @@ class sale_order_ext(models.Model):
             if not so.pr_sales and self.env.user.name.startswith('CRM'):
                 message = message + ('\n' if message else '') + "Please login before requesting a sales order!"
                 # raise ValidationError("Please login before registering a sales order!")
-            if so.mature_amount > 0:
-                message = message + (
-                    '\n' if message else '') + "Please settle matured amounts before initiating another sales!"
+
                 # raise ValidationError("Please settle matured amounts before initiating another sales!")
 
         if message:

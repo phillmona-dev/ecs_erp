@@ -1,4 +1,6 @@
-import datetime
+from datetime import datetime
+from datetime import timedelta
+
 
 from odoo import models, fields, api
 from dateutil import relativedelta
@@ -8,6 +10,7 @@ class sales_integ(models.Model):
     cust_details = fields.Boolean(default=False, string='Customer Details')
     customer_emp=fields.Many2one('droga.pharma.cust.employees',string='Customer Name', domain="[('parent_customer','=',partner_id)]")
     emp_descr=fields.Char(compute='_get_emp_descr',string='Customer',store=True)
+    available_amount_pharma = fields.Float(string='Credit balance', related='partner_id.available_amount_pharma')
     @api.depends('partner_id','customer_emp')
     def _get_emp_descr(self):
         for rec in self:
@@ -15,7 +18,7 @@ class sales_integ(models.Model):
             rec.emp_descr=rec.partner_id.name+emp_name
     cust_id_linked=fields.Char('Employee ID',related='customer_emp.cust_id')
     points_gained=fields.Float('Points gained')
-    dob = fields.Date('Date of birth', default=datetime.date.today(),related='customer_emp.dob')
+    dob = fields.Date('Date of birth', default=datetime.today(),related='customer_emp.dob')
     age = fields.Integer(compute='_compute_age',related='customer_emp.age')
     sex = fields.Selection(
         [('Male', 'Male'), ('Female', 'Female')],
@@ -29,6 +32,36 @@ class sales_integ(models.Model):
     counselling_header = fields.One2many('droga.pharma.counselling', 'sales_origin')
     minor_align_header = fields.One2many('droga.pharma.minor.alignment', 'sales_origin')
     membership_origin = fields.Many2one('droga.pharma.membership', readonly=True)
+    cust_availed_payment_term_ids=fields.Many2many('account.payment.term',related='partner_id.allowed_credit_terms')
+    mature_amount_pharma = fields.Monetary('Matured amount', compute='_get_mature_amount_pharma')
+    show_invoice_button_pharma = fields.Boolean(compute='_get_mature_amount_pharma')
+
+    @api.depends('partner_id')
+    def _get_mature_amount_pharma(self):
+        for rec in self:
+            if rec.partner_id.id in [15390, 15488]:
+                matured_invoices = []
+            elif rec.partner_id.vat != '0000000000':
+                matured_invoices = self.env['account.move'].search(
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('invoice_payment_term_id','!=',11),('cost_center','like','Pharmacy%'),
+                     ('company_id', '=', self.env.company.id),
+                     ('invoice_date_due', '<', datetime.now().date()),
+                     ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.vat', '=', rec.partner_id.vat),
+                     '|',
+                     ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
+            else:
+                matured_invoices = self.env['account.move'].search(
+                    [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),('invoice_payment_term_id','!=',11),('cost_center','like','Pharmacy%'),
+                     ('company_id', '=', self.env.company.id),
+                     ('invoice_date_due', '<', datetime.now().date()),
+                     ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id', '=', rec.partner_id.id), '|',
+                     ('partner_id.active', '=', True), ('partner_id.active', '=', False)])
+            tot_amount = 0
+            for mi in matured_invoices:
+                tot_amount = tot_amount + (
+                    mi['amount_total_signed'] if mi['amount_residual'] == 0 else mi['amount_residual'])
+            rec.mature_amount_pharma = tot_amount
+            rec.show_invoice_button_pharma = False if rec.mature_amount_pharma == 0 else True
 
     def open_sales(self):
         return {
@@ -50,7 +83,7 @@ class sales_integ(models.Model):
     def _compute_age(self):
         for record in self:
             if record.dob:
-                today = datetime.date.today()
+                today = datetime.today()
                 # Check if the date has passed this year
                 if today.strftime("%m%d") >= record.dob.strftime("%m%d"):
                     record['age'] = today.year - record.dob.year

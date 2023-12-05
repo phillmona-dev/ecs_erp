@@ -43,5 +43,6 @@
             action="droga_pharma_credit_limit_action"
             groups="droga_pharma.pharma_settings_admin"
             parent="droga_pharma.droga_pharma_customers_comp_list_menu"
+            groups="droga_pharma.pharma_settings_admin"
             sequence="200"/>
 </odoo>

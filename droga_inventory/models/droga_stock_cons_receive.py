@@ -36,7 +36,6 @@ class droga_stock_cons_receive(models.Model):
                                    state={'draft': [('readonly', False)]})
 
     consignment_reference = fields.Char(string='Order reference', default='', readonly=True)
-    cons_ref = fields.One2many('stock.picking', 'cons_receive_request', string='Consignment reference')
 
     issue_type = fields.Selection([('CONR', 'Consignment recieve'), ('SIR', 'Sample return'),('SUBL','Cleaning unit return')],
                                   string='Return type', required=True)
