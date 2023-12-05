@@ -56,7 +56,7 @@ class purchase_request_local(models.Model):
     request_by = fields.Many2one(
         "hr.employee", string="Requested By", required=True, default=_get_employee_id)
 
-    work_location=fields.Char(related="request_by.work_location_id.name")
+    work_location = fields.Char(related="request_by.work_location_id.name")
 
     request_date = fields.Datetime(
         "Request Date", required=True, default=datetime.today())
@@ -102,6 +102,15 @@ class purchase_request_local(models.Model):
 
     total_amount = fields.Float(
         "Total Amount", compute="compute_total_purchase_amount", store=True)
+
+    dummy_count = fields.Integer(compute="count_linked_documents", string="Dummy Count")
+    pr_count = fields.Integer(store=True, string="PR Count", compute="compute_total_purchase_amount")
+    rfq_count = fields.Integer(store=True, string="RFQ Count", compute="compute_total_purchase_amount")
+    po_count = fields.Integer(store=True, string="PO Count", compute="compute_total_purchase_amount")
+    grn_count = fields.Integer(store=True, string="GRN Count", compute="compute_total_purchase_amount")
+
+    pr_grn_receive_status = fields.Selection([('Received', 'Received'), ('Not Received', 'Not Received')], store=True,
+                                             default='Not Received')
 
     @api.depends("department")
     def _get_manager_id(self):
@@ -308,6 +317,49 @@ class purchase_request_local(models.Model):
             if user.company_id.id == company_id:
                 users.append(user.id)
         return users
+
+    @api.depends('name')
+    def count_linked_documents(self):
+
+        pr_count = 1
+        rfq_count = 0
+        po_count = 0
+        grn_count = 0
+
+        for record in self:
+            record.dummy_count = 1
+            # get current object
+            current_object = self.env['droga.purchase.request.local'].search(
+                [('id', '=', record.id), ('state', '!=', 'canceled')])
+
+            # search rfq count
+            rfq_count = self.env['droga.purchase.request.rfq.local'].search_count(
+                [('purchase_request_id', '=', record.id)])
+            # search rfq's
+            rfqs = self.env['droga.purchase.request.rfq.local'].search([('purchase_request_id', '=', record.id)])
+
+            for rfq in rfqs:
+                # search po's
+                po_count = self.env['purchase.order'].search_count(
+                    [('rfq_local_id', '=', rfq.id)])
+
+                # search po's then recived grn
+                pos = self.env['purchase.order'].search([('purchase_request_id', '=', record.id)])
+
+                for po in pos:
+                    # count grns
+                    grn_count = self.env['stock.picking'].search_count(
+                        [('origin', '=', po.name), ('state', '=', 'done')])
+
+                    if record.grn_count > 0:
+                        record.pr_grn_receive_status = 'Received'
+
+            # update counts
+            for xx in current_object:
+                xx.pr_count = pr_count
+                xx.rfq_count = rfq_count
+                xx.po_count = po_count
+                xx.grn_count = grn_count
 
 
 class purchase_request_line_local(models.Model):
