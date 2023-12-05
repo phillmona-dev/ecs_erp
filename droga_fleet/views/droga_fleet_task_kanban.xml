@@ -82,7 +82,7 @@
         </record>
 
         <record id="action_droga_fleet_task" model="ir.actions.act_window">
-            <field name="name">droga.fleet.request.task.kanban</field>
+            <field name="name">Drivers task list</field>
             <field name="res_model">droga.fleet.request.task</field>
             <field name="view_mode">kanban</field>
             <field name="context">{"search_default_active": 1, "default_model": "droga.fleet.request.task"}</field>
