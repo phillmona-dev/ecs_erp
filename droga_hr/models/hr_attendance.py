@@ -10,6 +10,9 @@ class Attendance(models.Model):
 
     real_worked_hours = fields.Float(string="Real Work Hours", compute="compute_real_worked_hours")
 
+    employee_badge_id = fields.Char(related='employee_id.barcode', string='Badge ID')
+    department = fields.Char(related='employee_id.department_name', string='Department')
+
     def update_not_checked_out_records(self):
         dt = datetime.utcnow()
         check_in = dt.strftime('%Y-%m-%d')
@@ -29,3 +32,4 @@ class Attendance(models.Model):
                 record.real_worked_hours = record.worked_hours
             else:
                 record.real_worked_hours = record.worked_hours - 1
+

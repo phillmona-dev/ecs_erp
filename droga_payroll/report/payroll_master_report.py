@@ -403,7 +403,7 @@ class PayrollMasterReports(models.Model):
                 bank_account = self.env['res.bank'].search([('id', '=', bank_id)])
 
                 if bank_account:
-                    bank_account_number = bank_account.bic
+                    bank_account_number = bank_account.bic if bank_account.bic else ''
 
             sheet_name = bank_name + ' - Net Pay'
             sheet = workbook.add_worksheet(sheet_name)
@@ -426,6 +426,7 @@ class PayrollMasterReports(models.Model):
             sheet.merge_range('A7:G7', '', small_header_format)
             sheet.merge_range('A8:G8', 'Re: PAYMENT TRANSFER', small_header_format)
             sheet.merge_range('A9:G9', '', small_header_format)
+
             sheet.merge_range('A10:G10',
                               'Dear Sir/ Madam- Please prepare the below payment from our Account No: ' + bank_account_number,
                               small1_header_format)
