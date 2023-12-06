@@ -197,9 +197,9 @@ class sale_order_line(models.Model):
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty')
     def _compute_price_unit(self):
-        if self.order_id.state in ('sale', 'cancel', 'done', 'fia'):
-            return
         for line in self:
+            if line.order_id.state in ('sale', 'cancel', 'done', 'fia'):
+                return
             line.phar_cont_price=0
             if line.order_from:
                 if line.order_from.startswith('PH'):
