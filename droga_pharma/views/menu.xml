@@ -68,7 +68,7 @@
                     <menuitem
                             id="droga_pharma_products_view"
                             name="Products"
-                            action="droga_pharma_product_action"
+                            action="droga_pharma_product_action1"
                             sequence="0"/>
                     <menuitem
                             id="droga_pharma_stock_on_hand_reports_menu"
@@ -214,12 +214,18 @@
                         id="droga_pharma_intervention_menu"
                         name="Intervention"
                         action="droga_pharma_intervention_action"
-                        sequence="14"/>
+                        sequence="15"/>
                 <menuitem
                         id="droga_pharma_area_coun_menu"
                         name="Area of counsel"
                         action="droga_pharma_area_coun_action"
-                        sequence="14"/>
+                        sequence="16"/>
+                <menuitem
+                        id="droga_pharma_point_types_menu"
+                        name="Point types"
+                        action="droga_pharma_point_types_action"
+                        groups="droga_pharma.pharma_director"
+                        sequence="17"/>
             </menuitem>
         </menuitem>
     </menuitem>

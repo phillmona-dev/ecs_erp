@@ -80,7 +80,7 @@ class sale_order_line(models.Model):
         store=True, required=True, tracking=True)
     is_prod_available = fields.Char(compute='is_prod_available_method')
     selling_price=fields.Float(related='product_id.list_price_phar')
-    phar_cont_price = fields.Float('Pharmacy contract price',compute='_compute_price_unit')
+    phar_cont_price = fields.Float('Pharmacy contract price',compute='_compute_price_unit',store=True)
     available_qty = fields.Float('Available', default=0, compute='is_prod_available_method')
     avail_char = fields.Char('Available', readonly=True, compute="is_prod_available_method")
     price_unit_before_discount = fields.Float('')

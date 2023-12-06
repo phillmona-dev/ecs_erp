@@ -572,7 +572,7 @@
                                     <field name="price_tax" invisible="1"/>
                                     <field name="price_total" invisible="1"/>
                                     <field name="price_unit"/>
-                                    <field name="std_unit_price"/>
+                                    <field name="phar_cont_price"/>
                                     <field name="manual_price_pharma"/>
                                     <field name="display_type"/>
                                     <field name="tax_id" invisible="1"/>
@@ -622,7 +622,7 @@
                                                                 </div>
                                                                 <div class="col-12 text-muted" attrs="{'invisible': [('manual_price_pharma', '=', False)]}">
                                                                     Unit Price default:
-                                                                    <t t-out="record.std_unit_price.value"/>
+                                                                    <t t-out="record.phar_cont_price.value"/>
                                                                 </div>
                                                             </div>
                                                         </div>

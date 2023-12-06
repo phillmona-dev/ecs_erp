@@ -51,6 +51,7 @@ class pharma_credit(models.Model):
 
 class pharma_price_list_header(models.Model):
     _name = 'droga.pharma.price.list.header'
+    _descr='Price list'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     customer=fields.Many2one('res.partner')
     products_detail=fields.One2many('droga.pharma.price.list','header')
