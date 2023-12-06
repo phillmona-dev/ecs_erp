@@ -68,7 +68,7 @@
                     <menuitem
                             id="droga_pharma_products_view"
                             name="Products"
-                            action="droga_pharma_product_action1"
+                            action="droga_pharma_product_action"
                             sequence="0"/>
                     <menuitem
                             id="droga_pharma_stock_on_hand_reports_menu"
