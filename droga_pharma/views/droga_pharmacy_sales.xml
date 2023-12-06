@@ -620,6 +620,10 @@
                                                                     Unit Price:
                                                                     <t t-out="record.price_unit.value"/>
                                                                 </div>
+                                                                <div class="col-12 text-muted" attrs="{'invisible': [('manual_price_pharma', '=', False)]}">
+                                                                    Unit Price default:
+                                                                    <t t-out="record.std_unit_price.value"/>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
