@@ -200,7 +200,7 @@ class sale_order_line(models.Model):
         for line in self:
             if line.order_id.state in ('sale', 'cancel', 'done', 'fia'):
                 return
-            line.phar_cont_price=0
+
             if line.order_from:
                 if line.order_from.startswith('PH'):
                     #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
@@ -213,6 +213,8 @@ class sale_order_line(models.Model):
                     line.product_uom = line.product_id.pharma_uom
                     line.product_uom_qty = line.product_uom_pharma_qty
                     return
+            else:
+                line.phar_cont_price = 0
         if self.order_id.company_id.id == 2:
             for line in self:
                 if line.store_placement:
