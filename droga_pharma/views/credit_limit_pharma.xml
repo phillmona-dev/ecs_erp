@@ -11,6 +11,9 @@
                 <field name="cust_credit_limit_pharma"></field>
                 <field name="unsettled_amount_pharma" readonly="1"></field>
                 <field name="available_amount_pharma"></field>
+                <field name="manual_sales_extension_date" groups="droga_pharma.pharma_director"></field>
+                <button string="Price list" groups="droga_pharma.pharma_director" type="object" name="open_price_hist"
+                        class="oe_stat_button"></button>
             </tree>
         </field>
     </record>
@@ -39,7 +42,7 @@
 
     <menuitem
             id="droga_sales_pharma_credit_limit_menu"
-            name="Credit limit for Pharmacy"
+            name="Credit limit"
             action="droga_pharma_credit_limit_action"
             parent="droga_pharma.droga_pharma_customers_comp_list_menu"
             groups="droga_pharma.pharma_settings_admin"

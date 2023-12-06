@@ -68,7 +68,8 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <xpath expr="//form/sheet/group/group/field[@name='payment_term_id']" position="after">
+            <xpath expr="//form/sheet/group/group/field[@name='payment_term_id']" position="replace">
+                <field name="payment_term_id" options="{'no_open':True,'no_create': True}" domain="[('used_under', 'in', ('BT','DR'))]"/>
                 <field name="show_invoice_button" invisible="1"></field>
                 <field name="mature_amount" style="color:red"
                        attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>

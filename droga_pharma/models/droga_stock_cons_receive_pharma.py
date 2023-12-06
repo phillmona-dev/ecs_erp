@@ -165,12 +165,16 @@ class droga_stock_cons_receive_detail_pharma(models.Model):
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True, state={'done': [('readonly', True)]})
     price_unit_cons = fields.Float('Unit price before VAT',store=True)
-
+    selling_price=fields.Float('Selling price',compute='get_sell_price',store=True)
     amount = fields.Float('Amount',compute='compute_amount')
 
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
                                   domain="[('category_id', '=', product_uom_category_id)]")
 
+    @api.depends('product_id')
+    def get_sell_price(self):
+        for rec in self:
+            rec.selling_price=rec.product_id.product_tmpl_id.list_price_phar
     @api.depends('price_unit_cons', 'product_uom_qty')
     def compute_amount(self):
         for rec in self:

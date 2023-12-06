@@ -139,7 +139,21 @@
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': ['|',('state','not in',('draft','sale')),('invoice_status', '!=', 'to invoice')]}"/>
-
+                    <button name="action_confirm"
+                            string="Confirm" font-size="16px"
+                            groups="droga_pharma.pharma_director"
+                            type="object" class="btn-primary" data-hotkey="q"
+                            attrs="{'invisible': [('state', '!=', 'price_request_pharma')]}"/>
+                    <button name="action_amend" class="oe_highlight btn-warning"
+                            string="Amend" font-size="16px"
+                            groups="droga_pharma.pharma_director"
+                            type="object" data-hotkey="q"
+                            attrs="{'invisible': [('state', '!=', 'price_request_pharma')]}"/>
+                    <button name="action_cancel" class="oe_highlight btn-danger"
+                            string="Reject" font-size="16px"
+                            groups="droga_pharma.pharma_director"
+                            type="object" data-hotkey="q"
+                            attrs="{'invisible': [('state', '!=', 'price_request_pharma')]}"/>
                     <button name="conf_and_invoice"
                             string="Confirm and create invoice" font-size="16px"
                             groups="droga_pharma.pharma_di_admin"
@@ -228,8 +242,8 @@
 
                             <field name="available_amount_pharma" attrs="{'invisible': [('pay_type', '=', False)]}" string="Available balance" options="{'no_create': True}"/>
 
-                            <field name="cust_details"></field>
-                            <field name="manual_price" invisible="1"></field>
+                            <field name="cust_details" invisible="1"></field>
+                            <field name="manual_price_pharma" ></field>
                             <field name="show_invoice_button_pharma" invisible="1"></field>
                             <field name="partner_invoice_id" groups="account.group_delivery_invoice_address"
                                    context="{'default_type':'invoice'}" options='{"always_reload": True}'/>
@@ -558,6 +572,8 @@
                                     <field name="price_tax" invisible="1"/>
                                     <field name="price_total" invisible="1"/>
                                     <field name="price_unit"/>
+                                    <field name="phar_cont_price"/>
+                                    <field name="manual_price_pharma"/>
                                     <field name="display_type"/>
                                     <field name="tax_id" invisible="1"/>
                                     <field name="company_id" invisible="1"/>
@@ -603,6 +619,10 @@
                                                                 <div class="col-12 text-muted">
                                                                     Unit Price:
                                                                     <t t-out="record.price_unit.value"/>
+                                                                </div>
+                                                                <div class="col-12 text-muted" attrs="{'invisible': [('manual_price_pharma', '=', False)]}">
+                                                                    Unit Price default:
+                                                                    <t t-out="record.phar_cont_price.value"/>
                                                                 </div>
                                                             </div>
                                                         </div>

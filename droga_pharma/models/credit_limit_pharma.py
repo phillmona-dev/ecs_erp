@@ -1,3 +1,5 @@
+from datetime import date
+
 from odoo import models, fields, api
 
 class pharma_credit(models.Model):
@@ -6,6 +8,22 @@ class pharma_credit(models.Model):
     unsettled_amount_pharma = fields.Monetary(compute='_compute_balance_pharma', string='Unsettled amount')
     available_amount_pharma = fields.Float(string='Credit balance', compute='_compute_balance_pharma')
     allowed_credit_terms=fields.Many2many('account.payment.term')
+    manual_sales_extension_date=fields.Date('Manual sales extension date',tracking=True)
+
+    def open_price_hist(self):
+        return {
+            'name': 'Price lists',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.pharma.price.list.header',
+            'views': [[self.env.ref('droga_pharma.droga_pharma_price_list_tree').id, 'tree'],
+                      [self.env.ref('droga_pharma.droga_pharma_price_list_form').id, 'form']],
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_customer': self.id,
+            },
+            'domain': [('customer', '=', self.id)],
+        }
 
     @api.depends('debit', 'credit')
     def _compute_balance_pharma(self):
@@ -31,3 +49,17 @@ class pharma_credit(models.Model):
 
             record.available_amount_pharma = record.cust_credit_limit_pharma - record.unsettled_amount_pharma
 
+class pharma_price_list_header(models.Model):
+    _name = 'droga.pharma.price.list.header'
+    _descr='Price list'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    customer=fields.Many2one('res.partner')
+    products_detail=fields.One2many('droga.pharma.price.list','header')
+    date_from = fields.Date('Date from',tracking=True)
+    date_to = fields.Date('Date to',tracking=True)
+    status=fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active')
+class pharma_price_list(models.Model):
+    _name='droga.pharma.price.list'
+    header=fields.Many2one('droga.pharma.price.list.header')
+    product=fields.Many2one('product.template',string='Product ID')
+    selling_price=fields.Float('Selling price')
