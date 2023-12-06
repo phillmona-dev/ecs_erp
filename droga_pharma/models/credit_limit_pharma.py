@@ -1,3 +1,5 @@
+from datetime import date
+
 from odoo import models, fields, api
 
 class pharma_credit(models.Model):
@@ -6,6 +8,7 @@ class pharma_credit(models.Model):
     unsettled_amount_pharma = fields.Monetary(compute='_compute_balance_pharma', string='Unsettled amount')
     available_amount_pharma = fields.Float(string='Credit balance', compute='_compute_balance_pharma')
     allowed_credit_terms=fields.Many2many('account.payment.term')
+    manual_sales_extension_date=fields.Date('Manual sales extension date',tracking=True)
 
     @api.depends('debit', 'credit')
     def _compute_balance_pharma(self):
