@@ -11,6 +11,8 @@ class sales_integ(models.Model):
     customer_emp=fields.Many2one('droga.pharma.cust.employees',string='Customer Name', domain="[('parent_customer','=',partner_id)]")
     emp_descr=fields.Char(compute='_get_emp_descr',string='Customer',store=True)
     available_amount_pharma = fields.Float(string='Credit balance', related='partner_id.available_amount_pharma')
+    manual_price_pharma=fields.Boolean('Manual price',default=False,tracking=True)
+
     @api.depends('partner_id','customer_emp')
     def _get_emp_descr(self):
         for rec in self:
@@ -113,6 +115,8 @@ class sales_integ(models.Model):
                 pick.do_unreserve()
         self.write({'state': 'draft'})
 
+    def action_amend(self):
+        self.write({'state': 'draft'})
     def action_mtm_orders(self):
         return {
             'name': 'MTM sessions',
@@ -162,6 +166,11 @@ class sales_integ(models.Model):
         'stock.lot', 'Lot/Serial Number',
         domain="[('product_id', '=', product_id), ('company_id', '=', company_id)]", check_company=True)
     tracking = fields.Selection(related='product_id.tracking')
+    manual_price_pharma = fields.Boolean('Manual price', compute='_get_manual_price')
+
+    def _get_manual_price(self):
+        for rec in self:
+            rec.manual_price_pharma=rec.order_id.manual_price_pharma
     @api.depends('frequency', 'product_uom_qty')
     def get_duration(self):
         for rec in self:

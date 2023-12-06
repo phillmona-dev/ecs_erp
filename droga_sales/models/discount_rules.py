@@ -187,7 +187,12 @@ class sale_order_line(models.Model):
         self.order_id.total_added = (core_sum + non_core_sum) - total_before_discount
 
 
-
+    def _get_pharma_price(self,line):
+        cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),('header.date_from','<',datetime.today()),('header.date_to','>',datetime.today()),('header.status','=','Active')])
+        if len(cont_prices)>0:
+            return cont_prices[0]["selling_price"]
+        else:
+            return line.product_id.list_price_phar
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty')
     def _compute_price_unit(self):
@@ -197,9 +202,10 @@ class sale_order_line(models.Model):
             if line.order_from:
                 if line.order_from.startswith('PH'):
                     #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
-                    line.price_unit = line.product_id.list_price_phar
-                    line.selling_price = line.product_id.list_price_phar
-
+                    line.std_unit_price = line.product_id.list_price_phar
+                    selling_price= self._get_pharma_price(line)
+                    line.price_unit = selling_price
+                    line.selling_price = selling_price
                     line.product_uom_pharma_measure = line.product_id.pharma_uom
                     line.product_uom = line.product_id.pharma_uom
                     line.product_uom_qty = line.product_uom_pharma_qty
@@ -375,6 +381,7 @@ class sale_order_ext(models.Model):
             ('draft', "Quotation"),
             ('sent', "Quotation Sent"),
             ('price_request', "Price change approval"),
+            ('price_request_pharma', "Price change approval"),
             ('req', "Operation manager"),
             ('fia', "Final approve"),
             ('cancel', "Cancelled"),
@@ -598,6 +605,9 @@ class sale_order_ext(models.Model):
                     for res in rec.order_line:
                         res.wareh = rec.wareh
                         res.product_id.product_tmpl_id.invoice_policy = 'order'
+                    if rec.manual_price_pharma and rec.state!='price_request_pharma':
+                        rec.state='price_request_pharma'
+                        return
                 else:
                     for res in rec.order_line:
                         #res.wareh =  32 if rec.order_from == 'PT-Bole' else 31
@@ -623,7 +633,7 @@ class sale_order_ext(models.Model):
         #Pharmacy validations below
         if self.order_from.startswith('PH'):
             price_changed=self.order_line.filtered(lambda x: math.ceil(x.price_unit)!=math.ceil(x.selling_price) or x.price_unit==0)
-            if len(price_changed)>0:
+            if len(price_changed)>0 and not self.manual_price_pharma:
                 message = message + ('\n' if message else '') + "Price can not be edited or be zero."
             if self.customer_emp:
                 if self.customer_emp.parent_customer.id!=self.partner_id.id:

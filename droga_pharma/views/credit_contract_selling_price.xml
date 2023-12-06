@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="droga_pharma_price_list_tree" model="ir.ui.view">
+        <field name="name">droga.pharma.price.list.header.tree</field>
+        <field name="model">droga.pharma.price.list.header</field>
+        <field name="arch" type="xml">
+            <tree string="" create="1" delete="0">
+                <field name="customer"></field>
+                <field name="date_from"></field>
+                <field name="date_to"></field>
+                <field name="status"></field>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_pharma_price_list_form" model="ir.ui.view">
+        <field name="name">droga.pharma.price.list.header.form</field>
+        <field name="model">droga.pharma.price.list.header</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <form string="Price list" delete="0">
+                <sheet>
+                    <group string="Store transfer request">
+                        <group>
+                            <field name="customer" readonly="1"></field>
+                            <field name="date_from"></field>
+                        </group>
+                        <group>
+                            <field name="status"></field>
+                            <field name="date_to"></field>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Product Details">
+                            <field name="products_detail" >
+                                <tree editable="bottom">
+                                    <field name="product" required="True" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="selling_price"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+                    <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+</odoo>
