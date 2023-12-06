@@ -5,6 +5,7 @@
         <field name="model">droga.pharma.price.list.header</field>
         <field name="arch" type="xml">
             <tree string="" create="1" delete="0">
+                <field name="contract_no"></field>
                 <field name="customer"></field>
                 <field name="date_from"></field>
                 <field name="date_to"></field>
@@ -24,6 +25,7 @@
                     <group string="Price list">
                         <group>
                             <field name="customer" readonly="1"></field>
+                            <field name="contract_no"></field>
                             <field name="date_from"></field>
                         </group>
                         <group>

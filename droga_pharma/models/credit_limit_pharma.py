@@ -53,7 +53,8 @@ class pharma_price_list_header(models.Model):
     _name = 'droga.pharma.price.list.header'
     _descr='Price list'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    customer=fields.Many2one('res.partner')
+    contract_no=fields.Char('Contract No')
+    customer=fields.Many2one('res.partner',required=True)
     products_detail=fields.One2many('droga.pharma.price.list','header')
     date_from = fields.Date('Date from',tracking=True)
     date_to = fields.Date('Date to',tracking=True)
