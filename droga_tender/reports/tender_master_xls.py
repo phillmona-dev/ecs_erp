@@ -11,7 +11,7 @@ class tender_master_xls(models.TransientModel):
 
     def generate_xlsx_report(self, workbook, data, tenders):
 
-        sheet = workbook.add_worksheet('Tender master listeeee')
+        sheet = workbook.add_worksheet('Tender master list')
         bold = workbook.add_format({'bold': True})
         sheet.write(0, 1, 'Tender master file', bold)
         sheet.write(2, 0, 'Customer name',bold)

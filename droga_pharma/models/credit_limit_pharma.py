@@ -1,5 +1,12 @@
 from datetime import date
-
+from io import BytesIO
+import xlsxwriter
+import base64
+import re
+try:
+    from base64 import encodebytes
+except ImportError:
+    from base64 import encodestring as encodebytes
 from odoo import models, fields, api
 
 class pharma_credit(models.Model):
@@ -58,9 +65,151 @@ class pharma_price_list_header(models.Model):
     products_detail=fields.One2many('droga.pharma.price.list','header')
     date_from = fields.Date('Date from',tracking=True)
     date_to = fields.Date('Date to',tracking=True)
-    status=fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active')
+    status=fields.Selection([('Active', 'Active'),('Offer','Offer'), ('Closed', 'Closed')],required=True,default='Offer',tracking=True)
+    pharmacy_group_id = fields.Many2many('droga.prod.categ.pharma',store=True)
+    margin = fields.Float(string='Margin')
+    def populate_items(self):
+        for rec in self:
+            rec.products_detail.unlink()
+            prods=self.env['product.template'].search([('list_price_phar', '!=', 0),('list_price_phar', '!=', 1)])
+            for prod in prods:
+                val={'product': prod.id,
+                     'header':rec.id,
+                     'selling_price':prod.list_price_phar,
+                     'rev_selling_price':prod.list_price_phar}
+                rec.products_detail.create(val)
+    def update_margin(self):
+        for rec in self:
+            if rec.pharmacy_group_id:
+                entries=rec.products_detail.search([('pharmacy_group_id','in',rec.pharmacy_group_id.ids)])
+            else:
+                entries = rec.products_detail
+            for det in entries:
+                det.write({'margin': rec.margin,
+                           'rev_selling_price':det.selling_price*(1+(rec.margin/100))})
+
+    def generate_report(self):
+        product_offering_report.generate_report(self.products_detail,self)
+
 class pharma_price_list(models.Model):
     _name='droga.pharma.price.list'
     header=fields.Many2one('droga.pharma.price.list.header')
     product=fields.Many2one('product.template',string='Product ID')
+    uom = fields.Many2one(related='product.pharma_uom')
     selling_price=fields.Float('Selling price')
+    rev_selling_price = fields.Float('Selling price')
+    margin=fields.Float(default=0,string='Margin')
+    pharmacy_group_id = fields.Many2one('droga.prod.categ.pharma',related='product.pharmacy_group_id',store=True)
+
+    @api.onchange("margin")
+    def _on_change_margin(self):
+        for rec in self:
+            rec.rev_selling_price=rec.selling_price*(1+(rec.margin/100))
+
+class product_offering_report(models.TransientModel):
+    _name='droga.pharma.product.offering.report'
+    fileout = fields.Binary('File', readonly=True)
+
+    @staticmethod
+    def generate_report(self,excel_datap,headerp):
+        excel_data = excel_datap
+        header=headerp
+        file_io = BytesIO()
+        workbook = xlsxwriter.Workbook(file_io)
+
+        sheet = workbook.add_worksheet('Products offering')
+
+        bold = workbook.add_format({'bold': True})
+
+        header_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 22})
+        main_title_format = workbook.add_format({
+            'bold': 0,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 16})
+        parameter_format = workbook.add_format({
+            'bold': 1,
+            'border': 7,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 12,
+            'fg_color': '#F6F5F5'})
+
+        separator_format = workbook.add_format({
+            'bold': 1,
+            'border': 7,
+            'align': 'left',
+            'valign': 'vcenter',
+            'font_size': 12,
+            'fg_color': '#D9D9D9'})
+
+        title_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 11,
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+        num_format = workbook.add_format({'num_format': 43, 'border': 7})
+        fields_format = workbook.add_format({ 'border': 7})
+        # set header
+        row_start = 0
+        sheet.set_row(row_start + 1, 30)
+        sheet.merge_range('A' + str(row_start + 1) + ':E' + str(row_start + 1), 'DROGA PHARMA P.L.C', header_format)
+        sheet.merge_range('A' + str(row_start + 2) + ':E' + str(row_start + 2), 'Products offering for '+header.customer.name, main_title_format)
+        sheet.merge_range('A' + str(row_start + 3) + ':B' + str(row_start + 5), 'Validity from : ' + str(header.date_from),
+                          parameter_format)
+        sheet.merge_range('C' + str(row_start + 3) + ':E' + str(row_start + 5), 'Validity to : ' + str(header.date_to),
+                          parameter_format)
+
+        # Set column widths
+
+        sheet.set_column(0, 0, 15)  # product_code
+        sheet.set_column(1, 1, 90)  # description
+        sheet.set_column(2, 2, 35)  # group
+        sheet.set_column(3, 3, 15)  # uom
+        sheet.set_column(4, 4, 12)  # selling price
+
+        row = 7
+        sheet.write(row, 0, 'Code', title_format)
+        sheet.write(row, 1, 'Product description', title_format)
+        sheet.write(row, 2, 'Category', title_format)
+        sheet.write(row, 3, 'Unit', title_format)
+        sheet.write(row, 4, 'Selling price', title_format)
+
+        # Iterate over excel_data and write the values to the sheet
+        for prod in excel_data:
+            row = row + 1
+            sheet.write(row, 0, prod.product.default_code,fields_format)
+            sheet.write(row, 1, prod.product.name,fields_format)
+            sheet.write(row, 2, prod.pharmacy_group_id.categ,fields_format)
+            sheet.write(row, 3, prod.uom.name,fields_format)
+            sheet.write(row, 4, prod.rev_selling_price,num_format)
+
+
+
+
+
+
+
+
+        workbook.close()
+
+        self.fileout = base64.b64encode(file_io.getvalue())
+        file_io.close()
+
+        datetime_string = fields.Datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f'Products offering for {header.customer.name} {header.date_from}_{datetime_string}.xlsx'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': f'web/content/?model={header._name}&id={header.id}&field=fileout&download=true&filename={filename}'
+        }
