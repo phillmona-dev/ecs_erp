@@ -1,3 +1,4 @@
+import io
 from datetime import date
 from io import BytesIO
 import xlsxwriter
@@ -129,7 +130,7 @@ class product_offering_report(models.TransientModel):
             excel_data = self.header_cost_list.products_detail.search([('pharmacy_group_id', 'in', self.prod_group.ids)])
         else:
             excel_data = self.header_cost_list.products_detail
-        
+
         header=self.header_cost_list
         file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
@@ -158,13 +159,14 @@ class product_offering_report(models.TransientModel):
             'font_size': 12,
             'fg_color': '#F6F5F5'})
 
-        separator_format = workbook.add_format({
-            'bold': 1,
-            'border': 7,
-            'align': 'left',
+        small_header_format = workbook.add_format({
+            'bold': 0,
+            'border': 1,
+            'align': 'center',
             'valign': 'vcenter',
-            'font_size': 12,
-            'fg_color': '#D9D9D9'})
+            'font_size': 11,
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
 
         title_format = workbook.add_format({
             'bold': 1,
@@ -177,13 +179,19 @@ class product_offering_report(models.TransientModel):
         num_format = workbook.add_format({'num_format': 43, 'border': 7})
         fields_format = workbook.add_format({ 'border': 7})
         # set header
+
+        if self.env.company.logo_web:
+            company_image=io.BytesIO(base64.b64decode(self.env.company.logo_web))
+            sheet.insert_image(0,0,"test_image.png",{'image_data':company_image,'y_scale':0.45,'y_offset':3})
+
         row_start = 0
         sheet.set_row(row_start + 1, 30)
         sheet.merge_range('A' + str(row_start + 1) + ':E' + str(row_start + 1), 'DROGA PHARMA P.L.C', header_format)
         sheet.merge_range('A' + str(row_start + 2) + ':E' + str(row_start + 2), 'Products offering for '+header.customer.name, main_title_format)
-        sheet.merge_range('A' + str(row_start + 3) + ':B' + str(row_start + 5), 'Validity from : ' + str(header.date_from),
+        sheet.merge_range('A3:E3', 'Addis Ketema subcity,Wo 6,H.No:133. Tel:+251-112-73-45-54/2519-13-66-75-37. Website:www.drogapharma.com. Addis Ababa, Ethiopia', small_header_format)
+        sheet.merge_range('A' + str(row_start + 4) + ':B' + str(row_start + 6), 'Validity from : ' + str(header.date_from),
                           parameter_format)
-        sheet.merge_range('C' + str(row_start + 3) + ':E' + str(row_start + 5), 'Validity to : ' + str(header.date_to),
+        sheet.merge_range('C' + str(row_start + 4) + ':E' + str(row_start + 6), 'Validity to : ' + str(header.date_to),
                           parameter_format)
 
         # Set column widths
