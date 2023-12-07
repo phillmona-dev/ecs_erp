@@ -642,7 +642,7 @@ class sale_order_ext(models.Model):
         #Pharmacy validations below
         if self.order_from.startswith('PH'):
             price_changed=self.order_line.filtered(lambda x: math.ceil(x.price_unit)!=math.ceil(x.phar_cont_price) or x.price_unit==0)
-            if len(price_changed)>0 and not self.manual_price_pharma and False:
+            if len(price_changed)>0 and not self.manual_price_pharma:
                 message = message + ('\n' if message else '') + "Price can not be edited or be zero."
             if self.customer_emp:
                 if self.customer_emp.parent_customer.id!=self.partner_id.id:

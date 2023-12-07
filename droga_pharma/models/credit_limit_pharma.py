@@ -89,7 +89,18 @@ class pharma_price_list_header(models.Model):
                            'rev_selling_price':det.selling_price*(1+(rec.margin/100))})
 
     def generate_report(self):
-        product_offering_report.generate_report(self.products_detail,self)
+        return {
+            'name': 'Price list',
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_model': 'droga.pharma.product',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'default_header_cost_list': self.id
+            }
+        }
 
 class pharma_price_list(models.Model):
     _name='droga.pharma.price.list'
@@ -107,13 +118,19 @@ class pharma_price_list(models.Model):
             rec.rev_selling_price=rec.selling_price*(1+(rec.margin/100))
 
 class product_offering_report(models.TransientModel):
-    _name='droga.pharma.product.offering.report'
+    _name='droga.pharma.product'
+    prod_group=fields.Many2many('droga.prod.categ.pharma')
     fileout = fields.Binary('File', readonly=True)
+    header_cost_list=fields.Many2one('droga.pharma.price.list.header')
 
     @staticmethod
-    def generate_report(self,excel_datap,headerp):
-        excel_data = excel_datap
-        header=headerp
+    def generate_report(self):
+        if self.prod_group:
+            excel_data = self.header_cost_list.products_detail.search([('pharmacy_group_id', 'in', self.prod_group.ids)])
+        else:
+            excel_data = self.header_cost_list.products_detail
+        
+        header=self.header_cost_list
         file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
 
@@ -211,5 +228,5 @@ class product_offering_report(models.TransientModel):
         return {
             'type': 'ir.actions.act_url',
             'target': 'new',
-            'url': f'web/content/?model={header._name}&id={header.id}&field=fileout&download=true&filename={filename}'
+            'url': f'web/content/?model={self._name}&id={self.id}&field=fileout&download=true&filename={filename}'
         }

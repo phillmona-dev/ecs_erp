@@ -122,7 +122,7 @@
                 <menuitem
                         id="droga_inventory_reports_pharma_excel"
                         name="Stock card - Excel"
-                        action="droga_inventory.droga_inventory_reports_excel_action"
+                        action="droga_pharma.droga_pharma_reports_excel_action"
                         sequence="10000"/>
 
             </menuitem>

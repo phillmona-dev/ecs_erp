@@ -1,1 +1,1 @@
-from . import mtm_report,dis_query_from
+from . import mtm_report,dis_query_from,stock_card_xls

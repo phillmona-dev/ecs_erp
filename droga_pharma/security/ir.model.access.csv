@@ -33,6 +33,8 @@ access_droga_pharma_points_earned,droga_pharma.droga_pharma_points_earned,model_
 access_droga_pharma_price_list_header,droga_pharma.droga_pharma_price_list_header,model_droga_pharma_price_list_header,base.group_user,1,1,1,1
 access_droga_pharma_price_list,droga_pharma.droga_pharma_price_list,model_droga_pharma_price_list,base.group_user,1,1,1,1
 access_droga_pharma_points_types,droga_pharma.droga_pharma_points_types,model_droga_pharma_points_types,base.group_user,1,1,1,1
+access_droga_pharma_reports_sc_excel,droga_pharma.droga_pharma_reports_sc_excel,model_droga_pharma_reports_sc_excel,base.group_user,1,1,1,1
+access_droga_pharma_product,droga_pharma.droga_pharma_product,model_droga_pharma_product,base.group_user,1,1,1,1
 
 access_report_mtm_excel,mtm.report.wizard,model_mtm_report_wizard,base.group_user,1,1,1,1
 access_drug_information_query,Access Drug Information Query,model_drug_information_query,base.group_user,1,1,1,1

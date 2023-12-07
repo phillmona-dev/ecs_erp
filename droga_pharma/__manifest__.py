@@ -32,6 +32,8 @@
         'views/droga_physio_list.xml',
         'views/companies.xml',
         'views/children.xml',
+        'views/reports/xls_stock_card.xml',
+        'views/reports/price_list_report.xml',
         'views/rewards/droga_pharma_reward_gain_settings.xml',
         'views/rewards/droga_pharma_reward_issue_settings.xml',
         'views/rewards/droga_pharma_referral_gain_settings.xml',
