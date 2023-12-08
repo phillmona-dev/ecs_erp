@@ -13,7 +13,7 @@ class droga_pharma_stock_card(models.TransientModel):
     per_location = fields.Binary('Per location?')
     results=fields.One2many('droga.pharma.stock.card.detail','header')
     def load_results(self):
-        loc_ids_under_wh=self.env['stock.location'].search([('complete_name', 'like', self.warehouse.code+'%'),('usage', '=', 'internal')])
+        loc_ids_under_wh=self.env['stock.location'].search([('complete_name', 'like', self.warehouse.code+'/%'),('usage', '=', 'internal'),('con_type','!=','SRL')])
         if self.product:
             stock_move_data=self.env['stock.move.line'].search(['|',('location_id', 'in', loc_ids_under_wh.ids),('location_dest_id', 'in', loc_ids_under_wh.ids),('state','=','done'),('date','>=',self.date_from),('date','<=',self.date_to),('product_id','=',self.product.id)],order="move_id desc").sorted(key=lambda r: r.move_id.date)
         else:
@@ -28,6 +28,7 @@ class droga_pharma_stock_card(models.TransientModel):
         qty_iss=0
         bal=0
         loss_adj=0
+        self.results.unlink()
         for prod in stock_products:
             for move_line in stock_move_data:
                 if move_line['product_id'].id==prod.id:
@@ -61,6 +62,7 @@ class droga_pharma_stock_card(models.TransientModel):
                             qty_iss=0
 
                     val = {
+                        'header':self.id,
                         'date': move_line['move_id'].date,
                         'doc_no': move_line['origin'] if move_line['origin'] else move_line['reference'],
                         'rece_from': loc,

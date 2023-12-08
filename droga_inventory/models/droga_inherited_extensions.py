@@ -928,7 +928,7 @@ class droga_stock_product_extension(models.Model):
             raise UserError("Default code can not be empty.")
         if res.company_id.id==2:
             res.order_type='ALL'
-        if res.reg_status=='draft' and not res.categ_id.name.startswith('Office') and res.company_id.id==1 and not res.from_pharma:
+        if res.reg_status=='draft' and not res.categ_id.name.startswith('Office') and not res.categ_id.name.startswith('Fixed') and res.company_id.id==1 and not res.from_pharma:
             res.reg_status='waiting'
             prods=self.env['product.product'].sudo().search(
                     [('product_tmpl_id', '=', res.id)])
