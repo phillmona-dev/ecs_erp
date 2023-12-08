@@ -222,7 +222,7 @@ class inventory_stock_card_xls(models.TransientModel):
 
         sheet.merge_range('A'+str(row_start+9)+':A'+str(row_start+11), 'Date', title_format)
         sheet.merge_range('B'+str(row_start+9)+':B'+str(row_start+11), 'Doc No.\n(Receiving\nor Issue)', title_format)
-        sheet.merge_range('C'+str(row_start+9)+':C'+str(row_start+11), 'Received\nfrom or\nIssued to)', title_format)
+        sheet.merge_range('C'+str(row_start+9)+':C'+str(row_start+11), 'Received\nfrom or\nIssued to', title_format)
 
         sheet.merge_range('D'+str(row_start+9)+':G'+str(row_start+10), 'Quantity', title_format)
         sheet.write(row_start+10, 3, 'Received',title_format)

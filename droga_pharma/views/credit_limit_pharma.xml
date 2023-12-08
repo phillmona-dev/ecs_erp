@@ -45,6 +45,6 @@
             name="Credit limit"
             action="droga_pharma_credit_limit_action"
             parent="droga_pharma.droga_pharma_customers_comp_list_menu"
-            groups="droga_pharma.pharma_settings_admin"
+            groups="droga_pharma.pharma_director"
             sequence="200"/>
 </odoo>

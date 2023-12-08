@@ -33,6 +33,7 @@
         'views/companies.xml',
         'views/children.xml',
         'views/reports/xls_stock_card.xml',
+        'reports/stock_card_inquiry.xml',
         'views/reports/price_list_report.xml',
         'views/rewards/droga_pharma_reward_gain_settings.xml',
         'views/rewards/droga_pharma_reward_issue_settings.xml',

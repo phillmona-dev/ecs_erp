@@ -84,6 +84,13 @@
                             sequence="2"/>
 
                     <menuitem
+                            id="droga_pharma_stock_card"
+                            name="Stock card"
+                            action="droga_pharma_stock_card_inq_action"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                            sequence="4"/>
+
+                    <menuitem
                             id="droga_pharma_stock_all_transactions_menu"
                             name="Stock transactions - All"
                             action="droga_pharma_inv_transaction_all_warehouse_action"
