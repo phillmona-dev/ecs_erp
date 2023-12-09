@@ -7,10 +7,10 @@
         <field name="arch" type="xml">
 
             <xpath expr="//field[@name='product_uom'][2]" position="replace">
-                <field name="uom_id" invisible="1"/>
-                <field name="import_uom_new" invisible="1"/>
+                <field name="import_uom" invisible="1"/>
+                <field name="pharma_uom" invisible="1"/>
                 <field name="product_uom_pharma" string="UoM" groups="uom.group_uom" options="{'no_create':True,'no_open':True}"
-                       domain="['|',('id', '=', uom_id),('id','=',import_uom_new)]"
+                       domain="['|',('id', '=', import_uom),('id','=',pharma_uom)]"
                                         attrs="{
                                         'column_invisible':[('parent.request_type','!=','Pharmacy')],
                                             'readonly': [('state', 'in', ('purchase', 'done', 'cancel'))],

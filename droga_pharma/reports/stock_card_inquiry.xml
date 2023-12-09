@@ -36,6 +36,7 @@
                                     <field name="qty_iss"/>
                                     <field name="loss_adj"/>
                                     <field name="bal"/>
+                                    <field name="uom"/>
                                     <field name="batch_no"/>
                                     <field name="exp_date"/>
                                 </tree>

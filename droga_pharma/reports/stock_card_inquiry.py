@@ -69,6 +69,7 @@ class droga_pharma_stock_card(models.TransientModel):
                         'qty_iss':qty_iss,
                         'loss_adj':loss_adj,
                         'bal':bal,
+                        'uom':move_line['product_id'].uom_id.name,
                         'batch_no':move_line['lot_id'].name if move_line['lot_id'] else '-',
                         'exp_date':move_line['expiration_date'] if move_line['expiration_date'] else False
                     }
@@ -86,4 +87,5 @@ class pharma_price_list(models.TransientModel):
     bal=fields.Float('Balance')
     batch_no = fields.Char('Batch #')
     exp_date=fields.Date('Expiry date')
+    uom=fields.Char('Unit')
 
