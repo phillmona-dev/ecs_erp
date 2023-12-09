@@ -41,7 +41,7 @@ class droga_stock_move_line_extension(models.Model):
     trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move',
                                  compute='_get_trans_type', store=True)
     trans_warehouse = fields.Many2one('stock.warehouse', compute='_get_trans_type',store=True)
-    import_quant = fields.Float('Quantity',compute='_get_on_hand',store=True)
+    import_quant = fields.Float('Quantity',compute='_get_on_hand')
     import_uom=fields.Many2one('uom.uom',related='product_id.import_uom_new')
 
     reserved_uom_qty_done = fields.Float('Reserved', compute='_get_on_hand')
@@ -404,8 +404,8 @@ class droga_stock_move_extension(models.Model):
     itemcode = fields.Char(related='product_id.default_code', store=True,string="Product")
     itemdesc = fields.Char(related='product_id.name', store=True,string="Description")
 
-    import_quant = fields.Float('Demand',compute='_get_on_hand',store=True)
-    import_quant_done = fields.Float('Done', compute='_get_on_hand', store=True)
+    import_quant = fields.Float('Demand',compute='_get_on_hand')
+    import_quant_done = fields.Float('Done', compute='_get_on_hand')
     reserved_availability_done=fields.Float('Reserved', compute='_get_on_hand')
     import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
 
