@@ -93,24 +93,24 @@ class inventory_stock_card_xls(models.TransientModel):
 
                     if move_line['location_id'] in loc_ids_under_wh:
                         if move_line['location_dest_id'].usage == 'inventory':
-                            sheet.write(row_start, 5, move_line['qty_done'] * -1, num_format)
-                            balance -= move_line['qty_done']
+                            sheet.write(row_start, 5, move_line['import_quant'] * -1, num_format)
+                            balance -= move_line['import_quant']
                             sheet.write(row_start, 3, 0, num_format)
                             sheet.write(row_start, 4, 0, num_format)
                         else:
-                            sheet.write(row_start, 4, move_line['qty_done'], num_format)
-                            balance -= move_line['qty_done']
+                            sheet.write(row_start, 4, move_line['import_quant'], num_format)
+                            balance -= move_line['import_quant']
                             sheet.write(row_start, 3, 0, num_format)
                             sheet.write(row_start, 5, 0, num_format)
                     else:
                         if move_line['location_id'].usage == 'inventory':
-                            sheet.write(row_start, 5, move_line['qty_done'], num_format)
-                            balance += move_line['qty_done']
+                            sheet.write(row_start, 5, move_line['import_quant'], num_format)
+                            balance += move_line['import_quant']
                             sheet.write(row_start, 4, 0, num_format)
                             sheet.write(row_start, 3, 0, num_format)
                         else:
-                            sheet.write(row_start, 3, move_line['qty_done'], num_format)
-                            balance += move_line['qty_done']
+                            sheet.write(row_start, 3, move_line['import_quant'], num_format)
+                            balance += move_line['import_quant']
                             sheet.write(row_start, 4, 0, num_format)
                             sheet.write(row_start, 5, 0, num_format)
 
@@ -147,24 +147,24 @@ class inventory_stock_card_xls(models.TransientModel):
 
             if stock_move['location_id'] in loc_ids:
                 if stock_move['location_dest_id'].usage=='inventory':
-                    sheet.write(row_start, 5, stock_move['qty_done']*-1, num_format)
-                    balance-=stock_move['qty_done']
+                    sheet.write(row_start, 5, stock_move['import_quant']*-1, num_format)
+                    balance-=stock_move['import_quant']
                     sheet.write(row_start, 3, 0, num_format)
                     sheet.write(row_start, 4, 0, num_format)
                 else:
-                    sheet.write(row_start, 4, stock_move['qty_done'],num_format)
-                    balance += stock_move['qty_done']
+                    sheet.write(row_start, 4, stock_move['import_quant'],num_format)
+                    balance += stock_move['import_quant']
                     sheet.write(row_start, 3, 0,num_format)
                     sheet.write(row_start, 5, 0, num_format)
             else:
                 if stock_move['location_id'].usage == 'inventory':
-                    sheet.write(row_start, 5, stock_move['qty_done'], num_format)
-                    balance += stock_move['qty_done']
+                    sheet.write(row_start, 5, stock_move['import_quant'], num_format)
+                    balance += stock_move['import_quant']
                     sheet.write(row_start, 4, 0, num_format)
                     sheet.write(row_start, 3, 0, num_format)
                 else:
-                    sheet.write(row_start, 3, stock_move['qty_done'],num_format)
-                    balance += stock_move['qty_done']
+                    sheet.write(row_start, 3, stock_move['import_quant'],num_format)
+                    balance += stock_move['import_quant']
                     sheet.write(row_start, 4, 0,num_format)
                     sheet.write(row_start, 5,0, num_format)
 
@@ -245,7 +245,7 @@ class inventory_stock_card_xls(models.TransientModel):
         sheet.merge_range('A'+str(row_start+2)+':L'+str(row_start+2), 'Stock record card', main_title_format)
         sheet.merge_range('A'+str(row_start+3)+':L'+str(row_start+3), 'Product name, strength and dosage form : '+prod.default_code+'-'+prod.name, parameter_format)
 
-        sheet.merge_range('A'+str(row_start+4)+':F'+str(row_start+4), 'Unit of measure : '+prod.product_tmpl_id.uom_id.name, parameter_format)
+        sheet.merge_range('A'+str(row_start+4)+':F'+str(row_start+4), 'Unit of measure : '+prod.product_tmpl_id.import_uom_new.name, parameter_format)
         sheet.merge_range('G'+str(row_start+4)+':L'+str(row_start+4), 'Location : '+self.warehouse.name, parameter_format)
 
         sheet.merge_range('A'+str(row_start+5)+':F'+str(row_start+5), 'Maximum stock level : '+str(prod.reordering_max_qty), parameter_format)
