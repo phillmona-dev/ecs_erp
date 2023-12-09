@@ -247,7 +247,7 @@ class droga_stock_transfer_custom_detail(models.Model):
     @api.depends('product_id')
     def get_uom(self):
         for rec in self:
-            rec.product_uom = rec.product_id.uom_id
+            rec.product_uom = rec.product_id.uom_po_id
 
     def set_uom(self):
         pass

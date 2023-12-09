@@ -3,9 +3,8 @@ from datetime import date
 
 class droga_pharma_stock_card(models.TransientModel):
     _name = 'droga.pharma.stock.card.inquiry'
+    _descr = 'Stock card enquiry'
 
-
-    _descr = 'Price list'
     warehouse = fields.Many2one('stock.warehouse', 'Warehouse')
     product = fields.Many2one('product.product', 'Product')
     date_from = fields.Date('Date from', default=date(2022, 12, 20))

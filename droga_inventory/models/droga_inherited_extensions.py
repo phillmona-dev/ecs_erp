@@ -31,6 +31,13 @@ class droga_stock_move_line_extension(models.Model):
     trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move',
                                  compute='_get_trans_type', store=True)
     trans_warehouse = fields.Many2one('stock.warehouse', compute='_get_trans_type',store=True)
+    import_quant = fields.Float('Quantity',compute='_get_on_hand',store=True)
+    import_uom=fields.Many2one('uom.uom',related='product_id.uom_po_id')
+
+    @api.depends('qty_done')
+    def _get_on_hand(self):
+        for rec in self:
+            rec.import_quant = rec.qty_done * (rec.product_id.uom_id.factor / rec.product_id.uom_po_id.factor)
     @api.depends('move_id.trans_type', 'move_id.trans_type_detail')
     def _get_trans_type(self):
         for rec in self:
@@ -367,6 +374,13 @@ class droga_stock_move_extension(models.Model):
     itemcode = fields.Char(related='product_id.default_code', store=True,string="Product")
     itemdesc = fields.Char(related='product_id.name', store=True,string="Description")
 
+    import_quant = fields.Float('Quantity',compute='_get_on_hand',store=True)
+    import_uom = fields.Many2one('uom.uom', related='product_id.uom_po_id')
+
+    @api.depends('product_uom_qty')
+    def _get_on_hand(self):
+        for rec in self:
+            rec.import_quant = rec.product_uom_qty * (rec.product_id.uom_id.factor / rec.product_id.uom_po_id.factor)
     @api.depends('state')
     def _get_wareh(self):
         for rec in self:
@@ -814,11 +828,10 @@ class droga_stock_product_extension(models.Model):
     has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
 
-    @api.onchange("pharma_uom")
+    @api.onchange("uom_po_id")
     def _on_change_pharma_uom(self):
         for rec in self:
-            if rec.from_pharma:
-                rec.uom_id=rec.pharma_uom
+            rec.uom_id=rec.uom_po_id
 
     def _search_has_access(self, operator, value):
 
