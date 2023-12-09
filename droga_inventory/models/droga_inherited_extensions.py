@@ -24,8 +24,9 @@ class droga_stock_move_line_extension(models.Model):
     source_wh_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'), ('PT', 'Physiotherapy'),
-        ('PH', 'Pharmacy'), ('PR', 'Project')], compute='_get_source_type')
+        ('PH', 'Pharmacy'), ('PR', 'Project')], compute='_get_source_type',store=True)
 
+    @api.depends('location_id','location_dest_id')
     def _get_source_type(self):
         for rec in self:
             if rec.location_id.usage == 'internal':
@@ -387,7 +388,9 @@ class droga_stock_move_extension(models.Model):
     source_wh_type = fields.Selection([
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
-    ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type')
+    ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
+
+    @api.depends('location_id', 'location_dest_id')
     def _get_source_type(self):
         for rec in self:
             if rec.location_id.usage=='internal':
