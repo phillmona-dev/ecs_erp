@@ -126,7 +126,7 @@
                     </group>
                     <group string="Unit of measures">
                         <field name="from_pharma" invisible="1"></field>
-                        <field name="uom_po_id" string="Import UOM" options="{'no_create': True}" attrs="{'required': [('from_pharma', '=', True)]}"/>/>
+                        <field name="import_uom_new" string="Import UOM" options="{'no_create': True}" attrs="{'required': [('from_pharma', '=', True)]}"/>/>
                         <field name="uom_id" string="Pharmacy UOM" options="{'no_create': True}" attrs="{'readonly': [('from_pharma', '=', True)]}"/>
                         <field name="categ" readonly="1" invisible="1"></field>
                     </group>

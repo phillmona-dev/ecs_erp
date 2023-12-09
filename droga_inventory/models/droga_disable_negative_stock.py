@@ -8,11 +8,11 @@ class StockQuant(models.Model):
     has_access=fields.Boolean(related='warehouse_id.has_access')
     has_read_access = fields.Boolean(related='location_id.has_read_access')
     import_quant=fields.Float('On Hand Quantity',compute='_get_on_hand',store=True)
-    import_uom = fields.Many2one('uom.uom', related='product_id.uom_po_id')
+    import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
     @api.depends('quantity')
     def _get_on_hand(self):
         for rec in self:
-            rec.import_quant=rec.quantity*(rec.product_id.uom_id.factor/rec.product_id.uom_po_id.factor)
+            rec.import_quant=rec.quantity/(rec.product_id.uom_id.factor/rec.product_id.import_uom_new.factor)
 
     @api.constrains("product_id", "quantity")
     def check_negative_qty(self):

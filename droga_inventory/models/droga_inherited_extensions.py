@@ -21,7 +21,17 @@ class droga_stock_move_line_extension(models.Model):
     location_dest_id = fields.Many2one('stock.location', 'To', domain="[('usage', '!=', 'view')]", check_company=True,
                                        required=True, compute="_compute_location_id", store=True, readonly=False,
                                        precompute=True)
+    source_wh_type = fields.Selection([
+        ('IM', 'Import'),
+        ('WS', 'Wholesale'), ('PT', 'Physiotherapy'),
+        ('PH', 'Pharmacy'), ('PR', 'Project')], compute='_get_source_type')
 
+    def _get_source_type(self):
+        for rec in self:
+            if rec.location_id.usage == 'internal':
+                rec.source_wh_type = rec.location_id.warehouse_id.wh_type
+            else:
+                rec.source_wh_type = rec.location_dest_id.warehouse_id.wh_type
     has_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     has_read_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_read_access',
@@ -32,12 +42,21 @@ class droga_stock_move_line_extension(models.Model):
                                  compute='_get_trans_type', store=True)
     trans_warehouse = fields.Many2one('stock.warehouse', compute='_get_trans_type',store=True)
     import_quant = fields.Float('Quantity',compute='_get_on_hand',store=True)
-    import_uom=fields.Many2one('uom.uom',related='product_id.uom_po_id')
+    import_uom=fields.Many2one('uom.uom',related='product_id.import_uom_new')
 
-    @api.depends('qty_done')
+    reserved_uom_qty_done = fields.Float('Reserved', compute='_get_on_hand')
+
+    @api.onchange('import_quant')
+    def _prod_qty_change(self):
+        for rec in self:
+            rec.qty_done = rec.import_quant * (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+
+    @api.depends('qty_done','import_uom','reserved_uom_qty')
     def _get_on_hand(self):
         for rec in self:
-            rec.import_quant = rec.qty_done * (rec.product_id.uom_id.factor / rec.product_id.uom_po_id.factor)
+            rec.import_quant = rec.qty_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            rec.reserved_uom_qty_done = rec.reserved_uom_qty / (
+                    rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
     @api.depends('move_id.trans_type', 'move_id.trans_type_detail')
     def _get_trans_type(self):
         for rec in self:
@@ -365,6 +384,17 @@ class droga_stock_move_extension(models.Model):
     reservation_discard_time=fields.Datetime(string='Reservation cancel time',compute='_compute_res_discard',inverse='_inverse_res_discard')
     reserve_indef=fields.Boolean('Reserve indefinitely',default=False,tracking=True)
     source_wh=fields.Char(related='location_id.warehouse_id.name')
+    source_wh_type = fields.Selection([
+        ('IM','Import'),
+        ('WS', 'Wholesale'),('PT','Physiotherapy'),
+    ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type')
+    def _get_source_type(self):
+        for rec in self:
+            if rec.location_id.usage=='internal':
+                rec.source_wh_type=rec.location_id.warehouse_id.wh_type
+            else:
+                rec.source_wh_type = rec.location_dest_id.warehouse_id.wh_type
+
     trans_type=fields.Many2one('droga.inventory.transaction.types',string='Type',compute='_get_trans_type',store=True)
     trans_type_detail = fields.Many2one('droga.inventory.transaction.types', string='Type Detail', compute='_get_trans_type',
                                  store=True)
@@ -374,13 +404,17 @@ class droga_stock_move_extension(models.Model):
     itemcode = fields.Char(related='product_id.default_code', store=True,string="Product")
     itemdesc = fields.Char(related='product_id.name', store=True,string="Description")
 
-    import_quant = fields.Float('Quantity',compute='_get_on_hand',store=True)
-    import_uom = fields.Many2one('uom.uom', related='product_id.uom_po_id')
+    import_quant = fields.Float('Demand',compute='_get_on_hand',store=True)
+    import_quant_done = fields.Float('Done', compute='_get_on_hand', store=True)
+    reserved_availability_done=fields.Float('Reserved', compute='_get_on_hand')
+    import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
 
-    @api.depends('product_uom_qty')
+    @api.depends('product_uom_qty','import_uom')
     def _get_on_hand(self):
         for rec in self:
-            rec.import_quant = rec.product_uom_qty * (rec.product_id.uom_id.factor / rec.product_id.uom_po_id.factor)
+            rec.import_quant = rec.product_uom_qty / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            rec.import_quant_done = rec.quantity_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            rec.reserved_availability_done=rec.reserved_availability / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
     @api.depends('state')
     def _get_wareh(self):
         for rec in self:
@@ -812,6 +846,7 @@ class droga_stock_product_extension(models.Model):
 
     categ=fields.Many2one('uom.category',related='uom_id.category_id')
     pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',tracking=True)
+    import_uom_new = fields.Many2one('uom.uom', string='Pharma UOM', tracking=True)
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
@@ -827,11 +862,6 @@ class droga_stock_product_extension(models.Model):
 
     has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
-
-    @api.onchange("uom_po_id")
-    def _on_change_pharma_uom(self):
-        for rec in self:
-            rec.uom_id=rec.uom_po_id
 
     def _search_has_access(self, operator, value):
 

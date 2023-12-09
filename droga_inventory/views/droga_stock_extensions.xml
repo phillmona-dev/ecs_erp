@@ -55,6 +55,38 @@
                        attrs="{'column_invisible':[('parent.from_reconcile_menu', '=', False)]}"></field>
             </xpath>
 
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom']" position="replace">
+                <field name="source_wh_type" invisible="1"></field>
+                <field name="product_uom"
+                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
+                <field name="import_uom"
+                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="replace">
+                <field name="source_wh_type" invisible="1"></field>
+                <field name="product_uom_qty"
+                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
+                <field name="import_quant"
+                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='quantity_done']" position="replace">
+                <field name="source_wh_type" invisible="1"></field>
+                <field name="quantity_done"
+                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
+                <field name="import_quant_done"
+                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='reserved_availability']" position="replace">
+                <field name="source_wh_type" invisible="1"></field>
+                <field name="reserved_availability"
+                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
+                <field name="reserved_availability_done"
+                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
+            </xpath>
+
             <xpath expr="//form/sheet/group/group/field[@name='origin']" position="replace">
                 <field name="origin" readonly="1" attrs="{'invisible': [('origin', '=', False)]}"></field>
                 <field name="trans_issue_request" readonly="1"
@@ -120,6 +152,30 @@
                        attrs="{'readonly': ['&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"
                        invisible="not context.get('show_destination_location')"
                        domain="[('has_access','=',True), '|',('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
+            </xpath>
+            <xpath expr="//tree/field[@name='reserved_uom_qty']" position="replace">
+                <field name="reserved_uom_qty" invisible="1"></field>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='qty_done']" position="replace">
+                <field name="source_wh_type" invisible="1"></field>
+                <field name="qty_done"
+                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')],'readonly': ['|', '&amp;', ('state', '=', 'done'), ('is_locked', '=', True), '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"></field>
+                <field name="import_quant"
+                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')],'readonly': ['|', '&amp;', ('state', '=', 'done'), ('is_locked', '=', True), '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"></field>
+
+
+            </xpath>
+
+            <xpath expr="//tree/field[@name='product_uom_id']" position="replace">
+                <field name="product_uom_id" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom"
+                        attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')],'readonly': ['|', '|', ('reserved_uom_qty', '!=', 0.0),
+                                                '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True),
+                                                '&amp;', ('state', '=', 'done'), ('id', '!=', False)]}"/>
+                <field name="import_uom" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom"
+                        attrs="{'column_invisible':[('source_wh_type', '=', 'PH')],'readonly': ['|', '|', ('reserved_uom_qty', '!=', 0.0),
+                                                '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True),
+                                                '&amp;', ('state', '=', 'done'), ('id', '!=', False)]}"/>
             </xpath>
         </field>
     </record>

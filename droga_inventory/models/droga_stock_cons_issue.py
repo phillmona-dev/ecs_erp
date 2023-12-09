@@ -211,7 +211,7 @@ class droga_stock_cons_issue_detail(models.Model):
     @api.depends('product_id')
     def get_uom(self):
         for rec in self:
-            rec.product_uom = rec.product_id.uom_po_id
+            rec.product_uom = rec.product_id.import_uom_new
 
     def set_uom(self):
         pass
