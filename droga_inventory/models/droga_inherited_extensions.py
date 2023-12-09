@@ -29,7 +29,9 @@ class droga_stock_move_line_extension(models.Model):
     @api.depends('location_id','location_dest_id')
     def _get_source_type(self):
         for rec in self:
-            if rec.location_id.usage == 'internal':
+            if rec.picking_type_id.code=='internal':
+                rec.source_wh_type = 'IM'
+            elif rec.location_id.usage == 'internal':
                 rec.source_wh_type = rec.location_id.warehouse_id.wh_type
             else:
                 rec.source_wh_type = rec.location_dest_id.warehouse_id.wh_type
@@ -393,7 +395,9 @@ class droga_stock_move_extension(models.Model):
     @api.depends('location_id', 'location_dest_id')
     def _get_source_type(self):
         for rec in self:
-            if rec.location_id.usage=='internal':
+            if rec.picking_type_id.code=='internal':
+                rec.source_wh_type='IM'
+            elif rec.location_id.usage=='internal':
                 rec.source_wh_type=rec.location_id.warehouse_id.wh_type
             else:
                 rec.source_wh_type = rec.location_dest_id.warehouse_id.wh_type
