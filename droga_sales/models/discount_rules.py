@@ -209,8 +209,8 @@ class sale_order_line(models.Model):
                     if not line.manual_price_pharma:
                         line.price_unit = selling_price
                     line.phar_cont_price = selling_price
-                    line.product_uom_pharma_measure = line.product_id.pharma_uom
-                    line.product_uom = line.product_id.pharma_uom
+                    line.product_uom_pharma_measure = line.product_id.uom_id
+                    line.product_uom = line.product_id.uom_id
                     line.product_uom_qty = line.product_uom_pharma_qty
                     return
             else:
@@ -259,6 +259,7 @@ class sale_order_line(models.Model):
                     used_under = ['PH', 'All']
 
             for line in self:
+
                 if self.order_id.order_from:
                     if self.order_id.order_from.startswith('PH'):
                         line.wareh = line.order_id.wareh
@@ -266,7 +267,7 @@ class sale_order_line(models.Model):
                         line.wareh = line.product_id.default_warehouse
                 elif not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
                     line.wareh = line.product_id.default_warehouse
-
+                line.product_uom = line.product_id.import_uom_new
                 # Get discounts/additional payments per type
                 type_rates = self.env['droga.price.discount.per.type'].search(
                     [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id), ('status', '=', 'Active'),
@@ -292,7 +293,7 @@ class sale_order_line(models.Model):
                     all_rate = all_rate + rate['percent']
 
                 uom_rate = line.product_uom.factor / (
-                    line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else (
+                    line.product_id.import_uom_new.factor if line.product_id.import_uom_new.factor != 0 else (
                         line.product_uom.factor if line.product_uom.factor != 0 else 1))
                 # Product and quantity discount rules
                 product_qty = self.env['droga.price.discount.per.product.qty'].search(
@@ -313,26 +314,10 @@ class sale_order_line(models.Model):
                 else:
                     price = line.with_company(line.company_id)._get_display_price()
                     if not line.tender_origin_form_tender and not line.manual_price:
-                        line.price_unit = line.product_id._get_tax_included_unit_price(
-                            line.company_id,
-                            line.order_id.currency_id,
-                            line.order_id.date_order,
-                            'sale',
-                            fiscal_position=line.order_id.fiscal_position_id,
-                            product_price_unit=price,
-                            product_currency=line.currency_id
-                        ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
+                        line.price_unit = line.product_id.list_price* ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
                                 1 + ((non_core_rate + all_rate) / 100)))
 
-                    line.std_unit_price = line.product_id._get_tax_included_unit_price(
-                        line.company_id,
-                        line.order_id.currency_id,
-                        line.order_id.date_order,
-                        'sale',
-                        fiscal_position=line.order_id.fiscal_position_id,
-                        product_price_unit=price,
-                        product_currency=line.currency_id
-                    ) * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
+                    line.std_unit_price = line.product_id.list_price * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
                             1 + ((non_core_rate + all_rate) / 100)))
 
                 line.price_unit_before_discount = line.std_unit_price
