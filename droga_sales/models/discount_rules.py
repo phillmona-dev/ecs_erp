@@ -267,7 +267,9 @@ class sale_order_line(models.Model):
                         line.wareh = line.product_id.default_warehouse
                 elif not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
                     line.wareh = line.product_id.default_warehouse
-                line.product_uom = line.product_id.import_uom_new
+
+                if not line.product_uom:
+                    line.product_uom = line.product_id.import_uom_new
                 # Get discounts/additional payments per type
                 type_rates = self.env['droga.price.discount.per.type'].search(
                     [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id), ('status', '=', 'Active'),
@@ -312,12 +314,12 @@ class sale_order_line(models.Model):
                     line.price_unit = 0.0
                     line.std_unit_price = 0.0
                 else:
-                    price = line.with_company(line.company_id)._get_display_price()
+                    price = line.product_id.list_price*(line.product_id.product_tmpl_id.import_uom_new.factor/line.product_uom.factor)
                     if not line.tender_origin_form_tender and not line.manual_price:
-                        line.price_unit = line.product_id.list_price* ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
+                        line.price_unit = price* ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
                                 1 + ((non_core_rate + all_rate) / 100)))
 
-                    line.std_unit_price = line.product_id.list_price * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
+                    line.std_unit_price = price * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
                             1 + ((non_core_rate + all_rate) / 100)))
 
                 line.price_unit_before_discount = line.std_unit_price
