@@ -20,8 +20,8 @@ class MarketReportWizard(models.TransientModel):
 
     product_type = fields.Selection([('medicine', 'Medicine'), ('medical_device', 'Medical Device')])
 
-    date_from = fields.Date(string='From Date')
-    date_to = fields.Date(string='To Date')
+    date_from = fields.Date(string='From Date',)
+    date_to = fields.Date(string='To Date',)
 
     def action_get_xls(self, data):
 

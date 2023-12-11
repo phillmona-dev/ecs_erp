@@ -64,7 +64,7 @@
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="replace">
-                <field name="source_wh_type" invisible="0"></field>
+                <field name="source_wh_type" invisible="1"></field>
                 <field name="product_uom_qty"
                        attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
                 <field name="import_quant"

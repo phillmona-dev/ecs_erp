@@ -15,7 +15,7 @@ class FinalRegisteredRenewal(models.Model):
         [('medicine', 'Medicine'), ('device', 'Medical Device'), ('food', 'Food'), ('cosmetics', 'Cosmetics')],
         string='Product Type', required=True)
 
-    product_name = fields.Many2many('product.product', string='Products')
+    product_name = fields.Text( string='Products')
     approval_date = fields.Date(string='Approval Date')
     validity_date = fields.Date(string='Validity Date')
     remark = fields.Text(string='Remark')
@@ -58,9 +58,9 @@ class FinalRegisteredRenewal(models.Model):
 
     def send_insurance_reminder(self):
         today = fields.Date.today()
-        three_month_from_now = today + timedelta(days=180)
+        six_month_from_now = today + timedelta(days=180)
 
-        agreement_due_date = self.search([('validity_date', '=', three_month_from_now)])
+        agreement_due_date = self.search([('validity_date', '=', six_month_from_now)])
         for agreement in agreement_due_date:
             message = "There is a validity date to registered list in 6 months"
             self.notify(message)

@@ -32,5 +32,20 @@
         <xpath expr="//t/t/div/table/tbody/tr/td[3]/span[2]" position="replace">
             <span t-field="move.product_uom.uom_title"/>
         </xpath>
+
     </template>
+
+
+
+    <template id="droga_deliv_slip_inherit_uom" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+            <xpath expr="//tr/td[3]" position="replace">
+            <td class="text-center" name="move_line_aggregated_qty_done">
+                <t t-if="aggregated_lines[line]['import_quant']">
+                    <span t-esc="aggregated_lines[line]['import_quant']"
+                        t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
+                    <span t-esc="aggregated_lines[line]['import_uom'].name"/>
+                </t>
+            </td>
+        </xpath>
+            </template>
 </odoo>

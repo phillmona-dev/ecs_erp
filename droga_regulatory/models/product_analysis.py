@@ -7,8 +7,7 @@ class droga_prod_analysis(models.Model):
     _name = "droga.bdr.product.analysis"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    analysis_no=fields.Char('Analysis number', default=lambda self: self.env['ir.sequence'].next_by_code('droga.reg.prod.analysis.custom.sequence'),
-                              readonly=True)
+    analysis_no = fields.Char('Analysis number', readonly=True)
     product_descr=fields.Char('Product description')
     product_grade=fields.Char('Product Grade')
     criterias = fields.One2many('droga.bdr.product.analysis.criterias','product_analysis')
@@ -124,16 +123,22 @@ class droga_prod_analysis(models.Model):
     def _onchange_grade(self):
         self._default_grade_ids()
 
+    # @api.model
+    # def create(self, vals_list):
+    #     vals_list['analysis_no'] = self.env['ir.sequence'].next_by_code(
+    #         'droga.reg.prod.analysis.custom.sequence')
+    #     if not vals_list['analysis_no']:
+    #         raise UserError("Sequence not found.")
+    #
+    #     #add criterias
+    #     return super().create(vals_list)
+
     @api.model
-    def create(self, vals_list):
-        vals_list['analysis_no'] = self.env['ir.sequence'].next_by_code(
-            'droga.reg.prod.analysis.custom.sequence')
-        if not vals_list['analysis_no']:
-            raise UserError("Sequence not found.")
+    def create(self, vals):
+        sequence = self.env['ir.sequence'].next_by_code('droga.reg.prod.analysis.custom.sequence')
 
-        #add criterias
-        return super().create(vals_list)
-
+        vals['analysis_no'] = sequence
+        return super(droga_prod_analysis, self).create(vals)
 
     def calculate_score(self):
         if self.criteria_ids:

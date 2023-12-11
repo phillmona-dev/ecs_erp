@@ -3,7 +3,7 @@
 
 
     <menuitem id="regulatory_main_menu" name="Regulatory"
-              web_icon="droga_droga_regulatory,static/description/icon.png"
+              web_icon="droga_ra,static/description/icon.png"
               sequence="10">
 
         <menuitem
@@ -15,7 +15,7 @@
 
         <menuitem
                 id="droga_reg_exhibition"
-                name="Exhibition Entry"
+                name="Suppliers Information Entry"
                 action="action_company_info"
                 sequence="23"
         />
@@ -49,6 +49,9 @@
                 <menuitem id="droga_reg_gmp_follow_up" name="GMP Follow Up" action="action_gmp_inspection"/>
             </menuitem>
 
+            <menuitem id="droga_regulatory_agency_agreement" name="Agreement" sequence="22">
+                <menuitem id="droga_reg_agency_agreement" name="Agency Agreement" action="action_agency_agreement"/>
+            </menuitem>
 
             <menuitem id="droga_regulatory_registered_list_follow_up" name="Follow UP List" sequence="30">
                 <menuitem id="droga_reg_registered_follow" name="Company Follow Up"

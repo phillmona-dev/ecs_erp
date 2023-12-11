@@ -6,6 +6,11 @@
         <field name="view_mode">tree,form</field>
     </record>
     <data>
+        <record id="sequence_product_analysis" model="ir.sequence">
+            <field name="name">Product Analysis Sequence</field>
+            <field name="code">droga.reg.prod.analysis.custom.sequence</field>
+            <field name="prefix">PROD_ANA_</field>
+        </record>
 
         <record id="droga_product_analysis_view" model="ir.ui.view">
             <field name="name">droga.product.analysis.view</field>
@@ -38,7 +43,7 @@
                             <group>
                                 <field name="score_out_of_hundred" readonly="1"/>
                                 <field name="grade_name"/>
-                                <field name="exb_num" widget="many2many_tags" string="Select Exhibition Entries"/>
+                                <field name="exb_num" widget="many2many_tags" string="Select Suppliers information entry"/>
                                 <field name="sup_config_name"/>
 
 

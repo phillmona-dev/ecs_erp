@@ -13,6 +13,33 @@ class purchase_order(models.Model):
 
         self.amount_total_usd = total
 
+    def generate_release_permit(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Release Permits',
+            'res_model': 'droga.reg.pre.import.permit.generated',
+            'view_mode': 'form',
+            'context': {
+                'default_ra_status': 'procurement',
+                'default_date_received': fields.Datetime.now(),
+
+            },
+
+        }
+
+    def add_to_pre_import(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Pre-Import Permits',
+            'res_model': 'droga.reg.pre.import.permit.header',
+            'view_mode': 'form',
+            'context': {
+                'default_date_received': fields.Datetime.now(),
+                'default_ra_status': 'procurement',
+            },
+        }
+
+    preimport_permit_no = fields.Char(string='Preimport permit No')
     rfq_id = fields.Many2one("droga.purhcase.request.rfq")
     rfq_local_id = fields.Many2one("droga.purchase.request.rfq.local")
     purchase_request_id = fields.Many2one("droga.purhcase.request")
@@ -20,7 +47,7 @@ class purchase_order(models.Model):
 
     supplier_country = fields.Many2one(related='partner_id.country_id', store=True)
 
-    from_rfq=fields.Boolean(default=False)
+    from_rfq = fields.Boolean(default=False)
 
     shipping_reconcilations = fields.One2many(
         'droga.purchase.shipping.reconcilation', 'purchase_order_id')
@@ -209,11 +236,12 @@ class purchase_order(models.Model):
         message = ''
         for res in self:
             for line in res.order_line:
-                new_items=self.env['product.template'].search([('old_ref','=',line.product_id.default_code)])
-                if len(new_items)>0:
-                    message=message+'Product '+line.product_id.default_code+' has been updated with '+new_items[0].default_code+', '
+                new_items = self.env['product.template'].search([('old_ref', '=', line.product_id.default_code)])
+                if len(new_items) > 0:
+                    message = message + 'Product ' + line.product_id.default_code + ' has been updated with ' + \
+                              new_items[0].default_code + ', '
 
-        if len(message)>5:
+        if len(message) > 5:
             raise UserError(message)
 
         return super(purchase_order, self).button_confirm()
@@ -231,14 +259,15 @@ class purchase_order(models.Model):
 
         request_type = res.request_type
 
-        #Check if there are old items in PO
-        message=''
+        # Check if there are old items in PO
+        message = ''
         for line in res.order_line:
-            new_items=self.env['product.template'].search([('old_ref','=',line.product_id.default_code)])
-            if len(new_items)>0 and not res.from_rfq:
-                message=message+'Product '+line.product_id.default_code+' has been updated with '+new_items[0].default_code+', '
+            new_items = self.env['product.template'].search([('old_ref', '=', line.product_id.default_code)])
+            if len(new_items) > 0 and not res.from_rfq:
+                message = message + 'Product ' + line.product_id.default_code + ' has been updated with ' + new_items[
+                    0].default_code + ', '
 
-        if len(message)>5:
+        if len(message) > 5:
             raise UserError(message)
 
         if request_type == 'Foregin':

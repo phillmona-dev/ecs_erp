@@ -853,7 +853,7 @@ class droga_stock_product_extension(models.Model):
 
     categ=fields.Many2one('uom.category',related='uom_id.category_id')
     pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',tracking=True)
-    import_uom_new = fields.Many2one('uom.uom', string='Pharma UOM', tracking=True)
+    import_uom_new = fields.Many2one('uom.uom', string='Import UOM', tracking=True)
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
