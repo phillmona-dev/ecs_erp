@@ -48,7 +48,15 @@ class droga_stock_move_line_extension(models.Model):
     import_uom=fields.Many2one('uom.uom',related='product_id.import_uom_new')
 
     reserved_uom_qty_done = fields.Float('Reserved', compute='_get_on_hand')
+    pharmacy_unit = fields.Char('Pharmacy unit', default=False, compute='_get_pharma_unit',store=True)
 
+    @api.depends('move_id.pharmacy_unit')
+    def _get_pharma_unit(self):
+        for rec in self:
+            if rec.move_id.pharmacy_unit:
+                rec.pharmacy_unit = 'True'
+            else:
+                rec.pharmacy_unit = 'False'
     @api.onchange('import_quant')
     def _prod_qty_change(self):
         for rec in self:
@@ -116,6 +124,94 @@ class droga_stock_move_line_extension(models.Model):
                 rec.has_read_access = True
             else:
                 rec.has_read_access = False
+
+
+    def _get_aggregated_product_quantitiescustom(self, **kwargs):
+        """ Returns a dictionary of products (key = id+name+description+uom) and corresponding values of interest.
+
+        Allows aggregation of data across separate move lines for the same product. This is expected to be useful
+        in things such as delivery reports. Dict key is made as a combination of values we expect to want to group
+        the products by (i.e. so data is not lost). This function purposely ignores lots/SNs because these are
+        expected to already be properly grouped by line.
+
+        returns: dictionary {product_id+name+description+uom: {product, name, description, qty_done, product_uom}, ...}
+        """
+        aggregated_move_lines = {}
+
+        def get_aggregated_properties(move_line=False, move=False):
+            move = move or move_line.move_id
+            uom = move.product_uom or move_line.product_uom_id
+            name = move.product_id.display_name
+            description = move.description_picking
+            if description == name or description == move.product_id.name:
+                description = False
+            product = move.product_id
+            line_key = f'{product.id}_{product.display_name}_{description or ""}_{uom.id}'
+            return (line_key, name, description, uom)
+
+        # Loops to get backorders, backorders' backorders, and so and so...
+        backorders = self.env['stock.picking']
+        pickings = self.picking_id
+        while pickings.backorder_ids:
+            backorders |= pickings.backorder_ids
+            pickings = pickings.backorder_ids
+
+        for move_line in self:
+            if kwargs.get('except_package') and move_line.result_package_id:
+                continue
+            line_key, name, description, uom = get_aggregated_properties(move_line=move_line)
+
+            qty_done = move_line.product_uom_id._compute_quantity(move_line.qty_done, uom)
+            if line_key not in aggregated_move_lines:
+                qty_ordered = None
+                if backorders and not kwargs.get('strict'):
+                    qty_ordered = move_line.move_id.product_uom_qty
+                    # Filters on the aggregation key (product, description and uom) to add the
+                    # quantities delayed to backorders to retrieve the original ordered qty.
+                    following_move_lines = backorders.move_line_ids.filtered(
+                        lambda ml: get_aggregated_properties(move=ml.move_id)[0] == line_key
+                    )
+                    qty_ordered += sum(following_move_lines.move_id.mapped('product_uom_qty'))
+                    # Remove the done quantities of the other move lines of the stock move
+                    previous_move_lines = move_line.move_id.move_line_ids.filtered(
+                        lambda ml: get_aggregated_properties(move=ml.move_id)[0] == line_key and ml.id != move_line.id
+                    )
+                    qty_ordered -= sum(map(lambda m: m.product_uom_id._compute_quantity(m.qty_done, uom), previous_move_lines))
+                aggregated_move_lines[line_key] = {'name': name,
+                                                   'description': description,
+                                                   'qty_done': qty_done,
+                                                   'qty_ordered': qty_ordered or qty_done,
+                                                   'product_uom': uom,
+                                                   'product': move_line.product_id}
+            else:
+                aggregated_move_lines[line_key]['qty_ordered'] += qty_done
+                aggregated_move_lines[line_key]['qty_done'] += qty_done
+
+        # Does the same for empty move line to retrieve the ordered qty. for partially done moves
+        # (as they are splitted when the transfer is done and empty moves don't have move lines).
+        if kwargs.get('strict'):
+            return aggregated_move_lines
+        pickings = (self.picking_id | backorders)
+        for empty_move in pickings.move_ids:
+            if not (empty_move.state == "cancel" and empty_move.product_uom_qty
+                    and float_is_zero(empty_move.quantity_done, precision_rounding=empty_move.product_uom.rounding)):
+                continue
+            line_key, name, description, uom = get_aggregated_properties(move=empty_move)
+
+            if line_key not in aggregated_move_lines:
+                qty_ordered = empty_move.product_uom_qty
+                aggregated_move_lines[line_key] = {
+                    'name': name,
+                    'description': description,
+                    'qty_done': False,
+                    'qty_ordered': qty_ordered,
+                    'product_uom': uom,
+                    'product': empty_move.product_id,
+                }
+            else:
+                aggregated_move_lines[line_key]['qty_ordered'] += empty_move.product_uom_qty
+
+        return aggregated_move_lines
 class droga_warehouse_extension(models.Model):
     _inherit = 'stock.warehouse'
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
@@ -391,6 +487,15 @@ class droga_stock_move_extension(models.Model):
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
+    pharmacy_unit = fields.Char('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
+
+    @api.depends('picking_id.pharmacy_unit')
+    def _get_pharma_unit(self):
+        for rec in self:
+            if rec.picking_id.pharmacy_unit:
+                rec.pharmacy_unit='True'
+            else:
+                rec.pharmacy_unit = 'False'
 
     @api.depends('location_id', 'location_dest_id')
     def _get_source_type(self):
@@ -664,6 +769,7 @@ class droga_stock_picking_extension(models.Model):
         ('SAP','Sales placement location'),
         ('SRL', 'Inter-store receive transit location'),
         ], string='Cons/sample Type',related='location_dest_id.con_type')
+    pharmacy_unit=fields.Boolean('Pharmacy unit',default=False,store=True)
 
     def _get_loc_descr(self):
         for rec in self:

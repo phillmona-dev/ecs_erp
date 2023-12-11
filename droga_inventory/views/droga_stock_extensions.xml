@@ -99,6 +99,7 @@
                        attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
                 <field name="to_correct_pick" options="{'no_create': True}"
                        attrs="{'invisible':[('from_reconcile_menu', '=', False)],'required':[('from_reconcile_menu', '=', True)]}"/>
+                <field name="pharmacy_unit"></field>
                 <field name="remark"
                        attrs="{'invisible':[('from_reconcile_menu', '=', False)],'required':[('from_reconcile_menu', '=', True)]}"/>
             </xpath>
@@ -159,21 +160,23 @@
 
             <xpath expr="//tree/field[@name='qty_done']" position="replace">
                 <field name="source_wh_type" invisible="1"></field>
+                <field name="pharmacy_unit" invisible="0"></field>
                 <field name="qty_done"
-                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')],'readonly': ['|', '&amp;', ('state', '=', 'done'), ('is_locked', '=', True), '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"></field>
+                       attrs="{'column_invisible':[('pharmacy_unit', '!=', 'True')],'readonly': ['|', '&amp;', ('state', '=', 'done'), ('is_locked', '=', True), '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"></field>
                 <field name="import_quant"
-                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')],'readonly': ['|', '&amp;', ('state', '=', 'done'), ('is_locked', '=', True), '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"></field>
+                       attrs="{'column_invisible':[('pharmacy_unit', '=', 'True')],'readonly': ['|', '&amp;', ('state', '=', 'done'), ('is_locked', '=', True), '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"></field>
 
 
             </xpath>
 
             <xpath expr="//tree/field[@name='product_uom_id']" position="replace">
+                <field name="pharmacy_unit" invisible="1"></field>
                 <field name="product_uom_id" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom"
-                        attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')],'readonly': ['|', '|', ('reserved_uom_qty', '!=', 0.0),
+                        attrs="{'column_invisible':[('pharmacy_unit', '!=', 'True')],'readonly': ['|', '|', ('reserved_uom_qty', '!=', 0.0),
                                                 '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True),
                                                 '&amp;', ('state', '=', 'done'), ('id', '!=', False)]}"/>
                 <field name="import_uom" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom"
-                        attrs="{'column_invisible':[('source_wh_type', '=', 'PH')],'readonly': ['|', '|', ('reserved_uom_qty', '!=', 0.0),
+                        attrs="{'column_invisible':[('pharmacy_unit', '=', 'True')],'readonly': ['|', '|', ('reserved_uom_qty', '!=', 0.0),
                                                 '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True),
                                                 '&amp;', ('state', '=', 'done'), ('id', '!=', False)]}"/>
             </xpath>
@@ -266,11 +269,15 @@
             </xpath>
 
             <xpath expr="//tree/field[@name='qty_done']" position="replace">
-                <field name="import_quant" string="Quantity"/>
+                <field name="pharmacy_unit" invisible="1"></field>
+                <field name="import_quant" string="Quantity" attrs="{'column_invisible':[('pharmacy_unit', '!=', True)]}"></field>
+                <field name="qty_done" string="Quantity" attrs="{'column_invisible':[('pharmacy_unit', '!=', False)]}"></field>
             </xpath>
 
             <xpath expr="//tree/field[@name='product_uom_id']" position="replace">
-                <field name="import_uom" string="Unit"/>
+                <field name="pharmacy_unit" invisible="1"></field>
+                <field name="import_uom" string="Unit" attrs="{'column_invisible':[('pharmacy_unit', '!=', True)]}"></field>
+                <field name="product_uom_id" string="Unit" attrs="{'column_invisible':[('pharmacy_unit', '!=', False)]}"></field>
             </xpath>
         </field>
     </record>

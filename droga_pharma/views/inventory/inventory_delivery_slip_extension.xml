@@ -38,14 +38,55 @@
 
 
     <template id="droga_deliv_slip_inherit_uom" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
-            <xpath expr="//tr/td[3]" position="replace">
+            <xpath expr="//tr[1]" position="replace">
+            <t t-set="aggregated_linescustom" t-value="o.move_line_ids._get_aggregated_product_quantitiescustom()"/>
+
+            <tr t-foreach="aggregated_linescustom" t-as="line">
+            <td>
+                <span t-esc="aggregated_linescustom[line]['name']"/>
+                <p t-if="aggregated_linescustom[line]['description']">
+                    <span t-esc="aggregated_linescustom[line]['description']"/>
+                </p>
+            </td>
+            <td class="text-center" name="move_line_aggregated_qty_ordered">
+                <span t-esc="aggregated_linescustom[line]['qty_ordered']"
+                    t-options="{'widget': 'float', 'decimal_precision': '2'}"/>
+                <span t-esc="aggregated_linescustom[line]['product_uom'].name"/>
+            </td>
             <td class="text-center" name="move_line_aggregated_qty_done">
-                <t t-if="aggregated_lines[line]['import_quant']">
-                    <span t-esc="aggregated_lines[line]['import_quant']"
-                        t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
-                    <span t-esc="aggregated_lines[line]['import_uom'].name"/>
+                <t t-if="aggregated_linescustom[line]['qty_done']">
+                    <span t-esc="aggregated_linescustom[line]['qty_done']"
+                        t-options="{'widget': 'float', 'decimal_precision': '2'}"/>
+                    <span t-esc="aggregated_linescustom[line]['product_uom'].name"/>
                 </t>
             </td>
+        </tr>
+
         </xpath>
             </template>
+
+
+
+    <template id="droga_deliv_slip_inherit_uom_serial" inherit_id="stock.stock_report_delivery_has_serial_move_line">
+            <xpath expr="//td[@name='move_line_lot_qty_done']" position="replace">
+            <td class="text-center" name="move_line_lot_qty_done">
+            <span t-field="move_line.import_quant"/>
+            <span t-field="move_line.import_uom"/>
+        </td>
+
+        </xpath>
+            </template>
+
+
+    <template id="droga_deliv_slip_inherit_uom_backorder" inherit_id="stock.report_delivery_document">
+            <xpath expr="//td[@class='text-center w-auto']" position="replace">
+            <td class="text-center" name="move_line_lot_qty_done">
+            <span t-field="bo_line.import_quant"/>
+                                            <span t-field="bo_line.import_uom"/>
+        </td>
+
+        </xpath>
+            </template>
+
+
 </odoo>
