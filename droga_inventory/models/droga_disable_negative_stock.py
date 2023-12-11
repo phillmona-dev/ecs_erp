@@ -9,7 +9,7 @@ class StockQuant(models.Model):
     has_read_access = fields.Boolean(related='location_id.has_read_access')
     import_quant=fields.Float('On Hand Quantity',compute='_get_on_hand',store=True)
     import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
-    @api.depends('quantity')
+    @api.depends('quantity','product_id.import_uom_new')
     def _get_on_hand(self):
         for rec in self:
             rec.import_quant=rec.quantity/(rec.product_id.uom_id.factor/rec.product_id.import_uom_new.factor)

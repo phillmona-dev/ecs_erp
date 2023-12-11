@@ -54,7 +54,7 @@ class droga_stock_move_line_extension(models.Model):
         for rec in self:
             rec.qty_done = rec.import_quant * (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
 
-    @api.depends('qty_done','import_uom','reserved_uom_qty')
+    @api.depends('qty_done','product_id.import_uom_new','reserved_uom_qty')
     def _get_on_hand(self):
         for rec in self:
             rec.import_quant = rec.qty_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
@@ -416,7 +416,7 @@ class droga_stock_move_extension(models.Model):
     reserved_availability_done=fields.Float('Reserved', compute='_get_on_hand')
     import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
 
-    @api.depends('product_uom_qty','import_uom')
+    @api.depends('product_uom_qty','product_id.import_uom_new')
     def _get_on_hand(self):
         for rec in self:
             rec.import_quant = rec.product_uom_qty / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)

@@ -66,6 +66,19 @@ class cust_sales_credit_limit(models.Model):
     contract_num = fields.Char('Contract number')
     invoice_printed = fields.Char(default="No", string="Invoice printed", store=True)
 
+    INVOICE_STATUS = [
+        ('upselling', 'Upselling Opportunity'),
+        ('invoiced', 'Fully Invoiced'),
+        ('to invoice', 'To Invoice'),
+        ('no', 'Nothing to Invoice')
+    ]
+    
+    invoice_status = fields.Selection(
+        selection=INVOICE_STATUS,tracking=True,
+        string="Invoice Status",
+        compute='_compute_invoice_status',
+        store=True)
+
     def _cust_type_inv(self):
         pass
 
