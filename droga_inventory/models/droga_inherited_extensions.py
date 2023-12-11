@@ -48,15 +48,15 @@ class droga_stock_move_line_extension(models.Model):
     import_uom=fields.Many2one('uom.uom',related='product_id.import_uom_new')
 
     reserved_uom_qty_done = fields.Float('Reserved', compute='_get_on_hand')
-    pharmacy_unit = fields.Char('Pharmacy unit', default=False, compute='_get_pharma_unit',store=True)
+    pharmacy_unit = fields.Integer('Pharmacy unit', default=0, compute='_get_pharma_unit',store=True)
 
     @api.depends('move_id.pharmacy_unit')
     def _get_pharma_unit(self):
         for rec in self:
             if rec.move_id.pharmacy_unit:
-                rec.pharmacy_unit = 'True'
+                rec.pharmacy_unit = 1
             else:
-                rec.pharmacy_unit = 'False'
+                rec.pharmacy_unit = 0
     @api.onchange('import_quant')
     def _prod_qty_change(self):
         for rec in self:
@@ -487,15 +487,15 @@ class droga_stock_move_extension(models.Model):
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
-    pharmacy_unit = fields.Char('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
+    pharmacy_unit = fields.Integer('Pharmacy unit', default=0,compute='_get_pharma_unit',store=True)
 
     @api.depends('picking_id.pharmacy_unit')
     def _get_pharma_unit(self):
         for rec in self:
             if rec.picking_id.pharmacy_unit:
-                rec.pharmacy_unit='True'
+                rec.pharmacy_unit=1
             else:
-                rec.pharmacy_unit = 'False'
+                rec.pharmacy_unit = 0
 
     @api.depends('location_id', 'location_dest_id')
     def _get_source_type(self):
