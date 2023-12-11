@@ -84,6 +84,13 @@
                             sequence="2"/>
 
                     <menuitem
+                            id="droga_pharma_stock_card"
+                            name="Stock card"
+                            action="droga_pharma_stock_card_inq_action"
+                            groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+                            sequence="4"/>
+
+                    <menuitem
                             id="droga_pharma_stock_all_transactions_menu"
                             name="Stock transactions - All"
                             action="droga_pharma_inv_transaction_all_warehouse_action"
@@ -122,7 +129,7 @@
                 <menuitem
                         id="droga_inventory_reports_pharma_excel"
                         name="Stock card - Excel"
-                        action="droga_inventory.droga_inventory_reports_excel_action"
+                        action="droga_pharma.droga_pharma_reports_excel_action"
                         sequence="10000"/>
 
             </menuitem>
@@ -214,12 +221,18 @@
                         id="droga_pharma_intervention_menu"
                         name="Intervention"
                         action="droga_pharma_intervention_action"
-                        sequence="14"/>
+                        sequence="15"/>
                 <menuitem
                         id="droga_pharma_area_coun_menu"
                         name="Area of counsel"
                         action="droga_pharma_area_coun_action"
-                        sequence="14"/>
+                        sequence="16"/>
+                <menuitem
+                        id="droga_pharma_point_types_menu"
+                        name="Point types"
+                        action="droga_pharma_point_types_action"
+                        groups="droga_pharma.pharma_director"
+                        sequence="17"/>
             </menuitem>
         </menuitem>
     </menuitem>

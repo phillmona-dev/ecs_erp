@@ -159,8 +159,8 @@ class droga_stock_transfer_custom(models.Model):
                         'picking_type_id': pick_type_id,
                         'name': picking_id.name,
                         'product_id': rec['product_id'].id,
-                        'product_uom': rec['product_uom'].id,
-                        'product_uom_qty': rec['product_uom_qty'],
+                        'product_uom': rec["product_id"].uom_id.id,
+                        'product_uom_qty': rec['product_uom_qty']*(rec["product_id"].uom_id.factor/rec["product_uom"].factor),
                         'location_id': def_location_id,
                         'location_dest_id': self.location_dest_id.id,
                         #'state': 'waiting',
@@ -247,12 +247,12 @@ class droga_stock_transfer_custom_detail(models.Model):
     @api.depends('product_id')
     def get_uom(self):
         for rec in self:
-            rec.product_uom = rec.product_id.uom_id
+            rec.product_uom = rec.product_id.import_uom_new
 
     def set_uom(self):
         pass
 
     # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
-    import_uom = fields.Many2one(related='product_id.uom_id', store=True)
-    pharma_uom = fields.Many2one(related='product_id.pharma_uom', store=True)
+    import_uom = fields.Many2one(related='product_id.import_uom_new', store=True)
+    pharma_uom = fields.Many2one(related='product_id.uom_id', store=True)

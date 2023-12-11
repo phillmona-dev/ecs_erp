@@ -15,17 +15,7 @@
         </record>
     </data>
     <data>
-        <!-- Tree View -->
-        <record id="view_agency_agreement_tree" model="ir.ui.view">
-            <field name="name">agency.agreement.tree</field>
-            <field name="model">droga.reg.agency.agreement.header</field>
-            <field name="arch" type="xml">
-                <tree>
-                    <field name="details"/>
 
-                </tree>
-            </field>
-        </record>
 
         <!-- Form View -->
         <record id="view_agency_agreement_form" model="ir.ui.view">
@@ -36,15 +26,29 @@
                     <sheet>
                         <h2>Agency Agreement Form</h2>
                         <group>
-                            <field name="name"/>
-                            <field name="phone"/>
-                            <field name="applicant_type"/>
-                            <field name="start_date"/>
-                            <field name="end_date"/>
-                            <field name="extension_date"/>
-                            <field name="status"/>
+                            <group>
+                                 <field name="name"/>
+                                <field name="applicant_type"/>
+                                  <field name="start_date"/>
+                                 <field name="extension_date"/>
+                            </group>
+                            <group>
+                                <field name="phone"/>
+                                 <field name="status"/>
+                                <field name="end_date"/>
+                            </group>
 
                         </group>
+                         <h2>
+                            Follow up
+                        </h2>
+                        <hr/>
+                        <field name="follow_up">
+                            <tree editable="top">
+                               <field name="follow_up_date"/>
+                                <field name="follow_up_status"/>
+                            </tree>
+                        </field>
                     </sheet>
 
                     <div class="oe_chatter">

@@ -33,7 +33,7 @@ class droga_pharma_customer_employees(models.Model):
         string='Gender',tracking=True)
     job_position = fields.Char(string='Job position')
     company_limit= fields.Float(string='Credit limit', tracking=True,related='parent_customer.cust_credit_limit_pharma')
-    employee_credit_limit=fields.Float('Credit limit',default=0)
+    employee_credit_limit=fields.Float('Credit limit',default=0,tracking=True)
     cust_id=fields.Char('Employee ID')
     profession=fields.Selection(
         [('hp', 'Health professional'),('other', 'Other')],

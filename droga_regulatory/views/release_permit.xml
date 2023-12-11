@@ -3,10 +3,16 @@
     <data>
         <!-- Form View -->
         <record id="view_pre_import_permit_generated_form" model="ir.ui.view">
-            <field name="name">pre.import.permit.generated.form</field>
+            <field name="name">Release Permit</field>
             <field name="model">droga.reg.pre.import.permit.generated</field>
             <field name="arch" type="xml">
                 <form>
+                    <header>
+                        <field name="ra_status" invisible="1"></field>
+                        <button name="activty_for_ra" type="object" string="Submit to RA"
+                                class="btn-primary"
+                                attrs="{'invisible': [('ra_status', '=', 'ra')]}"/>
+                    </header>
                     <sheet>
                         <h2>Release Permit </h2>
                         <group>
@@ -64,7 +70,7 @@
 
         <!-- Action -->
         <record id="action_pre_import_permit_generated" model="ir.actions.act_window">
-            <field name="name">Pre Import Permits Generated</field>
+            <field name="name">Release Permits</field>
             <field name="res_model">droga.reg.pre.import.permit.generated</field>
             <field name="view_mode">tree,form</field>
         </record>

@@ -46,7 +46,7 @@
                             id="cancel_request1" data-hotkey="v"
                             confirm="Are you sure you want to cancel the request? once it cancelled you can't modify the form"
                             class="oe_highlight btn-danger"
-                            attrs="{'invisible':['|',('requester','!=',False),('state','not in',('Draft','Authorized'))]}"/>
+                            attrs="{'invisible':[('state','not in',('Draft','Authorized'))]}"/>
 
                     <button name="reject_box" type="object"
                             string="Reject" id="reject_request1"
@@ -103,9 +103,11 @@
                         <group>
                             <field name="approve_dept_manger"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled'))]}"/>
-                            <field name="purpose" attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled','Approved'))]}"/>
+                            <field name="purpose"
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled','Approved'))]}"/>
                             <field name="company_id" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled','Approved'))]}" invisible="0"/>
+                                   attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled','Approved'))]}"
+                                   invisible="0"/>
                             <field name="currency_id" options="{'no_create':True,'no_open':True}"
                                    attrs="{'readonly': [('state', 'in', ('Approved', 'Cancelled','Approved'))]}"/>
                         </group>
@@ -125,9 +127,9 @@
                         </group>
                         <group string="Budget Category">
                             <field name="budgetary_position" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
                             <field name="budget_account" options="{'no_create':True,'no_open':True}"
-                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled','Approved'))]}"/>
+                                   attrs="{'readonly': [('state', 'in', ('Authorized', 'Cancelled'))]}"/>
                             <field name="budget_rem_balance"/>
                         </group>
                     </group>

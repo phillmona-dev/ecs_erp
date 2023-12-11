@@ -9,6 +9,17 @@
                 <field name='has_read_access' invisible="1"></field>
                 <field name='has_access' invisible="1"></field>
             </xpath>
+            <xpath expr="//tree/field[@name='inventory_quantity_auto_apply']" position="replace">
+                <field name='import_quant'></field>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='product_uom_id']" position="replace">
+                <field name='import_uom'></field>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='reserved_quantity']" position="attributes">
+                <attribute name='invisible'>1</attribute>
+            </xpath>
 
         </field>
     </record>

@@ -3,13 +3,22 @@
     <data>
         <!-- Form View -->
         <record id="view_pre_import_permit_form" model="ir.ui.view">
-            <field name="name">pre.import.permit.form</field>
+            <field name="name">Pre-Import Permit</field>
             <field name="model">droga.reg.pre.import.permit.header</field>
             <field name="arch" type="xml">
                 <form>
+                    <header>
+                        <field name="ra_status" invisible="1"></field>
+                        <button name="activty_for_ra" type="object" string="Submit to RA"
+                                class="btn-primary"
+                                attrs="{'invisible': [('ra_status', '=', 'ra')]}"/>
+                    </header>
                     <sheet>
                         <h2>Pre-Import Permit</h2>
                         <group>
+                            <group>
+                                <field name="preimport_permit_no"/>
+                            </group>
 
                             <group>
                                 <field name="manufacturer"/>
@@ -24,7 +33,6 @@
                                 <field name="no_days"/>
 
                             </group>
-
 
 
                         </group>
@@ -49,7 +57,7 @@
                 <tree>
                     <field name="manufacturer"/>
                     <field name="proforma_invoice_no"/>
-                     <field name="app_no"/>
+                    <field name="app_no"/>
                     <field name="invoice_amount"/>
                     <field name="date_received"/>
                     <field name="date_generated"/>

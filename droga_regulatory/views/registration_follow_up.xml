@@ -12,10 +12,23 @@
                         attrs="{'invisible': [('is_registered', '=', True)]}"/>
                     </header>
                     <sheet>
+                         <h4>Registered Variants</h4>
                         <group>
+                           <group>
+                                <field name="is_a_variant_of" widget="many2many_tags"/>
+                           </group>
+                            <group>
+                                 <field name="has_variants"  widget="many2many_tags"/>
+                            </group>
+
+                        </group>
+                        <br></br><hr/><hr/>
+
+                        <group>
+
                             <group>
                                 <field name="company_name"/>
-                                <field name="products_to_be_registered" widget="many2many_tags"/>
+                                <field name="products"/>
                                 <field name="agency_agreement_linkage_date"/>
                                 <field name="registration_type"/>
                                 <field name="fee_attached"/>
@@ -89,9 +102,8 @@
 
                                 </group>
                             </page>
+
                         </notebook>
-
-
                     </sheet>
 
                     <div class="oe_chatter">
@@ -119,6 +131,44 @@
             </field>
         </record>
 
+        <record id="droga_regulatory_company_registration" model="ir.ui.view">
+            <field name="name">company.registration.kanban.view</field>
+            <field name="model">registration.model</field>
+            <field name="arch" type="xml">
+
+                <kanban class="o_kanban_mobile" sample="1">
+                    <field name="company_name"/>
+                    <field name="products"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                                <div class="o_kanban_image">
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                        Company Name:
+                                    </strong>
+                                    <field name="company_name"/>
+                                    <br/>
+                                    <hr/>
+
+                                    <strong class="o_kanban_record_title">
+                                        These Products have been registered:
+                                    </strong>
+                                    <field name="products"/>
+                                    <br/>
+                                    <hr/>
+
+                                    <button name="set_activity_done" string="Mark as read" type="object" class="oe_highlight"/>
+
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+
+            </field>
+        </record>
         <!-- Action -->
         <record id="action_registration_follow_up" model="ir.actions.act_window">
             <field name="name">Registrations</field>
@@ -142,7 +192,7 @@
                         </group>
                         <group>
                             <field name="product_type"/>
-                            <field name="product_name" widget="many2many_tags"/>
+                            <field name="product_name"/>
                             <field name="validity_date"/>
                             <field name="product_type"/>
                             <field name="pack_size"/>
@@ -162,6 +212,16 @@
             </field>
         </record>
 
+        <record id="view_registration_model_duplicate_tree" model="ir.ui.view">
+            <field name="name">registration.model.duplicate.tree</field>
+            <field name="model">registration.model.duplicate</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="company_name"/>
+                    <field name="products_to_be_registered"/>
+                </tree>
+            </field>
+        </record>
 
     </data>
 </odoo>

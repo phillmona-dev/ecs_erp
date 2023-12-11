@@ -27,6 +27,7 @@
             <tree string="Purchase Request" delete="0">
                 <field name="name"/>
                 <field name="request_by"/>
+                <field name="work_location"/>
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
@@ -37,6 +38,14 @@
                        decoration-success="state in('Ceo Approved,Procurement Manager')" widget="badge"/>
                 <field name="wf_state" decoration-warning="wf_state in('On Progress')"
                        decoration-success="wf_state in('Approved')" widget="badge"/>
+                <field name="pr_count" optional="hide"/>
+                <field name="rfq_count" optional="hide"/>
+                <field name="po_count" optional="hide"/>
+                <field name="grn_count" optional="hide"/>
+                <field name="dummy_count" optional="hide"/>
+                <field name="pr_grn_receive_status" optional="show"
+                       decoration-warning="pr_grn_receive_status=='Not Received'"
+                       decoration-success="pr_grn_receive_status=='Received'" widget="badge" string="Receive Status"/>
             </tree>
         </field>
     </record>
@@ -281,6 +290,24 @@
         </field>
     </record>
 
+    <!-- pivot view -->
+    <record id="droga_purchase_request_local_view_pivot" model="ir.ui.view">
+        <field name="name">Purchase Request</field>
+        <field name="model">droga.purchase.request.local</field>
+        <field name="arch" type="xml">
+            <pivot string="Purchase Request" display_quantity="1" sample="1">
+
+                <field name="request_date" type="row"/>
+
+                <field name="pr_count" type="measure"/>
+                <field name="rfq_count" type="measure"/>
+                <field name="po_count" type="measure"/>
+                <field name="grn_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+
     <!-- search view -->
     <record id="droga_purchase_request_local_view_search" model="ir.ui.view">
         <field name="name">droga.purchase.request.view.search</field>
@@ -345,14 +372,15 @@
         </field>
     </record>
 
-     <record id="droga_purchase_request_pharmacy_action" model="ir.actions.act_window">
+    <record id="droga_purchase_request_pharmacy_action" model="ir.actions.act_window">
         <field name="name">Purchase Request</field>
         <field name="res_model">droga.purchase.request.local</field>
-        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_mode">tree,form,kanban,pivot</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purchase_request_local_view_tree')}),
          (0, 0, {'view_mode': 'form', 'view_id': ref('droga_purchase_request_local_view_form')}),
-         (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_purchase_request_local_view_kanban')})]"/>
+         (0, 0, {'view_mode': 'kanban', 'view_id': ref('droga_purchase_request_local_view_kanban')}),
+         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_request_local_view_pivot')})]"/>
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="domain">[('request_type', '=', 'Pharmacy')]</field>

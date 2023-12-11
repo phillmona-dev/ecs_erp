@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <data>
+        <record id="sequence_bdr_requests" model="ir.sequence">
+            <field name="name">BDR requests Sequence</field>
+            <field name="code">droga.reg.master.custom.sequence</field>
+            <field name="prefix">REQ_D_</field>
+        </record>
         <!-- Form View -->
         <record id="view_droga_bdr_requests_header_form" model="ir.ui.view">
             <field name="name">droga.bdr.requests.header.form</field>

@@ -52,6 +52,7 @@
                     <sheet>
                          <group>
                         <group>
+                            <field name="mark_an_number"/>
                             <field name="local_agent"/>
                         </group>
                         <group>
@@ -62,14 +63,13 @@
                          <h2>Sales recorded by Agent</h2>
                         <hr/>
                         <group>
-
-
                             <h6>Manufacturer and Product</h6>
                             <group>
 
                                 <field name="manufacturer"/>
                                 <field name="generic_name"/>
                                 <field name="brand_name"/>
+                                <field name="country"/>
                                 <field name="application_number"/>
                                 <br/>
                                 <br/>
@@ -103,7 +103,7 @@
 
                             <h6>Product Category</h6>
                             <group>
-
+                                <field name="dosage_form"/>
                                 <field name="product_type"/>
                                 <field name="pharma_category"/>
                             </group>

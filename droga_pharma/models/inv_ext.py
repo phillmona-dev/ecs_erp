@@ -99,8 +99,8 @@ class droga_pharma_lot_extension(models.Model):
 
 class droga_purchase_uom_extension(models.Model):
     _inherit='purchase.order.line'
-    import_uom = fields.Many2one(related='product_id.uom_id', store=True)
-    pharma_uom = fields.Many2one(related='product_id.pharma_uom', store=True)
+    import_uom = fields.Many2one(related='product_id.import_uom_new', store=True)
+    pharma_uom = fields.Many2one(related='product_id.uom_id', store=True)
     request_type=fields.Selection(related='order_id.request_type')
 
     itemcode = fields.Char(related='product_id.default_code', store=True, string="Product")
