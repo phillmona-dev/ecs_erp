@@ -537,7 +537,7 @@ class purhcase_request_line(models.Model):
     @api.onchange('product_id')
     def set_unit(self):
         for record in self:
-            record.product_uom = record.product_id.uom_id
+            record.product_uom = record.product_id.import_uom_new
             record.is_core_product = record.product_id.is_core_product
             record.current_stock_balance = record.product_id.free_qty
 

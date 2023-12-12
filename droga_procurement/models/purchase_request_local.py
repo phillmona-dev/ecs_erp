@@ -402,7 +402,7 @@ class purchase_request_line_local(models.Model):
     @api.onchange('product_id')
     def set_unit_product(self):
         for record in self:
-            record.product_uom = record.product_id.uom_id
+            record.product_uom = record.product_id.import_uom_new
             # get product type
 
             product_type = record.purchase_request_id.purchase_type
