@@ -102,7 +102,7 @@ class cust_sales_credit_limit(models.Model):
         for rec in self:
             if rec.partner_id.id in [15390, 15488] or rec.partner_id.x_exclude_maturity_for_reconciliation:
                 matured_invoices = []
-            elif rec.partner_id.vat != '0000000000':
+            elif rec.partner_id.vat != '0000000000' and not rec.partner_id.mature_individually:
                 matured_invoices = self.env['account.move'].search(
                     [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
                      ('company_id', '=', self.env.company.id),
@@ -137,6 +137,14 @@ class cust_sales_credit_limit(models.Model):
     def create(self, vals):
         message = ''
         result = super(cust_sales_credit_limit, self).create(vals)
+
+        order_lines_negative = result.order_line.filtered(
+            lambda x: x.is_prod_available == 'False')
+        if (len(order_lines_negative) > 0):
+            products = ''
+            for lin in order_lines_negative:
+                products += lin.product_template_id.default_code + ', '
+            message = message + ('\n' if message else '') + "Product quantity is out of stock for " + products
 
         for so in result:
 

@@ -54,8 +54,42 @@ export class CheckinController extends FormController {
       } else {
         reject('Geolocation is not supported');
       }
+       };
+
+
+   onClickTestJavascriptout(){
+
+
+        const options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+        };
+
+        if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+
+          var latitude = position.coords.latitude;
+          var longitude = position.coords.longitude;
+
+          var location = latitude + ', ' + longitude;
+          var res_id=this.model.root.data.id;
+          rpc.query({
+                    model: 'crm.lead',
+                    method: 'update_check_out_locations',
+                    args: [0,res_id,latitude,longitude]
+                });
+          window.location.reload();
+        },
+        function(error) {console.log(error);  },
+        options);
+
+      } else {
+        reject('Geolocation is not supported');
+      }
        }
-   }
+
+};
 
 CheckinController.template="check_in.JsFormView";
 
@@ -82,4 +116,6 @@ registry.category('views').add('check_in_form_view', {
     Controller: CheckinController,
     Renderer: CheckinRenderer,
 });
+
+
 

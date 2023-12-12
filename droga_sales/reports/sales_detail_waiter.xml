@@ -11,6 +11,7 @@
                 <field name="invoice_no" optional="show"/>
                 <field name="itemcode" string="ItemCode" optional="show"/>
                 <field name="itemdesc" string="ItemDescription" optional="show"/>
+                <field name="manufacturing" string="Manufacturer" optional="show"/>
                 <field name="crm_group1" string="CRMCategory" optional="show"/>
                 <field name="itemcateg" string="INVCategory" optional="show"/>
                 <field name="cash_or_credit" string="PaymentType" optional="show"/>

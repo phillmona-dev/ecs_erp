@@ -851,7 +851,7 @@ class sale_order_ext(models.Model):
                     'droga_sales.sales_wholesale_approve_admin'):
                     modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request', 'memb')]]
                 else:
-                    modifiers['readonly'] = [['state', 'not in', ('draft', 'memb')]]
+                    modifiers['readonly'] = [['state', 'not in', ('draft', 'memb','req')]]
 
                 node.set('modifiers', simplejson.dumps(modifiers))
             res['arch'] = etree.tostring(doc)

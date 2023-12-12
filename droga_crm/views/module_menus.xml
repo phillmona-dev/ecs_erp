@@ -117,7 +117,10 @@
     <!-- Customer action add domain to filter by region -->
     <record id="base.action_partner_form" model="ir.actions.act_window">
         <field name="domain">[('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]</field>
-        <field name="view_mode">kanban,tree,form,activity,map</field>
+        <field name="view_mode">tree,kanban,form,activity,map</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('base.view_partner_tree')}),
+        (0, 0, {'view_mode': 'kanban', 'view_id': ref('base.res_partner_kanban_view')})]"></field>
     </record>
 
     <!-- Hide default reporting menu -->

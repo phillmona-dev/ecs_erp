@@ -143,6 +143,8 @@
                            string="City/sub-city team"></field>
                     <field name="area" options="{'no_create':True,'no_open':True}" string="Area"
                            domain="([('parent_id','=',city_name),('status','=','Active')])"></field>
+
+                    <field name="mature_individually" groups="droga_crm.tin_admin"></field>
                     <field name="x_exclude_maturity_for_reconciliation" groups="droga_crm.tin_admin"></field>
                 </group>
 
@@ -208,4 +210,15 @@
             </xpath>
         </field>
     </record>
+
+    <record id="res_partner_view_tree_add_if_loc_set" model="ir.ui.view">
+            <field name="name">res.partner.view.tree.inherit.loc.set</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="loc_set" optional="show"/>
+                </xpath>
+            </field>
+        </record>
 </odoo>

@@ -49,6 +49,7 @@ class sales_report_det_fields(models.Model):
 
     itemcode = fields.Char(related='product_id.default_code',store=True)
     itemdesc = fields.Char(related='product_id.name',store=True)
+    manufacturing=fields.Char(related='product_id.manufacturing',store=True)
     itemcateg = fields.Many2one('product.category', related='product_id.categ_id')
 
     invoiced_amt = fields.Float('Invoiced Amount', compute='_get_invoiced_amount', store=True)
