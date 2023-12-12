@@ -94,7 +94,6 @@ class sale_order_line(models.Model):
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
-
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
         selfsud = self.sudo()
@@ -268,7 +267,7 @@ class sale_order_line(models.Model):
                 elif not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
                     line.wareh = line.product_id.default_warehouse
 
-                if not line.product_uom:
+                if not line.product_uom or line.product_uom==line.product_id.uom_id:
                     line.product_uom = line.product_id.import_uom_new
                 # Get discounts/additional payments per type
                 type_rates = self.env['droga.price.discount.per.type'].search(

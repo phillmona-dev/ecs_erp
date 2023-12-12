@@ -117,7 +117,7 @@ class cust_contact_extension(models.Model):
             # if len(vals['vat']) == 0:
             # raise UserError("Please enter Tin no. It is mandatory")
             if vals['supplier_rank'] == 0 and vals['vat']:
-                if (len(vals['vat']) < 10 or len(vals['vat']) > 14):
+                if (len(vals['vat']) < 10 or len(vals['vat']) > 14) and vals['company_id']==1:
                     raise UserError("Length of Tin no should either be 10 or 13, please amend accordingly.")
         return super(cust_contact_extension, self).create(vals)
 
