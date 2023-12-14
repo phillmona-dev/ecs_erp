@@ -138,14 +138,6 @@ class cust_sales_credit_limit(models.Model):
         message = ''
         result = super(cust_sales_credit_limit, self).create(vals)
 
-        order_lines_negative = result.order_line.filtered(
-            lambda x: x.is_prod_available == 'False')
-        if (len(order_lines_negative) > 0):
-            products = ''
-            for lin in order_lines_negative:
-                products += lin.product_template_id.default_code + ', '
-            message = message + ('\n' if message else '') + "Product quantity is out of stock for " + products
-
         for so in result:
 
             # if not so.order_from:
