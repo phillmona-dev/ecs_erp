@@ -259,6 +259,7 @@ class sale_order_line(models.Model):
 
             for line in self:
 
+                #Assign warehouse
                 if self.order_id.order_from:
                     if self.order_id.order_from.startswith('PH'):
                         line.wareh = line.order_id.wareh
@@ -328,6 +329,7 @@ class sale_order_line(models.Model):
             core_sum = self.order_id.core_sum
             non_core_sum = self.order_id.non_core_sum
 
+            #Payment type discount rules. This is here because it's calculated after default selling price has been set
             amount_rates = self.env['droga.price.discount.per.amount'].search(
                 [('payment_term', '=', self.order_id['payment_term_id'].id), ('status', '=', 'Active'),
                  ('used_under', 'in', used_under)])
@@ -344,17 +346,13 @@ class sale_order_line(models.Model):
                     'to_amt']:
                     all_rate = all_rate + rate['percent']
 
-            for lin in self.order_id.order_line.filtered(
-                    lambda x: x.product_id.is_core_product):
-                if core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
-                    lin.price_unit = lin.price_unit * (1 + ((core_rate + all_rate) / 100))
-                lin.std_unit_price = lin.std_unit_price * (1 + ((core_rate + all_rate) / 100))
+            for lin in self.order_id.order_line:
+                if not self.order_id.tender_origin_form_tender and not self.order_id.manual_price:
+                    lin.price_unit = lin.price_unit_before_discount * (1 + ((core_rate + all_rate) / 100)) if lin.product_id.is_core_product else lin.price_unit_before_discount * (1 + ((non_core_rate + all_rate) / 100))
+                lin.std_unit_price = lin.price_unit_before_discount * (1 + (
+                                (core_rate + all_rate) / 100)) if lin.product_id.is_core_product else lin.price_unit_before_discount * (
+                                1 + ((non_core_rate + all_rate) / 100))
 
-            for lin in self.order_id.order_line.filtered(
-                    lambda x: not x.product_id.is_core_product):
-                if non_core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
-                    lin.price_unit = lin.price_unit * (1 + ((non_core_rate + all_rate) / 100))
-                lin.std_unit_price = lin.std_unit_price * (1 + ((non_core_rate + all_rate) / 100))
 
             # self.order_id._get_sub_totals()
             super(sale_order_line, self)._compute_amount()

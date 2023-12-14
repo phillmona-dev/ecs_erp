@@ -69,6 +69,8 @@
                    position="before">
                 <field name="std_unit_price"
                        attrs="{'column_invisible': [('parent.manual_price', '=', False)]}"></field>
+                <field name="price_unit_before_discount"
+                       attrs="{'column_invisible': [('parent.manual_price', '!=', False)]}"></field>
             </xpath>
         </field>
     </record>
