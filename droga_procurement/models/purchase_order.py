@@ -240,10 +240,10 @@ class purchase_order(models.Model):
                 record.payment_status = 'Paid'
 
                 # calclualte payment lead time
-                if record.shipment_doc_original_recived_by_applicant_bank and record.supplier_payment_date:
+                if record.shipment_doc_collected_from_applicant_bank and record.supplier_payment_date:
                     # Convert strings to datetime objects
                     date_format = '%Y-%m-%d'
-                    date1 = record.shipment_doc_original_recived_by_applicant_bank
+                    date1 = record.shipment_doc_collected_from_applicant_bank
                     date2 = record.supplier_payment_date
 
                     # Calculate the difference between the two dates
