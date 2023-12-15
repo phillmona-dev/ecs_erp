@@ -88,3 +88,9 @@ class droga_product_template(models.Model):
         #res.crm_group=res.categ_id.crm_group
         res.crm_group = res.categ_id.crm_group
         return res
+
+class StockQuantityHistoryDisable(models.TransientModel):
+    _inherit = 'stock.quantity.history'
+
+    def open_at_date(self):
+        pass
