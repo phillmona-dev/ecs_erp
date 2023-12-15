@@ -884,6 +884,15 @@ class droga_stock_product_extension(models.Model):
         digits='Product Price',tracking=True,
         help="Price at which the product is sold to customers.",
     )
+    def _compute_show_qty_status_button(self):
+        for template in self:
+            template.show_on_hand_qty_status_button = False
+            template.show_forecasted_qty_status_button = template.type == 'product'
+
+    qty_available_import=fields.Float('Quantity On Hand', compute='_compute_quantities_import')
+    def _compute_quantities_import(self):
+        for rec in self:
+            rec.qty_available_import=rec.qty_available*(rec.import_uom_new.factor / rec.uom_id.factor)
     categ_id = fields.Many2one(
         'product.category', 'Product Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
