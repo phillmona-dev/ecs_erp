@@ -537,6 +537,9 @@ class partial_shipment(models.Model):
     custom_duty_tax_additional_amount = fields.Float(
         "Additional Custom Duty Tax Amount")
 
+    custom_duty_tax_additional_actual_paid = fields.Float(
+        "Additional Custom Duty Tax Actual Paid Amount")
+
     custom_duty_withholding_tax = fields.Float("Custom Withholding Tax")
 
     storage_cost = fields.Float("Storage Cost")

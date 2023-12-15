@@ -345,6 +345,8 @@
                             <field name="custom_tax_acceptance"/>
                             <field name="custom_duty_tax_additional_amount"
                                    attrs="{'invisible': [('custom_tax_acceptance', '==', True)]}"/>
+                            <field name="custom_duty_tax_additional_amount"
+                                   attrs="{'invisible': [('custom_duty_tax_additional_actual_paid', '==', True)]}"/>
 
 
                         </group>
