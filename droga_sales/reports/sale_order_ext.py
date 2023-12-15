@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.http import request
 from odoo.tools import drop_view_if_exists
 
 
@@ -45,6 +46,8 @@ class sales_report_det_fields(models.Model):
                 rec.cash_or_credit = 'Cash'
 
     crm_group1 = fields.Many2one('droga.crm.settings.prod_group', related='product_id.crm_group', store=True)
+    has_group_access=fields.Boolean('Has CRM product group access',related='product_id.product_tmpl_id.crm_group.has_group_access')
+
     is_core = fields.Boolean(related='product_id.is_core_product', store=True)
 
     itemcode = fields.Char(related='product_id.default_code',store=True)

@@ -7,27 +7,26 @@
             <tree default_order='date_order_det,order_partner_id,order_id' string="" create="false" delete="false">
                 <field name="sales_initiator_det" string="WaiterName" optional="show"/>
                 <field name="sales_dept" string="SalesMemo" optional="show"/>
-                <field name="order_id" string="InvoiceNumber" optional="show"/>
-                <field name="invoice_no" optional="show"/>
+                <field name="order_id" string="InvoiceNumber" optional="hide"/>
+                <field name="invoice_no" optional="hide"/>
                 <field name="itemcode" string="ItemCode" optional="show"/>
                 <field name="itemdesc" string="ItemDescription" optional="show"/>
+                <field name="qty_invoiced" string="Qty" optional="show"/>
                 <field name="manufacturing" string="Manufacturer" optional="show"/>
                 <field name="crm_group1" string="CRMCategory" optional="show"/>
                 <field name="itemcateg" string="INVCategory" optional="show"/>
-                <field name="cash_or_credit" string="PaymentType" optional="show"/>
+                <field name="cash_or_credit" string="PaymentType" optional="hide"/>
                 <field name="order_partner_id" string="BuyerName" optional="show"/>
                 <field name="cust_type_ext_det" optional="show"/>
-                <field name="cust_location" string="City" optional="show"/>
-                <field name="qty_invoiced" string="Qty" optional="show"/>
+                <field name="order_from_det" optional="show"/>
+                <field name="cust_location" string="City" optional="hide"/>
                 <field name="invoiced_amt" string="Grand Total" optional="show"/>
-                <field name="qty_delivered" optional="show"/>
+                <field name="qty_delivered" optional="hide"/>
                 <field name="invoice_date" string="Invoice Date" optional="show"/>
 
                 <field name="product_uom" string="UOM" optional="hide"/>
-                <field name="crm_group1" optional="hide"/>
                 <field name="is_core" optional="hide"/>
                 <field name="date_order_det" string="Date" optional="hide"/>
-                <field name="order_from_det" optional="hide"/>
                 <field name="payment_term_det" optional="hide"/>
 
                 <field name="product_uom_qty" string="Qty ordered" optional="hide"/>
@@ -109,7 +108,7 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_waiter_view_tree')})]"/>
         <field name="search_view_id" ref="droga_sales_waiter_search_tree"></field>
-        <field name="domain">[('state', '!=', 'cancel'),('has_cust_access','=',True),('order_from_det', 'in', ('IM-IM','IM-WS',False))]</field>
+        <field name="domain">[('state', '!=', 'cancel'),('has_group_access','=',True),('has_cust_access','=',True),('order_from_det', 'in', ('IM-IM','IM-WS',False))]</field>
         <field name="context">{'search_default_invoiced':1,'search_default_today_sales': 1}</field>
     </record>
 
