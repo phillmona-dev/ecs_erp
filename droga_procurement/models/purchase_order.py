@@ -1,5 +1,6 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from datetime import datetime
 
 
 class purchase_order(models.Model):
@@ -159,6 +160,8 @@ class purchase_order(models.Model):
 
     freight_paid_date = fields.Date("Freight Paid Date")
     container_deposit_amount = fields.Float("Container Deposit Amount")
+    container_deposit_status = fields.Selection([('Returned', 'Returned'), ('Not Returned', 'Not Returned')],
+                                                default='Not Returned')
 
     freight_settlement_advice_to_finance = fields.Date(
         "Freight Settlement Debit Advice Handed Over to Finance")
@@ -218,6 +221,40 @@ class purchase_order(models.Model):
         [("Local", "Local"), ("Foregin", "Foregin"), ("Pharmacy", "Pharmacy")], readonly=True)
     is_delivery_partial = fields.Boolean("Partial Delivery")
     lc_margins = fields.One2many("droga.purchase.lc.margin", "purchase_order_id")
+
+    payment_status = fields.Selection([('Paid', 'Paid'), ('Not Paid', 'Not Paid')], default='Not Paid',
+                                      compute="compute_payment_status")
+
+    payment_lead_time = fields.Float("Payment Lead Time", compute="compute_payment_status")
+    delinquent_status = fields.Selection([('Delinquent', 'Delinquent'), ('Non Delinquent', 'Non Delinquent')],
+                                         compute="compute_payment_status")
+
+    @api.depends("supplier_payment_date")
+    def compute_payment_status(self):
+        for record in self:
+            record.payment_status = 'Not Paid'
+            record.payment_lead_time = 0
+            record.delinquent_status = 'Non Delinquent'
+
+            if record.supplier_payment_date and record.request_type == 'Foregin':
+                record.payment_status = 'Paid'
+
+                # calclualte payment lead time
+                if record.shipment_doc_original_recived_by_applicant_bank and record.supplier_payment_date:
+                    # Convert strings to datetime objects
+                    date_format = '%Y-%m-%d'
+                    date1 = record.shipment_doc_original_recived_by_applicant_bank
+                    date2 = record.supplier_payment_date
+
+                    # Calculate the difference between the two dates
+                    time_difference = date2 - date1
+
+                    # Extract the number of days
+                    days_difference = time_difference.days
+                    record.payment_lead_time = days_difference
+
+            if record.delinquent_settlement_date:
+                record.delinquent_status = 'Delinquent'
 
     def open_lc_detail(self):
         view = self.env.ref('droga_procurement.droga_purchase_lc_view_form')
@@ -377,6 +414,24 @@ class purchase_order_line(models.Model):
 
     product_category = fields.Many2one(related='product_id.categ_id', store=True)
 
+    rfq_price_total_etb = fields.Float("RFQ Price", compute="compute_rfq_price")
+    price_variance_with_rfq = fields.Float("RFQ Price Variance", compute="compute_rfq_price")
+
+    def compute_rfq_price(self):
+        for record in self:
+            record.rfq_price_total_etb = 0
+            record.price_variance_with_rfq = 0
+
+            # get rfq price by product id and rfq id
+            rfq_id = record.order_id.rfq_id.id
+            product_id = record.product_id.id
+
+            rfq_product_line = self.env['droga.purhcase.request.rfq.line'].search([('rfq_id', '=', rfq_id), ('product_id', '=', product_id)])
+
+            for rfq in rfq_product_line:
+                record.rfq_price_total_etb = rfq.total_price
+                record.price_variance_with_rfq = record.price_total - rfq.total_price
+
     def _inverse_compute_total(self):
         pass
 
@@ -464,6 +519,8 @@ class partial_shipment(models.Model):
 
     freight_paid_date = fields.Date("Freight Paid Date")
     container_deposit_amount = fields.Float("Container Deposit Amount")
+    container_deposit_status = fields.Selection([('Returned', 'Returned'), ('Not Returned', 'Not Returned')],
+                                                default='Not Returned')
 
     freight_settlement_advice_to_finance = fields.Date(
         "Freight Settlement Debit Advice Handed Over to Finance")

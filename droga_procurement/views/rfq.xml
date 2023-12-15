@@ -404,6 +404,7 @@
                                            string="UoM"/>
                                     <field name="product_qty" width="10" string="Qty"/>
                                     <field name="unit_price_foregin" width="10"/>
+                                     <field name="unit_price_discount_foregin" width="10"/>
                                     <field name="total_price_foregin" width="10" sum="Total"/>
                                     <field name="unit_price" string="Unit Price ETB" width="10" readonly="1"/>
 
@@ -644,6 +645,24 @@
             <p class="o_view_nocontent_smiling_face">
                 Request for Quotation
             </p>
+        </field>
+    </record>
+
+    <!-- search view -->
+    <record id="droga_purhcase_request_rfq_line_foregin_view_search" model="ir.ui.view">
+        <field name="name">droga_purhcase_request_rfq_line_foregin.view.search</field>
+        <field name="model">droga.purhcase.request.rfq.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="rfq_id"/>
+                <field name="product_id"/>
+                <field name="unit_price"/>
+                <field name="total_price"/>
+                <field name="unit_price_foregin"/>
+                <field name="total_price_foregin"/>
+
+
+            </search>
         </field>
     </record>
 

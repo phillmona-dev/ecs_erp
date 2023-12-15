@@ -137,6 +137,15 @@ class purhcase_request(models.Model):
     rfq_count = fields.Integer("RFQ Count", compute='compute_rfq_count', default=0)
     rfq_status = fields.Char("RFQ Status", compute="compute_rfq_status")
 
+    dummy_count = fields.Integer(compute="count_linked_documents", string="Dummy Count")
+    pr_count1 = fields.Integer(store=True, string="PR Count")
+    rfq_count1 = fields.Integer(store=True, string="RFQ Count")
+    po_count1 = fields.Integer(store=True, string="PO Count")
+    grn_count1= fields.Integer(store=True, string="GRN Count")
+
+    pr_grn_receive_status = fields.Selection([('Received', 'Received'), ('Not Received', 'Not Received')], store=True,
+                                             default='Not Received')
+
     def compute_rfq_status(self):
         # set rfq status to not created
         for record in self:
@@ -438,6 +447,51 @@ class purhcase_request(models.Model):
             for product in products:
                 if product.company_id.id == 2:
                     rec.product_id = product
+
+    @api.depends('name')
+    def count_linked_documents(self):
+
+        pr_count = 1
+        rfq_count = 0
+        po_count = 0
+        grn_count = 0
+
+        for record in self:
+            record.dummy_count = 1
+            # get current object
+            current_object = self.env['droga.purhcase.request'].search(
+                [('id', '=', record.id), ('state', '!=', 'canceled')])
+
+            # search rfq count
+            rfq_count = self.env['droga.purhcase.request.rfq'].search_count(
+                [('purhcase_request_id', '=', record.id)])
+            # search rfq's
+            rfqs = self.env['droga.purhcase.request.rfq'].search([('purhcase_request_id', '=', record.id)])
+
+            for rfq in rfqs:
+                # search po's
+                po_count = self.env['purchase.order'].search_count(
+                    [('rfq_id', '=', rfq.id)])
+
+                # search po's then recived grn
+                pos = self.env['purchase.order'].search([('rfq_id', '=', rfq.id)])
+
+                for po in pos:
+                    # count grns
+                    grn_count = self.env['stock.picking'].search_count(
+                        [('origin', '=', po.name), ('state', '=', 'done')])
+
+                    if record.grn_count1 > 0:
+                        record.pr_grn_receive_status = 'Received'
+
+            # update counts
+            for xx in current_object:
+                xx.pr_count1 = pr_count
+                xx.rfq_count1 = rfq_count
+                xx.po_count1 = po_count
+                xx.grn_count1= grn_count
+
+
 
 
 class purhcase_request_line(models.Model):

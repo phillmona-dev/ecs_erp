@@ -304,7 +304,8 @@
                 <filter name="submitted" string="Submitted" domain="[('state', '=', 'Submitted')]"/>
                 <filter name="verified" string="Verified" domain="[('state', '=', 'Verified')]"/>
                 <filter name="budget" string="Budget Approved" domain="[('state', '=', 'Budget Approved')]"/>
-                <filter name="approved" string="Approved" domain="[('state', '=', 'Approved'),('wf_state', '=', 'Approved')]"/>
+                <filter name="approved" string="Approved"
+                        domain="[('state', '=', 'Approved'),('wf_state', '=', 'Approved')]"/>
                 <filter name="canceled" string="Canceled" domain="[('state', '=', 'Canceled')]"/>
                 <separator/>
                 <filter name="request_date" string="Request Date" date="request_date"/>
@@ -337,6 +338,14 @@
                 <field name="rfq_status" widget="badge" decoration-danger="rfq_status == 'Not Created'"
                        decoration-warning="rfq_status in('Draft','Checked','Operation Manager')"
                        decoration-success="rfq_status in('CEO Approval')"/>
+                <field name="pr_count1" optional="hide"/>
+                <field name="rfq_count1" optional="hide"/>
+                <field name="po_count1" optional="hide"/>
+                <field name="grn_count1" optional="hide"/>
+                <field name="dummy_count" optional="hide"/>
+                <field name="pr_grn_receive_status" optional="show"
+                       decoration-warning="pr_grn_receive_status=='Not Received'"
+                       decoration-success="pr_grn_receive_status=='Received'" widget="badge" string="Receive Status"/>
                 <field name="company_id"/>
             </tree>
         </field>
@@ -596,8 +605,9 @@
                                            string="UoM"/>
                                     <field name="product_qty" string="Ordered Quantity"/>
                                     <field name="current_stock_balance" string="Current Stock"
-                                           decoration-success="current_stock_balance &lt;= four_month_order_qty"
-                                           decoration-danger="current_stock_balance &gt; four_month_order_qty"
+                                           decoration-success="current_stock_balance &gt; four_month_order_qty"
+                                           decoration-warning="current_stock_balance &lt;= four_month_order_qty"
+                                           decoration-danger="current_stock_balance == 0"
                                            widget="badge"/>
                                     <field name="expected_average_mon_cons" string="Average Monthly Consumption"/>
                                     <field name="order_qty_and_current_stcok"
@@ -607,7 +617,11 @@
                                     <field name="four_month_order_qty"
                                            decoration-success="four_month_order_qty &gt;= product_qty"
                                            decoration-danger="four_month_order_qty &lt; product_qty" widget="badge"/>
-                                    <field name="six_month_order_qty" widget="badge"/>
+                                    <field name="six_month_order_qty" string="MoS"
+                                           widget="badge"
+                                           decoration-success="six_month_order_qty &gt; four_month_order_qty"
+                                           decoration-warning="six_month_order_qty &lt;= six_month_order_qty"
+                                           decoration-danger="six_month_order_qty == 0"/>
                                 </tree>
                             </field>
                         </page>
