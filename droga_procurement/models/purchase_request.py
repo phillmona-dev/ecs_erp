@@ -141,7 +141,7 @@ class purhcase_request(models.Model):
     pr_count1 = fields.Integer(store=True, string="PR Count")
     rfq_count1 = fields.Integer(store=True, string="RFQ Count")
     po_count1 = fields.Integer(store=True, string="PO Count")
-    grn_count1= fields.Integer(store=True, string="GRN Count")
+    grn_count1 = fields.Integer(store=True, string="GRN Count")
 
     pr_grn_receive_status = fields.Selection([('Received', 'Received'), ('Not Received', 'Not Received')], store=True,
                                              default='Not Received')
@@ -489,9 +489,7 @@ class purhcase_request(models.Model):
                 xx.pr_count1 = pr_count
                 xx.rfq_count1 = rfq_count
                 xx.po_count1 = po_count
-                xx.grn_count1= grn_count
-
-
+                xx.grn_count1 = grn_count
 
 
 class purhcase_request_line(models.Model):
@@ -617,7 +615,8 @@ class purhcase_request_line(models.Model):
     def _consumption_total(self):
         for record in self:
             record.four_month_order_qty = record.expected_average_mon_cons * 4
-            record.six_month_order_qty = record.expected_average_mon_cons * 6
+            # record.six_month_order_qty = record.expected_average_mon_cons * 6
+            record.six_month_order_qty = (record.product_qty + record.current_stock_balance) / record.expected_average_mon_cons
             record.order_qty_and_current_stcok = record.product_qty + \
                                                  record.current_stock_balance
         return True
