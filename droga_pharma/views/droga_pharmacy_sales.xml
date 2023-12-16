@@ -159,7 +159,7 @@
                             groups="droga_pharma.pharma_di_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                    <button type="object" string="Dispense for manual sales" name="disp_products" groups="droga_inventory.inventory_stk"
+                    <button type="object" string="Dispense for manual sales" name="disp_products_manual" groups="droga_inventory.inventory_stk"
                         attrs="{'invisible': ['|',('state','=','dispense'),'|',('invoice_status','!=','invoiced'),('state', '!=', 'sale')]}"
                         class="oe_highlight"></button>
 
