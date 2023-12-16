@@ -1059,3 +1059,34 @@ class ResUsers(models.Model):
     warehouse_ids_ph_disp=fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph_disp', 'uid', 'warehouse_id',
                                            domain="[('wh_type', '=', 'PH'),('has_dispensary_location','=',True)]",
                                            string='Pharmacy sales access')
+
+
+class prod(models.Model):
+    _inherit = 'product.product'
+    import_uom_new=fields.Many2one('uom.uom',related='product_tmpl_id.import_uom_new')
+    @api.depends('stock_move_ids.product_qty', 'stock_move_ids.state')
+    @api.depends_context(
+        'lot_id', 'owner_id', 'package_id', 'from_date', 'to_date',
+        'location', 'warehouse',
+    )
+    def _compute_quantities(self):
+        products = self.with_context(prefetch_fields=False).filtered(lambda p: p.type != 'service').with_context(
+            prefetch_fields=True)
+        res = products._compute_quantities_dict(self._context.get('lot_id'), self._context.get('owner_id'),
+                                                self._context.get('package_id'), self._context.get('from_date'),
+                                                self._context.get('to_date'))
+        for product in products:
+            rate=product.product_tmpl_id.uom_id.factor/product.product_tmpl_id.import_uom_new.factor
+            product.update(res[product.id])
+            product.qty_available=product.qty_available/rate
+            product.incoming_qty = product.incoming_qty / rate
+            product.outgoing_qty = product.outgoing_qty / rate
+            product.virtual_available = product.virtual_available / rate
+            product.free_qty = product.free_qty / rate
+        # Services need to be set with 0.0 for all quantities
+        services = self - products
+        services.qty_available = 0.0
+        services.incoming_qty = 0.0
+        services.outgoing_qty = 0.0
+        services.virtual_available = 0.0
+        services.free_qty = 0.0
