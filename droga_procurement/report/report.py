@@ -20,8 +20,8 @@ class ProcurementLeadTimeReports(models.Model):
     grn_date = fields.Date(string='GRN Date')
     grn_state = fields.Char(string='GRN State')
     lc_start_date = fields.Date(string='LC Approved Date')
-    pr_to_grn_lead_time = fields.Float("PR to GRN Lead Time")
-    pr_to_lc_lead_time=fields.Float("PR to LC Lead Time")
+    pr_to_grn_lead_time = fields.Float("PR to GRN Lead Time",group_operator="avg")
+    pr_to_lc_lead_time=fields.Float("PR to LC Lead Time",group_operator="avg")
     company_id = fields.Many2one('res.company')
 
     def init(self):
