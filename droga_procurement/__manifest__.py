@@ -47,6 +47,7 @@
         'report/rfq_local.xml',
         'report/purchase_order.xml',
         'report/estimated_landed_cost.xml',
+        'report/procurement_lead_time.xml',
         'data/mail_template.xml',
         'views/menu.xml',
         'report/purchase_items_list.xml'
