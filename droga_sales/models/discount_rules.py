@@ -122,20 +122,21 @@ class sale_order_line(models.Model):
             if rec.product_id.detailed_type == 'service':
                 rec.is_prod_available = 'True'
                 return
-            if rec.order_id.order_from:
-                if rec.order_id.order_from.startswith('PH') and rec.available_qty < rec.product_uom_qty:
-                    rec.is_prod_available = 'False'
-                    #return
-
-            prodqty=sum(self.order_id.order_line.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
+            prodqty = sum(self.order_id.order_line.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
                 'product_uom_qty'))
-            if (not rec.product_id.bought_locally) and rec.available_qty < prodqty:
-                rec.is_prod_available = 'False'
-            # This is for out of stock products that are bought locally, they'll show up with orange color
-            elif rec.product_id.bought_locally and rec.available_qty < prodqty:
-                rec.is_prod_available = 'Kinda'
+            if rec.order_id.order_from:
+                if rec.available_qty < prodqty:
+                    rec.is_prod_available = 'False'
+                elif rec.available_qty >= prodqty:
+                    rec.is_prod_available = 'True'
             else:
-                rec.is_prod_available = 'True'
+                if (not rec.product_id.bought_locally) and rec.available_qty < prodqty:
+                    rec.is_prod_available = 'False'
+                # This is for out of stock products that are bought locally, they'll show up with orange color
+                elif rec.product_id.bought_locally and rec.available_qty < prodqty:
+                    rec.is_prod_available = 'Kinda'
+                else:
+                    rec.is_prod_available = 'True'
 
     def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
         selfsud = self.sudo()
