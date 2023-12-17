@@ -621,8 +621,9 @@ class purhcase_request_line(models.Model):
         for record in self:
             record.four_month_order_qty = record.expected_average_mon_cons * 4
             # record.six_month_order_qty = record.expected_average_mon_cons * 6
-            record.six_month_order_qty = (
-                                                     record.product_qty + record.current_stock_balance) / record.expected_average_mon_cons
+            if record.expected_average_mon_cons!=0:
+                record.six_month_order_qty = (
+                                             record.product_qty + record.current_stock_balance) / record.expected_average_mon_cons
             record.order_qty_and_current_stcok = record.product_qty + \
                                                  record.current_stock_balance
         return True

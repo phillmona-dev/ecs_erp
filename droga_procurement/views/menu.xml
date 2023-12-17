@@ -89,6 +89,10 @@
                   sequence="5"
                   action="droga_purchase_request_foreign_pr_vs_rfq_view_action"
                   groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
+        <menuitem id="droga_procurement_foreign_lead_time_report_menu" name="Procurement Lead Time"
+                  sequence="6"
+                  action="droga_procurement_foreign_lead_time_report_action"
+                  groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
     </menuitem>
 
     <menuitem id="droga_request_for_quotation_report_parent" name="Request for Quotation" sequence="2"

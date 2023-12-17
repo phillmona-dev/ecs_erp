@@ -27,10 +27,16 @@ class AccountAsset(models.Model):
     def generate_asset_id(self):
 
         for record in self:
-            if record.asset_number == "":
-                asset_sub_category = self.env["account.asset.subcat"].search([('id', '=', record.asset_sub_category)])
-                if asset_sub_category.sequence:
-                    record.asset_number = asset_sub_category.sequence.next_by_id()
+            if record.asset_number == "" or not record.asset_number:
+                if record.asset_sub_category.id:
+                    asset_sub_category = self.env["account.asset.subcat"].search(
+                        [('id', '=', record.asset_sub_category.id)])
+                    if asset_sub_category.sequence:
+                        record.asset_number = asset_sub_category.sequence.next_by_id()
+                else:
+                    raise ValidationError("Please select sub category")
+            else:
+                raise ValidationError("Asset code is already generated")
 
     @api.constrains('asset_number')
     def _check_asset_no_unique(self):
