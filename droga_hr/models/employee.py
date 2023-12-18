@@ -17,6 +17,8 @@ class Employee(models.Model):
 
     bank = fields.Many2one('res.bank', string="Bank")
     bank_account = fields.Char("Bank Account")
+    certificate = fields.Selection(
+        [('Below Diploma', 'Below Diploma'), ('Diploma', 'Diploma'), ('Above Masters', 'Above Masters')])
 
     @api.model
     def create(self, vals):
