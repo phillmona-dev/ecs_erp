@@ -12,6 +12,21 @@ class picking_inherit(models.Model):
     picking_type_id_pharmacy = fields.Many2one(
         'stock.picking.type', 'Operation Type',
         required=False, check_company=True)
+    show_set_to_draft=fields.Boolean(compute='_show_set_to_draft')
+
+    def _show_set_to_draft(self):
+        for rec in self:
+            if not rec.name.startswith('MT'):
+                rec.show_set_to_draft=True
+            else:
+                rec.show_set_to_draft = False
+
+    def set_to_draft(self):
+        for rec in self:
+            rec.do_unreserve()
+            for mv in rec.move_ids:
+                mv.write({'state': 'draft'})
+            rec.write({'state': 'draft'})
 
     @api.onchange("picking_type_id_pharmacy")
     def _on_picking_type_id_pharmacy(self):

@@ -17,7 +17,21 @@
             </field>
         </record>
 
+    <record id="stock_picking_transfer_button" model="ir.ui.view">
+        <field name="name">stock.picking.inherited.button.transfer</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="priority">100000</field>
+        <field name="arch" type="xml">
 
+            <xpath expr="//form/header/button[@name='action_cancel']" position="after">
+                <field name="show_set_to_draft" invisible="1"></field>
+                <button name="set_to_draft"
+                        attrs="{'invisible': ['|',('show_set_to_draft','=',True),('state','in',('done','cancel','draft','processed'))]}"
+                        string="Set to draft" type="object"/>
+            </xpath>
+        </field>
+    </record>
     <record id="stock_picking_inter_pharmacy_transfer_add" model="ir.ui.view">
         <field name="name">stock.picking.inter.pharmacy.inherited.transfer</field>
         <field name="model">stock.picking</field>
