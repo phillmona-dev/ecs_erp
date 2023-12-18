@@ -52,3 +52,4 @@ class EmployeePublic(models.Model):
 
     bank = fields.Many2one('res.bank', string="Bank")
     bank_account = fields.Char("Bank Account")
+    department_name = fields.Char(related='department_id.name', store=True)
