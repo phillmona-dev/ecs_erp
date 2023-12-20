@@ -27,6 +27,7 @@
                         <button name="load" type="object" string="Load" class="oe_highlight"/>
                        <button name="update_trans" type="object" string="Update Transactions"/>
                        <button name="update_uom" type="object" string="Update UOM"/>
+                           <button name="round_whole_no" type="object" string="Round numbers"/>
                        </div>
                     </group>
 
