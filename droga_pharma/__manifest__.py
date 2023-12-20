@@ -60,6 +60,7 @@
         'reports/sales_detail_report.xml',
         'reports/inventory_report.xml',
         'reports/points_enquiry.xml',
+        'views/update_stock.xml',
         'views/menu.xml',
         'views/customers.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
@@ -67,7 +68,7 @@
         'views/inventory/droga_pharma_inventory_menus.xml',
         'views/inventory/inventory_delivery_slip_extension.xml',
         'views/inventory/inter_pharmacy_transfer_custom.xml',
-        'views/procurement_extension.xml'
+        'views/procurement_extension.xml',
     ],
 
     # any module necessary for this one to work correctly
