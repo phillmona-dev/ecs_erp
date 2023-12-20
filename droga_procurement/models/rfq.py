@@ -755,6 +755,7 @@ class Rfq_Detail(models.Model):
     total_price = fields.Float(
         'Total Price', compute="_compute_total", store=True, digits=(12, 4))
 
+    unit_price_discount_foregin=fields.Float('Unit Price Discount', digits=(12, 4))
     unit_price_foregin = fields.Float('Unit Price', digits=(12, 4))
     total_price_foregin = fields.Float(
         'Total Price', compute="_compute_total", store=True, digits=(12, 4))

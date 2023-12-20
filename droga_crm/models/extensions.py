@@ -41,8 +41,16 @@ class cust_contact_extension(models.Model):
     partner_latitude = fields.Float(string='Geo Latitude', digits=(10, 7), tracking=True)
     partner_longitude = fields.Float(string='Geo Longitude', digits=(10, 7), tracking=True)
     loc_history = fields.One2many('droga.crm.loc.history', 'partner')
+    loc_set=fields.Boolean('Location set',default=False,compute='_is_loc_set',store=True)
+    mature_individually = fields.Boolean('Mature individually', default=False)
 
-
+    @api.depends('partner_latitude','partner_longitude')
+    def _is_loc_set(self):
+        for rec in self:
+            if rec.partner_latitude!=0 or rec.partner_longitude!=0:
+                rec.loc_set=True
+            else:
+                rec.loc_set = False
 
     # lati_custom =fields.Float('Geo Latitude',digits=(10,7))
     # long_custom = fields.Float('Geo Longtude',digits=(10,7))
@@ -117,7 +125,7 @@ class cust_contact_extension(models.Model):
             # if len(vals['vat']) == 0:
             # raise UserError("Please enter Tin no. It is mandatory")
             if vals['supplier_rank'] == 0 and vals['vat']:
-                if (len(vals['vat']) < 10 or len(vals['vat']) > 14):
+                if (len(vals['vat']) < 10 or len(vals['vat']) > 14) and vals['company_id']==1:
                     raise UserError("Length of Tin no should either be 10 or 13, please amend accordingly.")
         return super(cust_contact_extension, self).create(vals)
 
@@ -277,7 +285,10 @@ class crm_lead_extension(models.Model):
                 res.check_in_descr = (res.check_in_time_and_date + timedelta(hours=3)).strftime(
                     "%d %b, %H:%M") + ' (' + f"{int(dist):,}" + ' m)'
 
-            elif res.check_out_lati == 0:
+
+    def update_check_out_locations(self, res_id, lati, long):
+        for res in self.env['crm.lead'].search([('id', '=', res_id)]):
+            if res.check_out_lati == 0:
                 res.check_out_lati = float(lati)
                 res.check_out_long = float(long)
                 dist = self.calculate_distance(float(lati), float(long), res.partner_id.partner_latitude,

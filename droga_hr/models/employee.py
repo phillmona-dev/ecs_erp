@@ -13,10 +13,12 @@ class Employee(models.Model):
 
     hire_date = fields.Date("Hire Date")
     retire_date = fields.Date("Retire Date", compute="compute_retire_date")
-    department_name = fields.Char(related='department_id.name')
+    department_name = fields.Char(related='department_id.name', store=True)
 
     bank = fields.Many2one('res.bank', string="Bank")
     bank_account = fields.Char("Bank Account")
+    certificate = fields.Selection(
+        [('Below Diploma', 'Below Diploma'), ('Diploma', 'Diploma'), ('Above Masters', 'Above Masters')])
 
     @api.model
     def create(self, vals):
@@ -50,3 +52,4 @@ class EmployeePublic(models.Model):
 
     bank = fields.Many2one('res.bank', string="Bank")
     bank_account = fields.Char("Bank Account")
+    department_name = fields.Char(related='department_id.name', store=True)

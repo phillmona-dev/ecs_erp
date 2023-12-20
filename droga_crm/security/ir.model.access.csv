@@ -36,3 +36,4 @@ access_droga_res_partner_mr,crm.res_partner,base.model_res_partner,droga_crm.crm
 access_droga_res_partner_readonly,crm.res_partner_read,base.model_res_partner,base.group_user,1,0,0,0
 
 access_droga_update_location,crm_update_location,model_crm_update_location,base.group_user,1,1,1,1
+access_prod_category_all,prod_category_all,product.model_product_category,base.group_user,1,1,1,1

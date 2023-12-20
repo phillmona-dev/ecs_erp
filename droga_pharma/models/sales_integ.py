@@ -5,6 +5,9 @@ from datetime import timedelta
 from odoo import models, fields, api
 from dateutil import relativedelta
 
+from odoo.exceptions import ValidationError
+
+
 class sales_integ(models.Model):
     _inherit = 'sale.order'
     cust_details = fields.Boolean(default=False, string='Customer Details')
@@ -95,9 +98,19 @@ class sales_integ(models.Model):
                 record['age'] = 0
     def action_done(self):
         self.state='done'
+    def disp_products_manual(self):
+        inv = self.env['account.move'].search(
+            [('invoice_origin', '=', self.name)])
+        if len(inv)==0:
+            raise ValidationError(
+                "Invoice have to be created before dispensing.")
+        elif not inv[0]["FSInvoiceNumber"]:
+            raise ValidationError(
+                "Please fill out FS number under invoice.")
+        else:
+            self.disp_products()
     def disp_products(self):
         #temp = self.invoice_status
-        self.state = 'dispense'
         #self.invoice_status = temp
 
         for rec in self:
@@ -106,6 +119,7 @@ class sales_integ(models.Model):
                 for move in pick.move_ids:
                     move.quantity_done=move.product_uom_qty
                 pick.button_validate()
+        self.state = 'dispense'
 
     # set sales order if invoice is not created
     def set_to_draft(self):
@@ -113,6 +127,7 @@ class sales_integ(models.Model):
             pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
             for pick in pickings:
                 pick.do_unreserve()
+                pick.write({'state': 'draft'})
         self.write({'state': 'draft'})
 
     def action_amend(self):

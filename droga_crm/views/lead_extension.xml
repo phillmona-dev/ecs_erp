@@ -6,7 +6,9 @@
         <field name="priority" eval="1"/>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+
             <xpath expr="//form" position="attributes">
+                <attribute name="js_class">check_out_form_view</attribute>
                 <attribute name="js_class">check_in_form_view</attribute>
             </xpath>
 

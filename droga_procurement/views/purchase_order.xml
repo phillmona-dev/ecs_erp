@@ -60,6 +60,11 @@
                 <field name="exchange_rate" attrs="{'invisible': [('request_type', '==', 'Local')]}"/>
             </xpath>
 
+            <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_subtotal']"
+                   position="after">
+                <field name="price_variance_with_rfq" attrs="{'invisible': [('parent.request_type', '==', 'Local')]}"/>
+            </xpath>
+
             <xpath expr="//button[@name='action_view_invoice']" position="after">
                 <button name="%(droga_finance.droga_account_payment_request1_action)d" type="action"
                         string="Payment Request" states="purchase" class="oe_stat_button" icon="fa-file-text"
@@ -330,6 +335,7 @@
                             <field name="freight_paid_date"/>
                             <field name="freight_settlement_advice_to_finance"/>
                             <field name="container_deposit_amount"/>
+                            <field name="container_deposit_status"/>
                             <field name="shipping_doc_to_transitor"/>
 
                             <field name="declaration_number"/>
@@ -337,6 +343,8 @@
                             <field name="custom_duty_withholding_tax"/>
                             <field name="custom_duty_tax_paid_date"/>
                             <field name="custom_tax_acceptance"/>
+                            <field name="custom_duty_tax_additional_amount"
+                                   attrs="{'invisible': [('custom_tax_acceptance', '==', True)]}"/>
                             <field name="custom_duty_tax_additional_amount"
                                    attrs="{'invisible': [('custom_tax_acceptance', '==', True)]}"/>
 
@@ -436,6 +444,29 @@
     </record>
 
 
+    <!-- inherited for tree view of purchase.order -->
+    <record id="inherit_for_purchase_order_tree" model="ir.ui.view">
+        <field name="name">Purchase Order</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='date_planned']" position="after">
+                <field name="request_type" invisible="1"/>
+                <field name="payment_status" widget="badge" decoration-success="payment_status == 'Paid'"
+                       decoration-danger="payment_status == 'Not Paid'"
+                       attrs="{'invisible': [('request_type', 'in',('Local','Pharmacy'))]}"/>
+                <field name="payment_lead_time" attrs="{'invisible': [('request_type', 'in',('Local','Pharmacy'))]}"
+                       widget="badge"/>
+                <field name="delinquent_status" attrs="{'invisible': [('request_type', 'in',('Local','Pharmacy'))]}"
+                       widget="badge" decoration-success="delinquent_status == 'Delinquent'"
+                       decoration-danger="delinquent_status == 'Non Delinquent'"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
     <!-- partial shipment view -->
     <record id="droga_purchase_order_partial_shipment_view_form" model="ir.ui.view">
         <field name="name">Partial Shipment</field>
@@ -519,6 +550,7 @@
                                     <field name="freight_paid_date"/>
                                     <field name="freight_settlement_advice_to_finance"/>
                                     <field name="container_deposit_amount"/>
+                                    <field name="container_deposit_status"/>
                                     <field name="shipping_doc_to_transitor"/>
 
                                     <field name="declaration_number"/>

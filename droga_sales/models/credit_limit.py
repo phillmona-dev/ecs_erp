@@ -66,6 +66,19 @@ class cust_sales_credit_limit(models.Model):
     contract_num = fields.Char('Contract number')
     invoice_printed = fields.Char(default="No", string="Invoice printed", store=True)
 
+    INVOICE_STATUS = [
+        ('upselling', 'Upselling Opportunity'),
+        ('invoiced', 'Fully Invoiced'),
+        ('to invoice', 'To Invoice'),
+        ('no', 'Nothing to Invoice')
+    ]
+    
+    invoice_status = fields.Selection(
+        selection=INVOICE_STATUS,tracking=True,
+        string="Invoice Status",
+        compute='_compute_invoice_status',
+        store=True)
+
     def _cust_type_inv(self):
         pass
 
@@ -89,7 +102,7 @@ class cust_sales_credit_limit(models.Model):
         for rec in self:
             if rec.partner_id.id in [15390, 15488] or rec.partner_id.x_exclude_maturity_for_reconciliation:
                 matured_invoices = []
-            elif rec.partner_id.vat != '0000000000':
+            elif rec.partner_id.vat != '0000000000' and not rec.partner_id.mature_individually:
                 matured_invoices = self.env['account.move'].search(
                     [('state', '=', 'posted'), ('journal_id.type', '=', 'sale'),
                      ('company_id', '=', self.env.company.id),

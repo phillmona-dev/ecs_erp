@@ -75,7 +75,7 @@
                         <field name="is_core_product"/>
                     </group>
                     <group string="Origin">
-                        <field name="manufacturing"></field>
+                        <field name="manufacturing" required="True"></field>
                         <field name="origin"
                                options="{'no_create':True,'no_open':True}"/>
                     </group>
@@ -187,6 +187,23 @@
             </p>
         </field>
     </record>
+
+    <record model="ir.ui.view" id="product_template_kanban_stock_view_import_uom">
+            <field name="name">Product Template Kanban Stock</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_kanban_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="inside">
+                    <field name="type"/>
+                    <field name="show_on_hand_qty_status_button" groups="stock.group_stock_user"/>
+                </xpath>
+                <xpath expr="//div[@name='product_lst_price']" position="after">
+                    <t groups="stock.group_stock_user">
+                    <div >On hand: <field name="qty_available_import"/> <field name="import_uom_new"/></div>
+                    </t>
+                </xpath>
+            </field>
+        </record>
 </odoo>
 
 

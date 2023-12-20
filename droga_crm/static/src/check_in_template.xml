@@ -4,10 +4,14 @@
        t-inherit="web.FormView" t-inherit-mode="primary" owl="1">
 
 
-        <xpath expr="//ActionMenus" position="after">
+        <xpath expr="//ActionMenus" position="before">
             <button class="btn btn-info" type="button" t-on-click="onClickTestJavascript">
-                Check in/out
+                Check in
+            </button>
+            <button class="btn btn-info" type="button" t-on-click="onClickTestJavascriptout">
+                Check out
             </button>
         </xpath>
     </t>
 </templates>
+

@@ -94,7 +94,6 @@ class sale_order_line(models.Model):
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
-
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
         selfsud = self.sudo()
@@ -123,19 +122,21 @@ class sale_order_line(models.Model):
             if rec.product_id.detailed_type == 'service':
                 rec.is_prod_available = 'True'
                 return
-            if rec.order_id.order_from:
-                if rec.order_id.order_from.startswith('PH') and rec.available_qty < rec.product_uom_qty:
-                    rec.is_prod_available = 'False'
-
-            prodqty=sum(self.order_id.order_line.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
+            prodqty = sum(self.order_id.order_line.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
                 'product_uom_qty'))
-            if (not rec.product_id.bought_locally) and rec.available_qty < prodqty:
-                rec.is_prod_available = 'False'
-            # This is for out of stock products that are bought locally, they'll show up with orange color
-            elif rec.product_id.bought_locally and rec.available_qty < prodqty:
-                rec.is_prod_available = 'Kinda'
+            if rec.order_id.order_from:
+                if rec.available_qty < prodqty:
+                    rec.is_prod_available = 'False'
+                elif rec.available_qty >= prodqty:
+                    rec.is_prod_available = 'True'
             else:
-                rec.is_prod_available = 'True'
+                if (not rec.product_id.bought_locally) and rec.available_qty < prodqty:
+                    rec.is_prod_available = 'False'
+                # This is for out of stock products that are bought locally, they'll show up with orange color
+                elif rec.product_id.bought_locally and rec.available_qty < prodqty:
+                    rec.is_prod_available = 'Kinda'
+                else:
+                    rec.is_prod_available = 'True'
 
     def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
         selfsud = self.sudo()
@@ -260,6 +261,7 @@ class sale_order_line(models.Model):
 
             for line in self:
 
+                #Assign warehouse
                 if self.order_id.order_from:
                     if self.order_id.order_from.startswith('PH'):
                         line.wareh = line.order_id.wareh
@@ -267,7 +269,9 @@ class sale_order_line(models.Model):
                         line.wareh = line.product_id.default_warehouse
                 elif not line.wareh and line.product_id.default_warehouse.wh_type == self.order_id.order_type:
                     line.wareh = line.product_id.default_warehouse
-                line.product_uom = line.product_id.import_uom_new
+
+                if not line.product_uom or line.product_uom==line.product_id.uom_id:
+                    line.product_uom = line.product_id.import_uom_new
                 # Get discounts/additional payments per type
                 type_rates = self.env['droga.price.discount.per.type'].search(
                     [('cust_type', '=', self.order_id['partner_id']['cust_type_ext'].id), ('status', '=', 'Active'),
@@ -312,12 +316,12 @@ class sale_order_line(models.Model):
                     line.price_unit = 0.0
                     line.std_unit_price = 0.0
                 else:
-                    price = line.with_company(line.company_id)._get_display_price()
+                    price = line.product_id.list_price*(line.product_id.product_tmpl_id.import_uom_new.factor/line.product_uom.factor)
                     if not line.tender_origin_form_tender and not line.manual_price:
-                        line.price_unit = line.product_id.list_price* ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
+                        line.price_unit = price* ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
                                 1 + ((non_core_rate + all_rate) / 100)))
 
-                    line.std_unit_price = line.product_id.list_price * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
+                    line.std_unit_price = price * ((1 + ((core_rate + all_rate) / 100)) if line.product_id.is_core_product else (
                             1 + ((non_core_rate + all_rate) / 100)))
 
                 line.price_unit_before_discount = line.std_unit_price
@@ -327,6 +331,7 @@ class sale_order_line(models.Model):
             core_sum = self.order_id.core_sum
             non_core_sum = self.order_id.non_core_sum
 
+            #Payment type discount rules. This is here because it's calculated after default selling price has been set
             amount_rates = self.env['droga.price.discount.per.amount'].search(
                 [('payment_term', '=', self.order_id['payment_term_id'].id), ('status', '=', 'Active'),
                  ('used_under', 'in', used_under)])
@@ -343,17 +348,13 @@ class sale_order_line(models.Model):
                     'to_amt']:
                     all_rate = all_rate + rate['percent']
 
-            for lin in self.order_id.order_line.filtered(
-                    lambda x: x.product_id.is_core_product):
-                if core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
-                    lin.price_unit = lin.price_unit * (1 + ((core_rate + all_rate) / 100))
-                lin.std_unit_price = lin.std_unit_price * (1 + ((core_rate + all_rate) / 100))
+            for lin in self.order_id.order_line:
+                if not self.order_id.tender_origin_form_tender and not self.order_id.manual_price:
+                    lin.price_unit = lin.price_unit_before_discount * (1 + ((core_rate + all_rate) / 100)) if lin.product_id.is_core_product else lin.price_unit_before_discount * (1 + ((non_core_rate + all_rate) / 100))
+                lin.std_unit_price = lin.price_unit_before_discount * (1 + (
+                                (core_rate + all_rate) / 100)) if lin.product_id.is_core_product else lin.price_unit_before_discount * (
+                                1 + ((non_core_rate + all_rate) / 100))
 
-            for lin in self.order_id.order_line.filtered(
-                    lambda x: not x.product_id.is_core_product):
-                if non_core_rate + all_rate != 0 and not self.order_id.tender_origin_form_tender and not line.manual_price:
-                    lin.price_unit = lin.price_unit * (1 + ((non_core_rate + all_rate) / 100))
-                lin.std_unit_price = lin.std_unit_price * (1 + ((non_core_rate + all_rate) / 100))
 
             # self.order_id._get_sub_totals()
             super(sale_order_line, self)._compute_amount()
@@ -850,7 +851,7 @@ class sale_order_ext(models.Model):
                     'droga_sales.sales_wholesale_approve_admin'):
                     modifiers['readonly'] = [['state', 'not in', ('draft', 'req', 'price_request', 'memb')]]
                 else:
-                    modifiers['readonly'] = [['state', 'not in', ('draft', 'memb')]]
+                    modifiers['readonly'] = [['state', 'not in', ('draft', 'memb','req')]]
 
                 node.set('modifiers', simplejson.dumps(modifiers))
             res['arch'] = etree.tostring(doc)

@@ -48,13 +48,21 @@ class droga_stock_move_line_extension(models.Model):
     import_uom=fields.Many2one('uom.uom',related='product_id.import_uom_new')
 
     reserved_uom_qty_done = fields.Float('Reserved', compute='_get_on_hand')
+    pharmacy_unit = fields.Boolean('Pharmacy unit', default=False, compute='_get_pharma_unit',store=True)
 
+    @api.depends('move_id.pharmacy_unit')
+    def _get_pharma_unit(self):
+        for rec in self:
+            if rec.move_id.pharmacy_unit:
+                rec.pharmacy_unit = True
+            else:
+                rec.pharmacy_unit = False
     @api.onchange('import_quant')
     def _prod_qty_change(self):
         for rec in self:
             rec.qty_done = rec.import_quant * (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
 
-    @api.depends('qty_done','import_uom','reserved_uom_qty')
+    @api.depends('qty_done','product_id.import_uom_new','reserved_uom_qty')
     def _get_on_hand(self):
         for rec in self:
             rec.import_quant = rec.qty_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
@@ -116,6 +124,17 @@ class droga_stock_move_line_extension(models.Model):
                 rec.has_read_access = True
             else:
                 rec.has_read_access = False
+
+
+    def _get_aggregated_product_quantities(self, **kwargs):
+        aggregated_move_lines = super()._get_aggregated_product_quantities(**kwargs)
+        for aggregated_move_line in aggregated_move_lines:
+            rate = aggregated_move_lines[aggregated_move_line]['product'].product_tmpl_id.uom_id.factor/aggregated_move_lines[aggregated_move_line]['product'].product_tmpl_id.import_uom_new.factor
+            aggregated_move_lines[aggregated_move_line]['qty_done'] = aggregated_move_lines[aggregated_move_line]['qty_done']/rate
+            aggregated_move_lines[aggregated_move_line]['qty_ordered'] = aggregated_move_lines[aggregated_move_line][
+                                                                          'qty_ordered'] / rate
+            aggregated_move_lines[aggregated_move_line]['product_uom']=aggregated_move_lines[aggregated_move_line]['product'].product_tmpl_id.import_uom_new
+        return aggregated_move_lines
 class droga_warehouse_extension(models.Model):
     _inherit = 'stock.warehouse'
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
@@ -391,6 +410,15 @@ class droga_stock_move_extension(models.Model):
         ('IM','Import'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
+    pharmacy_unit = fields.Boolean('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
+
+    @api.depends('picking_id.pharmacy_unit')
+    def _get_pharma_unit(self):
+        for rec in self:
+            if rec.picking_id.pharmacy_unit:
+                rec.pharmacy_unit=True
+            else:
+                rec.pharmacy_unit = False
 
     @api.depends('location_id', 'location_dest_id')
     def _get_source_type(self):
@@ -416,7 +444,7 @@ class droga_stock_move_extension(models.Model):
     reserved_availability_done=fields.Float('Reserved', compute='_get_on_hand')
     import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
 
-    @api.depends('product_uom_qty','import_uom')
+    @api.depends('product_uom_qty','product_id.import_uom_new')
     def _get_on_hand(self):
         for rec in self:
             rec.import_quant = rec.product_uom_qty / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
@@ -664,6 +692,7 @@ class droga_stock_picking_extension(models.Model):
         ('SAP','Sales placement location'),
         ('SRL', 'Inter-store receive transit location'),
         ], string='Cons/sample Type',related='location_dest_id.con_type')
+    pharmacy_unit=fields.Boolean('Pharmacy unit',default=False,store=True)
 
     def _get_loc_descr(self):
         for rec in self:
@@ -778,6 +807,15 @@ class droga_stock_product_extension(models.Model):
         digits='Product Price',tracking=True,
         help="Price at which the product is sold to customers.",
     )
+    def _compute_show_qty_status_button(self):
+        for template in self:
+            template.show_on_hand_qty_status_button = False
+            template.show_forecasted_qty_status_button = template.type == 'product'
+
+    qty_available_import=fields.Float('Quantity On Hand', compute='_compute_quantities_import')
+    def _compute_quantities_import(self):
+        for rec in self:
+            rec.qty_available_import=rec.qty_available*(rec.import_uom_new.factor / rec.uom_id.factor)
     categ_id = fields.Many2one(
         'product.category', 'Product Category',
         change_default=True, default='', group_expand='_read_group_categ_id',
@@ -1021,3 +1059,34 @@ class ResUsers(models.Model):
     warehouse_ids_ph_disp=fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph_disp', 'uid', 'warehouse_id',
                                            domain="[('wh_type', '=', 'PH'),('has_dispensary_location','=',True)]",
                                            string='Pharmacy sales access')
+
+
+class prod(models.Model):
+    _inherit = 'product.product'
+    import_uom_new=fields.Many2one('uom.uom',related='product_tmpl_id.import_uom_new')
+    @api.depends('stock_move_ids.product_qty', 'stock_move_ids.state')
+    @api.depends_context(
+        'lot_id', 'owner_id', 'package_id', 'from_date', 'to_date',
+        'location', 'warehouse',
+    )
+    def _compute_quantities(self):
+        products = self.with_context(prefetch_fields=False).filtered(lambda p: p.type != 'service').with_context(
+            prefetch_fields=True)
+        res = products._compute_quantities_dict(self._context.get('lot_id'), self._context.get('owner_id'),
+                                                self._context.get('package_id'), self._context.get('from_date'),
+                                                self._context.get('to_date'))
+        for product in products:
+            rate=product.product_tmpl_id.uom_id.factor/product.product_tmpl_id.import_uom_new.factor
+            product.update(res[product.id])
+            product.qty_available=product.qty_available/rate
+            product.incoming_qty = product.incoming_qty / rate
+            product.outgoing_qty = product.outgoing_qty / rate
+            product.virtual_available = product.virtual_available / rate
+            product.free_qty = product.free_qty / rate
+        # Services need to be set with 0.0 for all quantities
+        services = self - products
+        services.qty_available = 0.0
+        services.incoming_qty = 0.0
+        services.outgoing_qty = 0.0
+        services.virtual_available = 0.0
+        services.free_qty = 0.0
