@@ -233,6 +233,12 @@
                         action="droga_pharma_point_types_action"
                         groups="droga_pharma.pharma_director"
                         sequence="17"/>
+                <menuitem
+                        id="droga_pharma_update_uom"
+                        name="Update uom"
+                        action="droga_pharma_update_stock_action"
+                        groups="droga_pharma.pharma_director"
+                        sequence="18"/>
             </menuitem>
         </menuitem>
     </menuitem>
