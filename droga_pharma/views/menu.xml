@@ -166,36 +166,44 @@
                     id="droga_pharma_reward_settings"
                     name="Reward settings"
                     sequence="29">
-                <menuitem
-                        id="droga_pharma_referral_rewards_menu"
-                        name="Rewards gain settings per referral"
-                        action="droga_pharma_referral_rewards_action"
-                        sequence="12"/>
-
 
                 <menuitem
-                        id="droga_pharma_rewards_gain_menu"
-                        name="Rewards gain settings per purchase"
-                        action="droga_pharma_rewards_gain_action"
-                        sequence="13"/>
+                        id="droga_pharma_gain_settings"
+                        name="Gain settings"
+                        sequence="29">
+                    <menuitem
+                            id="droga_pharma_referral_rewards_menu"
+                            name="Rewards gain settings per referral"
+                            action="droga_pharma_referral_rewards_action"
+                            sequence="12"/>
+                    <menuitem
+                            id="droga_pharma_rewards_gain_menu"
+                            name="Rewards gain settings per purchase"
+                            action="droga_pharma_rewards_gain_action"
+                            sequence="13"/>
+                </menuitem>
 
                 <menuitem
-                        id="droga_pharma_rewards_issue_menu"
-                        name="Rewards issue settings"
-                        action="droga_pharma_rewards_issue_action"
-                        sequence="12"/>
+                        id="droga_pharma_rewards"
+                        name="Reward settings"
+                        sequence="29">
 
-                <menuitem
-                        id="droga_pharma_discount_high_value_menu"
-                        name="Rewards per high value"
-                        action="droga_pharma_discount_high_value_action"
-                        sequence="14"/>
-
-                <menuitem
-                        id="droga_pharma_breast_cont_type_menu"
-                        name="Rewards for breast feeders"
-                        action="droga_pharma_breast_cont_type_action"
-                        sequence="15"/>
+                    <menuitem
+                            id="droga_pharma_rewards_issue_menu"
+                            name="Rewards per accumulated points"
+                            action="droga_pharma_rewards_issue_action"
+                            sequence="12"/>
+                    <menuitem
+                            id="droga_pharma_discount_high_value_menu"
+                            name="Rewards per high value purchase"
+                            action="droga_pharma_discount_high_value_action"
+                            sequence="14"/>
+                    <menuitem
+                            id="droga_pharma_breast_cont_type_menu"
+                            name="Rewards for breast feeders"
+                            action="droga_pharma_breast_cont_type_action"
+                            sequence="15"/>
+                </menuitem>
             </menuitem>
 
             <menuitem

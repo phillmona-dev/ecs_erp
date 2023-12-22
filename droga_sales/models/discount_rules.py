@@ -190,10 +190,15 @@ class sale_order_line(models.Model):
 
 
     def _get_pharma_price(self,line):
+        #Contract price
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),('header.customer','=',line.order_id.partner_id.id),('header.date_from','<',datetime.today()),('header.date_to','>',datetime.today()),('header.status','=','Active')])
         if len(cont_prices)>0:
             return cont_prices[0]["selling_price"]
         else:
+            #Fetch any discounts here
+
+            #
+
             return line.product_id.list_price_phar
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty')
@@ -535,6 +540,10 @@ class sale_order_ext(models.Model):
 
             })
         action['context'] = context
+
+        #Insert reward points here
+
+
         return action
 
     @api.depends('order_line.product_template_id')

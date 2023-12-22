@@ -15,15 +15,18 @@ class droga_pharma_stock_card(models.TransientModel):
     results_move_po = fields.One2many('droga.pharma.update.po', 'header')
     #results_move_so = fields.One2many('droga.pharma.update.so', 'header')
     results_move_line = fields.One2many('droga.pharma.update.stock.move.line', 'header')
-    rate=fields.Float('rate (division)',default=1,compute='_get_uom_rate',inverse='_inverse')
+    rate=fields.Float('rate (division)',default=1)
 
     def _inverse(self):
         pass
 
-    @api.depends('new_uom','current_uom')
+    @api.onchange('new_uom','current_uom')
     def _get_uom_rate(self):
         for rec in self:
-            rec.rate=rec.new_uom.factor/rec.current_uom.factor
+            if rec.current_uom:
+                rec.rate=rec.new_uom.factor/rec.current_uom.factor
+            else:
+                rec.rate=1
     def load(self):
         for rec in self:
             rec.results_move.unlink()
@@ -71,8 +74,8 @@ class droga_pharma_stock_card(models.TransientModel):
                     (rec.rate,rec.rate,rec.rate,rec.rate,rec.rate, rec.new_uom.id, mv.move_line.id))
             for mv in rec.results_move_line:
                 self.env.cr.execute(
-                    """ update stock_move_line set qty_done=qty_done*%s,product_uom_id=%s where id=%s""",
-                    (rec.rate,rec.new_uom.id,mv.move_line.id))
+                    """ update stock_move_line set reserved_qty=reserved_qty*%s,reserved_uom_qty=reserved_uom_qty*%s,qty_done=qty_done*%s,product_uom_id=%s where id=%s""",
+                    (rec.rate,rec.rate,rec.rate,rec.new_uom.id,mv.move_line.id))
             for mv in rec.results_move_po:
                 self.env.cr.execute(
                     """update purchase_order_line set product_uom=%s,product_qty=product_qty*%s,price_unit=price_unit/%s,qty_received=qty_received*%s,qty_to_invoice=qty_to_invoice*%s,qty_invoiced=qty_invoiced*%s where id=%s""",
@@ -83,8 +86,23 @@ class droga_pharma_stock_card(models.TransientModel):
             #update ir_property set value_float=47.568 where res_id='product.product,32319';
             self.load()
 
+    def round_whole_no(self):
+        for rec in self:
+            for mv in rec.results_move:
+                self.env.cr.execute(
+                    """ update stock_move set product_qty=round(product_qty::numeric, 0),product_uom_qty=round(product_uom_qty::numeric, 0),quantity_done=round(quantity_done::numeric, 0) where id=%s""",
+                    (mv.move_line.id,))
+            for mv in rec.results_move_line:
+                self.env.cr.execute(
+                    """ update stock_move_line set reserved_qty=round(reserved_qty::numeric, 0),reserved_uom_qty=round(reserved_uom_qty::numeric, 0),qty_done=round(qty_done::numeric, 0) where id=%s""",
+                    ( mv.move_line.id,))
+        self.load()
+
     def update_uom(self):
         for rec in self:
+            if not rec.new_uom:
+                return
+
             prod_id = self.env['product.product'].search([('product_tmpl_id', '=', rec.product_id.id)]).id
             #rec.product_id.write({'uom_id':rec.new_uom})
             self.env.cr.execute(
@@ -106,8 +124,9 @@ class droga_pharma_stock_card(models.TransientModel):
 
             self.env.cr.execute(
                 """ update product_template set uom_id=%s where id=%s""",
-                (rec.new_uom.id,prod_id ))
-            self.load()
+                (rec.new_uom.id,rec.product_id.id ))
+        self.load()
+
 class droga_update_stock_move(models.TransientModel):
     _name = 'droga.pharma.update.stock.move'
     header = fields.Many2one('droga.pharma.update.stock')

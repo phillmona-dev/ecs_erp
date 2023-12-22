@@ -1,7 +1,7 @@
 from odoo import _, api, models,fields
 from odoo.exceptions import ValidationError
 from odoo.tools import config, float_compare
-
+from datetime import datetime
 
 class StockQuant(models.Model):
     _inherit = "stock.quant"
@@ -44,6 +44,24 @@ class StockQuant(models.Model):
                         "complete_name": quant.location_id.complete_name,
                     }
                 )
+
+            prod_sum =  sum(self.env['stock.quant'].search(
+                [('product_id', '=', quant.product_id.id), ('location_id.usage', '=', 'internal')]).mapped('quantity'))
+            self.env['product.template'].search([('id','=',quant.product_id.product_tmpl_id.id)])[0].write({
+                'most_recent_trans_date': datetime.now().date(),
+                'stock_quantity_total':prod_sum
+            })
+            if prod_sum==0:
+                vals = {
+                    'product': quant.product_id.product_tmpl_id.id,
+                    'date_from': datetime.now().date(),
+                }
+                self.env['stock.out.history'].create(vals)
+            else:
+                recs=self.env['stock.out.history'].search([('date_to','=',False)])
+                for rc in recs:
+                    rc.write({'date_to':datetime.now().date()})
+
 
     @api.model
     def _get_quants_action(self, domain=None, extend=False):

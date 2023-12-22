@@ -205,7 +205,6 @@
         <field name="inherit_id" ref="product.product_category_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/field[@name='parent_id']" position="after">
-                <field name="avail_in_product_master"></field>
                 <field name="crm_group"></field>
             </xpath>
         </field>

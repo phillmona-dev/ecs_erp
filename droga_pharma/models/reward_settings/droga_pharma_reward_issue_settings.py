@@ -9,5 +9,6 @@ class droga_pharma_reward_issue(models.Model):
     prod_template = fields.Many2many('product.template', string='Reward product items', tracking=True)
     reward_req_points=fields.Float('Reward required points', tracking=True)
     reward_req_frequ = fields.Float('Reward required frequency (days)', tracking=True)
+    remark = fields.Char('Remark')
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active',
                               tracking=True)

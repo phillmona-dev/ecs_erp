@@ -30,6 +30,7 @@
                         <field name="from_amt"></field>
                         <field name="to_amt"></field>
                         <field name="discount"></field>
+                        <field name="remark"></field>
                         <field name="status"></field>
                     </group>
                     <div class="oe_chatter">
