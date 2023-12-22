@@ -691,7 +691,7 @@ class sale_order_ext(models.Model):
                 message = message + "Customer type must be registered for customer!"
             if not so.partner_id.city_name and not so.order_from.startswith('P'):
                 message = message + ('\n' if message else '') + message + "City must be registered for customer!"
-            if not so.partner_id.vat:
+            if not so.partner_id.vat and so.company_id.id==1:
                 message = message + ('\n' if message else '') + message + "Tin No must be registered for customer!"
                 # raise ValidationError("Tin No must be registered for customer!")
             if so.order_from.startswith('PH'):

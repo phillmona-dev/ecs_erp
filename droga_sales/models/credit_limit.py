@@ -14,7 +14,7 @@ class cust_credit_limit(models.Model):
     cust_credit_limit = fields.Float(string='Credit limit', tracking=True)
     unsettled_amount = fields.Monetary(compute='_compute_balance', string='Unsettled amount')
     available_amount = fields.Float(string='Credit balance', compute='_compute_balance')
-    vat = fields.Char(string='Tin No', index=True,
+    vat = fields.Char(string='Tin No', index=True,default='0000000000',
                       help="The Tax Identification Number. Complete it if the contact is subjected to government taxes. Used in some legal statements.")
 
     @api.depends('debit', 'credit')
@@ -144,7 +144,7 @@ class cust_sales_credit_limit(models.Model):
             #    if self.env.company.id == 1 and so.order_type.startswith('WS'):
             #        raise ValidationError('Sales is temporarly unavailable, please check later.')
 
-            if not so.partner_id.vat:
+            if not so.partner_id.vat and so.company_id.id==1:
                 message = message + "Tin No must be registered for customer!"
                 # raise ValidationError("Tin No must be registered for customer!")
             if not so.pr_sales and (self.env.user.name.startswith('CRM') or self.env.user.name.startswith('Tender')):

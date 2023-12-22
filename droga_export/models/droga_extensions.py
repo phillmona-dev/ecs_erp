@@ -434,6 +434,7 @@ class droga_sale_inherit(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_export_origin_form': self.id,
+                'default_request_type':'Local'
             },
             'domain':
                 ([('export_origin_form', '=', self.id)])
