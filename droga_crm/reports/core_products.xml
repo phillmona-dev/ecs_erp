@@ -29,7 +29,15 @@
                 <field name="categ_id"></field>
                 <field name="default_warehouse"></field>
                 <field name="average_month_consumption"></field>
+                <field name="availability"></field>
                 <filter name="core_products" string="Core products" domain="[('is_core_product', '=', True)]" />
+
+                <separator/>
+
+                <filter name="available" string="Available" domain="[('availability', '=', 'Available')]" />
+                <filter name="needs_reordering" string="Needs reordering" domain="[('availability', '=', 'Needs reordering')]" />
+                <filter name="stock_out" string="Stock out" domain="[('availability', '=', 'Stock out')]" />
+
                 <filter name="group_categ" string="Category" context="{'group_by':'categ_id'}"/>
             </search>
         </field>
