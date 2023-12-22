@@ -8,5 +8,6 @@ class droga_pharma_high_value_purchase(models.Model):
     from_amt = fields.Float(string='From amount', tracking=True)
     to_amt = fields.Float(string='To amount', tracking=True)
     discount = fields.Float(string='Discount', tracking=True)
+    remark = fields.Char('Remark')
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active',
                               tracking=True)

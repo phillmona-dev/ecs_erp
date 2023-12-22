@@ -13,8 +13,8 @@
         <field name="arch" type="xml">
             <tree string="" delete="0">
                 <field name="points_to_gain"></field>
-                <field name="from_qty"></field>
-                <field name="to_qty"></field>
+                <field name="from_amt"></field>
+                <field name="to_amt"></field>
                 <field name="status"></field>
             </tree>
         </field>
@@ -27,9 +27,10 @@
             <form string="" delete="0">
                 <sheet>
                     <group>
-                        <field name="from_qty"></field>
-                        <field name="to_qty"></field>
+                        <field name="from_amt"></field>
+                        <field name="to_amt"></field>
                         <field name="points_to_gain"></field>
+                        <field name="remark"></field>
                         <field name="status"></field>
                     </group>
                     <div class="oe_chatter">

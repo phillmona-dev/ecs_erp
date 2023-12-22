@@ -28,6 +28,7 @@
                     <group>
                         <field name="cont_type"></field>
                         <field name="discount"></field>
+                        <field name="remark"></field>
                         <field name="status"></field>
                     </group>
                     <div class="oe_chatter">

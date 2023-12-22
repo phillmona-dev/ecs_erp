@@ -1,0 +1,131 @@
+from datetime import datetime
+
+from odoo import fields, models, api
+
+
+class product_alerts(models.Model):
+    _inherit='product.template'
+    most_recent_so_alert_date=fields.Date('Most recent alert time',default=datetime.now().date(),store=True)
+    most_recent_order_alert_date = fields.Date('Most recent minimum level order alert time', default=datetime.now().date(), store=True)
+    most_recent_trans_date=fields.Date('Most recent trans date',default=datetime.now().date(),store=True)
+    stock_quantity_total=fields.Float('Stock quantity in droga')
+    stock_out_detail=fields.One2many('stock.out.history','product')
+    availability=fields.Char('Availability',compute='_compute_availability',store=True)
+    notification_for=fields.Selection([('All', 'All'), ('Pharma', 'Pharma'),('Import','Import')],
+                              tracking=True)
+    @api.depends('stock_quantity_total','emergency_order_point')
+    def _compute_availability(self):
+        for rec in self:
+            if rec.stock_quantity_total==0:
+                rec.availability='Stock out'
+            elif rec.stock_quantity_total>0 and rec.stock_quantity_total<=rec.emergency_order_point:
+                rec.availability = 'Needs reordering'
+            else:
+                rec.availability = 'Available'
+    def open_stock_out_hist(self):
+        return {
+            'name': 'Tender submission details',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'product.template',
+            'view_id': self.env.ref('droga_inventory.droga_inventory_stock_out_history').id,
+            'type': 'ir.actions.act_window',
+            'res_id': self.id,
+            'target': 'new',
+        }
+class stock_out_history(models.Model):
+    _name='stock.out.history'
+    product=fields.Many2one('product.template')
+    date_from=fields.Date('Stock out date from')
+    date_to = fields.Date('Stock out date to')
+    duration=fields.Integer('Stock out duration',compute='_get_stock_out_duration')
+    def _get_stock_out_duration(self):
+        for rec in self:
+            if rec.date_to:
+                rec.duration=(rec.date_to-rec.date_from).days
+            else:
+                rec.duration = (datetime.now().date() - rec.date_from).days
+class stock_out_notification(models.Model):
+    _name='stock.out.notification'
+    _description = 'Stock out notification'
+    def generate_stock_out_alert(self):
+        query = """select id from product_template where most_recent_so_alert_date<most_recent_trans_date and stock_quantity_total=0 and notification_for in ('Import','All') and company_id=1"""
+        self._cr.execute(query)
+        qry_res = self._cr.dictfetchall()
+        stock_out_items = self.env['product.template'].browse(set(rec['id'] for rec in qry_res))
+
+        query_pharma = """select id from product_template where most_recent_so_alert_date<most_recent_trans_date and stock_quantity_total=0 and notification_for in ('Pharma','All') and company_id=1"""
+        self._cr.execute(query_pharma)
+        qry_res_pharma = self._cr.dictfetchall()
+        stock_out_items_pharma = self.env['product.template'].browse(set(rec['id'] for rec in qry_res_pharma))
+
+        for rec in stock_out_items:
+            rec.write({'most_recent_so_alert_date': datetime.now().date()})
+
+            channels = self.env['mail.channel'].search([('name', '=', 'Stock out notification')])
+            message = "Product '" + rec.name + "("+rec.default_code+")' is out of stock."
+
+            for c in channels:
+                c.message_post(
+                    subject="Stock out notification. ",
+                    body=message,
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=self.env.user.id,
+                )
+
+        for rec in stock_out_items_pharma:
+            rec.write({'most_recent_so_alert_date': datetime.now().date()})
+
+            channels = self.env['mail.channel'].search([('name', '=', 'Stock out notification - Pharmacy')])
+            message = "Product '" + rec.name + "(" + rec.default_code + ")' is out of stock."
+
+            for c in channels:
+                c.message_post(
+                    subject="Stock out notification. ",
+                    body=message,
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=self.env.user.id,
+                )
+
+    def generate_min_order_alert(self):
+        query = """select id from product_template where most_recent_order_alert_date<most_recent_trans_date and emergency_order_point<=stock_quantity_total and company_id=1"""
+        self._cr.execute(query)
+        qry_res = self._cr.dictfetchall()
+        stock_out_items = self.env['product.template'].browse(set(rec['id'] for rec in qry_res))
+
+        query_pharma = """select id from product_template where most_recent_order_alert_date<most_recent_trans_date and emergency_order_point<=stock_quantity_total and company_id=1"""
+        self._cr.execute(query_pharma)
+        qry_res_pharma = self._cr.dictfetchall()
+        stock_out_items_pharma = self.env['product.template'].browse(set(rec['id'] for rec in qry_res_pharma))
+
+        for rec in stock_out_items:
+            rec.write({'most_recent_order_alert_date': datetime.now().date()})
+
+            channels = self.env['mail.channel'].search([('name', '=', 'Minimum stock order level')])
+            message = "Product '" + rec.name + "("+rec.default_code+")' has reached it's minimum stock order level."
+
+            for c in channels:
+                c.message_post(
+                    subject="Minimum order level notification. ",
+                    body=message,
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=self.env.user.id,
+                )
+
+        for rec in stock_out_items_pharma:
+            rec.write({'most_recent_order_alert_date': datetime.now().date()})
+
+            channels = self.env['mail.channel'].search([('name', '=', 'Minimum stock order level - Pharmacy')])
+            message = "Product '" + rec.name + "(" + rec.default_code + ")' has reached it's minimum stock order level."
+
+            for c in channels:
+                c.message_post(
+                    subject="Minimum order level notification. ",
+                    body=message,
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=self.env.user.id,
+                )
