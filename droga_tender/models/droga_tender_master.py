@@ -10,7 +10,7 @@ class droga_tender_master(models.Model):
     _name = 'droga.tender.master'
     _description = 'Tender master file'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name = 'ten_id'
+    _rec_name = 'ten_name'
 
     # region fields definition
     # Date fields
@@ -80,7 +80,8 @@ class droga_tender_master(models.Model):
                 return
             try:
                 if rec.extension_date_eth == '':
-                    rec.extension_date_gre = rec.closing_date_gre + timedelta(days=int(rec.ext_period))
+                    date_to=rec.closing_date_gre + timedelta(days=int(rec.ext_period))
+                    rec.extension_date_gre = date_to + timedelta(days=int(self.get_ext_days_add(rec.closing_date_gre.date(),date_to.date())))
                 else:
                     converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
                         int(rec.extension_date_eth.split("-")[0]), int(rec.extension_date_eth.split("-")[1]),
@@ -103,7 +104,7 @@ class droga_tender_master(models.Model):
     customer_tender_no = fields.Char("Customer tender no")
     procurement_title = fields.Char('Procurement title')
     ten_id = fields.Char('Droga tender ID')
-    ten_name = fields.Char('Tender description', compute='_get_tender_description')
+    ten_name = fields.Char('Tender description', compute='_get_tender_description',store=True)
 
     # Selection fields
     period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')])
@@ -111,6 +112,23 @@ class droga_tender_master(models.Model):
                                        string='Extension period type')
     bid_type = fields.Selection([('f', 'Foreign'), ('l', 'Local'), ('F+L', 'F+L')])
     status = fields.Selection([('active', 'Active'), ('closed', 'Closed')], compute="get_status")
+
+    def get_ext_days_add(self,date_fromp,date_top):
+        holidays=self.env['resource.calendar.leaves'].search([ '|','|','&',('date_to','>=',date_fromp),('date_from','<=',date_fromp),'&',('date_to','>=',date_top),('date_from','<=',date_top),'&',('date_from','>=',date_fromp),('date_to','<=',date_top)])
+        days=0
+        for hd in holidays:
+            if hd.date_from.date()<date_fromp:
+                if hd.date_to.date()>date_top:
+                    days=days+(date_top-date_fromp).days
+                else:
+                    days = days + (hd.date_to.date() - date_fromp).days+1
+            else:
+                if hd.date_to.date()>date_top:
+                    days=days+(date_top-hd.date_from.date()).days
+                else:
+                    days = days + (hd.date_to.date() - hd.date_from.date()).days+1
+
+        return days
 
     @api.depends("closing_date_gre")
     def get_status(self):
@@ -273,7 +291,7 @@ class droga_tender_master(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_tender': self.id,
-                'default_client': self.customer.id,
+                'default_client': self.customer.master_cust_id.id,
                 'default_request_type': self.bid_type,
                 'default_po_number':self.customer_tender_no,
             },
@@ -292,7 +310,7 @@ class droga_tender_master(models.Model):
             'context': {
                 'default_tender_origin_form': self.id,
                 'default_issue_type': 'SIF',
-                'default_customer':self.customer.id,
+                'default_customer':self.customer.master_cust_id.id,
                 'default_menu_from':'SR'
             },
             'domain':

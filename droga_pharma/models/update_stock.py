@@ -16,7 +16,8 @@ class droga_pharma_stock_card(models.TransientModel):
     #results_move_so = fields.One2many('droga.pharma.update.so', 'header')
     results_move_line = fields.One2many('droga.pharma.update.stock.move.line', 'header')
     rate=fields.Float('rate (division)',default=1)
-
+    date=fields.Date('Transaction date')
+    ref=fields.Char('Transaction reference')
     def _inverse(self):
         pass
 
@@ -39,13 +40,24 @@ class droga_pharma_stock_card(models.TransientModel):
 
             prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.product_id.id)]).id
             if rec.code:
-                moves=self.env['stock.move'].search([('picking_id.picking_type_id.code','=',rec.code),('product_id','=',prod_id),'|',('location_id.warehouse_id','in', warehouses.ids),('location_dest_id.warehouse_id','in', warehouses.ids)]).ids
+                moves=self.env['stock.move'].search([('picking_id.picking_type_id.code','=',rec.code),('product_id','=',prod_id),'|',('location_id.warehouse_id','in', warehouses.ids),('location_dest_id.warehouse_id','in', warehouses.ids)])
                 origins=self.env['stock.move'].search([('picking_id.picking_type_id.code','=',rec.code),('product_id','=',prod_id),'|',('location_id.warehouse_id','in', warehouses.ids),('location_dest_id.warehouse_id','in', warehouses.ids)]).mapped('origin')
             else:
                 moves = self.env['stock.move'].search(
-                    [('product_id', '=', prod_id), '|',('location_id.warehouse_id', 'in', warehouses.ids), ('location_dest_id.warehouse_id', 'in',  warehouses.ids)]).ids
+                    [('product_id', '=', prod_id), '|',('location_id.warehouse_id', 'in', warehouses.ids), ('location_dest_id.warehouse_id', 'in',  warehouses.ids)])
                 origins=self.env['stock.move'].search(
                     [('product_id', '=', prod_id), '|',('location_id.warehouse_id', 'in', warehouses.ids), ('location_dest_id.warehouse_id', 'in',  warehouses.ids)]).mapped('origin')
+
+            #Filter by date
+            if rec.date:
+                moves = moves.filtered(lambda x: (x.date.date() == rec.date))
+                origins = moves.mapped('origin')
+            # Filter by reference
+            if rec.ref:
+                moves = moves.filtered(lambda x: (x.reference == rec.ref))
+                origins = moves.mapped('origin')
+
+            moves=moves.ids
 
             moves_line = self.env['stock.move.line'].search([('move_id','in',moves)]).ids
             po_lines=[]

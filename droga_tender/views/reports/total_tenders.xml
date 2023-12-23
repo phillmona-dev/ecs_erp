@@ -27,12 +27,4 @@
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_report_total_tender')})]"/>
         </record>
-
-        <menuitem
-            id="droga_report_total_tender_menu"
-            name="Total tenders"
-            action="droga_tender_report_total_tenders"
-            parent="tender_reports"
-            groups="tender_user"
-            sequence="11"/>
 </odoo>

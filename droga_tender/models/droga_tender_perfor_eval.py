@@ -81,7 +81,7 @@ class droga_tender_master(models.Model):
             return
         channels = self.env['mail.channel'].search([('name', '=', 'Tender buisness development')])
 
-        message = "Please register product titled '" + self.item_pro + "'."
+        message = "Please develop and import product titled '" + self.item_pro + "' as our customers require it."
         message = message + '\n Product group is - ' + self.type_item.type_or_item_name if self.type_item.type_or_item_name else message
         for c in channels:
             c.message_post(
