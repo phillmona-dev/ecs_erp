@@ -117,14 +117,19 @@ class droga_pharma_stock_card(models.TransientModel):
 
             prod_id = self.env['product.product'].search([('product_tmpl_id', '=', rec.product_id.id)]).id
             #rec.product_id.write({'uom_id':rec.new_uom})
+
+            self.env.cr.execute(
+                """delete from stock_quant where product_id=%s""",
+                (prod_id,))
+
             self.env.cr.execute(
                 """insert into stock_quant (product_id,company_id,location_id,lot_id,create_uid,write_uid,inventory_date,quantity,reserved_quantity,inventory_diff_quantity,inventory_quantity_set,in_date,create_date,write_date,removal_date,warehouse_id,wh_type,branch_id)
-                    select product_id,company_id,location_id,lot_id,2,2,'2023-12-31',0,0,0,false,'2023-06-30','2023-06-30','2023-06-30',(select i.removal_date from stock_lot i where i.id=lot_id),
-                    (select y.warehouse_id from stock_location y where y.id=location_id),'PH',(select m.linked_analytic from stock_warehouse m where m.id=(select y.warehouse_id from stock_location y where y.id=lot_id)) from stock_quant_summary where product_id=%s""",
+                    select product_id,company_id,location_id,lot_id,2,2,'2023-12-31',0,0,0,false,'2023-06-30','2023-06-30','2023-06-30',(select i.removal_date from stock_lot i where i.id=stock_quant_summary.lot_id),
+                    (select y.warehouse_id from stock_location y where y.id=stock_quant_summary.location_id),'PH',(select m.linked_analytic from stock_warehouse m where m.id=(select y.warehouse_id from stock_location y where y.id=stock_quant_summary.location_id)) from stock_quant_summary where product_id=%s""",
             (prod_id ,))
 
             self.env.cr.execute(
-                """update stock_quant set inventory_diff_quantity=0, quantity=
+                """update stock_quant set wh_type=(select i.wh_type from stock_warehouse i where i.id=stock_quant.warehouse_id),inventory_diff_quantity=0, quantity=
                 (select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=stock_quant.product_id and y.lot_id=stock_quant.lot_id and 
                 y.location_dest_id=stock_quant.location_id and y.state='done')-(select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=
                 stock_quant.product_id and y.lot_id=stock_quant.lot_id and y.location_id=stock_quant.location_id and y.state='done') where product_id=%s""",

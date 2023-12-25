@@ -65,7 +65,7 @@
 
 
     <record model="ir.actions.act_window" id="droga_pharma_inv_onhand_warehouse_action">
-        <field name="domain">[('quantity', '!=', 0),('has_access','=',True),('wh_type','=','PH')]</field>
+        <field name="domain">[('quantity', '!=', 0),('has_access','=',True)]</field>
         <field name="name">Stock on hand by warehouse</field>
         <field name="res_model">stock.quant</field>
         <field name="search_view_id" ref="droga_pharma_inv_onhand_warehouse_search"></field>
@@ -73,7 +73,7 @@
     </record>
 
     <record model="ir.actions.act_window" id="droga_pharma_inv_onhand_no_batch__warehouse_action">
-        <field name="domain">[('quantity', '!=', 0),('has_access','=',True),('wh_type','=','PH')]</field>
+        <field name="domain">[('quantity', '!=', 0),('has_access','=',True)]</field>
         <field name="name">Stock on hand no batch by warehouse</field>
         <field name="context">{'group_by_no_leaf':1,'group_by':['product_id','location_id']}</field>
         <field name="res_model">stock.quant</field>
