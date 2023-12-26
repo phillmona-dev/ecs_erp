@@ -31,7 +31,7 @@
                 <field name="request_date"/>
                 <field name="department"/>
                 <field name="purpose"/>
-                <field name="total_price"/>
+                <field name="total_amount"/>
                 <field name="company_id" invisible="1"/>
                 <field name="state" decoration-warning="state in('Draft')"
                        decoration-info="state in('Submitted','Verified','Budget Approved')"
