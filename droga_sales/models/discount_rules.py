@@ -109,9 +109,9 @@ class sale_order_line(models.Model):
                 wh_list = selfsud.env['stock.warehouse'].search([('wh_type', '=', rec.order_id.order_type)])
 
             for wh in wh_list:
-                rate = rec.product_uom.factor / (
+                rate = round(rec.product_uom.factor / (
                     rec.product_id.uom_id.factor if rec.product_id.uom_id.factor != 0 else (
-                        rec.product_uom.factor if rec.product_uom.factor != 0 else 1))
+                        rec.product_uom.factor if rec.product_uom.factor != 0 else 1)),2)
                 rec.available_qty = rec.available_qty + ((selfsud._get_avail_qty_per_warehouse(rec.product_id,
                                                                                                wh) - selfsud._get_outgoing_qty_per_warehouse(
                     rec.product_id, wh)) * (rate))
@@ -124,7 +124,7 @@ class sale_order_line(models.Model):
                 return
             prodqty = sum(self.order_id.order_line.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
                 'product_uom_qty'))
-            if rec.order_id.order_from:
+            if rec.order_id.order_from and rec.company_id.id==1:
                 if rec.available_qty < prodqty:
                     rec.is_prod_available = 'False'
                 elif rec.available_qty >= prodqty:
@@ -142,8 +142,7 @@ class sale_order_line(models.Model):
         selfsud = self.sudo()
         moves = selfsud.env['stock.move'].search(
             [('product_id', '=', product_id.id), ('location_id.warehouse_id', '=', warehouse_id.id),
-             ('location_id.usage', '=', 'internal'), ('location_dest_id.usage', '!=', 'internal'),
-             ('state', 'not in', ['done', 'cancel', 'draft','waiting','confirmed'])])
+             ('location_id.usage', '=', 'internal'),('state', 'not in', ['done', 'cancel', 'draft','waiting','confirmed']),('location_dest_id.usage', '!=', 'internal')])
         return sum(moves.mapped('reserved_qty'))
 
     def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):

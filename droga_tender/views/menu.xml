@@ -51,4 +51,12 @@
               groups="droga_tender.tender_user"
               parent="droga_tender.tender_reports"
               sequence="60"/>
+
+    <menuitem
+            id="tender_core_products"
+            name="Core products"
+            action="droga_crm.droga_crm_core_products_crm_action"
+            parent="droga_tender.tender_reports"
+            groups="droga_tender.tender_user"
+            sequence="70"/>
 </odoo>
