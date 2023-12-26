@@ -12,10 +12,29 @@
                 <field name="check_out"/>
                 <field name="is_absent"/>
                 <field name="absence_reason"/>
+                <field name="worked_hours"/>
+                <field name="real_worked_hours"/>
                 <field name="late_minute"/>
                 <field name="company_id"/>
 
             </tree>
+        </field>
+    </record>
+
+    <!-- tree view -->
+    <record id="hr_attendance_absence_report_search_view" model="ir.ui.view">
+        <field name="name">Absence Report</field>
+        <field name="model">droga.hr.attendance.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="is_absent"/>
+                <field name="absence_reason"/>
+                <field name="late_minute"/>
+
+            </search>
         </field>
     </record>
 

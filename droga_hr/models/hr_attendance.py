@@ -63,7 +63,7 @@ class AttendanceReport(models.Model):
     _name = 'droga.hr.attendance.report'
 
     employee_id = fields.Many2one("hr.employee")
-    date = fields.Date("Absence Day")
+    date = fields.Date("Attendance Day")
     check_in = fields.Datetime("Check In")
     check_out = fields.Datetime("Check Out")
     day_count = fields.Float("Day Count")
@@ -71,12 +71,15 @@ class AttendanceReport(models.Model):
     absence_reason = fields.Char("Reason")
     company_id = fields.Many2one("res.company")
     late_minute = fields.Float("Late Minute")
+    worked_hours = fields.Float("Worked Hours")
+    real_worked_hours = fields.Float("Real Worked Hours")
 
     def update_attendance_report(self):
         # get active employees
         vals = {}
-        check_in_time_str = '05:00'
-        start_day_str = '2023-11-29'
+
+        # start_day_str = '2023-11-29'
+        start_day_str = datetime.now()
         start_day = datetime.strptime(start_day_str, '%Y-%m-%d').date()
         # Get the current day
         current_day = datetime.now().date()
@@ -98,7 +101,10 @@ class AttendanceReport(models.Model):
                 emp_attendances = self.env["hr.attendance"].search(
                     [('employee_id', '=', employee.id), ('attendance_date', '=', day)])
 
-                if len(emp_attendances) == 0:
+                attendance_report = self.env['droga.hr.attendance.report'].search(
+                    [('employee_id', '=', employee.id), ('date', '=', day)])
+
+                if len(emp_attendances) == 0 and len(attendance_report) == 0:
                     # create absent record
                     vals["employee_id"] = employee.id
                     vals["date"] = day
@@ -108,6 +114,8 @@ class AttendanceReport(models.Model):
                     vals["late_minute"] = 0
                     vals["check_in"] = None
                     vals["check_out"] = None
+                    vals["worked_hours"] = 0
+                    vals["real_worked_hours"] = 0
 
                     self.env["droga.hr.attendance.report"].create(vals)
 
@@ -115,12 +123,12 @@ class AttendanceReport(models.Model):
 
                     check_in_time = datetime.strptime(str(attendance.check_in), '%Y-%m-%d %H:%M:%S')
 
-                    attendance_report = self.env['droga.hr.attendance.report'].search(
-                        [('employee_id', '=', employee.id), ('date', '=', day)])
-
                     minutes_late = 0
                     is_absent = False
                     absence_reason = ""
+                    real_worked_hours = 0
+
+                    real_worked_hours = self.compute_real_worked_hours(attendance)
 
                     # Calculate five minutes late
                     if check_in_time.hour >= 5:
@@ -148,6 +156,8 @@ class AttendanceReport(models.Model):
                         vals["late_minute"] = minutes_late
                         vals["check_in"] = attendance.check_in
                         vals["check_out"] = attendance.check_out
+                        vals["worked_hours"] = attendance.worked_hours
+                        vals["real_worked_hours"] = real_worked_hours
 
                         self.env["droga.hr.attendance.report"].create(vals)
 
@@ -156,7 +166,18 @@ class AttendanceReport(models.Model):
                         attendance_report.write(
                             {'is_absent': is_absent, 'absence_reason': absence_reason,
                              'check_in': attendance.check_in,
-                             'check_out': attendance.check_out, 'late_minute': minutes_late})
+                             'check_out': attendance.check_out, 'late_minute': minutes_late,
+                             'real_worked_hours': real_worked_hours})
 
                 # Move to the next day
                 day += timedelta(days=1)
+
+    def compute_real_worked_hours(self, attendance):
+        for record in attendance:
+            date_object = record.check_in
+            if record.worked_hours == 0:
+                return 0
+            elif date_object.weekday() in [5, 6]:
+                return record.worked_hours
+            else:
+                return record.worked_hours - 1
