@@ -57,6 +57,10 @@
                 <attribute name="readonly">1</attribute>
             </xpath>
 
+            <xpath expr="//field[@name='department_id']" position="before">
+                <field name="contract_type" options="{'no_create':True,'no_open':True}"/>
+            </xpath>
+
 
         </field>
     </record>
