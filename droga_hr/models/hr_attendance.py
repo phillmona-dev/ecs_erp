@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from datetime import datetime
+from odoo.exceptions import ValidationError
 
 
 class Attendance(models.Model):
@@ -12,6 +13,23 @@ class Attendance(models.Model):
 
     employee_badge_id = fields.Char(related='employee_id.barcode', string='Badge ID')
     department = fields.Char(related='employee_id.department_name', string='Department')
+
+    @api.model
+    def create(self, vals):
+        # search record for the current employee
+
+        check_in = datetime.strptime(vals['check_in'], '%Y-%m-%d %H:%M:%S')
+        check_in = check_in.strftime('%Y-%m-%d')
+
+        employee_id = vals['employee_id']
+        check_in_record = self.env["hr.attendance"].search(
+            [('check_in', '<=', check_in), ('check_in', '>=', check_in), ('employee_id', '=', employee_id)])
+
+        if check_in_record:
+            raise ValidationError("You can't create check in more than once!")
+        else:
+            res = super(Attendance, self).create(vals)
+            return res
 
     def update_not_checked_out_records(self):
         dt = datetime.utcnow()
@@ -32,4 +50,3 @@ class Attendance(models.Model):
                 record.real_worked_hours = record.worked_hours
             else:
                 record.real_worked_hours = record.worked_hours - 1
-
