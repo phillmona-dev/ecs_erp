@@ -18,7 +18,7 @@ class Attendance(models.Model):
     def create(self, vals):
         # search record for the current employee
 
-        check_in = datetime.strptime(vals['check_in'], '%Y-%m-%d %H:%M:%S')
+        check_in = datetime.strptime(str(vals['check_in']), '%Y-%m-%d %H:%M:%S')
         check_in = check_in.strftime('%Y-%m-%d')
 
         employee_id = vals['employee_id']
