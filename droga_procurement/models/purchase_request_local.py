@@ -34,6 +34,17 @@ class purchase_request_local(models.Model):
 
             record.total_amount = total
 
+    def compute_total_purchase_amount_update(self):
+
+        records = self.env["droga.purchase.request.local"].search([])
+
+        for record in records:
+            total = 0
+            for line in record.purchase_request_lines:
+                total += line.total_price
+
+            record.total_amount = total
+
     def get_current_uid(self):
         for record in self:
             if self.env.context.get('uid', False):
