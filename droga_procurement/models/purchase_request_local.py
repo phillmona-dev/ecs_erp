@@ -26,11 +26,24 @@ class purchase_request_local(models.Model):
     # compute total purchase amount
     @api.depends('purchase_request_lines.total_price')
     def compute_total_purchase_amount(self):
-        total = 0
-        for record in self.purchase_request_lines:
-            total += record.total_price
 
-        self.total_amount = total
+        for record in self:
+            total = 0
+            for line in record.purchase_request_lines:
+                total += line.total_price
+
+            record.total_amount = total
+
+    def compute_total_purchase_amount_update(self):
+
+        records = self.env["droga.purchase.request.local"].search([])
+
+        for r1 in records:
+            if r1.total_amount <= 100000 and r1.request_type == "Local":
+                r1.write({'wf_state': 'Approved'})
+            elif r1.total_amount <= 500000 and r1.request_type == "Pharmacy":
+                r1.write({'wf_state': 'Approved'})
+
 
     def get_current_uid(self):
         for record in self:
