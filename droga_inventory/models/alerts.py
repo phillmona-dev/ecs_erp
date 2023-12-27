@@ -13,6 +13,14 @@ class product_alerts(models.Model):
     availability=fields.Char('Availability',compute='_compute_availability',store=True)
     notification_for=fields.Selection([('All', 'All'), ('Pharma', 'Pharma'),('Import','Import')],
                               tracking=True)
+    tracking = fields.Selection([
+        ('serial', 'By Unique Serial Number'),
+        ('lot', 'By Lots'),
+        ('none', 'No Tracking')],
+        string="Tracking", required=True, default='none',
+        # Not having a default value here causes issues when migrating.
+        compute='_compute_tracking', store=True, readonly=False, precompute=True,tracking=True,
+        help="Ensure the traceability of a storable product in your warehouse.")
     @api.depends('stock_quantity_total','emergency_order_point')
     def _compute_availability(self):
         for rec in self:

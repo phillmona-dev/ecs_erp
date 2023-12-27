@@ -16,7 +16,8 @@ class droga_pharma_stock_card(models.TransientModel):
     #results_move_so = fields.One2many('droga.pharma.update.so', 'header')
     results_move_line = fields.One2many('droga.pharma.update.stock.move.line', 'header')
     rate=fields.Float('rate (division)',default=1)
-
+    date=fields.Date('Transaction date')
+    ref=fields.Char('Transaction reference')
     def _inverse(self):
         pass
 
@@ -39,13 +40,24 @@ class droga_pharma_stock_card(models.TransientModel):
 
             prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.product_id.id)]).id
             if rec.code:
-                moves=self.env['stock.move'].search([('picking_id.picking_type_id.code','=',rec.code),('product_id','=',prod_id),'|',('location_id.warehouse_id','in', warehouses.ids),('location_dest_id.warehouse_id','in', warehouses.ids)]).ids
+                moves=self.env['stock.move'].search([('picking_id.picking_type_id.code','=',rec.code),('product_id','=',prod_id),'|',('location_id.warehouse_id','in', warehouses.ids),('location_dest_id.warehouse_id','in', warehouses.ids)])
                 origins=self.env['stock.move'].search([('picking_id.picking_type_id.code','=',rec.code),('product_id','=',prod_id),'|',('location_id.warehouse_id','in', warehouses.ids),('location_dest_id.warehouse_id','in', warehouses.ids)]).mapped('origin')
             else:
                 moves = self.env['stock.move'].search(
-                    [('product_id', '=', prod_id), '|',('location_id.warehouse_id', 'in', warehouses.ids), ('location_dest_id.warehouse_id', 'in',  warehouses.ids)]).ids
+                    [('product_id', '=', prod_id), '|',('location_id.warehouse_id', 'in', warehouses.ids), ('location_dest_id.warehouse_id', 'in',  warehouses.ids)])
                 origins=self.env['stock.move'].search(
                     [('product_id', '=', prod_id), '|',('location_id.warehouse_id', 'in', warehouses.ids), ('location_dest_id.warehouse_id', 'in',  warehouses.ids)]).mapped('origin')
+
+            #Filter by date
+            if rec.date:
+                moves = moves.filtered(lambda x: (x.date.date() == rec.date))
+                origins = moves.mapped('origin')
+            # Filter by reference
+            if rec.ref:
+                moves = moves.filtered(lambda x: (x.reference == rec.ref))
+                origins = moves.mapped('origin')
+
+            moves=moves.ids
 
             moves_line = self.env['stock.move.line'].search([('move_id','in',moves)]).ids
             po_lines=[]
@@ -105,18 +117,29 @@ class droga_pharma_stock_card(models.TransientModel):
 
             prod_id = self.env['product.product'].search([('product_tmpl_id', '=', rec.product_id.id)]).id
             #rec.product_id.write({'uom_id':rec.new_uom})
+
+            self.env.cr.execute(
+                """delete from stock_quant where product_id=%s""",
+                (prod_id,))
+
             self.env.cr.execute(
                 """insert into stock_quant (product_id,company_id,location_id,lot_id,create_uid,write_uid,inventory_date,quantity,reserved_quantity,inventory_diff_quantity,inventory_quantity_set,in_date,create_date,write_date,removal_date,warehouse_id,wh_type,branch_id)
-                    select product_id,company_id,location_id,lot_id,2,2,'2023-12-31',0,0,0,false,'2023-06-30','2023-06-30','2023-06-30',(select i.removal_date from stock_lot i where i.id=lot_id),
-                    (select y.warehouse_id from stock_location y where y.id=location_id),'PH',(select m.linked_analytic from stock_warehouse m where m.id=(select y.warehouse_id from stock_location y where y.id=lot_id)) from stock_quant_summary where product_id=%s""",
+                    select product_id,company_id,location_id,lot_id,2,2,'2023-12-31',0,0,0,false,'2023-06-30','2023-06-30','2023-06-30',(select i.removal_date from stock_lot i where i.id=stock_quant_summary.lot_id),
+                    (select y.warehouse_id from stock_location y where y.id=stock_quant_summary.location_id),'PH',(select m.linked_analytic from stock_warehouse m where m.id=(select y.warehouse_id from stock_location y where y.id=stock_quant_summary.location_id)) from stock_quant_summary where product_id=%s""",
             (prod_id ,))
 
             self.env.cr.execute(
-                """update stock_quant set inventory_diff_quantity=0, quantity=
+                """update stock_quant set wh_type=(select i.wh_type from stock_warehouse i where i.id=stock_quant.warehouse_id),inventory_diff_quantity=0, quantity=
                 (select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=stock_quant.product_id and y.lot_id=stock_quant.lot_id and 
                 y.location_dest_id=stock_quant.location_id and y.state='done')-(select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=
                 stock_quant.product_id and y.lot_id=stock_quant.lot_id and y.location_id=stock_quant.location_id and y.state='done') where product_id=%s""",
                 (prod_id,))
+
+            self.env.cr.execute(
+                """update stock_move_line set reserved_qty=0,reserved_uom_qty=0 where state in ('assigned','partially_available') and product_id=%s
+                """,(prod_id,)
+            )
+
 
             quants=self.env['stock.quant'].search([('product_id','=',prod_id)])
             for qu in quants:

@@ -18,14 +18,9 @@ class droga_tender_master(models.Model):
     # decimal fields
     quantity = fields.Float("Award qty",related='parent_tender_performance_detail.quantity')
 
-    award_quantity = fields.Float("Revised qty", compute='get_award_qty', store=True,inverse='_inverse_award_qty')
-
-    def _inverse_award_qty(self):
-        pass
-
     def get_award_qty(self):
-        for rec in self:
-            rec.award_quantity = rec.quantity
+        return self.parent_tender_performance_detail.quantity
+    award_quantity = fields.Float("Revised qty", default=get_award_qty)
 
     unit_price = fields.Float("Unit price",related='parent_tender_performance_detail.unit_price')
     amount = fields.Float("Amount quoted",related='parent_tender_performance_detail.amount')
@@ -33,7 +28,7 @@ class droga_tender_master(models.Model):
     droga_product=fields.Many2one('product.template')
     droga_old_product = fields.Many2one('product.template')
 
-    award_cost = fields.Float("Awarded cost")
+    award_cost = fields.Float("Awarded cost",readonly=1)
     perf_pct=fields.Float('% of Performance',compute="compute_performance")
     init_sales_order=fields.Boolean('Initiate S.order?',default=False)
 
@@ -43,12 +38,12 @@ class droga_tender_master(models.Model):
 
     def _compute_ordered_delivered_qty(self):
         for rec in self:
-            if len(self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id),('product_tmpl_id','=',rec.droga_old_product.id)]))==0:
+            if len(self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id)]))==0:
                 rec.ordered_qty = 0
                 rec.delivered_qty = 0
                 rec.remaining_qty=rec.award_quantity
             else:
-                prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id),('product_tmpl_id','=',rec.droga_old_product.id)]).ids
+                prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id)]).ids
                 ten_sales=self.env['sale.order'].search([('state','=','sale'),('tender_origin_form_tender','=',rec.parent_tender_performance.id)]).ids
 
                 rec.ordered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','in',prod_id)]).mapped('product_uom_qty'))
@@ -68,6 +63,10 @@ class droga_tender_master(models.Model):
             except Exception as e:
                 rec.perf_pct=0.0
 
+    @api.onchange("award_quantity")
+    def _qty_change(self):
+        for record in self:
+            record.award_cost=record.award_quantity*record.unit_price
     # relational fields
     unit_of_measure = fields.Many2one('uom.uom', string='UOM')
     parent_tender_performance = fields.Many2one('droga.tender.master', required=True)
@@ -81,7 +80,7 @@ class droga_tender_master(models.Model):
             return
         channels = self.env['mail.channel'].search([('name', '=', 'Tender buisness development')])
 
-        message = "Please register product titled '" + self.item_pro + "'."
+        message = "Please develop and import product titled '" + self.item_pro + "' as our customers require it."
         message = message + '\n Product group is - ' + self.type_item.type_or_item_name if self.type_item.type_or_item_name else message
         for c in channels:
             c.message_post(

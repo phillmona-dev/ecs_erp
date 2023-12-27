@@ -58,7 +58,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         sheet.set_column('D:D', 14)
         sheet.set_column('E:E', 18)
         sheet.set_column('F:F', 18)
-        sheet.set_column('G:G', 16)
+        sheet.set_column('G:G', 17.3)
         row_start=12
         date_format = workbook.add_format({'num_format': 'd mmm yyyy', 'border': 7})
         num_format = workbook.add_format({'num_format': 43, 'border': 7})
@@ -89,7 +89,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
             'border': 0,
             'align': 'left',
             'valign': 'vcenter',
-            'font_size': 16})
+            'font_size': 14})
         main_title_format = workbook.add_format({
             'bold': 1,
             'border': 0,
@@ -132,7 +132,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
 
         if self.env.company.logo_web:
             company_image=io.BytesIO(base64.b64decode(self.env.company.logo_web))
-            sheet.insert_image(0,5,"test_image.png",{'image_data':company_image,'y_scale':0.4,'y_offset':3})
+            sheet.insert_image(0,6,"test_image.png",{'image_data':company_image,'y_scale':0.16,'y_offset':0})
 
         sheet.merge_range('A1:G1' ,'Droga Pharma P.L.C',big_header_format)
         sheet.merge_range('A2:C2', 'Importer and Distributor  For:', medium_header_format)

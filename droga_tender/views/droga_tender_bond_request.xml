@@ -12,7 +12,7 @@
                 <field name="security_form"/>
                 <field name="purpose"/>
                 <field name="tender"/>
-                <field name="po_number"/>
+                <field name="po_number" string="Customer tender no"/>
                 <field name="starting_date"/>
                 <field name="validity_period"/>
                 <field name="amount"/>
@@ -58,7 +58,7 @@
                                     <field name="security_form" options="{'no_create':True,'no_open':True}"/>
                                     <field name="purpose"/>
                                     <field name="tender" readonly="1"/>
-                                    <field name="po_number" readonly="1"/>
+                                    <field name="po_number" string="Customer tender no" readonly="1"/>
                                 </group>
 
                                 <group>

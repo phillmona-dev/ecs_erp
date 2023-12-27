@@ -28,4 +28,10 @@
 
 
     </menuitem>
+
+    <menuitem id="hr_attendance_absence_report_menu" name="Attendance Report"
+              action="hr_attendance_absence_report_action" groups="human_resource_manager_group"
+              parent="hr_attendance.menu_hr_attendance_root"
+              sequence="5"/>
+
 </odoo>

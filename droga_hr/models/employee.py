@@ -17,7 +17,7 @@ class Employee(models.Model):
 
     bank = fields.Many2one('res.bank', string="Bank")
     bank_account = fields.Char("Bank Account")
-    
+    contract_type = fields.Many2one("hr.contract.type", string="Contract Type", required=True)
 
     @api.model
     def create(self, vals):
@@ -25,7 +25,12 @@ class Employee(models.Model):
         # self_comp = self.with_company(self.company_id)
 
         # genertae automatic employee ID
-        vals['barcode'] = self.env['ir.sequence'].next_by_code('employee.id') or '/'
+        if vals['contract_type'] == 1:  # permanent
+            vals['barcode'] = self.env['ir.sequence'].next_by_code('employee.id') or '/'
+        elif vals['contract_type'] == 3:  # Contract
+            vals['barcode'] = self.env['ir.sequence'].next_by_code('employee.con.id') or '/'
+        else:
+            vals['barcode'] = self.env['ir.sequence'].next_by_code('employee.par.id') or '/'
 
         res = super(Employee, self).create(vals)
 
@@ -52,3 +57,4 @@ class EmployeePublic(models.Model):
     bank = fields.Many2one('res.bank', string="Bank")
     bank_account = fields.Char("Bank Account")
     department_name = fields.Char(related='department_id.name', store=True)
+    contract_type = fields.Many2one("hr.contract.type", string="Contract Type", required=True)

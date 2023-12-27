@@ -11,7 +11,7 @@
                 <field name="invoice_no" optional="hide"/>
                 <field name="itemcode" string="ItemCode" optional="show"/>
                 <field name="itemdesc" string="ItemDescription" optional="show"/>
-                <field name="qty_invoiced" string="Qty" optional="show"/>
+                <field name="qty_invoiced" string="Qty" sum="Total" optional="show"/>
                 <field name="manufacturing" string="Manufacturer" optional="show"/>
                 <field name="crm_group1" string="CRMCategory" optional="show"/>
                 <field name="itemcateg" string="INVCategory" optional="show"/>
@@ -20,8 +20,8 @@
                 <field name="cust_type_ext_det" optional="show"/>
                 <field name="order_from_det" optional="show"/>
                 <field name="cust_location" string="City" optional="hide"/>
-                <field name="invoiced_amt" string="Grand Total" optional="show"/>
-                <field name="qty_delivered" optional="hide"/>
+                <field name="invoiced_amt" string="Grand Total" sum="Total" optional="show"/>
+                <field name="qty_delivered" sum="Total" optional="hide"/>
                 <field name="invoice_date" string="Invoice Date" optional="show"/>
 
                 <field name="product_uom" string="UOM" optional="hide"/>

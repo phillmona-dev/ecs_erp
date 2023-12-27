@@ -17,11 +17,13 @@
                             <field name="product_id" options="{'no_create':True,'no_open':True}"></field>
                             <field name="current_uom" options="{'no_create':True,'no_open':True}"></field>
                             <field name="new_uom" options="{'no_create':True,'no_open':True}"></field>
+                            <field name="date"></field>
                         </group>
                         <group>
                             <field name="code"></field>
                             <field name="warehouse" widget="many2many_tags" options="{'no_create':True,'no_open':True}"></field>
                             <field name="rate"></field>
+                            <field name="ref"></field>
                         </group>
                        <div colspan="3">
                         <button name="load" type="object" string="Load" class="oe_highlight"/>

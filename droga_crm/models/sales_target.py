@@ -7,7 +7,7 @@ from odoo import models, fields, api
 class sales_target_header(models.Model):
     _name='droga.crm.sales.target.header'
     target_detail=fields.One2many('droga.crm.sales.target.detail','target_header')
-    sales_team = fields.Many2one('crm.team')
+    sales_team = fields.Many2one('droga.crm.settings.city')
     type=fields.Selection([('Weekly','Weekly'),('Monthly','Monthly'),('Quarterly','Quarterly')],default='Weekly')
     date_from=fields.Date('Date from')
     date_to=fields.Date('Date to',compute='_get_date_to')
