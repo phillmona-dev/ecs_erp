@@ -15,6 +15,7 @@ class droga_crm_grade_vs_schedule(models.TransientModel):
     grade = fields.Char('Grade')
     required_visits = fields.Integer('Required visits')
     planned_visits = fields.Integer('Planned visits')
+    planned_visits_all = fields.Integer('Planned visits everyone')
     customer_type=fields.Char('Organization type')
     cust_type = fields.Char('Customer type')
     cust_id=fields.Integer('Customer ID')
@@ -33,10 +34,10 @@ class droga_crm_grade_vs_schedule(models.TransientModel):
             rec.plan_descr=rec.userid+' - '+calendar.month_name[int(rec.month)]+', '+rec.year
     def _compute_diff(self):
         for rec in self:
-            rec.required_vs_planned=str(rec.planned_visits-rec.required_visits)
-            if rec.planned_visits-rec.required_visits==0:
+            rec.required_vs_planned=str(rec.planned_visits_all-rec.required_visits)
+            if rec.planned_visits_all-rec.required_visits==0:
                 rec.required_vs_planned_status='equal'
-            elif rec.planned_visits-rec.required_visits>0:
+            elif rec.planned_visits_all-rec.required_visits>0:
                 rec.required_vs_planned_status = 'greater'
             else:
                 rec.required_vs_planned_status='less_than'

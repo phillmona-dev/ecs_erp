@@ -174,6 +174,10 @@ class customer_visit_header(models.Model):
 
         for partner in partners_list:
             planned_vis=len(self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)])) if self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)]) else 0
+            planned_vis_all = len(self.env['droga.customer.visit.detail'].search(
+                [('visit_header.month', '=', self.month),('visit_header.year', '=', self.year), ('visit_client', '=', partner.id)])) if self.env[
+                'droga.customer.visit.detail'].search(
+                [('visit_header.month', '=', self.month),('visit_header.year', '=', self.year), ('visit_client', '=', partner.id)]) else 0
             vals = {
                 'month': self.month,
                 'month_des': calendar.month_name[int(self.month)],
@@ -183,7 +187,8 @@ class customer_visit_header(models.Model):
                 'visit_header_id': self.id,
                 'required_visits': partner.cust_grade.visit_times_per_month if partner.cust_grade else 4,
                 'planned_visits': planned_vis,
-                'diff':planned_vis-partner.cust_grade.visit_times_per_month if partner.cust_grade else planned_vis-4,
+                'planned_visits_all': planned_vis_all,
+                'diff':planned_vis_all-partner.cust_grade.visit_times_per_month if partner.cust_grade else planned_vis_all-4,
                 'customer_type': partner.cust_type_ext.full_name,
                 'cust_type': 'Customer',
                 'cust_id': partner.id
@@ -192,6 +197,12 @@ class customer_visit_header(models.Model):
             self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
         for cont in contacts_list:
             planned_vis=len(self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)])) if self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)]) else 0
+            planned_vis_all = len(self.env['droga.crm.contacts.schedule'].search(
+                [('visits_header.month', '=', self.month), ('visits_header.year', '=', self.year),
+                 ('contact_custom','=',cont.id)])) if self.env[
+                'droga.crm.contacts.schedule'].search(
+                [('visits_header.month', '=', self.month), ('visits_header.year', '=', self.year),
+                 ('contact_custom','=',cont.id)]) else 0
             vals = {
                 'month': self.month,
                 'month_des': calendar.month_name[int(self.month)],
@@ -201,7 +212,8 @@ class customer_visit_header(models.Model):
                 'visit_header_id': self.id,
                 'required_visits': cont.cont_grade.visit_times_per_month if cont.cont_grade else 4,
                 'planned_visits': planned_vis,
-                'diff':planned_vis-cont.cont_grade.visit_times_per_month if cont.cont_grade else planned_vis-4,
+                'planned_visits_all': planned_vis_all,
+                'diff':planned_vis_all-cont.cont_grade.visit_times_per_month if cont.cont_grade else planned_vis_all-4,
                 'customer_type': cont.parent_customer.cust_type_ext.full_name,
                 'cust_type': 'Contact',
                 'cust_id': partner.id

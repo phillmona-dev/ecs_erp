@@ -15,6 +15,7 @@
                 <field name="grade"></field>
                 <field name="required_visits"></field>
                 <field name="planned_visits"></field>
+                <field name="planned_visits_all"></field>
                 <field name="required_vs_planned_status" invisible="1"></field>
                 <field name="diff" invisible="1"></field>
                 <field name="required_vs_planned" decoration-success="required_vs_planned_status == 'greater'"
@@ -36,6 +37,7 @@
                 <field name="grade"></field>
                 <field name="required_visits"></field>
                 <field name="planned_visits"></field>
+                <field name="planned_visits_all"></field>
                 <field name="required_vs_planned"></field>
                 <filter name="group_cust_type" string="Customer type" context="{'group_by':'cust_type'}"/>
                 <filter string="To revise plans"
@@ -76,6 +78,7 @@
                 <field name="grade"></field>
                 <field name="required_visits"></field>
                 <field name="planned_visits"></field>
+                <field name="planned_visits_all"></field>
                 <field name="required_vs_planned_status" invisible="1"></field>
                 <field name="diff" invisible="1"></field>
                 <field name="required_vs_planned" decoration-success="required_vs_planned_status == 'greater'"
@@ -100,6 +103,11 @@
                                         Planned visits:
                                         <field name="planned_visits"></field>
                                     </li>
+                                    <li>
+                                        Planned visits everyone:
+                                        <field name="planned_visits_all"></field>
+                                    </li>
+
                                     <li>
                                         Req vs planned:
                                         <field name="required_vs_planned" decoration-success="required_vs_planned_status == 'greater'"
