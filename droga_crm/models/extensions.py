@@ -244,6 +244,8 @@ class crm_lead_extension(models.Model):
     co_travel_crm = fields.Many2many('droga.pro.sales.master', string='Co-travelers')
     date_planned = fields.Datetime('Lead date', default=fields.Date.today())
     origin_user_id = fields.Many2one('res.users')
+    is_from_plan=fields.Boolean(Default=False,string='From plan')
+
     planned_visit_selection = fields.Selection([
         ('Early Morning', 'Early Morning'),
         ('Late Morning', 'Late Morning'),

@@ -97,12 +97,6 @@ class sales_report_det_fields(models.Model):
                 rec.sales_dept = 'Employee'
 
     invoice_date = fields.Date('Invoice date',store=True)
-
-    def update_inv(self):
-        sales = self.env['sale.order.line'].search([('invoice_date','=',False)])
-        for rec in sales:
-            inv=self.env['account.move'].search([('invoice_origin','=',rec.order_id.name)])
-            rec.invoice_date=inv[0].create_date if len(inv)>0 else False
 class droga_sales_cost_of_sales_view(models.Model):
     _name = 'droga.sales.cost.of.sales'
 

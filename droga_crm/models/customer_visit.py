@@ -250,6 +250,7 @@ class customer_visit_header(models.Model):
                     'type': 'lead',
                     'stage_id': 1,
                     'plan_id':det.id,
+                    'is_from_plan':True,
                     'expected_revenue': 0,
                     'date_planned': det['visit_date'],
                     'partner_id': det['visit_client'].id,
@@ -285,6 +286,7 @@ class customer_visit_header(models.Model):
                         'type': 'lead',
                         'stage_id': 1,
                         'plan_id': det.id,
+                        'is_from_plan': True,
                         'core_products': contdet['core_products'],
                         'co_travel_crm': contdet['co_travel_crm'],
                         'contact_custom':contdet['contact_custom'].id,
@@ -428,7 +430,7 @@ class customer_visit_detail(models.Model):
     date_to = fields.Date(related='visit_header.date_to')
     def get_visit_date(self):
         return self.visit_header.last_updated_date
-    visit_date=fields.Date('Visit date',default=get_visit_date)
+    visit_date=fields.Date('Visit date',default=get_visit_date,required=True)
     visit_date_descr=fields.Char('Day',compute='_get_date_descr',store=True)
     core_products=fields.Many2many('product.template',domain=[('is_core_product','=','true')])
 
@@ -481,11 +483,11 @@ class customer_visit_detail(models.Model):
             'view_mode': 'tree',
             'view_type': 'form',
             'res_model': 'droga.crm.contacts',
-            'context': "{'search_default_group_cust_name':1}",
+            #'context': "{'search_default_group_cust_name':1}",
             'views': [[self.env.ref('droga_crm.droga_crm_doctors_schedule_view_tree').id, 'tree'],
                       [self.env.ref('droga_crm.droga_crm_doctors_schedule_view_kanban').id, 'kanban']],
             'type': 'ir.actions.act_window',
-            'domain': [('days', '=', self.visit_date.strftime("%A")),('contact_area.id','=',self.city_name.ids)],
+            'domain': [('parent_customer','=',self.visit_client.ids)],
             'target': 'new',
         }
 
