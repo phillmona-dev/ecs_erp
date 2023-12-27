@@ -41,6 +41,13 @@ class product_alerts(models.Model):
             'res_id': self.id,
             'target': 'new',
         }
+
+    def update_qty(self):
+        pros=self.env['product.template'].search([])
+        for rec in pros:
+            quants=self.env['stock.quant'].search([('product_id.product_tmpl_id.id','=',rec.id),('location_id.usage','=','internal')])
+            rec.stock_quantity_total=sum(quants.mapped('quantity'))
+            rec._compute_availability()
 class stock_out_history(models.Model):
     _name='stock.out.history'
     product=fields.Many2one('product.template')
@@ -62,10 +69,10 @@ class stock_out_notification(models.Model):
         qry_res = self._cr.dictfetchall()
         stock_out_items = self.env['product.template'].browse(set(rec['id'] for rec in qry_res))
 
-        query_pharma = """select id from product_template where most_recent_so_alert_date<most_recent_trans_date and stock_quantity_total=0 and notification_for in ('Pharma','All') and company_id=1"""
-        self._cr.execute(query_pharma)
-        qry_res_pharma = self._cr.dictfetchall()
-        stock_out_items_pharma = self.env['product.template'].browse(set(rec['id'] for rec in qry_res_pharma))
+        #query_pharma = """select id from product_template where most_recent_so_alert_date<most_recent_trans_date and stock_quantity_total=0 and notification_for in ('Pharma','All') and company_id=1"""
+        #self._cr.execute(query_pharma)
+        #qry_res_pharma = self._cr.dictfetchall()
+        #stock_out_items_pharma = self.env['product.template'].browse(set(rec['id'] for rec in qry_res_pharma))
 
         for rec in stock_out_items:
             rec.write({'most_recent_so_alert_date': datetime.now().date()})
@@ -81,7 +88,7 @@ class stock_out_notification(models.Model):
                     subtype_xmlid='mail.mt_comment',
                     author_id=self.env.user.id,
                 )
-
+        """
         for rec in stock_out_items_pharma:
             rec.write({'most_recent_so_alert_date': datetime.now().date()})
 
@@ -96,6 +103,7 @@ class stock_out_notification(models.Model):
                     subtype_xmlid='mail.mt_comment',
                     author_id=self.env.user.id,
                 )
+        """
 
     def generate_min_order_alert(self):
         query = """select id from product_template where most_recent_order_alert_date<most_recent_trans_date and emergency_order_point<=stock_quantity_total and company_id=1"""

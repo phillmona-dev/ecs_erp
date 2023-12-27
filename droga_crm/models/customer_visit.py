@@ -164,11 +164,55 @@ class customer_visit_header(models.Model):
         }
 
     def plan_analysis(self):
+
+        views=self.env['droga.crm.grade.vs.schedule.trans'].search([('visit_header_id', '=', self.id)])
+        views.unlink()
+
+        regions=self.pr_sales.p_regions.ids
+        partners_list=self.env['res.partner'].search([('city_name','in',regions),('company_id','=',self.env.company.id)])
+        contacts_list=self.env['droga.crm.contacts'].search([('contact_area','in',regions),('company_id','=',self.env.company.id)])
+
+        for partner in partners_list:
+            planned_vis=len(self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)])) if self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)]) else 0
+            vals = {
+                'month': self.month,
+                'month_des': calendar.month_name[int(self.month)],
+                'year': self.year,
+                'state': self.state,
+                'cust_name': partner.name,
+                'visit_header_id': self.id,
+                'required_visits': partner.cust_grade.visit_times_per_month if partner.cust_grade else 4,
+                'planned_visits': planned_vis,
+                'diff':planned_vis-partner.cust_grade.visit_times_per_month if partner.cust_grade else planned_vis-4,
+                'customer_type': partner.cust_type_ext.full_name,
+                'cust_type': 'Customer',
+                'cust_id': partner.id
+            }
+
+            self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
+        for cont in contacts_list:
+            planned_vis=len(self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)])) if self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)]) else 0
+            vals = {
+                'month': self.month,
+                'month_des': calendar.month_name[int(self.month)],
+                'year': self.year,
+                'state': self.state,
+                'cust_name': cont.descr+' ('+cont.parent_customer.name+')',
+                'visit_header_id': self.id,
+                'required_visits': cont.cont_grade.visit_times_per_month if cont.cont_grade else 4,
+                'planned_visits': planned_vis,
+                'diff':planned_vis-cont.cont_grade.visit_times_per_month if cont.cont_grade else planned_vis-4,
+                'customer_type': cont.parent_customer.cust_type_ext.full_name,
+                'cust_type': 'Contact',
+                'cust_id': partner.id
+            }
+
+            self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
         return {
             'name': 'Plan analysis for '+self.userid+' - '+calendar.month_name[int(self.month)]+', '+self.year,
             'view_mode': 'tree',
             'view_type': 'form',
-            'res_model': 'droga.crm.grade.vs.schedule.view',
+            'res_model': 'droga.crm.grade.vs.schedule.trans',
             'views': [[self.env.ref('droga_crm.droga_crm_required_vs_planned_tree').id, 'tree'],
                       [self.env.ref('droga_crm.droga_crm_grade_vs_schedule_view_view_kanban').id, 'kanban']],
             'type': 'ir.actions.act_window',
