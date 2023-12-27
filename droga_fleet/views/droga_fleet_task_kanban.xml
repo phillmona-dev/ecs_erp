@@ -86,6 +86,7 @@
             <field name="res_model">droga.fleet.request.task</field>
             <field name="view_mode">kanban</field>
             <field name="context">{"search_default_active": 1, "default_model": "droga.fleet.request.task"}</field>
+            <field name="domain">[('is_record_owner','=',True)]</field>
         </record>
     </data>
 </odoo>
