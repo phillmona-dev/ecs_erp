@@ -135,6 +135,12 @@ class droga_pharma_stock_card(models.TransientModel):
                 stock_quant.product_id and y.lot_id=stock_quant.lot_id and y.location_id=stock_quant.location_id and y.state='done') where product_id=%s""",
                 (prod_id,))
 
+            self.env.cr.execute(
+                """update stock_move_line set reserved_qty=0,reserved_uom_qty=0 where state in ('assigned','partially_available') and product_id=%s
+                """,(prod_id,)
+            )
+
+
             quants=self.env['stock.quant'].search([('product_id','=',prod_id)])
             for qu in quants:
                 qu._get_on_hand()

@@ -96,17 +96,7 @@ class sales_report_det_fields(models.Model):
             else:
                 rec.sales_dept = 'Employee'
 
-    invoice_date = fields.Date('Invoice date', compute='_get_invoice_date',store=True)
-
-    @api.depends('invoice_lines')
-    def _get_invoice_date(self):
-        for rec in self:
-            if len(rec.invoice_lines) > 0:
-                rec.invoice_date = rec.invoice_lines[0].move_id.invoice_date
-            else:
-                rec.invoice_date = False
-
-
+    invoice_date = fields.Date('Invoice date',store=True)
 class droga_sales_cost_of_sales_view(models.Model):
     _name = 'droga.sales.cost.of.sales'
 

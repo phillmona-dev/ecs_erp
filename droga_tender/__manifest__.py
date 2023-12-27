@@ -53,7 +53,7 @@
 
     # any module necessary for this one to work correctly
 
-    'depends': ['base', 'hr', 'account',
+    'depends': ['base', 'hr', 'account','droga_crm',
                 'mail', 'droga_crm', 'hr', 'droga_finance', 'droga_inventory','droga_sales',
                 'resource', 'stock', 'sale',
                 'web'],

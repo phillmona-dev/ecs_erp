@@ -123,6 +123,14 @@
         (0, 0, {'view_mode': 'kanban', 'view_id': ref('base.res_partner_kanban_view')})]"></field>
     </record>
 
+    <menuitem
+        id="crm.crm_lead_menu_my_activities"
+        name="My Activities"
+        parent="crm.crm_menu_sales"
+        groups="droga_crm.non_existent_group"
+        action="crm.crm_lead_action_my_activities"
+        sequence="2"/>
+
     <!-- Hide default reporting menu -->
 
     <record model="ir.ui.menu" id="crm.crm_menu_report">
@@ -136,7 +144,7 @@
     </record>
     <!-- Pipeline menu domain -->
     <record model="ir.actions.act_window" id="crm.crm_lead_action_pipeline">
-        <field name="domain">[('is_record_owner','=',True),('type','=','opportunity')]</field>
+        <field name="domain">[('is_record_owner','=',True)]</field>
         <field name="context">{'search_default_activities_today': 1}</field>
     </record>
     <!-- Leads menu rename -->

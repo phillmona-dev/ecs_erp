@@ -98,7 +98,7 @@ class droga_tender_submission_detail(models.Model):
         if "status" in vals_list:
             if vals_list["status"]=="awarded":
                 to_create_perf_eval = {
-                    "award_cost":vals_list["unit_price"]*vals_list["quantity"],
+                    "award_cost":vals_list["unit_price"]*vals_list["quantity"],"award_quantity":vals_list["quantity"],
                     "parent_tender_performance": vals_list["parent_tender_submission"],
                     "parent_tender_performance_detail": res.id,
                 }
@@ -152,7 +152,7 @@ class droga_tender_submission_detail(models.Model):
             return super().write(vals)
         if vals["status"]=="awarded":
             to_create_perf_eval = {
-                "parent_tender_performance_detail": self.id,
+                "parent_tender_performance_detail": self.id,"award_quantity":(vals['quantity'] if 'quantity' in vals else self.quantity),
                 "award_cost": (vals['unit_price'] if 'unit_price' in vals else self.unit_price) * (vals['quantity'] if 'quantity' in vals else self.quantity),
                 "parent_tender_performance": self.parent_tender_submission.id,
             }

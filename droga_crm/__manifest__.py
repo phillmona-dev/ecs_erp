@@ -24,7 +24,6 @@
         'reports/leads_report.xml',
         'views/module_menus.xml',
         'security/ir.model.access.csv',
-        'security/report_record_rules.xml',
         'reports/excel_reports/visit_plan.xml',
         'reports/core_products.xml',
         'views/cust_extension.xml',

@@ -45,6 +45,7 @@
             id="droga_sales_excel_report"
             name="Profit margin by item excel"
             parent="droga_sales.droga_sales_reports_menu"
+            groups="droga_inventory.inv_prod_fin,droga_inventory.inv_prod_fin_wf,droga_finance.account_finance_operation_manager_group"
             action="action_sales_excel_report"
             sequence="26"/>
 </odoo>

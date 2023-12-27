@@ -259,7 +259,7 @@ class droga_tender_master(models.Model):
                     'product_template_id': line.droga_product.id,
                     'product_uom': line.droga_product.uom_id.id,
                     'product_id':self.env['product.product'].search([('product_tmpl_id','=',line.droga_product.id)])[0].id ,
-                    'product_uom_qty': line.quantity - line.ordered_qty,
+                    'product_uom_qty': line.award_quantity - line.ordered_qty,
                     'price_unit': line.unit_price,
                     'tender_line': line.id
                 })

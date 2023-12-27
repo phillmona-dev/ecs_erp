@@ -7,10 +7,12 @@ from odoo import models, fields, api
 class sales_target_header(models.Model):
     _name='droga.crm.sales.target.header'
     target_detail=fields.One2many('droga.crm.sales.target.detail','target_header')
-    sales_team = fields.Many2one('crm.team')
+    sales_team = fields.Many2one('droga.crm.settings.city')
     type=fields.Selection([('Weekly','Weekly'),('Monthly','Monthly'),('Quarterly','Quarterly')],default='Weekly')
     date_from=fields.Date('Date from')
-    date_to=fields.Date('Date to',compute='_get_date_to')
+    date_to=fields.Date('Date to',compute='_get_date_to',inverse='_inverse_date_to',store=True)
+    def _inverse_date_to(self):
+        pass
     _sql_constraints = [
         ('target_team_type_datefrom', 'unique (sales_team,type,date_from)', 'The combination sales team,type and date already exists!')
     ]
@@ -40,13 +42,16 @@ class sales_target_header(models.Model):
             'res_id': self.id,
         }
 
-
+    def duplicate_entry(self):
+        pass
 
 class sales_target_detail(models.Model):
     _name='droga.crm.sales.target.detail'
     target_header=fields.Many2one('droga.crm.sales.target.header',required=True)
     indicator=fields.Many2one('product.template')
     target_qty=fields.Integer('Target qty')
+    me_too = fields.Boolean('MeToo')
     target_amt = fields.Integer('Target amt')
     achievement = fields.Integer('Achievement')     #Fix me
     remark=fields.Char('Remark')
+    prod_group = fields.Many2one('droga.crm.settings.prod_group')

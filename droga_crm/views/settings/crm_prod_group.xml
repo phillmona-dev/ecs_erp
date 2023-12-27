@@ -13,6 +13,7 @@
         <field name="arch" type="xml">
             <tree string="" editable="top" delete="0">
                 <field name="prod_group"></field>
+                <field name="parent_group"></field>
                 <field name="status"></field>
             </tree>
         </field>
