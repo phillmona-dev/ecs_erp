@@ -81,7 +81,7 @@ class AttendanceReport(models.Model):
 
         # start_day_str = '2023-11-29'
         start_day_str = datetime.now()
-        start_day = datetime.strptime(str(start_day_str), '%Y-%m-%d').date()
+        start_day = datetime.strptime(str(start_day_str), '%Y-%m-%d %H:%M:%S').date()
         # Get the current day
         current_day = datetime.now().date()
 
