@@ -63,6 +63,7 @@ class AttendanceReport(models.Model):
     _name = 'droga.hr.attendance.report'
 
     employee_id = fields.Many2one("hr.employee")
+    employee_badge_id = fields.Char(related='employee_id.barcode', string='Badge ID')
     date = fields.Date("Attendance Day")
     check_in = fields.Datetime("Check In")
     check_out = fields.Datetime("Check Out")
