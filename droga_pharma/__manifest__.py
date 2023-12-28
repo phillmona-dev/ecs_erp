@@ -46,7 +46,6 @@
         'views/selection_settings/intervention.xml',
         'views/selection_settings/area_counsel.xml',
         'views/selection_settings/prod_categ.xml',
-        'views/selection_settings/point_types.xml',
         'views/compounding.xml',
         'views/pcm/mtm.xml',
         'views/credit_limit_pharma.xml',

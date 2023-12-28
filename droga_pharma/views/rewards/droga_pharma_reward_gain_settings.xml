@@ -12,8 +12,8 @@
         <field name="model">droga.pharma.reward.gain</field>
         <field name="arch" type="xml">
             <tree string="" delete="0">
-                <field name="prod_group" widget="many2many_tags"></field>
                 <field name="points_to_gain"></field>
+                <field name="remark"></field>
                 <field name="status"></field>
             </tree>
         </field>
@@ -26,7 +26,6 @@
             <form string="" delete="0">
                 <sheet>
                     <group>
-                        <field name="prod_group" widget="many2many_tags" domain="[('avail_in_product_master', '=',True)]" options="{'no_create':True,'no_open':True}"></field>
                         <field name="points_to_gain"></field>
                         <field name="remark"></field>
                         <field name="status"></field>
