@@ -8,9 +8,8 @@ class droga_crm_settings_prod_groups(models.Model):
     prod_group = fields.Char("Product group",required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
-
+    parent_group=fields.Many2one('droga.crm.settings.prod_group')
     has_group_access = fields.Boolean('Has CRM product group access', search='_has_group_access',compute='_compute_group')
-
     def _has_group_access(self, operator, value):
         if not self.env.user.name.upper().startswith('CRM MEDICAL'):
             return [('id', 'in', [x.id for x in self.env['res.partner'].search([(1, '=', 1)])])]

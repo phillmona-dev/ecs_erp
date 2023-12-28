@@ -4,10 +4,19 @@ class points_storage(models.Model):
     _name='droga.pharma.points.earned'
 
     customer=fields.Many2one('res.partner')
-    point_type=fields.Many2one('droga.pharma.points.types')
+    type= fields.Selection([
+        ('Purchase reward', 'Purchase reward'),
+        ('Speciality service reward', 'Speciality service reward'),
+        ('Referral reward', 'Referral reward'),
+        ('Discount for repeat purchase', 'Discount for repeat purchase'),
+        ('Discount for speciality service usage', 'Discount for speciality service usage'),
+        ('Discount for referral', 'Discount for referral'),
+        ('Discount for breast feed', 'Discount for breast feed'),
+        ('Discount for health professional', 'Discount for health professional')
+    ])
     sales_ref=fields.Many2one('sale.order',string='Sales order')
     earned_date=fields.Date('Date')
-    points_earned = fields.Float('Points earned')
+    points_earned = fields.Float('Points')
 
     def open_sales(self):
         return {
@@ -21,7 +30,3 @@ class points_storage(models.Model):
             'res_id': self.sales_ref.id,
         }
 
-class points_types(models.Model):
-    _name='droga.pharma.points.types'
-    type=fields.Char('Type')
-    point_per_sale=fields.Integer('Points per transaction')

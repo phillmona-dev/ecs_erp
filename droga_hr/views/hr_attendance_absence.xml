@@ -6,6 +6,7 @@
         <field name="model">droga.hr.attendance.report</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="employee_badge_id"/>
                 <field name="employee_id"/>
                 <field name="date" string="Date"/>
                 <field name="check_in"/>
@@ -27,6 +28,7 @@
         <field name="model">droga.hr.attendance.report</field>
         <field name="arch" type="xml">
             <search>
+                <field name="employee_badge_id"/>
                 <field name="employee_id"/>
                 <field name="check_in"/>
                 <field name="check_out"/>

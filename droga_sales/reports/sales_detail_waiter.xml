@@ -35,7 +35,10 @@
                 <field name="wareh" optional="hide" string="Warehouse"/>
                 <field name="price_unit" optional="hide"/>
                 <field name="state" optional="hide"/>
-                <field name="invoice_status" optional="hide"/>
+                <field name="invoice_status"  decoration-success="invoice_status == 'invoiced' or (invoice_status=='no' and state=='dispense')"
+                       decoration-info="invoice_status == 'to invoice'"
+                       decoration-warning="invoice_status == 'upselling'"
+                       widget="badge" optional="hide"/>
 
             </tree>
         </field>
@@ -74,28 +77,28 @@
                 <separator/>
 
                 <filter string="Today sales"
-                        domain="[('date_order_det', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date_order_det', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
+                        domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
                         name="today_sales"></filter>
 
                 <filter string="Current week sales"
                     domain="[
-                        ('date_order_det', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
-                        ('date_order_det', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
+                        ('invoice_date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('invoice_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
                     name="current_week_sales"></filter>
 
                 <filter string="Previous week sales"
-                       domain="[('date_order_det', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),
-                       ('date_order_det', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]"
+                       domain="[('invoice_date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),
+                       ('invoice_date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]"
                         name="previous_week_sales"></filter>
 
                 <filter string="Current month sales"
-                        domain="[('date_order_det','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('date_order_det','&gt;=',time.strftime('%%Y-%%m-01'))]"
+                        domain="[('invoice_date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
+                        ('invoice_date','&gt;=',time.strftime('%%Y-%%m-01'))]"
                         name="current_month_sales"></filter>
 
                 <filter string="Previous month sales"
-                        domain="[('date_order_det','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('date_order_det','&lt;',time.strftime('%%Y-%%m-01'))]"
+                        domain="[('invoice_date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
+                        ('invoice_date','&lt;',time.strftime('%%Y-%%m-01'))]"
                 name="previous_month_sales"></filter>
             </search>
         </field>

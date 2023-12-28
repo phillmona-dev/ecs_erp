@@ -13,7 +13,6 @@
         <field name="arch" type="xml">
             <tree string="" editable="top" delete="0">
                 <field name="type"></field>
-                <field name="point_per_sale"></field>
             </tree>
         </field>
     </record>

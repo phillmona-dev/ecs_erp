@@ -4,6 +4,7 @@ from odoo import api, fields, models
 from datetime import timedelta
 
 from odoo.exceptions import UserError
+from odoo.http import request
 
 
 class FleetRequest(models.Model):
@@ -559,6 +560,39 @@ class RequestTasks(models.Model):
 
     chauffeur = fields.Many2one("hr.employee", string=" Driver (If Needed)")
     chauffeur_drivers=fields.Many2one('droga.pro.sales.master',string=" Driver (If Needed)",domain="[('employee_access_users', 'like', 'Driver%')]")
+    def _get_pr_sales_logged(self):
+        if not request:
+            return False
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        return False if len(ses) == 0 else ses[0].pro_id.ids[0]
+
+
+    pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Driver ID log", store=False,
+                                      default=_get_pr_sales_logged)
+
+    is_record_owner = fields.Boolean('Show lead', store=False, compute="_is_record_owner", search="_search_field")
+
+    @api.depends('pr_sales_logged')
+    def _is_record_owner(self):
+        for rec in self:
+            if rec.chauffeur_drivers == rec.pr_sales_logged:
+                rec.is_record_owner = True
+            else:
+                rec.is_record_owner = False
+
+    def _search_field(self, operator, value):
+        if operator == '=':
+            if not request:
+                return [('id', 'in', [])]
+            ses = self.env['droga.pro.sales.master.visit'].sudo().search([('s_id', '=', request.session.sid)])
+            if len(ses) == 0:
+                return [('id', 'in', [])]
+            else:
+                is_rec_owner = self.env['droga.fleet.request.task'].sudo().search([('chauffeur_drivers', '=', ses[0].pro_id.ids[0])])
+                # is_rec_inside_self=self.sudo().search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
+                return [('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False)]
+        else:
+            return [('id', 'in', [])]
 
     request_id = fields.Many2one('droga.fleet.request')
 

@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <tree create="0" delete="0">
                 <field name="customer"/>
-                <field name="point_type"/>
+                <field name="type"/>
                 <field name="sales_ref"/>
                 <field name="earned_date"/>
                 <field name="points_earned"/>
@@ -21,13 +21,13 @@
         <field name="arch" type="xml">
             <search>
                 <field name="customer"/>
-                <field name="point_type"/>
+                <field name="type"/>
                 <field name="sales_ref"/>
                 <field name="earned_date"/>
                 <field name="points_earned"/>
 
                 <searchpanel>
-                    <field name="point_type" string="Point type"/>
+                    <field name="type" string="Type"/>
                 </searchpanel>
             </search>
         </field>

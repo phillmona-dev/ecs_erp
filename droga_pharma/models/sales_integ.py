@@ -98,6 +98,7 @@ class sales_integ(models.Model):
                 record['age'] = 0
     def action_done(self):
         self.state='done'
+        self.set_activity_done()
     def disp_products_manual(self):
         inv = self.env['account.move'].search(
             [('invoice_origin', '=', self.name)])
@@ -130,8 +131,15 @@ class sales_integ(models.Model):
                 pick.write({'state': 'draft'})
         self.write({'state': 'draft'})
 
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        for act in activity:
+            act.sudo().action_done()
+
     def action_amend(self):
         self.write({'state': 'draft'})
+        self.set_activity_done()
     def action_mtm_orders(self):
         return {
             'name': 'MTM sessions',
