@@ -19,6 +19,8 @@ class Employee(models.Model):
     bank_account = fields.Char("Bank Account")
     contract_type = fields.Many2one("hr.contract.type", string="Contract Type", required=True)
 
+    is_attendance_required = fields.Boolean("Attendance Required", default=True)
+
     @api.model
     def create(self, vals):
         # get sequence number for each company
@@ -58,3 +60,4 @@ class EmployeePublic(models.Model):
     bank_account = fields.Char("Bank Account")
     department_name = fields.Char(related='department_id.name', store=True)
     contract_type = fields.Many2one("hr.contract.type", string="Contract Type", required=True)
+    is_attendance_required = fields.Boolean("Attendance Required", default=True)

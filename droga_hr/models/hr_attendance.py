@@ -65,6 +65,7 @@ class AttendanceReport(models.Model):
     _order = 'date desc'
 
     employee_id = fields.Many2one("hr.employee")
+    department = fields.Char(related='employee_id.department_name', string='Department', store=True)
     employee_badge_id = fields.Char(related='employee_id.barcode', string='Badge ID')
     date = fields.Date("Attendance Day")
     check_in = fields.Datetime("Check In")
@@ -77,17 +78,18 @@ class AttendanceReport(models.Model):
     worked_hours = fields.Float("Worked Hours")
     real_worked_hours = fields.Float("Real Worked Hours")
 
-    def update_attendance_report(self):
+    def update_attendance_report(self, start_day_str):
         # get active employees
         vals = {}
 
-        # start_day_str = '2023-12-27'
-        start_day_str = datetime.now().date()
+        # start_day_str = '2023-11-29'
+        # start_day_str = datetime.now().date()
         start_day = datetime.strptime(str(start_day_str), "%Y-%m-%d").date()
         # Get the current day
         current_day = datetime.now().date()
 
-        active_employees = self.env["hr.employee"].search([('active', '=', True)])
+        active_employees = self.env["hr.employee"].search(
+            [('active', '=', True), ('is_attendance_required', '=', True)])
 
         for employee in active_employees:
 
@@ -135,7 +137,18 @@ class AttendanceReport(models.Model):
 
                     # Calculate five minutes late
                     if check_in_time.hour >= 5:
-                        minutes_late = check_in_time.minute
+                        start_time_str = str(day) + " 05:00:00"
+
+                        # Convert string representations to datetime objects
+                        start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
+                        end_time = datetime.strptime(str(check_in_time), "%Y-%m-%d %H:%M:%S")
+
+                        # Calculate the time difference
+                        time_difference = end_time - start_time
+
+                        # Extract the total minutes from the time difference
+                        minutes_late = time_difference.total_seconds() / 60
+
                     if minutes_late > 30 and attendance.worked_hours == 0:
                         is_absent = True
                         absence_reason = "Late >30 Min & No Check Out"

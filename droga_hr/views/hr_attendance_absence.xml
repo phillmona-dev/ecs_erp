@@ -8,15 +8,18 @@
             <tree>
                 <field name="employee_badge_id"/>
                 <field name="employee_id"/>
+                <field name="department"/>
                 <field name="date" string="Date"/>
                 <field name="check_in"/>
                 <field name="check_out"/>
-                <field name="is_absent"/>
-                <field name="absence_reason"/>
-                <field name="worked_hours"/>
-                <field name="real_worked_hours"/>
+                <field name="worked_hours" widget="float_time"/>
+                <field name="real_worked_hours" widget="float_time"/>
                 <field name="late_minute"/>
-                <field name="company_id"/>
+                <field name="is_absent"/>
+                <field name="absence_reason" widget="badge" decoration-success="absence_reason == 'Showed Up'"
+                       decoration-danger="absence_reason in('Late >30 Min &#38; No Check Out','Late >30 Min','Not Showed Up')"
+                       decoration-warning="absence_reason == 'No Check Out'"/>
+
 
             </tree>
         </field>
@@ -30,6 +33,7 @@
             <search>
                 <field name="employee_badge_id"/>
                 <field name="employee_id"/>
+                <field name="department"/>
                 <field name="check_in"/>
                 <field name="check_out"/>
                 <field name="is_absent"/>
@@ -53,5 +57,13 @@
             </p>
         </field>
     </record>
+
+    <record model="ir.rule" id="hr_attendance_absence_report_rule">
+        <field name="name">Attendance Report multi-company</field>
+        <field name="model_id" ref="model_droga_hr_attendance_report"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
 
 </odoo>
