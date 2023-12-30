@@ -149,18 +149,24 @@ class AttendanceReport(models.Model):
                         # Extract the total minutes from the time difference
                         minutes_late = time_difference.total_seconds() / 60
 
-                    if minutes_late > 30 and attendance.worked_hours == 0:
+                    if minutes_late > 30 and attendance.worked_hours == 0 and employee.check_out:
                         is_absent = True
                         absence_reason = "Late >30 Min & No Check Out"
                     elif minutes_late > 30 and attendance.worked_hours != 0:
                         absence_reason = "Late >30 Min"
                         is_absent = True
-                    elif attendance.worked_hours == 0:
+                    elif attendance.worked_hours == 0 and employee.check_out:
                         absence_reason = "No Check Out"
                         is_absent = True
                     else:
                         is_absent = False
                         absence_reason = "Showed Up"
+
+                    # if employee don't require check out time set the check out to 5:00
+                    check_out = attendance.check_out
+                    if not employee.check_out:
+                        check_out = str(day) + " 14:00:00"
+                        check_out = datetime.strptime(check_out, '%Y-%m-%d %H:%M:%S')
 
                     if len(attendance_report) == 0:  # insert new record
 
@@ -171,7 +177,7 @@ class AttendanceReport(models.Model):
                         vals["company_id"] = employee.company_id.id
                         vals["late_minute"] = minutes_late
                         vals["check_in"] = attendance.check_in
-                        vals["check_out"] = attendance.check_out
+                        vals["check_out"] = check_out
                         vals["worked_hours"] = attendance.worked_hours
                         vals["real_worked_hours"] = real_worked_hours
 
@@ -213,6 +219,4 @@ class AttendanceOvertTimeReport(models.Model):
     company_id = fields.Many2one("res.company")
     worked_hours = fields.Float("Worked Hours")
     real_worked_hours = fields.Float("Real Worked Hours")
-    approval_status=fields.Selection([('Approved','Not App')])
-
-
+    approval_status = fields.Selection([('Approved', 'Not App')])
