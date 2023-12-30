@@ -244,3 +244,23 @@ class AttendanceOvertTimeReport(models.Model):
                 vals["over_time_hour"] = over_time_hour
 
                 self.env["droga.hr.attendance.over.time"].create(vals)
+
+class AttendanceOvertTimeReport1(models.Model):
+    _name = 'droga.hr.attendance.overt_time'
+
+    _order = 'date desc'
+
+    employee_id = fields.Many2one("hr.employee")
+    department = fields.Char(related='employee_id.department_name', string='Department', store=True)
+    employee_badge_id = fields.Char(related='employee_id.barcode', string='Badge ID', store=True)
+    date = fields.Date("Attendance Day")
+    check_in = fields.Datetime("Check In")
+    check_out = fields.Datetime("Check Out")
+    company_id = fields.Many2one("res.company")
+    worked_hours = fields.Float("Worked Hours")
+    real_worked_hours = fields.Float("Real Worked Hours")
+    over_time_hour = fields.Float("Over Time Hour")
+    approval_status = fields.Selection([('Approved', 'Approved'), ('Not Approved', 'Not Approved')], tracking=True,
+                                       default='Not Approved')
+
+   
