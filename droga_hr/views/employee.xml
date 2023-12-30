@@ -28,7 +28,7 @@
                     <group>
                         <field name="is_attendance_required"/>
                         <field name="check_in"/>
-                        <field name="check_in"/>
+                        <field name="check_out"/>
                     </group>
                 </page>
 
