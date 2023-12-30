@@ -21,7 +21,7 @@ class Employee(models.Model):
 
     is_attendance_required = fields.Boolean("Attendance Required", default=True)
     check_in = fields.Boolean("Check In", default=True)
-    check_out = fields.Boolean("Check In", default=True)
+    check_out = fields.Boolean("Check Out", default=True)
 
     @api.model
     def create(self, vals):
