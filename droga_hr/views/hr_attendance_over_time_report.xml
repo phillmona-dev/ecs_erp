@@ -13,6 +13,7 @@
                 <field name="check_in"/>
                 <field name="check_out"/>
                 <field name="worked_hours" widget="float_time"/>
+                <field name="real_worked_hours" widget="float_time"/>
                 <field name="over_time_hour" widget="float_time"/>
                 <field name="approval_status" widget="badge" decoration-success="approval_status == 'Approved'"
                        decoration-warning="approval_status == 'Not Approved'"/>

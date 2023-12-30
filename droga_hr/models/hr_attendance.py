@@ -230,15 +230,15 @@ class AttendanceOvertTimeReport(models.Model):
 
         for attendance in attendances:
             overtime = self.env["droga.hr.attendance.over.time"].search(
-                [('employee_id', '=', attendance.employee.id), ('date', '=', attendance.date)])
+                [('employee_id', '=', attendance.employee_id.id), ('date', '=', attendance.date)])
 
             if len(overtime) == 0:
                 over_time_hour = attendance.real_worked_hours - 8
-                vals["employee_id"] = attendance.employee.id
+                vals["employee_id"] = attendance.employee_id.id
                 vals["date"] = attendance.date
                 vals["check_in"] = attendance.check_in
                 vals["check_out"] = attendance.check_out
-                vals["company_id"] = attendance.company_id
+                vals["company_id"] = attendance.company_id.id
                 vals["worked_hours"] = attendance.worked_hours
                 vals["real_worked_hours"] = attendance.real_worked_hours
                 vals["over_time_hour"] = over_time_hour
