@@ -63,3 +63,5 @@ class EmployeePublic(models.Model):
     department_name = fields.Char(related='department_id.name', store=True)
     contract_type = fields.Many2one("hr.contract.type", string="Contract Type", required=True)
     is_attendance_required = fields.Boolean("Attendance Required", default=True)
+    check_in = fields.Boolean("Check In", default=True)
+    check_out = fields.Boolean("Check In", default=True)
