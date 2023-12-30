@@ -263,4 +263,4 @@ class AttendanceOvertTimeReport1(models.Model):
     approval_status = fields.Selection([('Approved', 'Approved'), ('Not Approved', 'Not Approved')], tracking=True,
                                        default='Not Approved')
 
-   
+

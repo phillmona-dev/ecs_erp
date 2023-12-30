@@ -40,6 +40,30 @@
                 <field name="absence_reason"/>
                 <field name="late_minute"/>
 
+                <filter string="Today"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
+                        name="today_trans"></filter>
+
+                <filter string="Current week"
+                        domain="[('date', '&lt;=', ((context_today()+relativedelta(weeks=0, weekday=-1)).strftime('%Y-%m-%d'))),
+                    ('date', '&gt;=', ((context_today()-relativedelta(weeks=1, weekday=0)).strftime('%Y-%m-%d')))]"
+                        name="current_week_trans"></filter>
+
+                <filter string="Previous week"
+                        domain="[('date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),
+                       ('date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]"
+                        name="previous_week_trans"></filter>
+
+                <filter string="Current month"
+                        domain="[('date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
+                        ('date','&gt;=',time.strftime('%%Y-%%m-01'))]"
+                        name="current_month_trans"></filter>
+
+                <filter string="Previous month"
+                        domain="[('date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
+                        ('date','&lt;',time.strftime('%%Y-%%m-01'))]"
+                        name="previous_month_trans"></filter>
+
             </search>
         </field>
     </record>
