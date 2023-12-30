@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- tree view for odoo overtime -->
+    <record id="hr_attendance_over_time_report_tree_view" model="ir.ui.view">
+        <field name="name">Over Time Report</field>
+        <field name="model">droga.hr.attendance.over.time</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="employee_badge_id"/>
+                <field name="employee_id"/>
+                <field name="department"/>
+                <field name="date" string="Date"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="worked_hours" widget="float_time"/>
+                <field name="over_time_hour" widget="float_time"/>
+                <field name="approval_status" widget="badge" decoration-success="approval_status == 'Approved'"
+                       decoration-warning="approval_status == 'Not Approved'"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <!-- search view -->
+    <record id="hr_attendance_over_time_report_search_view" model="ir.ui.view">
+        <field name="name">Absence Report</field>
+        <field name="model">droga.hr.attendance.over.time</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_badge_id"/>
+                <field name="employee_id"/>
+                <field name="department"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="over_time_hour"/>
+
+            </search>
+        </field>
+    </record>
+
+    <!-- action -->
+    <record id="hr_attendance_over_time_report_action" model="ir.actions.act_window">
+        <field name="name">Over Time Report</field>
+        <field name="res_model">droga.hr.attendance.over.time</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Over Time Report
+            </p>
+        </field>
+    </record>
+
+    <!-- rule -->
+    <record model="ir.rule" id="hr_attendance_over_time_report_rule">
+        <field name="name">Over Time Report multi-company</field>
+        <field name="model_id" ref="model_droga_hr_attendance_over_time"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+
+</odoo>

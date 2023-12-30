@@ -25,7 +25,7 @@
         </field>
     </record>
 
-    <!-- tree view -->
+    <!-- search view -->
     <record id="hr_attendance_absence_report_search_view" model="ir.ui.view">
         <field name="name">Absence Report</field>
         <field name="model">droga.hr.attendance.report</field>

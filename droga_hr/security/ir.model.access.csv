@@ -7,6 +7,7 @@ access_droga_payroll_hr_job_grade,hr.job.grade,model_hr_job_grade,base.group_use
 access_droga_hr_letter,droga.hr.letter,model_droga_hr_letter,base.group_user,1,1,1,1
 access_droga_hr_letter_type,droga.hr.letter.type,model_droga_hr_letter_type,hr.group_hr_user,1,1,1,1
 access_droga_hr_attendance_report,droga.hr.attendance.report,model_droga_hr_attendance_report,hr.group_hr_user,1,1,1,1
+access_droga_hr_attendance_over_time,droga.hr.attendance.over.time,model_droga_hr_attendance_over_time,hr.group_hr_user,1,1,1,1
 
 
 

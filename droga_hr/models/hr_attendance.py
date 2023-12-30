@@ -82,8 +82,6 @@ class AttendanceReport(models.Model):
         # get active employees
         vals = {}
 
-        # start_day_str = '2023-11-29'
-        # start_day_str = datetime.now().date()
         start_day = datetime.strptime(str(start_day_str), "%Y-%m-%d").date()
         # Get the current day
         current_day = datetime.now().date()
@@ -137,7 +135,7 @@ class AttendanceReport(models.Model):
 
                     # Calculate five minutes late
                     if check_in_time.hour >= 5:
-                        start_time_str = str(day) + " 05:00:00"
+                        start_time_str = str(check_in_time.date()) + " 05:00:00"
 
                         # Convert string representations to datetime objects
                         start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
@@ -171,7 +169,7 @@ class AttendanceReport(models.Model):
                     if len(attendance_report) == 0:  # insert new record
 
                         vals["employee_id"] = employee.id
-                        vals["date"] = day
+                        vals["date"] = check_in_time.date()
                         vals["is_absent"] = is_absent
                         vals["absence_reason"] = absence_reason
                         vals["company_id"] = employee.company_id.id
@@ -206,7 +204,7 @@ class AttendanceReport(models.Model):
 
 
 class AttendanceOvertTimeReport(models.Model):
-    _name = 'droga.hr.attendance.overt_time'
+    _name = 'droga.hr.attendance.over.time'
 
     _order = 'date desc'
 
@@ -219,4 +217,30 @@ class AttendanceOvertTimeReport(models.Model):
     company_id = fields.Many2one("res.company")
     worked_hours = fields.Float("Worked Hours")
     real_worked_hours = fields.Float("Real Worked Hours")
-    approval_status = fields.Selection([('Approved', 'Not App')])
+    over_time_hour = fields.Float("Over Time Hour")
+    approval_status = fields.Selection([('Approved', 'Approved'), ('Not Approved', 'Not Approved')], tracking=True,
+                                       default='Not Approved')
+
+    def update_over_time_records(self, start_day_str):
+        vals = {}
+
+        start_day = datetime.strptime(str(start_day_str), "%Y-%m-%d").date()
+        attendances = self.env['droga.hr.attendance.report'].search(
+            [('is_absent', '=', False), ('real_worked_hours', '>=', 9), ('date', '>=', start_day)])
+
+        for attendance in attendances:
+            overtime = self.env["droga.hr.attendance.over.time"].search(
+                [('employee_id', '=', attendance.employee.id), ('date', '=', attendance.date)])
+
+            if len(overtime) == 0:
+                over_time_hour = attendance.real_worked_hours - 8
+                vals["employee_id"] = attendance.employee.id
+                vals["date"] = attendance.date
+                vals["check_in"] = attendance.check_in
+                vals["check_out"] = attendance.check_out
+                vals["company_id"] = attendance.company_id
+                vals["worked_hours"] = attendance.worked_hours
+                vals["real_worked_hours"] = attendance.real_worked_hours
+                vals["over_time_hour"] = over_time_hour
+
+                self.env["droga.hr.attendance.over.time"].create(vals)
