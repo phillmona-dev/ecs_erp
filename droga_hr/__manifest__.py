@@ -33,6 +33,7 @@
         'views/hr_letter.xml',
         'views/hr_attendance.xml',
         'views/hr_attendance_absence.xml',
+        'views/hr_attendance_over_time_report.xml',
         'report/letter.xml',
         'views/menu.xml',
     ],
