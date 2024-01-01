@@ -60,14 +60,22 @@ class droga_stock_move_line_extension(models.Model):
     @api.onchange('import_quant')
     def _prod_qty_change(self):
         for rec in self:
-            rec.qty_done = rec.import_quant * (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            if rec.company_id.id==1:
+                rec.qty_done = rec.import_quant * (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            else:
+                rec.qty_done = rec.import_quant
 
     @api.depends('qty_done','product_id.import_uom_new','reserved_uom_qty')
     def _get_on_hand(self):
         for rec in self:
-            rec.import_quant = rec.qty_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
-            rec.reserved_uom_qty_done = rec.reserved_uom_qty / (
-                    rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            if rec.company_id.id==1:
+                rec.import_quant = rec.qty_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+                rec.reserved_uom_qty_done = rec.reserved_uom_qty / (
+                        rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            else:
+                rec.import_quant = rec.qty_done
+                rec.reserved_uom_qty_done = rec.reserved_uom_qty
+
     @api.depends('move_id.trans_type', 'move_id.trans_type_detail')
     def _get_trans_type(self):
         for rec in self:
@@ -447,9 +455,14 @@ class droga_stock_move_extension(models.Model):
     @api.depends('product_uom_qty','product_id.import_uom_new')
     def _get_on_hand(self):
         for rec in self:
-            rec.import_quant = rec.product_uom_qty / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
-            rec.import_quant_done = rec.quantity_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
-            rec.reserved_availability_done=rec.reserved_availability / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            if rec.company_id.id==1:
+                rec.import_quant = rec.product_uom_qty / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+                rec.import_quant_done = rec.quantity_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+                rec.reserved_availability_done=rec.reserved_availability / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            else:
+                rec.import_quant = rec.product_uom_qty
+                rec.import_quant_done = rec.quantity_done
+                rec.reserved_availability_done = rec.reserved_availability
     @api.depends('state')
     def _get_wareh(self):
         for rec in self:

@@ -12,7 +12,10 @@ class StockQuant(models.Model):
     @api.depends('quantity','product_id.import_uom_new')
     def _get_on_hand(self):
         for rec in self:
-            rec.import_quant=rec.quantity/(rec.product_id.uom_id.factor/rec.product_id.import_uom_new.factor)
+            if rec.company_id.id==1:
+                rec.import_quant=rec.quantity/(rec.product_id.uom_id.factor/rec.product_id.import_uom_new.factor)
+            else:
+                rec.import_quant=rec.quantity
 
     @api.constrains("product_id", "quantity")
     def check_negative_qty(self):

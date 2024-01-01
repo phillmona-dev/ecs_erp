@@ -24,6 +24,14 @@
                     </group>
                 </page>
 
+                <page string="Attendance Setting">
+                    <group>
+                        <field name="is_attendance_required"/>
+                        <field name="check_in"/>
+                        <field name="check_out"/>
+                    </group>
+                </page>
+
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='hr_settings']" position="after">
@@ -59,6 +67,7 @@
 
             <xpath expr="//field[@name='department_id']" position="before">
                 <field name="contract_type" options="{'no_create':True,'no_open':True}"/>
+
             </xpath>
 
 
