@@ -2,6 +2,7 @@
 <odoo>
     <menuitem id="pharma_main_menu" name="Pharmacy chain"
               web_icon="droga_pharma,static/description/icon.png"
+              groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_supply_chain_manager,pharma_di_admin,pharma_director"
               sequence="10">
 
         <menuitem
@@ -22,7 +23,7 @@
         <menuitem
                 id="droga_pharma_reports"
                 name="Reports"
-                groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
+                groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_supply_chain_manager"
                 sequence="30">
 
             <menuitem

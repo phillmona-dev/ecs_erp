@@ -24,12 +24,15 @@
                             <field name="warehouse" widget="many2many_tags" options="{'no_create':True,'no_open':True}"></field>
                             <field name="rate"></field>
                             <field name="ref"></field>
+                            <field name="prod_id" invisible="1"></field>
+                            <field name="batch"></field>
                         </group>
                        <div colspan="3">
                         <button name="load" type="object" string="Load" class="oe_highlight"/>
                        <button name="update_trans" type="object" string="Update Transactions"/>
                        <button name="update_uom" type="object" string="Update UOM"/>
                            <button name="round_whole_no" type="object" string="Round numbers"/>
+                           <button name="update_batch" type="object" string="Update batch"/>
                        </div>
                     </group>
 
@@ -57,6 +60,7 @@
                                     <field name="reserved_uom_qty"/>
                                     <field name="qty_done"/>
                                     <field name="product_uom"/>
+                                    <field name="lot_Name"/>
                                     <field name="trans_date"/>
                                     <field name="from_loc"/>
                                     <field name="to_loc"/>

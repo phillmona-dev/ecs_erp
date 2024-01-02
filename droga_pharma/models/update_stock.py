@@ -18,6 +18,11 @@ class droga_pharma_stock_card(models.TransientModel):
     rate=fields.Float('rate (division)',default=1)
     date=fields.Date('Transaction date')
     ref=fields.Char('Transaction reference')
+    prod_id=fields.Many2one('product.product',compute='get_prod_id')
+    batch=fields.Many2one('stock.lot',domain="[('product_id', '=', prod_id)]")
+    def get_prod_id(self):
+        for rec in self:
+            rec.prod_id=self.env['product.product'].search([('product_tmpl_id', '=', rec.product_id.id)]).id
     def _inverse(self):
         pass
 
@@ -78,6 +83,13 @@ class droga_pharma_stock_card(models.TransientModel):
                     'po_line':r}
                 self.env['droga.pharma.update.po'].create(mv)
 
+    def update_batch(self):
+        for rec in self:
+            for mv in rec.results_move_line:
+                self.env.cr.execute(
+                    """ update stock_move_line set lot_id=%s where id=%s""",
+                    (rec.batch.id,mv.move_line.id))
+            self.load()
     def update_trans(self):
         for rec in self:
             for mv in rec.results_move:
@@ -173,6 +185,7 @@ class droga_update_stock_move_line(models.TransientModel):
     trans_date = fields.Datetime('Transaction date', related='move_line.move_id.date')
     from_loc = fields.Char('stock.warehouse', related='move_line.move_id.picking_id.from_wh')
     to_loc = fields.Char('stock.warehouse', related='move_line.move_id.picking_id.from_wh')
+    lot_Name=fields.Many2one('stock.lot',realted='move_line.lot_id')
 class droga_update_stock_move_po(models.TransientModel):
     _name = 'droga.pharma.update.po'
     header = fields.Many2one('droga.pharma.update.stock')

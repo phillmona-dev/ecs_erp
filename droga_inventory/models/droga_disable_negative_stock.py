@@ -12,7 +12,7 @@ class StockQuant(models.Model):
     @api.depends('quantity','product_id.import_uom_new')
     def _get_on_hand(self):
         for rec in self:
-            if rec.company_id.id==1:
+            if rec.company_id.id==1 and rec.product_id.import_uom_new.factor!=0:
                 rec.import_quant=rec.quantity/(rec.product_id.uom_id.factor/rec.product_id.import_uom_new.factor)
             else:
                 rec.import_quant=rec.quantity

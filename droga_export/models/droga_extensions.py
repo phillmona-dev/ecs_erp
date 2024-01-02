@@ -310,7 +310,16 @@ class droga_cons_inherit_detail(models.Model):
     _inherit = 'droga.inventory.cons.issue.detail'
     proc_cost = fields.Float('Processing cost')
     tot_cost= fields.Float('Total',compute='_compute_tot_cost')
-
+    product_amt=fields.Float('Total',compute='_compute_bag_cost')
+    @api.depends('product_id','product_uom_qty')
+    def _compute_bag_cost(self):
+        for rec in self:
+            rec.product_amt=rec.product_id.product_tmpl_id.standard_price*rec.product_uom_qty
+    @api.onchange("product_id")
+    def _on_change_fiscal_year(self):
+        for rec in self:
+            if rec.company_id.id==2:
+                rec.warehouse_id=9
     @api.depends('product_uom_qty','proc_cost')
     def _compute_tot_cost(self):
         for rec in self:
@@ -373,7 +382,8 @@ class droga_sale_inherit(models.Model):
             'context': {
                 'default_issue_type': 'SUBL',
                 'default_subcontract_issue_origin_form': self.id,
-                'default_detail_entries':itemsdetail
+                'default_detail_entries':itemsdetail,
+                'default_warehouse_id':9
             },
             'domain': [('subcontract_issue_origin_form', '=', self.id)],
         }

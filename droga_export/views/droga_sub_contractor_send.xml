@@ -82,7 +82,7 @@
                                     <field name="company_id" invisible="1"/>
                                     <field name="product_id" required="1" options="{'no_create':True,'no_open':True}"
                                            context="{'default_detailed_type': 'product'}"/>
-                                    <field name="product_uom" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="product_uom" options="{'no_create':True,'no_open':True}" readonly="1"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="product_uom_qty" sum="Total" string="Quantity"/>
@@ -155,6 +155,7 @@
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="product_uom_qty" sum="Total" string="Quantity"/>
+                                    <field name="product_amt" sum="Total" string="Amount"/>
                                     <field name="warehouse_id" attrs="{'required': [('state', '!=','draft')]}"
                                            string="Issuer warehouse" options="{'no_create':True,'no_open':True}"/>
                                 </tree>
@@ -178,7 +179,7 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_subcontractor_issue_view_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('droga_sales_subcontractor_issue_view_form')})]"/>
-        <field name="context">{'default_issue_type': 'SUBL'}</field>
+        <field name="context">{'default_issue_type': 'SUBL','default_warehouse_id':9}</field>
         <field name="domain">[('create_uid','=',uid)]</field>
     </record>
 
