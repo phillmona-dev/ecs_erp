@@ -27,19 +27,40 @@
         <field name="arch" type="xml">
             <form string="" delete="0">
                 <sheet>
-
                     <group string="Counselling">
+
                         <group>
                             <field name="client_descr"></field>
                             <field name="date"></field>
+                            <field name="mobile" readonly="0"/>
+                            <field name="gender" readonly="0"/>
+                            <field name="weight" readonly="0"/>
+                            <field name="height" readonly="0"/>
+                            <field name="bsa"/>
+                            <field name="dob" readonly="0"/>
+                            <field name="age"/>
+                            <field name="physician"/>
                             <field name="status"></field>
                         </group>
                         <group>
                             <field name="area_counsel"></field>
                             <field name="pharmacist_lev_understanding"></field>
+                            <field name="counselling_given"></field>
+                            <field name="patient_lev_understanding"></field>
+                            <field name="assessment"/>
                             <field name="ses_acceptance"></field>
                         </group>
                     </group>
+                    <notebook>
+                        <page string="Medication Info">
+                            <group>
+                                <field name="medical" readonly="0"/>
+                                <field name="medication_history" readonly="0"/>
+                                <field name="immunization" readonly="0"/>
+                                <field name="adr" readonly="0"/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

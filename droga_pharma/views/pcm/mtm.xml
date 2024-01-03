@@ -10,11 +10,11 @@
         <field name="name">droga.pharma.mtm.tree</field>
         <field name="model">droga.pharma.mtm.header</field>
         <field name="arch" type="xml">
-            <tree string="" delete="0">
+            <tree string="" delete="0" create="0">
                 <field name="sales_origin"></field>
                 <field name="client_descr"></field>
-                <field name="asses_care_plan"></field>
-                <field name="recs_inter"></field>
+<!--                <field name="asses_care_plan"></field>-->
+<!--                <field name="recs_inter"></field>-->
                 <field name="cons_start_date"></field>
                 <field name="cons_end_date"></field>
             </tree>
@@ -28,40 +28,53 @@
         <field name="arch" type="xml">
             <form string="" delete="0">
                 <sheet>
+                    <header>
+                        <button name="medication_list" string="medication list" type="object" class="oe_stat_button"/>
+                    </header>
+                    <group>
+                    <group>
+                        <field name="client_descr"></field>
+                        <field name="mobile" readonly="0"/>
+                        <field name="gender" readonly="0"/>
+                        <field name="weight" readonly="0"/>
+                        <field name="height" readonly="0"/>
+                        <field name="bsa"/>
+                        <field name="dob" readonly="0"/>
+                        <field name="age"/>
+                        <field name="address"/>
+                        <field name="profession" readonly="0"/>
+                        <field name="pregnancy" readonly="0"/>
+                    </group>
+                    <group>
+                        <field name="cons_start_date"/>
+                        <field name="cons_end_date"/>
+                        <field name="physician"/>
+                        <field name="medical" readonly="0"/>
+                        <field name="medication_history" readonly="0"/>
+                        <field name="immunization" readonly="0"/>
+                        <field name="adr" readonly="0"/>
+                        <field name="diagnosis" readonly="0"/>
+                    </group>
+                    </group>
                     <notebook>
                         <page string="Drugs list">
                             <field name="detail_mtm" mode="tree">
                                 <tree editable="bottom" create="1">
+                                    <field name="date"></field>
                                     <field name="indication"></field>
                                     <field name="drug"></field>
                                     <field name="frequency"></field>
                                     <field name="frequency_type"></field>
                                     <field name="start_date"></field>
                                     <field name="stop_date"></field>
+                                    <field name="remark"></field>
                                 </tree>
                             </field>
                         </page>
-                    </notebook>
-
-                    <group string="Assessment, plan and recommendations">
-                        <field name="asses_care_plan"></field>
-                        <field name="recs_inter"></field>
-                    </group>
-                    <hr></hr>
-
-
-
-                    <div class="oe_button_box" name="button_box">
-
-                            <button icon="fa-credit-card-alt" type="object" string="Generate schedule" name="mtm_schedule"
-                                    class="oe_stat_button"></button>
-                        </div>
-
-                    <notebook>
                         <page string="Follow up schedule">
 
                             <field name="detail_mtm_followup" mode="tree">
-                                <tree editable="bottom" create="1">
+                                <tree editable="top" create="1">
                                     <field name="date_follow_up"></field>
                                     <field name="time"></field>
                                     <field name="current_status"></field>
@@ -72,6 +85,12 @@
                             </field>
                         </page>
                     </notebook>
+
+                    <div class="oe_button_box" name="button_box">
+
+                            <button icon="fa-credit-card-alt" type="object" string="Generate schedule" name="mtm_schedule"
+                                    class="oe_stat_button"></button>
+                        </div>
                 </sheet>
             </form>
         </field>

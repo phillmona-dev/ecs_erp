@@ -16,8 +16,8 @@
                 <field name="drug_therapy_cause"/>
                 <field name="intervention"/>
                 <field name="intervention_implemented"/>
-                <field name="asses_care_plan"/>
-                <field name="recs_inter"/>
+<!--                <field name="asses_care_plan"/>-->
+<!--                <field name="recs_inter"/>-->
 
             </tree>
         </field>
@@ -37,8 +37,8 @@
                 <field name="drug_therapy_cause"/>
                 <field name="intervention"/>
                 <field name="intervention_implemented"/>
-                <field name="asses_care_plan"/>
-                <field name="recs_inter"/>
+<!--                <field name="asses_care_plan"/>-->
+<!--                <field name="recs_inter"/>-->
                     </group>
                 </form>
             </field>

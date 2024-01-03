@@ -19,6 +19,25 @@
                 action="droga_sales_pharmacy_action_to_invoice"
                 groups="pharma_br_admin,pharma_ip_admin"
                 sequence="23"/>
+        <menuitem
+                id="droga_pharma_mtm_and_counselling"
+                name="MTM and Counselling"
+                groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
+                sequence="30">
+            <menuitem
+                    id="droga_pharma_mtm_menu"
+                    name="MTM"
+                    action="droga_pharma_mtm_action"
+                    groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
+                    sequence="1"/>
+            <menuitem
+                    id="droga_pharma_counselling_menu"
+                    name="Counselling"
+                    action="droga_pharma_counselling_action"
+                    groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
+                    sequence="5"/>
+        </menuitem>
+
 
         <menuitem
                 id="droga_pharma_reports"

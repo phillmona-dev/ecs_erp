@@ -47,7 +47,11 @@
         'views/selection_settings/area_counsel.xml',
         'views/selection_settings/prod_categ.xml',
         'views/compounding.xml',
+<<<<<<< Updated upstream
         'views/credit_limit_pharma.xml',
+=======
+        'views/pcm/mtm_detail.xml',
+>>>>>>> Stashed changes
         'views/pcm/mtm.xml',
         'views/credit_limit_pharma.xml',
         'views/pcm/minor_alignment.xml',

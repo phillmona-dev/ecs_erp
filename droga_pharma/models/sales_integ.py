@@ -31,15 +31,30 @@ class sales_integ(models.Model):
     weight = fields.Float('Weight')
     diagnosis = fields.Html('Diagnosis')
     physiotherapist = fields.Many2one('droga.physiotherapist.list')
-    mtm_count=fields.Integer('MTM count',default=1)
+    mtm_count=fields.Integer('MTM count',default=0)
     mtm_header=fields.One2many('droga.pharma.mtm.header','sales_origin')
-    counselling_count=fields.Integer('Counselling count',default=1)
+    counselling_count=fields.Integer('Counselling count',default=0)
     counselling_header = fields.One2many('droga.pharma.counselling', 'sales_origin')
     minor_align_header = fields.One2many('droga.pharma.minor.alignment', 'sales_origin')
     membership_origin = fields.Many2one('droga.pharma.membership', readonly=True)
     cust_availed_payment_term_ids=fields.Many2many('account.payment.term',related='partner_id.allowed_credit_terms')
     mature_amount_pharma = fields.Monetary('Matured amount', compute='_get_mature_amount_pharma')
     show_invoice_button_pharma = fields.Boolean(compute='_get_mature_amount_pharma')
+
+    # def create_product(self, name, price, category_id):
+    #     product_template = self.env['product.template'].create({
+    #         'name': name,
+    #         'list_price': price,
+    #         'display_name': name,
+    #     })
+    #
+    #     product = self.env['product.product'].create({
+    #         'product_tmpl_id': product_template.id,
+    #         'categ_id': category_id,
+    #     })
+    #
+    #     return product
+
 
     @api.depends('partner_id')
     def _get_mature_amount_pharma(self):
@@ -79,11 +94,24 @@ class sales_integ(models.Model):
 
             'res_id': self.id,
         }
+
     @api.onchange('dob','sex')
     def _onchange_dob_weight_sex(self):
         for rec in self:
             rec.customer_emp.dob=self.dob
             rec.customer_emp.gender = self.sex
+
+    @api.onchange('order_line')
+    def _onchange_order_line(self):
+        for rec in self:
+            for pro in rec.order_line.product_id:
+                product_name = str(pro.display_name)
+                index = product_name.find(']')
+                if product_name[1:index] == '10005':
+                    rec.mtm_count = 1
+                elif product_name[1:index] == '10001':
+                    rec.counselling_count = 1
+
     @api.depends('dob')
     def _compute_age(self):
         for record in self:
@@ -157,13 +185,14 @@ class sales_integ(models.Model):
         return {
             'name': 'Counselling sessions',
             'view_type': 'form',
-            'view_mode': 'tree,form',
+            'view_mode': 'form',
             'res_model': 'droga.pharma.counselling',
             'view_id': False,
             'type': 'ir.actions.act_window',
             'context': {
                 'default_sales_origin': self.id,
             },
+            'res_id': self.counselling_header.id
         }
 
     def action_minor_aliments(self):
