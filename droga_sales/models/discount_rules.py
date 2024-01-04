@@ -85,8 +85,8 @@ class sale_order_line(models.Model):
     def _get_discount(self):
         for rec in self:
             if rec.price_unit!=0:
-                margin=(rec.price_unit-rec.phar_cont_price)/rec.price_unit
-                rec.phar_cont_price_marginc=str((abs(margin)*100))+' %'
+                margin=round((rec.price_unit-rec.phar_cont_price)/rec.price_unit*-100,2)
+                rec.phar_cont_price_marginc=str((margin))+' %'
             else:
                 rec.phar_cont_price_marginc='0 %';
     available_qty = fields.Float('Available', default=0, compute='is_prod_available_method')
