@@ -81,6 +81,14 @@ class sale_order_line(models.Model):
     is_prod_available = fields.Char(compute='is_prod_available_method')
     selling_price=fields.Float(related='product_id.list_price_phar')
     phar_cont_price = fields.Float('Pharmacy contract price',compute='_compute_price_unit',store=True)
+    phar_cont_price_marginc=fields.Char('Discount rate',compute='_get_discount')
+    def _get_discount(self):
+        for rec in self:
+            if rec.price_unit!=0:
+                margin=(rec.price_unit-rec.phar_cont_price)/rec.price_unit
+                rec.phar_cont_price_marginc=str((abs(margin)*100))+' %'
+            else:
+                rec.phar_cont_price_marginc='0 %';
     available_qty = fields.Float('Available', default=0, compute='is_prod_available_method')
     avail_char = fields.Char('Available', readonly=True, compute="is_prod_available_method")
     price_unit_before_discount = fields.Float('')
