@@ -208,7 +208,14 @@ class AttendanceOvertTimeReport(models.Model):
 
     _order = 'date desc'
 
+    def _get_employee_id(self):
+        # assigning the related employee of the logged in user
+        employee_rec = self.env['hr.employee'].search(
+            [('user_id', '=', self.env.uid)], limit=1)
+        return employee_rec.id
+
     employee_id = fields.Many2one("hr.employee")
+    manager_id = fields.Many2one(related='employee_id.parent_id', string='Manager', store=True)
     department = fields.Char(related='employee_id.department_name', string='Department', store=True)
     employee_badge_id = fields.Char(related='employee_id.barcode', string='Badge ID', store=True)
     date = fields.Date("Attendance Day")
@@ -218,8 +225,10 @@ class AttendanceOvertTimeReport(models.Model):
     worked_hours = fields.Float("Worked Hours")
     real_worked_hours = fields.Float("Real Worked Hours")
     over_time_hour = fields.Float("Over Time Hour")
-    approval_status = fields.Selection([('Approved', 'Approved'), ('Not Approved', 'Not Approved')], tracking=True,
+    approval_status = fields.Selection([('Approved', 'Approved'), ('Not Approved', 'Not Approved'),('Rejected', 'Rejected')], tracking=True,
                                        default='Not Approved')
+
+    current_employee_id = fields.Many2one("hr.employee", default=_get_employee_id)
 
     def update_over_time_records(self, start_day_str):
         vals = {}
@@ -245,6 +254,22 @@ class AttendanceOvertTimeReport(models.Model):
 
                 self.env["droga.hr.attendance.over.time"].create(vals)
 
+    def approve_over_time(self):
+        for record in self:
+            if record.approval_status == 'Approved':
+                raise ValidationError("It is already approved")
+            else:
+                record.write({'approval_status': 'Approved'})
+
+    def reject_over_time(self):
+        for record in self:
+            if record.approval_status == 'Rejected':
+                raise ValidationError("It is already rejected")
+            else:
+                record.write({'approval_status': 'Rejected'})
+
+
+
 class AttendanceOvertTimeReport1(models.Model):
     _name = 'droga.hr.attendance.overt_time'
 
@@ -262,5 +287,3 @@ class AttendanceOvertTimeReport1(models.Model):
     over_time_hour = fields.Float("Over Time Hour")
     approval_status = fields.Selection([('Approved', 'Approved'), ('Not Approved', 'Not Approved')], tracking=True,
                                        default='Not Approved')
-
-

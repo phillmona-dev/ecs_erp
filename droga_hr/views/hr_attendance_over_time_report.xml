@@ -9,7 +9,7 @@
                 <field name="employee_badge_id"/>
                 <field name="employee_id"/>
                 <field name="department"/>
-                <field name="date" string="Date"/>
+                <field name="date" string="Date" invisible="1"/>
                 <field name="check_in"/>
                 <field name="check_out"/>
                 <field name="worked_hours" widget="float_time"/>
@@ -59,6 +59,11 @@
                         ('date','&lt;',time.strftime('%%Y-%%m-01'))]"
                         name="previous_month_trans"></filter>
 
+                <separator/>
+                <filter name="not_approved" string="Not Approved" domain="[('approval_status', '=', 'Not Approved')]"/>
+                <filter name="approved" string="Approved" domain="[('approval_status', '=', 'Approved')]"/>
+                <filter name="rejected" string="Rejected" domain="[('approval_status', '=', 'Rejected')]"/>
+
             </search>
         </field>
     </record>
@@ -76,6 +81,50 @@
             </p>
         </field>
     </record>
+
+
+    <!-- tree view for odoo overtime - for approval-->
+    <record id="hr_attendance_over_time_report_tree_approval_view" model="ir.ui.view">
+        <field name="name">Over Time Report</field>
+        <field name="model">droga.hr.attendance.over.time</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="employee_badge_id"/>
+                <field name="employee_id"/>
+                <field name="department"/>
+                <field name="date" string="Date" invisible="1"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="worked_hours" widget="float_time"/>
+                <field name="real_worked_hours" widget="float_time"/>
+                <field name="over_time_hour" widget="float_time"/>
+                <field name="approval_status" widget="badge" decoration-success="approval_status == 'Approved'"
+                       decoration-warning="approval_status == 'Not Approved'"
+                       decoration-danger="approval_status == 'Rejected'"/>
+                <button name="approve_over_time" type="object" string="Approve" class="oe_highlight"
+                        confirm="Are you sure?"/>
+                <button name="reject_over_time" type="object" string="Reject" class="oe_highlight"
+                        confirm="Are you sure?"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- action -->
+    <record id="hr_attendance_over_time_report_approval_action" model="ir.actions.act_window">
+        <field name="name">Over Time Report</field>
+        <field name="res_model">droga.hr.attendance.over.time</field>
+        <field name="view_mode">tree</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('hr_attendance_over_time_report_tree_approval_view')})]"/>
+        <field name="domain">[('manager_id.user_id','=',uid)]</field>
+        <field name="context">{"search_default_not_approved":1,"search_default_current_week_trans":1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Over Time Approval
+            </p>
+        </field>
+    </record>
+
 
     <!-- rule -->
     <record model="ir.rule" id="hr_attendance_over_time_report_rule">

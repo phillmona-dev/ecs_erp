@@ -39,6 +39,9 @@
                   action="droga_hr.droga_hr_letter_request_eng_action" groups="self_service_group"/>
          <menuitem id="self_service_letter_request_amharic_menu" name="Letter Request-Amharic" sequence="3"
                   action="droga_hr.droga_hr_letter_request_amharic_action" groups="self_service_group"/>
+        <menuitem id="hr_attendance_over_time_report_approval_menu" name="Over Time Approval"
+                  action="droga_hr.hr_attendance_over_time_report_approval_action" groups="self_service_group"
+                  sequence="4"/>
     </menuitem>
 
 
