@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <data noupdate="1">
+       <record id="ir_cron_scheduler_mtm_follow_up" model="ir.cron">
+           <field name="name">MTM Follow up notification</field>
+           <field name="model_id" ref="model_droga_pharma_mtm_header"/>
+           <field name="state">code</field>
+           <field name="code">model.mtm_schedule()</field>
+           <field name="user_id" ref="base.user_root"/>
+           <field name="interval_number">1</field>
+           <field name="interval_type">days</field>
+           <field name="numbercall">-1</field>
+       </record>
+    </data>
     <record id="droga_pharma_mtm_action" model="ir.actions.act_window">
         <field name="name">MTM registration</field>
         <field name="res_model">droga.pharma.mtm.header</field>
@@ -27,35 +39,68 @@
         <field name="model">droga.pharma.mtm.header</field>
         <field name="arch" type="xml">
             <form string="" delete="0">
+                <header>
+                    <button name="medication_list" string="medication list" type="object" class="oe_highlight"/>
+                </header>
                 <sheet>
-                    <header>
-                        <button name="medication_list" string="medication list" type="object" class="oe_stat_button"/>
-                    </header>
-                    <group>
-                    <group>
-                        <field name="client_descr"></field>
-                        <field name="mobile" readonly="0"/>
-                        <field name="gender" readonly="0"/>
-                        <field name="weight" readonly="0"/>
-                        <field name="height" readonly="0"/>
-                        <field name="bsa"/>
-                        <field name="dob" readonly="0"/>
-                        <field name="age"/>
-                        <field name="address"/>
-                        <field name="profession" readonly="0"/>
-                        <field name="pregnancy" readonly="0"/>
-                    </group>
-                    <group>
-                        <field name="cons_start_date"/>
-                        <field name="cons_end_date"/>
-                        <field name="physician"/>
-                        <field name="medical" readonly="0"/>
-                        <field name="medication_history" readonly="0"/>
-                        <field name="immunization" readonly="0"/>
-                        <field name="adr" readonly="0"/>
-                        <field name="diagnosis" readonly="0"/>
-                    </group>
-                    </group>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+                        <div style="width: 50%;">
+                            <div>
+                                <h5>Patient's Personal Info</h5>
+                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
+                                <group>
+                                    <field name="client_descr"></field>
+                                    <field name="gender" readonly="0"/>
+                                    <field name="weight" readonly="0"/>
+                                    <field name="height" readonly="0"/>
+                                    <field name="bsa"/>
+                                    <field name="dob" readonly="0"/>
+                                    <field name="age"/>
+                                    <field name="profession" readonly="0"/>
+                                    <field name="pregnancy" readonly="0"/>
+                                </group>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div>
+                                <h5>MTM schedule</h5>
+                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
+                                <group>
+                                    <field name="cons_start_date"/>
+                                    <field name="cons_end_date"/>
+                                    <field name="plan_generate_frequency"/>
+                                </group>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div style="width: 50%;">
+                            <div>
+                                <h5>Patient's Medication info</h5>
+                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
+                                <group>
+                                    <field name="medical" readonly="0"/>
+                                    <field name="medication_history" readonly="0"/>
+                                    <field name="immunization" readonly="0"/>
+                                    <field name="adr" readonly="0"/>
+                                    <field name="diagnosis" readonly="0"/>
+                                </group>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div>
+                                <h5>Contact Info</h5>
+                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
+                                <group>
+                                    <field name="mobile" readonly="0"/>
+                                    <field name="address"/>
+                                    <field name="physician"/>
+                                </group>
+                            </div>
+                            <br/>
+                        </div>
+                    </div>
+                    <br/>
+                    <hr/>
                     <notebook>
                         <page string="Drugs list">
                             <field name="detail_mtm" mode="tree">
@@ -86,13 +131,66 @@
                         </page>
                     </notebook>
 
-                    <div class="oe_button_box" name="button_box">
+<!--                    <div class="oe_button_box" name="button_box">-->
 
-                            <button icon="fa-credit-card-alt" type="object" string="Generate schedule" name="mtm_schedule"
-                                    class="oe_stat_button"></button>
-                        </div>
+<!--                            <button icon="fa-credit-card-alt" type="object" string="Generate schedule" name="mtm_schedule"-->
+<!--                                    class="oe_stat_button"></button>-->
+<!--                        </div>-->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </sheet>
             </form>
         </field>
     </record>
+    <record id="view_droga_mtm_kanban" model="ir.ui.view">
+            <field name="name">MTM Follow up Kanban</field>
+            <field name="model">droga.pharma.mtm.header</field>
+            <field name="arch" type="xml">
+
+                <kanban class="o_kanban_mobile" sample="1" create="0">
+                    <field name="client_descr"/>
+                    <field name="sales_origin"/>
+                    <field name="cons_start_date"/>
+                    <field name="cons_end_date"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                                <div class="o_kanban_image">
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                        Sales Origin:
+                                        <field name="sales_origin"/>
+                                    </strong>
+                                    <hr/>
+
+                                    <strong class="o_kanban_record_title">
+                                        Client:
+                                    </strong>
+                                    <field name="client_descr"/>
+                                    <br/>
+                                    <strong class="o_kanban_record_title">
+                                        MTM start date:
+                                    </strong>
+                                    <field name="cons_start_date"/>
+                                    <br/>
+                                    <strong class="o_kanban_record_title">
+                                        MTM end date:
+                                    </strong>
+                                    <field name="cons_end_date"/>
+                                    <br/>
+                                    <hr/>
+
+                                    <button name="set_activity_done" string="Mark as read" type="object" class="oe_highlight"/>
+
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
 </odoo>

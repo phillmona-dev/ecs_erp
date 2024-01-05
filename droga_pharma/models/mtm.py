@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from email.policy import default
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
@@ -7,7 +7,8 @@ from odoo.exceptions import ValidationError
 class droga_pharma_mtm_header(models.Model):
     _name = 'droga.pharma.mtm.header'
     _rec_name = "client_descr"
-
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = "Droga MTM"
     plan_generate_frequency=fields.Integer('Plan generation frequency in days')
 
     detail_mtm=fields.One2many('droga.pharma.mtm.detail','parent_mtm')
@@ -15,7 +16,7 @@ class droga_pharma_mtm_header(models.Model):
     # Related fields
     client = fields.Many2one('res.partner',related='sales_origin.partner_id')
     customer = fields.Many2one('droga.pharma.cust.employees',related='sales_origin.customer_emp')
-    client_descr= fields.Char(related='sales_origin.emp_descr')
+    client_descr= fields.Char(related='sales_origin.emp_descr', store=True)
     sales_origin=fields.Many2one('sale.order')
     mobile = fields.Char("Mobile", related='customer.phone_no', store=True)
     medical = fields.Html("Medical History", related="customer.medical_history", store=True)
@@ -28,7 +29,7 @@ class droga_pharma_mtm_header(models.Model):
     height = fields.Float("Height")
     bsa = fields.Float("BSA")
     address = fields.Char("Address")
-    pregnancy = fields.Boolean("Pregnancy status")
+    pregnancy = fields.Char("Pregnancy status")
     immunization = fields.Html("Immunization", related="customer.immunization", store=True)
     adr = fields.Html("ADRS and/or Allergies", related="customer.adr_allergy", store=True)
     diagnosis = fields.Text("Diagnosis")
@@ -36,6 +37,18 @@ class droga_pharma_mtm_header(models.Model):
     #dates
     cons_start_date=fields.Date('MTM start date')
     cons_end_date = fields.Date('MTM end date')
+    prev_schedule = fields.Date('Prev schedule', default=lambda self: self._compute_prev_schedule())
+    next_schedule = fields.Date('Next schedule', default=lambda self: self._compute_next_schedule())
+
+    def _compute_prev_schedule(self):
+        for rec in self:
+            if rec.cons_start_date:
+                rec.prev_schedule = rec.cons_start_date
+
+    def _compute_next_schedule(self):
+        for rec in self:
+            if rec.cons_start_date:
+                rec.next_schedule = rec.cons_start_date + timedelta(days=rec.plan_generate_frequency)
 
     @api.depends("dob")
     def _compute_age(self):
@@ -70,8 +83,34 @@ class droga_pharma_mtm_header(models.Model):
             'domain': [('id', 'in', detail_mtm_ids)],
         }
 
+    def create_an_activity(self,rec, user_id, message):
+        self.env['mail.activity'].sudo().create({
+            'res_model_id': self.env.ref('droga_pharma.model_droga_pharma_mtm_header').id,
+            'res_name': message,
+            'res_id': rec.id,
+            'automated': True,
+            'user_id': user_id,
+            'activity_type_id': 4,
+            'summary': message,
+            'note': message
+        })
+
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_id', '=', self.id)])
+        if activity:
+            activity.sudo().action_done()
+
     def mtm_schedule(self):
-        return
+        today = fields.Date.today()
+        records = self.search([('cons_end_date', '>=', today), ('next_schedule', '=', today)])
+        for rec in records:
+            print("in")
+            message = "The mtm customer "+rec.client_descr+" has a follow up today."
+            print(rec.next_schedule)
+            self.create_an_activity(rec, rec.create_uid.id, message)
+            rec.prev_schedule = today
+            rec.next_schedule = today + timedelta(days=rec.plan_generate_frequency)
 
     @api.model
     def create(self, vals):
@@ -144,8 +183,11 @@ class droga_pharma_mtm_schedule_detail(models.Model):
         for rec in self:
             rec.intervention=rec.drug_therapy_cause.recommended_intervention.descr
 
-    intervention_implemented = fields.Boolean('Intervention implemented?')
-
+    intervention_implemented = fields.Selection(selection=[('fully', 'Fully Implemented'), ('partial', 'Partially Implemented'), ('rejected', 'Rejected')],string='Intervention implemented?')
+    outcome = fields.Selection(selection=[('resolved', 'Resolved'), ('stable', 'Stable'),
+                                          ('partial_improvement', 'Partial Improvement'),
+                                          ('unimproved', 'Unimproved'), ('worsened', 'Worsened'),
+                                          ('failure', 'Failure'), ('expiry', 'Expiry')])
     # asses_care_plan = fields.Html('Assessment and care plan',
     #                               related='parent_follow_up.parent_mtm_follow.asses_care_plan')
     #
@@ -158,16 +200,18 @@ class droga_pharma_mtm_schedule_detail(models.Model):
 
     def get_indication(self):
         for fu in self:
-            ind = ''
+            ind = []
             for fud in fu.parent_follow_up.parent_mtm_follow.detail_mtm:
-                ind = ind + fud.indication + ', '
-            fu.indication = ind
+                ind.append(fud.indication)
+            fu.indication = ",".join(ind)
 
     drug = fields.Char("Drug", compute='get_drugs')
 
     def get_drugs(self):
         for followup in self:
-            followup.drug = '-'
-            # Write the functio similar to indication here
+            drugs = []
+            for f_drug in followup.parent_follow_up.parent_mtm_follow.detail_mtm:
+                drugs.append(f_drug.drug.display_name)
+            followup.drug = ",".join(drugs)
 
     remark = fields.Char('Remark')

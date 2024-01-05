@@ -6,7 +6,9 @@ class droga_pharma_counselling(models.Model):
     _name = 'droga.pharma.counselling'
 
     #Text fields
-    area_counsel=fields.Many2one('droga.pharma.area_counsel',string='Area of counselling')
+    # area_counsel=fields.Many2one('droga.pharma.area_counsel',string='Area of counselling')
+    counselling_cat = fields.Selection(selection=[('life_style', 'Life style'), ('medication_use', 'Medication Use')], string='Area of counselling')
+    description = fields.Char("Area of counselling description")
     status=fields.Char("Status")
     ses_acceptance= fields.Selection([('Accepted', 'Accepted'), ('Rejected', 'Rejected')],string="Acceptance")
     pharmacist_lev_understanding=fields.Selection([('High', 'High'), ('Optimal', 'Optimal'),('Low', 'Low')],string='Pharmacist level of understanding')
@@ -15,7 +17,6 @@ class droga_pharma_counselling(models.Model):
     sales_origin = fields.Many2one('sale.order')
     counselling_given = fields.Html("Counselling given")
     patient_lev_understanding=fields.Selection([('High', 'High'), ('Optimal', 'Optimal'),('Low', 'Low')],string='Patient Level of understanding')
-
     # Related fields
     client = fields.Many2one('res.partner', related='sales_origin.partner_id')
     client_descr = fields.Char(related='sales_origin.emp_descr')

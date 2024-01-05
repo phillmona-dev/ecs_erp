@@ -114,7 +114,7 @@
                 </menuitem>
                 <menuitem
                         id="droga_pharma_report_mtm"
-                        name="MTM"
+                        name="MTM and Counselling"
                         sequence="4">
                     <menuitem
                             id="droga_pharma_points_earned_report_menu"
@@ -124,9 +124,19 @@
 
                     <menuitem
                             id="droga_pharma_follow_up_report_menu"
-                            name="Follow up detail"
+                            name="MTM"
                             action="action_droga_pharma_mtm_schedule_detail_tree"
                             sequence="5"/>
+                    <menuitem
+                            id="droga_pharma_counselling_report_menu"
+                            name="Counselling"
+                            action="droga_pharma_counselling_action"
+                            sequence="7"/>
+                    <menuitem
+                            id="droga_pharma_minor_alignments_report_menu"
+                            name="Minor Alignments"
+                            action="droga_pharma_aliment_action"
+                            sequence="9"/>
                 </menuitem>
 
 
