@@ -64,7 +64,7 @@ class droga_pharma_mtm_header(models.Model):
         for rec in self:
             no_of_days = rec.mtm_duration_in_months * 30
             rec.cons_end_date = rec.cons_start_date + timedelta(days=no_of_days)
-            if not rec.check_compute:
+            if not rec.check_compute and rec.no_of_sessions != 0:
                 follow_date = rec.cons_start_date
                 rate = (rec.mtm_duration_in_months * 30) // rec.no_of_sessions
                 for i in range(rec.no_of_sessions):
