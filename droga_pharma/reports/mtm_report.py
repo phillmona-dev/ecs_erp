@@ -157,6 +157,6 @@ class ReportWizard(models.TransientModel):
         excel_data = self.env['droga.pharma.mtm.follow_up.detail'].search_read(domain)
         return self.action_get_xls(excel_data)
 
-    def action_cancel(self):
 
+    def action_cancel(self):
         return {'type': 'ir.actions.act_window_close'}

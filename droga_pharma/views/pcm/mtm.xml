@@ -129,6 +129,17 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="MTM History">
+
+                            <field name="mtm_history" mode="tree">
+                                <tree editable="top" create="1">
+                                    <field name="origin_sales" readonly="1"/>
+                                    <field name="cons_start_date"/>
+                                    <field name="cons_end_date"/>
+                                    <field name="active_state"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
 
 <!--                    <div class="oe_button_box" name="button_box">-->

@@ -15,7 +15,7 @@ class droga_pharma_prod_ext(models.Model):
     pharma_prod_categ=fields.Many2one('droga.pharma.prod.categ',string='Product category')
     pharma_filler=fields.Char(compute='_fill_fields')
     pharma_detailed_type = fields.Selection([
-        ('consu', 'Consumable'),('membershipcard', 'Membership E-Card'),('hthscreen','Health screening'),('mtmcard', 'MTM E-Card'),('Compounding','Compounding'),('product', 'Storable product'),
+        ('counselling', 'Counselling'),('consu', 'Consumable'),('membershipcard', 'Membership E-Card'),('hthscreen','Health screening'),('mtmcard', 'MTM E-Card'),('Compounding','Compounding'),('product', 'Storable product'),
         ('service', 'Service')], string='Product Type', default='product', required=True)
 
     duration=fields.Integer('Membership duration in months')

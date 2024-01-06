@@ -181,14 +181,15 @@
                                 class="oe_stat_button"
                                 string="MTM orders"
                                 icon="fa-credit-card-alt"
-                                attrs="{'invisible': [('mtm_count', '=', 0)]}">
+                                attrs="{'invisible': ['|', ('has_mtm_products', '=', False), ('invoice_status', '!=', 'invoiced')]}">
+
                         </button>
                         <button name="action_counselling_orders"
                                 type="object"
                                 class="oe_stat_button"
                                 string="Counselling orders"
                                 icon="fa-credit-card-alt"
-                                attrs="{'invisible': [('counselling_count', '=', 0)]}">
+                                attrs="{'invisible': ['|', ('has_counsell_products', '=', False), ('invoice_status', '!=', 'invoiced')]}">
                         </button>
                         <button name="action_minor_aliments"
                                 type="object"
@@ -196,8 +197,8 @@
                                 string="Minor ailments"
                                 icon="fa-credit-card-alt">
                         </button>
-                        <field name="mtm_count" invisible="1"/>counselling_count
-                        <field name="counselling_count" invisible="1"/>
+                        <field name="has_mtm_products" invisible="1"/>
+                        <field name="has_counsell_products" invisible="1"/>
                     </div>
                     <group>
                         <group>

@@ -21,7 +21,7 @@
                 sequence="23"/>
         <menuitem
                 id="droga_pharma_mtm_and_counselling"
-                name="MTM and Counselling"
+                name="PCM"
                 groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
                 sequence="30">
             <menuitem
@@ -33,9 +33,14 @@
             <menuitem
                     id="droga_pharma_counselling_menu"
                     name="Counselling"
-                    action="droga_pharma_counselling_action"
+                    action="droga_pharma_counselling_view_action"
                     groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
                     sequence="5"/>
+            <menuitem
+                    id="droga_minor_alignment_menu"
+                    name="Minor Alignments"
+                    action="droga_minor_aliment_view_action"
+                    sequence="11"/>
         </menuitem>
 
 
@@ -114,29 +119,29 @@
                 </menuitem>
                 <menuitem
                         id="droga_pharma_report_mtm"
-                        name="MTM and Counselling"
+                        name="PCM reports"
                         sequence="4">
                     <menuitem
                             id="droga_pharma_points_earned_report_menu"
                             name="Customer points"
                             action="action_droga_pharma_points_earned_action"
-                            sequence="3"/>
+                            sequence="9"/>
 
                     <menuitem
                             id="droga_pharma_follow_up_report_menu"
                             name="MTM"
                             action="action_droga_pharma_mtm_schedule_detail_tree"
-                            sequence="5"/>
+                            sequence="3"/>
                     <menuitem
                             id="droga_pharma_counselling_report_menu"
                             name="Counselling"
                             action="droga_pharma_counselling_action"
-                            sequence="7"/>
+                            sequence="5"/>
                     <menuitem
                             id="droga_pharma_minor_alignments_report_menu"
                             name="Minor Alignments"
                             action="droga_pharma_aliment_action"
-                            sequence="9"/>
+                            sequence="7"/>
                 </menuitem>
 
 

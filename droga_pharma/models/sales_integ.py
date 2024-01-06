@@ -31,30 +31,17 @@ class sales_integ(models.Model):
     weight = fields.Float('Weight')
     diagnosis = fields.Html('Diagnosis')
     physiotherapist = fields.Many2one('droga.physiotherapist.list')
-    mtm_count=fields.Integer('MTM count',default=1)
+    has_mtm_products=fields.Boolean(compute='_onchange_order_line')
+    has_counsell_products = fields.Boolean(compute='_onchange_order_line')
     mtm_header=fields.One2many('droga.pharma.mtm.header','sales_origin')
-    counselling_count=fields.Integer('Counselling count',default=1)
     counselling_header = fields.One2many('droga.pharma.counselling', 'sales_origin')
     minor_align_header = fields.One2many('droga.pharma.minor.alignment', 'sales_origin')
     membership_origin = fields.Many2one('droga.pharma.membership', readonly=True)
     cust_availed_payment_term_ids=fields.Many2many('account.payment.term',related='partner_id.allowed_credit_terms')
     mature_amount_pharma = fields.Monetary('Matured amount', compute='_get_mature_amount_pharma')
     show_invoice_button_pharma = fields.Boolean(compute='_get_mature_amount_pharma')
-
-    # def create_product(self, name, price, category_id):
-    #     product_template = self.env['product.template'].create({
-    #         'name': name,
-    #         'list_price': price,
-    #         'display_name': name,
-    #     })
-    #
-    #     product = self.env['product.product'].create({
-    #         'product_tmpl_id': product_template.id,
-    #         'categ_id': category_id,
-    #     })
-    #
-    #     return product
-
+    mtm_duration_in_months = fields.Integer("MTM duration in months",compute='_onchange_order_line')
+    no_of_sessions = fields.Integer("Number of MTM sessions",compute='_onchange_order_line')
 
     @api.depends('partner_id')
     def _get_mature_amount_pharma(self):
@@ -101,16 +88,22 @@ class sales_integ(models.Model):
             rec.customer_emp.dob=self.dob
             rec.customer_emp.gender = self.sex
 
-    @api.onchange('order_line')
+    #@api.onchange('order_line')
     def _onchange_order_line(self):
         for rec in self:
+            rec.has_mtm_products = False
+            rec.has_counsell_products = False
+            rec.mtm_duration_in_months = 0
+            rec.no_of_sessions = 0
             for pro in rec.order_line.product_id:
-                product_name = str(pro.display_name)
-                index = product_name.find(']')
-                if product_name[1:index] == '54015':
-                    rec.mtm_count = 1
-                elif product_name[1:index] == '54016':
-                    rec.counselling_count = 1
+                pro_type = pro.product_tmpl_id.pharma_detailed_type
+                if pro_type == "mtmcard":
+                    rec.has_mtm_products = True
+                    rec.mtm_duration_in_months = pro.product_tmpl_id.tf_in_months
+                    rec.no_of_sessions = pro.product_tmpl_id.no_of_sessions
+                if pro_type == "counselling":
+                    rec.has_counsell_products = True
+
 
     @api.depends('dob')
     def _compute_age(self):
@@ -178,9 +171,13 @@ class sales_integ(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_sales_origin': self.id,
+                'default_client': self.partner_id,
+                'default_mtm_duration_in_months': self.mtm_duration_in_months,
+                'default_no_of_sessions': self.no_of_sessions,
             },
             'res_id': self.mtm_header.id
         }
+
     def action_counselling_orders(self):
         return {
             'name': 'Counselling sessions',

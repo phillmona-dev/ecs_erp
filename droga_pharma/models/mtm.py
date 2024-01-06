@@ -3,9 +3,26 @@ from email.policy import default
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
+class droga_pharma_mtm_history(models.Model):
+    _name='droga.pharma.mtm.history'
+    #mtm_duration_in_months = fields.Integer("MTM duration in months")
+    active_state = fields.Selection(selection=[('active', 'Active'), ("inactive","Inactive")], compute='_compute_active_state', readonly=True)
+    cons_start_date = fields.Date('MTM start date')
+    cons_end_date = fields.Date('MTM end date')
+    mtm_header=fields.Many2one('droga.pharma.mtm.header')
+    origin_sales=fields.Many2one('sale.order')
+
+    def _compute_active_state(self):
+        for rec in self:
+            today = fields.Date.today()
+            if today >= rec.cons_start_date and today <= rec.cons_end_date:
+                rec.active_state = 'active'
+            else:
+                rec.active_state = 'Inactive'
 
 class droga_pharma_mtm_header(models.Model):
     _name = 'droga.pharma.mtm.header'
+    mtm_history=fields.One2many('droga.pharma.mtm.history','mtm_header')
     _rec_name = "client_descr"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Droga MTM"
@@ -14,31 +31,56 @@ class droga_pharma_mtm_header(models.Model):
     detail_mtm=fields.One2many('droga.pharma.mtm.detail','parent_mtm')
     detail_mtm_followup = fields.One2many('droga.pharma.mtm.follow_up', 'parent_mtm_follow')
     # Related fields
-    client = fields.Many2one('res.partner',related='sales_origin.partner_id')
+    client = fields.Many2one('res.partner')
     customer = fields.Many2one('droga.pharma.cust.employees',related='sales_origin.customer_emp')
     client_descr= fields.Char(related='sales_origin.emp_descr', store=True)
     sales_origin=fields.Many2one('sale.order')
-    mobile = fields.Char("Mobile", related='customer.phone_no', store=True)
-    medical = fields.Html("Medical History", related="customer.medical_history", store=True)
-    medication_history = fields.Html("Medication History and adherence", related='customer.medication_history', store=True)
-    dob = fields.Date("Date of Birth", compute="_get_dob" ,store=True)
+    mobile = fields.Char("Mobile", related='client.phone', store=True)
+    medical = fields.Html("Medical History")
+    medication_history = fields.Html("Medication History and adherence", store=True)
+    dob = fields.Date("Date of Birth", store=True)
     age = fields.Integer("Age", compute="_compute_age", readonly=True)
-    gender = fields.Selection(selection=[("Male", "Male"), ("Female", "Female")], string="Gender", related='customer.gender', store=True)
-    profession = fields.Selection(selection=[("hp", "Health Professional"), ("other", "Other")], string="Profession", related="customer.profession", store=True)
+    gender = fields.Selection(selection=[("Male", "Male"), ("Female", "Female")], string="Gender", store=True)
+    profession = fields.Selection(selection=[("hp", "Health Professional"), ("other", "Other")], string="Profession", store=True)
     weight = fields.Float("Weight")
     height = fields.Float("Height")
     bsa = fields.Float("BSA")
     address = fields.Char("Address")
     pregnancy = fields.Char("Pregnancy status")
-    immunization = fields.Html("Immunization", related="customer.immunization", store=True)
-    adr = fields.Html("ADRS and/or Allergies", related="customer.adr_allergy", store=True)
+    immunization = fields.Html("Immunization", store=True)
+    adr = fields.Html("ADRS and/or Allergies", store=True)
     diagnosis = fields.Text("Diagnosis")
     physician = fields.Char("Primary physician and contact information")
     #dates
-    cons_start_date=fields.Date('MTM start date')
-    cons_end_date = fields.Date('MTM end date')
     prev_schedule = fields.Date('Prev schedule', default=lambda self: self._compute_prev_schedule())
     next_schedule = fields.Date('Next schedule', default=lambda self: self._compute_next_schedule())
+    no_of_sessions = fields.Integer("Number of MTM sessions")
+    mtm_duration_in_months = fields.Integer("MTM duration in months")
+    cons_start_date = fields.Date('MTM start date', default=fields.Date.today(), store=True, readonly=True)
+    cons_end_date = fields.Date('MTM end date', compute='_compute_end_date', readonly=True)
+    check_compute = fields.Boolean(default=False, store=True)
+
+    def _compute_end_date(self):
+        for rec in self:
+            no_of_days = rec.mtm_duration_in_months * 30
+            rec.cons_end_date = rec.cons_start_date + timedelta(days=no_of_days)
+            if not rec.check_compute:
+                follow_date = rec.cons_start_date
+                rate = (rec.mtm_duration_in_months * 30) // rec.no_of_sessions
+                for i in range(rec.no_of_sessions):
+                    new_record = self.env['droga.pharma.mtm.follow_up'].create({
+                        'parent_mtm_follow': rec.id,
+                        'date_follow_up': follow_date,
+                        'from_sales_order': True,
+                    })
+                    follow_date += timedelta(days=rate)
+                new_record = self.env['droga.pharma.mtm.history'].create({
+                    'mtm_header': rec.id,
+                    'cons_start_date': rec.cons_start_date,
+                    'cons_end_date': rec.cons_end_date,
+                    'origin_sales': rec.sales_origin.id,
+                })
+                rec.check_compute = True
 
     def _compute_prev_schedule(self):
         for rec in self:
@@ -57,13 +99,6 @@ class droga_pharma_mtm_header(models.Model):
                 record.age = datetime.now().year - record.dob.year
             else:
                 record.age = 0
-
-    def _get_dob(self):
-        for rec in self:
-            if rec.customer.dob:
-                rec.dob = rec.customer.dob
-            else:
-                rec.dob = datetime.now()
 
     def medication_list(self):
         detail_mtm_ids = self.mapped('detail_mtm').ids
@@ -105,9 +140,7 @@ class droga_pharma_mtm_header(models.Model):
         today = fields.Date.today()
         records = self.search([('cons_end_date', '>=', today), ('next_schedule', '=', today)])
         for rec in records:
-            print("in")
             message = "The mtm customer "+rec.client_descr+" has a follow up today."
-            print(rec.next_schedule)
             self.create_an_activity(rec, rec.create_uid.id, message)
             rec.prev_schedule = today
             rec.next_schedule = today + timedelta(days=rec.plan_generate_frequency)
@@ -153,6 +186,7 @@ class droga_pharma_mtm_schedule(models.Model):
     referral = fields.Boolean("Sent referral for further diagnosis")
     asses_care_plan = fields.Html('Assessment and care plan')
     recs_inter = fields.Html('Recommendations / Interventions')
+    from_sales_order = fields.Boolean("From Sales order?", default=False)
 
     def open_follow_up_form(self):
         return {
