@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from datetime import timedelta, date
 import simplejson
 from lxml import etree
 import math
@@ -84,8 +84,8 @@ class sale_order_line(models.Model):
     phar_cont_price_marginc=fields.Char('Discount rate',compute='_get_discount')
     def _get_discount(self):
         for rec in self:
-            if rec.price_unit!=0:
-                margin=round((rec.price_unit-rec.phar_cont_price)/rec.price_unit*-100,2)
+            if rec.phar_cont_price!=0:
+                margin=round((rec.price_unit-rec.phar_cont_price)/rec.phar_cont_price*-100,2)
                 rec.phar_cont_price_marginc=str((margin))+' %'
             else:
                 rec.phar_cont_price_marginc='0 %';
@@ -102,6 +102,7 @@ class sale_order_line(models.Model):
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
+
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
         selfsud = self.sudo()
@@ -167,6 +168,14 @@ class sale_order_line(models.Model):
     def _inverse_price(self):
         pass
 
+    def calc_sales_totals_pharma(self):
+        total_pharma=0
+        total_disc_pharma=0
+        for ln in self.order_id.order_line:
+            total_pharma_before_discount=total_pharma+(ln.product_uom_qty*ln.phar_cont_price)
+            total_disc_pharma=total_pharma_before_discount-self.order_id.amount_total
+        self.order_id.total_pharma=total_pharma
+        self.order_id.total_disc_pharma = total_disc_pharma
     def calc_sales_totals(self):
         core_sum = 0
         non_core_sum = 0
@@ -195,17 +204,45 @@ class sale_order_line(models.Model):
         self.order_id.total_discount = total_before_discount - (core_sum + non_core_sum)
         self.order_id.total_added = (core_sum + non_core_sum) - total_before_discount
 
+    def _get_pharma_price_with_discount(self,line):
+        cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),
+                                                                  ('header.customer', '=', line.order_id.partner_id.id),
+                                                                  ('header.date_from', '<', datetime.today()),
+                                                                  ('header.date_to', '>', datetime.today()),
+                                                                  ('header.status', '=', 'Active')])
+        if len(cont_prices) > 0:
+            return cont_prices[0]["selling_price"]
+        else:
+            # Fetch any discounts here
+            rate = 1
+            discount_per_acc = self.env['droga.pharma.reward.issue'].search([])
+            for disc in discount_per_acc:
+                if (
+                        line.product_id.product_tmpl_id.id == disc.prod_template.id or line.product_id.product_tmpl_id.categ_id in disc.prod_group) and disc.reward_req_points <= sum(
+                        self.env['droga.pharma.points.earned'].search([('customer', '=', line.order_id.partner_id.id), (
+                        'earned_date', '>=', date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
+                                'points_earned')):
+                    rate = 1 + (disc.reward_pct / 100)
+                    return line.product_id.list_price_phar * rate
 
+            self.calc_sales_totals_pharma()
+
+            discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([])
+            for disc in discount_per_amount:
+                if self.order_id.total_pharma>disc.from_amt and self.order_id.total_pharma<disc.to_amt:
+                    rate=1 + (disc.discount / 100)
+                    return line.product_id.list_price_phar * rate
+
+            discount_per_person=self.env['droga.breast.feed.reward.contact.type'].search([])
+            #Breastfeeder and health professional
+
+            return line.product_id.list_price_phar * rate
     def _get_pharma_price(self,line):
         #Contract price
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),('header.customer','=',line.order_id.partner_id.id),('header.date_from','<',datetime.today()),('header.date_to','>',datetime.today()),('header.status','=','Active')])
         if len(cont_prices)>0:
             return cont_prices[0]["selling_price"]
         else:
-            #Fetch any discounts here
-
-            #
-
             return line.product_id.list_price_phar
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty')
@@ -218,10 +255,10 @@ class sale_order_line(models.Model):
                 if line.order_from.startswith('PH'):
                     #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
                     line.std_unit_price = line.product_id.list_price_phar
-                    selling_price= self._get_pharma_price(line)
+                    selling_price= self._get_pharma_price_with_discount(line)
                     if not line.manual_price_pharma:
                         line.price_unit = selling_price
-                    line.phar_cont_price = selling_price
+                    line.phar_cont_price = self._get_pharma_price(line)
                     line.product_uom_pharma_measure = line.product_id.uom_id
                     line.product_uom = line.product_id.uom_id
                     line.product_uom_qty = line.product_uom_pharma_qty
@@ -407,6 +444,8 @@ class sale_order_ext(models.Model):
     has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
                                         compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
+    total_pharma = fields.Float('Total pharmacy before discount')
+    total_disc_pharma = fields.Float('Total discount for pharmacy')
     def get_wareh(self):
         list=self.env.user.warehouse_ids_ph_disp+self.env.user.warehouse_ids_im_ws
         return list[

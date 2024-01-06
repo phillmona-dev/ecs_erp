@@ -47,7 +47,7 @@
                         <div style="width: 50%;">
                             <div>
                                 <h5>Patient's Personal Info</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
+                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"></div>
                                 <group>
                                     <field name="client_descr"></field>
                                     <field name="gender" readonly="0"/>
@@ -63,12 +63,12 @@
                             <br/>
                             <br/>
                             <div>
-                                <h5>MTM schedule</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
+                                <h5>Contact Info</h5>
+                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"></div>
                                 <group>
-                                    <field name="cons_start_date"/>
-                                    <field name="cons_end_date"/>
-                                    <field name="plan_generate_frequency"/>
+                                    <field name="mobile" readonly="0"/>
+                                    <field name="address"/>
+                                    <field name="physician"/>
                                 </group>
                             </div>
                         </div>
@@ -76,7 +76,7 @@
                         <div style="width: 50%;">
                             <div>
                                 <h5>Patient's Medication info</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
+                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"></div>
                                 <group>
                                     <field name="medical" readonly="0"/>
                                     <field name="medication_history" readonly="0"/>
@@ -88,13 +88,7 @@
                             <br/>
                             <br/>
                             <div>
-                                <h5>Contact Info</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
-                                <group>
-                                    <field name="mobile" readonly="0"/>
-                                    <field name="address"/>
-                                    <field name="physician"/>
-                                </group>
+
                             </div>
                             <br/>
                         </div>

@@ -36,7 +36,6 @@
                             <field name="vat" placeholder="e.g. BE0477472701"/>
                         </group>
                         <group>
-                            <field name="phone" widget="phone"/>
                             <field name="mobile" widget="phone"/>
                         </group>
                     </group>

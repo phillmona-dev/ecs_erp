@@ -162,6 +162,7 @@ class sales_integ(models.Model):
         self.write({'state': 'draft'})
         self.set_activity_done()
     def action_mtm_orders(self):
+        id=self.env['droga.pharma.mtm.header'].search([('client','=',self.partner_id.id)])[0].id if len(self.env['droga.pharma.mtm.header'].search([('client','=',self.partner_id.id)]))>0 else False
         return {
             'name': 'MTM sessions',
             'view_type': 'form',
@@ -171,11 +172,11 @@ class sales_integ(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_sales_origin': self.id,
-                'default_client': self.partner_id,
+                'default_client': self.partner_id.id,
                 'default_mtm_duration_in_months': self.mtm_duration_in_months,
                 'default_no_of_sessions': self.no_of_sessions,
             },
-            'res_id': self.mtm_header.id
+            'res_id': id
         }
 
     def action_counselling_orders(self):

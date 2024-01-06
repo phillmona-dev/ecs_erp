@@ -58,9 +58,7 @@
                     <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
                         <div style="width: 50%;">
                             <div>
-                                <h5>Patient's Personal Info</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
-                                <group>
+                                <group string="Patient's Personal Info">
                                     <field name="client_descr"/>
                                     <field name="dob" readonly="0"/>
                                     <field name="age"/>
@@ -74,9 +72,7 @@
                         </div>
                         <div style="width: 50%;">
                             <div>
-                                <h5>Minor alignment Info</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;"></div>
-                                <group>
+                                <group string="Minor alignment Info">
                                     <field name="sales_origin"/>
                                     <field name="minor_align"/>
                                     <field name="decision"/>

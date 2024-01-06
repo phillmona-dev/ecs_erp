@@ -33,9 +33,9 @@ class droga_pharma_mtm_header(models.Model):
     # Related fields
     client = fields.Many2one('res.partner')
     customer = fields.Many2one('droga.pharma.cust.employees',related='sales_origin.customer_emp')
-    client_descr= fields.Char(related='sales_origin.emp_descr', store=True)
+    client_descr= fields.Char(related='client.name')
     sales_origin=fields.Many2one('sale.order')
-    mobile = fields.Char("Mobile", related='client.phone', store=True)
+    mobile = fields.Char("Mobile", related='client.mobile', store=True)
     medical = fields.Html("Medical History")
     medication_history = fields.Html("Medication History and adherence", store=True)
     dob = fields.Date("Date of Birth", store=True)
@@ -148,7 +148,7 @@ class droga_pharma_mtm_header(models.Model):
     @api.model
     def create(self, vals):
         res=super(droga_pharma_mtm_header, self).create(vals)
-        if not res.customer:
+        if not res.client:
             raise ValidationError(
                 "Customer must be registered to initiate an MTM order.")
         return res
