@@ -4,7 +4,7 @@
         <field name="name">Counselling</field>
         <field name="res_model">droga.pharma.counselling</field>
         <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="droga_pharma_counselling_tree_view"/>
+<!--        <field name="view_id" ref="droga_pharma_counselling_tree_view"/>-->
     </record>
 
     <record id="droga_pharma_counselling_view_action" model="ir.actions.act_window">
@@ -14,18 +14,18 @@
         <field name="view_id" ref="droga_counselling_view"/>
     </record>
 
-    <record id="droga_pharma_counselling_tree_view" model="ir.ui.view">
-        <field name="name">droga.pharma.counselling.tree</field>
-        <field name="model">droga.pharma.counselling</field>
-        <field name="arch" type="xml">
-            <tree string="Counselling" delete="0" create="0">
-                <field name="counselling_cat"></field>
-                <field name="status"></field>
-                <field name="pharmacist_lev_understanding"></field>
-                <field name="ses_acceptance"></field>
-            </tree>
-        </field>
-    </record>
+<!--    <record id="droga_pharma_counselling_tree_view" model="ir.ui.view">-->
+<!--        <field name="name">droga.pharma.counselling.tree</field>-->
+<!--        <field name="model">droga.pharma.counselling</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <tree string="Counselling" delete="0" create="0">-->
+<!--                <field name="counselling_cat"></field>-->
+<!--                <field name="status"></field>-->
+<!--                <field name="pharmacist_lev_understanding"></field>-->
+<!--                <field name="ses_acceptance"></field>-->
+<!--            </tree>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <record id="droga_counselling_view" model="ir.ui.view">
         <field name="name">droga.pharma.counselling.view.tree</field>
