@@ -62,8 +62,8 @@ class ReportWizard(models.TransientModel):
             sheet.write(row, col + 5, re.search(r"'([^']*)'", str(ed.get('drug_therapy_cause', ''))).group(1), bold)
             sheet.write(row, col + 6, re.sub('<[^<]+?>', '', str(ed.get('intervention', ''))), bold)
             sheet.write(row, col + 7, re.sub('<[^<]+?>', '', str(ed.get('intervention_implemented', ''))), bold)
-            sheet.write(row, col + 8, re.sub('<[^<]+?>', '', str(ed.get('asses_care_plan', ''))), bold)
-            sheet.write(row, col + 9, re.sub('<[^<]+?>', '', str(ed.get('recs_inter', ''))), bold)
+            # sheet.write(row, col + 8, re.sub('<[^<]+?>', '', str(ed.get('asses_care_plan', ''))), bold)
+            # sheet.write(row, col + 9, re.sub('<[^<]+?>', '', str(ed.get('recs_inter', ''))), bold)
 
     def action_wizard_print_excel_report(self):
         _client = self.client

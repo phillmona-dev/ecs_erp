@@ -8,16 +8,13 @@
         <field name="model">droga.pharma.mtm.follow_up.detail</field>
         <field name="arch" type="xml">
             <tree create="0" delete="0">
-                <field name="client"/>
-                <field name="customer"/>
                 <field name="indication"/>
                 <field name="drug"/>
                 <field name="drug_therapy_problem"/>
                 <field name="drug_therapy_cause"/>
                 <field name="intervention"/>
                 <field name="intervention_implemented"/>
-                <field name="asses_care_plan"/>
-                <field name="recs_inter"/>
+                <field name="outcome"/>
 
             </tree>
         </field>
@@ -29,16 +26,13 @@
             <field name="arch" type="xml">
                 <form string="MTM Detail">
                     <group>
-                        <field name="client"/>
-                <field name="customer"/>
-                <field name="indication"/>
-                <field name="drug"/>
-                <field name="drug_therapy_problem"/>
-                <field name="drug_therapy_cause"/>
-                <field name="intervention"/>
-                <field name="intervention_implemented"/>
-                <field name="asses_care_plan"/>
-                <field name="recs_inter"/>
+                        <field name="indication"/>
+                        <field name="drug"/>
+                        <field name="drug_therapy_problem"/>
+                        <field name="drug_therapy_cause"/>
+                        <field name="intervention"/>
+                        <field name="intervention_implemented"/>
+                        <field name="outcome"/>
                     </group>
                 </form>
             </field>

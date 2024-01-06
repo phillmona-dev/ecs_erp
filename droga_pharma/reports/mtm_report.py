@@ -136,8 +136,8 @@ class ReportWizard(models.TransientModel):
 
             sheet.write(row, col + 5, re.sub('<[^<]+?>', '', str(ed.get('intervention', ''))))
             sheet.write(row, col + 6, re.sub('<[^<]+?>', '', str(ed.get('intervention_implemented', ''))))
-            sheet.write(row, col + 7, re.sub('<[^<]+?>', '', str(ed.get('asses_care_plan', ''))))
-            sheet.write(row, col + 8, re.sub('<[^<]+?>', '', str(ed.get('recs_inter', ''))))
+            # sheet.write(row, col + 7, re.sub('<[^<]+?>', '', str(ed.get('asses_care_plan', ''))))
+            # sheet.write(row, col + 8, re.sub('<[^<]+?>', '', str(ed.get('recs_inter', ''))))
 
     def action_wizard_print_excel_report(self):
 
@@ -157,6 +157,6 @@ class ReportWizard(models.TransientModel):
         excel_data = self.env['droga.pharma.mtm.follow_up.detail'].search_read(domain)
         return self.action_get_xls(excel_data)
 
-    def action_cancel(self):
 
+    def action_cancel(self):
         return {'type': 'ir.actions.act_window_close'}

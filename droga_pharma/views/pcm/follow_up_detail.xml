@@ -12,6 +12,15 @@
                             <field name="time"></field>
                             <field name="current_status"></field>
                         </group>
+                        <group>
+                            <field name="plan"/>
+                            <field name="referral"/>
+                        </group>
+                    </group>
+                    <hr></hr>
+                    <group string="Assessment, plan and recommendations">-->
+                        <field name="asses_care_plan"></field>
+                        <field name="recs_inter"></field>
                     </group>
                     <notebook>
                         <page string="Follow up detail">
@@ -21,6 +30,7 @@
                                     <field name="drug_therapy_cause"></field>
                                     <field name="intervention"></field>
                                     <field name="intervention_implemented"></field>
+                                    <field name="outcome"/>
                                     <field name="remark"></field>
                                 </tree>
                             </field>

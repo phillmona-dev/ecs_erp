@@ -4,6 +4,7 @@ from odoo.exceptions import Warning
 
 class DrugInformationQuery(models.Model):
     _name = 'drug.information.query'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Drug Information Query'
     state = fields.Selection([
         ('enquiry', 'Enquiry'),
@@ -124,15 +125,6 @@ class DrugInformationQuery(models.Model):
     ], string='Response Needed In', required=True)
     referral_required = fields.Boolean(string='Referral Required', required=True)
     additional_information = fields.Text(string='Additional Information', required=True)
-    requestor_initials = fields.Char(string='Initial of the Requestor', required=True)
-    requestor_date = fields.Date(string='Requestor Date', required=True)
-    enquiry_received_date = fields.Date(string='Enquiry Received On', required=True)
-    enquiry_received_time = fields.Char(string='Enquiry Received Time', required=True)
-    enquiry_received_by = fields.Char(string='Enquiry Received By', required=True)
-    enquiry_reference_no = fields.Char(string='Enquiry Reference No.', required=True)
-    response_given_date = fields.Date(string='Response Given To Requestor On', required=True)
-    response_given_time = fields.Char(string='Response Given Time', required=True)
-    response_made_by = fields.Char(string='Response Made By', required=True)
 
     # DIS RESPONSE FORM
     disclaimer = fields.Text(string='.',
@@ -178,18 +170,27 @@ class DrugInformationQuery(models.Model):
     ], string='Was the information used?')
     email_feedback = fields.Char(string='Email')
     thanks = fields.Text(string='.', default='We thank you for your time and response ')
-
+    create_user=fields.Many2one('res.users', default=lambda self: self.env.user.id)
     def open_enquire_form(self):
         self.state = "response"
 
     def open_respond_form(self):
-        if self.reference_no_reponce and self.date_reponce and self.inquirer_name_reponce and self.phone_no_reponce and self.email_reponce and self.message_reponce and self.question_reponce and self.answer_reponce and self.references_reponce and self.add_info_reponce and self.completed_by_reponce:
-            self.state = "feedback"
-        else:
-            raise Warning('Please fill in all the required fields.')
+        self.state = "feedback"
+        #if self.reference_no_reponce and self.date_reponce and self.inquirer_name_reponce and self.phone_no_reponce and self.email_reponce and self.message_reponce and self.question_reponce and self.answer_reponce and self.references_reponce and self.add_info_reponce and self.completed_by_reponce:
+        #    self.state = "feedback"
+        #else:
+        #    raise Warning('Please fill in all the required fields.')
 
     def open_feedback_form(self):
-        if self.reference_no_feedback and self.enquiry_date_feedback and self.message_feedback and self.provision_of_information_feedback and self.information_received_in_time_feedback and self.presentation_of_information_feedback and self.information_meet_expectation_feedback and self.information_used_feedback and self.email_feedback:
-            self.state = "completed"
-        else:
-            raise Warning('Please fill in all the required fields.')
+        self.state = "completed"
+        #if self.reference_no_feedback and self.enquiry_date_feedback and self.message_feedback and self.provision_of_information_feedback and self.information_received_in_time_feedback and self.presentation_of_information_feedback and self.information_meet_expectation_feedback and self.information_used_feedback and self.email_feedback:
+        #    self.state = "completed"
+        #else:
+        #    raise Warning('Please fill in all the required fields.')
+
+    def set_activity_done(self):
+
+        activity = self.env["mail.activity"].search(
+            [('res_name', '=', self.name)])
+        for act in activity:
+            act.sudo().action_done()
