@@ -24,10 +24,11 @@
         <field name="name">droga.pharma.minor.aliment.tree</field>
         <field name="model">droga.pharma.minor.alignment</field>
         <field name="arch" type="xml">
-            <tree string="Minor Alignments" create="0" delete="0">
+            <tree string="Minor Alignments" create="1" delete="0">
                 <field name="minor_align"></field>
                 <field name="decision"></field>
                 <field name="referral"></field>
+                <field name="create_date" string="Date"></field>
                 <field name="treatment" widget="many2many_tags"></field>
             </tree>
         </field>

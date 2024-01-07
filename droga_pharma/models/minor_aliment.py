@@ -24,8 +24,24 @@ class droga_pharma_minor_alignment(models.Model):
     mobile = fields.Char("Mobile", related='client.phone', store=True)
     medical = fields.Html("Medical History", store=True)
     medication_history = fields.Html("Medication History and adherence", store=True)
-    dob = fields.Date("Date of Birth", store=True)
+    dob = fields.Date("Date of Birth", compute='get_dob', store=True,inverse='inverse_dob',tracking=True)
     age = fields.Integer("Age", compute="_compute_age", readonly=True)
+
+    def get_dob(self):
+        for rec in self:
+            rec.dob = rec.client.dob
+    def inverse_dob(self):
+        for rec in self:
+            rec.client.dob = rec.dob
+
+    @api.depends("dob")
+    def _compute_age(self):
+        for record in self:
+            if record.dob:
+                record.age = datetime.now().year - record.dob.year
+            else:
+                record.age = 0
+
     gender = fields.Selection(selection=[("Male", "Male"), ("Female", "Female")], string="Gender", store=True)
     profession = fields.Selection(selection=[("hp", "Health Professional"), ("other", "Other")], string="Profession", store=True)
     # weight = fields.Float("Weight")
@@ -38,14 +54,6 @@ class droga_pharma_minor_alignment(models.Model):
     diagnosis = fields.Text("Diagnosis")
     physician = fields.Char("Primary physician and contact information")
     next_date = fields.Date("Next appointment date")
-
-    @api.depends("dob")
-    def _compute_age(self):
-        for record in self:
-            if record.dob:
-                record.age = datetime.now().year - record.dob.year
-            else:
-                record.age = 0
 
     def create_an_activity(self,rec, user_id, message):
         self.env['mail.activity'].sudo().create({

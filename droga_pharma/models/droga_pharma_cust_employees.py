@@ -1,4 +1,5 @@
 import datetime
+from datetime import datetime,date
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
@@ -11,6 +12,41 @@ class droga_pharma_customer(models.Model):
     memberships_partner=fields.One2many('droga.pharma.membership', 'parent_customer')
     company_type = fields.Selection(string='Company Type',
                                     selection=[('person', 'Individual'), ('company', 'Company')])
+    childs = fields.One2many('droga.pharma.child', 'parent_cust', string='Childs')
+    def open_children(self):
+        return {
+            'name': 'Children',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.pharma.cust.employees',
+            'view_id': self.env.ref('droga_pharma.droga_pharma_children_cust').id,
+            'type': 'ir.actions.act_window',
+
+            # This will pass the detail ID if a record is present
+            'domain': [('parent_cust', '=', self.id)],
+            'target': 'new',
+        }
+    dob = fields.Date("Date of Birth", store=True)
+    age = fields.Integer("Age", compute="_compute_age", readonly=True)
+
+    @api.depends("dob")
+    def _compute_age(self):
+        for record in self:
+            if record.dob:
+                record.age = datetime.now().year - record.dob.year
+            else:
+                record.age = 0
+
+    gender = fields.Selection(
+        [('Male', 'Male'), ('Female', 'Female')],
+        string='Gender', tracking=True)
+    profession = fields.Selection(
+        [('hp', 'Health professional'), ('other', 'Other')],
+        string='Profession')
+    medical_history = fields.Html('Medical history', tracking=True)
+    medication_history = fields.Html('Medication history and adherance', tracking=True)
+    adr_allergy = fields.Html('ADRs and/or Allergies', tracking=True)
+    immunization = fields.Html('Immunization', tracking=True)
 
 class droga_pharma_customer_employees(models.Model):
     _name = 'droga.pharma.cust.employees'
@@ -28,19 +64,23 @@ class droga_pharma_customer_employees(models.Model):
     employer_name = fields.Char(related='parent_customer.name', store=True)
     employee_name = fields.Char('Employee Name', required=True)
     mobile = fields.Char('Mobile')
-    gender = fields.Selection(
-        [('Male', 'Male'), ('Female', 'Female')],
-        string='Gender',tracking=True)
     job_position = fields.Char(string='Job position')
     company_limit= fields.Float(string='Credit limit', tracking=True,related='parent_customer.cust_credit_limit_pharma')
     employee_credit_limit=fields.Float('Credit limit',default=0,tracking=True)
     cust_id=fields.Char('Employee ID')
+    gender = fields.Selection(
+        [('Male', 'Male'), ('Female', 'Female')],
+        string='Gender', tracking=True)
     profession=fields.Selection(
         [('hp', 'Health professional'),('other', 'Other')],
         string='Profession')
+    medical_history = fields.Html('Medical history', tracking=True)
+    medication_history = fields.Html('Medication history and adherance', tracking=True)
+    adr_allergy = fields.Html('ADRs and/or Allergies', tracking=True)
+    immunization = fields.Html('Immunization', tracking=True)
     age = fields.Integer(compute='_compute_age')
     phone_no = fields.Char('Phone No',tracking=True)
-    dob = fields.Date('Date of birth', default=datetime.date.today(),tracking=True)
+    dob = fields.Date('Date of birth', default=date.today(),tracking=True)
     additional_product_groups=fields.Many2many('product.category')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     max_amount=fields.Float(string='Max amount')
@@ -52,10 +92,7 @@ class droga_pharma_customer_employees(models.Model):
         string='Period type')
     remaining_amount_period=fields.Char(string='Remaining',compute='_remain_amount_period')
     childs=fields.One2many('droga.pharma.child','parent',string='Childs')
-    medical_history=fields.Html('Medical history',tracking=True)
-    medication_history = fields.Html('Medication history and adherance',tracking=True)
-    adr_allergy = fields.Html('ADRs and/or Allergies',tracking=True)
-    immunization = fields.Html('Immunization',tracking=True)
+
 
     @api.model
     def create(self, vals):
@@ -107,7 +144,7 @@ class droga_pharma_customer_employees(models.Model):
     def _compute_age(self):
         for record in self:
             if record.dob:
-                today = datetime.date.today()
+                today = date.today()
                 # Check if the date has passed this year
                 if today.strftime("%m%d") >= record.dob.strftime("%m%d"):
                     record['age'] = today.year - record.dob.year
@@ -128,11 +165,16 @@ class droga_pharma_child_list(models.Model):
     gender = fields.Selection(
         [('Male', 'Male'), ('Female', 'Female')],
         string='Child gender', tracking=True)
-    child_dob= fields.Date('Child dob', default=datetime.datetime(2000,1,1),tracking=True)
+    child_dob= fields.Date('Child dob', default=datetime(2000,1,1),tracking=True)
     child_name=fields.Char('Child name')
     breast_feed_days=fields.Float('Breastfeed period in days',default=180)
+    breat_feed_end_date=fields.Date(compute='get_end_date',store=True)
     parent=fields.Many2one('droga.pharma.cust.employees',string='Parent')
-
+    parent_cust = fields.Many2one('res.partner', string='Parent')
+    @api.depends('breast_feed_days','child_dob')
+    def get_end_date(self):
+        for rec in self:
+            rec.breat_feed_end_date= rec.child_dob + datetime.timedelta(days=rec.breast_feed_days)
     @api.constrains('child_dob')
     def _is_dob_valid(self):
         for record in self:

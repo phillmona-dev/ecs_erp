@@ -32,6 +32,38 @@
 
     </record>
 
+    <record id="droga_pharma_children_cust" model="ir.ui.view">
+        <field name="name">droga.pharma.children.cust.form</field>
+        <field name="model">res.partner</field>
+        <field name="priority">400</field>
+        <field name="arch" type="xml">
+
+            <form delete="0" editable="bottom">
+
+                <sheet>
+                    <notebook>
+                        <page string="Children">
+                            <field name="childs" mode="tree">
+                                <tree delete="0" editable="bottom" multi_line="1">
+
+                                    <field name="child_name"/>
+                                    <field name="gender"/>
+                                    <field name="child_dob"/>
+                                    <field name="breast_feed_days"/>
+
+                                </tree>
+                            </field>
+
+                        </page>
+
+                    </notebook>
+                </sheet>
+
+            </form>
+        </field>
+
+    </record>
+
 
     <record id="droga_pharma_customers_create_popup" model="ir.ui.view">
         <field name="name">droga.pharma.cust.employees.view.form.popup</field>

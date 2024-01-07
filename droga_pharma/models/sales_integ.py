@@ -5,7 +5,7 @@ from datetime import timedelta
 from odoo import models, fields, api
 from dateutil import relativedelta
 
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class sales_integ(models.Model):
@@ -23,8 +23,24 @@ class sales_integ(models.Model):
             rec.emp_descr=rec.partner_id.name+emp_name
     cust_id_linked=fields.Char('Employee ID',related='customer_emp.cust_id')
     points_gained=fields.Float('Points gained')
-    dob = fields.Date('Date of birth', default=datetime.today(),related='customer_emp.dob')
-    age = fields.Integer(compute='_compute_age',related='customer_emp.age')
+    dob = fields.Date("Date of Birth", compute='get_dob', store=True, inverse='inverse_dob', tracking=True)
+    age = fields.Integer("Age", compute="_compute_age", readonly=True)
+
+    def get_dob(self):
+        for rec in self:
+            rec.dob = rec.client.dob
+
+    def inverse_dob(self):
+        for rec in self:
+            rec.client.dob = rec.dob
+
+    @api.depends("dob")
+    def _compute_age(self):
+        for record in self:
+            if record.dob:
+                record.age = datetime.now().year - record.dob.year
+            else:
+                record.age = 0
     sex = fields.Selection(
         [('Male', 'Male'), ('Female', 'Female')],
         string='Sex',related='customer_emp.gender')
@@ -105,18 +121,6 @@ class sales_integ(models.Model):
                     rec.has_counsell_products = True
 
 
-    @api.depends('dob')
-    def _compute_age(self):
-        for record in self:
-            if record.dob:
-                today = datetime.today()
-                # Check if the date has passed this year
-                if today.strftime("%m%d") >= record.dob.strftime("%m%d"):
-                    record['age'] = today.year - record.dob.year
-                else:
-                    record['age'] = today.year - record.dob.year - 1
-            else:
-                record['age'] = 0
     def action_done(self):
         self.state='done'
         self.set_activity_done()
@@ -183,28 +187,32 @@ class sales_integ(models.Model):
         return {
             'name': 'Counselling sessions',
             'view_type': 'form',
-            'view_mode': 'form',
+            'view_mode': 'tree,form',
             'res_model': 'droga.pharma.counselling',
             'view_id': False,
             'type': 'ir.actions.act_window',
             'context': {
                 'default_sales_origin': self.id,
+                'default_client': self.partner_id.id,
             },
-            'res_id': self.counselling_header.id
+            'domain': [('client', '=', self.partner_id.id)],
         }
 
     def action_minor_aliments(self):
+        if self.partner_id.id==15488:
+            raise UserError("Pharma one time customer can not be used to register minor aliments. Please register customer to use the feature..")
         return {
             'name': 'Minor ailments',
             'view_type': 'form',
-            'view_mode': 'form',
+            'view_mode': 'tree,form',
             'res_model': 'droga.pharma.minor.alignment',
             'view_id': False,
             'type': 'ir.actions.act_window',
             'context': {
                 'default_sales_origin': self.id,
+                'default_client': self.partner_id.id,
             },
-            'res_id': self.minor_align_header.id
+            'domain': [('client', '=', self.partner_id.id)],
         }
 
 class sales_integ(models.Model):

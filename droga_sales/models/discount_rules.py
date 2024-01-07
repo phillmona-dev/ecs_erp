@@ -233,8 +233,13 @@ class sale_order_line(models.Model):
                     rate=1 + (disc.discount / 100)
                     return line.product_id.list_price_phar * rate
 
+            breat_feed_children=len(self.env['droga.pharma.child'].search([('parent_cust','=',self.order_id.partner_id.id),('breat_feed_end_date','>=',datetime.today())]))
             discount_per_person=self.env['droga.breast.feed.reward.contact.type'].search([])
-            #Breastfeeder and health professional
+            for disc in discount_per_person:
+                if disc.cont_type=="hp" and self.order_id.partner_id.profession=="hp":
+                    rate=1 + (disc.discount / 100)
+                elif disc.cont_type=='bp' and breat_feed_children>0:
+                    rate = 1 + (disc.discount / 100)
 
             return line.product_id.list_price_phar * rate
     def _get_pharma_price(self,line):
