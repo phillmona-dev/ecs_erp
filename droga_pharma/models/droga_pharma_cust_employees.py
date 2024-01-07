@@ -1,5 +1,5 @@
 import datetime
-from datetime import datetime,date
+from datetime import datetime,date,timedelta
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
@@ -174,7 +174,7 @@ class droga_pharma_child_list(models.Model):
     @api.depends('breast_feed_days','child_dob')
     def get_end_date(self):
         for rec in self:
-            rec.breat_feed_end_date= rec.child_dob + datetime.timedelta(days=rec.breast_feed_days)
+            rec.breat_feed_end_date= rec.child_dob + timedelta(days=rec.breast_feed_days)
     @api.constrains('child_dob')
     def _is_dob_valid(self):
         for record in self:
