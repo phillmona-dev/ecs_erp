@@ -23,7 +23,7 @@
                         <field name="recs_inter"></field>
                     </group>
                     <notebook>
-                        <page string="Follow up detail">
+                        <page string="MTM Detail">
                             <field name="follow_up_detail" mode="tree">
                                 <tree editable="bottom" create="1">
                                     <field name="drug_therapy_problem"></field>

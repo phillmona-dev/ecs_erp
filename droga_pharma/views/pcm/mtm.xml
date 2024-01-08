@@ -119,7 +119,7 @@
                                     <field name="time"></field>
                                     <field name="current_status"></field>
                                     <button icon="fa-credit-card-alt"
-                                            type="object" string=" Follow up detail"
+                                            type="object" string=" Detail"
                                             name="open_follow_up_form" class="oe_highlight"/>
                                 </tree>
                             </field>
