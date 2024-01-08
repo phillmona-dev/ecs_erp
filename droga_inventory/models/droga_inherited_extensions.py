@@ -987,6 +987,11 @@ class droga_stock_product_extension(models.Model):
     def _onchange_pharma_group(self):
         self.taxes_id=self.pharmacy_group_id.taxes_id.ids
 
+    @api.onchange('uom_id')
+    def _onchange_uom(self):
+        for rec in self:
+            rec.uom_po_id=rec.uom_id.id
+
     @api.onchange('default_code')
     def _onchange_default_code(self):
         if not self.default_code:
