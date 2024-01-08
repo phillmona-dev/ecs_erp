@@ -32,7 +32,7 @@ class sales_integ(models.Model):
 
     def inverse_dob(self):
         for rec in self:
-            rec.client.dob = rec.dob
+            rec.partner_id.dob = rec.dob
 
     @api.depends("dob")
     def _compute_age(self):

@@ -33,7 +33,7 @@
         <field name="arch" type="xml">
             <tree string="Counselling" delete="0" create="0">
                 <field name="sales_origin"/>
-                <field name="client_descr"/>
+                <field name="client"/>
                 <field name="mobile"/>
                 <field name="counselling_cat"></field>
                 <field name="status"></field>
@@ -52,7 +52,7 @@
                     <group string="Counselling">
 
                         <group>
-                            <field name="client_descr"></field>
+                            <field name="client"></field>
                             <field name="date"></field>
                             <field name="mobile" readonly="0"/>
                             <field name="gender" readonly="0"/>

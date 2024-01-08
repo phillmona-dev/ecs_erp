@@ -79,7 +79,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Memberships"
+                        <page string="Memberships" attrs="{'invisible': [(1, '>', 0)]}"
                               groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_dp_admin,droga_pharma.pharma_di_admin">
                             <field name="memberships_employee" mode="tree,kanban">
                                 <tree editable="0" create="0">

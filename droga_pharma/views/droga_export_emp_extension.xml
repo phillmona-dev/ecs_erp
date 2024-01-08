@@ -81,7 +81,7 @@
                         </kanban>
                     </field>
                 </page>
-                <page string="Memberships" attrs="{'invisible': [('supplier_rank', '>', 0)]}"
+                <page string="Memberships" attrs="{'invisible': [(1, '>', 0)]}"
                       groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_dp_admin,droga_pharma.pharma_di_admin">
                     <field name="memberships_partner" mode="tree,kanban">
                         <tree editable="0" create="0">

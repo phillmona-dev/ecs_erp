@@ -36,19 +36,48 @@ class droga_pharma_mtm_header(models.Model):
     client_descr= fields.Char(related='client.name')
     sales_origin=fields.Many2one('sale.order')
     mobile = fields.Char("Mobile", related='client.mobile', store=True)
-    medical = fields.Html("Medical History")
-    medication_history = fields.Html("Medication History and adherence", store=True)
-    dob = fields.Date("Date of Birth", store=True)
+    medical = fields.Html("Medical History",store=True,compute='get_cust_hist',inverse='update_medical')
+    medication_history = fields.Html("Medication History and adherence", store=True,compute='get_cust_hist',inverse='update_medication_history')
+    immunization = fields.Html("Immunization", store=True,compute='get_cust_hist',inverse='update_immunization')
+    adr = fields.Html("ADRS and/or Allergies", store=True,compute='get_cust_hist',inverse='update_adr')
+
+    def get_cust_hist(self):
+        for rec in self:
+            rec.medical=rec.client.medical_history
+            rec.medication_history = rec.client.medication_history
+            rec.immunization = rec.client.immunization
+            rec.adr = rec.client.adr_allergy
+            rec.dob = rec.client.dob
+            rec.gender=rec.client.gender
+
+    def update_adr(self):
+        for rec in self:
+            rec.client.adr_allergy=rec.adr
+    def update_immunization(self):
+        for rec in self:
+            rec.client.immunization=rec.immunization
+    def update_medication_history(self):
+        for rec in self:
+            rec.client.medication_history=rec.medication_history
+    def update_medical(self):
+        for rec in self:
+            rec.client.medical_history=rec.medical
+    def update_dob(self):
+        for rec in self:
+            rec.client.dob=rec.dob
+    def update_gender(self):
+        for rec in self:
+            rec.client.gender=rec.gender
+
+    dob = fields.Date("Date of Birth", store=True,compute='get_cust_hist',inverse='update_dob')
     age = fields.Integer("Age", compute="_compute_age", readonly=True)
-    gender = fields.Selection(selection=[("Male", "Male"), ("Female", "Female")], string="Gender", store=True)
+    gender = fields.Selection(selection=[("Male", "Male"), ("Female", "Female")], string="Gender", store=True,compute='get_cust_hist',inverse='update_gender')
     profession = fields.Selection(selection=[("hp", "Health Professional"), ("other", "Other")], string="Profession", store=True)
     weight = fields.Float("Weight")
     height = fields.Float("Height")
     bsa = fields.Float("BSA")
     address = fields.Char("Address")
     pregnancy = fields.Char("Pregnancy status")
-    immunization = fields.Html("Immunization", store=True)
-    adr = fields.Html("ADRS and/or Allergies", store=True)
     diagnosis = fields.Text("Diagnosis")
     physician = fields.Char("Primary physician and contact information")
     #dates
@@ -100,22 +129,26 @@ class droga_pharma_mtm_header(models.Model):
             else:
                 record.age = 0
 
-    def medication_list(self):
+    def mtm_list(self):
         detail_mtm_ids = self.mapped('detail_mtm').ids
-        if not detail_mtm_ids:
+        id = self.env['droga.pharma.mtm.header'].search([('client', '=', self.id)])[0].id if len(
+            self.env['droga.pharma.mtm.header'].search([('client', '=', self.id)])) > 0 else False
+        if len(id)==0:
             return False
-
         return {
-            'name': 'Medication Lists',
-            'view_type': 'tree',
-            'view_mode': 'tree',
-            'res_model': 'droga.pharma.mtm.detail',
+            'name': 'MTM sessions',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.pharma.mtm.header',
             'view_id': False,
             'type': 'ir.actions.act_window',
             'context': {
-                'default_parent_mtm': self.id,
+                'default_sales_origin': self.id,
+                'default_client': self.partner_id.id,
+                'default_mtm_duration_in_months': self.mtm_duration_in_months,
+                'default_no_of_sessions': self.no_of_sessions,
             },
-            'domain': [('id', 'in', detail_mtm_ids)],
+            'res_id': id
         }
 
     def create_an_activity(self,rec, user_id, message):

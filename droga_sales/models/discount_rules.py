@@ -593,7 +593,25 @@ class sale_order_ext(models.Model):
         action['context'] = context
 
         #Insert reward points here
-
+        services_count=self.order_line.filtered(
+                lambda x: x.product_id.product_tmpl_id.detailed_type=='service')
+        if self.partner_id.id==15488:
+            return action
+        
+        if len(services_count)>0:
+            points_to_earn=self.env['droga.pharma.reward.gain'].search([('type','=','Services')])[0].points_to_gain if len(self.env['droga.pharma.reward.gain'].search([('type','=','Services')]))>0 else 0
+        else:
+            points_to_earn = self.env['droga.pharma.reward.gain'].search([('type', '=', 'Stocked')])[
+                0].points_to_gain if len(
+                self.env['droga.pharma.reward.gain'].search([('type', '=', 'Stocked')])) > 0 else 0
+        points = {
+            'type': 'Purchase reward',
+            'customer': self.partner_id.id,
+            'sales_ref': self.id,
+            'earned_date': self.date_order,
+            'points_earned': points_to_earn,
+        }
+        self.env['droga.pharma.points.earned'].create(points)
 
         return action
 
