@@ -17,7 +17,11 @@ class pharma_credit(models.Model):
     available_amount_pharma = fields.Float(string='Credit balance', compute='_compute_balance_pharma')
     allowed_credit_terms=fields.Many2many('account.payment.term')
     manual_sales_extension_date=fields.Date('Manual sales extension date',tracking=True)
-
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ("requested", "Requested"),
+        ("active", "Activated"),
+    ], string='Status', default="draft", readonly=True, tracking=True)
     def open_price_hist(self):
         return {
             'name': 'Price lists',
@@ -32,6 +36,18 @@ class pharma_credit(models.Model):
             },
             'domain': [('customer', '=', self.id)],
         }
+
+    def request(self):
+        for rec in self:
+            rec.state='requested'
+
+    def approve(self):
+        for rec in self:
+            rec.state='active'
+
+    def amend(self):
+        for rec in self:
+            rec.state='draft'
 
     @api.depends('debit', 'credit')
     def _compute_balance_pharma(self):

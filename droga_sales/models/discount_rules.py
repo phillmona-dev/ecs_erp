@@ -235,8 +235,12 @@ class sale_order_line(models.Model):
 
             breat_feed_children=len(self.env['droga.pharma.child'].search([('parent_cust','=',self.order_id.partner_id.id),('breat_feed_end_date','>=',datetime.today())]))
             discount_per_person=self.env['droga.breast.feed.reward.contact.type'].search([])
+            partner_state='draft'
+            if self.order_id.partner_id.state:
+                partner_state=self.order_id.partner_id.state
+
             for disc in discount_per_person:
-                if disc.cont_type=="hp" and self.order_id.partner_id.profession=="hp":
+                if disc.cont_type=="hp" and self.order_id.partner_id.profession=="hp" and partner_state=='active':
                     rate=1 + (disc.discount / 100)
                 elif disc.cont_type=='bp' and breat_feed_children>0:
                     rate = 1 + (disc.discount / 100)
