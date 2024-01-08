@@ -36,10 +36,10 @@ class droga_pharma_mtm_header(models.Model):
     client_descr= fields.Char(related='client.name')
     sales_origin=fields.Many2one('sale.order')
     mobile = fields.Char("Mobile", related='client.mobile', store=True)
-    medical = fields.Html("Medical History",store=True,compute='get_cust_hist',inverse='update_medical')
-    medication_history = fields.Html("Medication History and adherence", store=True,compute='get_cust_hist',inverse='update_medication_history')
-    immunization = fields.Html("Immunization", store=True,compute='get_cust_hist',inverse='update_immunization')
-    adr = fields.Html("ADRS and/or Allergies", store=True,compute='get_cust_hist',inverse='update_adr')
+    medical = fields.Html("Medical History",store=True,compute='get_cust_hist',inverse='update_medical',tracking=True)
+    medication_history = fields.Html("Medication History and adherence", store=True,compute='get_cust_hist',inverse='update_medication_history',tracking=True)
+    immunization = fields.Html("Immunization", store=True,compute='get_cust_hist',inverse='update_immunization',tracking=True)
+    adr = fields.Html("ADRS and/or Allergies", store=True,compute='get_cust_hist',inverse='update_adr',tracking=True)
 
     def get_cust_hist(self):
         for rec in self:
