@@ -114,7 +114,7 @@
                         <page string="MTM Detail">
 
                             <field name="detail_mtm_followup" mode="tree">
-                                <tree editable="top" create="1">
+                                <tree editable="bottom" create="1">
                                     <field name="date_follow_up"></field>
                                     <field name="time"></field>
                                     <field name="current_status"></field>
