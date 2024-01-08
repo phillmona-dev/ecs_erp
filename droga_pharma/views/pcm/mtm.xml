@@ -111,7 +111,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Follow up schedule">
+                        <page string="MTM Detail">
 
                             <field name="detail_mtm_followup" mode="tree">
                                 <tree editable="top" create="1">
