@@ -62,6 +62,7 @@
                             <group>
                                 <group name="group_general">
                                     <field name="active" invisible="1"/>
+                                    <field name="detailed_type"/>
                                     <field name="pharma_detailed_type"/>
                                     <field name="pharmacy_group_id" string="Pharma Product Category" required="True"/>
                                     <field name="categ_id" string="Import Product Category" invisible="True"/>
@@ -74,10 +75,8 @@
                                     </div>
                                     <field name="default_code" string="Product code"></field>
                                     <field name="categ" readonly="1" invisible="1"></field>
-                                    <field name="pharma_uom" groups="uom.group_uom" options="{'no_create': True}"
-                                           required="True"/>
                                     <field name="uom_id" groups="uom.group_uom" options="{'no_create': True}"
-                                           invisible="True"/>
+                                           required="True"/>
                                     <field name="pharma_filler" invisible="True"></field>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="cost_currency_id" invisible="1"/>
