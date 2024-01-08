@@ -52,9 +52,9 @@
                                 <group>
                                     <field name="client"></field>
                                     <field name="gender" readonly="0"/>
-                                    <field name="weight" readonly="0"/>
-                                    <field name="height" readonly="0"/>
-                                    <field name="bsa"/>
+                                    <field name="weight" string="Weight (KG)" readonly="0"/>
+                                    <field name="height" string="Height (CM)" readonly="0"/>
+                                    <field name="bsa" string="BSA (M2)"/>
                                     <field name="dob" readonly="0"/>
                                     <field name="age"/>
                                     <field name="profession" readonly="0"/>
