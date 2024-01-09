@@ -3,7 +3,7 @@ from datetime import timedelta
 
 
 from odoo import models, fields, api
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 
 from odoo.exceptions import ValidationError, UserError
 
@@ -47,8 +47,6 @@ class sales_integ(models.Model):
     weight = fields.Float('Weight')
     diagnosis = fields.Html('Diagnosis')
     physiotherapist = fields.Many2one('droga.physiotherapist.list')
-    has_mtm_products=fields.Boolean(compute='_onchange_order_line')
-    has_counsell_products = fields.Boolean(compute='_onchange_order_line')
     mtm_header=fields.One2many('droga.pharma.mtm.header','sales_origin')
     counselling_header = fields.One2many('droga.pharma.counselling', 'sales_origin')
     minor_align_header = fields.One2many('droga.pharma.minor.alignment', 'sales_origin')
@@ -56,8 +54,10 @@ class sales_integ(models.Model):
     cust_availed_payment_term_ids=fields.Many2many('account.payment.term',related='partner_id.allowed_credit_terms')
     mature_amount_pharma = fields.Monetary('Matured amount', compute='_get_mature_amount_pharma')
     show_invoice_button_pharma = fields.Boolean(compute='_get_mature_amount_pharma')
-    mtm_duration_in_months = fields.Integer("MTM duration in months",compute='_onchange_order_line')
-    no_of_sessions = fields.Integer("Number of MTM sessions",compute='_onchange_order_line')
+    mtm_duration_in_months = fields.Integer("MTM duration in months",compute='_compute_mtm_counsil')
+    no_of_sessions = fields.Integer("Number of MTM sessions",compute='_compute_mtm_counsil')
+    has_mtm_products = fields.Boolean(compute='_compute_mtm_counsil')
+    has_counsell_products = fields.Boolean(compute='_compute_mtm_counsil')
 
     @api.depends('partner_id')
     def _get_mature_amount_pharma(self):
@@ -105,7 +105,7 @@ class sales_integ(models.Model):
             rec.customer_emp.gender = self.sex
 
     #@api.onchange('order_line')
-    def _onchange_order_line(self):
+    def _compute_mtm_counsil(self):
         for rec in self:
             rec.has_mtm_products = False
             rec.has_counsell_products = False
@@ -166,7 +166,51 @@ class sales_integ(models.Model):
         self.write({'state': 'draft'})
         self.set_activity_done()
     def action_mtm_orders(self):
-        id=self.env['droga.pharma.mtm.header'].search([('client','=',self.partner_id.id)])[0].id if len(self.env['droga.pharma.mtm.header'].search([('client','=',self.partner_id.id)]))>0 else False
+        id=self.env['droga.pharma.mtm.header'].search([('client','=',self.partner_id.id)])
+        if len(id)==0:
+            mtm = {
+                'client': self.partner_id.id,
+            }
+
+            id=self.env['droga.pharma.mtm.header'].create(mtm)
+
+            follow_up = {
+                'parent_mtm_follow': id.id,
+                'date_follow_up':self.date_order,
+                'from_sales_order':True
+            }
+
+            self.env['droga.pharma.mtm.follow_up'].create(follow_up)
+
+            mtm_hist = {
+                'cons_start_date': self.date_order,
+                'cons_end_date': self.date_order + relativedelta(months=self.mtm_duration_in_months),
+                'mtm_header': id[0].id,
+                'origin_sales': self.id,
+                'no_of_sessions':self.no_of_sessions-1
+            }
+
+            self.env['droga.pharma.mtm.history'].create(mtm_hist)
+        elif len(self.env['droga.pharma.mtm.follow_up'].search([('origin_sales','=',self.id)]))==0:
+            follow_up = {
+                'parent_mtm_follow': id[0].id,
+                'date_follow_up': self.date_order,
+                'from_sales_order': True,
+                'origin_sales':self.id
+            }
+
+            self.env['droga.pharma.mtm.follow_up'].create(follow_up)
+
+            mtm_hist = {
+                'cons_start_date': self.date_order,
+                'cons_end_date': self.date_order+relativedelta(months=self.mtm_duration_in_months),
+                'mtm_header': id[0].id,
+                'origin_sales': self.id,
+                'no_of_sessions': self.no_of_sessions - 1
+            }
+
+            self.env['droga.pharma.mtm.history'].create(mtm_hist)
+
         return {
             'name': 'MTM sessions',
             'view_type': 'form',
@@ -180,7 +224,7 @@ class sales_integ(models.Model):
                 'default_mtm_duration_in_months': self.mtm_duration_in_months,
                 'default_no_of_sessions': self.no_of_sessions,
             },
-            'res_id': id
+            'res_id': id[0].id
         }
 
     def action_counselling_orders(self):
@@ -255,6 +299,11 @@ class sales_integ(models.Model):
     def create(self, vals):
         #Validate if there are multiple membership/mtm sales and raise error off of it
         res = super(sales_integ, self).create(vals)
+
+        if (res.order_id.has_counsell_products or res.order_id.has_mtm_products) and res.order_id.partner_id.is_company:
+            raise UserError("For MTM and council service, customer must of type individual.")
+
+        '''
         for rec in res:
             if rec.product_id.pharma_detailed_type=='membershipcard':
 
@@ -272,4 +321,5 @@ class sales_integ(models.Model):
                 }
 
                 self.env['droga.pharma.membership'].sudo().create(membership_vals)
+        '''
         return res
