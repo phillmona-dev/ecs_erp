@@ -24,13 +24,14 @@
                     </group>
                     <notebook>
                         <page string="MTM Detail">
+                            <field name="from_sales_order" invisible="1"></field>
                             <field name="follow_up_detail" mode="tree">
                                 <tree editable="bottom" create="1">
                                     <field name="drug_therapy_problem"></field>
                                     <field name="drug_therapy_cause"></field>
-                                    <field name="intervention"></field>
-                                    <field name="intervention_implemented"></field>
-                                    <field name="outcome"/>
+                                    <field name="intervention" attrs="{'invisible': [('parent.from_sales_order', '=', True)]}"></field>
+                                    <field name="intervention_implemented" attrs="{'invisible': [('parent.from_sales_order', '=', True)]}"></field>
+                                    <field name="outcome" attrs="{'invisible': [('parent.from_sales_order', '=', True)]}"/>
                                     <field name="remark"></field>
                                 </tree>
                             </field>

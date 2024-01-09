@@ -6,19 +6,20 @@ from odoo.exceptions import ValidationError
 class droga_pharma_mtm_history(models.Model):
     _name='droga.pharma.mtm.history'
     #mtm_duration_in_months = fields.Integer("MTM duration in months")
-    active_state = fields.Selection(selection=[('active', 'Active'), ("inactive","Inactive")], compute='_compute_active_state', readonly=True)
+    active_status = fields.Char('Status',compute='_compute_active_state')
     cons_start_date = fields.Date('MTM start date')
     cons_end_date = fields.Date('MTM end date')
     mtm_header=fields.Many2one('droga.pharma.mtm.header')
     origin_sales=fields.Many2one('sale.order')
+    no_of_sessions=fields.Integer()
 
     def _compute_active_state(self):
         for rec in self:
             today = fields.Date.today()
             if today >= rec.cons_start_date and today <= rec.cons_end_date:
-                rec.active_state = 'active'
+                rec.active_status = 'Active'
             else:
-                rec.active_state = 'Inactive'
+                rec.active_status = 'Closed'
 
 class droga_pharma_mtm_header(models.Model):
     _name = 'droga.pharma.mtm.header'
@@ -80,46 +81,8 @@ class droga_pharma_mtm_header(models.Model):
     pregnancy = fields.Char("Pregnancy status")
     diagnosis = fields.Text("Diagnosis")
     physician = fields.Char("Primary physician and contact information")
-    #dates
-    prev_schedule = fields.Date('Prev schedule', default=lambda self: self._compute_prev_schedule())
-    next_schedule = fields.Date('Next schedule', default=lambda self: self._compute_next_schedule())
-    no_of_sessions = fields.Integer("Number of MTM sessions")
-    mtm_duration_in_months = fields.Integer("MTM duration in months")
-    cons_start_date = fields.Date('MTM start date', default=fields.Date.today(), store=True, readonly=True)
-    cons_end_date = fields.Date('MTM end date', compute='_compute_end_date', readonly=True)
+
     check_compute = fields.Boolean(default=False, store=True)
-
-    def _compute_end_date(self):
-        for rec in self:
-            no_of_days = rec.mtm_duration_in_months * 30
-            rec.cons_end_date = rec.cons_start_date + timedelta(days=no_of_days)
-            if not rec.check_compute and rec.no_of_sessions != 0:
-                follow_date = rec.cons_start_date
-                rate = (rec.mtm_duration_in_months * 30) // rec.no_of_sessions
-                for i in range(rec.no_of_sessions):
-                    new_record = self.env['droga.pharma.mtm.follow_up'].create({
-                        'parent_mtm_follow': rec.id,
-                        'date_follow_up': follow_date,
-                        'from_sales_order': True,
-                    })
-                    follow_date += timedelta(days=rate)
-                new_record = self.env['droga.pharma.mtm.history'].create({
-                    'mtm_header': rec.id,
-                    'cons_start_date': rec.cons_start_date,
-                    'cons_end_date': rec.cons_end_date,
-                    'origin_sales': rec.sales_origin.id,
-                })
-                rec.check_compute = True
-
-    def _compute_prev_schedule(self):
-        for rec in self:
-            if rec.cons_start_date:
-                rec.prev_schedule = rec.cons_start_date
-
-    def _compute_next_schedule(self):
-        for rec in self:
-            if rec.cons_start_date:
-                rec.next_schedule = rec.cons_start_date + timedelta(days=rec.plan_generate_frequency)
 
     @api.depends("dob")
     def _compute_age(self):
@@ -128,28 +91,6 @@ class droga_pharma_mtm_header(models.Model):
                 record.age = datetime.now().year - record.dob.year
             else:
                 record.age = 0
-
-    def mtm_list(self):
-        detail_mtm_ids = self.mapped('detail_mtm').ids
-        id = self.env['droga.pharma.mtm.header'].search([('client', '=', self.id)])[0].id if len(
-            self.env['droga.pharma.mtm.header'].search([('client', '=', self.id)])) > 0 else False
-        if len(id)==0:
-            return False
-        return {
-            'name': 'MTM sessions',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'droga.pharma.mtm.header',
-            'view_id': False,
-            'type': 'ir.actions.act_window',
-            'context': {
-                'default_sales_origin': self.id,
-                'default_client': self.partner_id.id,
-                'default_mtm_duration_in_months': self.mtm_duration_in_months,
-                'default_no_of_sessions': self.no_of_sessions,
-            },
-            'res_id': id
-        }
 
     def create_an_activity(self,rec, user_id, message):
         self.env['mail.activity'].sudo().create({
@@ -220,7 +161,7 @@ class droga_pharma_mtm_schedule(models.Model):
     asses_care_plan = fields.Html('Assessment and care plan')
     recs_inter = fields.Html('Recommendations / Interventions')
     from_sales_order = fields.Boolean("From Sales order?", default=False)
-
+    origin_sales=fields.Many2one('sale.order')
     def open_follow_up_form(self):
         return {
             'name': 'Follow up',
