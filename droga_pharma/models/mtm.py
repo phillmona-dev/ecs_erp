@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from email.policy import default
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
+
 
 class droga_pharma_mtm_history(models.Model):
     _name='droga.pharma.mtm.history'
@@ -11,8 +12,13 @@ class droga_pharma_mtm_history(models.Model):
     cons_end_date = fields.Date('MTM end date')
     mtm_header=fields.Many2one('droga.pharma.mtm.header')
     origin_sales=fields.Many2one('sale.order')
-    no_of_sessions=fields.Integer()
+    client=fields.Many2one('res.partner',related='origin_sales.partner_id')
+    no_of_sessions=fields.Integer('Total sessions')
+    no_of_sessions_left=fields.Integer(compute='_get_no_of_sessions_left',string='Remaining sessions')
 
+    def _get_no_of_sessions_left(self):
+        for rec in self:
+            rec.no_of_sessions_left=rec.no_of_sessions-len(self.env['droga.pharma.mtm.follow_up'].search([('origin_sales','=',rec.origin_sales.id)]))
     def _compute_active_state(self):
         for rec in self:
             today = fields.Date.today()
@@ -173,6 +179,18 @@ class droga_pharma_mtm_schedule(models.Model):
             'target': 'current',
             'res_id': self.id
         }
+
+    @api.model
+    def create(self, vals):
+        res=super(droga_pharma_mtm_schedule, self).create(vals)
+        sod=self.env['droga.pharma.mtm.history'].search([('cons_start_date','<=',res.date_follow_up),('cons_end_date','>=',res.date_follow_up),('client','=',res.parent_mtm_follow.client.id)])
+        for sd in sod:
+            if sd.no_of_sessions-len(self.search([('origin_sales','=',sd.origin_sales.id)]))>0:
+                vals['origin_sales']=sd.origin_sales.id
+                res.origin_sales = sd.origin_sales.id
+                return res
+
+        raise UserError("There're no active MTM orders to create a follow up.")
 
 
 class droga_pharma_mtm_schedule_detail(models.Model):

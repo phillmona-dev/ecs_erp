@@ -592,6 +592,7 @@
                                     <field name="price_tax" invisible="1"/>
                                     <field name="price_total" invisible="1"/>
                                     <field name="price_unit"/>
+                                    <field name="state" invisible="1" />
                                     <field name="phar_cont_price"/>
                                     <field name="phar_cont_price_marginc"/>
                                     <field name="manual_price_pharma"/>

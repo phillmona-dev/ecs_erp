@@ -24,7 +24,7 @@
         <field name="name">droga.pharma.minor.aliment.tree</field>
         <field name="model">droga.pharma.minor.alignment</field>
         <field name="arch" type="xml">
-            <tree string="Minor Alignments" create="1" delete="0">
+            <tree string="Minor Aliments" create="1" delete="0">
                 <field name="minor_align"></field>
                 <field name="decision"></field>
                 <field name="referral"></field>
@@ -38,7 +38,7 @@
         <field name="name">droga.pharma.minor.aliment.view.tree</field>
         <field name="model">droga.pharma.minor.alignment</field>
         <field name="arch" type="xml">
-            <tree string="Minor Alignments" create="0" delete="0">
+            <tree string="Minor Aliments" create="0" delete="0">
                 <field name="sales_origin"/>
                 <field name="client"/>
                 <field name="mobile"/>
@@ -54,8 +54,13 @@
         <field name="name">droga.pharma.minor.aliment.form</field>
         <field name="model">droga.pharma.minor.alignment</field>
         <field name="arch" type="xml">
-            <form string="Minor alignments" delete="0">
+            <form string="Minor Aliments" delete="0">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button icon="fa-credit-card-alt"
+                                type="object" string=" Initiate sales"
+                                name="init_sales" class="oe_stat_button"/>
+                    </div>
                     <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
                         <div style="width: 50%;">
                             <div>
@@ -86,7 +91,12 @@
                     <hr/>
                     <notebook>
                         <page string="Treatment">
-                            <field name="treatment"/>
+                            <field name="aliment_treatments">
+                                <tree editable="bottom">
+                                    <field name="product"/>
+                                    <field name="quantity"/>
+                                </tree>
+                            </field>
                         </page>
                         <page string="Patient's Medication Info">
                             <group>
@@ -114,7 +124,7 @@
         </field>
     </record>
     <record id="view_droga_minor_alignment_kanban" model="ir.ui.view">
-            <field name="name">Minor Alignments Kanban</field>
+            <field name="name">Minor Aliments Kanban</field>
             <field name="model">droga.pharma.minor.alignment</field>
             <field name="arch" type="xml">
 

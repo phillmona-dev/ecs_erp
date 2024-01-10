@@ -599,7 +599,7 @@ class sale_order_ext(models.Model):
         #Insert reward points here
         services_count=self.order_line.filtered(
                 lambda x: x.product_id.product_tmpl_id.detailed_type=='service')
-        if self.partner_id.id==15488:
+        if self.partner_id.id==15488 or self.order_from!='PH' or self.partner_id.is_company:
             return action
         
         if len(services_count)>0:

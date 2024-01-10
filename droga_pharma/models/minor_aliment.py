@@ -4,7 +4,7 @@ from odoo import models, fields, api
 
 class droga_pharma_minor_alignment(models.Model):
     _name = 'droga.pharma.minor.alignment'
-    _description = 'Droga Minor Alignments'
+    _description = 'Droga Minor Aliments'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     #Text fields
     minor_align=fields.Char("Minor ailment",required=True)
@@ -15,6 +15,7 @@ class droga_pharma_minor_alignment(models.Model):
 
     treatment=fields.Many2many('product.template')
     detail_minor_alignment_followup = fields.One2many('droga.pharma.minor.alignment.follow_up', 'parent_minor_alignment')
+    aliment_treatments=fields.One2many('droga.pharma.minor.alignment.products', 'parent_minor_alignment_prod')
 
     # Related fields
     client = fields.Many2one('res.partner')
@@ -33,6 +34,54 @@ class droga_pharma_minor_alignment(models.Model):
     def inverse_dob(self):
         for rec in self:
             rec.client.dob = rec.dob
+
+    def init_sales(self):
+        order_lines = []
+        sod=self.env['sale.order'].search([('minor_align_header','=',self.id)])
+        if len(sod)>0:
+            return {
+                'name': 'Sales order',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'sale.order',
+                'view_id': self.env.ref('droga_pharma.view_order_form_pharma').id,
+                'type': 'ir.actions.act_window',
+
+                'domain':
+                    ([('id', '=', sod[0].id)]),
+                'res_id': sod[0].id,
+            }
+
+        for line in self.aliment_treatments:
+            order_lines.append({
+                'name': line.product.product_tmpl_id.name,
+                'product_template_id': line.product.product_tmpl_id.id,
+                'product_uom': line.product.product_tmpl_id.uom_id.id,
+                'product_id':line.product.id,
+                'product_uom_qty': line.quantity,
+                'price_unit': line.product.product_tmpl_id.list_price_phar,
+            })
+
+        return {
+            'name': 'Sales order',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sale.order',
+            'view_id': self.env.ref('droga_pharma.view_order_form_pharma').id,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_partner_id': self.client.id,
+                'default_order_line': order_lines,
+                'default_state':'draft',
+                'default_minor_align_header':self.id,
+                'default_payment_term_id': 11,
+                'default_pricelist_id': 2,
+                'default_currency_id': 77,
+                'default_order_from':'PH'
+            },
+            'domain':
+                ([('minor_align_header', '=', self.id)])
+        }
 
     @api.depends("dob")
     def _compute_age(self):
@@ -80,6 +129,11 @@ class droga_pharma_minor_alignment(models.Model):
             message = "The customer "+rec.client_descr+" has an appointment for "+rec.minor_align
             self.create_an_activity(rec, rec.create_uid.id, message)
 
+class droga_minor_alignment_products_detail(models.Model):
+    _name = 'droga.pharma.minor.alignment.products'
+    product=fields.Many2one('product.product')
+    quantity=fields.Float('Quantity')
+    parent_minor_alignment_prod = fields.Many2one('droga.pharma.minor.alignment')
 
 class droga_minor_alignment_schedule(models.Model):
     _name = 'droga.pharma.minor.alignment.follow_up'

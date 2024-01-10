@@ -98,6 +98,7 @@
                                 <tree editable="bottom" create="1">
                                     <field name="date_follow_up"></field>
                                     <field name="time"></field>
+                                    <field name="origin_sales"></field>
                                     <field name="current_status"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Detail"
@@ -112,6 +113,7 @@
                                     <field name="cons_start_date" readonly="1"/>
                                     <field name="cons_end_date" readonly="1"/>
                                     <field name="active_status" readonly="1"/>
+                                    <field name="no_of_sessions_left" readonly="1"/>
                                 </tree>
                             </field>
                         </page>
