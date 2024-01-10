@@ -103,6 +103,8 @@ class droga_purchase_uom_extension(models.Model):
     pharma_uom = fields.Many2one(related='product_id.uom_id', store=True)
     request_type=fields.Selection(related='order_id.request_type')
 
+    picking_type_id = fields.Many2one('stock.picking.type', 'Deliver To',related='order_id.picking_type_id')
+
     itemcode = fields.Char(related='product_id.default_code', store=True, string="Product")
     itemdesc = fields.Char(related='product_id.name', store=True, string="Description")
 

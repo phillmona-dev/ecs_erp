@@ -42,6 +42,7 @@
                 <field name="qty_received" sum="Total received" string="Received"></field>
                 <field name="price_unit" string="Unit price"></field>
                 <field name="price_subtotal" string="Amount" sum="Total amount" type="measure"/>
+                <field name="picking_type_id"></field>
                 <button icon="fa-credit-card-alt" type="object" name="open_purchase"
                         class="oe_stat_button"></button>
             </tree>
