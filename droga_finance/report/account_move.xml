@@ -593,7 +593,7 @@
 
                     <div class="page">
 
-                        <div id="informations" class="row mt32 mb32">
+                        <div id="informations" class="row">
                             <div class="col-6 bm-2">
                                 <h6 class="small">ከ:-
                                     <strong t-esc="o.company_id.name"/>
@@ -645,7 +645,7 @@
                             </div>
                         </div>
 
-                        <div id="informations" class="row mt32 mb32">
+                        <div id="informations" class="row">
                             <div class="col-8 bm-2">
                                 <h6 class="small">የክፍያው ምክንያት</h6>
                                 <h6 class="small">Payment Description:-
@@ -678,7 +678,7 @@
                         </div>
 
 
-                        <div id="informations" class="row mt32 mb32">
+                        <div id="informations" class="row">
                             <div class="col-12 bm-2">
                                 <h6 class="small">
                                     <span class="small">የክፍያ ሁኔታ</span>
