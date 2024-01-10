@@ -49,7 +49,7 @@ class sales_integ(models.Model):
     physiotherapist = fields.Many2one('droga.physiotherapist.list')
     mtm_header=fields.One2many('droga.pharma.mtm.header','sales_origin')
     counselling_header = fields.One2many('droga.pharma.counselling', 'sales_origin')
-    minor_align_header = fields.One2many('droga.pharma.minor.alignment', 'sales_origin')
+    minor_align_header = fields.Many2one('droga.pharma.minor.alignment')
     membership_origin = fields.Many2one('droga.pharma.membership', readonly=True)
     cust_availed_payment_term_ids=fields.Many2many('account.payment.term',related='partner_id.allowed_credit_terms')
     mature_amount_pharma = fields.Monetary('Matured amount', compute='_get_mature_amount_pharma')
@@ -187,7 +187,7 @@ class sales_integ(models.Model):
                 'cons_end_date': self.date_order + relativedelta(months=self.mtm_duration_in_months),
                 'mtm_header': id[0].id,
                 'origin_sales': self.id,
-                'no_of_sessions':self.no_of_sessions-1
+                'no_of_sessions': self.no_of_sessions
             }
 
             self.env['droga.pharma.mtm.history'].create(mtm_hist)
@@ -195,6 +195,7 @@ class sales_integ(models.Model):
             follow_up = {
                 'parent_mtm_follow': id[0].id,
                 'date_follow_up': self.date_order,
+                'time': self.date_order.strftime('%H:%M:%S'),
                 'from_sales_order': True,
                 'origin_sales':self.id
             }
@@ -206,7 +207,7 @@ class sales_integ(models.Model):
                 'cons_end_date': self.date_order+relativedelta(months=self.mtm_duration_in_months),
                 'mtm_header': id[0].id,
                 'origin_sales': self.id,
-                'no_of_sessions': self.no_of_sessions - 1
+                'no_of_sessions': self.no_of_sessions
             }
 
             self.env['droga.pharma.mtm.history'].create(mtm_hist)
