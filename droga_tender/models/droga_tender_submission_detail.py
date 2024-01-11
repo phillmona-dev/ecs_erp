@@ -13,6 +13,7 @@ class droga_tender_submission_detail(models.Model):
     #Text fields
     lot_number=fields.Char("Lot Number",required=True)
     item_des = fields.Char("Item requested")
+    item_des_list = fields.Many2one('droga.tender.products',string="Item requested")
     item_pro = fields.Char("Item proposed")
     product=fields.Many2one('product.product','Product')
     brand_model = fields.Char("Brand/Model")
@@ -184,3 +185,9 @@ class droga_tender_submission_detail(models.Model):
                 self.parent_tender_submission.alert_sent=True
 
         return super().write(vals)
+
+
+class droga_tender_products(models.Model):
+    _name='droga.tender.products'
+    _rec_name = 'product'
+    product=fields.Char('Product')

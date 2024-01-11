@@ -198,3 +198,5 @@ class droga_tender_activity_generate(models.Model):
                 })
         # endregion
 
+        self.env.cr.execute(
+            """ delete from mail_activity where res_model = 'droga.tender.master' and date_deadline<current_date-INTERVAL '5 DAY'""",[])

@@ -42,4 +42,38 @@
             parent="tender_settings_menu"
             groups="tender_manager"
             sequence="19"/>
+
+
+
+
+
+
+
+
+
+
+    <record id="droga_tender_products_reg_action" model="ir.actions.act_window">
+        <field name="name">Products registry</field>
+        <field name="res_model">droga.tender.products</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="droga_tender_products_reg_tree" model="ir.ui.view">
+        <field name="name">droga.tender.settings.type_or_item.view.tree</field>
+        <field name="model">droga.tender.products</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" delete="0">
+                <field name="product"></field>
+            </tree>
+        </field>
+    </record>
+
+
+    <menuitem
+            id="droga_tender_prod_type_or_item"
+            name="Products registry"
+            action="droga_tender_products_reg_action"
+            parent="tender_settings_menu"
+            groups="tender_manager"
+            sequence="19"/>
 </odoo>

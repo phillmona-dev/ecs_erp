@@ -18,7 +18,7 @@
                 <field name="amount"/>
                 <field name="request_type"/>
                 <field name="on_behalf_of"/>
-                <button icon="fa-credit-card-alt" type="object" string="Get report" name="get_report"
+                <button icon="fa-credit-card-alt" type="object" string="Get report" name="get_bond_letter"
                         class="oe_stat_button"></button>
             </tree>
         </field>
@@ -34,11 +34,11 @@
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="bond_approve"
-                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
+                            attrs="{'invisible': [('state', 'not in', ('req'))]}"
                             groups="droga_tender.bond_recepient"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
-                            attrs="{'invisible': [('state', 'not in', ('stmg','mtmg'))]}"
+                            attrs="{'invisible': [('state', 'not in', ('req'))]}"
                             groups="droga_tender.bond_recepient"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
@@ -48,12 +48,16 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,req,pro"/>
                 </header>
                 <sheet string="New Bond Request">
+                    <div class="oe_button_box" name="button_box">
+                        <button icon="fa-credit-card-alt" type="object" string="Get letter" name="get_bond_letter"
+                                class="oe_stat_button"></button>>
+                    </div>
                     <notebook>
                         <page string=" Bond Request Details">
                             <group>
                                 <group>
                                     <field name="bank" options="{'no_create':True,'no_open':True}"/>
-                                    <field name="client" readonly="1"/>
+                                    <field name="client" readonly="1" required="1"/>
                                     <field name="security_type"/>
                                     <field name="security_form" options="{'no_create':True,'no_open':True}"/>
                                     <field name="purpose"/>

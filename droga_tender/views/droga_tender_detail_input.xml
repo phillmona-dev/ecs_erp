@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <tree editable="top">
                     <field name="lot_number"></field>
-                    <field name="item_des"></field>
+                    <field name="item_des_list"></field>
                 </tree>
             </field>
         </record>
@@ -20,7 +20,7 @@
             <field name="arch" type="xml">
                 <search>
                     <field name="lot_number"></field>
-                    <field name="item_des"></field>
+                    <field name="item_des_list"></field>
                 </search>
             </field>
         </record>

@@ -63,7 +63,7 @@ class droga_tender_master_related(models.Model):
     def generate_activity(self):
         # recs = self.env['droga.tender.master'].search([('closing_date_gre','>=','datetime.datetime.combine(context_today(), datetime.time(0,0,0))')])
 
-        tender_users = self.env['res.groups'].search([('name', '=', 'Tender User')])[0]['users']
+        tender_users = self.env['res.groups'].search([('name', '=', 'Tender Alert Receiver')])[0]['users']
 
         #region submission alerts
         compare_date_addis = datetime.date.today() + datetime.timedelta(days=3)
@@ -251,6 +251,10 @@ class droga_tender_master_related(models.Model):
                     'note': rec['parent_tender_contract'].ten_name
                 })
         # endregion
+        self.env.cr.execute(
+            """ delete from mail_activity where res_model = 'droga.tender.master' and date_deadline<current_date-INTERVAL '5 DAY'""",
+            [])
+
 
     def write(self, vals):
         upd=super().write(vals)

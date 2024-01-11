@@ -69,7 +69,7 @@
                                         <field name="lot_number"/>
                                         <field name="item_num"/>
                                         <field name="type_item" options="{'no_create':True,'no_open':True}"/>
-                                        <field name="item_des"/>
+                                        <field name="item_des_list"/>
                                         <field name="item_pro"/>
                                         <field name="uom_reg_field" options="{'no_open':True}"/>
                                         <field name="quantity"/>

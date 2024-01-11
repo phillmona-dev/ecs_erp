@@ -44,7 +44,7 @@ class droga_bond_requests(models.Model):
 
         return super(droga_bond_requests,self).create(vals_list)
 
-    def get_report(self):
+    def get_bond_letter(self):
         pass
 
     def request(self):
