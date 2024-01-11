@@ -224,7 +224,7 @@ class sale_order_line(models.Model):
                                 'points_earned')):
                     rate = 1 + (disc.reward_pct / 100)
                     #return line.product_id.list_price_phar * rate
-                    return line.product_id.list_price_phar 
+                    return line.product_id.list_price_phar
 
             self.calc_sales_totals_pharma()
 

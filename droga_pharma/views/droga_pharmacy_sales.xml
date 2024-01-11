@@ -167,7 +167,10 @@
                             groups="droga_inventory.inventory_stk"
                             attrs="{'invisible': ['|',('state','=','dispense'),'|',('invoice_status','!=','invoiced'),('state', '!=', 'sale')]}"
                             class="oe_highlight"></button>
-
+                    <button type="object" string="Dispense for manual sales" name="disp_products_manual"
+                            groups="droga_pharma.pharma_di_admin"
+                            attrs="{'invisible': ['|',('state','=','dispense'),('state', '!=', 'sale')]}"
+                            class="oe_highlight"></button>
                     <field name="state" widget="statusbar" statusbar_visible="draft,sale,dispense"/>
 
                 </header>
@@ -204,11 +207,26 @@
                                 icon="fa-credit-card-alt"
                                 attrs="{'invisible': ['|', ('has_counsell_products', '=', False), ('invoice_status', '!=', 'invoiced')]}">
                         </button>
-                        <button name="action_minor_aliments"
+                        <button name="action_beautypicks"
                                 type="object"
                                 class="oe_stat_button"
-                                string="Minor ailments"
+                                string="Reward"
+                                invisible="1"
                                 icon="fa-credit-card-alt">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Reward</span>
+                                <span class="o_stat_text">Beauty-picks</span>
+                            </div>
+                        </button>
+                        <button name="action_supp_rewards"
+                                type="object"
+                                class="oe_stat_button"
+                                invisible="1"
+                                icon="fa-credit-card-alt">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Reward</span>
+                                <span class="o_stat_text">Supplements</span>
+                            </div>
                         </button>
                         <field name="has_mtm_products" invisible="1"/>
                         <field name="has_counsell_products" invisible="1"/>
@@ -592,7 +610,7 @@
                                     <field name="price_tax" invisible="1"/>
                                     <field name="price_total" invisible="1"/>
                                     <field name="price_unit"/>
-                                    <field name="state" invisible="1" />
+                                    <field name="state" invisible="1"/>
                                     <field name="phar_cont_price"/>
                                     <field name="phar_cont_price_marginc"/>
                                     <field name="manual_price_pharma"/>
@@ -709,7 +727,8 @@
         <field name="context">
             {'default_payment_term_id':11,'default_order_from':'PH','search_default_to_invoice':1,'search_default_today_sales':1}
         </field>
-        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to invoice','invoiced'))]
+        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to
+            invoice','invoiced'))]
         </field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),

@@ -64,13 +64,13 @@
                     <group string="Store issue request">
                         <group>
                             <field name="customer"
-                                   attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
+                                   attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done','processed'))]}"></field>
                             <field name="issue_type" required="True"
                                    readonly="1"></field>
                         </group>
                         <group>
                             <field name="issue_date"
-                                   attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done'))]}"></field>
+                                   attrs="{'readonly': [('state', 'in', ('waiting','stmg','reject','cancel','done','processed'))]}"></field>
                             <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}"
                                    widget="many2many_tags" readonly="1"></field>
                             <field name="remark"></field>

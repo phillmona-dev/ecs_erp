@@ -51,6 +51,7 @@
         'views/pcm/mtm_detail.xml',
         'views/pcm/mtm.xml',
         'views/credit_limit_pharma.xml',
+        'views/rewards_issue.xml',
         'views/pcm/minor_alignment.xml',
         'views/pcm/counselling.xml',
         'views/pcm/follow_up_detail.xml',

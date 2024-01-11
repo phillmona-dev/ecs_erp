@@ -235,3 +235,8 @@ class droga_stock_move_line(models.Model):
                 rec.type = 'Sales return'
             else:
                 rec.type='-'
+
+class free_sample_issue_ext(models.Model):
+    _inherit = 'droga.inventory.consignment.issue'
+    def dispense_products(self):
+        pass

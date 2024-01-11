@@ -125,6 +125,9 @@ class sales_integ(models.Model):
         self.state='done'
         self.set_activity_done()
     def disp_products_manual(self):
+        if self.amount_total==0:
+            self.disp_products()
+            return
         inv = self.env['account.move'].search(
             [('invoice_origin', '=', self.name)])
         if len(inv)==0:
@@ -243,6 +246,33 @@ class sales_integ(models.Model):
             'domain': [('client', '=', self.partner_id.id)],
         }
 
+    def action_beautypicks(self):
+        return {
+            'name': 'Reward - Beauty-picks',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.inventory.consignment.issue',
+            'views': [[self.env.ref('droga_pharma.droga_inventory_reward_issue_view_form').id, 'form']],
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_issue_type': 'RWDB',
+                'default_customer': self.partner_id.id,
+            },
+        }
+
+    def action_supp_rewards(self):
+        return {
+            'name': 'Reward - Supplements',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.inventory.consignment.issue',
+            'views': [[self.env.ref('droga_pharma.droga_inventory_reward_issue_view_form').id, 'form']],
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_issue_type': 'RWDS',
+                'default_customer': self.partner_id.id,
+            },
+        }
     def action_minor_aliments(self):
         if self.partner_id.id==15488:
             raise UserError("Pharma one time customer can not be used to register minor aliments. Please register customer to use the feature..")

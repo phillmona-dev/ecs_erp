@@ -1,5 +1,6 @@
 from odoo import models, fields
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+
 
 class droga_raw_items_model(models.Model):
     _name='droga.export.raw.items'
@@ -198,3 +199,4 @@ class StockPicking(models.Model):
 
         self.env.cr.commit()
         return super(StockPicking, self).button_validate()
+

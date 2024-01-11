@@ -711,7 +711,9 @@ class droga_stock_picking_extension(models.Model):
         for rec in self:
             rec.from_wh=rec.location_id.warehouse_id.name if rec.location_id.warehouse_id else rec.location_id.name
             rec.to_wh = rec.location_dest_id.warehouse_id.name if rec.location_dest_id.warehouse_id else rec.location_dest_id.name
-
+    def unlink(self):
+        raise ValidationError(
+            "You can't delete inventory transactions.")
     def _search_has_access(self, operator, value):
 
         if operator == '=':
