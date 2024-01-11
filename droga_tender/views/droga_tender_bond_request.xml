@@ -36,7 +36,7 @@
                     <button name="bond_approve"
                             attrs="{'invisible': [('state', 'not in', ('req'))]}"
                             groups="droga_tender.bond_recepient"
-                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                            string="Letter sent" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
                             attrs="{'invisible': [('state', 'not in', ('req'))]}"
                             groups="droga_tender.bond_recepient"

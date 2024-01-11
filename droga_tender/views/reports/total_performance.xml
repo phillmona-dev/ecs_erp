@@ -17,6 +17,8 @@
                 <field name="total_delivered_amount"></field>
                 <field name="performance_pct_delivery"></field>
                 <field name="remark"></field>
+                <button icon="fa-credit-card-alt" type="object" string="Details" name="sub_detail_open"
+                        class="oe_stat_button"></button>
             </tree>
         </field>
     </record>

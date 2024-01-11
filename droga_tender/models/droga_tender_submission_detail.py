@@ -12,7 +12,7 @@ class droga_tender_submission_detail(models.Model):
 
     #Text fields
     lot_number=fields.Char("Lot Number",required=True)
-    item_des = fields.Char("Item requested")
+    item_des = fields.Char("Item requested old")
     item_des_list = fields.Many2one('droga.tender.products',string="Item requested")
     item_pro = fields.Char("Item proposed")
     product=fields.Many2one('product.product','Product')
