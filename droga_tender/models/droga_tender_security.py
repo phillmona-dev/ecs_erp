@@ -36,7 +36,7 @@ class ModelName(models.Model):
     security_amount = fields.Float('Security amount')
 
     #selection fields
-    status=fields.Selection([('Active','Active'),('Expired','Expired'),('Returned','Returned')],compute="_compute_status",inverse="_inverse_status",default='Active',store=True)
+    status=fields.Selection([('Active','Active'),('Expired','Expired'),('Returned','Returned')],compute="_compute_status",inverse="_inverse_status",default='Active')
 
     @api.depends("starting_date", "security_period_in_days")
     def _compute_status(self):

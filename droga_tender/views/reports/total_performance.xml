@@ -87,6 +87,7 @@
             <search string="Upcoming Tenders" >
                 <field name="parent_tender_performance" string="Tender ID"></field>
                 <field name="customer"></field>
+                <field name="droga_product"></field>
                 <field name="procurement_title"></field>
                 <field name="closing_date_gre"></field>
                 <field name="amount"></field>

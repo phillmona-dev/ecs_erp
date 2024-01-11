@@ -223,7 +223,8 @@ class sale_order_line(models.Model):
                         'earned_date', '>=', date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
                                 'points_earned')):
                     rate = 1 + (disc.reward_pct / 100)
-                    return line.product_id.list_price_phar * rate
+                    #return line.product_id.list_price_phar * rate
+                    return line.product_id.list_price_phar 
 
             self.calc_sales_totals_pharma()
 
@@ -231,7 +232,8 @@ class sale_order_line(models.Model):
             for disc in discount_per_amount:
                 if self.order_id.total_pharma>disc.from_amt and self.order_id.total_pharma<disc.to_amt:
                     rate=1 + (disc.discount / 100)
-                    return line.product_id.list_price_phar * rate
+                    #return line.product_id.list_price_phar * rate
+                    return line.product_id.list_price_phar
 
             breat_feed_children=len(self.env['droga.pharma.child'].search([('parent_cust','=',self.order_id.partner_id.id),('breat_feed_end_date','>=',datetime.today())]))
             discount_per_person=self.env['droga.breast.feed.reward.contact.type'].search([])
@@ -245,7 +247,8 @@ class sale_order_line(models.Model):
                 elif disc.cont_type=='bp' and breat_feed_children>0:
                     rate = 1 + (disc.discount / 100)
 
-            return line.product_id.list_price_phar * rate
+            #return line.product_id.list_price_phar * rate
+            return line.product_id.list_price_phar
     def _get_pharma_price(self,line):
         #Contract price
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),('header.customer','=',line.order_id.partner_id.id),('header.date_from','<',datetime.today()),('header.date_to','>',datetime.today()),('header.status','=','Active')])
