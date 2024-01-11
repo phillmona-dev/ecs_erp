@@ -1,4 +1,6 @@
 from email.policy import default
+import pandas as pd
+
 from odoo import models, fields, api
 from datetime import datetime, date, timedelta
 
@@ -73,15 +75,17 @@ class droga_tender_master(models.Model):
                                          inverse='inverse_ext_date',
                                          help="Time should be in Ethiopian format not AM/PM.")
 
-    @api.depends("extension_date_eth", "closing_date_gre", "ext_period")
+    @api.depends("extension_date_eth", "closing_date_gre", "ext_period","period_type")
     def conv_ext_date(self):
         for rec in self:
             if not rec.ext_period:
                 return
             try:
-                if rec.extension_date_eth == '':
+                if rec.extension_date_eth == '' and rec.period_type=='wd':
                     date_to=rec.closing_date_gre + timedelta(days=int(rec.ext_period))
                     rec.extension_date_gre = date_to + timedelta(days=int(self.get_ext_days_add(rec.closing_date_gre.date(),date_to.date())))
+                elif rec.extension_date_eth == '' and rec.period_type=='cd':
+                    rec.extension_date_gre = rec.closing_date_gre + timedelta(days=int(rec.ext_period))
                 else:
                     converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
                         int(rec.extension_date_eth.split("-")[0]), int(rec.extension_date_eth.split("-")[1]),
@@ -128,8 +132,12 @@ class droga_tender_master(models.Model):
                 else:
                     days = days + (hd.date_to.date() - hd.date_from.date()).days+1
 
-        return days
+        return days + self.count_weekends_pandas(date_fromp,date_top)
 
+    def count_weekends_pandas(self,start_date, end_date):
+        dates = pd.date_range(start_date, end_date)
+        weekends = dates[dates.weekday.isin([5, 6])]
+        return weekends.shape[0]
     @api.depends("closing_date_gre")
     def get_status(self):
         for record in self:

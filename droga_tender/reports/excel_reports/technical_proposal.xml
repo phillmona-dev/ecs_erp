@@ -33,5 +33,5 @@
             action="droga_tender_reports_technical_proposal_excel_action"
             parent="tender_reports"
             groups="tender_user"
-            sequence="11"/>
+            sequence="20"/>
 </odoo>

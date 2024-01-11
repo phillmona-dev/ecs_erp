@@ -70,11 +70,22 @@ class droga_tender_master(models.Model):
     # relational fields
     unit_of_measure = fields.Many2one('uom.uom', string='UOM')
     parent_tender_performance = fields.Many2one('droga.tender.master', required=True)
+    customer=fields.Many2one(related='parent_tender_performance.customer')
+    procurement_title=fields.Char(related='parent_tender_performance.procurement_title')
+    closing_date_gre=fields.Datetime(related='parent_tender_performance.closing_date_gre')
     parent_tender_performance_detail = fields.Many2one('droga.tender.submission.detail')
     type_item = fields.Many2one('droga.tender.settings.type.item', string='Type or items',related='parent_tender_performance_detail.type_item')
     company_id = fields.Many2one('res.company', string='Company', required=True,
                                  state={'done': [('readonly', True)]},related='parent_tender_performance_detail.company_id')
-
+    performance_pct=fields.Float(compute='_compute_perf_item',string='Award %')
+    total_delivered_amount=fields.Float(compute='_compute_perf_item',string='Total delivered amt')
+    performance_pct_delivery=fields.Float(compute='_compute_perf_item',string='Delivery %')
+    cus_type = fields.Many2one(related='parent_tender_performance.customer_type', string='Customer type', store=True)
+    def _compute_perf_item(self):
+        for rec in self:
+            rec.performance_pct=(rec.award_cost/rec.amount)*100 if rec.amount!=0 else 0
+            rec.total_delivered_amount=rec.unit_price*rec.quantity
+            rec.performance_pct_delivery=((rec.unit_price*rec.quantity)/rec.award_cost)*100 if rec.award_cost!=0 else 0
     def reg_products(self):
         if not self.item_pro:
             return

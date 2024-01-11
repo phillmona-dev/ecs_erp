@@ -9,10 +9,14 @@ class droga_tender_master_related(models.Model):
     bid_security_amount_char = fields.Char('Security amount', required=True)
     bid_security_pct = fields.Float('Security percent')
     awarded_amt_total=fields.Float('Awarded total amount',compute='_compute_awarded_amt_total',store=True)          #Total tender awarded
-    tender_amt_participated = fields.Float('Total Quotation', compute='_compute_awarded_amt_total', store=True)     #Total tender participated
+    tender_amt_participated = fields.Float('Total Quotation', compute='_compute_awarded_amt_total',store=True)     #Total tender participated
+    performance_amt_award = fields.Float('Total award', compute='_compute_amt_performance',store=True)
     performance_amt_sent=fields.Float('Total Quotation',compute='_compute_amt_performance',store=True)              #Not active
-    performance_amt_award=fields.Float('Total award',compute='_compute_amt_performance',store=True)                 #Not active
-    performance_pct=fields.Float('Award %',compute='_compute_awarded_amt_total',store=True,group_operator='avg')
+    performance_pct=fields.Float('Award %',compute='_compute_awarded_amt_total',group_operator='avg',store=True)
+
+    total_delivered_amount=fields.Float('Total delivered amt',compute='_compute_delivered_amt_total',store=True)
+    performance_pct_delivery=fields.Float('Delivery %',compute='_compute_delivered_amt_total',group_operator='avg',store=True)
+
     award_folder=fields.Char(related='detail_submissions_fin.award_fold_num')
     item_types=fields.Text('Item / types',compute='_get_item_types')
 
@@ -22,7 +26,18 @@ class droga_tender_master_related(models.Model):
     opening_alert_sent = fields.Boolean('Opening alert sent status',default=False)
     extension_alert_sent = fields.Boolean('Extension alert sent status',default=False)
 
-    @api.depends('detail_submissions_fin.amount','detail_submissions_fin.status')
+    @api.depends('detail_performance.delivered_qty','detail_performance.unit_price','detail_performance.award_cost')
+    def _compute_delivered_amt_total(self):
+        for rec in self:
+            total_award = 0
+            total_delivered = 0
+            for perf_line in rec.detail_performance:
+                total_delivered+=perf_line.delivered_qty*perf_line.unit_price
+                total_award+=perf_line.award_cost
+            rec.total_delivered_amount=total_delivered
+            rec.performance_pct_delivery=(total_delivered/total_award)*100 if total_award!=0 else 0
+
+    @api.depends('detail_submissions_fin.amount','detail_submissions_fin.status','detail_submissions_fin.amount','detail_submissions_fin')
     def _compute_awarded_amt_total(self):
         for rec in self:
             fin_details = rec.detail_submissions_fin

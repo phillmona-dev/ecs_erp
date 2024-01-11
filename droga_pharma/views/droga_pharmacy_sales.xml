@@ -709,8 +709,7 @@
         <field name="context">
             {'default_payment_term_id':11,'default_order_from':'PH','search_default_to_invoice':1,'search_default_today_sales':1}
         </field>
-        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to
-            invoice','invoiced'))]
+        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to invoice','invoiced'))]
         </field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),

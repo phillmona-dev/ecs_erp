@@ -64,6 +64,7 @@
         <field name="context">{'search_default_awarded_tenders': 1}</field>
         </record>
 
+        <!-->
         <menuitem
             id="droga_report_total_awarded_menu"
             name="Total awarded"
@@ -71,4 +72,5 @@
             parent="tender_reports"
             groups="tender_user"
             sequence="11"/>
+            <-->
 </odoo>
