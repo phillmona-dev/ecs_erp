@@ -12,7 +12,6 @@
                 groups="pharma_dp_admin,pharma_br_admin"
                 sequence="20"/>
 
-
         <menuitem
                 id="droga_sales_pharmacy_menu_invoice"
                 name="To invoice"
@@ -41,6 +40,11 @@
                     name="Minor Aliments"
                     action="droga_minor_aliment_view_action"
                     sequence="11"/>
+            <menuitem
+                id="droga_prescription_menu"
+                name="Prescription"
+                action="droga_pharma_prescription_action"
+                sequence="30"/>
         </menuitem>
 
 
