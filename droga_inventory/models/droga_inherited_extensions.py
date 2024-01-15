@@ -210,6 +210,7 @@ class droga_location_extension(models.Model):
         ('SIR', 'Sample issue to be returned'),
         ('SAR', 'Sample being returned'),
         ('DIL', 'Dispatch location'),
+        ('RWD', 'Rewards location'),
         ('ATL', 'Asset transit location'),
         ('SAP','Sales placement location'),
         ('SRL', 'Inter-store receive transit location'),

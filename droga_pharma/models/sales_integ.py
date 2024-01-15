@@ -15,7 +15,7 @@ class sales_integ(models.Model):
     emp_descr=fields.Char(compute='_get_emp_descr',string='Customer',store=True)
     available_amount_pharma = fields.Float(string='Credit balance', related='partner_id.available_amount_pharma')
     manual_price_pharma=fields.Boolean('Manual price',default=False,tracking=True)
-
+    referred_by=fields.Many2one('res.partner',string='Referred by')
     @api.depends('partner_id','customer_emp')
     def _get_emp_descr(self):
         for rec in self:

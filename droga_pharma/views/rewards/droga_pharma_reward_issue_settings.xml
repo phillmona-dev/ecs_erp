@@ -14,7 +14,7 @@
             <tree string="" delete="0">
                 <field name="reward_pct"></field>
                 <field name="prod_group" widget="many2many_tags"></field>
-                <field name="prod_template" widget="many2many_tags"></field>
+                <field name="prod_template"></field>
                 <field name="reward_req_points" string="Req points"></field>
                 <field name="reward_req_frequ" string="Frequency (Days)"></field>
                 <field name="status"></field>
@@ -31,7 +31,10 @@
                     <group>
                         <field name="reward_pct"></field>
                         <field name="prod_group" widget="many2many_tags" domain="[('avail_in_product_master', '=',True)]" options="{'no_create':True,'no_open':True}"></field>
-                        <field name="prod_template" widget="many2many_tags" options="{'no_create':True,'no_open':True}"></field>
+                        <field name="prod_template" options="{'no_create':True,'no_open':True}"></field>
+                        <field name="uom"></field>
+                        <field name="quantity"></field>
+                        <field name="type"></field>
                         <field name="reward_req_points"></field>
                         <field name="reward_req_frequ"></field>
                         <field name="remark"></field>

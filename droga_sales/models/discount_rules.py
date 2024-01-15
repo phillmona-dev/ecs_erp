@@ -212,14 +212,15 @@ class sale_order_line(models.Model):
                                                                   ('header.status', '=', 'Active')])
         if len(cont_prices) > 0:
             return cont_prices[0]["selling_price"]
+        elif line.order_id.partner_id.is_company:
+            return line.product_id.list_price_phar
         else:
             # Fetch any discounts here
             rate = 1
-            discount_per_acc = self.env['droga.pharma.reward.issue'].search([])
+            discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','=','Purchase reward')])
             for disc in discount_per_acc:
-                if (
-                        line.product_id.product_tmpl_id.id == disc.prod_template.id or line.product_id.product_tmpl_id.categ_id in disc.prod_group) and disc.reward_req_points <= sum(
-                        self.env['droga.pharma.points.earned'].search([('customer', '=', line.order_id.partner_id.id), (
+                if line.product_id.product_tmpl_id.categ_id in disc.prod_group and disc.reward_req_points <= sum(
+                        self.env['droga.pharma.points.earned'].search([('customer', '=', line.order_id.partner_id.id),('type','=',disc.type), (
                         'earned_date', '>=', date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
                                 'points_earned')):
                     rate = 1 + (disc.reward_pct / 100)
@@ -458,6 +459,27 @@ class sale_order_ext(models.Model):
     sales_initiator = fields.Char('Sales person', store=True)
     total_pharma = fields.Float('Total pharmacy before discount')
     total_disc_pharma = fields.Float('Total discount for pharmacy')
+    show_beauty_button=fields.Boolean(compute='_show_supp_vit')
+    show_vit_button = fields.Boolean(compute='_show_supp_vit')
+
+    @api.depends('partner_id')
+    def _show_supp_vit(self):
+        for rec in self:
+            rec.show_beauty_button=False
+            rec.show_vit_button = False
+            if rec.partner_id.is_company:
+                return
+            discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Referral reward','Speciality service reward'))])
+            for disc in discount_per_acc:
+                if disc.reward_req_points <= sum(self.env['droga.pharma.points.earned'].search(
+                            [('customer', '=', rec.partner_id.id), ('type', '=', disc.type), (
+                                    'earned_date', '>=',
+                                    date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
+                            'points_earned')):
+                    if disc.type=="Referral reward":
+                        rec.show_beauty_button=True
+                    else:
+                        rec.show_vit_button = True
     def get_wareh(self):
         list=self.env.user.warehouse_ids_ph_disp+self.env.user.warehouse_ids_im_ws
         return list[
@@ -600,6 +622,22 @@ class sale_order_ext(models.Model):
         action['context'] = context
 
         #Insert reward points here
+
+        if self.referred_by:
+            if len(self.env['sale.order'].search([('state','in',('sale','dispense')),('id','!=',self.id),('referred_by','=',self.referred_by.id),('partner_id','=',self.partner_id.id)]))==0:
+                points_to_earn = self.env['droga.pharma.referral.reward'].search([('from_amt','<',self.amount_total),('to_amt','>',self.amount_total)])[
+                    0].points_to_gain if len(
+                    self.env['droga.pharma.referral.reward'].search([('from_amt','<',self.amount_total),('to_amt','>',self.amount_total)])) > 0 else 0
+                points = {
+                    'type': 'Referral reward',
+                    'customer': self.referred_by.id,
+                    'sales_ref': self.id,
+                    'earned_date': self.date_order,
+                    'points_earned': points_to_earn,
+                }
+
+                self.env['droga.pharma.points.earned'].create(points)
+
         services_count=self.order_line.filtered(
                 lambda x: x.product_id.product_tmpl_id.detailed_type=='service')
         if self.partner_id.id==15488 or self.order_from!='PH' or self.partner_id.is_company:
@@ -607,17 +645,20 @@ class sale_order_ext(models.Model):
         
         if len(services_count)>0:
             points_to_earn=self.env['droga.pharma.reward.gain'].search([('type','=','Services')])[0].points_to_gain if len(self.env['droga.pharma.reward.gain'].search([('type','=','Services')]))>0 else 0
+            type='Speciality service reward'
         else:
             points_to_earn = self.env['droga.pharma.reward.gain'].search([('type', '=', 'Stocked')])[
                 0].points_to_gain if len(
                 self.env['droga.pharma.reward.gain'].search([('type', '=', 'Stocked')])) > 0 else 0
+            type = 'Purchase reward'
         points = {
-            'type': 'Purchase reward',
+            'type': type,
             'customer': self.partner_id.id,
             'sales_ref': self.id,
             'earned_date': self.date_order,
             'points_earned': points_to_earn,
         }
+
         self.env['droga.pharma.points.earned'].create(points)
 
         return action

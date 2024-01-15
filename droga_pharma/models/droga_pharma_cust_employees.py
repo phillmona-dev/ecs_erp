@@ -47,7 +47,76 @@ class droga_pharma_customer(models.Model):
     medication_history = fields.Html('Medication history and adherance', tracking=True)
     adr_allergy = fields.Html('ADRs and/or Allergies', tracking=True)
     immunization = fields.Html('Immunization', tracking=True)
+    show_beauty_button = fields.Boolean(compute='_show_supp_vit',string='Has beauty pick reward')
+    show_vit_button = fields.Boolean(compute='_show_supp_vit',string='Has vitamin reward')
 
+    def _show_supp_vit(self):
+        for rec in self:
+            rec.show_beauty_button = False
+            rec.show_vit_button = False
+            if rec.is_company:
+                return
+            discount_per_acc = self.env['droga.pharma.reward.issue'].search(
+                [('type', 'in', ('Referral reward', 'Speciality service reward'))])
+            for disc in discount_per_acc:
+                if disc.reward_req_points <= sum(self.env['droga.pharma.points.earned'].search(
+                        [('customer', '=', rec.id), ('type', '=', disc.type), (
+                                'earned_date', '>=',
+                                date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
+                    'points_earned')):
+                    if disc.type == "Referral reward":
+                        rec.show_beauty_button = True
+                    else:
+                        rec.show_vit_button = True
+
+    def action_beautypicks(self):
+        det_entries = []
+        disc = self.env['droga.pharma.reward.issue'].search(
+            [('type', '=', ('Referral reward'))])[0]
+        det_entries.append({
+            'product_id': self.env['product.product'].search([('product_tmpl_id', '=', disc.prod_template.id)])[0].id,
+            'product_uom_pharma': disc.uom.id,
+            'product_uom_qty': disc.quantity,
+            'warehouse_id': [self.env.user.warehouse_ids_ph_disp + self.env.user.warehouse_ids_im_ws][0].ids[0]
+        })
+        return {
+            'name': 'Reward - Beauty-picks',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.inventory.consignment.issue',
+            'views': [[self.env.ref('droga_pharma.droga_inventory_reward_issue_view_form').id, 'form']],
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_issue_type': 'RWDB',
+                'default_customer': self.id,
+                'default_detail_entries':det_entries
+            },
+        }
+
+    def action_supp_rewards(self):
+        det_entries = []
+        disc = self.env['droga.pharma.reward.issue'].search(
+            [('type', '=', ('Speciality service reward'))])[0]
+        det_entries.append({
+            'product_id': self.env['product.product'].search([('product_tmpl_id','=',disc.prod_template.id)])[0].id,
+            'product_uom_pharma': disc.uom.id,
+            'product_uom_qty': disc.quantity,
+            'warehouse_id': [self.env.user.warehouse_ids_ph_disp + self.env.user.warehouse_ids_im_ws][0].ids[0]
+
+        })
+        return {
+            'name': 'Reward - Supplements',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.inventory.consignment.issue',
+            'views': [[self.env.ref('droga_pharma.droga_inventory_reward_issue_view_form').id, 'form']],
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_issue_type': 'RWDS',
+                'default_customer': self.id,
+                'default_detail_entries': det_entries
+            },
+        }
 class droga_pharma_customer_employees(models.Model):
     _name = 'droga.pharma.cust.employees'
 

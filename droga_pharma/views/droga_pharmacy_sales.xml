@@ -207,11 +207,13 @@
                                 icon="fa-credit-card-alt"
                                 attrs="{'invisible': ['|', ('has_counsell_products', '=', False), ('invoice_status', '!=', 'invoiced')]}">
                         </button>
+                        <field name="show_beauty_button" invisible="1"></field>
+                        <field name="show_vit_button" invisible="1"></field>
                         <button name="action_beautypicks"
                                 type="object"
                                 class="oe_stat_button"
                                 string="Reward"
-                                invisible="1"
+                                attrs="{'invisible': [('show_beauty_button', '=', False)]}"
                                 icon="fa-credit-card-alt">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_text">Reward</span>
@@ -221,7 +223,7 @@
                         <button name="action_supp_rewards"
                                 type="object"
                                 class="oe_stat_button"
-                                invisible="1"
+                                attrs="{'invisible': [('show_vit_button', '=', False)]}"
                                 icon="fa-credit-card-alt">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_text">Reward</span>
@@ -279,7 +281,8 @@
                                    string="Available balance" options="{'no_create': True}"/>
 
                             <field name="cust_details" invisible="1"></field>
-                            <field name="manual_price_pharma"></field>
+                            <field name="referred_by" domain="[('is_company', '=', False)]" attrs="{'readonly': [('state', 'in', ('done'))]}"></field>
+                            <field name="manual_price_pharma" attrs="{'readonly': [('state', 'in', ('done'))]}"></field>
                             <field name="show_invoice_button_pharma" invisible="1"></field>
                             <field name="partner_invoice_id" groups="account.group_delivery_invoice_address"
                                    context="{'default_type':'invoice'}" options='{"always_reload": True}'/>

@@ -203,7 +203,6 @@ class droga_stock_cons_issue_detail(models.Model):
         'Request',
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True, state={'done': [('readonly', True)]})
-
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
                                   domain="[('category_id', '=', product_uom_category_id)]")
 

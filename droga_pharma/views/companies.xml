@@ -9,7 +9,29 @@
             <form string="Partners" delete="0">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-
+                        <field name="show_beauty_button" invisible="1"></field>
+                        <field name="show_vit_button" invisible="1"></field>
+                        <button name="action_beautypicks"
+                                type="object"
+                                class="oe_stat_button"
+                                string="Reward"
+                                attrs="{'invisible': [('show_beauty_button', '=', False)]}"
+                                icon="fa-credit-card-alt">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Reward</span>
+                                <span class="o_stat_text">Beauty-picks</span>
+                            </div>
+                        </button>
+                        <button name="action_supp_rewards"
+                                type="object"
+                                class="oe_stat_button"
+                                attrs="{'invisible': [('show_vit_button', '=', False)]}"
+                                icon="fa-credit-card-alt">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Reward</span>
+                                <span class="o_stat_text">Supplements</span>
+                            </div>
+                        </button>
                         <button icon="fa-credit-card-alt" type="object" string="Children" name="open_children"
                                 class="oe_stat_button"></button>
 
@@ -31,7 +53,9 @@
 
 
 
-                    <div class="oe_button_box" name="button_box"/>
+                    <div class="oe_button_box" name="button_box">
+
+                            </div>
 
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
                             attrs="{'invisible': [('active', '=', True)]}"/>

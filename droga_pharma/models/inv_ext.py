@@ -238,5 +238,81 @@ class droga_stock_move_line(models.Model):
 
 class free_sample_issue_ext(models.Model):
     _inherit = 'droga.inventory.consignment.issue'
+
     def dispense_products(self):
-        pass
+        for rec in self.detail_entries:
+            rec.product_uom=rec.product_uom_pharma
+        self.set_activity_done()
+        warehouse_list = set(self.detail_entries['warehouse_id'])
+
+        for wh in warehouse_list:
+            pick_type_id = self.env['stock.picking.type'].sudo().search(
+                [('sequence_code', '=', 'RWD'), ('warehouse_id', '=', wh.id)]).id
+            cust_locat = self.env['stock.location'].search([('con_type', '=', 'RWD')]).id
+            if not pick_type_id:
+                raise UserError("Picking type is not configured for one of the warehouses.")
+            if not cust_locat:
+                raise UserError(
+                    "Customer location for type RWD not set. Please configure accordingly.")
+
+        for wh in warehouse_list:
+            # Get picking type for issue type per warehouse.
+            # Issue type will be configured per warehouse.
+            pick_type_id = self.env['stock.picking.type'].sudo().search(
+                [('sequence_code', '=', 'RWD'), ('warehouse_id', '=', wh.id)]).id
+            # Get default location for the warehouse
+            def_loc_id = self.env['stock.location'].search(
+                [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False), ('usage', '=', 'internal')])[
+                0].id
+            if not def_loc_id:
+                raise UserError("Store location not set for issuer warehouse. Please configure accordingly.")
+
+            picking_vals = {
+                'partner_id': self.customer.id,
+                'company_id': self.env.company.id,
+                'picking_type_id': pick_type_id,
+                'location_id': def_loc_id,
+                'location_dest_id': cust_locat,
+                'origin': self.name,
+                'cons_sample_issue_request': self.id,
+                'state': 'confirmed',
+                'scheduled_date': self.issue_date
+            }
+            picking_id = self.env['stock.picking'].sudo().create(picking_vals)
+
+            if not self.consignment_reference:
+                self.consignment_reference = picking_id.name + '\n'
+            else:
+                self.consignment_reference = self.consignment_reference + picking_id.name + '\n'
+
+            for rec in self.detail_entries:
+
+                if (rec['warehouse_id'] == wh):
+                    move_vals = {
+                        'picking_id': picking_id.id,
+                        'picking_type_id': pick_type_id,
+                        'name': picking_id.name,
+                        'product_id': rec['product_id'].id,
+                        'product_uom': rec["product_id"].uom_id.id,
+                        'product_uom_qty': rec['product_uom_qty'] ,
+                        'location_id': def_loc_id,
+                        'location_dest_id': cust_locat,
+                        'state': 'confirmed',
+                        'company_id': self.env.company.id
+                    }
+
+                    self.env['stock.move'].sudo().create(move_vals)
+
+            picking_id.sudo().action_confirm()
+            picking_id.sudo().action_assign()
+            for move in picking_id.move_ids:
+                move.quantity_done = move.product_uom_qty
+            #picking_id.sudo().action_confirm()
+
+            picking_id.button_validate()
+
+        self.state = 'processed'
+
+class free_sample_detail(models.Model):
+    _inherit='droga.inventory.cons.issue.detail'
+    product_uom_pharma=fields.Many2one('uom.uom',string='UOM')
