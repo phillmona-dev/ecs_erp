@@ -1,5 +1,4 @@
 from datetime import datetime
-import pdfkit
 from odoo import models, fields, api
 
 
