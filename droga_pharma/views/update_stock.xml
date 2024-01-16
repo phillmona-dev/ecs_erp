@@ -22,7 +22,7 @@
                         <group>
                             <field name="code"></field>
                             <field name="warehouse" widget="many2many_tags" options="{'no_create':True,'no_open':True}"></field>
-                            <field name="rate"></field>
+                            <field name="rate" digits="[2, 20]"></field>
                             <field name="ref"></field>
                             <field name="prod_id" invisible="1"></field>
                             <field name="batch"></field>
