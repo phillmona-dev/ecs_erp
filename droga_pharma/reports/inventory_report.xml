@@ -14,8 +14,8 @@
                 <field name='branch_id' optional="hidden"/>
                 <field name="quantity" string="On Hand Quantity" sum="Total On Hand"/>
                 <field name="selling_price" string="Selling price"/>
-                <field name="unit_cost" string="Unit cost"/>
-                <field name="total_amount" string="Amount" sum="Total amount"/>
+		<field name="unit_cost" string="Unit cost" groups="droga_pharma.pharma_director"/>
+                <field name="total_amount" string="Amount" groups="droga_pharma.pharma_director" sum="Total amount"/>
                 <field name="lot_id"/>
                 
             </tree>
