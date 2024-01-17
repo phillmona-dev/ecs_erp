@@ -55,4 +55,28 @@ class ModelName(models.Model):
     # Text fields
     bank_number=fields.Char('Bank Number')
 
-
+    def extend_bid_request(self):
+        record = self.env['droga.bond.requests'].search([('tender', '=', self.tender_id.id)])
+        return {
+            'name': 'Bond request',
+            'view_mode': 'form',
+            'res_model': 'droga.bond.requests',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'context': {
+                'default_tender': self.tender_id.id,
+                'default_is_extension': True,
+                'default_bank': self.bank.id,
+                'default_security_form': self.security_type.id,
+                'default_starting_date': self.starting_date,
+                'default_amount': self.security_amount,
+                'default_validity_period': self.security_period_in_days,
+                'default_bank_number': self.bank_number,
+                'default_dead_line_date': self.dead_line_date,
+                'default_po_number': self.tender_id.customer_tender_no,
+                'default_client': self.tender_id.customer.master_cust_id.id,
+                'default_request_type': self.tender_id.bid_type,
+                'default_to_be_extended_bond': record[0].id,
+                'default_security_type': record[0].security_type,
+            },
+        }

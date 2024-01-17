@@ -1,0 +1,46 @@
+<odoo>
+    <template id="report_reward">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div style="margin-left: 5%;">
+                            <h1>Droga <t t-if="str(doc.issue_type) == 'RWDB'">Beauty Picks Reward</t>
+                            <t t-if="str(doc.issue_type) == 'RWDS'">
+                              Supplements Reward
+                            </t> </h1>
+                        </div>
+                        <br/>
+                        <br/>
+                        <div style="margin-left: 5%; margin-right: 10%;">
+                          <h5>Dear <strong><span t-field="doc.customer.name"/></strong>, our company Droga Pharma Plc. rewards its valuable customers based on different criteria. Therefore, we're thrilled to provide you a giveaway of <span t-esc="int(doc.detail_entries.product_uom_qty)"/> <span t-field="doc.detail_entries.product_uom_pharma.name"/> of <strong><span t-esc="doc.detail_entries.product_id.display_name.split('] ')[-1]"/> </strong>as a reward <t t-if="str(doc.issue_type) == 'RWDB'"> for referring customers.</t>
+                            <t t-if="str(doc.issue_type) == 'RWDS'">
+                                for using our MTM/Counselling/compounding services.
+                            </t></h5>
+
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <div style="margin-left: 20%; margin-top:15%;">
+                            <h4>More ways to bond, more ways to get rewarded!</h4>
+<!--                            <h4 style="font-family: 'Noto Sans Ethiopic';">ከኛ ይወዳጁ፣ አብዝተው ያትርፉ!</h4>-->
+                            <h4>Thank You!</h4>
+<!--                            <h4 style="font-family: 'Noto Sans Ethiopic';">እናመሰግናለን!</h4>-->
+                            <h4>Droga Pharmacy</h4>
+<!--                            <h4 style="font-family: 'Noto Sans Ethiopic';">ድሮጋ ፋርማሲ</h4>-->
+                        </div>
+                        <br/>
+                        <br/>
+                        <div style="margin-top:35%; margin-left:65%;">
+                            <strong><span t-field="doc.customer.name"/></strong>
+                            <br/>
+                            <h5>Date: </h5>
+                            <h5>Signature: </h5>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
