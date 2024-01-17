@@ -177,6 +177,16 @@ class sales_integ(models.Model):
 
             id=self.env['droga.pharma.mtm.header'].create(mtm)
 
+            mtm_hist = {
+                'cons_start_date': self.date_order,
+                'cons_end_date': self.date_order + relativedelta(months=self.mtm_duration_in_months),
+                'mtm_header': id[0].id,
+                'origin_sales': self.id,
+                'no_of_sessions': self.no_of_sessions
+            }
+
+            self.env['droga.pharma.mtm.history'].create(mtm_hist)
+
             follow_up = {
                 'parent_mtm_follow': id.id,
                 'date_follow_up':self.date_order,
@@ -184,6 +194,8 @@ class sales_integ(models.Model):
             }
 
             self.env['droga.pharma.mtm.follow_up'].create(follow_up)
+
+        elif len(self.env['droga.pharma.mtm.follow_up'].search([('origin_sales','=',self.id)]))==0:
 
             mtm_hist = {
                 'cons_start_date': self.date_order,
@@ -194,7 +206,7 @@ class sales_integ(models.Model):
             }
 
             self.env['droga.pharma.mtm.history'].create(mtm_hist)
-        elif len(self.env['droga.pharma.mtm.follow_up'].search([('origin_sales','=',self.id)]))==0:
+
             follow_up = {
                 'parent_mtm_follow': id[0].id,
                 'date_follow_up': self.date_order,
@@ -204,16 +216,6 @@ class sales_integ(models.Model):
             }
 
             self.env['droga.pharma.mtm.follow_up'].create(follow_up)
-
-            mtm_hist = {
-                'cons_start_date': self.date_order,
-                'cons_end_date': self.date_order+relativedelta(months=self.mtm_duration_in_months),
-                'mtm_header': id[0].id,
-                'origin_sales': self.id,
-                'no_of_sessions': self.no_of_sessions
-            }
-
-            self.env['droga.pharma.mtm.history'].create(mtm_hist)
 
         return {
             'name': 'MTM sessions',
