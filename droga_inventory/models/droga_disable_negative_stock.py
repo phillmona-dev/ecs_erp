@@ -69,7 +69,7 @@ class StockQuant(models.Model):
 
             prod_sum =  sum(self.env['stock.quant'].search(
                 [('product_id', '=', quant.product_id.id), ('location_id.usage', '=', 'internal')]).mapped('quantity'))
-            self.env['product.template'].search([('id','=',quant.product_id.product_tmpl_id.id)])[0].write({
+            self.env['product.template'].search([('id','=',quant.product_id.product_tmpl_id.id),'|', ('active', '=', True), ('active', '=', False)])[0].write({
                 'most_recent_trans_date': datetime.now().date(),
                 'stock_quantity_total':prod_sum
             })

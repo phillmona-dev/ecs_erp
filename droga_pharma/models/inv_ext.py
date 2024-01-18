@@ -157,7 +157,7 @@ class droga_stock_quant(models.Model):
     ('PH', 'Pharmacy'),('PR','Project')], related='warehouse_id.wh_type',store=True)
     unit_cost=fields.Float('Unit price',compute='get_cost')
     total_amount=fields.Float('Amount',compute='get_cost')
-
+    selling_price=fields.Float(related='product_id.product_tmpl_id.list_price_phar')
     def get_cost(self):
         for rec in self:
             rec.unit_cost=rec.product_id.standard_price
