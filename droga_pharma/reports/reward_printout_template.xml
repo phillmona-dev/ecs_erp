@@ -1,14 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <template id="report_reward">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
                     <div class="page">
-                        <div style="margin-left: 5%;">
-                            <h1>Droga <t t-if="str(doc.issue_type) == 'RWDB'">Beauty Picks Reward</t>
+                        <div style="margin-left: 5%; display: flex;">
+                            <h1 style="display: inline; margin-right: 25%;">Droga <t t-if="str(doc.issue_type) == 'RWDB'">Beauty Picks Reward</t>
                             <t t-if="str(doc.issue_type) == 'RWDS'">
                               Supplements Reward
                             </t> </h1>
+                            <p style="display: inline;"><span t-field="doc.name"/></p>
                         </div>
                         <br/>
                         <br/>
@@ -22,21 +24,22 @@
                         <br/>
                         <br/>
                         <br/>
-                        <div style="margin-left: 20%; margin-top:15%;">
+                        <div style="margin-left: 20%; margin-top:40%;">
                             <h4>More ways to bond, more ways to get rewarded!</h4>
-<!--                            <h4 style="font-family: 'Noto Sans Ethiopic';">ከኛ ይወዳጁ፣ አብዝተው ያትርፉ!</h4>-->
-                            <h4>Thank You!</h4>
+<!--                            <h4 style="font-family: Arial Unicode MS, Code2000, Abyssinica SIL, sans-serif;">ከኛ ይወዳጁ፣ አብዝተው ያትርፉ!</h4>-->
+                            <br/>
+                            <h4 style="margin-left: 27%;">Thank You!</h4>
 <!--                            <h4 style="font-family: 'Noto Sans Ethiopic';">እናመሰግናለን!</h4>-->
-                            <h4>Droga Pharmacy</h4>
+                            <br/>
+                            <h4 style="margin-left: 23%;">Droga Pharmacy</h4>
 <!--                            <h4 style="font-family: 'Noto Sans Ethiopic';">ድሮጋ ፋርማሲ</h4>-->
                         </div>
                         <br/>
                         <br/>
-                        <div style="margin-top:35%; margin-left:65%;">
-                            <strong><span t-field="doc.customer.name"/></strong>
-                            <br/>
-                            <h5>Date: </h5>
-                            <h5>Signature: </h5>
+                        <div style="margin-top:20%; display: flex;">
+                            <strong><span style="display: inline; margin-right: 20%;" t-field="doc.customer.name"/></strong>
+                            <h5 style="display: inline; margin-right: 25%;">Date: </h5>
+                            <h5 style="display: inline;">Signature: </h5>
                         </div>
                     </div>
                 </t>

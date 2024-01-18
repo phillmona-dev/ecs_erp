@@ -18,7 +18,7 @@
         <field name="name">droga.pharma.counselling.tree</field>
         <field name="model">droga.pharma.counselling</field>
         <field name="arch" type="xml">
-            <tree string="Counselling" delete="1" create="1">
+            <tree string="Counselling" delete="0" create="0">
                 <field name="counselling_cat"></field>
                 <field name="status"></field>
                 <field name="pharmacist_lev_understanding"></field>

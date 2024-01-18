@@ -18,6 +18,18 @@
         <field name="view_mode">tree,form</field>
     </record>
 
+    <record id="droga_pharma_mtm_tree_view" model="ir.ui.view">
+        <field name="name">droga.pharma.mtm.tree.view</field>
+        <field name="model">droga.pharma.mtm.header</field>
+        <field name="arch" type="xml">
+            <tree string="" delete="0" create="0">
+                <field name="client"/>
+<!--                <field name="sales_origin"/>-->
+                <field name="mobile"/>
+            </tree>
+        </field>
+    </record>
+
     <record id="droga_pharma_mtm_form" model="ir.ui.view">
         <field name="name">droga.pharma.mtm.form</field>
         <field name="model">droga.pharma.mtm.header</field>
