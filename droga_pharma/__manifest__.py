@@ -64,6 +64,8 @@
         'reports/points_enquiry.xml',
         'reports/prescription_template.xml',
         'reports/prescription_report.xml',
+        'reports/reward_printout_template.xml',
+        'reports/reward_printout_report.xml',
         'views/prescription.xml',
         'views/update_stock.xml',
         'views/menu.xml',
