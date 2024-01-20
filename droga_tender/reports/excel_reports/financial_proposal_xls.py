@@ -55,7 +55,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         sheet.set_column('A:A', 10.5)
         sheet.set_column('B:B', 35)
         sheet.set_column('C:C', 11)
-        sheet.set_column('D:D', 14)
+        sheet.set_column('D:D', 18)
         sheet.set_column('E:E', 18)
         sheet.set_column('F:F', 18)
         sheet.set_column('G:G', 17.3)
@@ -80,7 +80,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         big_header_format = workbook.add_format({
             'bold': 1,
             'border': 0,
-            'align': 'left',
+            'align': 'center',
             'valign': 'vcenter',
             'fg_color': '#d5d5dd',
             'font_size': 36})
@@ -132,7 +132,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
 
         if self.env.company.logo_web:
             company_image=io.BytesIO(base64.b64decode(self.env.company.logo_web))
-            sheet.insert_image(0,6,"test_image.png",{'image_data':company_image,'y_scale':0.16,'y_offset':0})
+            sheet.insert_image(0,0,"test_image.png",{'image_data':company_image,'y_scale':0.16,'y_offset':0})
 
         sheet.merge_range('A1:G1' ,'Droga Pharma P.L.C',big_header_format)
         sheet.merge_range('A2:C2', 'Importer and Distributor  For:', medium_header_format)
@@ -161,7 +161,7 @@ class tender_financial_proposal_master_xls(models.TransientModel):
         sheet.merge_range('E12:G12', 'Date - '+self.env.cr.now().strftime("%B %d,%Y"), small_header_format)
 
         sheet.merge_range('A' + str(row_start + 1) + ':G' + str(row_start + 1), self.tender_id['customer'].name, header_format)
-        sheet.merge_range('A' + str(row_start + 2) + ':G' + str(row_start + 2), self.tender_id['procurement_title'],header_format)
+        sheet.merge_range('A' + str(row_start + 2) + ':G' + str(row_start + 2),self.tender_id['procurement_title'] if self.tender_id['procurement_title'] else ' ',header_format)
         sheet.merge_range('A' + str(row_start + 3) + ':G' + str(row_start + 3), 'Financial proposal',main_title_format)
 
         sheet.write(row_start+4, 0, 'S.No',title_format)

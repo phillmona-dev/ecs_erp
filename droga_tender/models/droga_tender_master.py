@@ -36,18 +36,34 @@ class droga_tender_master(models.Model):
                                        store=True, inverse='inverse_close_date',
                                        help="Time should be in Ethiopian format not AM/PM.")
 
-    @api.depends("closing_date_eth", "float_period", "posted_date_gre", "open_date_gre")
+    @api.depends("closing_date_eth", "float_period", "posted_date_gre", "open_date_gre","period_type")
     def conv_close_date(self):
-        try:
-            if self.closing_date_eth == '':
-                self.closing_date_gre = self.posted_date_gre + timedelta(days=int(self.float_period))
-            else:
-                converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
-                    int(self.closing_date_eth.split("-")[0]), int(self.closing_date_eth.split("-")[1]),
-                    2000 + int(self.closing_date_eth.split("-")[2]))
-                self.closing_date_gre = converted_date
-        except Exception as e:
-            self.closing_date_eth = ""
+        for rec in self:
+            try:
+                if rec.closing_date_eth == '':
+                    if rec.period_type=='wd':
+                        date_adder=rec.posted_date_gre
+                        fp=int(rec.float_period)
+                        while fp>0:
+                            date_adder += timedelta(days=1)
+                            if date_adder.weekday() >= 5:  # sunday = 6
+                                continue
+                            fp -= 1
+
+                        rec.closing_date_gre=date_adder + timedelta(days=int(rec.get_ext_days_add(rec.posted_date_gre, date_adder)))
+                        #if date_to.weekday()!=4:
+                        #    rec.closing_date_gre=rec.closing_date_gre+timedelta(days=int(rec.get_ext_days_add(date_to,rec.closing_date_gre)))
+                        if rec.closing_date_gre.weekday()==5 or rec.closing_date_gre.weekday()==6:
+                            rec.closing_date_gre = rec.closing_date_gre + timedelta(days=7-rec.closing_date_gre.weekday())
+                    else:
+                        rec.closing_date_gre = rec.posted_date_gre + timedelta(days=int(rec.float_period))
+                else:
+                    converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
+                        int(rec.closing_date_eth.split("-")[0]), int(rec.closing_date_eth.split("-")[1]),
+                        2000 + int(rec.closing_date_eth.split("-")[2]))
+                    rec.closing_date_gre = converted_date
+            except Exception as e:
+                rec.closing_date_eth = ""
 
     def inverse_close_date(self):
         pass
@@ -82,10 +98,22 @@ class droga_tender_master(models.Model):
                 return
             try:
                 if rec.extension_date_eth == '' and rec.period_type=='wd':
-                    date_to=rec.closing_date_gre + timedelta(days=int(rec.ext_period))
-                    rec.extension_date_gre = date_to + timedelta(days=int(self.get_ext_days_add(rec.closing_date_gre.date(),date_to.date())))
+                    date_adder = rec.closing_date_gre
+                    fp = int(rec.ext_period)
+                    while fp > 0:
+                        date_adder += timedelta(days=1)
+                        if date_adder.weekday() >= 5:  # sunday = 6
+                            continue
+                        fp -= 1
+
+                    rec.extension_date_gre = date_adder + timedelta(
+                        days=int(rec.get_ext_days_add(rec.closing_date_gre, date_adder)))
+                    # if date_to.weekday()!=4:
+                    #    rec.closing_date_gre=rec.closing_date_gre+timedelta(days=int(rec.get_ext_days_add(date_to,rec.closing_date_gre)))
+                    if rec.extension_date_gre.weekday() == 5 or rec.extension_date_gre.weekday() == 6:
+                        rec.extension_date_gre = rec.extension_date_gre + timedelta(days=7 - rec.extension_date_gre.weekday())
                 elif rec.extension_date_eth == '' and rec.period_type=='cd':
-                    rec.extension_date_gre = rec.closing_date_gre + timedelta(days=int(rec.ext_period))
+                    rec.extension_date_gre = rec.extension_date_gre + timedelta(days=int(rec.ext_period))
                 else:
                     converted_date = eth_to_greg_date_conv.converter.eth_to_greg_convert(
                         int(rec.extension_date_eth.split("-")[0]), int(rec.extension_date_eth.split("-")[1]),
@@ -111,7 +139,7 @@ class droga_tender_master(models.Model):
     ten_name = fields.Char('Tender description', compute='_get_tender_description',store=True)
 
     # Selection fields
-    period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')])
+    period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')],default='cd')
     ext_period_type = fields.Selection([('wd', 'Working days'), ('cd', 'Calendar days')],
                                        string='Extension period type')
     bid_type = fields.Selection([('f', 'Foreign'), ('l', 'Local'), ('F+L', 'F+L')])
@@ -132,7 +160,8 @@ class droga_tender_master(models.Model):
                 else:
                     days = days + (hd.date_to.date() - hd.date_from.date()).days+1
 
-        return days + self.count_weekends_pandas(date_fromp,date_top)
+        #return days + self.count_weekends_pandas(date_fromp,date_top)
+        return days
 
     def count_weekends_pandas(self,start_date, end_date):
         dates = pd.date_range(start_date, end_date)

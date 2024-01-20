@@ -57,7 +57,7 @@ class tender_technical_proposal_master_xls(models.TransientModel):
         sheet.set_column('A:A', 10.5)
         sheet.set_column('B:B', 35)
         sheet.set_column('C:C', 11)
-        sheet.set_column('D:D', 14)
+        sheet.set_column('D:D', 18)
         sheet.set_column('E:E', 18)
         sheet.set_column('F:F', 18)
         sheet.set_column('G:G', 16)
@@ -82,7 +82,7 @@ class tender_technical_proposal_master_xls(models.TransientModel):
         big_header_format = workbook.add_format({
             'bold': 1,
             'border': 0,
-            'align': 'left',
+            'align': 'center',
             'valign': 'vcenter',
             'fg_color': '#d5d5dd',
             'font_size': 36})
@@ -91,7 +91,7 @@ class tender_technical_proposal_master_xls(models.TransientModel):
             'border': 0,
             'align': 'left',
             'valign': 'vcenter',
-            'font_size': 16})
+            'font_size': 14})
         main_title_format = workbook.add_format({
             'bold': 1,
             'border': 0,
@@ -134,7 +134,7 @@ class tender_technical_proposal_master_xls(models.TransientModel):
 
         if self.env.company.logo_web:
             company_image = io.BytesIO(base64.b64decode(self.env.company.logo_web))
-            sheet.insert_image(0, 5, "test_image.png", {'image_data': company_image, 'y_scale': 0.4, 'y_offset': 3})
+            sheet.insert_image(0, 0, "test_image.png", {'image_data': company_image, 'y_scale': 0.16, 'y_offset': 0})
 
         sheet.merge_range('A1:G1', 'Droga Pharma P.L.C', big_header_format)
         sheet.merge_range('A2:C2', 'Importer and Distributor  For:', medium_header_format)
@@ -163,39 +163,55 @@ class tender_technical_proposal_master_xls(models.TransientModel):
         sheet.merge_range('E12:G12', 'Date - ' + self.env.cr.now().strftime("%B %d,%Y"), small_header_format)
 
         sheet.merge_range('A' + str(row_start + 1) + ':I' + str(row_start + 1), self.tender_id['customer'].name, header_format)
-        sheet.merge_range('A' + str(row_start + 2) + ':I' + str(row_start + 2), self.tender_id['procurement_title'],header_format)
+        sheet.merge_range('A' + str(row_start + 2) + ':I' + str(row_start + 2), self.tender_id['procurement_title'] if self.tender_id['procurement_title'] else ' ',header_format)
         sheet.merge_range('A' + str(row_start + 3) + ':I' + str(row_start + 3), 'Technical proposal',main_title_format)
 
         sheet.write(row_start+4, 0, 'S.No',title_format)
         sheet.write(row_start + 4, 1, 'Items', title_format)
         sheet.write(row_start + 4, 2, 'Unit', title_format)
-        sheet.write(row_start + 4, 3, 'Item requested.', title_format)
-        sheet.write(row_start + 4, 4, 'Item proposed', title_format)
+        sheet.write(row_start + 4, 3, 'Item/spec requested.', title_format)
+        sheet.write(row_start + 4, 4, 'Item/spec proposed', title_format)
         sheet.write(row_start + 4, 5, 'Supplier', title_format)
         sheet.write(row_start + 4, 6, 'Brand', title_format)
-        sheet.write(row_start + 4, 7, 'Qty', title_format)
-        sheet.write(row_start + 4, 8, 'Remark', title_format)
+        sheet.write(row_start + 4, 7, 'Bidder compliance remark', title_format)
+        sheet.write(row_start + 4, 8, 'Qty', title_format)
+        sheet.write(row_start + 4, 9, 'Remark', title_format)
         row_start=row_start+5
 
         tot_amount=0
 
-        for rec in self.tender_id['detail_submissions_fin']:
-            sheet.write(row_start, 0, rec.item_num)
+        recs=self.tender_id['detail_submissions_fin']
+        if self.lot_no:
+            recs=recs.filtered(
+            lambda m: m.lot_number == self.lot_no)
+        if self.item_number:
+            recs=recs.filtered(
+            lambda m: m.item_num == self.item_number)
+
+        for rec in recs:
+            sheet.write(row_start, 0, rec.item_num,border)
             item=rec.item_pro if rec.item_pro else rec.type_item.type_or_item_name
-            sheet.write(row_start, 1, item if item else ' ')
+            sheet.write(row_start, 1, item if item else ' ',border)
             uom=rec.uom_reg_field
-            sheet.write(row_start, 2, uom.uom_name if uom else ' ')
+            sheet.write(row_start, 2, uom.uom_name if uom else ' ',border)
 
-            sheet.write(row_start, 3, rec.item_des if rec.item_des else ' ')
-            sheet.write(row_start, 4, rec.item_pro if rec.item_pro else ' ')
-            sheet.write(row_start, 5, rec.supplier_new if rec.supplier_new else ' ')
-            sheet.write(row_start, 6, rec.brand_model if rec.brand_model else ' ')
-
-            sheet.write(row_start, 7, rec.quantity,num_format)
+            sheet.write(row_start, 3, rec.item_des if rec.item_des else ' ',border)
+            sheet.write(row_start, 4, rec.item_pro if rec.item_pro else ' ',border)
+            sheet.write(row_start, 5, rec.supplier_new if rec.supplier_new else ' ',border)
+            sheet.write(row_start, 6, rec.brand_model if rec.brand_model else ' ',border)
+            sheet.write(row_start, 7, ' ', border)
+            sheet.write(row_start, 8, rec.quantity,num_format)
             tot_amount+=rec.amount
-            sheet.write(row_start, 8, rec.remark if rec.remark else ' ')
+            sheet.write(row_start, 9, rec.remark if rec.remark else ' ',border)
 
             row_start+=1
+
+            for rec_detail in rec.tender_specs:
+                sheet.write(row_start, 3, rec_detail.spec_requested if rec_detail.spec_requested else ' ', border)
+                sheet.write(row_start, 4, rec_detail.spec_offered if rec_detail.spec_offered else ' ', border)
+                sheet.write(row_start, 7, rec_detail.bidder_compliance_remark if rec_detail.bidder_compliance_remark else ' ', border)
+                sheet.write(row_start, 9, rec_detail.remark if rec_detail.remark else ' ', border)
+                row_start += 1
 
         row_start+=2
 

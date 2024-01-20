@@ -25,6 +25,7 @@
                         <br/>
                         <br/>
                         <div style="margin-left: 20%; margin-top:40%;">
+                            <h4 style="margin-left: 21%;">ከኛ ይወዳጁ አብዝተው ያትርፉ! </h4>
                             <h4>More ways to bond, more ways to get rewarded!</h4>
 <!--                            <h4 style="font-family: Arial Unicode MS, Code2000, Abyssinica SIL, sans-serif;">ከኛ ይወዳጁ፣ አብዝተው ያትርፉ!</h4>-->
                             <br/>
@@ -36,10 +37,11 @@
                         </div>
                         <br/>
                         <br/>
-                        <div style="margin-top:20%; display: flex;">
-                            <strong><span style="display: inline; margin-right: 20%;" t-field="doc.customer.name"/></strong>
-                            <h5 style="display: inline; margin-right: 25%;">Date: </h5>
-                            <h5 style="display: inline;">Signature: </h5>
+                        <div style="margin-top:15%; display: flex;">
+                            <strong><span style="display: inline;margin-left: 5%; margin-right: 10%;" t-field="doc.customer.name"/></strong>
+                            <h5 style="display: inline;margin-right: 20%;">Signature: </h5>
+                            <h5 style="display: inline;">Date:  </h5> <span style="display: inline;" t-field="doc.issue_date"/>
+
                         </div>
                     </div>
                 </t>
