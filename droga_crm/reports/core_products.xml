@@ -32,6 +32,8 @@
                 <field name="availability"></field>
                 <filter name="core_products" string="Core products" domain="[('is_core_product', '=', True)]" />
 
+                <filter name="group_unregistered" string="CRM Group unregistered" domain="[('crm_group', '=', False)]" />
+
                 <separator/>
 
                 <filter name="available" string="Available" domain="[('availability', '=', 'Available')]" />

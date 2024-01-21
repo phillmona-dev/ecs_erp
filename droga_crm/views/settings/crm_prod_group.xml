@@ -40,6 +40,7 @@
         <field name="view_mode">tree</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_crm_customer_prod_group_registry_view_tree')})]"/>
+        <field name="context">{"search_default_group_unregistered":1}</field>
     </record>
 
     <menuitem
