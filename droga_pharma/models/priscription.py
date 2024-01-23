@@ -13,11 +13,12 @@ class droga_pharma_priscription(models.Model):
     gender = fields.Selection(selection=[("Male", "Male"), ("Female", "Female")], string="Gender", store=True,
                               compute='get_cust_hist', inverse='update_gender')
     weight = fields.Float("Weight")
+    height = fields.Float("Height")
     dob = fields.Date("Date of Birth", store=True,compute='get_cust_hist',inverse='update_dob')
     patient_fullname = fields.Char("Patient's Full name", compute='_compute_fullname')
     card_no = fields.Char("Card no")
     region = fields.Char("Region")
-    town = fields.Char("Town")
+    town = fields.Char("Zone/City/Subcity")
     wereda = fields.Char("Wereda")
     kebele = fields.Char("Kebele")
     house_no = fields.Char("House No")
