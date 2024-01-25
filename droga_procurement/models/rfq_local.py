@@ -270,7 +270,7 @@ class Rfq_Local(models.Model):
                 purchase_order = self.env['purchase.order'].create(vals)
 
             # create purchase order commitment budget
-            for line in self.rfq_lines:
+            '''for line in self.rfq_lines:
                 if line.winner == "Yes":
                     # get budgetary position and expense account from purchase request
                     purchase_request = self.env['droga.purchase.request.line.local'].search(
@@ -291,7 +291,7 @@ class Rfq_Local(models.Model):
 
                     # persist to database
                     self.env['droga.budget.commitment.budget'].create(
-                        commitment_budget)
+                        commitment_budget)'''
 
         return {
             'type': 'ir.actions.client',
