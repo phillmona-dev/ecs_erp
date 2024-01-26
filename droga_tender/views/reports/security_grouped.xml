@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <tree string="" create="false" delete="false" expand="1">
                 <field name="tender_id"></field>
+                <field name="cus_type"></field>
                 <field name="security_type"></field>
                 <field name="security_for"></field>
                 <field name="security_amount"></field>
@@ -26,6 +27,7 @@
         <field name="arch" type="xml">
             <search string="Upcoming Tenders">
                 <field name="tender_id"></field>
+                <field name="cus_type"></field>
                 <field name="security_type"></field>
                 <field name="security_for"></field>
                 <field name="security_amount"></field>
@@ -72,6 +74,7 @@
                 <filter name="group_type" string="Security type" context="{'group_by':'security_type'}"/>
                 <filter name="group_status" string="Status" context="{'group_by':'status'}"/>
                 <filter name="group_bank" string="Bank" context="{'group_by':'bank'}"/>
+                <filter name="group_custype" string="Customer type" context="{'group_by':'cus_type'}"/>
             </search>
         </field>
     </record>
