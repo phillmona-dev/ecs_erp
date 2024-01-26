@@ -29,7 +29,13 @@ class droga_tender_master(models.Model):
     droga_product=fields.Many2one('product.template')
     droga_old_product = fields.Many2one('product.template')
 
-    award_cost = fields.Float("Awarded cost",readonly=1)
+    award_cost = fields.Float("Awarded cost",readonly=1,compute="compute_award",store=True)
+
+    @api.depends("award_quantity")
+    def compute_award(self):
+        for rec in self:
+            rec.award_cost=rec.award_quantity*rec.unit_price
+
     perf_pct=fields.Float('% of Performance',compute="compute_performance")
     init_sales_order=fields.Boolean('Initiate S.order?',default=False)
 

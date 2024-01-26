@@ -28,7 +28,7 @@
         <field name="model">droga.tender.performance.evaluation</field>
         <field name="arch" type="xml">
             <tree string="" create="false" delete="false" expand="1">
-                <field name="parent_tender_performance" string="Tender ID"></field>
+                <field name="parent_tender_performance" string="Tender ID" optional="hide"></field>
                 <field name="customer"></field>
                 <field name="item_des_list" string="Item requested"></field>
                 <field name="item_pro" string="Item proposed"></field>
@@ -50,7 +50,7 @@
         <field name="model">droga.tender.submission.detail</field>
         <field name="arch" type="xml">
             <tree string="" create="false" delete="false" expand="1">
-                <field name="parent_tender_submission" string="Tender ID"></field>
+                <field name="parent_tender_submission" string="Tender ID" optional="hide"></field>
                 <field name="customer"></field>
                 <field name="item_des_list" string="Item requested"></field>
                 <field name="item_pro" string="Item proposed"></field>
