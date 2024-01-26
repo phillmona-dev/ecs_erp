@@ -68,5 +68,5 @@
             action="droga_sample_tender_action"
             parent="tender_reports"
             groups="tender_user"
-            sequence="12"/>
+            sequence="13"/>
 </odoo>
