@@ -29,6 +29,8 @@
         <field name="arch" type="xml">
             <tree string="" create="false" delete="false" expand="1">
                 <field name="parent_tender_performance" string="Tender ID" optional="hide"></field>
+                <button icon="fa-credit-card-alt" type="object" name="open_tender"
+                        class="oe_stat_button"></button>
                 <field name="customer"></field>
                 <field name="item_des_list" string="Item requested"></field>
                 <field name="item_pro" string="Item proposed"></field>
@@ -51,6 +53,8 @@
         <field name="arch" type="xml">
             <tree string="" create="false" delete="false" expand="1">
                 <field name="parent_tender_submission" string="Tender ID" optional="hide"></field>
+                <button icon="fa-credit-card-alt" type="object" name="open_tender"
+                        class="oe_stat_button"></button>
                 <field name="customer"></field>
                 <field name="item_des_list" string="Item requested"></field>
                 <field name="item_pro" string="Item proposed"></field>

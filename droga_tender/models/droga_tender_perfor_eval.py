@@ -31,6 +31,16 @@ class droga_tender_master(models.Model):
 
     award_cost = fields.Float("Awarded cost",readonly=1,compute="compute_award",store=True)
 
+    def open_tender(self):
+        return {
+            'name': 'Tender',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.tender.master',
+            'type': 'ir.actions.act_window',
+            'res_id': self.parent_tender_performance.id,
+        }
+
     @api.depends("award_quantity")
     def compute_award(self):
         for rec in self:

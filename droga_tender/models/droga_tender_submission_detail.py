@@ -25,6 +25,16 @@ class droga_tender_submission_detail(models.Model):
     item_num=fields.Integer('Item Number')
     deliv_period_text = fields.Char("Delivery period")
 
+    def open_tender(self):
+        return {
+            'name': 'Tender',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.tender.master',
+            'type': 'ir.actions.act_window',
+            'res_id': self.parent_tender_submission.id,
+        }
+
     procurement_title = fields.Char(related='parent_tender_submission.procurement_title')
     closing_date_gre = fields.Datetime(related='parent_tender_submission.closing_date_gre')
     cus_type = fields.Many2one(related='parent_tender_submission.customer_type', string='Customer type', store=True)
