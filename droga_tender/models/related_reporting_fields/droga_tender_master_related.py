@@ -271,6 +271,30 @@ class droga_tender_master_related(models.Model):
             [])
 
 
+
+
+
+
+        invoices = self.env['account.move'].search([('invoice_date_due', '<', compare_date),
+                                                    ('invoice_date_due', '>', datetime.date.today()),
+                                                    ('state', '=', 'posted'),('tender_alert_sent','=',False),
+                                                    ('payment_state', 'in', ('not_paid', 'partial')),
+                                                    ('sales_initiator','=like','TEN%')])
+        channels = self.env['mail.channel'].search([('name', '=', 'Tender 10 days due date alert')])
+
+        for inv in invoices:
+            inv.write({'tender_alert_sent': True})
+            message = "Please followup " + inv.partner_id.name + " on its outstanding payment of " + str(
+                inv.amount_total_signed) + " due on "+str(inv.invoice_date_due)+"."
+            for c in channels:
+                c.message_post(
+                    subject=inv.partner_id.name,
+                    body=message,
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=self.env.user.id,
+                )
+
     def write(self, vals):
         upd=super().write(vals)
         if 'closing_date_gre' in vals:
@@ -285,3 +309,8 @@ class droga_tender_master_related(models.Model):
 
         return upd
 
+
+
+class droga_tender_late_invoice(models.Model):
+    _inherit = 'account.move'
+    tender_alert_sent=fields.Boolean('Tender alert sent',default=False)
