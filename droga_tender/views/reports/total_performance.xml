@@ -30,6 +30,8 @@
             <tree string="" create="false" delete="false" expand="1">
                 <field name="parent_tender_performance" string="Tender ID"></field>
                 <field name="customer"></field>
+                <field name="item_des_list" string="Item requested"></field>
+                <field name="item_pro" string="Item proposed"></field>
                 <field name="droga_product"></field>
                 <field name="type_item"></field>
                 <field name="procurement_title"></field>
@@ -87,6 +89,8 @@
             <search string="Upcoming Tenders" >
                 <field name="parent_tender_performance" string="Tender ID"></field>
                 <field name="customer"></field>
+                <field name="item_des_list" string="Item requested"></field>
+                <field name="item_pro" string="Item proposed"></field>
                 <field name="droga_product"></field>
                 <field name="procurement_title"></field>
                 <field name="closing_date_gre"></field>

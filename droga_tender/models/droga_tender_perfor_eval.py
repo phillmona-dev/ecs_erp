@@ -13,6 +13,7 @@ class droga_tender_master(models.Model):
     lot_number = fields.Char("Lot #",related='parent_tender_performance_detail.lot_number')
     item_num = fields.Integer('Item #.',related='parent_tender_performance_detail.item_num')
     item_des = fields.Char("Item requested",related='parent_tender_performance_detail.item_des')
+    item_des_list = fields.Many2one('droga.tender.products', string="Item requested",related='parent_tender_performance_detail.item_des_list')
     item_pro = fields.Char("Item proposed",related='parent_tender_performance_detail.item_pro')
 
     # decimal fields
