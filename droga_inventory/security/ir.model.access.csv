@@ -24,3 +24,5 @@ access_inventory_lock_date,droga.inv.lock_period,model_droga_inv_lock_period,bas
 access_inventory_trans_type,droga.inv.trans_type,model_droga_inventory_transaction_types,base.group_user,1,1,1,1
 access_stock_out_notification,droga_stock_out_notification,model_stock_out_notification,base.group_user,1,1,1,1
 access_stock_out_history,droga_stock_out_history,model_stock_out_history,base.group_user,1,1,1,1
+access_droga_inventory_consignment_report,droga_inventory_consignment_report,model_droga_inventory_consignment_report,base.group_user,1,1,1,1
+

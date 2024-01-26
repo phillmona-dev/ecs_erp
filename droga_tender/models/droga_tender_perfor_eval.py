@@ -34,7 +34,10 @@ class droga_tender_master(models.Model):
     @api.depends("award_quantity")
     def compute_award(self):
         for rec in self:
-            rec.award_cost=rec.award_quantity*rec.unit_price
+            if rec.award_quantity*rec.unit_price!=0:
+                rec.award_cost=rec.award_quantity*rec.unit_price
+            else:
+                rec.award_cost=rec.amount
 
     perf_pct=fields.Float('% of Performance',compute="compute_performance")
     init_sales_order=fields.Boolean('Initiate S.order?',default=False)
