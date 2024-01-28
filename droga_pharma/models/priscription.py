@@ -28,7 +28,15 @@ class droga_pharma_priscription(models.Model):
     diagnosis = fields.Text("Diagnosis, if not ICD")
     prescription_drugs = fields.One2many('droga.pharma.priscription.meds', 'parent_prescription')
     company_id = fields.Many2one("res.company")
+    transcriber = fields.Char("Transcriber", compute='_compute_transcriber')
+    qualification = fields.Char("Qualification", compute='_compute_transcriber')
 
+    def _compute_transcriber(self):
+        for rec in self:
+            user = self.env.user
+            rec.transcriber = user.name
+            employee = self.env['hr.employee'].search([('user_id', '=', user.id)], limit=1)
+            rec.qualification = employee.job_id.name
     @api.depends('client')
     def _compute_fullname(self):
         for rec in self:
@@ -58,6 +66,8 @@ class droga_pharma_priscription(models.Model):
 class droga_pharma_priscription_meds(models.Model):
     _name='droga.pharma.priscription.meds'
 
-    drug = fields.Text("Drug description")
+    drug = fields.Text("Drug description", required=True)
     price = fields.Float("Price")
     parent_prescription = fields.Many2one('droga.pharma.priscription')
+    dosage = fields.Char("Dosage")
+    quantity = fields.Float("Quantity")
