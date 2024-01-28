@@ -9,6 +9,7 @@ class ModelName(models.Model):
 
     #relation fields
     tender_id=fields.Many2one('droga.tender.master')
+    cus_type = fields.Many2one(related='tender_id.cus_type', string='Customer type', store=True)
     bid_security=fields.Many2one('droga.tender.master')
     performance_security=fields.Many2one('droga.tender.contract')
     advance_security = fields.Many2one('droga.tender.contract')

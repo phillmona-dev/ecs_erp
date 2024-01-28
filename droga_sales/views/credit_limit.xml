@@ -42,6 +42,22 @@
                eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_credit_limit_tree')})]"/>
     </record>
 
+    <record id="account_invoice_addfilters_inherit" model="ir.ui.view">
+        <field name="name">account.move.filter.add</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='late']" position="after">
+                <filter string="Due in 10 days" name="in_10_days" domain="[
+                        ('invoice_date_due', '&lt;', (context_today() + relativedelta(days=10)).strftime('%Y-%m-%d')),
+                        ('invoice_date_due', '&gt;', context_today().strftime('%Y-%m-%d')),
+                        ('state', '=', 'posted'),
+                        ('payment_state', 'in', ('not_paid', 'partial'))
+                    ]"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="droga_sales_payment_term_exclusion" model="ir.ui.view">
         <field name="name">Apply credit limit</field>
         <field name="model">account.payment.term</field>

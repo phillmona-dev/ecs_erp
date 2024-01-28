@@ -40,6 +40,7 @@
         'views/droga_tender_contract_security_tree.xml',
         'views/reports/total_tenders.xml',
         'views/reports/failed_cancelled.xml',
+        'views/reports/tender_sample.xml',
         'views/reports/security_grouped.xml',
         'views/reports/total_awarded.xml',
         'views/reports/total_performance.xml',

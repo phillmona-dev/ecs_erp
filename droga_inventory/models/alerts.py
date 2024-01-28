@@ -32,7 +32,7 @@ class product_alerts(models.Model):
                 rec.availability = 'Available'
     def open_stock_out_hist(self):
         return {
-            'name': 'Tender submission details',
+            'name': 'Stock out history',
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'product.template',

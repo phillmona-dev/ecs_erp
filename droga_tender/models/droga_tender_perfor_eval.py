@@ -13,6 +13,7 @@ class droga_tender_master(models.Model):
     lot_number = fields.Char("Lot #",related='parent_tender_performance_detail.lot_number')
     item_num = fields.Integer('Item #.',related='parent_tender_performance_detail.item_num')
     item_des = fields.Char("Item requested",related='parent_tender_performance_detail.item_des')
+    item_des_list = fields.Many2one('droga.tender.products', string="Item requested",related='parent_tender_performance_detail.item_des_list')
     item_pro = fields.Char("Item proposed",related='parent_tender_performance_detail.item_pro')
 
     # decimal fields
@@ -28,7 +29,26 @@ class droga_tender_master(models.Model):
     droga_product=fields.Many2one('product.template')
     droga_old_product = fields.Many2one('product.template')
 
-    award_cost = fields.Float("Awarded cost",readonly=1)
+    award_cost = fields.Float("Awarded cost",readonly=1,compute="compute_award",store=True)
+
+    def open_tender(self):
+        return {
+            'name': 'Tender',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'droga.tender.master',
+            'type': 'ir.actions.act_window',
+            'res_id': self.parent_tender_performance.id,
+        }
+
+    @api.depends("award_quantity")
+    def compute_award(self):
+        for rec in self:
+            if rec.award_quantity*rec.unit_price!=0:
+                rec.award_cost=rec.award_quantity*rec.unit_price
+            else:
+                rec.award_cost=rec.amount
+
     perf_pct=fields.Float('% of Performance',compute="compute_performance")
     init_sales_order=fields.Boolean('Initiate S.order?',default=False)
 
