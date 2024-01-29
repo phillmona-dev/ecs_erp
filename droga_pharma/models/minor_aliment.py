@@ -23,10 +23,40 @@ class droga_pharma_minor_alignment(models.Model):
     client_descr = fields.Char(related='sales_origin.emp_descr')
     sales_origin = fields.Many2one('sale.order')
     mobile = fields.Char("Mobile", related='client.phone', store=True)
-    medical = fields.Html("Medical History", store=True)
-    medication_history = fields.Html("Medication History and adherence", store=True)
-    dob = fields.Date("Date of Birth", compute='get_dob', store=True,inverse='inverse_dob',tracking=True)
+    medical = fields.Html("Medical History", store=True, compute='get_cust_hist', inverse='update_medical',
+                          tracking=True)
+    medication_history = fields.Html("Medication History and adherence", store=True, compute='get_cust_hist',
+                                     inverse='update_medication_history', tracking=True)
+    immunization = fields.Html("Immunization", store=True, compute='get_cust_hist', inverse='update_immunization',
+                               tracking=True)
+    adr = fields.Html("ADRS and/or Allergies", store=True, compute='get_cust_hist', inverse='update_adr', tracking=True)
+    dob = fields.Date("Date of Birth", compute='get_dob', store=True, inverse='inverse_dob', tracking=True)
     age = fields.Integer("Age", compute="_compute_age", readonly=True)
+
+    def get_cust_hist(self):
+        for rec in self:
+            rec.medical = rec.client.medical_history
+            rec.medication_history = rec.client.medication_history
+            rec.immunization = rec.client.immunization
+            rec.adr = rec.client.adr_allergy
+            rec.dob = rec.client.dob
+            rec.gender = rec.client.gender
+
+    def update_adr(self):
+        for rec in self:
+            rec.client.adr_allergy = rec.adr
+
+    def update_immunization(self):
+        for rec in self:
+            rec.client.immunization = rec.immunization
+
+    def update_medication_history(self):
+        for rec in self:
+            rec.client.medication_history = rec.medication_history
+
+    def update_medical(self):
+        for rec in self:
+            rec.client.medical_history = rec.medical
 
     def get_dob(self):
         for rec in self:
@@ -93,13 +123,7 @@ class droga_pharma_minor_alignment(models.Model):
 
     gender = fields.Selection(selection=[("Male", "Male"), ("Female", "Female")], string="Gender", store=True)
     profession = fields.Selection(selection=[("hp", "Health Professional"), ("other", "Other")], string="Profession", store=True)
-    # weight = fields.Float("Weight")
-    # height = fields.Float("Height")
-    # bsa = fields.Float("BSA")
     address = fields.Char("Address")
-    # pregnancy = fields.Char("Pregnancy status")
-    immunization = fields.Html("Immunization", store=True)
-    adr = fields.Html("ADRS and/or Allergies", store=True)
     diagnosis = fields.Text("Diagnosis")
     physician = fields.Char("Primary physician and contact information")
     next_date = fields.Date("Next appointment date")

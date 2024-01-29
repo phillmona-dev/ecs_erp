@@ -25,7 +25,7 @@
                     attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app,droga_pharma.pharma_director"
                     string="Approve"/>
                 <button name="reject" type="object" class="btn-danger"
-                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app"
+                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app,droga_pharma.pharma_director"
                     string="Reject"/>
                 </header>
                 <sheet name="product_form">
