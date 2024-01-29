@@ -23,6 +23,7 @@
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
             <search>
+                <field name="mobile"></field>
                 <field name="name"></field>
                 <field name="vat"></field>
                 <field name="cust_credit_limit_pharma"></field>
