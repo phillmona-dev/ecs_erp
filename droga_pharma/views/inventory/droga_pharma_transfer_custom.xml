@@ -22,7 +22,7 @@
         <field name="arch" type="xml">
             <form string="Transfers" delete="0">
                 <header>
-                    <button name="confirm_ph"
+                    <button name="request_ph"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="confirm_ph"

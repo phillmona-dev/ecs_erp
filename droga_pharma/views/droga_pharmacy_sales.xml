@@ -242,8 +242,18 @@
                                         <field style="color:#89C35C" name="amount_total" readonly="1"/>
                                         <field name="name" invisible="1"></field>
                                         <field name="order_from" invisible="1"></field>
+
                                     </div>
                                 </h1>
+
+                                <field name="total_disc_pharma" invisible="1"></field>
+                                <h3>
+                                    <div attrs="{'invisible': [('total_disc_pharma', '=', 0)]}">
+                                        Discount -
+                                        <field style="color:#89C35C" name="total_disc_pharma" readonly="1"/>
+
+                                    </div>
+                                </h3>
                             </div>
                         </group>
 
@@ -430,7 +440,7 @@
                                         </group>
                                         <group attrs="{'invisible': [('display_type', '!=', False)]}"
                                                style="font-size:11pt">>
-
+                                            <field name="disc_applied" invisible="1"></field>
                                             <label for="price_unit" string="Unit price"/>
                                             <div class="o_row">
                                                 <field name="price_unit" readonly="1"/>
@@ -438,6 +448,7 @@
                                                 <field name="tax_id" widget="many2many_tags"
                                                        readonly="1"/>
                                             </div>
+                                            <field name="disc_applied" invisible="1"></field>
                                         </group>
                                         <hr></hr>
                                         <group>
@@ -538,6 +549,7 @@
                                             optional="show"
                                     />
                                     <field name="qty_delivered_method" invisible="1"/>
+                                    <field name="disc_applied" invisible="1"></field>
                                     <field
                                             name="qty_invoiced"
                                             decoration-info="(not display_type and invoice_status == 'to invoice')"
@@ -694,6 +706,7 @@
                                     <field name="tax_totals" widget="account-tax-totals-field" nolabel="1" colspan="2"
                                            readonly="1"/>
                                 </group>
+
                                 <div class="clearfix"/>
                             </group>
                         </page>

@@ -89,7 +89,8 @@ class droga_pharma_customer(models.Model):
             'context': {
                 'default_issue_type': 'RWDB',
                 'default_customer': self.id,
-                'default_detail_entries':det_entries
+                'default_detail_entries':det_entries,
+                'default_points_to_deduct':disc.reward_req_points
             },
         }
 
@@ -114,7 +115,8 @@ class droga_pharma_customer(models.Model):
             'context': {
                 'default_issue_type': 'RWDS',
                 'default_customer': self.id,
-                'default_detail_entries': det_entries
+                'default_detail_entries': det_entries,
+                'default_points_to_deduct': disc.reward_req_points
             },
         }
 class droga_pharma_customer_employees(models.Model):

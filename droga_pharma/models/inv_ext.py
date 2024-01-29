@@ -238,8 +238,15 @@ class droga_stock_move_line(models.Model):
 
 class free_sample_issue_ext(models.Model):
     _inherit = 'droga.inventory.consignment.issue'
-
+    points_to_deduct=fields.Float('Points to deduct')
     def dispense_products(self):
+
+        #Check stock balance here
+        order_lines_negative = self.detail_entries.filtered(
+            lambda x: x.is_prod_available == 'False')
+        if (len(order_lines_negative) > 0):
+            raise UserError("There's no available item on hand to process the reward.")
+
         for rec in self.detail_entries:
             rec.product_uom=rec.product_uom_pharma
         self.set_activity_done()
@@ -247,7 +254,7 @@ class free_sample_issue_ext(models.Model):
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'RWD'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'RWD')]).id
             cust_locat = self.env['stock.location'].search([('con_type', '=', 'RWD')]).id
             if not pick_type_id:
                 raise UserError("Picking type is not configured for one of the warehouses.")
@@ -259,7 +266,7 @@ class free_sample_issue_ext(models.Model):
             # Get picking type for issue type per warehouse.
             # Issue type will be configured per warehouse.
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'RWD'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'RWD')]).id
             # Get default location for the warehouse
             def_loc_id = self.env['stock.location'].search(
                 [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False), ('usage', '=', 'internal')])[
@@ -312,6 +319,83 @@ class free_sample_issue_ext(models.Model):
             picking_id.button_validate()
 
         self.state = 'processed'
+
+        if self.issue_type=='RWDB':
+            points = {
+                'type': 'Referral reward',
+                'customer': self.customer.id,
+                'earned_date': self.issue_date,
+                'points_earned': self.points_to_deduct * -1,
+            }
+
+            self.env['droga.pharma.points.earned'].create(points)
+        else:
+            points = {
+                'type': 'Discount for referral',
+                'customer': self.customer.id,
+                'earned_date': self.issue_date,
+                'points_earned': self.points_to_deduct * -1,
+            }
+
+            self.env['droga.pharma.points.earned'].create(points)
+
+class droga_stock_cons_issue_detail_inherit(models.Model):
+    _inherit = 'droga.inventory.cons.issue.detail'
+    is_prod_available = fields.Char(compute='is_prod_available_method',precompute=True)
+    avail_char=fields.Char('Available')
+
+    @api.model
+    def create(self, vals):
+        res=super(droga_stock_cons_issue_detail_inherit, self).create(vals)
+        res.is_prod_available_method()
+        return super(droga_stock_cons_issue_detail_inherit, self).create(vals)
+
+    def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
+        selfsud = self.sudo()
+        moves = selfsud.env['stock.move'].search(
+            [('product_id', '=', product_id.id), ('location_id.warehouse_id', '=', warehouse_id.id),
+             ('location_id.usage', '=', 'internal'),('state', 'not in', ['done', 'cancel', 'draft','waiting','confirmed']),('location_dest_id.usage', '!=', 'internal')])
+        return sum(moves.mapped('reserved_qty'))
+
+    def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):
+
+        selfsud = self.sudo()
+        tot_quantity = 0.0
+        for location_id in selfsud.env['stock.location'].search(
+                [('warehouse_id', '=', warehouse_id.id), ('usage', '=', 'internal'),('con_type','!=','SRL')]):
+            quants = selfsud.env['stock.quant'].search(
+                [('product_id', '=', product_id.id), ('location_id', '=', location_id.id)])
+            tot_quantity = tot_quantity + sum(quants.mapped('quantity'))
+        return tot_quantity
+
+    @api.depends('product_id')
+    def is_prod_available_method(self):
+        selfsud = self.sudo()
+        for rec in selfsud:
+            available_qty = 0
+
+            wh = rec.warehouse_id
+
+
+            rate = round(rec.product_uom.factor / (
+                rec.product_id.uom_id.factor if rec.product_id.uom_id.factor != 0 else (
+                    rec.product_uom.factor if rec.product_uom.factor != 0 else 1)),6)
+            available_qty = available_qty + ((selfsud._get_avail_qty_per_warehouse(rec.product_id,
+                                                                                           wh) - selfsud._get_outgoing_qty_per_warehouse(
+                rec.product_id, wh)) * (rate))
+
+            rec.avail_char = str(available_qty)
+
+
+            if rec.product_id.detailed_type == 'service':
+                rec.is_prod_available = 'True'
+                return
+            prodqty = sum(self.cons_header.detail_entries.filtered(lambda x: x.product_id.id == rec.product_id.id).mapped(
+                'product_uom_qty'))
+            if available_qty < prodqty:
+                rec.is_prod_available = 'False'
+            elif available_qty >= prodqty:
+                rec.is_prod_available = 'True'
 
 class free_sample_detail(models.Model):
     _inherit='droga.inventory.cons.issue.detail'

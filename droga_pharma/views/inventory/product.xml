@@ -22,7 +22,7 @@
                 <header>
                 <field name="reg_status" invisible="1"/>
                 <button name="approve" type="object" class="btn-primary"
-                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app"
+                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app,droga_pharma.pharma_director"
                     string="Approve"/>
                 <button name="reject" type="object" class="btn-danger"
                     attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app"
