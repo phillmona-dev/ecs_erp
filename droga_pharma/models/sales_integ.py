@@ -62,7 +62,11 @@ class sales_integ(models.Model):
     @api.depends('partner_id')
     def _get_mature_amount_pharma(self):
         for rec in self:
-            if rec.partner_id.id in [15390, 15488] or rec.partner_id.manual_sales_extension_date if rec.partner_id.manual_sales_extension_date else date(2000, 1, 1) >= date.today():
+            if rec.partner_id.id==15488:
+                rec.mature_amount_pharma = 0
+                rec.show_invoice_button_pharma = False
+                return
+            if rec.partner_id.id in [15390, 15488] or (rec.partner_id.manual_sales_extension_date if rec.partner_id.manual_sales_extension_date else date(2000, 1, 1) >= date.today()):
                 matured_invoices = []
             elif rec.partner_id.vat != '0000000000':
                 matured_invoices = self.env['account.move'].search(
