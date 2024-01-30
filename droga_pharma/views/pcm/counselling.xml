@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="sequence_counselling_session" model="ir.sequence">
+        <field name="name">Counselling Session Sequence</field>
+        <field name="code">droga.pharma.counselling.session.sequence</field>
+        <field name="prefix">COU_SES_</field>
+    </record>
+
     <record id="droga_pharma_counselling_action" model="ir.actions.act_window">
         <field name="name">Counselling</field>
         <field name="res_model">droga.pharma.counselling</field>
@@ -52,6 +58,7 @@
                     <group string="Counselling">
 
                         <group>
+                            <field name="coun_code"/>
                             <field name="client"></field>
                             <field name="date"></field>
                             <field name="mobile" readonly="0"/>
@@ -61,6 +68,7 @@
                             <field name="bsa"/>
                             <field name="dob" readonly="0"/>
                             <field name="age"/>
+                            <field name="address"/>
                             <field name="physician"/>
                             <field name="status"></field>
                         </group>

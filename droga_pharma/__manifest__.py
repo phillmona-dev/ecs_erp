@@ -68,6 +68,8 @@
         'reports/reward_printout_report.xml',
         'reports/client_plan_template.xml',
         'reports/client_plan_report.xml',
+        'reports/counselling_printout_template.xml',
+        'reports/counselling_printout.xml',
         'views/prescription.xml',
         'views/update_stock.xml',
         'views/menu.xml',

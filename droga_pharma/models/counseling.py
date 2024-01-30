@@ -7,6 +7,7 @@ class droga_pharma_counselling(models.Model):
 
     #Text fields
     # area_counsel=fields.Many2one('droga.pharma.area_counsel',string='Area of counselling')
+    coun_code = fields.Char("Counselling session ID", default=lambda self: self.env['ir.sequence'].next_by_code('droga.pharma.counselling.session.sequence'), readonly=True)
     counselling_cat = fields.Selection(selection=[('life_style', 'Life style'), ('medication_use', 'Medication Use')], string='Area of counselling')
     description = fields.Char("Area of counselling description")
     status=fields.Char("Status")
