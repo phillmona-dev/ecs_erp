@@ -217,13 +217,6 @@ class sale_order_line(models.Model):
             return cont_prices[0]["selling_price"]
         elif line.order_id.partner_id.is_company:
 
-            discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])
-            for disc in discount_per_amount:
-                if self.order_id.total_pharma > disc.from_amt and self.order_id.total_pharma < disc.to_amt:
-                    rate = 1 + (disc.discount / 100)
-                    line.disc_applied = disc.discount
-                    return line.product_id.list_price_phar * rate
-
             line.order_id.points_to_deduct = 0
             return line.product_id.list_price_phar
         else:
@@ -236,7 +229,7 @@ class sale_order_line(models.Model):
                         'earned_date', '>=', date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
                                 'points_earned')):
                     rate = 1 + (disc.reward_pct / 100)
-                    line.disc_applied = disc.discount
+                    line.disc_applied = disc.reward_pct
                     line.order_id.points_to_deduct = disc.reward_req_points
                     line.order_id.deduct_type='Discount for repeat purchase'
 
