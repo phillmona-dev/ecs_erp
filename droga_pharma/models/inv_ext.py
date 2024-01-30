@@ -344,12 +344,6 @@ class droga_stock_cons_issue_detail_inherit(models.Model):
     is_prod_available = fields.Char(compute='is_prod_available_method',precompute=True)
     avail_char=fields.Char('Available')
 
-    @api.model
-    def create(self, vals):
-        res=super(droga_stock_cons_issue_detail_inherit, self).create(vals)
-        res.is_prod_available_method()
-        return super(droga_stock_cons_issue_detail_inherit, self).create(vals)
-
     def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
         selfsud = self.sudo()
         moves = selfsud.env['stock.move'].search(

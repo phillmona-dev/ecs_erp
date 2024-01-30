@@ -3,7 +3,8 @@
     <record id="sequence_counselling_session" model="ir.sequence">
         <field name="name">Counselling Session Sequence</field>
         <field name="code">droga.pharma.counselling.session.sequence</field>
-        <field name="prefix">COU_SES_</field>
+        <field name="prefix">COU/%(y)s/</field>
+        <field name="implementation">no_gap</field>
     </record>
 
     <record id="droga_pharma_counselling_action" model="ir.actions.act_window">
@@ -59,13 +60,13 @@
                     <group string="Counselling">
 
                         <group>
-                            <field name="coun_code"/>
-                            <field name="client"></field>
-                            <field name="date"></field>
-                            <field name="mobile" readonly="0"/>
-                            <field name="gender" readonly="0"/>
-                            <field name="weight" readonly="0"/>
-                            <field name="height" readonly="0"/>
+                            <field name="coun_code" readonly="1"/>
+                            <field name="client"  readonly="1"></field>
+                            <field name="date" readonly="1"></field>
+                            <field name="mobile"/>
+                            <field name="gender"/>
+                            <field name="weight"/>
+                            <field name="height"/>
                             <field name="bsa"/>
                             <field name="dob" readonly="0"/>
                             <field name="age"/>
