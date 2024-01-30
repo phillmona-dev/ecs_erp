@@ -9,6 +9,7 @@
                 <field name="emp_descr"></field>
                 <field name="date_order"></field>
                 <field name="wareh" string="Branch"></field>
+                <field name="total_disc_pharma" string="Discount"></field>
                 <field name="amount_total" sum="Total"></field>
                 <field name="invoice_status"
                        decoration-success="invoice_status == 'invoiced' or (invoice_status=='no' and state=='dispense')"
@@ -37,6 +38,7 @@
                 <field name="emp_descr"></field>
                 <field name="date_order"></field>
                 <field name="wareh" string="Branch"></field>
+                <field name="total_disc_pharma" string="Discount"></field>
                 <field name="amount_total"></field>
                 <field name="state"
                        decoration-success="state == 'dispense'"
@@ -205,7 +207,7 @@
                                 class="oe_stat_button"
                                 string="Counselling orders"
                                 icon="fa-credit-card-alt"
-                                attrs="{'invisible': ['|', ('has_counsell_products', '=', False), ('invoice_status', '!=', 'invoiced')]}">
+                                attrs="{'invisible': ['|', ('has_counsell_products', '=', False), ('invoice_status', 'not in', ('invoiced','no'))]}">
                         </button>
                         <field name="show_beauty_button" invisible="1"></field>
                         <field name="show_vit_button" invisible="1"></field>
