@@ -36,7 +36,8 @@
                         <br/>
                         <div style="display: flex;">
                             <p style="display: inline; margin-right: 10%;">Mobile: <span t-field="doc.mobile"/></p>
-                            <p style="display: inline; margin-right: 10%;"><span t-field="doc.inpatient"/></p>
+                            <t t-if="doc.inpatient">
+                            <p style="display: inline; margin-right: 10%;"><span t-field="doc.inpatient"/></p></t>
                         </div>
                         <br/>
                         <div style="display: flex;">
