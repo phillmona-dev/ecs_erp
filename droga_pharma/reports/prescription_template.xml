@@ -55,7 +55,6 @@
                                 <t t-foreach="doc.prescription_drugs" t-as="related_record">
                                     <tr>
                                         <td><t t-esc="related_record.drug"/></td>
-                                        <td><t t-esc="related_record.dosage"/></td>
                                         <td><t t-esc="related_record.quantity"/></td>
                                     </tr>
 <!--                                    <t t-set="total_price" t-value="total_price + related_record.price"/>-->

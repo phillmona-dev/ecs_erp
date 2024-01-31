@@ -216,11 +216,11 @@ class sale_order_line(models.Model):
             line.order_id.points_to_deduct=0
             return cont_prices[0]["selling_price"]
         elif line.order_id.partner_id.is_company:
-
             line.order_id.points_to_deduct = 0
             return line.product_id.list_price_phar
         else:
             #Accumulated points discount
+            line.order_id.calc_sales_totals_pharma()
             rate = 1
             discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Purchase reward','Discount for repeat purchase')),('status','=','Active')])
             for disc in discount_per_acc:
@@ -232,18 +232,15 @@ class sale_order_line(models.Model):
                     line.disc_applied = disc.reward_pct
                     line.order_id.points_to_deduct = disc.reward_req_points
                     line.order_id.deduct_type='Discount for repeat purchase'
-
-
                     return line.product_id.list_price_phar * rate
-
-            self.calc_sales_totals_pharma()
 
             #High value purchase discounts
             discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')])
             for disc in discount_per_amount:
-                if self.order_id.total_pharma>disc.from_amt and self.order_id.total_pharma<disc.to_amt:
+                if self.order_id.total_pharma_discount_groups>disc.from_amt and self.order_id.total_pharma_discount_groups<disc.to_amt and line.product_id.product_tmpl_id.categ_id in disc.prod_group:
                     rate=1 + (disc.discount / 100)
                     line.disc_applied = disc.discount
+                    line.order_id.deduct_type = 'Discount for high value purchase'
                     return line.product_id.list_price_phar * rate
 
             #Breast feeders and health professionals discount
@@ -274,7 +271,7 @@ class sale_order_line(models.Model):
         else:
             return line.product_id.list_price_phar
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
-                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty')
+                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.price_unit')
     def _compute_price_unit(self):
         for line in self:
             if line.order_id.state in ('sale', 'cancel', 'done', 'fia'):
@@ -291,7 +288,18 @@ class sale_order_line(models.Model):
                     line.product_uom_pharma_measure = line.product_id.uom_id
                     line.product_uom = line.product_id.uom_id
                     line.product_uom_qty = line.product_uom_pharma_qty
-                    self.calc_sales_totals_pharma()
+                    line.order_id.calc_sales_totals_pharma()
+                    '''
+                    groups = self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])[
+                        0].prod_group if len(
+                        self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])) > 0 else []
+                    for l in self.order_id.order_line:
+                        if l.product_id.product_tmpl_id.categ_id in groups:
+                            l.write({'disc_applied': line.disc_applied})
+                            l.write({'price_unit': l.phar_cont_price*(1+(line.disc_applied/100))})
+                            l.write({'selling_price': l.phar_cont_price * (1 + (line.disc_applied / 100))})
+                            '''
+
                     return
             else:
                 line.phar_cont_price = 0
@@ -475,22 +483,33 @@ class sale_order_ext(models.Model):
                                         compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
     total_pharma = fields.Float('Total pharmacy before discount',compute='calc_sales_totals_pharma',store=True)
+    total_pharma_discount_groups = fields.Float('Total pharmacy discount apply groups', compute='calc_sales_totals_pharma', store=True)
     total_disc_pharma = fields.Float('Total discount for pharmacy',compute='calc_sales_totals_pharma',store=True)
     show_beauty_button=fields.Boolean(compute='_show_supp_vit')
     show_vit_button = fields.Boolean(compute='_show_supp_vit')
     points_to_deduct=fields.Float('Points to deduct',default=0)
     deduct_type=fields.Char('Type')
+    deduct_descr=fields.Char(compute='_compute_desc')
 
-    @api.depends('order_line.product_uom_pharma_qty','order_line.phar_cont_price','order_line.price_unit','partner_id')
+    @api.depends('total_disc_pharma','deduct_type')
+    def _compute_desc(self):
+        for rec in self:
+            rec.deduct_descr=(str(round(rec.total_disc_pharma,2)) if rec.total_disc_pharma else '')+', '+(rec.deduct_type if rec.deduct_type else '')
+    @api.depends('partner_id')
     def calc_sales_totals_pharma(self):
         for rec in self:
             total_pharma=0
             total_with_discount=0
+            total_pharma_discount_groups=0
+            groups = self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')])[0].prod_group if len(self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')]))>0 else []
             for ln in rec.order_line:
                 total_pharma=total_pharma+(ln.product_uom_pharma_qty*ln.phar_cont_price)
                 total_with_discount=total_with_discount+(ln.product_uom_pharma_qty*ln.price_unit)
+                if ln.product_id.product_tmpl_id.categ_id in groups:
+                    total_pharma_discount_groups+=(ln.product_uom_pharma_qty*ln.phar_cont_price)
             rec.total_pharma=total_pharma
             rec.total_disc_pharma = total_pharma-total_with_discount
+            rec.total_pharma_discount_groups=total_pharma_discount_groups
     @api.depends('partner_id')
     def _show_supp_vit(self):
         for rec in self:

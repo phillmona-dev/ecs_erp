@@ -248,25 +248,26 @@
                                     </div>
                                 </h1>
 
-                                <field name="total_disc_pharma" invisible="1"></field>
-                                <h3>
-                                    <div attrs="{'invisible': [('total_disc_pharma', '=', 0)]}">
-                                        Discount -
-                                        <field style="color:#89C35C" name="total_disc_pharma" readonly="1"/>
 
-                                    </div>
-                                </h3>
                             </div>
+
                         </group>
 
 
                     </group>
+                    <field name="total_disc_pharma" invisible="1"></field>
+                    <field name="deduct_type" invisible="1"></field>
+                    <field name="deduct_descr" invisible="1"></field>
+                    <group style="white-space:nowrap;font-size:13pt" col="1">
 
+                        <field style="color:#89C35C" attrs="{'invisible': [('total_disc_pharma', '=', 0)]}" name="deduct_descr" string="" readonly="1"/>
+
+                    </group>
                     <hr></hr>
                     <group name="sale_header">
                         <group name="partner_details">
                             <field name="partner_id" widget="res_partner_many2one"
-                                   context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
+                                   context="{'res_partner_search_mode': 'customer', 'show_address': 0, 'show_vat': False}"
                                    options='{"always_reload": True,"no_open":True,"no_create": True}'/>
 
 
@@ -293,7 +294,8 @@
                                    string="Available balance" options="{'no_create': True}"/>
 
                             <field name="cust_details" invisible="1"></field>
-                            <field name="referred_by" domain="[('is_company', '=', False)]" attrs="{'readonly': [('state', 'in', ('done'))]}"></field>
+                            <field name="referred_by" domain="[('is_company', '=', False)]"
+                                   attrs="{'readonly': [('state', 'in', ('done'))]}"></field>
                             <field name="manual_price_pharma" attrs="{'readonly': [('state', 'in', ('done'))]}"></field>
                             <field name="show_invoice_button_pharma" invisible="1"></field>
                             <field name="partner_invoice_id" groups="account.group_delivery_invoice_address"
@@ -302,6 +304,7 @@
                                    context="{'default_type':'delivery'}" options='{"always_reload": True}'/>
                         </group>
                         <group name="order_details">
+                            <field name="phone_no" readonly="1" string="Phone No"></field>
                             <field name="Vat_no" readonly="1" string="Tin No"></field>
                             <field name="cust_availed_payment_term_ids" invisible="1"></field>
                             <field name="payment_term_id"
@@ -745,7 +748,8 @@
         <field name="context">
             {'default_payment_term_id':11,'default_order_from':'PH','search_default_to_invoice':1,'search_default_today_sales':1}
         </field>
-        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to invoice','invoiced'))]
+        <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True),('invoice_status','in',('to
+            invoice','invoiced'))]
         </field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
         <field name="view_ids" eval="[(5, 0, 0),
