@@ -21,6 +21,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'reports/droga_pharma_header_footer.xml',
         'views/droga_export_emp_extension.xml',
         'views/credit_contract_selling_price.xml',
         'views/dis_query_form.xml',
