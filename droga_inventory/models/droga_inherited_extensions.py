@@ -1097,7 +1097,10 @@ class prod(models.Model):
                                                 self._context.get('package_id'), self._context.get('from_date'),
                                                 self._context.get('to_date'))
         for product in products:
-            rate=product.product_tmpl_id.uom_id.factor/product.product_tmpl_id.import_uom_new.factor
+            if product.product_tmpl_id.import_uom_new.factor==0:
+                rate=1
+            else:
+                rate=product.product_tmpl_id.uom_id.factor/product.product_tmpl_id.import_uom_new.factor
             product.update(res[product.id])
             product.qty_available=product.qty_available/rate
             product.incoming_qty = product.incoming_qty / rate

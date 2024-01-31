@@ -15,7 +15,7 @@ class droga_pharma_counselling(models.Model):
     pharmacist_lev_understanding=fields.Selection([('High', 'High'), ('Optimal', 'Optimal'),('Low', 'Low')],string='Pharmacist level of understanding')
     assessment = fields.Html("Assessment")
     date=fields.Date('Date',default=datetime.today())
-    sales_origin = fields.Many2one('sale.order')
+    sales_origin = fields.Many2one('sale.order',required=True)
     counselling_given = fields.Html("Counselling given")
     patient_lev_understanding=fields.Selection([('High', 'High'), ('Optimal', 'Optimal'),('Low', 'Low')],string='Patient Level of understanding')
     # Related fields

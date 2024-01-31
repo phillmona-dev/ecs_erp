@@ -18,10 +18,10 @@ class droga_pharma_customer(models.Model):
             'name': 'Children',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'droga.pharma.cust.employees',
+            'res_model': 'res.partner',
             'view_id': self.env.ref('droga_pharma.droga_pharma_children_cust').id,
             'type': 'ir.actions.act_window',
-
+            'res_id': self.id,
             # This will pass the detail ID if a record is present
             'domain': [('parent_cust', '=', self.id)],
             'target': 'new',
@@ -162,7 +162,6 @@ class droga_pharma_customer_employees(models.Model):
         [('Day', 'Day'), ('Month', 'Month'),('Year', 'Year')],
         string='Period type')
     remaining_amount_period=fields.Char(string='Remaining',compute='_remain_amount_period')
-    childs=fields.One2many('droga.pharma.child','parent',string='Childs')
 
 
     @api.model
@@ -240,7 +239,7 @@ class droga_pharma_child_list(models.Model):
     child_name=fields.Char('Child name')
     breast_feed_days=fields.Float('Breastfeed period in days',default=180)
     breat_feed_end_date=fields.Date(compute='get_end_date',store=True)
-    parent=fields.Many2one('droga.pharma.cust.employees',string='Parent')
+
     parent_cust = fields.Many2one('res.partner', string='Parent')
     @api.depends('breast_feed_days','child_dob')
     def get_end_date(self):
@@ -249,6 +248,6 @@ class droga_pharma_child_list(models.Model):
     @api.constrains('child_dob')
     def _is_dob_valid(self):
         for record in self:
-            if record.child_dob > datetime.date.today():
+            if record.child_dob > datetime.today().date():
                 raise ValidationError(
                     "Date of birth should not be greater than current date.")
