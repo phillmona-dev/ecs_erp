@@ -15,20 +15,19 @@
                     }
                 </style>
             </head>
-                <div style="content: ''; display: table; clear: both; height:50px;">
-                    <div style="float: left; width: 30%;">
+                <div style="content: ''; display: table; clear: both; height:50px; justify-content: space-between;">
+                    <div style="float: left; width: 33.33%;">
                         <h2>DROGA PHARMACY</h2>
-                        <h5 style="margin-left: 13%; font-family: amharic_font, Arial, sans-serif;">ድሮጋ ፋርማሲ</h5>
+                        <h5 style="margin-left: 17%; font-family: amharic_font, Arial, sans-serif;">ድሮጋ ፋርማሲ</h5>
                         <h5>+251965757515, +251966565664</h5>
                     </div>
-                    <div style="float: left; width: 40%;">
-                        <img t-if="company.logo_web" t-att-src="image_data_uri(company.logo_web)"
-                             style="margin-left: 23%"
+                    <div style="float: left; width: 28%; margin-left: 5%;">
+                        <img t-if="company.logo_web" t-att-src="image_data_uri(company.logo_web)" style="width: 45%; height: 100%; object-fit: cover;"
                              alt="Logo"/>
                     </div>
-                    <div style="float: left; width: 30%;">
+                    <div style="float: left; width: 28%;">
                         <h2>Looking After Your Health!</h2>
-                        <h5 style="margin-left: 10%; font-family: amharic_font, Arial, sans-serif;">ጤናዎን በመጠበቅ ላይ!</h5>
+                        <h5 style="margin-left: 17%; font-family: amharic_font, Arial, sans-serif;">ጤናዎን በመጠበቅ ላይ!</h5>
                     </div>
                 </div>
             <hr style="height:2px;border-width:0;color:black;background-color:black"/>
@@ -45,33 +44,18 @@
             <t t-set="company" t-value="user.company_id"/>
             <div class="footer">
                 <div class="text-center" style="border-top: 1px solid black;">
-<!--                    <ul class="list-inline mb4 text-nowrap">-->
-<!--                        <li t-if="company.phone" class="list-inline-item d-inline">Phone:-->
-<!--                            <span class="o_force_ltr" t-field="company.phone"/>-->
-<!--                        </li>-->
-<!--                        <li t-if="company.email" class="list-inline-item d-inline">Email:-->
-<!--                            <span t-field="company.email"/>-->
-<!--                        </li>-->
-<!--                        <li t-if="company.website" class="list-inline-item d-inline">Web:-->
-<!--                            <span t-field="company.website"/>-->
-<!--                        </li>-->
-<!--                        <li t-if="company.vat" class="list-inline-item d-inline"><t-->
-<!--                                t-esc="company.country_id.vat_label or 'Tax ID'"/>:-->
-<!--                            <span t-field="company.vat"/>-->
-<!--                        </li>-->
-<!--                    </ul>-->
-                    <div style="display: flex; justify-content: space-between;">
-                        <p style="display: inline; margin-right: 7%">Region: Addis Ababa</p>
-                        <p style="display: inline; margin-right: 7%">Subcity: Arada</p>
-                        <p style="display: inline; margin-right: 7%">Woreda: 08</p>
-                        <p style="display: inline; margin-right: 7%">Kebelle: 14</p>
+                    <div style="display: flex; justify-content: space-between; margin-left: 4.8%">
+                        <p style="display: inline; margin-right: 5%">Region: Addis Ababa</p>
+                        <p style="display: inline; margin-right: 5%">Subcity: Arada</p>
+                        <p style="display: inline; margin-right: 5%">Woreda: 08</p>
+                        <p style="display: inline; margin-right: 5%">Kebelle: 14</p>
                         <p style="display: inline;">House No.: 379</p>
                     </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <p style="display: inline; margin-right: 10%" t-if="company.email" class="list-inline-item d-inline">Email:
+                    <div style="display: flex;">
+                        <p style="display: inline; margin-right: 5%" t-if="company.email">Email:
                             <span t-field="company.email"/>
                         </p>
-                        <p style="display: inline; margin-right: 10%" t-if="company.website" class="list-inline-item d-inline">Web:
+                        <p style="display: inline; margin-right: 5%" t-if="company.website" >Web:
                             <span t-field="company.website"/>
                         </p>
                         <p style="display: inline;">Tin: 0045080232</p>
