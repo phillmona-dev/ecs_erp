@@ -501,7 +501,8 @@ class sale_order_ext(models.Model):
             total_pharma=0
             total_with_discount=0
             total_pharma_discount_groups=0
-            groups = self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')])[0].prod_group if len(self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')]))>0 else []
+            #groups = self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')])[0].prod_group if len(self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')]))>0 else []
+            groups=[]
             for ln in rec.order_line:
                 total_pharma=total_pharma+(ln.product_uom_pharma_qty*ln.phar_cont_price)
                 total_with_discount=total_with_discount+(ln.product_uom_pharma_qty*ln.price_unit)

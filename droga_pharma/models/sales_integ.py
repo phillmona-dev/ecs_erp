@@ -22,6 +22,8 @@ class sales_integ(models.Model):
         for rec in self:
             emp_name=(' - '+rec.customer_emp.descr) if rec.customer_emp.descr else ''
             rec.emp_descr=rec.partner_id.name+emp_name
+            if not rec.emp_descr:
+                rec.emp_descr='-'
     cust_id_linked=fields.Char('Employee ID',related='customer_emp.cust_id')
     points_gained=fields.Float('Points gained')
     dob = fields.Date("Date of Birth", compute='get_dob', store=True, inverse='inverse_dob', tracking=True)
