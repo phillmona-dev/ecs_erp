@@ -18,19 +18,19 @@
                         </div>
                         <br/>
                         <div style="display: flex;">
-                            <p style="display: inline; margin-right: 7%;">Patient's name: <span t-field="doc.patient_fullname"/></p>
-                            <p style="display: inline; margin-right: 7%;">Gender: <span t-field="doc.gender"/></p>
-                            <p style="display: inline; margin-right: 7%;">Age: <span t-field="doc.age"/></p>
-                            <p style="display: inline; margin-right: 7%;">Weight: <span t-field="doc.weight"/></p>
-                            <p style="display: inline; margin-right: 7%;">Height: <span t-field="doc.height"/></p>
+                            <p style="display: inline; margin-right: 5%;">Patient's name: <span t-field="doc.patient_fullname"/></p>
+                            <p style="display: inline; margin-right: 5%;">Gender: <span t-field="doc.gender"/></p>
+                            <p style="display: inline; margin-right: 5%;">Age: <span t-field="doc.age"/></p>
+                            <p style="display: inline; margin-right: 5%;">Weight: <span t-field="doc.weight"/></p>
+                            <p style="display: inline; margin-right: 5%;">Height: <span t-field="doc.height"/></p>
                             <p style="display: inline;">Card No.: <span t-field="doc.card_no"/></p>
                         </div>
                         <br/>
-                        <div style="display: flex;">
-                            <p style="display: inline; margin-right: 10%;">Region: <span t-field="doc.region"/></p>
-                            <p style="display: inline; margin-right: 10%;">Zone/City/Subcity: <span t-field="doc.town"/></p>
-                            <p style="display: inline; margin-right: 10%;">Wereda: <span t-field="doc.wereda"/></p>
-                            <p style="display: inline; margin-right: 10%;">Kebele: <span t-field="doc.kebele"/></p>
+                        <div style="display: flex; justify-content: space-between;">
+                            <p style="display: inline; margin-right: 5%;">Region: <span t-field="doc.region"/></p>
+                            <p style="display: inline; margin-right: 5%;">Zone/City/Subcity: <span t-field="doc.town"/></p>
+                            <p style="display: inline; margin-right: 5%;">Wereda: <span t-field="doc.wereda"/></p>
+                            <p style="display: inline; margin-right: 5%;">Kebele: <span t-field="doc.kebele"/></p>
                             <p style="display: inline;">House No.: <span t-field="doc.house_no"/></p>
                         </div>
                         <br/>
