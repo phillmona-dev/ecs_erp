@@ -29,6 +29,7 @@
                     <group>
                         <field name="from_amt"></field>
                         <field name="to_amt"></field>
+                        <field name="prod_group" widget="many2many_tags" domain="[('avail_in_product_master', '=',True)]" options="{'no_create':True,'no_open':True}"></field>
                         <field name="discount"></field>
                         <field name="remark"></field>
                         <field name="status"></field>

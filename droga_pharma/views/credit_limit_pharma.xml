@@ -24,6 +24,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"></field>
+                <field name="mobile"></field>
                 <field name="vat"></field>
                 <field name="cust_credit_limit_pharma"></field>
                 <field name="unsettled_amount_pharma"></field>

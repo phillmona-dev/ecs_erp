@@ -35,12 +35,17 @@
                     <button name="amend"
                             attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
+
+
+
                     <button name="reset_order"
-                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
+                            attrs="{'invisible': [('state', 'not in', ('waiting','phmg'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws,droga_pharma.pharma_supply_chain_manager"
                             string="Reset to draft" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+
+
                     <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
@@ -52,6 +57,7 @@
                         </group>
                         <group>
                             <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
+                            <field name="location_id" options="{'no_create':True,'no_open':True}" attrs="{'invisible': [('state', 'not in', ('phmg'))]}" readonly="1"></field>
                         </group>
                     </group>
                     <notebook>

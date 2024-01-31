@@ -36,8 +36,7 @@
                         <br/>
                         <div style="display: flex;">
                             <p style="display: inline; margin-right: 10%;">Mobile: <span t-field="doc.mobile"/></p>
-                            <p style="display: inline; margin-right: 10%;">Inpatient: <span t-field="doc.inpatient"/></p>
-                            <p style="display: inline;">Outpatient: <span t-field="doc.outpatient"/></p>
+                            <p style="display: inline; margin-right: 10%;"><span t-field="doc.inpatient"/></p>
                         </div>
                         <br/>
                         <div style="display: flex;">
@@ -48,7 +47,6 @@
                             <thead>
                                 <tr>
                                     <th>Drug name, Stregnth, Frequency, Duration, How to use and other information</th>
-                                    <th>Dosage</th>
                                     <th>Quantity</th>
                                 </tr>
                             </thead>

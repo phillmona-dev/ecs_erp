@@ -228,7 +228,7 @@
     <record id="droga_tender_report_tender_performance_status_item" model="ir.actions.act_window">
         <field name="name">Total performance per item</field>
         <field name="res_model">droga.tender.performance.evaluation</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">tree,pivot</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_report_total_tender_performance_per_item')})]"/>
         <field name="search_view_id" ref="droga_tender_performance_search_tree_item"></field>
@@ -247,7 +247,7 @@
     <record id="droga_tender_report_tender_participated_non_participated_summary" model="ir.actions.act_window">
         <field name="name">Total per item aggregate</field>
         <field name="res_model">droga.tender.submission.detail</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">tree,pivot</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_report_total_tender_participated_minimum_column')})]"/>
         <field name="search_view_id" ref="droga_tender_participated_search_for_all"></field>

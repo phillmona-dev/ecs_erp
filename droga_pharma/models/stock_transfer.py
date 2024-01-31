@@ -83,6 +83,8 @@ class transfer_request_inherit(models.Model):
     def request_ph(self):
         self.set_activity_done()
         self.ensure_one()
+        if self.location_dest_id.complete_name[0:3]==self.location_id.code[0:3]:
+            self.confirm_ph()
         self._get_pharma_approvers()
         if not self.pharmacy_manager:
             raise UserError("Pharmacy operations manager not configured, please contact IT.")

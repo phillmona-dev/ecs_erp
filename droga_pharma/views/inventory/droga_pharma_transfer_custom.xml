@@ -22,7 +22,7 @@
         <field name="arch" type="xml">
             <form string="Transfers" delete="0">
                 <header>
-                    <button name="confirm_ph"
+                    <button name="request_ph"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="confirm_ph"
@@ -74,6 +74,17 @@
                 </sheet>
 
             </form>
+        </field>
+    </record>
+
+    <record id="droga_inventory_transfer_custom_view_form_inherit" model="ir.ui.view">
+        <field name="name">Inter-store approval</field>
+        <field name="model">droga.inventory.transfer.custom</field>
+        <field name="inherit_id" ref="droga_inventory.droga_inventory_transfer_custom_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='amend']" position="after">
+                <button name="confirm_ph" attrs="{'invisible': [('state', 'not in', ('phmg'))]}" groups="droga_pharma.pharma_supply_chain_manager" string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+            </xpath>
         </field>
     </record>
 

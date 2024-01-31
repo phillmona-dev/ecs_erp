@@ -23,7 +23,10 @@ class droga_pharma_priscription(models.Model):
     kebele = fields.Char("Kebele")
     house_no = fields.Char("House No")
     mobile = fields.Char("Mobile", related='client.mobile', store=True)
-    inpatient = fields.Boolean("Inpatient")
+
+    inpatient = fields.Selection(
+        [('Inpatient', 'Inpatient'), ('Outpatient', 'Outpatient')])
+
     outpatient = fields.Boolean("Outpatient")
     diagnosis = fields.Text("Diagnosis, if not ICD")
     prescription_drugs = fields.One2many('droga.pharma.priscription.meds', 'parent_prescription')

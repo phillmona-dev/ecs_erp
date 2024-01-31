@@ -15,6 +15,7 @@
                 <field name="reward_pct"></field>
                 <field name="prod_group" widget="many2many_tags"></field>
                 <field name="prod_template"></field>
+                <field name="type"></field>
                 <field name="reward_req_points" string="Req points"></field>
                 <field name="reward_req_frequ" string="Frequency (Days)"></field>
                 <field name="status"></field>

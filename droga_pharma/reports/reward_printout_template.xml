@@ -21,7 +21,7 @@
                         <div style="margin-left: 5%; margin-right: 10%;">
                             <h5>Our company offers various rewards to its beloved customers in many different ways.</h5>
                           <h5> Therefore,
-                              <t t-if="str(doc.issue_type) == 'RWDB'"> as you have invited another new customer to our pharmacy, we gave you this beauty care as a gift.</t>
+                              <t t-if="str(doc.issue_type) == 'RWDB'"> as you have invited another new customer to our pharmacy, we gave you this beauty care product as a gift.</t>
 
                             <t t-if="str(doc.issue_type) == 'RWDS'">
                                 as you have used our MTM/Counselling/Compounding service, we gave you this Supplements reward as a gift.

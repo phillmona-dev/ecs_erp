@@ -3,7 +3,8 @@
     <record id="sequence_counselling_session" model="ir.sequence">
         <field name="name">Counselling Session Sequence</field>
         <field name="code">droga.pharma.counselling.session.sequence</field>
-        <field name="prefix">COU_SES_</field>
+        <field name="prefix">COU/%(y)s/</field>
+        <field name="implementation">no_gap</field>
     </record>
 
     <record id="droga_pharma_counselling_action" model="ir.actions.act_window">
@@ -24,7 +25,8 @@
         <field name="name">droga.pharma.counselling.tree</field>
         <field name="model">droga.pharma.counselling</field>
         <field name="arch" type="xml">
-            <tree string="Counselling" delete="0" create="0">
+            <tree string="Counselling" delete="0" create="1">
+                <field name="coun_code"></field>
                 <field name="counselling_cat"></field>
                 <field name="status"></field>
                 <field name="pharmacist_lev_understanding"></field>
@@ -58,13 +60,13 @@
                     <group string="Counselling">
 
                         <group>
-                            <field name="coun_code"/>
-                            <field name="client"></field>
-                            <field name="date"></field>
-                            <field name="mobile" readonly="0"/>
-                            <field name="gender" readonly="0"/>
-                            <field name="weight" readonly="0"/>
-                            <field name="height" readonly="0"/>
+                            <field name="coun_code" readonly="1"/>
+                            <field name="client"  readonly="1"></field>
+                            <field name="date" readonly="1"></field>
+                            <field name="mobile"/>
+                            <field name="gender"/>
+                            <field name="weight"/>
+                            <field name="height"/>
                             <field name="bsa"/>
                             <field name="dob" readonly="0"/>
                             <field name="age"/>
@@ -85,10 +87,14 @@
                     <notebook>
                         <page string="Medication Info">
                             <group>
-                                <field name="medical" readonly="0"/>
-                                <field name="medication_history" readonly="0"/>
-                                <field name="immunization" readonly="0"/>
-                                <field name="adr" readonly="0"/>
+                                <group>
+                                    <field name="medical" readonly="0"></field>
+                                    <field name="medication_history" readonly="0"></field>
+                                </group>
+                                <group>
+                                    <field name="adr" readonly="0"></field>
+                                    <field name="immunization" readonly="0"></field>
+                                </group>
                             </group>
                         </page>
                     </notebook>

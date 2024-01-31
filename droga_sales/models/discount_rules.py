@@ -102,6 +102,7 @@ class sale_order_line(models.Model):
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
+    disc_applied=fields.Float('Discount applied',default=0)
 
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
@@ -170,12 +171,12 @@ class sale_order_line(models.Model):
 
     def calc_sales_totals_pharma(self):
         total_pharma=0
-        total_disc_pharma=0
+        total_with_discount=0
         for ln in self.order_id.order_line:
-            total_pharma_before_discount=total_pharma+(ln.product_uom_qty*ln.phar_cont_price)
-            total_disc_pharma=total_pharma_before_discount-self.order_id.amount_total
+            total_pharma=total_pharma+(ln.product_uom_pharma_qty*ln.phar_cont_price)
+            total_with_discount=total_with_discount+(ln.product_uom_pharma_qty*ln.price_unit)
         self.order_id.total_pharma=total_pharma
-        self.order_id.total_disc_pharma = total_disc_pharma
+        self.order_id.total_disc_pharma = total_pharma-total_with_discount
     def calc_sales_totals(self):
         core_sum = 0
         non_core_sum = 0
@@ -205,39 +206,49 @@ class sale_order_line(models.Model):
         self.order_id.total_added = (core_sum + non_core_sum) - total_before_discount
 
     def _get_pharma_price_with_discount(self,line):
+        line.disc_applied = 0
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),
                                                                   ('header.customer', '=', line.order_id.partner_id.id),
                                                                   ('header.date_from', '<', datetime.today()),
                                                                   ('header.date_to', '>', datetime.today()),
                                                                   ('header.status', '=', 'Active')])
         if len(cont_prices) > 0:
+            line.order_id.points_to_deduct=0
             return cont_prices[0]["selling_price"]
         elif line.order_id.partner_id.is_company:
+
+            line.order_id.points_to_deduct = 0
             return line.product_id.list_price_phar
         else:
-            # Fetch any discounts here
+            #Accumulated points discount
             rate = 1
-            discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','=','Purchase reward')])
+            discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Purchase reward','Discount for repeat purchase')),('status','=','Active')])
             for disc in discount_per_acc:
                 if line.product_id.product_tmpl_id.categ_id in disc.prod_group and disc.reward_req_points <= sum(
                         self.env['droga.pharma.points.earned'].search([('customer', '=', line.order_id.partner_id.id),('type','=',disc.type), (
                         'earned_date', '>=', date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
                                 'points_earned')):
                     rate = 1 + (disc.reward_pct / 100)
-                    #return line.product_id.list_price_phar * rate
-                    return line.product_id.list_price_phar
+                    line.disc_applied = disc.reward_pct
+                    line.order_id.points_to_deduct = disc.reward_req_points
+                    line.order_id.deduct_type='Discount for repeat purchase'
+
+
+                    return line.product_id.list_price_phar * rate
 
             self.calc_sales_totals_pharma()
 
-            discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([])
+            #High value purchase discounts
+            discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')])
             for disc in discount_per_amount:
                 if self.order_id.total_pharma>disc.from_amt and self.order_id.total_pharma<disc.to_amt:
                     rate=1 + (disc.discount / 100)
-                    #return line.product_id.list_price_phar * rate
-                    return line.product_id.list_price_phar
+                    line.disc_applied = disc.discount
+                    return line.product_id.list_price_phar * rate
 
+            #Breast feeders and health professionals discount
             breat_feed_children=len(self.env['droga.pharma.child'].search([('parent_cust','=',self.order_id.partner_id.id),('breat_feed_end_date','>=',datetime.today())]))
-            discount_per_person=self.env['droga.breast.feed.reward.contact.type'].search([])
+            discount_per_person=self.env['droga.breast.feed.reward.contact.type'].search([('status','=','Active')])
             partner_state='draft'
             if self.order_id.partner_id.state:
                 partner_state=self.order_id.partner_id.state
@@ -245,11 +256,16 @@ class sale_order_line(models.Model):
             for disc in discount_per_person:
                 if disc.cont_type=="hp" and self.order_id.partner_id.profession=="hp" and partner_state=='active':
                     rate=1 + (disc.discount / 100)
+                    line.disc_applied=disc.discount
+                    line.order_id.points_to_deduct = 1
+                    line.order_id.deduct_type = 'Discount for health professional'
                 elif disc.cont_type=='bp' and breat_feed_children>0:
                     rate = 1 + (disc.discount / 100)
+                    line.disc_applied = disc.discount
+                    line.order_id.points_to_deduct = 1
+                    line.order_id.deduct_type = 'Discount for breast feed'
 
-            #return line.product_id.list_price_phar * rate
-            return line.product_id.list_price_phar
+            return line.product_id.list_price_phar * rate
     def _get_pharma_price(self,line):
         #Contract price
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),('header.customer','=',line.order_id.partner_id.id),('header.date_from','<',datetime.today()),('header.date_to','>',datetime.today()),('header.status','=','Active')])
@@ -275,6 +291,7 @@ class sale_order_line(models.Model):
                     line.product_uom_pharma_measure = line.product_id.uom_id
                     line.product_uom = line.product_id.uom_id
                     line.product_uom_qty = line.product_uom_pharma_qty
+                    self.calc_sales_totals_pharma()
                     return
             else:
                 line.phar_cont_price = 0
@@ -457,11 +474,23 @@ class sale_order_ext(models.Model):
     has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
                                         compute='_compute_has_invoice_access')
     sales_initiator = fields.Char('Sales person', store=True)
-    total_pharma = fields.Float('Total pharmacy before discount')
-    total_disc_pharma = fields.Float('Total discount for pharmacy')
+    total_pharma = fields.Float('Total pharmacy before discount',compute='calc_sales_totals_pharma',store=True)
+    total_disc_pharma = fields.Float('Total discount for pharmacy',compute='calc_sales_totals_pharma',store=True)
     show_beauty_button=fields.Boolean(compute='_show_supp_vit')
     show_vit_button = fields.Boolean(compute='_show_supp_vit')
+    points_to_deduct=fields.Float('Points to deduct',default=0)
+    deduct_type=fields.Char('Type')
 
+    @api.depends('order_line.product_uom_pharma_qty','order_line.phar_cont_price','order_line.price_unit','partner_id')
+    def calc_sales_totals_pharma(self):
+        for rec in self:
+            total_pharma=0
+            total_with_discount=0
+            for ln in rec.order_line:
+                total_pharma=total_pharma+(ln.product_uom_pharma_qty*ln.phar_cont_price)
+                total_with_discount=total_with_discount+(ln.product_uom_pharma_qty*ln.price_unit)
+            rec.total_pharma=total_pharma
+            rec.total_disc_pharma = total_pharma-total_with_discount
     @api.depends('partner_id')
     def _show_supp_vit(self):
         for rec in self:
@@ -469,7 +498,7 @@ class sale_order_ext(models.Model):
             rec.show_vit_button = False
             if rec.partner_id.is_company:
                 return
-            discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Referral reward','Speciality service reward'))])
+            discount_per_acc = self.env['droga.pharma.reward.issue'].search([('status','=','Active'),('type','in',('Referral reward','Speciality service reward'))])
             for disc in discount_per_acc:
                 if disc.reward_req_points <= sum(self.env['droga.pharma.points.earned'].search(
                             [('customer', '=', rec.partner_id.id), ('type', '=', disc.type), (
@@ -638,6 +667,17 @@ class sale_order_ext(models.Model):
 
                 self.env['droga.pharma.points.earned'].create(points)
 
+
+        if self.points_to_deduct>0:
+            points = {
+                'type': self.deduct_type,
+                'customer': self.referred_by.id,
+                'sales_ref': self.id,
+                'earned_date': self.date_order,
+                'points_earned': self.points_to_deduct*-1,
+            }
+
+            self.env['droga.pharma.points.earned'].create(points)
         services_count=self.order_line.filtered(
                 lambda x: x.product_id.product_tmpl_id.detailed_type=='service')
         if self.partner_id.id==15488 or self.order_from!='PH' or self.partner_id.is_company:
@@ -753,7 +793,7 @@ class sale_order_ext(models.Model):
 
         #Pharmacy validations below
         if self.order_from.startswith('PH'):
-            price_changed=self.order_line.filtered(lambda x: math.ceil(x.price_unit)!=math.ceil(x.phar_cont_price) or x.price_unit==0)
+            price_changed=self.order_line.filtered(lambda x: math.ceil(x.price_unit/(1+(x.disc_applied/100)))!=math.ceil(x.phar_cont_price) or x.price_unit==0)
             if len(price_changed)>0 and not self.manual_price_pharma:
                 message = message + ('\n' if message else '') + "Price can not be edited or be zero."
             if self.customer_emp:

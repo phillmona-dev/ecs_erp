@@ -62,7 +62,11 @@ class sales_integ(models.Model):
     @api.depends('partner_id')
     def _get_mature_amount_pharma(self):
         for rec in self:
-            if rec.partner_id.id in [15390, 15488] or rec.partner_id.manual_sales_extension_date if rec.partner_id.manual_sales_extension_date else date(2000, 1, 1) >= date.today():
+            if rec.partner_id.id==15488:
+                rec.mature_amount_pharma = 0
+                rec.show_invoice_button_pharma = False
+                return
+            if rec.partner_id.id in [15390, 15488] or (rec.partner_id.manual_sales_extension_date if rec.partner_id.manual_sales_extension_date else date(2000, 1, 1) >= date.today()):
                 matured_invoices = []
             elif rec.partner_id.vat != '0000000000':
                 matured_invoices = self.env['account.move'].search(
@@ -229,6 +233,13 @@ class sales_integ(models.Model):
                 'default_client': self.partner_id.id,
                 'default_mtm_duration_in_months': self.mtm_duration_in_months,
                 'default_no_of_sessions': self.no_of_sessions,
+                'default_medical': self.partner_id.medical_history,
+                'default_medication_history': self.partner_id.medication_history,
+                'default_immunization': self.partner_id.immunization,
+                'default_adr': self.partner_id.adr_allergy,
+                'default_dob': self.partner_id.dob,
+                'default_gender': self.partner_id.gender,
+                'default_mobile': self.partner_id.mobile
             },
             'res_id': id[0].id
         }
@@ -244,6 +255,13 @@ class sales_integ(models.Model):
             'context': {
                 'default_sales_origin': self.id,
                 'default_client': self.partner_id.id,
+                'default_medical': self.partner_id.medical_history,
+                'default_medication_history' : self.partner_id.medication_history,
+                'default_immunization' : self.partner_id.immunization,
+                'default_adr' : self.partner_id.adr_allergy,
+                'default_dob' : self.partner_id.dob,
+                'default_gender' : self.partner_id.gender,
+                'default_mobile': self.partner_id.mobile
             },
             'domain': [('client', '=', self.partner_id.id)],
         }
