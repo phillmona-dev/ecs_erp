@@ -159,7 +159,7 @@ class droga_stock_office_supplies(models.Model):
         if self.create_uid.id == self.get_current_user_id():
             raise ValidationError(
                 "You can't approve your request!")
-        
+
         self.state = "verify"
 
     # cancel request
