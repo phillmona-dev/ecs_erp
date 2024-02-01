@@ -16,11 +16,14 @@ class sales_integ(models.Model):
     available_amount_pharma = fields.Float(string='Credit balance', related='partner_id.available_amount_pharma')
     manual_price_pharma=fields.Boolean('Manual price',default=False,tracking=True)
     referred_by=fields.Many2one('res.partner',string='Referred by')
+    phone_no=fields.Char(string='Mobile',related='partner_id.mobile')
     @api.depends('partner_id','customer_emp')
     def _get_emp_descr(self):
         for rec in self:
             emp_name=(' - '+rec.customer_emp.descr) if rec.customer_emp.descr else ''
             rec.emp_descr=rec.partner_id.name+emp_name
+            if not rec.emp_descr:
+                rec.emp_descr='-'
     cust_id_linked=fields.Char('Employee ID',related='customer_emp.cust_id')
     points_gained=fields.Float('Points gained')
     dob = fields.Date("Date of Birth", compute='get_dob', store=True, inverse='inverse_dob', tracking=True)

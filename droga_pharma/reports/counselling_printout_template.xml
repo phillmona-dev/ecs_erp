@@ -77,7 +77,7 @@
                         <div class="row mt32">
                             <div class="col-12">
                                 <div style="display: flex;">
-                                    <h2 style="font-family: amharic_font, Arial, sans-serif; display: inline; margin-right: 40%">የምክር ክትትል</h2>
+                                    <h2 style="font-family: amharic_font, Arial, sans-serif; display: inline; margin-right: 40%">የማማከር አገልግሎት መከታተያ</h2>
                                     <p style="display: inline;"><span t-field="doc.coun_code"/></p>
                                 </div>
                                 <br/>
@@ -93,7 +93,7 @@
                                </div>
                                 <br/>
                                 <br/>
-                                <h5 style="font-family: amharic_font, Arial, sans-serif;">ይሄንን  የማማከር  አገልግሎት  ተጠቅሜ ተግባራዊ  ለማረግ  የሚከተሉትን አፈፅማልለሁ።</h5>
+                                <h5 style="font-family: amharic_font, Arial, sans-serif;">ይህንን የማማከር አገልግሎት ተግባራዊ ለማድረግ የሚከተሉትን እፈፅማለሁ ።</h5>
 <!--                                <div t-raw="doc.plan"/>-->
                                 <br/>
                                 <table style="border-collapse: separate; border-spacing: 10%; width: 100%;">
