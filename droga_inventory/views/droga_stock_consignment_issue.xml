@@ -54,11 +54,6 @@
 
                     <field name="state" widget="statusbar" attrs="{'invisible': [('menu_from','!=','SR')]}" statusbar_visible="draft,stmg,waiting,processed"/>
 
-
-
-
-
-
                 </header>
                 <sheet>
                     <group string="Store issue request">

@@ -52,12 +52,8 @@
                         <p style="display: inline;">House No.: 379</p>
                     </div>
                     <div style="display: flex;">
-                        <p style="display: inline; margin-right: 5%" t-if="company.email">Email:
-                            <span t-field="company.email"/>
-                        </p>
-                        <p style="display: inline; margin-right: 5%" t-if="company.website" >Web:
-                            <span t-field="company.website"/>
-                        </p>
+                        <p style="display: inline; margin-right: 5%">Email: info@drogapharmacy.com</p>
+                        <p style="display: inline; margin-right: 5%">Web: https://drogapharmacy.com</p>
                         <p style="display: inline;">Tin: 0045080232</p>
                     </div>
                 </div>
