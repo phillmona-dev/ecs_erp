@@ -46,6 +46,10 @@ class droga_stock_office_supplies(models.Model):
         else:
             self.requester = False
 
+    def get_current_user_id(self):
+        context = self._context
+        return context.get('uid')
+
     name = fields.Char('Name', default='New')
 
     # for approvers
