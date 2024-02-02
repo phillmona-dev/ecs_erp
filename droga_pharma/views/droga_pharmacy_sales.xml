@@ -294,7 +294,7 @@
                                    string="Available balance" options="{'no_create': True}"/>
 
                             <field name="cust_details" invisible="1"></field>
-                            <field name="referred_by" domain="[('is_company', '=', False)]"
+                            <field name="referred_by" domain="[('is_company', '=', False)]" context="{'default_company_type':'person','form_view_ref':'droga_pharma.pharma_partner_view'}"
                                    attrs="{'readonly': [('state', 'in', ('done'))]}"></field>
                             <field name="manual_price_pharma" attrs="{'readonly': [('state', 'in', ('done'))]}"></field>
                             <field name="show_invoice_button_pharma" invisible="1"></field>
