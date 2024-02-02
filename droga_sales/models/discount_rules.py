@@ -222,16 +222,16 @@ class sale_order_line(models.Model):
             #Accumulated points discount
             line.order_id.calc_sales_totals_pharma()
             rate = 1
-            discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Purchase reward','Discount for repeat purchase')),('status','=','Active')])
+            discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Purchase reward','Discount for loyal customer')),('status','=','Active')])
             for disc in discount_per_acc:
                 if line.product_id.product_tmpl_id.categ_id in disc.prod_group and disc.reward_req_points <= sum(
-                        self.env['droga.pharma.points.earned'].search([('customer', '=', line.order_id.partner_id.id),('type','=',disc.type), (
+                        self.env['droga.pharma.points.earned'].search([('customer', '=', line.order_id.partner_id.id),('type','in',('Purchase reward','Discount for loyal customer')), (
                         'earned_date', '>=', date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
                                 'points_earned')):
                     rate = 1 + (disc.reward_pct / 100)
                     line.disc_applied = disc.reward_pct
                     line.order_id.points_to_deduct = disc.reward_req_points
-                    line.order_id.deduct_type='Discount for repeat purchase'
+                    line.order_id.deduct_type='Discount for loyal customer'
                     return line.product_id.list_price_phar * rate
 
             #High value purchase discounts
@@ -487,7 +487,7 @@ class sale_order_ext(models.Model):
     total_disc_pharma = fields.Float('Total discount for pharmacy',compute='calc_sales_totals_pharma',store=True)
     show_beauty_button=fields.Boolean(compute='_show_supp_vit')
     show_vit_button = fields.Boolean(compute='_show_supp_vit')
-    points_to_deduct=fields.Float('Points to deduct',default=0)
+    points_to_deduct=fields.Float('Points to deduct')
     deduct_type=fields.Char('Type')
     deduct_descr=fields.Char(compute='_compute_desc')
 
@@ -802,6 +802,17 @@ class sale_order_ext(models.Model):
             pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
             for pick in pickings:
                 pick.action_assign()
+
+        if self.deduct_type=='Discount for loyal customer':
+            points = {
+                'type': 'Discount for loyal customer',
+                'customer': self.partner_id.id,
+                'earned_date': self.date_order,
+                'sales_ref':self.id,
+                'points_earned': self.points_to_deduct * -1,
+            }
+
+            self.env['droga.pharma.points.earned'].create(points)
 
         return super(sale_order_ext, self).action_confirm()
 
