@@ -271,12 +271,11 @@ class sale_order_line(models.Model):
         else:
             return line.product_id.list_price_phar
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
-                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.price_unit')
+                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty')
     def _compute_price_unit(self):
         for line in self:
             if line.order_id.state in ('sale', 'cancel', 'done', 'fia'):
                 return
-
             if line.order_from:
                 if line.order_from.startswith('PH'):
                     #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
@@ -284,21 +283,27 @@ class sale_order_line(models.Model):
                     selling_price= self._get_pharma_price_with_discount(line)
                     if not line.manual_price_pharma:
                         line.price_unit = selling_price
+                    else:
+                        line.order_id.deduct_type='Manual discount'
                     line.phar_cont_price = self._get_pharma_price(line)
+                    if line.phar_cont_price!=0:
+                        line.disc_applied=math.ceil(round(((line.phar_cont_price-line.price_unit)/line.phar_cont_price)*100,2))*-1
                     line.product_uom_pharma_measure = line.product_id.uom_id
                     line.product_uom = line.product_id.uom_id
                     line.product_uom_qty = line.product_uom_pharma_qty
                     line.order_id.calc_sales_totals_pharma()
-                    '''
-                    groups = self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])[
-                        0].prod_group if len(
-                        self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])) > 0 else []
-                    for l in self.order_id.order_line:
-                        if l.product_id.product_tmpl_id.categ_id in groups:
-                            l.write({'disc_applied': line.disc_applied})
-                            l.write({'price_unit': l.phar_cont_price*(1+(line.disc_applied/100))})
-                            l.write({'selling_price': l.phar_cont_price * (1 + (line.disc_applied / 100))})
-                            '''
+
+                    #for l in line.order_id.order_line:
+                    #    l._compute_price_unit()
+
+
+                    #groups = self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])[
+                    #    0].prod_group if len(
+                    #    self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])) > 0 else []
+                    #for l in self.order_id.order_line:
+                    #    if l.product_id.product_tmpl_id.categ_id in groups and l.disc_applied!=line.disc_applied:
+                    #        l._compute_price_unit()
+
 
                     return
             else:
@@ -490,7 +495,6 @@ class sale_order_ext(models.Model):
     points_to_deduct=fields.Float('Points to deduct')
     deduct_type=fields.Char('Type')
     deduct_descr=fields.Char(compute='_compute_desc')
-
     @api.depends('total_disc_pharma','deduct_type')
     def _compute_desc(self):
         for rec in self:
