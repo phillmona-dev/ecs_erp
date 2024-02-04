@@ -224,8 +224,9 @@ class sale_order_line(models.Model):
             rate = 1
             discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Purchase reward','Discount for loyal customer')),('status','=','Active')])
             for disc in discount_per_acc:
+                line_id=line.order_id.ids[0] if len(line.order_id.ids)>0 else 0
                 if line.product_id.product_tmpl_id.categ_id in disc.prod_group and disc.reward_req_points <= sum(
-                        self.env['droga.pharma.points.earned'].search([('sales_ref','!=',line.order_id.ids[0]),('customer', '=', line.order_id.partner_id.id),('type','in',('Purchase reward','Discount for loyal customer')), (
+                        self.env['droga.pharma.points.earned'].search([('sales_ref','!=',line_id),('customer', '=', line.order_id.partner_id.id),('type','in',('Purchase reward','Discount for loyal customer')), (
                         'earned_date', '>=', date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
                                 'points_earned')):
                     rate = 1 + (disc.reward_pct / 100)
