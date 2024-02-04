@@ -103,7 +103,6 @@ class sale_order_line(models.Model):
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
     disc_applied=fields.Float('Discount applied',default=0)
-    trigger_update=fields.Float('Trigger update',default=0)
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
         selfsud = self.sudo()
@@ -272,14 +271,13 @@ class sale_order_line(models.Model):
         else:
             return line.product_id.list_price_phar
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
-                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.trigger_update')
+                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.product_id','order_id.order_line.product_uom_pharma_qty')
     def _compute_price_unit(self):
         for line in self:
             if line.order_id.state in ('sale', 'cancel', 'done', 'fia'):
                 return
             if line.order_from:
                 if line.order_from.startswith('PH'):
-                    prev_price=line.price_unit
                     #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
                     line.std_unit_price = line.product_id.list_price_phar
                     selling_price= self._get_pharma_price_with_discount(line)
@@ -294,8 +292,6 @@ class sale_order_line(models.Model):
                     line.product_uom = line.product_id.uom_id
                     line.product_uom_qty = line.product_uom_pharma_qty
                     line.order_id.calc_sales_totals_pharma()
-                    if prev_price!=line.price_unit:
-                        line.trigger_update=1 if line.trigger_update==0 else 0
                     #for l in line.order_id.order_line:
                     #    l._compute_price_unit()
 

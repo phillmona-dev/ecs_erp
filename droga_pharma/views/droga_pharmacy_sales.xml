@@ -632,6 +632,7 @@
                                     <field name="price_unit"/>
                                     <field name="state" invisible="1"/>
                                     <field name="phar_cont_price"/>
+                                    <field name="disc_applied"/>
                                     <field name="phar_cont_price_marginc"/>
                                     <field name="manual_price_pharma"/>
                                     <field name="display_type"/>
@@ -681,7 +682,7 @@
                                                                     <t t-out="record.price_unit.value"/>
                                                                 </div>
                                                                 <div class="col-12 text-muted"
-                                                                     attrs="{'invisible': [('manual_price_pharma', '=', False)]}">
+                                                                     attrs="{'invisible': [('manual_price_pharma', '=', False),('disc_applied','=',0)]}">
                                                                     Unit Price default:
                                                                     <t t-out="record.phar_cont_price.value"/>
                                                                 </div>
@@ -689,6 +690,11 @@
                                                                      attrs="{'invisible': [('manual_price_pharma', '=', False)]}">
                                                                     Discount margin:
                                                                     <t t-out="record.phar_cont_price_marginc.value"/>
+                                                                </div>
+                                                                <div class="col-12 text-muted"
+                                                                     attrs="{'invisible': [('disc_applied','=',0)]}">
+                                                                    Discount margin:
+                                                                    <t t-out="record.disc_applied.value*-1" />%
                                                                 </div>
                                                             </div>
                                                         </div>
