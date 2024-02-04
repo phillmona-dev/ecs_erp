@@ -135,8 +135,8 @@ class cust_sales_credit_limit(models.Model):
 
     def write(self,vals):
         if self.order_from and self.state not in ('sale', 'cancel', 'done', 'fia'):
-            if self.order_from=='PH' and ('state' in vals or 'discount_updated' not in vals):
-                vals.append('discount_updated','YES')
+            if self.order_from=='PH' and 'state' in vals:
+                vals['discount_updated']='YES'
                 for l in self.order_line:
                        l._compute_price_unit()
         return super(cust_sales_credit_limit, self).write(vals)
