@@ -18,6 +18,7 @@ class sales_integ(models.Model):
     referred_by=fields.Many2one('res.partner',string='Referred by')
     phone_no=fields.Char(string='Mobile',related='partner_id.mobile')
     partner_custom=fields.Many2one('res.partner.pharma2')
+    
     @api.onchange('partner_custom')
     def _partner_custom_change(self):
         for rec in self:
