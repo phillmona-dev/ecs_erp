@@ -10,6 +10,16 @@ except ImportError:
     from base64 import encodestring as encodebytes
 from odoo import models, fields, api
 
+class pharma_res_partner(models.Model):
+    _name='res.partner.pharma'
+    _rec_name = 'name'
+    partner=fields.Many2one('res.partner',required=True)
+    name=fields.Char(string='Name',compute='_get_name',store=True)
+
+    @api.depends('partner.name','partner.mobile')
+    def _get_name(self):
+        for rec in self:
+            rec.name=(rec.partner.name if rec.partner.name else '')+(' - '+rec.partner.mobile if rec.partner.mobile else '')+(' - '+rec.partner.phone if rec.partner.phone else '')
 class pharma_credit(models.Model):
     _inherit = 'res.partner'
     cust_credit_limit_pharma = fields.Float(string='Credit limit', tracking=True)
@@ -23,6 +33,14 @@ class pharma_credit(models.Model):
         ("active", "Activated"),
     ], string='Status', default="draft", readonly=True, tracking=True)
     phar_approver=fields.Many2one('res.users',compute='_get_approver')
+
+    @api.model
+    def create(self, vals):
+        result = super(pharma_credit, self).create(vals)
+        self.env['res.partner.pharma'].create({
+            'partner':result.id
+        })
+        return result
 
     def visit_detail_open(self):
         return {

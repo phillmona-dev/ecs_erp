@@ -83,7 +83,25 @@ class transfer_request_inherit(models.Model):
     def request_ph(self):
         self.set_activity_done()
         self.ensure_one()
-        self.confirm_ph()
+        if self.location_dest_id.complete_name[0:3] == 'PMS' or self.location_id.code[0:3]=='PMS':
+            self._get_pharma_approvers()
+            self.state = 'phmg'
+        else:
+            if self.location_dest_id.complete_name[0:3] != self.location_id.code[0:3]:
+                #Post on message board here
+                channels = self.env['mail.channel'].search([('name', '=', 'Pharmacy inter-store')])
+
+                message = "Inter-store transaction request has been initiated by " +self.location_dest_id.complete_name+'. The requested store is'+ self.location_id.name + "."
+                message = message + '   Inter-store request - ' + self.name
+                for c in channels:
+                    c.message_post(
+                        subject="Inter-store pharmacy transfer.",
+                        body=message,
+                        message_type='comment',
+                        subtype_xmlid='mail.mt_comment',
+                        author_id=self.env.user.id,
+                    )
+            self.confirm_ph()
         #if self.location_dest_id.complete_name[0:3]==self.location_id.code[0:3]:
         #    self.confirm_ph()
         #self._get_pharma_approvers()

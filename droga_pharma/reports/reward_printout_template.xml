@@ -68,7 +68,7 @@
                     <div class="page">
                         <h4 style="font-family: amharic_font, Arial, sans-serif; margin-left: 30%; text-decoration: underline;">የድሮጋ ፋርማሲ <t t-if="str(doc.issue_type) == 'RWDB'">የውበት መጠበቂያ ስጦታ</t>
                         <t t-if="str(doc.issue_type) == 'RWDS'">
-                          የማሟያ ስጦታ
+                          የጤና መጠበቂያ ስጦታ
                         </t> </h4>
                         <br/>
                         <br/>
@@ -80,7 +80,7 @@
                               <t t-if="str(doc.issue_type) == 'RWDB'"> ሌላ አዲስ ደንበኛ ወደ መድኃኒት ቤታችን ስለጋበዙ ይህን የውበት መጠበቂያ በስጦታ አበረከትንልዎ ፡፡</t>
 
                             <t t-if="str(doc.issue_type) == 'RWDS'">
-                                የመድኃኒት ቤታችንን የማማከር/የMTM/የቅመማ አገልግሎት ስለተጠቀሙ ይህን የማሟያ ስጦታ አበረከትንልዎ ፡፡
+                                የመድኅኒት ቤታችንን የመድኃኒት ክትትል/MTM/ አገልግሎት ስለተጠቀሙ ይህን የጤና መጠበቂያ ስጦታ አበረከትንልዎ ፡፡
                             </t></h5>
                         </div>
                         <br/>

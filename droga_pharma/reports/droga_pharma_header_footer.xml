@@ -16,12 +16,12 @@
                 </style>
             </head>
                 <div style="content: ''; display: table; clear: both; height:50px; justify-content: space-between;">
-                    <div style="float: left; width: 33.33%;">
+                    <div style="float: left; width: 33.33%; margin-left: 5%">
                         <h2>DROGA PHARMACY</h2>
-                        <h5 style="margin-left: 17%; font-family: amharic_font, Arial, sans-serif;">ድሮጋ ፋርማሲ</h5>
+                        <h5 style="margin-left: 19%; font-family: amharic_font, Arial, sans-serif;">ድሮጋ ፋርማሲ</h5>
                         <h5>+251965757515, +251966565664</h5>
                     </div>
-                    <div style="float: left; width: 28%; margin-left: 5%;">
+                    <div style="float: left; width: 28%; margin-left: 5%; margin-bottom:2%">
                         <img t-if="company.logo_web" t-att-src="image_data_uri(company.logo_web)" style="width: 45%; height: 100%; object-fit: cover;"
                              alt="Logo"/>
                     </div>
