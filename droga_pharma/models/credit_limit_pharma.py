@@ -11,7 +11,7 @@ except ImportError:
 from odoo import models, fields, api
 
 class pharma_res_partner(models.Model):
-    _name='res.partner.pharma'
+    _name='res.partner.pharma2'
     _rec_name = 'name'
     partner=fields.Many2one('res.partner',required=True)
     name=fields.Char(string='Name',compute='_get_name',store=True)
@@ -37,7 +37,7 @@ class pharma_credit(models.Model):
     @api.model
     def create(self, vals):
         result = super(pharma_credit, self).create(vals)
-        self.env['res.partner.pharma'].create({
+        self.env['res.partner.pharma2'].create({
             'partner':result.id
         })
         return result
