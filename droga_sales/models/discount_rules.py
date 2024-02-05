@@ -89,7 +89,7 @@ class sale_order_line(models.Model):
                 rec.phar_cont_price_marginc=str((margin))+' %'
             else:
                 rec.phar_cont_price_marginc='0 %';
-    available_qty = fields.Float('Available', default=0, compute='is_prod_available_method',store=True)
+    available_qty = fields.Float('Available', default=0,store=True)
     avail_char = fields.Char('Available', readonly=True, compute="is_prod_available_method")
     price_unit_before_discount = fields.Float('')
     wareh = fields.Many2one('stock.warehouse')
