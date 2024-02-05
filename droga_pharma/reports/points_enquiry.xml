@@ -10,7 +10,7 @@
                 <field name="type"/>
                 <field name="sales_ref"/>
                 <field name="earned_date"/>
-                <field name="points_earned"/>
+                <field name="points_earned" sum="Total"/>
             </tree>
         </field>
     </record>
