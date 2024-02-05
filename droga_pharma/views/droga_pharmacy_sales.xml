@@ -740,7 +740,7 @@
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">
-            {'default_partner_custom':21643,'default_order_from':'PH','default_payment_term_id':11,'search_default_today_sales':1}
+            {'default_partner_custom':8584,'default_order_from':'PH','default_payment_term_id':11,'search_default_today_sales':1}
         </field>
         <field name="domain">[('order_from','like','PH'),('has_pharma_access','=',True)]</field>
         <field name="search_view_id" ref="droga_sales_pharmacy_search_to_invoice"></field>
