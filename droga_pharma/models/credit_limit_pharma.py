@@ -22,6 +22,26 @@ class pharma_credit(models.Model):
         ("requested", "Requested"),
         ("active", "Activated"),
     ], string='Status', default="draft", readonly=True, tracking=True)
+    phar_approver=fields.Many2one('res.users',compute='_get_approver')
+
+    def visit_detail_open(self):
+        return {
+            'name': 'Health professional approval',
+            # 'view_type': 'form',
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_model': 'res.partner',
+            'view_id': self.env.ref('droga_pharma.pharma_partner_view').id,
+            'type': 'ir.actions.act_window',
+            'res_id': self.id,
+        }
+    @api.depends('state')
+    def _get_approver(self):
+        for rec in self:
+            rec.phar_approver = self.env.ref("droga_pharma.pharma_director").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                self.env.ref("droga_pharma.pharma_director").users.filtered(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
     def open_price_hist(self):
         return {
             'name': 'Price lists',
@@ -41,11 +61,19 @@ class pharma_credit(models.Model):
         for rec in self:
             rec.state='requested'
 
+    def set_activity_done(self):
+        activity = self.env["mail.activity"].search(
+            [('res_id', '=', self.id)])
+        for act in activity:
+            act.sudo().action_done()
+
     def approve(self):
+        self.set_activity_done()
         for rec in self:
             rec.state='active'
 
     def amend(self):
+        self.set_activity_done()
         for rec in self:
             rec.state='draft'
 

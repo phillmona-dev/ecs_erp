@@ -75,6 +75,7 @@
         'views/update_stock.xml',
         'views/menu.xml',
         'views/customers.xml',
+        'views/cust_approval_kanban.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
         'views/inventory/location_extension.xml',
         'views/inventory/droga_pharma_inventory_menus.xml',
