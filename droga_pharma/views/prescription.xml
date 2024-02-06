@@ -56,7 +56,6 @@
                             <field name="prescription_drugs">
                                 <tree editable="bottom">
                                     <field name="drug" required="1"/>
-                                    <field name="dosage"/>
                                     <field name="quantity"/>
                                 </tree>
                             </field>

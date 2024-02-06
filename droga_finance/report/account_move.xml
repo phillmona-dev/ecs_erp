@@ -11,6 +11,7 @@
         <field name="print_report_name">'Bank Payment Voucher - %s' % (object.name)
         </field>
         <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a5"/>
         <field name="binding_type">report</field>
     </record>
 
@@ -18,11 +19,9 @@
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <t t-foreach="docs" t-as="o">
-
-
                     <div class="page">
                         <div class="oe_structure"/>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-12 bm-2 text-end">
 
                                 <strong>Date:-</strong>
@@ -30,29 +29,41 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.transaction_no" class="m-0" style="font-size: 25px;"/>
+                                <span t-field="o.transaction_no" class="m-0"/>
 
                             </div>
                         </div>
                         <div class="text-center">
-                            <h2>Bank Payment Voucher</h2>
+                            <h5>Bank Payment Voucher</h5>
                         </div>
 
-                        <div id="informations" class="row ">
-                            <div class="col-12 bm-2">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
+                            <div class="col-7 bm-2">
                                 <strong>Payee:-</strong>
-                                <span t-field="o.partner_id.name" class="m-0"/>
-                            </div>
-                        </div>
-                        <div id="informations" class="row ">
-                            <div class="col-12 bm-2">
+                                <u>
+                                    <span t-field="o.partner_id.name" class="m-0"/>
+                                </u>
+
+                                <br></br>
                                 <strong>Purpose:-</strong>
-                                <span t-field="o.purpose" class="m-0"/>
+                                <u>
+                                    <span t-field="o.purpose" class="m-0"/>
+                                </u>
+
+                            </div>
+                            <div class="col-5 bm-2">
+                                <strong>Check No:-</strong>
+                                <span t-field="o.ref"></span>
+                                <br/>
+                                <strong>Bank Account:-</strong>
+                                <span t-field="o.journal_id"></span>
                             </div>
                         </div>
                         <br></br>
-                        <div id="informations" class="row ">
-                            <div class="col-9 bm-2">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
+                            <div class="col-12 bm-2">
                                 <strong>Amount in Figures:-</strong>
                                 <u>
                                     <span t-field="o.amount_total" class="m-0"/>
@@ -66,21 +77,16 @@
                                 </u>
 
                             </div>
-                            <div class="col-3 bm-2">
-                                <strong>Check No:-</strong>
-                                <span t-field="o.ref"></span>
-                                <br/>
-                                <strong>Bank Account:-</strong>
-                                <span t-field="o.journal_id"></span>
-                            </div>
+
                         </div>
                         <br></br>
-                        <table class="table table-sm o_main_table mt-4">
+
+                        <table class="table table-sm o_main_table mt-4" style="font-size: 12.5px;">
                             <thead>
                                 <tr>
-                                    <th>
+                                    <!--<th>
                                         <strong>Sub Ledger</strong>
-                                    </th>
+                                    </th>-->
                                     <th>
                                         <strong>GL Account</strong>
                                     </th>
@@ -98,7 +104,7 @@
                             </thead>
                             <tbody>
                                 <tr t-foreach="o.line_ids" t-as="line">
-                                    <td></td>
+                                    <!--<td></td>-->
                                     <td>
                                         <t t-esc="line.account_id.code"/>
                                     </td>
@@ -118,8 +124,7 @@
                         </table>
 
                         <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-3 bm-2">
                                 <strong>Prepared By</strong>
                                 <br></br>
@@ -146,24 +151,21 @@
                             </div>
                         </div>
                         <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-9 bm-2">
                             </div>
                             <div class="col-3 bm-2">
                                 <strong>Received the above amount</strong>
                                 <br></br>
                                 <br></br>
-                                <span>_________________________________</span>
+                                <span>_______________________________</span>
                                 <br></br>
                                 <span class="text-center">Signature of Payee</span>
                             </div>
                         </div>
                         <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-3 bm-2">
                                 <span>Distribution</span>
                             </div>
@@ -192,6 +194,7 @@
         <field name="print_report_name">'Bank Deposit Voucher - %s' % (object.name)
         </field>
         <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a5"/>
         <field name="binding_type">report</field>
     </record>
 
@@ -200,10 +203,9 @@
             <t t-call="web.external_layout">
                 <t t-foreach="docs" t-as="o">
 
-
                     <div class="page">
                         <div class="oe_structure"/>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-12 bm-2 text-end">
 
                                 <strong>Date:-</strong>
@@ -211,29 +213,41 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.transaction_no" class="m-0" style="font-size: 25px;"/>
+                                <span t-field="o.transaction_no" class="m-0"/>
 
                             </div>
                         </div>
                         <div class="text-center">
-                            <h2>Bank Deposit Voucher</h2>
+                            <h5>Bank Deposit Voucher</h5>
                         </div>
 
-                        <div id="informations" class="row ">
-                            <div class="col-12 bm-2">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
+                            <div class="col-7 bm-2">
                                 <strong>Payee:-</strong>
-                                <span t-field="o.partner_id.name" class="m-0"/>
-                            </div>
-                        </div>
-                        <div id="informations" class="row ">
-                            <div class="col-12 bm-2">
+                                <u>
+                                    <span t-field="o.partner_id.name" class="m-0"/>
+                                </u>
+
+                                <br></br>
                                 <strong>Purpose:-</strong>
-                                <span t-field="o.purpose" class="m-0"/>
+                                <u>
+                                    <span t-field="o.purpose" class="m-0"/>
+                                </u>
+
+                            </div>
+                            <div class="col-5 bm-2">
+                                <strong>Check No:-</strong>
+                                <span t-field="o.ref"></span>
+                                <br/>
+                                <strong>Bank Account:-</strong>
+                                <span t-field="o.journal_id"></span>
                             </div>
                         </div>
                         <br></br>
-                        <div id="informations" class="row ">
-                            <div class="col-9 bm-2">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
+                            <div class="col-12 bm-2">
                                 <strong>Amount in Figures:-</strong>
                                 <u>
                                     <span t-field="o.amount_total" class="m-0"/>
@@ -247,21 +261,16 @@
                                 </u>
 
                             </div>
-                            <div class="col-3 bm-2">
-                                <strong>Check No:-</strong>
-                                <span t-field="o.ref"></span>
-                                <br></br>
-                                <strong>Bank Account:-</strong>
-                                <span t-field="o.journal_id"></span>
-                            </div>
+
                         </div>
                         <br></br>
-                        <table class="table table-sm o_main_table mt-4">
+
+                        <table class="table table-sm o_main_table mt-4" style="font-size: 12.5px;">
                             <thead>
                                 <tr>
-                                    <th>
+                                    <!--<th>
                                         <strong>Sub Ledger</strong>
-                                    </th>
+                                    </th>-->
                                     <th>
                                         <strong>GL Account</strong>
                                     </th>
@@ -279,7 +288,7 @@
                             </thead>
                             <tbody>
                                 <tr t-foreach="o.line_ids" t-as="line">
-                                    <td></td>
+                                    <!--<td></td>-->
                                     <td>
                                         <t t-esc="line.account_id.code"/>
                                     </td>
@@ -299,8 +308,7 @@
                         </table>
 
                         <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-3 bm-2">
                                 <strong>Prepared By</strong>
                                 <br></br>
@@ -327,24 +335,21 @@
                             </div>
                         </div>
                         <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-9 bm-2">
                             </div>
                             <div class="col-3 bm-2">
                                 <strong>Received the above amount</strong>
                                 <br></br>
                                 <br></br>
-                                <span>_________________________________</span>
+                                <span>_______________________________</span>
                                 <br></br>
                                 <span class="text-center">Signature of Payee</span>
                             </div>
                         </div>
                         <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-3 bm-2">
                                 <span>Distribution</span>
                             </div>
@@ -358,6 +363,7 @@
 
 
                     </div>
+
                 </t>
             </t>
         </t>
@@ -374,6 +380,7 @@
         <field name="print_report_name">'Petty Cash Payment Voucher - %s' % (object.name)
         </field>
         <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a5"/>
         <field name="binding_type">report</field>
     </record>
 
@@ -382,10 +389,9 @@
             <t t-call="web.external_layout">
                 <t t-foreach="docs" t-as="o">
 
-
                     <div class="page">
                         <div class="oe_structure"/>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-12 bm-2 text-end">
 
                                 <strong>Date:-</strong>
@@ -393,29 +399,41 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.transaction_no" class="m-0" style="font-size: 25px;"/>
+                                <span t-field="o.transaction_no" class="m-0"/>
 
                             </div>
                         </div>
                         <div class="text-center">
-                            <h2>Petty Cash Voucher</h2>
+                            <h5>Petty Cash Voucher</h5>
                         </div>
 
-                        <div id="informations" class="row ">
-                            <div class="col-12 bm-2">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
+                            <div class="col-7 bm-2">
                                 <strong>Payee:-</strong>
-                                <span t-field="o.partner_id.name" class="m-0"/>
-                            </div>
-                        </div>
-                        <div id="informations" class="row ">
-                            <div class="col-12 bm-2">
+                                <u>
+                                    <span t-field="o.partner_id.name" class="m-0"/>
+                                </u>
+
+                                <br></br>
                                 <strong>Purpose:-</strong>
-                                <span t-field="o.narration" class="m-0"/>
+                                <u>
+                                    <span t-field="o.purpose" class="m-0"/>
+                                </u>
+
+                            </div>
+                            <div class="col-5 bm-2">
+                                <strong>Check No:-</strong>
+                                <span t-field="o.ref"></span>
+                                <br/>
+                                <strong>Bank Account:-</strong>
+                                <span t-field="o.journal_id"></span>
                             </div>
                         </div>
                         <br></br>
-                        <div id="informations" class="row ">
-                            <div class="col-9 bm-2">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
+                            <div class="col-12 bm-2">
                                 <strong>Amount in Figures:-</strong>
                                 <u>
                                     <span t-field="o.amount_total" class="m-0"/>
@@ -429,19 +447,16 @@
                                 </u>
 
                             </div>
-                            <div class="col-3 bm-2">
-                                <strong>Check No:-</strong>
-                                <br></br>
-                                <strong>Bank Account:-</strong>
-                            </div>
+
                         </div>
                         <br></br>
-                        <table class="table table-sm o_main_table mt-4">
+
+                        <table class="table table-sm o_main_table mt-4" style="font-size: 12.5px;">
                             <thead>
                                 <tr>
-                                    <th>
+                                    <!--<th>
                                         <strong>Sub Ledger</strong>
-                                    </th>
+                                    </th>-->
                                     <th>
                                         <strong>GL Account</strong>
                                     </th>
@@ -459,7 +474,7 @@
                             </thead>
                             <tbody>
                                 <tr t-foreach="o.line_ids" t-as="line">
-                                    <td></td>
+                                    <!--<td></td>-->
                                     <td>
                                         <t t-esc="line.account_id.code"/>
                                     </td>
@@ -479,8 +494,7 @@
                         </table>
 
                         <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-3 bm-2">
                                 <strong>Prepared By</strong>
                                 <br></br>
@@ -507,24 +521,21 @@
                             </div>
                         </div>
                         <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-9 bm-2">
                             </div>
                             <div class="col-3 bm-2">
                                 <strong>Received the above amount</strong>
                                 <br></br>
                                 <br></br>
-                                <span>_________________________________</span>
+                                <span>_______________________________</span>
                                 <br></br>
                                 <span class="text-center">Signature of Payee</span>
                             </div>
                         </div>
                         <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-3 bm-2">
                                 <span>Distribution</span>
                             </div>
@@ -538,6 +549,7 @@
 
 
                     </div>
+
                 </t>
             </t>
         </t>
@@ -554,7 +566,7 @@
         <field name="print_report_name">'Cash Receipt Voucher - %s' % (object.name)
         </field>
         <field name="binding_model_id" ref="account.model_account_move"/>
-
+        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a5"/>
         <field name="binding_type">report</field>
 
     </record>
@@ -875,6 +887,7 @@
         <field name="print_report_name">'Journal Voucher - %s' % (object.name)
         </field>
         <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="paperformat_id" ref="droga_procurement.paperformat_droga_a5"/>
         <field name="binding_type">report</field>
     </record>
 
@@ -886,7 +899,7 @@
 
                     <div class="page">
                         <div class="oe_structure"/>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-12 bm-2 text-end">
 
                                 <strong>Date:-</strong>
@@ -894,24 +907,41 @@
 
                                 <br></br>
                                 <strong>No:-</strong>
-                                <span t-field="o.name" class="m-0" style="font-size: 25px;"/>
+                                <span t-field="o.transaction_no" class="m-0"/>
 
                             </div>
                         </div>
                         <div class="text-center">
-                            <h2>Journal Voucher</h2>
+                            <h5>Journal Voucher</h5>
                         </div>
 
 
-                        <div id="informations" class="row ">
-                            <div class="col-12 bm-2">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
+                            <div class="col-7 bm-2">
+                                <strong>Payee:-</strong>
+                                <u>
+                                    <span t-field="o.partner_id.name" class="m-0"/>
+                                </u>
+
+                                <br></br>
                                 <strong>Purpose:-</strong>
-                                <span t-field="o.purpose" class="m-0"/>
+                                <u>
+                                    <span t-field="o.purpose" class="m-0"/>
+                                </u>
+
+                            </div>
+                            <div class="col-5 bm-2">
+                                <strong>Check No:-</strong>
+                                <span t-field="o.ref"></span>
+                                <br/>
+                                <strong>Bank Account:-</strong>
+                                <span t-field="o.journal_id"></span>
                             </div>
                         </div>
                         <br></br>
-                        <div id="informations" class="row ">
-                            <div class="col-9 bm-2">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
+                            <div class="col-12 bm-2">
                                 <strong>Amount in Figures:-</strong>
                                 <u>
                                     <span t-field="o.amount_total" class="m-0"/>
@@ -928,12 +958,13 @@
 
                         </div>
                         <br></br>
-                        <table class="table table-sm o_main_table mt-4">
+
+                        <table class="table table-sm o_main_table mt-4" style="font-size: 12.5px;">
                             <thead>
                                 <tr>
-                                    <th>
+                                    <!--<th>
                                         <strong>Sub Ledger</strong>
-                                    </th>
+                                    </th>-->
                                     <th>
                                         <strong>GL Account</strong>
                                     </th>
@@ -951,7 +982,7 @@
                             </thead>
                             <tbody>
                                 <tr t-foreach="o.line_ids" t-as="line">
-                                    <td></td>
+                                    <!--<td></td>-->
                                     <td>
                                         <t t-esc="line.account_id.code"/>
                                     </td>
@@ -971,8 +1002,7 @@
                         </table>
 
                         <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-3 bm-2">
                                 <strong>Prepared By</strong>
                                 <br></br>
@@ -999,24 +1029,21 @@
                             </div>
                         </div>
                         <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-9 bm-2">
                             </div>
                             <div class="col-3 bm-2">
                                 <strong>Received the above amount</strong>
                                 <br></br>
                                 <br></br>
-                                <span>_________________________________</span>
+                                <span>_______________________________</span>
                                 <br></br>
                                 <span class="text-center">Signature of Payee</span>
                             </div>
                         </div>
                         <br></br>
-                        <br></br>
-                        <div id="informations" class="row ">
+                        <div id="informations" class="row " style="font-size: 12.5px;">
                             <div class="col-3 bm-2">
                                 <span>Distribution</span>
                             </div>

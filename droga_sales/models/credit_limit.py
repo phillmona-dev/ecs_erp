@@ -133,16 +133,24 @@ class cust_sales_credit_limit(models.Model):
             pass
         return super(cust_sales_credit_limit, self).action_cancel()
 
+    def write(self,vals):
+        if self.order_from and self.state not in ('sale', 'cancel', 'done', 'fia'):
+            if self.order_from=='PH' and 'state' in vals:
+                for l in self.order_line:
+                       l._compute_price_unit()
+        return super(cust_sales_credit_limit, self).write(vals)
+
     @api.model
     def create(self, vals):
         message = ''
         result = super(cust_sales_credit_limit, self).create(vals)
 
-        for so in result:
+        if result.order_from:
+            if result.order_from=='PH':
+                for l in result.order_line:
+                       l._compute_price_unit()
 
-            # if not so.order_from:
-            #    if self.env.company.id == 1 and so.order_type.startswith('WS'):
-            #        raise ValidationError('Sales is temporarly unavailable, please check later.')
+        for so in result:
 
             if not so.partner_id.vat and so.company_id.id==1:
                 message = message + "Tin No must be registered for customer!"

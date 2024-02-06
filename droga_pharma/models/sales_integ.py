@@ -17,6 +17,13 @@ class sales_integ(models.Model):
     manual_price_pharma=fields.Boolean('Manual price',default=False,tracking=True)
     referred_by=fields.Many2one('res.partner',string='Referred by')
     phone_no=fields.Char(string='Mobile',related='partner_id.mobile')
+    partner_custom=fields.Many2one('res.partner.pharma2')
+
+    @api.onchange('partner_custom')
+    def _partner_custom_change(self):
+        for rec in self:
+            rec.partner_id=rec.partner_custom.partner if rec.partner_custom else False
+
     @api.depends('partner_id','customer_emp')
     def _get_emp_descr(self):
         for rec in self:

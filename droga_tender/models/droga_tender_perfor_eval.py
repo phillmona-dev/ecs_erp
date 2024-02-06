@@ -105,7 +105,7 @@ class droga_tender_master(models.Model):
         for rec in self:
             rec.performance_pct=(rec.award_cost/rec.amount)*100 if rec.amount!=0 else 0
             rec.total_delivered_amount=rec.unit_price*rec.quantity
-            rec.performance_pct_delivery=((rec.unit_price*rec.quantity)/rec.award_cost)*100 if rec.award_cost!=0 else 0
+            rec.performance_pct_delivery=((rec.unit_price*rec.delivered_qty)/rec.award_cost)*100 if rec.award_cost!=0 else 0
     def reg_products(self):
         if not self.item_pro:
             return
