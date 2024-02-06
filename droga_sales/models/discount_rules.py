@@ -271,6 +271,13 @@ class sale_order_line(models.Model):
         else:
             return line.product_id.list_price_phar
 
+    @api.onchange('product_id')
+    def _prod_changed(self):
+        for rec in self:
+            if rec.order_from:
+                if rec.order_from.startswith('PH'):
+                    rec.price_unit=self._get_pharma_price(rec)
+
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.product_uom_pharma_qty','order_id.total_disc_pharma')
     def _compute_price_unit(self):
@@ -282,10 +289,10 @@ class sale_order_line(models.Model):
                     #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
                     line.std_unit_price = line.product_id.list_price_phar
                     line.product_uom_qty = line.product_uom_pharma_qty
-                    line.price_unit = line.product_id.list_price_phar
+                    #line.price_unit = line.product_id.list_price_phar
                     line.phar_cont_price = self._get_pharma_price(line)
                     selling_price= self._get_pharma_price_with_discount(line)
-                    if not line.manual_price_pharma:
+                    if not line.order_id.manual_price_pharma:
                         line.price_unit = selling_price
                     else:
                         line.order_id.deduct_type='Manual discount'

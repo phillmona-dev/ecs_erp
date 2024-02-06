@@ -694,7 +694,7 @@
                                                                     <t t-out="record.phar_cont_price_marginc.value"/>
                                                                 </div>
                                                                 <div class="col-12 text-muted"
-                                                                     attrs="{'invisible': [('disc_applied','=',0)]}">
+                                                                     attrs="{'invisible': ['|',('disc_applied','=',0),('manual_price_pharma', '=', True)]}">
                                                                     Discount margin:
                                                                     <t t-out="record.disc_applied.value*-1" />%
                                                                 </div>
