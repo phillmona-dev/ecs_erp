@@ -204,10 +204,25 @@
                 <field name="payment_term" options="{'no_create':True,'no_open':True}"></field>
                 <field name="product" options="{'no_create':True,'no_open':True}"></field>
                 <field name="cust" options="{'no_create':True,'no_open':True}"></field>
-                <field name="percent"></field>
+                <field name="percent" digits="[2, 10]"></field>
                 <field name="used_under"></field>
                 <field name="status"></field>
             </tree>
+        </field>
+    </record>
+
+    <record id="droga_sales_discount_per_prod_cust_search" model="ir.ui.view">
+        <field name="name">droga.price.discount.per.product.customer.search</field>
+        <field name="model">droga.price.discount.per.product.customer</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="payment_term" options="{'no_create':True,'no_open':True}"></field>
+                <field name="product" options="{'no_create':True,'no_open':True}"></field>
+                <field name="cust" options="{'no_create':True,'no_open':True}"></field>
+                <field name="percent"></field>
+                <field name="used_under"></field>
+                <field name="status"></field>
+            </search>
         </field>
     </record>
 
@@ -221,7 +236,7 @@
                         <field name="payment_term" options="{'no_create':True,'no_open':True}"></field>
                         <field name="product" options="{'no_create':True,'no_open':True}"></field>
                         <field name="cust" options="{'no_create':True,'no_open':True}"></field>
-                        <field name="percent"></field>
+                        <field name="percent" digits="[2, 10]"></field>
                         <field name="used_under"></field>
                         <field name="status"></field>
                     </group>
@@ -241,6 +256,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids"
                eval="[(5, 0, 0),(0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_discount_per_prod_cust_tree')})]"/>
+        <field name="search_view_id" ref="droga_sales_discount_per_prod_cust_search"></field>
 
     </record>
 
