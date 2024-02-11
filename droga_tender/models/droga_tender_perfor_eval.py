@@ -15,7 +15,7 @@ class droga_tender_master(models.Model):
     item_des = fields.Char("Item requested",related='parent_tender_performance_detail.item_des')
     item_des_list = fields.Many2one('droga.tender.products', string="Item requested",related='parent_tender_performance_detail.item_des_list')
     item_pro = fields.Char("Item proposed",related='parent_tender_performance_detail.item_pro',store=True)
-    latest_invoice_date=fields.Date('Invoice date',related='parent_tender_performance_detail.latest_invoice_date')
+    latest_invoice_date=fields.Date('Invoice date',store=True)
 
     # decimal fields
     quantity = fields.Float("Award qty",related='parent_tender_performance_detail.quantity')

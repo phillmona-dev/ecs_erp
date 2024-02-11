@@ -40,12 +40,6 @@
     </record>
 
 
-    <record id="pharma_report_test" model="res.groups">
-        <field name="name">Pharmacy reports testing</field>
-        <field name="category_id" ref="pharma_management"/>
-    </record>
-
-
     <record model="ir.module.category" id="physio_management">
              <field name="name">Physiotherapy</field>
              <field name="description">Physiotherapy access level</field>
