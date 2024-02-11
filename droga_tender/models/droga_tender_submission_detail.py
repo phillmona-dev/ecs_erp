@@ -38,6 +38,7 @@ class droga_tender_submission_detail(models.Model):
     procurement_title = fields.Char(related='parent_tender_submission.procurement_title')
     closing_date_gre = fields.Datetime(related='parent_tender_submission.closing_date_gre')
     cus_type = fields.Many2one(related='parent_tender_submission.customer_type', string='Customer type', store=True)
+    latest_invoice_date = fields.Date('Invoice date')
 
     _sql_constraints = [
             ('lot_number_item_num_unique', 'unique (lot_number,item_num,month)', 'The combination lot number and item number already exists!')

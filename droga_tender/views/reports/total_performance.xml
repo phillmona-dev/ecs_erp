@@ -37,7 +37,7 @@
                 <field name="droga_product"></field>
                 <field name="type_item"></field>
                 <field name="procurement_title"></field>
-                <field name="closing_date_gre"></field>
+                <field name="latest_invoice_date"></field>
                 <field name="amount"></field>
                 <field name="award_cost"></field>
                 <field name="performance_pct"></field>
