@@ -158,6 +158,7 @@ class droga_stock_quant(models.Model):
     unit_cost=fields.Float('Unit price',compute='get_cost')
     total_amount=fields.Float('Amount',compute='get_cost')
     selling_price=fields.Float(related='product_id.product_tmpl_id.list_price_phar')
+    pharmacy_group_id = fields.Many2one('droga.prod.categ.pharma', related='product_id.product_tmpl_id.pharmacy_group_id')
     def get_cost(self):
         for rec in self:
             rec.unit_cost=rec.product_id.standard_price

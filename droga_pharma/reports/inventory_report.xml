@@ -10,6 +10,7 @@
 
                 <field name="product_id" widget="many2one"/>
                 <field name="product_uom_id" string="Unit" />
+                <field name="pharmacy_group_id" string="Group"></field>
                 <field name='company_id' optional="hidden"/>
                 <field name='branch_id' optional="hidden"/>
                 <field name="quantity" string="On Hand Quantity" sum="Total On Hand"/>
@@ -31,6 +32,7 @@
                 <field name="warehouse_id" optional="hide"/>
 
                 <field name="product_id" widget="many2one"/>
+                <field name="pharmacy_group_id" string="Group"></field>
                 <field name="product_uom_id" string="Unit" />
                 <field name='company_id' optional="hidden"/>
                 <field name='branch_id' optional="hidden"/>
