@@ -49,8 +49,7 @@ class AccountMove(models.Model):
 
     branch_address = fields.Many2one('droga.sales.branch.address', compute='get_branch_address')
 
-    payment_request_id=fields.Integer(related='payment_id.payment_request_id.id')
-
+    payment_request_id = fields.Integer(related='payment_id.payment_request_id.id')
 
     @api.model
     def create(self, vals):
@@ -360,3 +359,13 @@ class AccountCrv(models.Model):
             if crv_count > 1:
                 raise ValidationError(
                     'CRV Reference already registered in the system, you can''t use one reference multiple times')
+
+
+class AccountWithholding(models.Model):
+    _name = 'account.move.withholding'
+
+    move_id_wh = fields.Many2one('account.move')
+    withholding_tax_types = fields.Many2one("account.tax", required=True)
+    ref = fields.Char("Reference", required=True)
+    amount_before_vat = fields.Float("Amount Before Vat", required=True)
+    withholding_amount = fields.Float("Withholding Amount", required=True)
