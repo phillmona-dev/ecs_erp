@@ -54,7 +54,7 @@
                             <field name="FPMachineID" string="MachineID" readonly="0"/>
                             <field name="EJNumber" string="EJ Number" readonly="0"/>
                             <field name="tin_no" invisible="1"/>
-                            <field name="is_invoice_printed_pos" invisible="1"/>
+                            <field name="is_invoice_printed_pos" invisible="0"/>
                             <field name="sales_type" invisible="1"/>
                             <field name="pos_device_ip_address" invisible="1"/>
                             <field name="total_amount_word" invisible="1"/>
