@@ -258,8 +258,9 @@ class sales_integ(models.Model):
         return {
             'name': 'Counselling sessions',
             'view_type': 'form',
-            'view_mode': 'tree,form',
+            'view_mode': 'form',
             'res_model': 'droga.pharma.counselling',
+            'res_id':self.env['droga.pharma.counselling'].search([('sales_origin','=',self.id)]).ids[0]  if len(self.env['droga.pharma.counselling'].search([('sales_origin','=',self.id)]))>0 else False,
             'view_id': False,
             'type': 'ir.actions.act_window',
             'context': {
@@ -271,7 +272,9 @@ class sales_integ(models.Model):
                 'default_adr' : self.partner_id.adr_allergy,
                 'default_dob' : self.partner_id.dob,
                 'default_gender' : self.partner_id.gender,
-                'default_mobile': self.partner_id.mobile
+                'default_mobile': self.partner_id.mobile,
+                'default_weight': self.partner_id.weight,
+                'default_height': self.partner_id.height,
             },
             'domain': [('client', '=', self.partner_id.id)],
         }

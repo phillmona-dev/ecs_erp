@@ -13,6 +13,14 @@ class droga_pharma_customer(models.Model):
     company_type = fields.Selection(string='Company Type',
                                     selection=[('person', 'Individual'), ('company', 'Company')])
     childs = fields.One2many('droga.pharma.child', 'parent_cust', string='Childs')
+    weight = fields.Float("Weight")
+    height = fields.Float("Height (in meters)")
+    bmi = fields.Float(compute='_get_bmi',string='BMI')
+
+    @api.depends('weight','height')
+    def _get_bmi(self):
+        for rec in self:
+            rec.bmi = rec.weight / (rec.height * rec.height) if rec.height != 0 else 0
     def open_children(self):
         return {
             'name': 'Children',
