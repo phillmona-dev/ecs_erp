@@ -14,6 +14,7 @@ access_droga_account_check_setting,droga.account.check.setting,model_droga_accou
 access_droga_sales_branch_address,droga.sales.branch.address,model_droga_sales_branch_address,droga_finance.finance_self_service_group,1,1,1,1
 
 access_droga_finance_trial_balance_by_analytics,droga.finance.trial.balance.by.analytics,model_droga_finance_trial_balance_by_analytics,droga_finance.finance_self_service_group,1,1,1,1
+access_droga_account_move_withholidng,account.move.withholding,model_account_move_withholding,droga_finance.finance_self_service_group,1,1,1,1
 
 
 

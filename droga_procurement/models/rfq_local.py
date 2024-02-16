@@ -59,6 +59,8 @@ class Rfq_Local(models.Model):
     approvals = fields.One2many(
         'studio.approval.entry', 'res_id', string='Approvals')
 
+    for_pharmacy = fields.Boolean("For Pharmacy", default=False)
+
     @api.model
     def create(self, vals):
 
@@ -213,7 +215,7 @@ class Rfq_Local(models.Model):
 
             if self.request_type == "Pharmacy":
                 self.write({'wf_state': 'Approved'})
-                self.write({'state':'Committee Approval'})
+                self.write({'state': 'Committee Approval'})
             else:
                 users = self.get_users_for_roles('Procurement Committee', self.company_id.id)
                 for user in users:
@@ -247,7 +249,7 @@ class Rfq_Local(models.Model):
             for supplier in suppliers:
                 vals = {'name': 'New', 'state': 'draft', 'date_order': datetime.now(),
                         'rfq_local_id': supplier.rfq_id.id,
-                        'company_id': self.company_id.id,'from_rfq': True,
+                        'company_id': self.company_id.id, 'from_rfq': True,
                         'partner_id': supplier.supplier_id.id, 'request_type': self.request_type, 'order_line': []}
 
                 # get products the supplier won
