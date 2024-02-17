@@ -14,7 +14,7 @@ class droga_pharma_stock_card(models.TransientModel):
     def load_results(self):
         loc_ids_under_wh=self.env['stock.location'].search([('complete_name', 'like', self.warehouse.code+'/%'),('usage', '=', 'internal'),('con_type','!=','SRL')])
         if self.product:
-            stock_move_data=self.env['stock.move.line'].search(['|',('location_id', 'in', loc_ids_under_wh.ids),('location_dest_id', 'in', loc_ids_under_wh.ids),('state','=','done'),('date','>=',self.date_from),('date','<=',self.date_to),('product_id','=',self.product.id)],order="move_id desc").sorted(key=lambda r: r.move_id.date)
+            stock_move_data=self.env['stock.move.line'].search(['|',('location_id', 'in', loc_ids_under_wh.ids),('location_dest_id', 'in', loc_ids_under_wh.ids),('state','=','done'),('date','>=',self.date_from),('date','<=',self.date_to),('product_id','=',self.product.id)],order="move_id desc").sorted(key=lambda r: r.date)
         else:
             stock_move_data = self.env['stock.move.line'].search(
                 ['|', ('location_id', 'in', loc_ids_under_wh.ids), ('location_dest_id', 'in', loc_ids_under_wh.ids),
