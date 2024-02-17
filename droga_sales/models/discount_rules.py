@@ -100,7 +100,7 @@ class sale_order_line(models.Model):
     has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
     product_uom_pharma_qty=fields.Float('Quantity',default=1)
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
-    product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
+    product_uom_pharma_measure_descr=fields.Char(related='product_uom.name',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
     disc_applied=fields.Float('Discount applied',default=0)
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
