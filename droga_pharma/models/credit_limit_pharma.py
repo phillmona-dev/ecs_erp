@@ -19,7 +19,7 @@ class pharma_res_partner(models.Model):
     @api.depends('partner.name','partner.mobile')
     def _get_name(self):
         for rec in self:
-            rec.name=(rec.partner.name if rec.partner.name else '')+(' - '+str(rec.partner.mobile).replace(" ","") if rec.partner.mobile else '')+(' - '+str(rec.partner.phone).replace(" ","") if rec.partner.phone else '')
+            rec.name=(rec.partner.name if rec.partner.name else '')+(' - '+str(str(rec.partner.mobile).replace(" ","")).replace("251","0") if rec.partner.mobile else '')+(' - '+str(str(rec.partner.phone).replace(" ","")).replace("251","0") if rec.partner.phone else '')
 class pharma_credit(models.Model):
     _inherit = 'res.partner'
     cust_credit_limit_pharma = fields.Float(string='Credit limit', tracking=True)
