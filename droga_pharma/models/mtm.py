@@ -94,7 +94,7 @@ class droga_pharma_mtm_header(models.Model):
     height = fields.Float("Height (in meters)", compute='get_cust_hist', store=True, inverse='inverse_height')
     bmi = fields.Float(compute='_get_bmi', string='BMI')
 
-    @api.depends('client.weight', 'client.height')
+    @api.depends('weight','height','client.weight','client.height')
     def _get_bmi(self):
         for rec in self:
             rec.bmi = rec.weight / (rec.height * rec.height) if rec.height != 0 else 0
