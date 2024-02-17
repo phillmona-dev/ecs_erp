@@ -38,6 +38,8 @@ class droga_pharma_counselling(models.Model):
                                tracking=True)
     adr = fields.Html("ADRS and/or Allergies", store=True, compute='get_cust_hist', inverse='update_adr', tracking=True)
 
+    @api.depends('client.medical_history', 'client.medication_history', 'client.immunization', 'client.adr_allergy',
+                 'client.dob', 'client.gender', 'client.mobile','client.weight', 'client.height')
     def get_cust_hist(self):
         for rec in self:
             rec.medical = rec.client.medical_history
