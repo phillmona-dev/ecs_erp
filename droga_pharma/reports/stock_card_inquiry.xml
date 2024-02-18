@@ -31,6 +31,7 @@
                                 <tree editable="false">
                                     <field name="date"/>
                                     <field name="doc_no"/>
+                                    <field name="fs_no"/>
                                     <field name="rece_from"/>
                                     <field name="qty_rec"/>
                                     <field name="qty_iss"/>

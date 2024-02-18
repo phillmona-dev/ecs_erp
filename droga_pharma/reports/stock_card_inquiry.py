@@ -59,11 +59,13 @@ class droga_pharma_stock_card(models.TransientModel):
                             bal += move_line['qty_done']
                             loss_adj=0
                             qty_iss=0
-
+                    fs_no=self.env['account.move'].search([('invoice_origin','=',move_line['origin'] if move_line['origin'] else move_line['reference'])])
+                    fs_no_string=fs_no[0].FSInvoiceNumber if len(fs_no)>0 else ''
                     val = {
                         'header':self.id,
                         'date': move_line['move_id'].date,
                         'doc_no': move_line['origin'] if move_line['origin'] else move_line['reference'],
+                        'fs_no':fs_no_string,
                         'rece_from': loc,
                         'qty_rec':qty_rec,
                         'qty_iss':qty_iss,
@@ -80,6 +82,7 @@ class pharma_price_list(models.TransientModel):
     header = fields.Many2one('droga.pharma.stock.card.inquiry')
     date=fields.Date('Date')
     doc_no=fields.Char('Doc No.')
+    fs_no = fields.Char('FS No.')
     rece_from=fields.Char('Received/issued to')
     qty_rec=fields.Float('Qty received')
     qty_iss = fields.Float('Qty issued')
