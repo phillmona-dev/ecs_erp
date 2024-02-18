@@ -17,6 +17,7 @@ class droga_pharma_stock_card(models.TransientModel):
     results_move_line = fields.One2many('droga.pharma.update.stock.move.line', 'header')
     rate=fields.Float('rate (division)',default=1)
     date=fields.Date('Transaction date')
+    date_to = fields.Date('Transaction date to')
     ref=fields.Char('Transaction reference')
     prod_id=fields.Many2one('product.product',compute='get_prod_id')
     batch=fields.Many2one('stock.lot',domain="[('product_id', '=', prod_id)]")
@@ -54,8 +55,8 @@ class droga_pharma_stock_card(models.TransientModel):
                     [('product_id', '=', prod_id), '|',('location_id.warehouse_id', 'in', warehouses.ids), ('location_dest_id.warehouse_id', 'in',  warehouses.ids)]).mapped('origin')
 
             #Filter by date
-            if rec.date:
-                moves = moves.filtered(lambda x: (x.date.date() == rec.date))
+            if rec.date and rec.date_to:
+                moves = moves.filtered(lambda x: (x.date.date() >= rec.date and x.date.date() <= rec.date_to))
                 origins = moves.mapped('origin')
             # Filter by reference
             if rec.ref:

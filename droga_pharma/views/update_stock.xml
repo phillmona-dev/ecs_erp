@@ -18,6 +18,7 @@
                             <field name="current_uom" options="{'no_create':True,'no_open':True}"></field>
                             <field name="new_uom" options="{'no_create':True,'no_open':True}"></field>
                             <field name="date"></field>
+                            <field name="date_to"></field>
                         </group>
                         <group>
                             <field name="code"></field>
