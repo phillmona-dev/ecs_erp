@@ -282,7 +282,7 @@ class sale_order_line(models.Model):
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.product_uom_pharma_qty','order_id.total_disc_pharma')
     def _compute_price_unit(self):
         for line in self:
-            if line.order_id.state in ('sale', 'cancel', 'done', 'fia'):
+            if line.order_id.state in ('sale', 'cancel', 'done', 'fia','dispense','done'):
                 return
             if line.order_from:
                 if line.order_from.startswith('PH'):
