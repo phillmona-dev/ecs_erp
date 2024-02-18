@@ -99,6 +99,7 @@ class droga_stock_adjustment_request(models.Model):
                 'default_origin': self.name,
                 'default_request_no': self.name,
                 'default_from_reconcile_menu':True,
+                'default_state':'draft',
                 'default_to_correct_pick':self.to_correct_ref.id
             }
         }
