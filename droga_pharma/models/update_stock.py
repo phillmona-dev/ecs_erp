@@ -18,6 +18,10 @@ class droga_pharma_stock_card(models.TransientModel):
     rate=fields.Float('rate (division)',default=1)
     date=fields.Date('Transaction date')
     date_to = fields.Date('Transaction date to')
+
+    qty_from = fields.Float('Quantity from')
+    qty_to = fields.Float('Quantity to')
+
     ref=fields.Char('Transaction reference')
     prod_id=fields.Many2one('product.product',compute='get_prod_id')
     batch=fields.Many2one('stock.lot',domain="[('product_id', '=', prod_id)]")
@@ -61,6 +65,10 @@ class droga_pharma_stock_card(models.TransientModel):
             # Filter by reference
             if rec.ref:
                 moves = moves.filtered(lambda x: (x.reference == rec.ref))
+                origins = moves.mapped('origin')
+            # Filter by quantity
+            if rec.qty_to:
+                moves = moves.filtered(lambda x: (x.quantity_done >= rec.qty_from and x.quantity_done<=rec.qty_to))
                 origins = moves.mapped('origin')
 
             moves=moves.ids

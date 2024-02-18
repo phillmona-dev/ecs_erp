@@ -19,6 +19,7 @@
                             <field name="new_uom" options="{'no_create':True,'no_open':True}"></field>
                             <field name="date"></field>
                             <field name="date_to"></field>
+                            <field name="qty_from"></field>
                         </group>
                         <group>
                             <field name="code"></field>
@@ -27,6 +28,7 @@
                             <field name="ref"></field>
                             <field name="prod_id" invisible="1"></field>
                             <field name="batch"></field>
+                            <field name="qty_to"></field>
                         </group>
                        <div colspan="3">
                         <button name="load" type="object" string="Load" class="oe_highlight"/>
