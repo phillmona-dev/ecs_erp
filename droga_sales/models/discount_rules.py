@@ -120,10 +120,10 @@ class sale_order_line(models.Model):
             for wh in wh_list:
                 rate = round(rec.product_uom.factor / (
                     rec.product_id.uom_id.factor if rec.product_id.uom_id.factor != 0 else (
-                        rec.product_uom.factor if rec.product_uom.factor != 0 else 1)),6)
-                rec.available_qty = rec.available_qty + ((selfsud._get_avail_qty_per_warehouse(rec.product_id,
+                        rec.product_uom.factor if rec.product_uom.factor != 0 else 1)),9)
+                rec.available_qty = rec.available_qty + round(((selfsud._get_avail_qty_per_warehouse(rec.product_id,
                                                                                                wh) - selfsud._get_outgoing_qty_per_warehouse(
-                    rec.product_id, wh)) * (rate))
+                    rec.product_id, wh)) * (rate)),4)
                 # rec.available_qty=rec.available_qty*(rec.product_uom.factor/rec.product_id.uom_id.factor)
                 rec.avail_char = str(rec.available_qty)
             # rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
