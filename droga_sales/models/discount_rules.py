@@ -550,7 +550,7 @@ class sale_order_ext(models.Model):
     def unlink(self):
         raise ValidationError(
             "You can't delete sales transaction, either cancel it or pass a correcting entry.")
-    @api.depends('state')
+    @api.depends('name')
     def _get_pharma_wh(self):
         for rec in self:
             if rec.order_from=="PH":
