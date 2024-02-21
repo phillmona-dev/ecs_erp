@@ -482,6 +482,7 @@ class sale_order_ext(models.Model):
     has_pharma_access = fields.Boolean(default=False, search='_has_pharma_access', compute='_compute_has_pharma_access')
     has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
                                         compute='_compute_has_invoice_access')
+    has_physio_access = fields.Boolean(default=False, search='_has_physio_access', compute='_compute_has_physio_access')
     sales_initiator = fields.Char('Sales person', store=True)
     #total_pharma = fields.Float('Total pharmacy before discount',compute='calc_sales_totals_pharma',store=True)
     #total_pharma_discount_groups = fields.Float('Total pharmacy discount apply groups', compute='calc_sales_totals_pharma', store=True)
@@ -536,23 +537,30 @@ class sale_order_ext(models.Model):
                     else:
                         rec.show_vit_button = True
     def get_wareh(self):
-        list=self.env.user.warehouse_ids_ph_disp+self.env.user.warehouse_ids_im_ws
+        if self.order_from=="PT":
+            list=self.env.user.warehouse_ids_pt_disp
+        else:
+            list=self.env.user.warehouse_ids_ph_disp + self.env.user.warehouse_ids_im_ws
         return list[
             0].id if len(
             list) > 0 else False
 
-    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', default=get_wareh,compute='_get_pharma_wh',store=True)
+    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh',store=True)
 
     def unlink(self):
         raise ValidationError(
             "You can't delete sales transaction, either cancel it or pass a correcting entry.")
-
+    @api.depends('state')
     def _get_pharma_wh(self):
         for rec in self:
             if rec.order_from=="PH":
                 rec.wareh = self.env.user.warehouse_ids_ph_disp[
                     0].id if len(
                     self.env.user.warehouse_ids_ph_disp) > 0 else False
+            elif rec.order_from=="PT":
+                rec.wareh = self.env.user.warehouse_ids_pt_disp[
+                    0].id if len(
+                    self.env.user.warehouse_ids_pt_disp) > 0 else False
             else:
                 rec.wareh = self.env.user.warehouse_ids_im_ws[
                     0].id if len(
@@ -593,6 +601,13 @@ class sale_order_ext(models.Model):
             else:
                 return False
 
+    def _compute_has_physio_access(self):
+        for rec in self:
+            if rec.wareh in self.env.user.warehouse_ids_pt_disp.ids or rec.wareh in self.env.user.warehouse_ids_pt.ids:
+                return True
+            else:
+                return False
+
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
             for rec in self:
@@ -629,6 +644,13 @@ class sale_order_ext(models.Model):
     def _has_pharma_access(self,operator,value):
         if operator=='=':
             sales = self.env['sale.order'].sudo().search(['|',('wareh', 'in', self.env.user.warehouse_ids_ph.ids),('wareh', 'in', self.env.user.warehouse_ids_ph_disp.ids)])
+            return [('id', 'in', [x.id for x in sales])]
+        else:
+            return [('id', 'in', [])]
+
+    def _has_physio_access(self,operator,value):
+        if operator=='=':
+            sales = self.env['sale.order'].sudo().search([('wareh', 'in', self.env.user.warehouse_ids_pt_disp.ids)])
             return [('id', 'in', [x.id for x in sales])]
         else:
             return [('id', 'in', [])]

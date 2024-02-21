@@ -127,7 +127,7 @@
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <button name="action_done"
                             string="Done" font-size="16px"
-                            groups="droga_pharma.physio_user_bole,droga_pharma.physio_user_4k"
+                            groups="droga_pharma.physio_user_4k"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'memb')]}"/>
                     <button name="create_inv_local"

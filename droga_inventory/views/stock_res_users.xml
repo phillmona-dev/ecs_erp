@@ -8,6 +8,14 @@
             <field name="priority" eval="8"/>
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
+                    <page string="Physiotherapy sales access">
+                        <field name="warehouse_ids_pt_disp" mode="tree">
+                            <tree create="0">
+                                <field name="name"></field>
+                                <field name="code"></field>
+                            </tree>
+                        </field>
+                    </page>
                     <page string="Store Access Import and WS">
                         <field name="warehouse_ids_im_ws" mode="tree">
                             <tree create="0">

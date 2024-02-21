@@ -1080,6 +1080,9 @@ class ResUsers(models.Model):
     warehouse_ids_ph_disp=fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph_disp', 'uid', 'warehouse_id',
                                            domain="[('wh_type', '=', 'PH'),('has_dispensary_location','=',True)]",
                                            string='Pharmacy sales access')
+    warehouse_ids_pt_disp = fields.Many2many('stock.warehouse', 'stock_warehouse_access_pt_disp', 'uid', 'warehouse_id',
+                                             domain="[('wh_type', '=', 'PT')]",
+                                             string='Physiotherapy sales access')
 
 
 class prod(models.Model):
