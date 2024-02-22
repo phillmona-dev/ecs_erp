@@ -125,7 +125,7 @@
                             <field name="cust_name"></field>
                             <field name="cust_id"></field>
                             <field name="order_from" invisible="1"></field>
-                            <field name="physiotherapist" domain="[('status','=','Active'),('branch','=',order_from)]" options="{'no_open':True,'no_create': True}"/>
+                            <field name="physiotherapist" domain="[('status','=','Active'),('branch_w','=',wareh)]" options="{'no_open':True,'no_create': True}"/>
                             <field name="manual_price" invisible="1"></field>
                             <field name="show_invoice_button" invisible="1"></field>
                             <field name="partner_invoice_id" groups="account.group_delivery_invoice_address"
