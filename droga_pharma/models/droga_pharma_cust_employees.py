@@ -235,7 +235,7 @@ class droga_physiotherapist_list(models.Model):
     _name='droga.physiotherapist.list'
     _rec_name='physiotherapist_name'
     physiotherapist_name = fields.Many2one('hr.employee', string='Physiotherapist Name',required=True)
-    branch=fields.Selection([('PT-4 Kilo', '4 kilo branch'), ('PT-Bole', 'Bole branch')], required=True)
+    branch=fields.Selection([('PT-4 Kilo', '4 kilo branch'), ('PT-Bole', 'Bole branch')])
     branch_w=fields.Many2one('stock.warehouse')
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active')
 
