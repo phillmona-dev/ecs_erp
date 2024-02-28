@@ -7,7 +7,7 @@ import math
 import json
 
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 from odoo.http import request
 
 
@@ -103,6 +103,21 @@ class sale_order_line(models.Model):
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.name',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
     disc_applied=fields.Float('Discount applied',default=0)
+
+    def write(self, vals):
+        res = super(sale_order_line, self).write(vals)
+        if self.order_id.state in ('sale', 'done','dispense') and ('product_uom_pharma_qty' in vals or 'price_unit' in vals):
+            raise UserError("Sales order can not be updated once confirmed.")
+        return res
+
+    def _check_line_unlink(self):
+        return self.filtered(
+            lambda line:
+                line.state in ('sale', 'done','dispense')
+                and (line.invoice_lines or not line.is_downpayment)
+                and not line.display_type
+        )
+
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
         selfsud = self.sudo()
