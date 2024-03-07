@@ -731,7 +731,7 @@ class sale_order_ext(models.Model):
                 self.env['droga.pharma.points.earned'].create(points)
 
 
-        if self.points_to_deduct>0:
+        if self.points_to_deduct>1:
             points = {
                 'type': self.deduct_type,
                 'customer': self.referred_by.id,
