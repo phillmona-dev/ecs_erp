@@ -8,6 +8,7 @@ class points_storage(models.Model):
         ('Purchase reward', 'Purchase reward'),
         ('Speciality service reward', 'Speciality service reward'),
         ('Referral reward', 'Referral reward'),
+        ('Discount for high value purchase','Discount for high value purchase'),
         ('Discount for repeat purchase', 'Discount for repeat purchase'),
         ('Discount for loyal customer', 'Discount for loyal customer'),
         ('Discount for breast feed', 'Discount for breast feed'),
