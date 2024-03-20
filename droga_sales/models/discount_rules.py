@@ -741,11 +741,13 @@ class sale_order_ext(models.Model):
             }
 
             self.env['droga.pharma.points.earned'].create(points)
-        services_count=self.order_line.filtered(
-                lambda x: x.product_id.product_tmpl_id.detailed_type=='service')
-        if self.partner_id.id==15488 or self.order_from!='PH' or self.partner_id.is_company:
+
+        if self.partner_id.id==15488 or self.order_from!='PH' or self.partner_id.is_company or self.points_to_deduct>1:
             return action
-        
+
+        services_count = self.order_line.filtered(
+            lambda x: x.product_id.product_tmpl_id.detailed_type == 'service')
+
         if len(services_count)>0:
             points_to_earn=self.env['droga.pharma.reward.gain'].search([('type','=','Services')])[0].points_to_gain if len(self.env['droga.pharma.reward.gain'].search([('type','=','Services')]))>0 else 0
             type='Speciality service reward'
@@ -867,7 +869,7 @@ class sale_order_ext(models.Model):
 
         #Pharmacy validations below
         if self.order_from.startswith('PH'):
-            price_changed=self.order_line.filtered(lambda x: math.ceil(round(x.price_unit/(1+(x.disc_applied/100)),2))!=math.ceil(x.phar_cont_price) or x.price_unit==0)
+            price_changed=self.order_line.filtered(lambda x: math.ceil(round(x.price_unit/(1+((x.disc_applied if x.disc_applied!=-100 else 0)/100)),2))!=math.ceil(x.phar_cont_price) or x.price_unit==0)
             if len(price_changed)>0 and not self.manual_price_pharma:
                 message = message + ('\n' if message else '') + "Price can not be edited or be zero."
             if self.customer_emp:
