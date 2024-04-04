@@ -510,6 +510,7 @@ class sale_order_ext(models.Model):
     points_to_deduct=fields.Float('Points to deduct')
     deduct_type=fields.Char('Type')
     deduct_descr=fields.Char(compute='_compute_desc')
+    inv_number=fields.Char('Invoice Number')
     @api.depends('total_disc_pharma','deduct_type')
     def _compute_desc(self):
         for rec in self:

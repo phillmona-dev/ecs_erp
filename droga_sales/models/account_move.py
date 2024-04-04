@@ -57,6 +57,14 @@ class account_move(models.Model):
                 else:
                     sale.write({'invoice_printed': 'o'})
 
+    @api.onchange("FSInvoiceNumber")
+    def _fs_changed(self):
+        for rec in self:
+            sales = self.env['sale.order'].search([('name', '=', rec.invoice_origin)])
+            for sale in sales:
+                if rec.FSInvoiceNumber:
+                    sale.write({'inv_number': rec['FSInvoiceNumber']})
+
     @api.depends('invoice_line_ids.price_subtotal')
     def _get_core_amt(self):
 
