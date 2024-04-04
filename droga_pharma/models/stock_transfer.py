@@ -119,8 +119,16 @@ class transfer_request_inherit(models.Model):
 
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
-            def_location_id = self.env['stock.location'].search(
-                [('usage', '=', 'internal'), ('con_type', '=', False), ('wcode', '=', wh.code)])[0].id
+            locs=self.env['stock.location'].search(
+                [('usage', '=', 'internal'), ('con_type', '=', False), ('wcode', '=', wh.code)])
+
+            if len(locs)==0:
+                locs = self.env['stock.location'].search(
+                    [('usage', '=', 'production'), ('con_type', '=', False), ('wcode', '=', wh.code)])
+                if len(locs) == 0:
+                    raise UserError("Issuing warehouse doesn't have internal location.")
+
+            def_location_id = locs[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")
             picking_vals = {
