@@ -341,6 +341,8 @@ class AccountMove(models.Model):
 class AccountCrv(models.Model):
     _name = 'account.move.crv'
 
+    _order = "move_id_crv asc"
+
     move_id_crv = fields.Many2one('account.move')
     name = fields.Char(related='move_id_crv.name')
     customer_name = fields.Char(related='move_id_crv.invoice_partner_display_name')
