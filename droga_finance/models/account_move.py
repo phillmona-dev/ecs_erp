@@ -365,6 +365,10 @@ class AccountCrv(models.Model):
                 raise ValidationError(
                     'CRV Reference already registered in the system, you can''t use one reference multiple times')
 
+    def unlink(self):
+        raise ValidationError(
+            "You can't delete CRV Record")
+
 
 class AccountWithholding(models.Model):
     _name = 'account.move.withholding'
