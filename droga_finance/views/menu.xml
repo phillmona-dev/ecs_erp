@@ -104,6 +104,10 @@
         <menuitem id="droga_withholding_vendor_followup_menu" name="Withholding Followup"
                   action="droga_withholding_vendor_followup_action"
                   groups="account.group_account_manager" sequence="2"/>
+
+        <menuitem id="droga_account_move_crv_report_tree_menu" name="CRV List Report"
+                  action="droga_account_move_crv_report_tree_action"
+                  groups="account.group_account_manager" sequence="3"/>
     </menuitem>
 
 

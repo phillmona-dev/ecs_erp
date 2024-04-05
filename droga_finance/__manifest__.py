@@ -35,6 +35,7 @@
         'views/account_fiscal_year.xml',
         'views/account_journal.xml',
         'views/branch_address.xml',
+        'views/account_move_crv.xml',
         'report/payment_request.xml',
         'report/account_move.xml',
 
