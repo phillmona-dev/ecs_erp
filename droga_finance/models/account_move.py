@@ -342,6 +342,8 @@ class AccountCrv(models.Model):
     _name = 'account.move.crv'
 
     move_id_crv = fields.Many2one('account.move')
+    name = fields.Char(related='move_id_crv.name')
+    customer_name = fields.Char(related='move_id_crv.invoice_partner_display_name')
     crv_ref = fields.Char("CRV Reference", required=True)
     amount = fields.Float("Amount", required=True)
     is_crv_document_printed = fields.Boolean("Document Printed")

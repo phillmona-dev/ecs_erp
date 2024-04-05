@@ -8,9 +8,9 @@
         <field name="model">account.move.crv</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="move_id_crv.name" width="15"/>
-                <field name="move_id_crv" width="15"/>
-                <field name="move_id_crv.invoice_partner_display_name" width="15"/>
+                <field name="name" width="15"/>
+                <field name="customer_name" width="15"/>
+                <field name="crv_ref" width="15"/>
                 <field name="amount" width="15"/>
                 <field name="payment_description" width="15"/>
                 <field name="amount_word" width="15"/>
