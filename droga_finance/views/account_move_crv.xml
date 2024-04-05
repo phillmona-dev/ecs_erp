@@ -35,4 +35,20 @@
         </field>
     </record>
 
+    <!-- search view -->
+    <record id="droga_account_move_crv_report_search" model="ir.ui.view">
+        <field name="name">Cash Receipt Voucher List Search</field>
+        <field name="model">account.move.crv</field>
+        <field name="arch" type="xml">
+            <search string="">
+                <field name="move_id_crv"/>
+                <field name="name"/>
+                <field name="customer_name"/>
+                <field name="crv_ref"/>
+                <field name="amount"/>
+                <field name="payment_description"/>
+            </search>
+        </field>
+    </record>
+
 </odoo>
