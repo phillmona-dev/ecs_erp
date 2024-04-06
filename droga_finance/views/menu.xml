@@ -93,6 +93,9 @@
         <menuitem id="droga_withholding_customer_followup_menu" name="Withholding Followup"
                   action="droga_withholding_customer_followup_action"
                   groups="account.group_account_manager" sequence="2"/>
+        <menuitem id="droga_account_move_crv_report_tree_menu" name="CRV List Report"
+                  action="droga_account_move_crv_report_tree_action"
+                  groups="account.group_account_manager" sequence="3"/>
     </menuitem>
 
 
@@ -104,6 +107,8 @@
         <menuitem id="droga_withholding_vendor_followup_menu" name="Withholding Followup"
                   action="droga_withholding_vendor_followup_action"
                   groups="account.group_account_manager" sequence="2"/>
+
+
     </menuitem>
 
 
@@ -132,7 +137,7 @@
                   groups="account.group_account_manager"
                   sequence="5"/>
 
-         <menuitem id="droga_trial_balance_report_by_analytics_tree_menu" name="Trial Balance by Analytics"
+        <menuitem id="droga_trial_balance_report_by_analytics_tree_menu" name="Trial Balance by Analytics"
                   action="view_trial_balance_by_analytics_action"
                   groups="account.group_account_manager"
                   sequence="6"/>
