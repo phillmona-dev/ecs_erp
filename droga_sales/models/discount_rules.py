@@ -249,14 +249,6 @@ class sale_order_line(models.Model):
                     return line.product_id.list_price_phar * rate
 
             line.order_id.calc_sales_totals_pharma(line)
-            #High value purchase discounts
-            discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')])
-            for disc in discount_per_amount:
-                if line.order_id.total_pharma_discount_groups>disc.from_amt and line.order_id.total_pharma_discount_groups<disc.to_amt and line.product_id.product_tmpl_id.categ_id in disc.prod_group:
-                    rate=1 + (disc.discount / 100)
-                    line.disc_applied = disc.discount
-                    line.order_id.deduct_type = 'Discount for high value purchase'
-                    return line.product_id.list_price_phar * rate
 
             #Breast feeders and health professionals discount
             breat_feed_children=len(self.env['droga.pharma.child'].search([('parent_cust','=',self.order_id.partner_id.id),('breat_feed_end_date','>=',datetime.today())]))
@@ -278,6 +270,15 @@ class sale_order_line(models.Model):
                     line.order_id.deduct_type = 'Discount for breast feed'
 
             return line.product_id.list_price_phar * rate
+
+            # High value purchase discounts
+            discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])
+            for disc in discount_per_amount:
+                if line.order_id.total_pharma_discount_groups > disc.from_amt and line.order_id.total_pharma_discount_groups < disc.to_amt and line.product_id.product_tmpl_id.categ_id in disc.prod_group:
+                    rate = 1 + (disc.discount / 100)
+                    line.disc_applied = disc.discount
+                    line.order_id.deduct_type = 'Discount for high value purchase'
+                    return line.product_id.list_price_phar * rate
     def _get_pharma_price(self,line):
         #Contract price
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),('header.customer','=',line.order_id.partner_id.id),('header.date_from','<',datetime.today()),('header.date_to','>',datetime.today()),('header.status','=','Active')])
