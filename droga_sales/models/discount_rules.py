@@ -269,7 +269,8 @@ class sale_order_line(models.Model):
                     line.order_id.points_to_deduct = 1
                     line.order_id.deduct_type = 'Discount for breast feed'
 
-            return line.product_id.list_price_phar * rate
+            if rate!=1:
+                return line.product_id.list_price_phar * rate
 
             # High value purchase discounts
             discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])
@@ -279,6 +280,7 @@ class sale_order_line(models.Model):
                     line.disc_applied = disc.discount
                     line.order_id.deduct_type = 'Discount for high value purchase'
                     return line.product_id.list_price_phar * rate
+            return line.product_id.list_price_phar * rate
     def _get_pharma_price(self,line):
         #Contract price
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),('header.customer','=',line.order_id.partner_id.id),('header.date_from','<',datetime.today()),('header.date_to','>',datetime.today()),('header.status','=','Active')])
