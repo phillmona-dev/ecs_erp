@@ -151,9 +151,9 @@ class droga_pharma_stock_card(models.TransientModel):
 
             self.env.cr.execute(
                 """update stock_quant set wh_type=(select i.wh_type from stock_warehouse i where i.id=stock_quant.warehouse_id),inventory_diff_quantity=0, quantity=
-                (select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=stock_quant.product_id and y.lot_id=stock_quant.lot_id and 
+                (select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=stock_quant.product_id and coalesce(y.lot_id,0)=coalesce(stock_quant.lot_id,0) and 
                 y.location_dest_id=stock_quant.location_id and y.state='done')-(select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=
-                stock_quant.product_id and y.lot_id=stock_quant.lot_id and y.location_id=stock_quant.location_id and y.state='done') where product_id=%s""",
+                stock_quant.product_id and coalesce(y.lot_id,0)=coalesce(stock_quant.lot_id,0) and y.location_id=stock_quant.location_id and y.state='done') where product_id=%s""",
                 (prod_id,))
 
             self.env.cr.execute(

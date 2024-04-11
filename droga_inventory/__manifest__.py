@@ -40,6 +40,7 @@
         'report/report_tree_extension.xml',
         'report/stock_adjustment_request_report.xml',
         'report/xls_stock_card.xml',
+        'report/stock_take.xml',
         'report/store_request.xml',
         'views/droga_stock_adjustment_request_view.xml',
         'views/droga_inv_trans_types.xml'

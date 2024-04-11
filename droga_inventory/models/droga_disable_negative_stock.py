@@ -8,6 +8,7 @@ class StockQuant(models.Model):
     has_access=fields.Boolean(related='warehouse_id.has_access')
     has_read_access = fields.Boolean(related='location_id.has_read_access')
     import_quant=fields.Float('On Hand Quantity',compute='_get_on_hand',store=True)
+    import_counted_view = fields.Float('Import counted', compute='_get_import_counted', store=True)
     import_counted=fields.Float('Import counted')
     import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
 
@@ -28,6 +29,7 @@ class StockQuant(models.Model):
                 rec.inventory_quantity=rec.import_counted*(rec.product_id.uom_id.factor/rec.product_id.import_uom_new.factor)
             else:
                 rec.inventory_quantity=rec.import_counted
+
     @api.depends('quantity','product_id.import_uom_new')
     def _get_on_hand(self):
         for rec in self:
@@ -35,6 +37,14 @@ class StockQuant(models.Model):
                 rec.import_quant=rec.quantity/(rec.product_id.uom_id.factor/rec.product_id.import_uom_new.factor)
             else:
                 rec.import_quant=rec.quantity
+
+    @api.depends('inventory_quantity','product_id.import_uom_new')
+    def _get_import_counted(self):
+        for rec in self:
+            if rec.company_id.id == 1 and rec.product_id.import_uom_new.factor != 0:
+                rec.import_counted_view=rec.inventory_quantity*(rec.product_id.uom_id.factor*rec.product_id.import_uom_new.factor)
+            else:
+                rec.import_counted_view=rec.inventory_quantity
 
     @api.constrains("product_id", "quantity")
     def check_negative_qty(self):
