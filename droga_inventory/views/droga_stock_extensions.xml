@@ -193,6 +193,7 @@
             </xpath>
         </field>
     </record>
+    
 
     <record id="stock_warehouse_type_extension" model="ir.ui.view">
         <field name="name">stock.warehouse.inherited</field>
