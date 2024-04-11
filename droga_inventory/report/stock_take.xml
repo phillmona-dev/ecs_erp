@@ -29,7 +29,8 @@
             id="droga_inventory_reports_stocktake_excel"
             name="Stock take import format - Excel"
             action="droga_inventory_reports_stocktake_excel_action"
-            parent="stock.menu_warehouse_report"
-            groups="stock.group_stock_user"
+            parent="account.menu_finance_entries_accounting_miscellaneous"
+            groups="droga_inventory.inv_prod_fin"
             sequence="10001"/>
+
 </odoo>
