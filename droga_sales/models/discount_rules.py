@@ -7,7 +7,7 @@ import math
 import json
 
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 from odoo.http import request
 
 
@@ -100,9 +100,24 @@ class sale_order_line(models.Model):
     has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
     product_uom_pharma_qty=fields.Float('Quantity',default=1)
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
-    product_uom_pharma_measure_descr=fields.Char(related='product_uom.uom_title',string='Unit')
+    product_uom_pharma_measure_descr=fields.Char(related='product_uom.name',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
     disc_applied=fields.Float('Discount applied',default=0)
+
+    def write(self, vals):
+        res = super(sale_order_line, self).write(vals)
+        if self.order_id.state in ('sale', 'done','dispense') and ('product_uom_pharma_qty' in vals or 'price_unit' in vals):
+            raise UserError("Sales order can not be updated once confirmed.")
+        return res
+
+    def _check_line_unlink(self):
+        return self.filtered(
+            lambda line:
+                line.state in ('sale', 'done','dispense')
+                and (line.invoice_lines or not line.is_downpayment)
+                and not line.display_type
+        )
+
     @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
     def is_prod_available_method(self):
         selfsud = self.sudo()
@@ -120,10 +135,10 @@ class sale_order_line(models.Model):
             for wh in wh_list:
                 rate = round(rec.product_uom.factor / (
                     rec.product_id.uom_id.factor if rec.product_id.uom_id.factor != 0 else (
-                        rec.product_uom.factor if rec.product_uom.factor != 0 else 1)),6)
-                rec.available_qty = rec.available_qty + ((selfsud._get_avail_qty_per_warehouse(rec.product_id,
+                        rec.product_uom.factor if rec.product_uom.factor != 0 else 1)),9)
+                rec.available_qty = rec.available_qty + round(((selfsud._get_avail_qty_per_warehouse(rec.product_id,
                                                                                                wh) - selfsud._get_outgoing_qty_per_warehouse(
-                    rec.product_id, wh)) * (rate))
+                    rec.product_id, wh)) * (rate)),4)
                 # rec.available_qty=rec.available_qty*(rec.product_uom.factor/rec.product_id.uom_id.factor)
                 rec.avail_char = str(rec.available_qty)
             # rec.available_qty=rec.product_id.qty_available-rec.product_id.outgoing_qty
@@ -234,14 +249,6 @@ class sale_order_line(models.Model):
                     return line.product_id.list_price_phar * rate
 
             line.order_id.calc_sales_totals_pharma(line)
-            #High value purchase discounts
-            discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([('status','=','Active')])
-            for disc in discount_per_amount:
-                if line.order_id.total_pharma_discount_groups>disc.from_amt and line.order_id.total_pharma_discount_groups<disc.to_amt and line.product_id.product_tmpl_id.categ_id in disc.prod_group:
-                    rate=1 + (disc.discount / 100)
-                    line.disc_applied = disc.discount
-                    line.order_id.deduct_type = 'Discount for high value purchase'
-                    return line.product_id.list_price_phar * rate
 
             #Breast feeders and health professionals discount
             breat_feed_children=len(self.env['droga.pharma.child'].search([('parent_cust','=',self.order_id.partner_id.id),('breat_feed_end_date','>=',datetime.today())]))
@@ -262,6 +269,17 @@ class sale_order_line(models.Model):
                     line.order_id.points_to_deduct = 1
                     line.order_id.deduct_type = 'Discount for breast feed'
 
+            if rate!=1:
+                return line.product_id.list_price_phar * rate
+
+            # High value purchase discounts
+            discount_per_amount = self.env['droga.pharma.high.value.pruchase'].search([('status', '=', 'Active')])
+            for disc in discount_per_amount:
+                if line.order_id.total_pharma_discount_groups > disc.from_amt and line.order_id.total_pharma_discount_groups < disc.to_amt and line.product_id.product_tmpl_id.categ_id in disc.prod_group:
+                    rate = 1 + (disc.discount / 100)
+                    line.disc_applied = disc.discount
+                    line.order_id.deduct_type = 'Discount for high value purchase'
+                    return line.product_id.list_price_phar * rate
             return line.product_id.list_price_phar * rate
     def _get_pharma_price(self,line):
         #Contract price
@@ -271,21 +289,28 @@ class sale_order_line(models.Model):
         else:
             return line.product_id.list_price_phar
 
+    @api.onchange('product_id')
+    def _prod_changed(self):
+        for rec in self:
+            if rec.order_from:
+                if rec.order_from.startswith('PH'):
+                    rec.price_unit=self._get_pharma_price(rec)
+
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.product_uom_pharma_qty','order_id.total_disc_pharma')
     def _compute_price_unit(self):
         for line in self:
-            if line.order_id.state in ('sale', 'cancel', 'done', 'fia'):
+            if line.order_id.state in ('sale', 'cancel', 'done', 'fia','dispense','done'):
                 return
             if line.order_from:
                 if line.order_from.startswith('PH'):
                     #line.price_unit = line.product_id.list_price_phar/((line.product_uom_pharma_measure.factor if line.product_uom_pharma_measure.factor!=0 else 1)/(line.product_id.uom_id.factor if line.product_id.uom_id.factor != 0 else 1))
                     line.std_unit_price = line.product_id.list_price_phar
                     line.product_uom_qty = line.product_uom_pharma_qty
-                    line.price_unit = line.product_id.list_price_phar
+                    #line.price_unit = line.product_id.list_price_phar
                     line.phar_cont_price = self._get_pharma_price(line)
                     selling_price= self._get_pharma_price_with_discount(line)
-                    if not line.manual_price_pharma:
+                    if not line.order_id.manual_price_pharma:
                         line.price_unit = selling_price
                     else:
                         line.order_id.deduct_type='Manual discount'
@@ -475,6 +500,7 @@ class sale_order_ext(models.Model):
     has_pharma_access = fields.Boolean(default=False, search='_has_pharma_access', compute='_compute_has_pharma_access')
     has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
                                         compute='_compute_has_invoice_access')
+    has_physio_access = fields.Boolean(default=False, search='_has_physio_access', compute='_compute_has_physio_access')
     sales_initiator = fields.Char('Sales person', store=True)
     #total_pharma = fields.Float('Total pharmacy before discount',compute='calc_sales_totals_pharma',store=True)
     #total_pharma_discount_groups = fields.Float('Total pharmacy discount apply groups', compute='calc_sales_totals_pharma', store=True)
@@ -487,6 +513,7 @@ class sale_order_ext(models.Model):
     points_to_deduct=fields.Float('Points to deduct')
     deduct_type=fields.Char('Type')
     deduct_descr=fields.Char(compute='_compute_desc')
+    inv_number=fields.Char('Invoice Number')
     @api.depends('total_disc_pharma','deduct_type')
     def _compute_desc(self):
         for rec in self:
@@ -529,23 +556,30 @@ class sale_order_ext(models.Model):
                     else:
                         rec.show_vit_button = True
     def get_wareh(self):
-        list=self.env.user.warehouse_ids_ph_disp+self.env.user.warehouse_ids_im_ws
+        if self.order_from=="PT":
+            list=self.env.user.warehouse_ids_pt_disp
+        else:
+            list=self.env.user.warehouse_ids_ph_disp + self.env.user.warehouse_ids_im_ws
         return list[
             0].id if len(
             list) > 0 else False
 
-    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', default=get_wareh,compute='_get_pharma_wh',store=True)
+    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh',store=True)
 
     def unlink(self):
         raise ValidationError(
             "You can't delete sales transaction, either cancel it or pass a correcting entry.")
-
+    @api.depends('name')
     def _get_pharma_wh(self):
         for rec in self:
             if rec.order_from=="PH":
                 rec.wareh = self.env.user.warehouse_ids_ph_disp[
                     0].id if len(
                     self.env.user.warehouse_ids_ph_disp) > 0 else False
+            elif rec.order_from=="PT":
+                rec.wareh = self.env.user.warehouse_ids_pt_disp[
+                    0].id if len(
+                    self.env.user.warehouse_ids_pt_disp) > 0 else False
             else:
                 rec.wareh = self.env.user.warehouse_ids_im_ws[
                     0].id if len(
@@ -586,6 +620,13 @@ class sale_order_ext(models.Model):
             else:
                 return False
 
+    def _compute_has_physio_access(self):
+        for rec in self:
+            if rec.wareh in self.env.user.warehouse_ids_pt_disp.ids or rec.wareh in self.env.user.warehouse_ids_pt.ids:
+                return True
+            else:
+                return False
+
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
             for rec in self:
@@ -622,6 +663,13 @@ class sale_order_ext(models.Model):
     def _has_pharma_access(self,operator,value):
         if operator=='=':
             sales = self.env['sale.order'].sudo().search(['|',('wareh', 'in', self.env.user.warehouse_ids_ph.ids),('wareh', 'in', self.env.user.warehouse_ids_ph_disp.ids)])
+            return [('id', 'in', [x.id for x in sales])]
+        else:
+            return [('id', 'in', [])]
+
+    def _has_physio_access(self,operator,value):
+        if operator=='=':
+            sales = self.env['sale.order'].sudo().search([('wareh', 'in', self.env.user.warehouse_ids_pt_disp.ids)])
             return [('id', 'in', [x.id for x in sales])]
         else:
             return [('id', 'in', [])]
@@ -687,7 +735,7 @@ class sale_order_ext(models.Model):
                 self.env['droga.pharma.points.earned'].create(points)
 
 
-        if self.points_to_deduct>0:
+        if self.points_to_deduct>1:
             points = {
                 'type': self.deduct_type,
                 'customer': self.referred_by.id,
@@ -697,11 +745,13 @@ class sale_order_ext(models.Model):
             }
 
             self.env['droga.pharma.points.earned'].create(points)
-        services_count=self.order_line.filtered(
-                lambda x: x.product_id.product_tmpl_id.detailed_type=='service')
-        if self.partner_id.id==15488 or self.order_from!='PH' or self.partner_id.is_company:
+
+        if self.partner_id.id==15488 or self.order_from!='PH' or self.partner_id.is_company or self.points_to_deduct>1:
             return action
-        
+
+        services_count = self.order_line.filtered(
+            lambda x: x.product_id.product_tmpl_id.detailed_type == 'service')
+
         if len(services_count)>0:
             points_to_earn=self.env['droga.pharma.reward.gain'].search([('type','=','Services')])[0].points_to_gain if len(self.env['droga.pharma.reward.gain'].search([('type','=','Services')]))>0 else 0
             type='Speciality service reward'
@@ -823,7 +873,7 @@ class sale_order_ext(models.Model):
 
         #Pharmacy validations below
         if self.order_from.startswith('PH'):
-            price_changed=self.order_line.filtered(lambda x: math.ceil(round(x.price_unit/(1+(x.disc_applied/100)),2))!=math.ceil(x.phar_cont_price) or x.price_unit==0)
+            price_changed=self.order_line.filtered(lambda x: math.ceil(round(x.price_unit/(1+((x.disc_applied if x.disc_applied!=-100 else 0)/100)),2))!=math.ceil(x.phar_cont_price) or x.price_unit==0)
             if len(price_changed)>0 and not self.manual_price_pharma:
                 message = message + ('\n' if message else '') + "Price can not be edited or be zero."
             if self.customer_emp:
@@ -1074,7 +1124,7 @@ class account_move_inherit(models.Model):
                     if len(sale_order)>0:
                         if 'invoice_line_ids' in vals:
                             for line in vals['invoice_line_ids']:
-                                if sale_order[0].order_from.startswith('PH'):
+                                if sale_order[0].order_from.startswith('PH') or sale_order[0].order_from.startswith('PT'):
                                     line[2]['analytic_distribution'] = {241: 100,sale_order[0].order_line.wareh.linked_analytic.id: 100}
                                     analytic=sale_order[0].order_line.wareh.linked_analytic.id
                                 elif sale_order[0].tender_origin_form_tender:

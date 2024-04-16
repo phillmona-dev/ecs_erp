@@ -99,7 +99,7 @@
                             <field name="company_id" options="{'no_create':True,'no_open':True}" readonly="0"/>
                             <field name="procurement_committee" widget="many2many_tags" string="Committee"
                                    options="{'no_create':True,'no_open':True}"/>
-
+                            <field name="for_pharmacy" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
                         </group>
                         <group>
                             <field name="remark" attrs="{'readonly': [('state', 'not in', ('Draft'))]}"/>
@@ -107,6 +107,7 @@
                             <field name="total_winner_amount" invisible="1"/>
                             <field name="suppliers" widget="many2many_tags"
                                    options="{'no_create':True,'no_open':True}"/>
+
                         </group>
                     </group>
 

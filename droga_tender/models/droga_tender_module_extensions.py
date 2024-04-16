@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from odoo import models, fields, api
 
 
@@ -14,8 +16,27 @@ class sale_order_extension(models.Model):
     tender_origin_form_tender=fields.Many2one('droga.tender.master',readonly=True)
     po_tender=fields.Many2many('purchase.order',string='Purchase order')
     client_po_ref=fields.Char('Client PO ref')
-    def append_sales(self):
-        pass
+class accoumt_move(models.Model):
+    _inherit='account.move'
+
+    @api.model
+    def create(self, vals):
+        res=super(accoumt_move, self).create(vals)
+        if res.invoice_origin:
+            if res.invoice_origin.startswith('SOD'):
+                tenders=self.env['sale.order'].search([('name','=',res.invoice_origin)]).tender_origin_form_tender
+                for tend in tenders:
+                    tend.write({'latest_invoice_date': datetime.today()})
+
+                    childs = self.env['droga.tender.submission.detail'].search([('parent_tender_submission', '=', tend.id)])
+                    for ch in childs:
+                        ch.write({'latest_invoice_date': datetime.today()})
+
+                        det_childs = self.env['droga.tender.performance.evaluation'].search(
+                            [('parent_tender_performance_detail', '=', ch.id)])
+                        for chd in det_childs:
+                            chd.write({'latest_invoice_date': datetime.today()})
+        return res
 class pur_request_extension(models.Model):
     _inherit='droga.purchase.request.local'
     tender_origin_form_tender = fields.Many2one('droga.tender.master', readonly=True)

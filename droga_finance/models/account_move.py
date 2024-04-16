@@ -46,11 +46,11 @@ class AccountMove(models.Model):
 
     # crv
     crvs = fields.One2many('account.move.crv', 'move_id_crv')
+    withholdings = fields.One2many('account.move.withholding', 'move_id_wh')
 
     branch_address = fields.Many2one('droga.sales.branch.address', compute='get_branch_address')
 
-    payment_request_id=fields.Integer(related='payment_id.payment_request_id.id')
-
+    payment_request_id = fields.Integer(related='payment_id.payment_request_id.id')
 
     @api.model
     def create(self, vals):
@@ -341,7 +341,11 @@ class AccountMove(models.Model):
 class AccountCrv(models.Model):
     _name = 'account.move.crv'
 
+    _order = "move_id_crv asc"
+
     move_id_crv = fields.Many2one('account.move')
+    name = fields.Char(related='move_id_crv.name')
+    customer_name = fields.Char(related='move_id_crv.invoice_partner_display_name')
     crv_ref = fields.Char("CRV Reference", required=True)
     amount = fields.Float("Amount", required=True)
     is_crv_document_printed = fields.Boolean("Document Printed")
@@ -360,3 +364,108 @@ class AccountCrv(models.Model):
             if crv_count > 1:
                 raise ValidationError(
                     'CRV Reference already registered in the system, you can''t use one reference multiple times')
+
+    def unlink(self):
+        raise ValidationError(
+            "You can't delete CRV Record")
+
+
+class AccountWithholding(models.Model):
+    _name = 'account.move.withholding'
+
+    move_id_wh = fields.Many2one('account.move')
+    withholding_tax_types = fields.Many2one("account.tax", required=True,
+                                            domain="[('tax_group_id', '=', 'Withholding')]")
+    ref = fields.Char("Reference", required=True)
+    amount_before_vat = fields.Float("Before Vat", store=True)
+    withholding_amount = fields.Float("Withholding", store=True, compute="compute_with_holding")
+    withholding_date = fields.Date("Date", required=True)
+    entry_id = fields.Many2one('account.move')
+    withholding_amount_word = fields.Char("Amount Word", compute="_compute_amount_word")
+    withholding_percent = fields.Float("Withholding Percent", store=True)
+
+    def _compute_amount_word(self):
+        for record in self:
+            record.withholding_amount_word = self.env['account.move'].convert_to_word(record.withholding_amount)
+
+    def create_with_holding_entry(self):
+        pass
+
+    @api.depends("withholding_tax_types", "amount_before_vat")
+    def compute_with_holding(self):
+        for record in self:
+            # get untaxed amount
+            record.withholding_percent = abs(record.withholding_tax_types.amount)
+
+            if record.amount_before_vat == 0:
+                record.amount_before_vat = record.move_id_wh.amount_untaxed
+                record.withholding_amount = (
+                        record.move_id_wh.amount_untaxed * (abs(record.withholding_tax_types.amount) / 100))
+            else:
+                record.withholding_amount = (
+                        record.amount_before_vat * (abs(record.withholding_tax_types.amount) / 100))
+
+    def create_with_holding_entry(self):
+
+        if self.entry_id:
+            raise ValidationError("You can't create multiple entries")
+
+        for record in self:
+            # get vendor id
+            vendor_id = record.move_id_wh.partner_id.id
+            invoice_date = datetime.now()
+            invoice_lines = []
+
+            if record.move_id_wh.move_type == 'in_invoice':
+                invoice_lines.append({'debit': record.withholding_amount,
+                                      'credit': 0,
+                                      'partner_id': vendor_id,
+                                      'account_id': self.get_account_id('211001')})
+                invoice_lines.append({'debit': 0,
+                                      'credit': record.withholding_amount,
+                                      'partner_id': 0,
+                                      'account_id': self.get_account_id('214003')})
+            elif record.move_id_wh.move_type == 'out_invoice':
+                invoice_lines.append({'debit': record.withholding_amount,
+                                      'credit': 0,
+                                      'partner_id': 0,
+                                      'account_id': self.get_account_id('116002')})
+                invoice_lines.append({'debit': 0,
+                                      'credit': record.withholding_amount,
+                                      'partner_id': vendor_id,
+                                      'account_id': self.get_account_id('114001')})
+
+            entry = {
+                'move_type': 'entry',
+                'journal_id': self.get_journal_id('JV'),
+                'partner_id': vendor_id,
+                'invoice_date': invoice_date,
+                'line_ids': [(0, 0, {
+                    'partner_id': line['partner_id'],
+                    'debit': line['debit'],
+                    'credit': line['credit'],
+                    'account_id': line['account_id'],
+                }) for line in invoice_lines],
+            }
+
+            vendor_invoice = self.env['account.move'].create(entry)
+
+            record.entry_id = vendor_invoice
+
+    def get_account_id(self, account):
+        accounts = self.env["account.account"].search([('code', '=', account)])
+
+        account_id = 0
+        for account in accounts:
+            account_id = account.id
+
+        return account_id
+
+    def get_journal_id(self, journal):
+        journals = self.env["account.journal"].search([('code', '=', journal)])
+
+        journal_id = 0
+        for journal in journals:
+            journal_id = journal.id
+
+        return journal_id

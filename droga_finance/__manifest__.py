@@ -26,6 +26,7 @@
     'data': [
         'security/account_security.xml',
         'security/ir.model.access.csv',
+        'report/withholding_report.xml',
         'report/paper_format.xml',
         'views/account_payment.xml',
         'views/account_transaction_type.xml',
@@ -34,9 +35,10 @@
         'views/account_fiscal_year.xml',
         'views/account_journal.xml',
         'views/branch_address.xml',
+        'views/account_move_crv.xml',
         'report/payment_request.xml',
         'report/account_move.xml',
-        'report/withholding_report.xml',
+
         'report/account_payment.xml',
         'report/account_payment_check_printout.xml',
         'report/customer_outstanding_balance_report.xml',

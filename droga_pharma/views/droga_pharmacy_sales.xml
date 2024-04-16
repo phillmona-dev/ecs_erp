@@ -127,7 +127,7 @@
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <button name="action_done"
                             string="Done" font-size="16px"
-                            groups="droga_pharma.physio_user_bole,droga_pharma.physio_user_4k"
+                            groups="droga_pharma.physio_user_4k"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'memb')]}"/>
                     <button name="create_inv_local"
@@ -267,7 +267,7 @@
                     <hr></hr>
                     <group name="sale_header">
                         <group name="partner_details">
-                            <field name="partner_custom" options='{"no_open":True,"no_create": True}'></field>
+                            <field name="partner_custom" string="Customer" options='{"no_open":True,"no_create": True}'></field>
                             <field name="partner_id" invisible="1" widget="res_partner_many2one"
                                    context="{'res_partner_search_mode': 'customer', 'show_address': 0, 'show_vat': False}"
                                    options='{"always_reload": True,"no_open":True,"no_create": True}'/>
@@ -694,7 +694,7 @@
                                                                     <t t-out="record.phar_cont_price_marginc.value"/>
                                                                 </div>
                                                                 <div class="col-12 text-muted"
-                                                                     attrs="{'invisible': [('disc_applied','=',0)]}">
+                                                                     attrs="{'invisible': ['|',('disc_applied','=',0),('manual_price_pharma', '=', True)]}">
                                                                     Discount margin:
                                                                     <t t-out="record.disc_applied.value*-1" />%
                                                                 </div>

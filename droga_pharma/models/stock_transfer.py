@@ -83,7 +83,7 @@ class transfer_request_inherit(models.Model):
     def request_ph(self):
         self.set_activity_done()
         self.ensure_one()
-        if self.location_dest_id.complete_name[0:3] == 'PMS' or self.location_id.code[0:3]=='PMS':
+        if self.location_dest_id.complete_name[0:3] != self.location_id.code[0:3]:
             self._get_pharma_approvers()
             self.state = 'phmg'
         else:
@@ -91,15 +91,15 @@ class transfer_request_inherit(models.Model):
                 #Post on message board here
                 channels = self.env['mail.channel'].search([('name', '=', 'Pharmacy inter-store')])
 
-                message = "Inter-store transaction request has been initiated by " +self.location_dest_id.complete_name+'. The requested store is'+ self.location_id.name + "."
-                message = message + '   Inter-store request - ' + self.name
+                message = "Inter-store transaction request has been initiated by " +str.upper(self.location_dest_id.complete_name)+'. The requested store is '+ str.upper(self.location_id.name) + "."
+                message = message + '   Inter-store request number - ' + self.name
                 for c in channels:
                     c.message_post(
                         subject="Inter-store pharmacy transfer.",
                         body=message,
                         message_type='comment',
                         subtype_xmlid='mail.mt_comment',
-                        author_id=self.env.user.id,
+                        author_id=2,
                     )
             self.confirm_ph()
         #if self.location_dest_id.complete_name[0:3]==self.location_id.code[0:3]:
@@ -119,8 +119,16 @@ class transfer_request_inherit(models.Model):
 
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
-            def_location_id = self.env['stock.location'].search(
-                [('usage', '=', 'internal'), ('con_type', '=', False), ('wcode', '=', wh.code)])[0].id
+            locs=self.env['stock.location'].search(
+                [('usage', '=', 'internal'), ('con_type', '=', False), ('wcode', '=', wh.code)])
+
+            if len(locs)==0:
+                locs = self.env['stock.location'].search(
+                    [('usage', '=', 'production'), ('con_type', '=', False), ('wcode', '=', wh.code)])
+                if len(locs) == 0:
+                    raise UserError("Issuing warehouse doesn't have internal location.")
+
+            def_location_id = locs[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")
             picking_vals = {

@@ -16,7 +16,7 @@ class droga_pharma_prod_ext(models.Model):
     pharma_filler=fields.Char(compute='_fill_fields')
     pharma_detailed_type = fields.Selection([
         ('counselling', 'Counselling'),('consu', 'Consumable'),('membershipcard', 'Membership E-Card'),('hthscreen','Health screening'),('mtmcard', 'MTM E-Card'),('Compounding','Compounding'),('product', 'Storable product'),
-        ('service', 'Service')], string='Product Type', default='product', required=True)
+        ('service', 'Service')], string='Pharmacy Type', default='product', required=True)
 
     duration=fields.Integer('Membership duration in months')
     min_amt = fields.Integer('Membership minimum amount')
@@ -158,6 +158,7 @@ class droga_stock_quant(models.Model):
     unit_cost=fields.Float('Unit price',compute='get_cost')
     total_amount=fields.Float('Amount',compute='get_cost')
     selling_price=fields.Float(related='product_id.product_tmpl_id.list_price_phar')
+    pharmacy_group_id = fields.Many2one('droga.prod.categ.pharma', related='product_id.product_tmpl_id.pharmacy_group_id')
     def get_cost(self):
         for rec in self:
             rec.unit_cost=rec.product_id.standard_price

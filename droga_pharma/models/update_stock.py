@@ -17,6 +17,11 @@ class droga_pharma_stock_card(models.TransientModel):
     results_move_line = fields.One2many('droga.pharma.update.stock.move.line', 'header')
     rate=fields.Float('rate (division)',default=1)
     date=fields.Date('Transaction date')
+    date_to = fields.Date('Transaction date to')
+
+    qty_from = fields.Float('Quantity from')
+    qty_to = fields.Float('Quantity to')
+
     ref=fields.Char('Transaction reference')
     prod_id=fields.Many2one('product.product',compute='get_prod_id')
     batch=fields.Many2one('stock.lot',domain="[('product_id', '=', prod_id)]")
@@ -54,12 +59,16 @@ class droga_pharma_stock_card(models.TransientModel):
                     [('product_id', '=', prod_id), '|',('location_id.warehouse_id', 'in', warehouses.ids), ('location_dest_id.warehouse_id', 'in',  warehouses.ids)]).mapped('origin')
 
             #Filter by date
-            if rec.date:
-                moves = moves.filtered(lambda x: (x.date.date() == rec.date))
+            if rec.date and rec.date_to:
+                moves = moves.filtered(lambda x: (x.date.date() >= rec.date and x.date.date() <= rec.date_to))
                 origins = moves.mapped('origin')
             # Filter by reference
             if rec.ref:
                 moves = moves.filtered(lambda x: (x.reference == rec.ref))
+                origins = moves.mapped('origin')
+            # Filter by quantity
+            if rec.qty_to:
+                moves = moves.filtered(lambda x: (x.quantity_done >= rec.qty_from and x.quantity_done<=rec.qty_to))
                 origins = moves.mapped('origin')
 
             moves=moves.ids
@@ -142,9 +151,9 @@ class droga_pharma_stock_card(models.TransientModel):
 
             self.env.cr.execute(
                 """update stock_quant set wh_type=(select i.wh_type from stock_warehouse i where i.id=stock_quant.warehouse_id),inventory_diff_quantity=0, quantity=
-                (select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=stock_quant.product_id and y.lot_id=stock_quant.lot_id and 
+                (select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=stock_quant.product_id and coalesce(y.lot_id,0)=coalesce(stock_quant.lot_id,0) and 
                 y.location_dest_id=stock_quant.location_id and y.state='done')-(select coalesce(sum(y.qty_done),0) from stock_move_line y where y.product_id=
-                stock_quant.product_id and y.lot_id=stock_quant.lot_id and y.location_id=stock_quant.location_id and y.state='done') where product_id=%s""",
+                stock_quant.product_id and coalesce(y.lot_id,0)=coalesce(stock_quant.lot_id,0) and y.location_id=stock_quant.location_id and y.state='done') where product_id=%s""",
                 (prod_id,))
 
             self.env.cr.execute(

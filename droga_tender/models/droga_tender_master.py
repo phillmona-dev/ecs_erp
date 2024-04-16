@@ -18,6 +18,7 @@ class droga_tender_master(models.Model):
     # Date fields
     posted_date_gre = fields.Date("Posted/floated date GRE", required=True, compute="conv_posted_date", store=True,
                                   inverse='inverse_posted_date', help="Time should be in Ethiopian format not AM/PM.")
+    latest_invoice_date=fields.Date('Invoice date')
 
     @api.depends("posted_date_eth")
     def conv_posted_date(self):

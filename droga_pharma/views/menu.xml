@@ -32,7 +32,7 @@
             <menuitem
                     id="droga_pharma_counselling_menu"
                     name="Counselling"
-                    action="droga_pharma_counselling_view_action"
+                    action="droga_pharma_counselling_view_action_nocreate"
                     groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin"
                     sequence="5"/>
             <menuitem

@@ -19,7 +19,7 @@ class pharma_res_partner(models.Model):
     @api.depends('partner.name','partner.mobile')
     def _get_name(self):
         for rec in self:
-            rec.name=(rec.partner.name if rec.partner.name else '')+(' - '+rec.partner.mobile if rec.partner.mobile else '')+(' - '+rec.partner.phone if rec.partner.phone else '')
+            rec.name=(rec.partner.name if rec.partner.name else '')+(' - '+str(str(rec.partner.mobile).replace(" ","")).replace("251","0") if rec.partner.mobile else '')+(' - '+str(str(rec.partner.phone).replace(" ","")).replace("251","0") if rec.partner.phone else '')
 class pharma_credit(models.Model):
     _inherit = 'res.partner'
     cust_credit_limit_pharma = fields.Float(string='Credit limit', tracking=True)
@@ -57,9 +57,9 @@ class pharma_credit(models.Model):
     def _get_approver(self):
         for rec in self:
             rec.phar_approver = self.env.ref("droga_pharma.pharma_director").users.filtered(
-                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                lambda m: self.env.company.id in m.company_ids.ids and m.id not in (2,51)).ids[0] if len(
                 self.env.ref("droga_pharma.pharma_director").users.filtered(
-                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+                    lambda m: self.env.company.id in m.company_ids.ids and m.id not in (2,51)).ids) > 0 else None
     def open_price_hist(self):
         return {
             'name': 'Price lists',

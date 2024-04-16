@@ -125,6 +125,25 @@
                     </field>
                 </page>
 
+                <page id="withholding_view" string="Withholding">
+                    <field name="withholdings" mode="tree">
+                        <tree editable="bottom">
+                            <field name="withholding_tax_types" width="20" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
+                            <field name="ref" width="10" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
+                            <field name="withholding_date" width="10" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
+                            <field name="amount_before_vat" width="20" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
+                            <field name="withholding_amount" width="20" readonly="1"/>
+                            <field name="entry_id" options="{'no_create':True}" readonly="1"/>
+                            <button name="create_with_holding_entry" string="Entry"
+                                    type="object"
+                                    class="oe_stat_button" icon="fa-align-justify" width="10"/>
+                            <button name="%(droga_account_withholding_printout_new_action)d" string="Report"
+                                    type="action"
+                                    class="oe_stat_button" icon="fa-file" width="10"/>
+                        </tree>
+                    </field>
+                </page>
+
             </xpath>
 
 

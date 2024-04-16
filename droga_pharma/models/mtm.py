@@ -48,6 +48,7 @@ class droga_pharma_mtm_header(models.Model):
     immunization = fields.Html("Immunization", store=True,compute='get_cust_hist',inverse='update_immunization',tracking=True)
     adr = fields.Html("ADRS and/or Allergies", store=True,compute='get_cust_hist',inverse='update_adr',tracking=True)
 
+    @api.depends('client.medical_history','client.medication_history','client.immunization','client.adr_allergy','client.dob','client.gender','client.weight','client.height')
     def get_cust_hist(self):
         for rec in self:
             rec.medical=rec.client.medical_history
@@ -56,6 +57,8 @@ class droga_pharma_mtm_header(models.Model):
             rec.adr = rec.client.adr_allergy
             rec.dob = rec.client.dob
             rec.gender=rec.client.gender
+            rec.weight=rec.client.weight
+            rec.height = rec.client.height
 
     def update_adr(self):
         for rec in self:
@@ -75,13 +78,26 @@ class droga_pharma_mtm_header(models.Model):
     def update_gender(self):
         for rec in self:
             rec.client.gender=rec.gender
+    def inverse_weight(self):
+        for rec in self:
+            rec.client.weight = rec.weight
+
+    def inverse_height(self):
+        for rec in self:
+            rec.client.height = rec.height
 
     dob = fields.Date("Date of Birth", store=True,compute='get_cust_hist',inverse='update_dob')
     age = fields.Integer("Age", compute="_compute_age", readonly=True)
     gender = fields.Selection(selection=[("Male", "Male"), ("Female", "Female")], string="Gender", store=True,compute='get_cust_hist',inverse='update_gender')
     profession = fields.Selection(selection=[("hp", "Health Professional"), ("other", "Other")], string="Profession", store=True)
-    weight = fields.Float("Weight")
-    height = fields.Float("Height")
+    weight = fields.Float("Weight", compute='get_cust_hist', store=True, inverse='inverse_weight')
+    height = fields.Float("Height (in meters)", compute='get_cust_hist', store=True, inverse='inverse_height')
+    bmi = fields.Float(compute='_get_bmi', string='BMI')
+
+    @api.depends('weight','height','client.weight','client.height')
+    def _get_bmi(self):
+        for rec in self:
+            rec.bmi = rec.weight / (rec.height * rec.height) if rec.height != 0 else 0
     bsa = fields.Float("BSA")
     address = fields.Char("Address")
     pregnancy = fields.Char("Pregnancy status")

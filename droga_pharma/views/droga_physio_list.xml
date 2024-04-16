@@ -13,7 +13,7 @@
         <field name="arch" type="xml">
             <tree string="" delete="0">
                 <field name="physiotherapist_name"></field>
-                <field name="branch"></field>
+                <field name="branch_w"></field>
                 <field name="status"></field>
             </tree>
         </field>
@@ -27,7 +27,7 @@
                 <sheet>
                     <group>
                         <field name="physiotherapist_name" options="{'no_create':True,'no_open':True}"></field>
-                        <field name="branch"></field>
+                        <field name="branch_w"></field>
                         <field name="status"></field>
                     </group>
                 </sheet>

@@ -13,6 +13,14 @@ class droga_pharma_customer(models.Model):
     company_type = fields.Selection(string='Company Type',
                                     selection=[('person', 'Individual'), ('company', 'Company')])
     childs = fields.One2many('droga.pharma.child', 'parent_cust', string='Childs')
+    weight = fields.Float("Weight")
+    height = fields.Float("Height (in meters)")
+    bmi = fields.Float(compute='_get_bmi',string='BMI')
+
+    @api.depends('weight','height')
+    def _get_bmi(self):
+        for rec in self:
+            rec.bmi = rec.weight / (rec.height * rec.height) if rec.height != 0 else 0
     def open_children(self):
         return {
             'name': 'Children',
@@ -227,7 +235,8 @@ class droga_physiotherapist_list(models.Model):
     _name='droga.physiotherapist.list'
     _rec_name='physiotherapist_name'
     physiotherapist_name = fields.Many2one('hr.employee', string='Physiotherapist Name',required=True)
-    branch=fields.Selection([('PT-4 Kilo', '4 kilo branch'), ('PT-Bole', 'Bole branch')], required=True)
+    branch=fields.Selection([('PT-4 Kilo', '4 kilo branch'), ('PT-Bole', 'Bole branch')])
+    branch_w=fields.Many2one('stock.warehouse')
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active')
 
 class droga_pharma_child_list(models.Model):

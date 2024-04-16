@@ -76,7 +76,8 @@
                         <field name="average_month_consumption"/>
                         <field name="lead_time_in_days"></field>
                         <field name="notification_for"></field>
-                        <field name="is_core_product"/>
+                        <field name="is_core_product" readonly="1"/>
+                        <field name="is_core_product" groups="droga_inventory.inventory_core"/>
                     </group>
                     <group string="Origin">
                         <field name="manufacturing" required="True"></field>
