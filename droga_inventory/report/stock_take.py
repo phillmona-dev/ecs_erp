@@ -50,7 +50,7 @@ class inventory_stock_card_xls(models.TransientModel):
         num_format = workbook.add_format({'num_format': 43})
 
         row_start=0
-        loc_ids_under_wh=self.env['stock.location'].search([('complete_name', '=ilike', self.warehouse.code+'%'),('usage', '=', 'internal')])
+        loc_ids_under_wh=self.env['stock.location'].search([('warehouse_id', '=', self.warehouse.id),('usage', '=', 'internal')])
 
         stock_take_data = self.env['stock.quant'].search(
             [ ('location_id', 'in', loc_ids_under_wh.ids)], order="product_id desc").sorted(key=lambda r: r.product_id.default_code)
@@ -59,7 +59,7 @@ class inventory_stock_card_xls(models.TransientModel):
 
         for quant in stock_take_data:
             row_start+=1
-            sheet.write(row_start, 0, quant.get_metadata()[0].get('xmlid'))
+            sheet.write(row_start, 0, quant.get_metadata()[0].get('xmlid') if quant.get_metadata()[0].get('xmlid') else quant.export_data(['id']).get('datas')[0][0])
             sheet.write(row_start, 1, quant.product_id.default_code)
             sheet.write(row_start, 2, quant.product_id.product_tmpl_id.name)
             sheet.write(row_start, 3, quant.lot_id.name if quant.lot_id else ' ')
@@ -84,7 +84,7 @@ class inventory_stock_card_xls(models.TransientModel):
         green = workbook.add_format({'bold': True,'fg_color': '#3CB371'})
 
 
-        sheet.write(0, 0, 'External ID', green)
+        sheet.write(0, 0, 'Database ID', green)
         sheet.write(0, 1, 'Product code', bold)
         sheet.write(0, 2, 'Product description', bold)
         sheet.write(0, 3, 'Lot/Serial', bold)
