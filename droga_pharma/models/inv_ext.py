@@ -190,6 +190,7 @@ class droga_stock_move_line(models.Model):
     branch_dest_id = fields.Many2one('account.analytic.account', related='warehouse_dest_id.linked_analytic', store=True)
     branch=fields.Many2one('account.analytic.account', compute='get_branch', store=True)
 
+    @api.depends('branch_id', 'branch_dest_id')
     def get_branch(self):
         for record in self:
             if record.branch_id:
