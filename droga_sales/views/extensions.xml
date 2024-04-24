@@ -159,7 +159,7 @@
                 <field name="company_id" invisible="1"></field>
                 <field name="contract_num"
                        attrs="{'invisible': [('company_id', '!=', 2)],'required': [('company_id', '=', 2)]}"></field>
-                <field name="currency_id"
+                <field name="currency_id" options='{"no_create":True,"no_open":True}'
                        attrs="{'invisible': [('company_id', '!=', 2)],'required': [('company_id', '=', 2)]}"></field>
                 <field name="supporters" attrs="{'invisible': [('company_id', '!=', 1)]}" widget="many2many_tags"
                        string="Supporters"></field>

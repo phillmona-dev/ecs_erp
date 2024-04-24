@@ -22,6 +22,9 @@
                 <button icon="fa-credit-card-alt"
                         type="object" string=" Duplicate"
                                             name="duplicate_entry" class="oe_stat_button"/>
+                <button icon="fa-credit-card-alt"
+                        type="object" string=" Get report"
+                                            name="get_report" class="oe_stat_button"/>
             </tree>
         </field>
     </record>
@@ -34,7 +37,7 @@
             <form delete="0">
                 <field name="target_detail" mode="tree">
                     <tree string="" editable="top" delete="0">
-                        <field name="indicator"></field>
+                        <field name="indicator" widget="many2many_tags"></field>
                         <field name="prod_group"></field>
                         <field name="me_too"></field>
                         <field name="target_qty"></field>

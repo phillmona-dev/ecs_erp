@@ -8,9 +8,9 @@ class sales_target_header(models.Model):
     _name='droga.crm.sales.target.header'
     target_detail=fields.One2many('droga.crm.sales.target.detail','target_header')
     sales_team = fields.Many2one('droga.crm.settings.city')
-    type=fields.Selection([('Weekly','Weekly'),('Monthly','Monthly'),('Quarterly','Quarterly')],default='Weekly')
-    date_from=fields.Date('Date from')
-    date_to=fields.Date('Date to',compute='_get_date_to',inverse='_inverse_date_to',store=True)
+    type=fields.Selection([('Daily','Daily'),('Weekly','Weekly'),('Monthly','Monthly'),('Quarterly','Quarterly')],default='Weekly',required=True)
+    date_from=fields.Date('Date from',required=True)
+    date_to=fields.Date('Date to',compute='_get_date_to',inverse='_inverse_date_to',store=True,required=True)
     def _inverse_date_to(self):
         pass
     _sql_constraints = [
@@ -41,14 +41,24 @@ class sales_target_header(models.Model):
             #'target': 'new',
             'res_id': self.id,
         }
+    def get_report(self):
+        pass
 
     def duplicate_entry(self):
-        pass
+        for rec in self:
+            vals = {
+                'target_detail': rec.target_detail.ids,
+                'type': rec.type,
+                'date_from': rec.date_from,
+                'date_to': rec.date_to,
+            }
+
+            self.env['droga.crm.sales.target.header'].create(vals)
 
 class sales_target_detail(models.Model):
     _name='droga.crm.sales.target.detail'
     target_header=fields.Many2one('droga.crm.sales.target.header',required=True)
-    indicator=fields.Many2one('product.template')
+    indicator=fields.Many2many('product.template')
     target_qty=fields.Integer('Target qty')
     me_too = fields.Boolean('MeToo')
     target_amt = fields.Integer('Target amt')
