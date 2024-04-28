@@ -55,6 +55,7 @@
                         <field name="indicator" widget="many2many_tags"></field>
                         <field name="prod_group"></field>
                         <field name="me_too_core"></field>
+                        <field name="type"></field>
                         <field name="target_qty"></field>
                         <field name="target_amt"></field>
                         <field name="remark"></field>
@@ -75,10 +76,10 @@
                 <field name="me_too_core"></field>
                 <field name="target_qty"></field>
                 <field name="ach_qty"></field>
-                <field name="ach_qty_pct"></field>
+                <field name="ach_qty_pct" decoration-success="ach_qty_pct &gt;= 80" decoration-danger="ach_qty_pct &lt;= 50 and ach_qty_pct &gt; 0" decoration-warning="ach_qty_pct &lt; 80 and ach_qty_pct &gt; 50" decoration-info="ach_qty_pct == 0" widget="badge"></field>
                 <field name="target_amt"></field>
                 <field name="ach_amt"></field>
-                <field name="ach_amt_pct"></field>
+                <field name="ach_amt_pct" decoration-success="ach_amt_pct &gt;= 80" decoration-danger="ach_amt_pct &lt;= 50 and ach_amt_pct &gt; 0" decoration-warning="ach_amt_pct &lt; 80 and ach_amt_pct &gt; 50" decoration-info="ach_amt_pct == 0" widget="badge"></field>
                 <field name="remark"></field>
             </tree>
         </field>

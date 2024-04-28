@@ -35,11 +35,13 @@ class sales_target_header(models.Model):
         for rec in self:
             if rec.date_from:
                 if rec.type=='Weekly':
-                    rec.date_to=rec.date_from+ timedelta(days=7)
+                    rec.date_to=rec.date_from+ timedelta(days=6)
                 elif rec.type=='Monthly':
-                    rec.date_to = rec.date_from + relativedelta(months=1)
+                    rec.date_to = rec.date_from + relativedelta(months=1) - timedelta(days=1)
+                elif rec.type == 'Daily':
+                    rec.date_to = rec.date_from
                 else:
-                    rec.date_to = rec.date_from + relativedelta(months=3)
+                    rec.date_to = rec.date_from + relativedelta(months=3) - timedelta(days=1)
             else:
                 rec.date_to=rec.date_from
 
@@ -85,11 +87,11 @@ class sales_target_detail(models.Model):
     indicator=fields.Many2many('product.product')
     target_qty=fields.Integer('Target qty')
     #me_too = fields.Boolean('MeToo')
-    me_too_core = fields.Selection([('MeToo', 'MeToo'), ('Core', 'Core')],store=True)
+    me_too_core = fields.Selection([('MeToo', 'MeToo'), ('Core', 'Core')],store=True,string='Core / Me Too')
     target_amt = fields.Integer('Target amt')
     remark=fields.Char('Remark')
     prod_group = fields.Many2one('droga.crm.settings.prod_group')
-
+    type=fields.Selection([('By Indicator', 'By Indicator'), ('By Prod. Group', 'By Prod. Group'), ('Core / Me Too','Core / Me Too')],store=True,required=True)
 
 class sales_target_report(models.Model):
     _name='droga.crm.sales.target.report'
@@ -101,24 +103,43 @@ class sales_target_report(models.Model):
     prod_group = fields.Many2one('droga.crm.settings.prod_group', related='target_detail.prod_group')
 
     sales_team = fields.Many2one('droga.crm.settings.city')
-    target_qty=fields.Integer('Target qty')
-    ach_qty = fields.Integer('Acheived qty')
-    ach_qty_pct = fields.Integer('Acheived qty pct')
-    me_too_core = fields.Selection([('MeToo', 'MeToo'), ('Core', 'Core')],store=True)
-    target_amt = fields.Integer('Target amt')
-    ach_amt = fields.Integer('Acheived amount')
-    ach_amt_pct = fields.Integer('Acheived qty pct')
+    target_qty=fields.Float('Target qty')
+    ach_qty = fields.Float('Acheived qty')
+    ach_qty_pct = fields.Float('Acheived qty pct')
+    me_too_core = fields.Selection([('MeToo', 'MeToo'), ('Core', 'Core')],store=True,required=True)
+    target_amt = fields.Float('Target amt')
+    ach_amt = fields.Float('Acheived amount')
+    ach_amt_pct = fields.Float('Acheived amt pct')
 
     def init(self):
         self._cr.execute(""" 
            create or replace view droga_crm_sales_target_report as 
            (
-                select row_number() over () as id,g.* from (
+                select row_number() over () as id,
                 
-    select b.id as target_detail,c.droga_crm_settings_city_id as sales_team,b.target_qty,0 as ach_qty,0 as ach_qty_pct,cast(b.me_too_core as TEXT),b.target_amt,0 as ach_amt,0 as ach_amt_pct 
-	from droga_crm_sales_target_header a join droga_crm_sales_target_detail b on a.id=b.target_header
+                 t.target_detail,t.type,t.sales_team,t.target_qty,t.ach_qty,t.me_too_core,t.target_amt,t.ach_amt,t.ach_qty_pct,t.ach_amt_pct from (select (case when g.target_qty=0 then 0 else (g.ach_qty/g.target_qty)*100 end) as ach_qty_pct,(case when g.target_amt=0 then 0 else (g.ach_amt/g.target_amt)*100 end) as ach_amt_pct,g.* from (
+                
+    select b.id as target_detail,b.type,c.droga_crm_settings_city_id as sales_team,b.target_qty,
+	case b.type when 'By Indicator' then (select sum(i.price_unit) from sale_order_line i where i.product_id in 
+		(select g.product_product_id from droga_crm_sales_target_detail_product_product_rel g where g.droga_crm_sales_target_detail_id=b.id) and i.cust_location=c.droga_crm_settings_city_id 
+	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from) when 
+		'By Prod. Group' then (select sum(i.price_unit) from sale_order_line i where (select y.categ_id from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.prod_group
+	    and i.cust_location=c.droga_crm_settings_city_id 
+	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from)
+	when 'Core / Me Too' then (select sum(i.price_unit) from sale_order_line i where (select case when y.is_core_product=true then 'Core' else 'MeToo' end from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.me_too_core
+	    and i.cust_location=c.droga_crm_settings_city_id 
+	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from) else 0 end as ach_qty,cast(b.me_too_core as TEXT),b.target_amt,
+	case b.type when 'By Indicator' then (select sum(i.price_unit*i.qty_invoiced) from sale_order_line i where i.product_id in 
+		(select g.product_product_id from droga_crm_sales_target_detail_product_product_rel g where g.droga_crm_sales_target_detail_id=b.id) and i.cust_location=c.droga_crm_settings_city_id 
+	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from) when 
+		'By Prod. Group' then (select sum(i.price_unit*i.qty_invoiced) from sale_order_line i where (select y.categ_id from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.prod_group
+	    and i.cust_location=c.droga_crm_settings_city_id 
+	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from)
+	when 'Core / Me Too' then (select sum(i.price_unit*i.qty_invoiced) from sale_order_line i where (select case when y.is_core_product=true then 'Core' else 'MeToo' end from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.me_too_core
+	    and i.cust_location=c.droga_crm_settings_city_id 
+	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from) else 0 end as ach_amt from droga_crm_sales_target_header a join droga_crm_sales_target_detail b on a.id=b.target_header
 	join droga_crm_sales_target_header_droga_crm_settings_city_rel c on a.id=c.droga_crm_sales_target_header_id
 	
-               ) g 
+               ) g )t
            ) 
          """)

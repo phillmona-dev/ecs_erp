@@ -200,8 +200,7 @@ export class PosFormController extends FormController {
                                                         model: 'sale.order',
                                                         method: 'write',
                                                         args: [[sales_order_id],{
-                                                            invoice_printed:"Yes",
-                                                            fs_number:data.Content.FSInvoiceNumber
+                                                            invoice_printed:"Yes"
                                                         }],
                                                        }, {timeout: 60000})
                                                     .then(function (data){
