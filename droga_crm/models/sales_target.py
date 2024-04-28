@@ -100,7 +100,7 @@ class sales_target_report(models.Model):
     remark = fields.Char('Remark', related='target_detail.remark')
     prod_group = fields.Many2one('droga.crm.settings.prod_group', related='target_detail.prod_group')
 
-    sales_team = fields.Many2many('droga.crm.settings.city')
+    sales_team = fields.Many2one('droga.crm.settings.city')
     target_qty=fields.Integer('Target qty')
     ach_qty = fields.Integer('Acheived qty')
     ach_qty_pct = fields.Integer('Acheived qty pct')
@@ -114,6 +114,11 @@ class sales_target_report(models.Model):
            create or replace view droga_crm_sales_target_report as 
            (
                 select row_number() over () as id,g.* from (
-               select 1 as target_detail,1 as sales_team,0 as target_qty,0 as ach_qty,0 as ach_qty_pct,'MeToo' as me_too_core,0 as target_amt,0 as ach_amt,0 as ach_amt_pct ) g 
+                
+    select b.id as target_detail,c.droga_crm_settings_city_id as sales_team,b.target_qty,0 as ach_qty,0 as ach_qty_pct,cast(b.me_too_core as TEXT),b.target_amt,0 as ach_amt,0 as ach_amt_pct 
+	from droga_crm_sales_target_header a join droga_crm_sales_target_detail b on a.id=b.target_header
+	join droga_crm_sales_target_header_droga_crm_settings_city_rel c on a.id=c.droga_crm_sales_target_header_id
+	
+               ) g 
            ) 
          """)

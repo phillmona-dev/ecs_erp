@@ -6,13 +6,19 @@ from odoo.tools import drop_view_if_exists
 class sales_report_fields(models.Model):
     _inherit = 'sale.order'
     cust_location = fields.Many2one('droga.crm.settings.city', related='partner_id.city_name', store=True)
-
+    fs_number=fields.Char('FS Number')
 
 class sales_report_det_fields(models.Model):
     _inherit = 'sale.order.line'
     cust_location = fields.Many2one('droga.crm.settings.city', related='order_id.cust_location', store=True)
     cust_type_ext_det = fields.Many2one('droga.cust.type', string='Customer type', related='order_id.cust_type_ext',
                                         store=True)
+    fs_number=fields.Char(compute='_get_fs_no',store=True)
+    @api.depends('order_id.fs_number')
+    def _get_fs_no(self):
+        for rec in self:
+            rec.fs_number=rec.order_id.fs_number
+
     date_order_det = fields.Datetime('Date', related='order_id.date_order', store=True)
     order_type_det = fields.Selection([
         ('IM', 'Import'),
