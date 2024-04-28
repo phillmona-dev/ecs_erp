@@ -91,7 +91,7 @@
         <field name="name">droga.crm.sales.target.header.report.search</field>
         <field name="model">droga.crm.sales.target.report</field>
         <field name="arch" type="xml">
-            <search string="" editable="top" delete="0">
+            <search>
                 <field name="sales_team"></field>
                 <field name="indicator"></field>
                 <field name="prod_group"></field>

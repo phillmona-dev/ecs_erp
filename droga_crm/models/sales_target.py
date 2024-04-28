@@ -111,13 +111,9 @@ class sales_target_report(models.Model):
 
     def init(self):
         self._cr.execute(""" 
-           create or replace view droga_crm_grade_vs_schedule_view as 
+           create or replace view droga_crm_sales_target_report as 
            (
                 select row_number() over () as id,g.* from (
-                (select z.userid,y.city_descr,z.month,z.year,z.state,y.name as cust_name,z.id as visit_header_id,y.grade,y.visit_times_per_month as required_visits,(select count(m.*) from droga_customer_visit_detail m where m.visit_header=z.id and m.visit_client=y.id) as planned_visits,y.full_name as customer_type,y.cust_type,y.id as cust_id,z.user_id,(select count(m.*) from droga_customer_visit_detail m where m.visit_header=z.id and m.visit_client=y.id)-y.visit_times_per_month as diff,z.date_from as date_from,z.date_to as date_to,TO_CHAR(TO_TIMESTAMP (z.month::text, 'MM'), 'Month') as month_des,(select y.p_name from droga_pro_sales_master y where y.id=z.pr_sales) as pr_sales from droga_customer_visit_header z join 
-                (select a.name,b.grade,b.visit_times_per_month,c.full_name,d.city_descr,a.city_name,'Customer' as cust_type,a.id,a.company_id from res_partner a left join droga_cust_grade b on a.cust_grade=b.id left join droga_cust_type c on a.cust_type_ext=c.id left join droga_crm_settings_city d on a.city_name=d.id where a.is_company=true and a.city_name is not null) y on 1=1 limit 1000)
-                union
-                (select z.userid,y.city_descr,z.month,z.year,z.state,y.contact_name as cust_name,z.id as visit_header_id,y.grade,y.visit_times_per_month as required_visits,(select count(m.*) from droga_crm_contacts_schedule m where m.visits_header=z.id and m.contact_custom=y.id) as planned_visits,y.full_name as customer_type,y.cust_type,y.id as cust_id,z.user_id,(select count(m.*) from droga_crm_contacts_schedule m where m.visits_header=z.id and m.contact_custom=y.id)-y.visit_times_per_month as diff,z.date_from as date_from,z.date_to as date_to,TO_CHAR(TO_TIMESTAMP (z.month::text, 'MM'), 'Month') as month_des,(select y.p_name from droga_pro_sales_master y where y.id=z.pr_sales) as pr_sales from droga_customer_visit_header z join 
-                (select a.parent_name||' - '||a.contact_name as contact_name,b.grade,b.visit_times_per_month,c.full_name,d.city_descr,a.contact_area,'Contact' as cust_type,a.id,a.company_id from droga_crm_contacts a left join droga_cust_grade b on a.cont_grade=b.id left join droga_cust_type c on a.contact_type=c.id left join droga_crm_settings_city d on a.contact_area=d.id where a.contact_area is not null) y on 1=1 limit 1000)) g 
+               select 1 as target_detail,1 as sales_team,0 as target_qty,0 as ach_qty,0 as ach_qty_pct,'MeToo' as me_too_core,0 as target_amt,0 as ach_amt,0 as ach_amt_pct ) g 
            ) 
          """)
