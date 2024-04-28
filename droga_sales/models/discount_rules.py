@@ -1136,20 +1136,7 @@ class account_move_inherit(models.Model):
 
                         for so_line in sale_order.order_line:
                             so_line.write({'invoice_date': datetime.now()})
-                            if 'FSInvoiceNumber' in vals:
-                                so_line.write({'fs_number': so_line.fs_number+', '+vals['FSInvoiceNumber'] if so_line.fs_number else vals['FSInvoiceNumber']})
                 #get order type and fill analytic
         res=super(account_move_inherit, self).create(vals)
         res.account_move_linked_analytic=analytic
         return res
-
-    def write(self, vals):
-        for rec in self:
-            if 'FSInvoiceNumber' in vals and rec.invoice_origin is str:
-                sale_order = self.env['sale.order'].search(
-                    [('name', '=', str(vals['invoice_origin'])), ('company_id', '=', self.env.company.id)])
-                for so_line in sale_order:
-                    so_line.write({'fs_number': so_line.fs_number + ', ' + vals[
-                        'FSInvoiceNumber'] if so_line.fs_number else vals['FSInvoiceNumber']})
-
-        return super(account_move_inherit, self).write(vals)
