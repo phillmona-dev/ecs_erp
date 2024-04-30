@@ -73,7 +73,7 @@ class sales_target_header(models.Model):
     def duplicate_entry(self):
         for rec in self:
             vals = {
-                'target_detail': rec.target_detail.ids,
+                'target_detail': rec.target_detail.copy(),
                 'type': rec.type,
                 'date_from': rec.date_from,
                 'date_to': rec.date_to,

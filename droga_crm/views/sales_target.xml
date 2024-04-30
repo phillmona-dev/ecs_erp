@@ -15,6 +15,9 @@
                         type="object" string=" Target detail"
                                             name="target_detail_open" class="oe_stat_button"/>
                 <button icon="fa-credit-card-alt"
+                        type="object" string=" Duplicate"
+                                            name="duplicate_entry" class="oe_stat_button"/>
+                <button icon="fa-credit-card-alt"
                         type="object" string=" Get report"
                                             name="get_report" class="oe_stat_button"/>
             </tree>
