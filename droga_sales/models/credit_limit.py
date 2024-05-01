@@ -62,7 +62,7 @@ class cust_sales_credit_limit(models.Model):
     cust_id = fields.Char('Customer ID')
     sales_order_type = fields.Selection([
         ('Local', 'Local'),
-        ('Foreign', 'Foreign')], string='Order type')
+        ('Foreign', 'Foreign')], string='Order type',default='Local')
     contract_num = fields.Char('Contract number')
     invoice_printed = fields.Char(default="No", string="Invoice printed", store=True)
 

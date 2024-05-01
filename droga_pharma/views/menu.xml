@@ -169,6 +169,27 @@
             </menuitem>
         </menuitem>
 
+        <menuitem
+                id="droga_pharma_reports_spc"
+                name="Supply Chain Reports"
+                groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_supply_chain_manager"
+                sequence="31">
+
+            <menuitem
+                id="droga_pharma_reports_spc_proc"
+                name="Procurement reports"
+                sequence="8">
+
+                <menuitem
+                id="droga_pharma_reports_spc_proc_na"
+                name="Newly arrived items"
+                action="droga_pharma_action_spc_proc_na"
+                sequence="8">
+
+                </menuitem>
+
+            </menuitem>
+        </menuitem>
         <menuitem id="menu_drug_information_query"
                   name="DIS"
                   action="action_drug_information_query"

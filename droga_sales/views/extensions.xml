@@ -75,8 +75,7 @@
                        attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
                 <field name="order_type"
                        attrs="{'invisible': [('company_id', '!=', 1)],'required': [('company_id', '=', 1)]}"></field>
-                <field name="sales_order_type"
-                       attrs="{'invisible': [('company_id', '!=', 2)],'required': [('company_id', '=', 2)]}"></field>
+                <field name="sales_order_type"></field>
                 <field name="company_id" invisible="1"></field>
                 <field name="manual_price"></field>
             </xpath>
