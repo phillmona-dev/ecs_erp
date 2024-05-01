@@ -73,14 +73,19 @@ class sales_target_header(models.Model):
     def duplicate_entry(self):
         for rec in self:
             vals = {
-                'target_detail': rec.target_detail.copy(),
                 'type': rec.type,
                 'date_from': rec.date_from,
                 'date_to': rec.date_to,
             }
 
-            self.env['droga.crm.sales.target.header'].create(vals)
+            new_id=self.env['droga.crm.sales.target.header'].create(vals)
 
+            targ_details=[]
+            for det in rec.target_detail:
+                new_line_vals = det.copy_data(default={'target_header': new_id.id})[0]
+                targ_details.append((0, 0, new_line_vals))  # Create a new record with correct format
+
+            new_id.update({'target_detail': targ_details})
 class sales_target_detail(models.Model):
     _name='droga.crm.sales.target.detail'
     target_header=fields.Many2one('droga.crm.sales.target.header',required=True)
