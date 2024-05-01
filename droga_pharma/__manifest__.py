@@ -82,6 +82,7 @@
         'views/inventory/inter_pharmacy_transfer_custom.xml',
         'views/procurement_extension.xml',
         'sp_reports/proc_new_arrived.xml',
+        'sp_reports/itr.xml',
         'views/menu.xml',
     ],
 

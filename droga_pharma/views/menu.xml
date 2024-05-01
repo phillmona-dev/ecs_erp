@@ -174,6 +174,18 @@
                 name="Supply Chain Reports"
                 groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_supply_chain_manager"
                 sequence="31">
+             <menuitem
+                id="droga_pharma_reports_sta"
+                name="Stock analysis"
+                sequence="8">
+
+                <menuitem
+                id="droga_pharma_reports_sta_itr"
+                name="ITR"
+                action="droga_pharma_action_itr"
+                sequence="8">
+                </menuitem>
+            </menuitem>
 
             <menuitem
                 id="droga_pharma_reports_spc_proc"

@@ -263,7 +263,7 @@ class sale_order_line(models.Model):
                     line.disc_applied=disc.discount
                     line.order_id.points_to_deduct = 1
                     line.order_id.deduct_type = 'Discount for health professional'
-                elif disc.cont_type=='bp' and breat_feed_children>0:
+                elif disc.cont_type=='bp' and breat_feed_children>0 and self.order_id.partner_id.gender=='Female':
                     rate = 1 + (disc.discount / 100)
                     line.disc_applied = disc.discount
                     line.order_id.points_to_deduct = 1

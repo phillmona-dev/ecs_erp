@@ -28,8 +28,8 @@
         <field name="arch" type="xml">
             <search string="Stock on hand">
                 <field name="origin"/>
-                <field name="partner_id" optional="show"/>
-                <field name='company_id' optional="hidden"/>
+                <field name="partner_id" string="Supplier"/>
+                <field name='company_id'/>
                 <field name='name'/>
                 <field name='product_id'/>
                 <field name='location_id'/>
