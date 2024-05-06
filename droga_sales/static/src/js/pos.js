@@ -407,6 +407,7 @@ export class PosFormController extends FormController {
                 url: posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
                 method: "GET",
                 dataType: "json",
+                cache: true,
                 crossDomain: true,
                 headers: headers,
                 data: invoice,
