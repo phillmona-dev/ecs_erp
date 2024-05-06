@@ -37,11 +37,6 @@ export class PosFormController extends FormController {
         //get sales order id
          var invoice_origin=this.model.root.data.invoice_origin;
 
-
-
-
-
-
         console.log(this.model.root.data);
         if (this.model.root.data.pos_device_ip_address === "") {
             Dialog.alert(this, _t("The POS device IP address is not set for the current user, please contact the system administrator to set it."));
@@ -388,8 +383,60 @@ export class PosFormController extends FormController {
     }
 
     btnUpdateFs() {
+            if (this.model.root.data.pos_device_ip_address === "") {
+                Dialog.alert(this, _t("The POS device IP address is not set for the current user, please contact the system administrator to set it."));
+                return;
+            }
+            //set posurl
+            posUrl = "http://" + this.model.root.data.pos_device_ip_address;
 
-    }
+            //block UI
+            framework.blockUI();
+
+            const header = {
+                ThirdPartyID: "Odoo",
+                TenantId: "TenantId",
+                TransactionID: this.model.root.data.id,
+            };
+
+            let invoice = JSON.stringify(header);
+
+            $.ajax({
+                url: posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
+                method: "GET",
+                dataType: "json",
+                crossDomain: true,
+                headers: headers,
+                data: invoice,
+                contentType: "application/json",
+                timeout: 60000,
+            }).then((data) => {
+
+                framework.unblockUI();
+                //check print status
+                if (data.Success === "True" && data.Status === "Finished") {
+                    //update data on odoo
+
+                    rpc.query({
+                        model: "account.move",
+                        method: "update_fs_info",
+                        args: [this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber,data.Content.TimeStamp],
+                    }, { timeout: 60000 });
+
+                    browser.location.reload();
+                }
+                else {
+                    Dialog.alert(this, _t(data.ShortMessage));
+                }
+            })
+                .catch((error) => {
+                    //unblock UI
+                    console.log(error);
+                    framework.unblockUI();
+                    Dialog.alert(this, _t("Error"));
+                });
+
+        }
 
     //cancel command when the pos machine stack due to different  reasons
     CancelPosTransaction() {

@@ -23,7 +23,10 @@
                 Cancel
             </button>
 
-
+            <button class="btn" type="button" t-on-click="btnUpdateFs"
+                    groups="droga_sales.payment_term_update" id="btnUpdateFs">
+                Get FS Info
+            </button>
 
 
 

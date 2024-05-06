@@ -134,6 +134,19 @@ class account_move(models.Model):
     def view_init(self):
         pass
 
+    def update_fs_info(self,fsmachineid,fsinvoicenum,ejnumber,timestamp):
+        for rec in self:
+            rec.write({
+                'FPMachineID': fsmachineid,
+                'FSInvoiceNumber': fsinvoicenum,
+                'EJNumber': ejnumber,
+                'FTimeStamp': datetime.strptime(timestamp,'%Y-%m-%d %H:%M:%S') ,
+                'is_invoice_printed_pos': "true",
+            })
+            sales=self.env['sale.order'].search([('name','=',rec.invoice_origin)])
+            for sale in sales:
+                sale.write({'invoice_printed': 'Yes',
+                            'fs_number': fsinvoicenum})
     def generate_sales_xml(self):
 
         file_io = BytesIO()
