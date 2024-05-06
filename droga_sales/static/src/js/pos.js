@@ -396,18 +396,16 @@ export class PosFormController extends FormController {
             const header = {
                 ThirdPartyID: "Odoo",
                 TenantId: "TenantId",
-                TransactionID: String(this.model.root.data.id),
-                LineItem:[{},{}]
+                TransactionID: String(this.model.root.data.name)
             };
 
             let invoice = JSON.stringify(header);
             console.log(posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus")
-            console.log(headers)
             console.log(invoice)
             $.ajax({
                 url: posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
                 method: "GET",
-                dataType: "json",
+                dataType: "JSON",
                 crossDomain: true,
                 headers: headers,
                 data: invoice,
