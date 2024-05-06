@@ -400,12 +400,12 @@ export class PosFormController extends FormController {
             };
 
             let invoice = JSON.stringify(header);
-            console.log(posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus")
+            console.log(posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus/")
             console.log(invoice)
             $.ajax({
-                url: posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
-                method: "POST",
-                dataType: "JSON",
+                url: posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus/",
+                method: "GET",
+                dataType: "json",
                 crossDomain: true,
                 headers: headers,
                 data: invoice,
