@@ -407,27 +407,31 @@ export class PosFormController extends FormController {
             let invoice = JSON.stringify(header);
             console.log(posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus/")
             console.log(invoice)
-            $.ajax({
-                url: posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus/",
-                method: "GET",
-                dataType: "json",
-                crossDomain: true,
-                headers: headersget,
-                data: invoice,
-                timeout: 60000,
-            }).then((data) => {
 
-                framework.unblockUI();
+
+            var settings = {
+                  "url": "http://localhost:8545/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
+                  "method": "GET",
+                  "timeout": 0,
+                  "headers": {
+                    "Content-Type": "application/json",
+                    "ApiKey": "9a2a2f2680f04b43873f02ad7716afdb"
+                  },
+                  "data": invoice,
+                };
+
+            $.ajax(settings).done(function (response) {
+              framework.unblockUI();
                 console.log('Receive part')
-                console.log(data)
+                console.log(response)
                 //check print status
-                if (data.Success === "True" && data.Status === "Finished") {
+                if (response.Success === "True" && response.Status === "Finished") {
                     //update data on odoo
 
                     rpc.query({
                         model: "account.move",
                         method: "update_fs_info",
-                        args: [this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber,data.Content.TimeStamp],
+                        args: [this.model.root.data.id, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber,response.Content.TimeStamp],
                     }, { timeout: 60000 });
 
                     browser.location.reload();
@@ -435,13 +439,7 @@ export class PosFormController extends FormController {
                 else {
                     Dialog.alert(this, _t(data.ShortMessage));
                 }
-            })
-                .catch((error) => {
-                    //unblock UI
-                    console.log(error);
-                    framework.unblockUI();
-                    Dialog.alert(this, _t("Error"));
-                });
+            });
 
         }
 
