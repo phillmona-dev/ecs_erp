@@ -397,6 +397,7 @@ export class PosFormController extends FormController {
                 ThirdPartyID: "Odoo",
                 TenantId: "TenantId",
                 TransactionID: String(this.model.root.data.id),
+                LineItem:[{},{}]
             };
 
             let invoice = JSON.stringify(header);
@@ -407,7 +408,6 @@ export class PosFormController extends FormController {
                 url: posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
                 method: "GET",
                 dataType: "json",
-                cache: true,
                 crossDomain: true,
                 headers: headers,
                 data: invoice,
