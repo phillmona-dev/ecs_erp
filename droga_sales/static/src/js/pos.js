@@ -396,7 +396,7 @@ export class PosFormController extends FormController {
             const header = {
                 ThirdPartyID: "Odoo",
                 TenantId: "TenantId",
-                TransactionID: this.model.root.data.id,
+                TransactionID: String(this.model.root.data.id),
             };
 
             let invoice = JSON.stringify(header);
