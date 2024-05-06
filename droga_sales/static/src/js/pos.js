@@ -400,7 +400,9 @@ export class PosFormController extends FormController {
             };
 
             let invoice = JSON.stringify(header);
-
+            console.log(posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus")
+            console.log(headers)
+            console.log(invoice)
             $.ajax({
                 url: posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
                 method: "GET",
@@ -413,6 +415,8 @@ export class PosFormController extends FormController {
             }).then((data) => {
 
                 framework.unblockUI();
+                console.log('Receive part')
+                console.log(data)
                 //check print status
                 if (data.Success === "True" && data.Status === "Finished") {
                     //update data on odoo
