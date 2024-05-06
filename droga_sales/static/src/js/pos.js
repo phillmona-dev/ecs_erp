@@ -396,34 +396,28 @@ export class PosFormController extends FormController {
             const header = {
                 ThirdPartyID: "Odoo",
                 TenantId: "TenantId",
-                TransactionID: String(this.model.root.data.id),
+                TransactionID: this.model.root.data.id,
             };
-
+            
             const headersget = {
-            "Content-Type": "application/json",
-                    ApiKey: "9a2a2f2680f04b43873f02ad7716afdb",
-                };
-
-            let invoice = JSON.stringify(header);
-            console.log(posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus/")
-            console.log(invoice)
-
-
-            var settings = {
-                  "url": "http://localhost:8545/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
-                  "method": "GET",
-                  "timeout": 0,
-                  "headers": {
-                    "Content-Type": "application/json",
-                    "ApiKey": "9a2a2f2680f04b43873f02ad7716afdb"
-                  },
-                  "data": "{\r\n    ThirdPartyID:\"Odoo\",\r\n    TenantId:\"TenantId\",\r\n    TransactionID:\"+String(this.model.root.data.id)+\"\r\n}    ",
+                "Content-Type": "application/json",
+                ApiKey: "9a2a2f2680f04b43873f02ad7716afdb"
             };
-            console.log(settings)
+
+            const settings = {
+                "url": "http://localhost:8545/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
+                "method": "GET",
+                "timeout": 0,
+                "headers": headersget,
+                "data": JSON.stringify(header),
+            };
+
+            console.log(settings);
+
             $.ajax(settings).done(function (response) {
-              framework.unblockUI();
-                console.log('Receive part')
-                console.log(response)
+                framework.unblockUI();
+                console.log('Receive part');
+                console.log(response);
                 //check print status
                 if (response.Success === "True" && response.Status === "Finished") {
                     //update data on odoo
@@ -431,14 +425,16 @@ export class PosFormController extends FormController {
                     rpc.query({
                         model: "account.move",
                         method: "update_fs_info",
-                        args: [this.model.root.data.id, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber,response.Content.TimeStamp],
+                        args: [this.model.root.data.id, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber, response.Content.TimeStamp],
                     }, { timeout: 60000 });
 
                     browser.location.reload();
-                }
-                else {
+                } else {
                     Dialog.alert(this, _t(response.ShortMessage));
                 }
+            }).fail(function(error) {
+                console.error("Error:", error);
+                // Handle AJAX errors here
             });
 
         }
