@@ -419,7 +419,7 @@ export class PosFormController extends FormController {
                   },
                   "data": "{\r\n    ThirdPartyID:\"Odoo\",\r\n    TenantId:\"TenantId\",\r\n    TransactionID:\"+String(this.model.root.data.id)+\"\r\n}    ",
             };
-
+            console.log(settings)
             $.ajax(settings).done(function (response) {
               framework.unblockUI();
                 console.log('Receive part')
