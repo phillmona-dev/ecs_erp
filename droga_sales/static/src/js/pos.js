@@ -417,8 +417,8 @@ export class PosFormController extends FormController {
                     "Content-Type": "application/json",
                     "ApiKey": "9a2a2f2680f04b43873f02ad7716afdb"
                   },
-                  "data": invoice,
-                };
+                  "data": "{\r\n    ThirdPartyID:\"Odoo\",\r\n    TenantId:\"TenantId\",\r\n    TransactionID:\"+String(this.model.root.data.id)+\"\r\n}    ",
+            };
 
             $.ajax(settings).done(function (response) {
               framework.unblockUI();
@@ -437,7 +437,7 @@ export class PosFormController extends FormController {
                     browser.location.reload();
                 }
                 else {
-                    Dialog.alert(this, _t(data.ShortMessage));
+                    Dialog.alert(this, _t(response.ShortMessage));
                 }
             });
 
