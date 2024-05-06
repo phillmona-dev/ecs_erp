@@ -399,6 +399,11 @@ export class PosFormController extends FormController {
                 TransactionID: String(this.model.root.data.id),
             };
 
+            const headersget = {
+            "Content-Type": "application/json",
+                    ApiKey: "9a2a2f2680f04b43873f02ad7716afdb",
+                };
+
             let invoice = JSON.stringify(header);
             console.log(posUrl + "/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus/")
             console.log(invoice)
@@ -407,9 +412,8 @@ export class PosFormController extends FormController {
                 method: "GET",
                 dataType: "json",
                 crossDomain: true,
-                headers: headers,
+                headers: headersget,
                 data: invoice,
-                contentType: "application/json",
                 timeout: 60000,
             }).then((data) => {
 
