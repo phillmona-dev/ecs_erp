@@ -393,12 +393,8 @@ export class PosFormController extends FormController {
             //block UI
             framework.blockUI();
 
-            const header = {
-                trans_id: this.model.root.data.id,
-            };
-
             const settings = {
-                "url": "http://localhost:4949/get-pos",
+                "url": "http://localhost:4949/get-pos?trans_id="+this.model.root.data.id,
                 "method": "GET",
                 "timeout": 0,
                 "data": JSON.stringify(header),
