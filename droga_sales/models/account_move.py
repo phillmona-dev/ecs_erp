@@ -138,10 +138,10 @@ class account_move(models.Model):
         acc=self.env['account.move'].search([('id','=',res_id)])
         for rec in acc:
             rec.write({
-                'FPMachineID': fsmachineid,
-                'FSInvoiceNumber': fsinvoicenum,
-                'EJNumber': ejnumber,
-                'FTimeStamp': datetime.strptime(timestamp,'%Y-%m-%d %H:%M:%S') ,
+                'FPMachineID': fsmachineid if fsmachineid else ' ',
+                'FSInvoiceNumber': fsinvoicenum if fsinvoicenum else ' ',
+                'EJNumber': ejnumber if ejnumber else ' ',
+                'FTimeStamp': datetime.strptime(timestamp,'%Y-%m-%d %H:%M:%S') if timestamp else datetime.now(),
                 'is_invoice_printed_pos': "true",
             })
             sales=self.env['sale.order'].search([('name','=',rec.invoice_origin)])
