@@ -364,6 +364,8 @@ export class PosFormController extends FormController {
                 "timeout": 0,
             };
 
+            const accid=this.model.root.data.id
+
             $.ajax(settings).done(function (response) {
                 framework.unblockUI();
                 console.log('Receive part');
@@ -376,7 +378,7 @@ export class PosFormController extends FormController {
                     rpc.query({
                         model: "account.move",
                         method: "update_fs_info",
-                        args: [0,this.model.root.data.id, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber, response.Content.TimeStamp],
+                        args: [0,accid, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber, response.Content.TimeStamp],
                     }, { timeout: 60000 });
                     console.log('Update finished');
                     browser.location.reload();
