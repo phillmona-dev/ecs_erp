@@ -167,47 +167,12 @@ export class PosFormController extends FormController {
                     let ts = new Date();
                     let timeStamp = ts.getUTCFullYear() + "-" + ("0" + (ts.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + ts.getUTCDate()).slice(-2) + " " + ("0" + ts.getUTCHours()).slice(-2) + ":" + ("0" + ts.getUTCMinutes()).slice(-2) + ":" + ("0" + ts.getUTCSeconds()).slice(-2);
 
-                    rpc
-                        .query({
-                            model: "account.move", method: "write", args: [[this.model.root.data.id], {
-                                FPMachineID: data.Content.FPMachineID,
-                                FSInvoiceNumber: data.Content.FSInvoiceNumber,
-                                EJNumber: data.Content.EJNumber,
-                                FTimeStamp: timeStamp,
-                                is_invoice_printed_pos: "true",
-                            }],
-                        }, {timeout: 60000})
-                        .then(function (data) {
-
-
-                                //update sales order status
-                                var domain = [['name', '=', invoice_origin]];
-
-                                rpc.query({
-                                    model: 'sale.order',
-                                    method: 'search',
-                                    args: [domain],
-                                }, {timeout: 60000})
-                                .then(function (data){
-                                    var sales_order_id=data[0];
-
-                                                   rpc.query({
-                                                        model: 'sale.order',
-                                                        method: 'write',
-                                                        args: [[sales_order_id],{
-                                                            invoice_printed:"Yes"
-                                                        }],
-                                                       }, {timeout: 60000})
-                                                    .then(function (data){
-
-                                                    });
-                                });
-
-                            Dialog.alert(this, _t("Invoice has been successfully printed!"));
-                            browser.location.reload();
-                        }, function (data) {
-                            Dialog.alert(this, _t("Invoice has not been successfully printed!"));
-                        });
+                    rpc.query({
+                        model: "account.move",
+                        method: "update_fs_info",
+                        args: [this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber, data.Content.TimeStamp],
+                    }, { timeout: 60000 });
+                    
                 } else {
                     Dialog.alert(this, _t(data.ShortMessage));
                 }
@@ -397,7 +362,6 @@ export class PosFormController extends FormController {
                 "url": "http://localhost:4949/get-pos?trans_id="+this.model.root.data.id,
                 "method": "GET",
                 "timeout": 0,
-                "data": JSON.stringify(header),
             };
 
             console.log(settings);
