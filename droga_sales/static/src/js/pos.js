@@ -170,7 +170,7 @@ export class PosFormController extends FormController {
                     rpc.query({
                         model: "account.move",
                         method: "update_fs_info",
-                        args: [this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber, data.Content.TimeStamp],
+                        args: [0,this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber, data.Content.TimeStamp],
                     }, { timeout: 60000 });
 
                 } else {
@@ -364,8 +364,6 @@ export class PosFormController extends FormController {
                 "timeout": 0,
             };
 
-            console.log(settings);
-
             $.ajax(settings).done(function (response) {
                 framework.unblockUI();
                 console.log('Receive part');
@@ -373,13 +371,14 @@ export class PosFormController extends FormController {
                 //check print status
                 if (response.Success === "True" && response.Status === "Finished") {
                     //update data on odoo
+                    console.log('Update started');
                     console.log('Inside');
                     rpc.query({
                         model: "account.move",
                         method: "update_fs_info",
                         args: [0,this.model.root.data.id, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber, response.Content.TimeStamp],
                     }, { timeout: 60000 });
-
+                    console.log('Update finished');
                     browser.location.reload();
                 } else {
                     Dialog.alert(this, _t(response.ShortMessage));
