@@ -394,21 +394,13 @@ export class PosFormController extends FormController {
             framework.blockUI();
 
             const header = {
-                ThirdPartyID: "Odoo",
-                TenantId: "TenantId",
-                TransactionID: this.model.root.data.id,
-            };
-            
-            const headersget = {
-                "Content-Type": "application/json",
-                ApiKey: "9a2a2f2680f04b43873f02ad7716afdb"
+                trans_id: this.model.root.data.id,
             };
 
             const settings = {
-                "url": "http://localhost:8545/pedsfpsrv/api/SalesInvoice/GetInvoicePrintStatus",
+                "url": "http://localhost:4949/get-pos",
                 "method": "GET",
                 "timeout": 0,
-                "headers": headersget,
                 "data": JSON.stringify(header),
             };
 
