@@ -7,6 +7,7 @@ import requests
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from io import BytesIO
+from dateutil import parser
 
 try:
     from base64 import encodebytes
@@ -134,14 +135,30 @@ class account_move(models.Model):
     def view_init(self):
         pass
 
-    def update_fs_info(self,res_id,fsmachineid,fsinvoicenum,ejnumber,timestamp):
-        acc=self.env['account.move'].search([('id','=',res_id)])
-        for rec in acc:
+    def update_fs_info(self,fsmachineid,fsinvoicenum,ejnumber,timestamp,type):
+        for rec in self:
+            if(fsmachineid):
+                rec.write({
+                    'FPMachineID': fsmachineid,
+                })
+            if (fsinvoicenum):
+                rec.write({
+                    'FSInvoiceNumber': fsinvoicenum,
+                })
+            if (ejnumber):
+                rec.write({
+                    'EJNumber': ejnumber,
+                })
+            if(type=="printed"):
+                rec.write({
+                    'FTimeStamp': datetime.now(),
+                })
+            else:
+                if (timestamp):
+                    rec.write({
+                        'FTimeStamp': parser.parser().parse(timestamp) ,
+                    })
             rec.write({
-                'FPMachineID': fsmachineid if fsmachineid else ' ',
-                'FSInvoiceNumber': fsinvoicenum if fsinvoicenum else ' ',
-                'EJNumber': ejnumber if ejnumber else ' ',
-                'FTimeStamp': datetime.strptime(timestamp,'%Y-%m-%d %H:%M:%S') if timestamp else datetime.now(),
                 'is_invoice_printed_pos': "true",
             })
             sales=self.env['sale.order'].search([('name','=',rec.invoice_origin)])

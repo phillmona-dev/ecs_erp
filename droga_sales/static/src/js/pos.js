@@ -158,6 +158,7 @@ export class PosFormController extends FormController {
         })
             .then((data) => {
                 console.log(data);
+                console.log(data.Status)
                 //unblock UI
                 framework.unblockUI();
                 //check print status
@@ -170,7 +171,7 @@ export class PosFormController extends FormController {
                     rpc.query({
                         model: "account.move",
                         method: "update_fs_info",
-                        args: [0,this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber, data.Content.TimeStamp],
+                        args: [this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber, data.Content.TimeStamp,'printed'],
                     }, { timeout: 60000 });
 
                 } else {
@@ -379,7 +380,7 @@ export class PosFormController extends FormController {
                     rpc.query({
                         model: "account.move",
                         method: "update_fs_info",
-                        args: [0,accid, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber, response.Content.TimeStamp],
+                        args: [accid, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber, response.Content.TimeStamp,'getfs'],
                     }, { timeout: 60000 });
                     console.log('Update finished');
                     browser.location.reload();
