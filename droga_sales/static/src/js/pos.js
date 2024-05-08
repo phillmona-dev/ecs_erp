@@ -370,6 +370,7 @@ export class PosFormController extends FormController {
                 framework.unblockUI();
                 console.log('Receive part');
                 response=JSON.parse(response)
+                response=JSON.parse(accid)
                 //check print status
                 if (response.Success === "True" && response.Status === "Finished") {
                     //update data on odoo
@@ -381,7 +382,7 @@ export class PosFormController extends FormController {
                         args: [0,accid, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber, response.Content.TimeStamp],
                     }, { timeout: 60000 });
                     console.log('Update finished');
-                    browser.location.reload();
+                    //browser.location.reload();
                 } else {
                     Dialog.alert(this, _t(response.ShortMessage));
                 }
