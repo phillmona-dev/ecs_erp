@@ -367,7 +367,7 @@ export class PosFormController extends FormController {
             $.ajax(settings).done(function (response) {
                 framework.unblockUI();
                 console.log('Receive part');
-                console.log(response);
+                response=JSON.parse(response)
                 //check print status
                 if (response.Success === "True" && response.Status === "Finished") {
                     //update data on odoo
