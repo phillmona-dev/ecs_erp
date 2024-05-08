@@ -134,8 +134,9 @@ class account_move(models.Model):
     def view_init(self):
         pass
 
-    def update_fs_info(self,fsmachineid,fsinvoicenum,ejnumber,timestamp):
-        for rec in self:
+    def update_fs_info(self,res_id,fsmachineid,fsinvoicenum,ejnumber,timestamp):
+        acc=self.env['account.move'].search([('id','=',res_id)])
+        for rec in acc:
             rec.write({
                 'FPMachineID': fsmachineid,
                 'FSInvoiceNumber': fsinvoicenum,
