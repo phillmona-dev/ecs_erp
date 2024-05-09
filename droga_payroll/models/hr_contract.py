@@ -20,6 +20,9 @@ class HrContract(models.Model):
     salary_structure = fields.One2many(related="job_id.salary_structure")
     salary_structure_custom = fields.One2many("hr.job.salary", "contract_id")
 
+    # sales commission
+    sales_commission = fields.Float("Sales Commission", string='Sales Commission')
+
     # get contract rate
     def get_employee_rate(self, payment_code):
         amount = 0
