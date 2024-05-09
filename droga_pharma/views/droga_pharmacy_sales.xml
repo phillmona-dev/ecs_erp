@@ -135,16 +135,18 @@
                             groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'sale')]}"/>
-                    <button name="set_to_draft"
-                            string="Set to Draft" font-size="16px"
+                    <button name="cancel_sales"
+                            string="Cancel" font-size="16px"
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
-                            type="object" class="btn-primary" data-hotkey="q"
+                            type="object" class="oe_highlight btn-danger" data-hotkey="q"
                             attrs="{'invisible': ['|',('state','not in',('draft','sale')),('invoice_status', '!=', 'to invoice')]}"/>
+                    <!--
                     <button name="action_cancel"
                             string="Cancel" font-size="16px"
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': ['|',('state','not in',('draft','sale')),('invoice_status', '!=', 'to invoice')]}"/>
+                            -->
                     <button name="action_confirm"
                             string="Confirm" font-size="16px"
                             groups="droga_pharma.pharma_director"

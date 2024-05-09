@@ -678,6 +678,10 @@ class sale_order_ext(models.Model):
         self.action_confirm()
         self.create_inv_local()
 
+    def cancel_sales(self):
+        for rec in self:
+            rec._action_cancel()
+
     def create_inv_local(self):
         # self.action_confirm()
         x = {
