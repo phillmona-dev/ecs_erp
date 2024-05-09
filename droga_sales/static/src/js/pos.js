@@ -173,6 +173,8 @@ export class PosFormController extends FormController {
                         method: "update_fs_info",
                         args: [this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber, data.Content.TimeStamp,'printed'],
                     }, { timeout: 60000 });
+                    Dialog.alert(this, _t("Invoice has been successfully printed!"));
+                    browser.location.reload();
 
                 } else {
                     Dialog.alert(this, _t(data.ShortMessage));
