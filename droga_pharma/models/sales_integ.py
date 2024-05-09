@@ -157,10 +157,22 @@ class sales_integ(models.Model):
         #self.invoice_status = temp
 
         for rec in self:
-            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done')])
+            pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done'),('name','not like','%/RET/%')],order="name asc")
             for pick in pickings:
                 for move in pick.move_ids:
                     move.quantity_done=move.product_uom_qty
+                pick.button_validate()
+
+            pickings2 = self.env['stock.picking'].search(
+                [('origin', '=', rec.name), ('state', '!=', 'cancel'), ('state', '!=', 'done'),
+                 ('name', 'like', '%/RET/%')], order="name asc")
+            for pick in pickings2:
+                pick.action_confirm()
+                pick.action_assign()
+                for move in pick.move_ids:
+                    move.quantity_done = move.product_uom_qty
+                    for mv in move.move_line_ids:
+                        mv.lot_id=self.env['stock.move.line'].search([('picking_id','in',pickings.ids),('product_id','=',mv.product_id.id)],limit=1).lot_id
                 pick.button_validate()
         self.state = 'dispense'
 

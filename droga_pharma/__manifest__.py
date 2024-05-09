@@ -73,7 +73,6 @@
         'reports/counselling_printout.xml',
         'views/prescription.xml',
         'views/update_stock.xml',
-        'views/menu.xml',
         'views/customers.xml',
         'views/cust_approval_kanban.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
@@ -82,6 +81,9 @@
         'views/inventory/inventory_delivery_slip_extension.xml',
         'views/inventory/inter_pharmacy_transfer_custom.xml',
         'views/procurement_extension.xml',
+        'sp_reports/proc_new_arrived.xml',
+        'sp_reports/itr.xml',
+        'views/menu.xml',
     ],
 
     # any module necessary for this one to work correctly

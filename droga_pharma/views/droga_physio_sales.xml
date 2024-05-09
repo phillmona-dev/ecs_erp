@@ -8,6 +8,7 @@
                 <field name="name"></field>
                 <field name="emp_descr"></field>
                 <field name="amount_total"></field>
+                <field name="fs_number"></field>
                 <field name="invoice_status"
                     decoration-success="invoice_status == 'invoiced'"
                     decoration-info="invoice_status == 'to invoice'"

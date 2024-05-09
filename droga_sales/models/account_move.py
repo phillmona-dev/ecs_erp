@@ -7,6 +7,7 @@ import requests
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from io import BytesIO
+from dateutil import parser
 
 try:
     from base64 import encodebytes
@@ -63,7 +64,7 @@ class account_move(models.Model):
             sales = self.env['sale.order'].search([('name', '=', rec.invoice_origin)])
             for sale in sales:
                 if rec.FSInvoiceNumber:
-                    sale.write({'inv_number': rec['FSInvoiceNumber']})
+                    sale.write({'inv_number': sale.inv_number+', '+rec['FSInvoiceNumber'] if sale.inv_number else rec['FSInvoiceNumber']})
 
     @api.depends('invoice_line_ids.price_subtotal')
     def _get_core_amt(self):
@@ -134,6 +135,36 @@ class account_move(models.Model):
     def view_init(self):
         pass
 
+    def update_fs_info(self,fsmachineid,fsinvoicenum,ejnumber,timestamp,type):
+        for rec in self:
+            if(fsmachineid):
+                rec.write({
+                    'FPMachineID': fsmachineid,
+                })
+            if (fsinvoicenum):
+                rec.write({
+                    'FSInvoiceNumber': fsinvoicenum,
+                })
+            if (ejnumber):
+                rec.write({
+                    'EJNumber': ejnumber,
+                })
+            if(type=="printed"):
+                rec.write({
+                    'FTimeStamp': datetime.now(),
+                })
+            else:
+                if (timestamp):
+                    rec.write({
+                        'FTimeStamp': parser.parser().parse(timestamp) ,
+                    })
+            rec.write({
+                'is_invoice_printed_pos': "true",
+            })
+            sales=self.env['sale.order'].search([('name','=',rec.invoice_origin)])
+            for sale in sales:
+                sale.write({'invoice_printed': 'Yes',
+                            'fs_number': fsinvoicenum})
     def generate_sales_xml(self):
 
         file_io = BytesIO()

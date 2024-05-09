@@ -969,9 +969,9 @@ class droga_stock_product_extension(models.Model):
             if rec.reg_status=='rejected' and not self.env.user.has_group('droga_inventory.droga_prod_app'):
                 raise UserError("You can not edit the product as it's rejected.")
             if 'tracking' in vals_list:
-                done_moves = self.env['stock.move'].sudo().search([('product_id', 'in', rec.ids)],limit=1)
+                done_moves = self.env['stock.move'].sudo().search([('product_id.product_tmpl_id', 'in', rec.ids)],limit=1)
                 if done_moves:
-                    raise UserError(("You cannot change the batch setup as there are already stock moves for this product. If you want to change batch setup, you should rather archive this product and create a new one."))
+                    raise UserError(("You cannot change the batch setup as there are already stock moves for this product. If you want to change batch setup, you should reverse transactions, archive this product and create a new one."))
 
             if 'default_code' in vals_list:
                 if rec.default_code!=vals_list['default_code'] and vals_list['default_code'][-1]!='_' and rec.default_code and vals_list['default_code']:

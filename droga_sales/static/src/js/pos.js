@@ -37,11 +37,6 @@ export class PosFormController extends FormController {
         //get sales order id
          var invoice_origin=this.model.root.data.invoice_origin;
 
-
-
-
-
-
         console.log(this.model.root.data);
         if (this.model.root.data.pos_device_ip_address === "") {
             Dialog.alert(this, _t("The POS device IP address is not set for the current user, please contact the system administrator to set it."));
@@ -163,6 +158,7 @@ export class PosFormController extends FormController {
         })
             .then((data) => {
                 console.log(data);
+                console.log(data.Status)
                 //unblock UI
                 framework.unblockUI();
                 //check print status
@@ -172,47 +168,14 @@ export class PosFormController extends FormController {
                     let ts = new Date();
                     let timeStamp = ts.getUTCFullYear() + "-" + ("0" + (ts.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + ts.getUTCDate()).slice(-2) + " " + ("0" + ts.getUTCHours()).slice(-2) + ":" + ("0" + ts.getUTCMinutes()).slice(-2) + ":" + ("0" + ts.getUTCSeconds()).slice(-2);
 
-                    rpc
-                        .query({
-                            model: "account.move", method: "write", args: [[this.model.root.data.id], {
-                                FPMachineID: data.Content.FPMachineID,
-                                FSInvoiceNumber: data.Content.FSInvoiceNumber,
-                                EJNumber: data.Content.EJNumber,
-                                FTimeStamp: timeStamp,
-                                is_invoice_printed_pos: "true",
-                            }],
-                        }, {timeout: 60000})
-                        .then(function (data) {
+                    rpc.query({
+                        model: "account.move",
+                        method: "update_fs_info",
+                        args: [this.model.root.data.id, data.Content.FPMachineID, data.Content.FSInvoiceNumber, data.Content.EJNumber, data.Content.TimeStamp,'printed'],
+                    }, { timeout: 60000 });
+                    Dialog.alert(this, _t("Invoice has been successfully printed!"));
+                    browser.location.reload();
 
-
-                                //update sales order status
-                                var domain = [['name', '=', invoice_origin]];
-
-                                rpc.query({
-                                    model: 'sale.order',
-                                    method: 'search',
-                                    args: [domain],
-                                }, {timeout: 60000})
-                                .then(function (data){
-                                    var sales_order_id=data[0];
-
-                                                   rpc.query({
-                                                        model: 'sale.order',
-                                                        method: 'write',
-                                                        args: [[sales_order_id],{
-                                                            invoice_printed:"Yes"
-                                                        }],
-                                                       }, {timeout: 60000})
-                                                    .then(function (data){
-
-                                                    });
-                                });
-
-                            Dialog.alert(this, _t("Invoice has been successfully printed!"));
-                            browser.location.reload();
-                        }, function (data) {
-                            Dialog.alert(this, _t("Invoice has not been successfully printed!"));
-                        });
                 } else {
                     Dialog.alert(this, _t(data.ShortMessage));
                 }
@@ -388,8 +351,50 @@ export class PosFormController extends FormController {
     }
 
     btnUpdateFs() {
+            if (this.model.root.data.pos_device_ip_address === "") {
+                Dialog.alert(this, _t("The POS device IP address is not set for the current user, please contact the system administrator to set it."));
+                return;
+            }
+            //set posurl
+            posUrl = "http://" + this.model.root.data.pos_device_ip_address;
 
-    }
+            //block UI
+            framework.blockUI();
+
+            const settings = {
+                "url": "http://localhost:4949/get-pos?trans_id="+this.model.root.data.id,
+                "method": "GET",
+                "timeout": 0,
+            };
+
+            const accid=this.model.root.data.id
+
+            $.ajax(settings).done(function (response) {
+                framework.unblockUI();
+                console.log('Receive part');
+                response=JSON.parse(response)
+                console.log(accid);
+                //check print status
+                if (response.Success === "True" && response.Status === "Finished") {
+                    //update data on odoo
+                    console.log('Update started');
+                    console.log('Inside');
+                    rpc.query({
+                        model: "account.move",
+                        method: "update_fs_info",
+                        args: [accid, response.Content.FPMachineID, response.Content.FSInvoiceNumber, response.Content.EJNumber, response.Content.TimeStamp,'getfs'],
+                    }, { timeout: 60000 });
+                    console.log('Update finished');
+                    browser.location.reload();
+                } else {
+                    Dialog.alert(this, _t(response.ShortMessage));
+                }
+            }).fail(function(error) {
+                console.error("Error:", error);
+                // Handle AJAX errors here
+            });
+
+        }
 
     //cancel command when the pos machine stack due to different  reasons
     CancelPosTransaction() {

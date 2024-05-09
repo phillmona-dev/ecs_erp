@@ -82,6 +82,14 @@
         <field name="category_id" ref="base.module_category_inventory_inventory"/>
         <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
     </record>
+
+    <record model="ir.rule" id="droga_product_group_company">
+        <field name="name">Product groups multi-company</field>
+        <field name="model_id" ref="model_product_category"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
 </odoo>
 
 

@@ -99,13 +99,12 @@
         <field name="name">stock.move.tree.transaction.tree</field>
         <field name="model">stock.move</field>
         <field name="arch" type="xml">
-            <tree string="Stock transactions - Issue" delete="false" create="false">
+            <tree string="Stock transactions - All" delete="false" create="false">
                 <field name="date" />
 
                 <field name="origin"/>
                 <field name="partner_id" optional="show"/>
                 <field name='company_id' optional="hidden"/>
-                <field name='name'/>
                 <field name='product_id'/>
                 <field name='trans_warehouse'/>
                 <field name="trans_type_detail"></field>
@@ -139,13 +138,13 @@
                         domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
                         name="today_trans"></filter>
 
-                <filter string="Current week sales"
+                <filter string="Current week"
                     domain="[
                         ('date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
                         ('date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
                     name="current_week_sales"></filter>
 
-                <filter string="Previous week sales"
+                <filter string="Previous week"
                        domain="[
                     ('date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d 00:00:00')),
                     ('date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d 00:00:00'))]"
