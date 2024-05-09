@@ -32,6 +32,7 @@
                         <field name="canteen"/>
                         <field name="job_id"/>
                         <field name="sales_commission"/>
+                        <field name="has_company_vehicle"/>
                     </group>
                     <field name="salary_structure" mode="tree"
                            attrs="{'invisible': [('custom_salary_structure', '==',True )]}">
@@ -52,7 +53,6 @@
                             <field name="date_from" width="20" required="1"/>
                             <field name="date_to" width="20"/>
                             <field name="state" width="20"/>
-
 
 
                         </tree>
