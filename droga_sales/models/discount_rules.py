@@ -680,7 +680,8 @@ class sale_order_ext(models.Model):
 
     def cancel_sales(self):
         for rec in self:
-            rec._action_cancel()
+            if rec.state=='draft' or rec.state=='sale':
+                rec._action_cancel()
 
     def create_inv_local(self):
         # self.action_confirm()
