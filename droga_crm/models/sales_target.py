@@ -13,6 +13,14 @@ class sales_target_header(models.Model):
     date_from=fields.Date('Date from',required=True)
     date_to=fields.Date('Date to',compute='_get_date_to',inverse='_inverse_date_to',store=True,required=True)
     status=fields.Selection([('Active','Active'),('Closed','Closed')],required=True,compute='_get_status',store=True,default='Active')
+    detail_count=fields.Float(compute='_get_detail_count',string='Detail count')
+
+    def _get_detail_count(self):
+        for rec in self:
+            rec.detail_count=0
+            for det in rec.target_detail:
+                if det.target_qty+det.target_amt!=0:
+                    rec.detail_count=rec.detail_count+1
 
     @api.depends('date_from','date_to')
     def _get_status(self):
@@ -105,7 +113,7 @@ class sales_target_report(models.Model):
 
     indicator=fields.Many2many('product.product',related='target_detail.indicator')
     remark = fields.Char('Remark', related='target_detail.remark')
-    prod_group = fields.Many2one('droga.crm.settings.prod_group', related='target_detail.prod_group')
+    prod_group = fields.Many2one('droga.crm.settings.prod_group')
 
     sales_team = fields.Many2one('droga.crm.settings.city')
     target_qty=fields.Float('Target qty')
@@ -122,7 +130,7 @@ class sales_target_report(models.Model):
            (
                 select row_number() over () as id,
                 
-                 t.target_detail,t.type,t.sales_team,t.target_qty,t.ach_qty,t.me_too_core,t.target_amt,t.ach_amt,t.ach_qty_pct,t.ach_amt_pct from (select (case when g.target_qty=0 then 0 else (g.ach_qty/g.target_qty)*100 end) as ach_qty_pct,(case when g.target_amt=0 then 0 else (g.ach_amt/g.target_amt)*100 end) as ach_amt_pct,g.* from (
+                 t.target_detail,t.type,t.sales_team,t.target_qty,t.ach_qty,t.me_too_core,t.target_amt,t.ach_amt,t.ach_qty_pct,t.ach_amt_pct,t.prod_group from (select (case when g.target_qty=0 then 0 else (g.ach_qty/g.target_qty)*100 end) as ach_qty_pct,(case when g.target_amt=0 then 0 else (g.ach_amt/g.target_amt)*100 end) as ach_amt_pct,g.* from (
                 
     select b.id as target_detail,b.type,c.droga_crm_settings_city_id as sales_team,b.target_qty,
 	case b.type when 'By Indicator' then (select sum(i.price_unit) from sale_order_line i where i.product_id in 
@@ -142,8 +150,8 @@ class sales_target_report(models.Model):
 	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from)
 	when 'Core / Me Too' then (select sum(i.price_unit*i.qty_invoiced) from sale_order_line i where (select case when y.is_core_product=true then 'Core' else 'MeToo' end from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.me_too_core
 	    and i.cust_location=c.droga_crm_settings_city_id 
-	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from) else 0 end as ach_amt from droga_crm_sales_target_header a join droga_crm_sales_target_detail b on a.id=b.target_header
-	join droga_crm_sales_target_header_droga_crm_settings_city_rel c on a.id=c.droga_crm_sales_target_header_id
+	    and i.invoice_date<=a.date_to and i.invoice_date>=date_from) else 0 end as ach_amt,b.prod_group as prod_group from droga_crm_sales_target_header a join droga_crm_sales_target_detail b on a.id=b.target_header
+	join droga_crm_sales_target_header_droga_crm_settings_city_rel c on a.id=c.droga_crm_sales_target_header_id where (b.target_qty+b.target_amt)!=0
 	
                ) g )t
            ) 

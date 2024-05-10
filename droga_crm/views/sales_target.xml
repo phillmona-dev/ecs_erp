@@ -10,6 +10,7 @@
                 <field name="type"></field>
                 <field name="date_from"></field>
                 <field name="date_to"></field>
+                <field name="detail_count"></field>
                 <field name="status"></field>
                 <button icon="fa-credit-card-alt"
                         type="object" string=" Target detail"
