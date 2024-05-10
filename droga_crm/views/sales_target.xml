@@ -106,6 +106,8 @@
                 <field name="remark"></field>
 
                 <filter name="group_sales_team" string="Sales team" context="{'group_by':'sales_team'}"/>
+                <filter name="group_prod_grp" string="Product group" context="{'group_by':'prod_group'}"/>
+                <filter name="group_me_too" string="Me too / core" context="{'group_by':'me_too_core'}"/>
             </search>
         </field>
     </record>
