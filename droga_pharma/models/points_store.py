@@ -12,6 +12,7 @@ class points_storage(models.Model):
         ('Discount for repeat purchase', 'Discount for repeat purchase'),
         ('Discount for loyal customer', 'Discount for loyal customer'),
         ('Discount for breast feed', 'Discount for breast feed'),
+        ('Manual discount', 'Manual discount'),
         ('Discount for health professional', 'Discount for health professional')
     ])
     sales_ref=fields.Many2one('sale.order',string='Sales order')
