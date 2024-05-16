@@ -304,10 +304,10 @@ class product_offering_report(models.TransientModel):
 class account_move_ext(models.Model):
     _inherit = 'account.move'
     customer_emp = fields.Many2one('droga.pharma.cust.employees', string='Customer Name',
-                                   #compute='_get_cust_emp',store=True)
-                                   store=True)
+                                   compute='_get_cust_emp',store=True)
     cust_id_linked = fields.Char('Employee ID', related='customer_emp.cust_id')
 
+    @api.depends('name')
     def _get_cust_emp(self):
         for rec in self:
             rec.customer_emp=self.env['sale.order'].search([('name','=',rec.invoice_origin)]).customer_emp if len(self.env['sale.order'].search([('name','=',rec.invoice_origin)]))>0 else False
