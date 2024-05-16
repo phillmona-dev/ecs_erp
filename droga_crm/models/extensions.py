@@ -88,6 +88,8 @@ class cust_contact_extension(models.Model):
         for rec in self:
             if 'vat' in vals and rec.vat and not self.env.user.has_group('droga_crm.tin_admin'):
                 raise UserError("You can not edit Tin no.")
+            if 'name' in vals and rec.vat and not self.env.user.has_group('droga_crm.tin_admin'):
+                raise UserError("You can not edit name.")
         return super(cust_contact_extension, self).write(vals)
 
     def update_current_locations(self, res_id, latitude, longitude):
