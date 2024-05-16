@@ -15,11 +15,13 @@ class HrContract(models.Model):
     sales = fields.Boolean("Sales",
                            help="For sales transport allowance upto 2200 is not taxable for others it is upto 600")
     canteen = fields.Boolean("Uses Canteen Service", help="If the employee uses canteen service tick the check box");
-    has_company_vehicle = fields.Boolean('Company Vehicle',help="If the employee provided company vehicle tick the check box. The system will not calculate transport allowance")
+    has_company_vehicle = fields.Boolean('Company Vehicle',
+                                         help="If the employee provided company vehicle tick the check box. The system will not calculate transport allowance")
 
     custom_salary_structure = fields.Boolean("Custom Salary Structure", default=False)
     salary_structure = fields.One2many(related="job_id.salary_structure")
     salary_structure_custom = fields.One2many("hr.job.salary", "contract_id")
+    payment_deductions = fields.One2many("hr.payroll.payment.deduction", 'contract_id')
 
     # sales commission
     sales_commission = fields.Float("Sales Commission")
@@ -49,5 +51,15 @@ class HrContract(models.Model):
                             for rate in rates:
                                 if rate.payment_type.code == payment_code:
                                     amount = rate.amount
+
+        return amount
+
+    def get_payment_deduction_rate(self, pd_code):
+        amount = 0
+        for record in self:
+            if record.state == 'open':
+                payment_deductions = record.payment_deductions.search([('input_types.code', '=', pd_code)])
+                for payment_deduction in payment_deductions:
+                    amount = payment_deduction.amount
 
         return amount

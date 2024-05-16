@@ -57,6 +57,15 @@
 
                         </tree>
                     </field>
+                    <field name="payment_deductions" mode="tree" string="Payment and Deductions">
+                        <tree editable="bottom" string="Payment and Deductions">
+                            <field name="input_type" string="PD"/>
+                            <field name="input_types" string="PD Type"/>
+                            <field name="date_from" string="Date From"/>
+                            <field name="date_to" string="Date To"/>
+                            <field name="amount" string="Amount"/>
+                        </tree>
+                    </field>
                 </page>
 
                 <page string="Benefits" name="benefits" invisible="1">
