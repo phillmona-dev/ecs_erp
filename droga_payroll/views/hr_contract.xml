@@ -64,6 +64,8 @@
                             <field name="date_from" string="Date From"/>
                             <field name="date_to" string="Date To"/>
                             <field name="amount" string="Amount"/>
+                            <field name="total_amount" string="Total Amount"/>
+                            <field name="rem_amount" readonly="1"/>
                         </tree>
                     </field>
                 </page>

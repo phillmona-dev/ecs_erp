@@ -11,3 +11,5 @@ class HrPayrollPaymentDeductions(models.Model):
     date_from = fields.Date("Date From")
     date_to = fields.Date("Date To")
     amount = fields.Float("Amount")
+    total_amount = fields.Float("Total Amount")
+    rem_amount = fields.Float("Remaining Amount")
