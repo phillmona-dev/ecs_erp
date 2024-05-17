@@ -197,7 +197,7 @@ class droga_stock_transfer_custom_detail(models.Model):
     warehouse_id=fields.Many2one(
         'stock.warehouse', "Source warehouse",
         state={'draft': [('readonly', False)]})
-    cons_price=fields.Float('Consignment price')
+    cons_price=fields.Float('Consignment payable')
     @api.depends('location_source_id')
     def _get_wh(self):
         for rec in self:
