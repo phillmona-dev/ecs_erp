@@ -420,6 +420,7 @@ class droga_stock_move_extension(models.Model):
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
+    cons_price=fields.Float('Consignment price')
 
     @api.depends('picking_id.pharmacy_unit')
     def _get_pharma_unit(self):

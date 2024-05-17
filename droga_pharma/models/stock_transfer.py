@@ -128,6 +128,9 @@ class transfer_request_inherit(models.Model):
                 if len(locs) == 0:
                     raise UserError("Issuing warehouse doesn't have internal location.")
 
+            if self.consignment_item and len(self.detail_entries.filtered(lambda ent: ent.cons_price == 0))>0:
+                raise UserError("Consignment price should be filled for all entries.")
+
             def_location_id = locs[0].id
             if not def_location_id:
                 raise UserError("Default internal location is not configured for source warehouse.")
@@ -159,6 +162,7 @@ class transfer_request_inherit(models.Model):
                     'product_uom_qty': rec['product_uom_qty']*(rec["product_id"].uom_id.factor/rec["product_uom"].factor),
                     'location_id': def_location_id,
                     'location_dest_id': self.location_dest_id.id,
+                    'cons_price':rec['cons_price'],
                     # 'state': 'waiting',
                     # 'state': 'confirmed',
                     'state': 'draft',
