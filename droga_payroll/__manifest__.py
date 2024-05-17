@@ -28,7 +28,7 @@
         'views/hr_payslip_run.xml',
         'views/hr_contract.xml',
         'views/hr_payroll_payment_deduction.xml',
-        'views/menu.xml',
+        'views/Menu.xml',
         'report/hr_payslip_run.xml',
 
     ],
