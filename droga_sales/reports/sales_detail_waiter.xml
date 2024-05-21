@@ -12,7 +12,7 @@
                 <field name="fs_number" optional="hide"/>
                 <field name="itemcode" string="ItemCode" optional="show"/>
                 <field name="itemdesc" string="ItemDescription" optional="show"/>
-                <field name="qty_invoiced" string="Qty" sum="Total" optional="show"/>
+                <field name="import_quant_invoiced" string="Qty" sum="Total" optional="show"/>
                 <field name="manufacturing" string="Manufacturer" optional="show"/>
                 <field name="crm_group1" string="CRMCategory" optional="show"/>
                 <field name="itemcateg" string="INVCategory" optional="show"/>

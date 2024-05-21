@@ -39,6 +39,22 @@ class sales_target_header(models.Model):
                     ([('target_detail.target_header', 'in', self.ids)])
             }
 
+    def get_reports_prod(self):
+        for rec in self:
+            rec.date_from_rep=rec.date_from
+            rec.date_to_rep = rec.date_to
+            return {
+                'name': 'Target report '+str(rec.date_from)+' to '+ str(rec.date_to),
+                'view_mode': 'tree',
+                'view_type': 'tree',
+                'res_model': 'droga.crm.sales.target.report',
+                'view_id': self.env.ref('droga_crm.droga_crm_saels_target_report').id,
+                'type': 'ir.actions.act_window',
+                'context': {'search_default_group_prod_grp': 1},
+                'domain':
+                    ([('target_detail.target_header', 'in', self.ids)])
+            }
+
     def _get_detail_count(self):
         for rec in self:
             rec.detail_count=0
