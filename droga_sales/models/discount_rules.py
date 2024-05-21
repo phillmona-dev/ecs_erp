@@ -680,7 +680,7 @@ class sale_order_ext(models.Model):
 
     def cancel_sales(self):
         for rec in self:
-            if rec.state=='draft' or rec.state=='sale':
+            if (rec.state=='draft' or rec.state=='sale') and len(self.env["account.move"].search([('invoice_origin', '=', rec.name)]))==0:
                 rec._action_cancel()
 
     def create_inv_local(self):
