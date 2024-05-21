@@ -27,6 +27,8 @@
         'security/ir.model.access.csv',
         'views/hr_payslip_run.xml',
         'views/hr_contract.xml',
+        'views/hr_payroll_payment_deduction.xml',
+        'views/Menu.xml',
         'report/hr_payslip_run.xml',
 
     ],
