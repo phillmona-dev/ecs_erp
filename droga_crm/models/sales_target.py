@@ -169,11 +169,11 @@ class sales_target_report(models.Model):
     sales_team = fields.Many2one('droga.crm.settings.city')
     target_qty=fields.Float('Target qty')
     ach_qty = fields.Float('Acheived qty')
-    ach_qty_pct = fields.Float('Acheived qty pct')
+    ach_qty_pct = fields.Float('Acheived qty pct',group_operator=False)
     me_too_core = fields.Selection([('MeToo', 'MeToo'), ('Core', 'Core')],store=True,required=True)
     target_amt = fields.Float('Target amt')
     ach_amt = fields.Float('Acheived amount')
-    ach_amt_pct = fields.Float('Acheived amt pct')
+    ach_amt_pct = fields.Float('Acheived amt pct',group_operator=False)
 
     def init(self):
         self._cr.execute(""" 
@@ -183,16 +183,16 @@ class sales_target_report(models.Model):
                 
                  t.target_detail,t.type,t.sales_team,t.target_qty,t.ach_qty,t.me_too_core,t.target_amt,t.ach_amt,t.ach_qty_pct,t.ach_amt_pct,t.prod_group,t.header_id from (select (case when g.target_qty=0 then 0 else (g.ach_qty/g.target_qty)*100 end) as ach_qty_pct,(case when g.target_amt=0 then 0 else (g.ach_amt/g.target_amt)*100 end) as ach_amt_pct,g.* from (
                 
-    select b.id as target_detail,b.type,c.droga_crm_settings_city_id as sales_team,b.target_qty*a.rate as target_qty,
-	case b.type when 'By Indicator' then (select sum(i.qty_invoiced) from sale_order_line i where i.product_id in 
+    select b.id as target_detail,b.type,c.droga_crm_settings_city_id as sales_team,b.target_qty*a.rate*(cast((a.date_to_rep-a.date_from_rep)as decimal(7,2))/cast((a.date_to-a.date_from)as decimal(7,2))) as target_qty,
+	case b.type when 'By Indicator' then (select sum(i.import_quant_invoiced) from sale_order_line i where i.product_id in 
 		(select g.product_product_id from droga_crm_sales_target_detail_product_product_rel g where g.droga_crm_sales_target_detail_id=b.id) and i.cust_location=c.droga_crm_settings_city_id 
 	    and i.invoice_date<=a.date_to_rep and i.invoice_date>=date_from_rep) when 
-		'By Prod. Group' then (select sum(i.qty_invoiced) from sale_order_line i where (select y.categ_id from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.prod_group
+		'By Prod. Group' then (select sum(i.import_quant_invoiced) from sale_order_line i where (select y.categ_id from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.prod_group
 	    and i.cust_location=c.droga_crm_settings_city_id 
 	    and i.invoice_date<=a.date_to_rep and i.invoice_date>=date_from_rep)
-	when 'Core / Me Too' then (select sum(i.qty_invoiced) from sale_order_line i where (select case when y.is_core_product=true then 'Core' else 'MeToo' end from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.me_too_core
+	when 'Core / Me Too' then (select sum(i.import_quant_invoiced) from sale_order_line i where (select case when y.is_core_product=true then 'Core' else 'MeToo' end from product_template y where y.id=(select u.product_tmpl_id from product_product u where u.id=i.product_id)) =b.me_too_core
 	    and i.cust_location=c.droga_crm_settings_city_id 
-	    and i.invoice_date<=a.date_to_rep and i.invoice_date>=date_from_rep) else 0 end as ach_qty,cast(b.me_too_core as TEXT),b.target_amt*a.rate as target_amt,
+	    and i.invoice_date<=a.date_to_rep and i.invoice_date>=date_from_rep) else 0 end as ach_qty,cast(b.me_too_core as TEXT),b.target_amt*a.rate*(cast((a.date_to_rep-a.date_from_rep)as decimal(7,2))/cast((a.date_to-a.date_from)as decimal(7,2))) as target_amt,
 	case b.type when 'By Indicator' then (select sum(i.invoiced_amt)*1.0 from sale_order_line i where i.product_id in 
 		(select g.product_product_id from droga_crm_sales_target_detail_product_product_rel g where g.droga_crm_sales_target_detail_id=b.id) and i.cust_location=c.droga_crm_settings_city_id 
 	    and i.invoice_date<=a.date_to_rep and i.invoice_date>=date_from_rep) when 

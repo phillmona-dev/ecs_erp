@@ -282,6 +282,17 @@ class cust_sales_no_create_after_invoice(models.Model):
     order_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale')], string='Order type', related='order_id.order_type')
+    import_quant_invoiced=fields.Float('Invoiced quantity',  store=True)
+
+    @api.depends('qty_invoiced')
+    def _get_on_hand(self):
+        for rec in self:
+            if rec.company_id.id == 1 and rec.product_id.import_uom_new.factor != 0:
+                rec.import_quant_invoiced = rec.qty_invoiced / (
+                            rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+            else:
+                rec.import_quant_invoiced = rec.qty_invoiced
+
 
     def _get_expiry(self):
         for rec in self:
