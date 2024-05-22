@@ -22,7 +22,10 @@ class sales_target_header(models.Model):
 
     def _get_descr(self):
         for rec in self:
-            rec.header_description=rec.type+' target, '+rec.date_from.strftime('%d-%b-%Y').upper()+' - '+rec.date_to.strftime('%d-%b-%Y').upper()
+            cities=''
+            for cit in rec.sales_team:
+                cities=cities+cit.city_descr+', '
+            rec.header_description=cities+rec.type+' target, '+rec.date_from.strftime('%d-%b-%Y').upper()+' - '+rec.date_to.strftime('%d-%b-%Y').upper()
     def get_reports_all(self):
         for rec in self:
             rec.date_from_rep=rec.date_from
@@ -185,11 +188,18 @@ class sales_target_report(models.Model):
     sales_team = fields.Many2one('droga.crm.settings.city')
     target_qty=fields.Float('Target qty')
     ach_qty = fields.Float('Acheived qty')
-    ach_qty_pct = fields.Float('Acheived qty pct',group_operator=False)
+    ach_qty_pct = fields.Float('Acheived qty pct')
     me_too_core = fields.Selection([('MeToo', 'MeToo'), ('Core', 'Core')],store=True,required=True)
     target_amt = fields.Float('Target amt')
     ach_amt = fields.Float('Acheived amount')
-    ach_amt_pct = fields.Float('Acheived amt pct',group_operator=False)
+    ach_amt_pct = fields.Float('Acheived amt pct')
+    def read_group(self, domain, fields, groupby, **kwargs):
+        grouped_data = super(sales_target_report, self).read_group(domain, fields, groupby)
+        for group in grouped_data:
+            group['ach_qty_pct'] = (group['ach_qty'] / group['target_qty']) * 100 if group['target_qty'] != 0 else 0
+            group['ach_amt_pct'] = (group['ach_amt'] / group['target_amt']) * 100 if group['target_amt'] != 0 else 0
+
+        return grouped_data
 
     def init(self):
         self._cr.execute(""" 
