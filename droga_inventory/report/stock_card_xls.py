@@ -123,6 +123,12 @@ class inventory_stock_card_xls(models.TransientModel):
                         sheet.write(row_start, 9, move_line['lot_id'].name)
                     if move_line['expiration_date']:
                         sheet.write(row_start, 10, move_line['expiration_date'], date_format)
+
+                    fs_no = self.env['account.move'].search([('invoice_origin', '=',
+                                                              move_line['origin'] if move_line['origin'] else move_line[
+                                                                  'reference'])])
+
+                    sheet.write(row_start, 11, fs_no[0].FSInvoiceNumber if len(fs_no) > 0 else '', date_format)
                     row_start+=1
             row_start+=5
 
@@ -275,7 +281,7 @@ class inventory_stock_card_xls(models.TransientModel):
 
         sheet.merge_range('J'+str(row_start+9)+':J'+str(row_start+11), 'Batch #', title_format)
         sheet.merge_range('K'+str(row_start+9)+':K'+str(row_start+11), 'Expiry\nDate', title_format)
-        sheet.merge_range('L'+str(row_start+9)+':L'+str(row_start+11), 'Remark', title_format)
+        sheet.merge_range('L'+str(row_start+9)+':L'+str(row_start+11), 'FS Number', title_format)
 
         return sheet
 
