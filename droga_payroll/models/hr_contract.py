@@ -58,7 +58,7 @@ class HrContract(models.Model):
         amount = 0
         for record in self:
             if record.state == 'open':
-                payment_deductions = record.payment_deductions.search([('input_types.code', '=', pd_code)])
+                payment_deductions = record.payment_deductions.search([('input_types.code', '=', pd_code),('contract_id','=',record.id)])
                 for payment_deduction in payment_deductions:
                     amount = payment_deduction.amount
 
