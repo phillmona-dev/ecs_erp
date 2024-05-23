@@ -49,7 +49,13 @@ class droga_stock_move_line_extension(models.Model):
 
     reserved_uom_qty_done = fields.Float('Reserved', compute='_get_on_hand')
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False, compute='_get_pharma_unit',store=True)
-    fs_number=fields.Char('FS Number',compute='_get_pharma_unit',store=True)
+    fs_number=fields.Char('FS Number',compute='_get_fs_num',store=True,default=' ')
+
+    def _get_fs_num(self):
+        for rec in self:
+            sale=self.env['account.move'].search([('invoice_origin','=',rec.move_id.origin)])
+            if len(sale)>0:
+                rec.fs_number=sale.FSInvoiceNumber
     @api.depends('move_id.pharmacy_unit')
     def _get_pharma_unit(self):
         for rec in self:
