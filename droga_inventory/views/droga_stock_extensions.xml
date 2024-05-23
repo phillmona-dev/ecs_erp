@@ -216,6 +216,7 @@
                 <field name="off_supplies"></field>
                 <field name="group_type"></field>
                 <field name="reservation_period"></field>
+                <field name="batch_expiry_alert_date"></field>
             </xpath>
         </field>
     </record>

@@ -55,7 +55,7 @@ class droga_stock_move_line_extension(models.Model):
         for rec in self:
             sale=self.env['account.move'].search([('invoice_origin','=',rec.move_id.origin)])
             if len(sale)>0:
-                rec.fs_number=sale.FSInvoiceNumber
+                rec.fs_number=sale[0].FSInvoiceNumber
     @api.depends('move_id.pharmacy_unit')
     def _get_pharma_unit(self):
         for rec in self:
@@ -1080,6 +1080,7 @@ class product_selection_field(models.Model):
         ('EX','Export items'),
     ('OS', 'Office supplies')], string='Group type.')
     reservation_period=fields.Float('Reservation period in Hrs',default=0)
+    batch_expiry_alert_date = fields.Float('Batch expiry alert in days', default=90)
 
 class ResUsers(models.Model):
     _inherit = 'res.users'

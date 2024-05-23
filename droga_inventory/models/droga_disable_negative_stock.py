@@ -13,6 +13,7 @@ class StockQuant(models.Model):
     import_counted=fields.Float('Import counted')
     import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
 
+
     def write(self, vals):
         if 'import_counted' in vals:
             for res in self:
@@ -80,12 +81,13 @@ class StockQuant(models.Model):
                 )
             #Pharmacy stock out tracker
             if quant.location_id.usage=="internal":
-                stock_hist=self.env['product.availability.pharmacy'].search([('prod','=',quant.product_id.id),('warehouse','=',quant.location_id.warehouse_id.id)])
+                stock_hist=self.env['product.availability.pharmacy'].search([('prod','=',quant.product_id.id),('batch_id','=',quant.lot_id.id),('warehouse','=',quant.location_id.warehouse_id.id)])
                 if len(stock_hist)==0:
                     stock_tracker_vals = {
                         'prod': quant.product_id.id,
                         'warehouse': quant.location_id.warehouse_id.id,
                         'stock_quantity_total': quant.quantity,
+                        'batch_id':quant.lot_id.id
                     }
                     self.env['product.availability.pharmacy'].create(stock_tracker_vals)
                 else:

@@ -1,18 +1,56 @@
 from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import fields, models, api
 
 class prod_availability(models.Model):
     _name='product.availability.pharmacy'
-    prod=fields.Many2one('product.product')
-    warehouse=fields.Many2one('stock.warehouse')
-    stock_quantity_total = fields.Float('Stock quantity')
+    prod=fields.Many2one('product.product',readonly=True)
+    warehouse=fields.Many2one('stock.warehouse',readonly=True)
+    stock_quantity_total = fields.Float('Stock quantity',readonly=True)
     availability = fields.Char('Availability', compute='_compute_availability', store=True)
     categ_id=fields.Many2one('product.category',string='Product category',related='prod.product_tmpl_id.categ_id',store=True)
     wh_type = fields.Selection([
         ('IM', 'Import'),
         ('WS', 'Wholesale'), ('PT', 'Physiotherapy'),
         ('PH', 'Pharmacy'), ('PR', 'Project')], related='warehouse.wh_type', store=True)
+    batch_id=fields.Many2one('stock.lot',string='Batch ID',readonly=True)
+    expiry_date=fields.Datetime('Expiry date',compute='_expiry_status',store=True)
+    expiry_status=fields.Char('Expiry status',compute='_expiry_status',store=True)
+    company_id = fields.Many2one('res.company', string='Company',readonly=True,
+                                 default=lambda self: self.env.company.id)
+
+    availability_import = fields.Char('Availability', compute='_compute_availability_import', store=True)
+    stock_quantity_total_import = fields.Float('Stock quantity', compute='_compute_availability_import', store=True)
+    @api.depends('expiry_date','batch_id.expiration_date','prod')
+    def _expiry_status(self):
+        for rec in self:
+            rec.expiry_date=rec.batch_id.expiration_date
+
+            if not rec.expiry_date:
+                rec.expiry_status = 'No expiry'
+            elif datetime.today()>rec.expiry_date:
+                rec.expiry_status = 'Expired'
+            elif datetime.today()+ relativedelta(days=rec.prod.product_tmpl_id.categ_id.batch_expiry_alert_date)>rec.expiry_date:
+                rec.expiry_status='Near Expiry'
+            else:
+                rec.expiry_status = 'Up-to-Date'
+    @api.depends('stock_quantity_total','prod.product_tmpl_id.import_uom_new')
+    def _compute_availability_import(self):
+        for rec in self:
+            if rec.company_id.id == 1 and rec.prod.product_tmpl_id.import_uom_new.factor != 0:
+                rec.stock_quantity_total_import = rec.stock_quantity_total / (
+                            rec.prod.product_tmpl_id.uom_id.factor / rec.prod.product_tmpl_id.import_uom_new.factor)
+            else:
+                rec.stock_quantity_total_import = rec.stock_quantity_total
+
+            if rec.stock_quantity_total_import == 0:
+                rec.availability_import = 'Stock out'
+            elif rec.stock_quantity_total_import > 0 and rec.stock_quantity_total <= rec.prod.product_tmpl_id.pharmacy_order_point:
+                rec.availability_import = 'Needs reordering'
+            else:
+                rec.availability_import = 'Available'
 
     @api.depends('stock_quantity_total', 'prod.product_tmpl_id.pharmacy_order_point')
     def _compute_availability(self):
