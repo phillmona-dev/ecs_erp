@@ -5,7 +5,7 @@ from datetime import date
 class HrPayrollPaymentDeductions(models.Model):
     _name = 'hr.payroll.payment.deduction'
 
-    contract_id = fields.Many2one("hr.contract")
+    contract_id = fields.Many2one("hr.contract",domain="[('state', '=', 'open')]")
     employee_id = fields.Many2one(related='contract_id.employee_id')
     input_type = fields.Selection([('Payment', 'Payment'), ('Deduction', 'Deduction')])
     input_types = fields.Many2one('hr.payslip.input.type', 'Input Types')
