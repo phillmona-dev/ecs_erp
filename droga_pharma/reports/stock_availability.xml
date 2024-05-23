@@ -4,13 +4,15 @@
         <field name="name">product.availability.pharmacy.tree.transaction.tree</field>
         <field name="model">product.availability.pharmacy</field>
         <field name="arch" type="xml">
-            <tree string="Stock availability" delete="false" create="false">
+            <tree string="Stock availability" delete="false" create="false" default_order='write_date'>
                 <field name="prod"/>
                 <field name="warehouse"/>
                 <field name='stock_quantity_total'/>
+                <field name='categ_id'/>
                 <field name="availability" invisible="1"></field>
                 <field name="availability" decoration-success="availability =='Available'" decoration-warning="availability =='Needs reordering'"
                        decoration-danger="availability == 'Stock out'" widget="badge"></field>
+                <field name="write_date" string="Last update"></field>
             </tree>
         </field>
     </record>
@@ -24,6 +26,11 @@
                 <field name="warehouse"/>
                 <field name='stock_quantity_total'/>
                 <field name='availability'/>
+
+                <filter name="available" string="Available" domain="[('availability', '=', 'Available')]" />
+                <filter name="needs_reordering" string="Needs reordering" domain="[('availability', '=', 'Needs reordering')]" />
+                <filter name="stock_out" string="Stock out" domain="[('availability', '=', 'Stock out')]" />
+                <filter name="group_categ" string="Category" context="{'group_by':'categ_id'}"/>
             </search>
         </field>
     </record>
@@ -34,5 +41,7 @@
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="stock_availability_pharma_all_search"></field>
         <field name="view_id" ref="stock_availability_pharma_tree"/>
+        <field name="domain">[('wh_type', '=', 'PH'),('has_access','=',True)]</field>
+        <field name="context">{'search_default_stock_out':1}</field>
     </record>
 </odoo>
