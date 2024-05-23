@@ -78,6 +78,21 @@ class StockQuant(models.Model):
                         "complete_name": quant.location_id.complete_name,
                     }
                 )
+            #Pharmacy stock out tracker
+            if quant.location_id.usage=="internal":
+                stock_hist=self.env['product.availability.pharmacy'].search([('prod','=',quant.product_id.id),('warehouse','=',quant.location_id.warehouse_id.id)])
+                if len(stock_hist)==0:
+                    stock_tracker_vals = {
+                        'prod': quant.product_id.id,
+                        'warehouse': quant.location_id.warehouse_id.id,
+                        'stock_quantity_total': quant.quantity,
+                    }
+                    self.env['product.availability.pharmacy'].create(stock_tracker_vals)
+                else:
+                    prod_sum_phar = sum(self.env['stock.quant'].search(
+                        [('product_id', '=', quant.product_id.id), ('location_id.warehouse_id', '=', quant.warehouse_id.id)]).mapped(
+                        'quantity'))
+                    stock_hist[0].write({'stock_quantity_total': prod_sum_phar})
 
             prod_sum =  sum(self.env['stock.quant'].search(
                 [('product_id', '=', quant.product_id.id), ('location_id.usage', '=', 'internal')]).mapped('quantity'))

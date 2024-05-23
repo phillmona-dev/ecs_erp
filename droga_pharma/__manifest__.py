@@ -26,6 +26,7 @@
         'views/credit_contract_selling_price.xml',
         'views/dis_query_form.xml',
         'reports/mtm_report.xml',
+        'reports/stock_availability.xml',
         'reports/mtm_report_view.xml',
         'views/droga_physio_sales.xml',
         'views/droga_pharmacy_sales.xml',

@@ -70,7 +70,7 @@
                         <field name="detailed_type"/>
 
                         <field name="emergency_order_point"/>
-
+                        <field name="pharmacy_order_point"></field>
                         <field name="maximum_stock_level"/>
 
                         <field name="average_month_consumption"/>

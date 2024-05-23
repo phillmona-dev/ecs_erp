@@ -2,10 +2,26 @@ from datetime import datetime
 
 from odoo import fields, models, api
 
+class prod_availability(models.Model):
+    _name='product.availability.pharmacy'
+    prod=fields.Many2one('product.product')
+    warehouse=fields.Many2one('stock.warehouse')
+    stock_quantity_total = fields.Float('Stock quantity')
+    availability = fields.Char('Availability', compute='_compute_availability', store=True)
 
+    @api.depends('stock_quantity_total', 'prod.product_tmpl_id.pharmacy_order_point')
+    def _compute_availability(self):
+        for rec in self:
+            if rec.stock_quantity_total == 0:
+                rec.availability = 'Stock out'
+            elif rec.stock_quantity_total > 0 and rec.stock_quantity_total <= rec.prod.product_tmpl_id.pharmacy_order_point:
+                rec.availability = 'Needs reordering'
+            else:
+                rec.availability = 'Available'
 class product_alerts(models.Model):
     _inherit='product.template'
     most_recent_so_alert_date=fields.Date('Most recent alert time',default=datetime.now().date(),store=True)
+    pharmacy_order_point=fields.Float('Pharmacy emergency order point per branch')
     most_recent_order_alert_date = fields.Date('Most recent minimum level order alert time', default=datetime.now().date(), store=True)
     most_recent_trans_date=fields.Date('Most recent trans date',default=datetime.now().date(),store=True)
     stock_quantity_total=fields.Float('Stock quantity in droga')

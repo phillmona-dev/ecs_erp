@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="stock_availability_pharma_tree" model="ir.ui.view">
+        <field name="name">product.availability.pharmacy.tree.transaction.tree</field>
+        <field name="model">product.availability.pharmacy</field>
+        <field name="arch" type="xml">
+            <tree string="Stock availability" delete="false" create="false">
+                <field name="prod"/>
+                <field name="warehouse"/>
+                <field name='stock_quantity_total'/>
+                <field name="availability" invisible="1"></field>
+                <field name="availability" decoration-success="availability =='Available'" decoration-warning="availability =='Needs reordering'"
+                       decoration-danger="availability == 'Stock out'" widget="badge"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="stock_availability_pharma_all_search" model="ir.ui.view">
+        <field name="name">product.availability.pharmacy.tree.transaction.search</field>
+        <field name="model">product.availability.pharmacy</field>
+        <field name="arch" type="xml">
+            <search string="Stock availability">
+                <field name="prod"/>
+                <field name="warehouse"/>
+                <field name='stock_quantity_total'/>
+                <field name='availability'/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="droga_pharma_inv_availability_all_warehouse_action">
+        <field name="name">Stock availability</field>
+        <field name="res_model">product.availability.pharmacy</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="stock_availability_pharma_all_search"></field>
+        <field name="view_id" ref="stock_availability_pharma_tree"/>
+    </record>
+</odoo>
