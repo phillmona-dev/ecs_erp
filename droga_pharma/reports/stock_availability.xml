@@ -17,7 +17,7 @@
                 <field name="expiry_status" invisible="1"></field>
                 <field name="expiry_status" decoration-success="expiry_status =='Up-to-Date'" decoration-warning="expiry_status =='Near Expiry'"
                        decoration-danger="expiry_status == 'Expired'" widget="badge"></field>
-                <field name="write_date" string="Last update" invisible="1"></field>
+                <field name="write_date" string="Last transaction date"></field>
             </tree>
         </field>
     </record>
@@ -42,6 +42,7 @@
 
                 <filter name="prod" string="Product" context="{'group_by':'prod'}"/>
                 <filter name="group_categ" string="Category" context="{'group_by':'categ_id'}"/>
+                <filter name="group_wareh" string="Warehouse" context="{'group_by':'warehouse'}"/>
             </search>
         </field>
     </record>
