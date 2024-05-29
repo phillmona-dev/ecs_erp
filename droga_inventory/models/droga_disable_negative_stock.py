@@ -58,7 +58,7 @@ class StockQuant(models.Model):
             if (
                 float_compare(quant.quantity, 0, precision_digits=p) == -1
                 and quant.product_id.type == "product"
-                and quant.location_id.usage in ["internal", "transit","production"]
+                and quant.location_id.usage in ["internal", "transit"]
             ):
                 msg_add = ""
                 if quant.lot_id:

@@ -157,6 +157,9 @@ class sales_integ(models.Model):
         #self.invoice_status = temp
 
         for rec in self:
+            moves=self.env['stock.move'].search([('state','in',('assigned','partially_available')),('location_id.warehouse_id','=',rec.wareh.id),('reference','like','MTOV%'),('product_id','in',rec.order_line.product_id.ids)])
+            for mv in moves:
+                mv.picking_id.do_unreserve()
             pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done'),('name','not like','%/RET/%')],order="name asc")
             for pick in pickings:
                 for move in pick.move_ids:
