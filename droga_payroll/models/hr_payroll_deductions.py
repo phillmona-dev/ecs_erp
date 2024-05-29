@@ -5,7 +5,7 @@ from datetime import date
 class HrPayrollPaymentDeductions(models.Model):
     _name = 'hr.payroll.payment.deduction'
 
-    contract_id = fields.Many2one("hr.contract",domain="[('state', '=', 'open')]")
+    contract_id = fields.Many2one("hr.contract", domain="[('state', '=', 'open')]")
     employee_id = fields.Many2one(related='contract_id.employee_id')
     input_type = fields.Selection([('Payment', 'Payment'), ('Deduction', 'Deduction')])
     input_types = fields.Many2one('hr.payslip.input.type', 'Input Types')
@@ -23,3 +23,12 @@ class HrPayrollVariablePayments(models.Model):
     input_types = fields.Many2one('hr.payslip.input.type', 'Input Types')
     fiscal_year = fields.Many2one("account.fiscal.year", "Fiscal Year")
     period = fields.Many2one("account.fiscal.year.period", domain="[('fiscal_year_id', '=', fiscal_year)]")
+
+
+class HrPayrollRates(models.Model):
+    _name = 'hr.payroll.rate'
+
+    code = fields.Char("Code")
+    rate = fields.Float("Rate")
+    date_from = fields.Date("Date From")
+    date_to = fields.Date("Date To")
