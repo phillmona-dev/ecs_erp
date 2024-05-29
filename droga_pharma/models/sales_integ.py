@@ -163,6 +163,7 @@ class sales_integ(models.Model):
             pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done'),('name','not like','%/RET/%')],order="name asc")
             for pick in pickings:
                 for move in pick.move_ids:
+                    move.move_line_ids.unlink()
                     move.quantity_done=move.product_uom_qty
                 pick.button_validate()
 
