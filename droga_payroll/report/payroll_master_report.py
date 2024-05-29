@@ -98,6 +98,8 @@ class PayrollMasterReports(models.Model):
         self.payroll_net_report(workbook)
         self.deductions_report(workbook)
         self.payroll_reconciliation_report(workbook)
+        self.mobile_card_report(workbook)
+        self.company_vehicle_report(workbook)
         workbook.close()
 
         # The file to download will be stored under fileout field
@@ -629,25 +631,25 @@ class PayrollMasterReports(models.Model):
             for payslip_detail in record.line_ids:
                 # format the cell
 
-                if payslip_detail.code == 'CANDED': #canteen_total
+                if payslip_detail.code == 'CANDED':  # canteen_total
                     sheet.write(row_start, 2, payslip_detail.total, num_format)
                     canteen_total += payslip_detail.total
-                elif payslip_detail.code == 'LOAN': #loan_total
+                elif payslip_detail.code == 'LOAN':  # loan_total
                     sheet.write(row_start, 3, payslip_detail.total, num_format)
                     loan_total += payslip_detail.total
-                elif payslip_detail.code == 'NFALL': #fuel
+                elif payslip_detail.code == 'NFALL':  # fuel
                     sheet.write(row_start, 4, payslip_detail.total, num_format)
                     fuel_total += payslip_detail.total
-                elif payslip_detail.code == 'SACOSAV': #saco saving
+                elif payslip_detail.code == 'SACOSAV':  # saco saving
                     sheet.write(row_start, 5, payslip_detail.total, num_format)
                     saco_saving_total += payslip_detail.total
-                elif payslip_detail.code == 'SACOPAY': #saco payment
+                elif payslip_detail.code == 'SACOPAY':  # saco payment
                     sheet.write(row_start, 6, payslip_detail.total, num_format)
                     saco_loan_payment_total += payslip_detail.total
 
             row_start += 1
 
-                    # sub total
+            # sub total
 
         sheet.write(row_start, 2, canteen_total, num_format_sub_total)
         sheet.write(row_start, 3, loan_total, num_format_sub_total)
@@ -656,8 +658,126 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 6, saco_loan_payment_total, num_format_sub_total)
         sheet.write(row_start, 7, 0, num_format_sub_total)
 
+    # get employee mobile card excel
+    def mobile_card_report(self, workbook):
+        sheet = workbook.add_worksheet('Mobile Card')
 
+        sheet.set_column('A:A', 8)
+        sheet.set_column('B:B', 20)
+        sheet.set_column('C:C', 10)
+        sheet.set_column('D:D', 10)
+        sheet.set_column('E:E', 20)
 
+        row_start = 0
+
+        date_format = workbook.add_format(
+            {'num_format': 'mm/dd/yyyy', 'border': 7})
+        num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 9})
+        num_format_no = workbook.add_format({'num_format': '@', 'border': 1, 'font_name': 'Calibri', 'font_size': 9})
+
+        title_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 9,
+            'font_name': 'Calibri',
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+
+        sheet.write(row_start, 0, 'No', title_format)
+        sheet.write(row_start, 1, 'Name', title_format)
+        sheet.write(row_start, 2, 'Total Price', title_format)
+        sheet.write(row_start, 3, 'Phone No', title_format)
+        sheet.write(row_start, 4, 'Analytical Account', title_format)
+        row_start += 1
+
+        # get employee list who have a benefit for mobile card
+        mobile_cards = self.env['hr.payroll.payment.deduction'].search([('input_types.code', '=', 'MOBCAR')])
+
+        no = 1  # counter
+        for mobile_card in mobile_cards:
+            sheet.write(row_start, 0, no, num_format_no)
+            sheet.write(row_start, 1, mobile_card.employee_id.name, num_format)
+            sheet.write(row_start, 2, mobile_card.amount, num_format)
+            if mobile_card.employee_id.mobile_phone:
+                sheet.write(row_start, 3, mobile_card.employee_id.mobile_phone, num_format_no)
+            else:
+                sheet.write(row_start, 3, ' ', num_format_no)
+            if mobile_card.contract_id.analytic_account_id.name:
+                sheet.write(row_start, 4, mobile_card.contract_id.analytic_account_id.name, num_format_no)
+            else:
+                sheet.write(row_start, 4, ' ', num_format_no)
+
+            no += 1
+            row_start += 1
+
+    def company_vehicle_report(self, workbook):
+        sheet = workbook.add_worksheet('Company Vehicle')
+
+        sheet.set_column('A:A', 8)
+        sheet.set_column('B:B', 20)
+        sheet.set_column('C:C', 10)
+        sheet.set_column('D:D', 10)
+        sheet.set_column('E:E', 10)
+        sheet.set_column('F:F', 10)
+        sheet.set_column('G:G', 20)
+
+        row_start = 0
+
+        date_format = workbook.add_format(
+            {'num_format': 'mm/dd/yyyy', 'border': 7})
+        num_format = workbook.add_format({'num_format': 43, 'border': 1, 'font_name': 'Calibri', 'font_size': 9})
+        num_format_no = workbook.add_format({'num_format': '@', 'border': 1, 'font_name': 'Calibri', 'font_size': 9})
+
+        title_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 9,
+            'font_name': 'Calibri',
+            'text_wrap': 1,
+            'fg_color': '#F6F5F5'})
+
+        sheet.write(row_start, 0, 'No', title_format)
+        sheet.write(row_start, 1, 'Name', title_format)
+        sheet.write(row_start, 2, 'Quantity', title_format)
+        sheet.write(row_start, 3, 'Unit Price', title_format)
+        sheet.write(row_start, 4, 'Total Price', title_format)
+        sheet.write(row_start, 5, 'Phone No', title_format)
+        sheet.write(row_start, 6, 'Analytical Account', title_format)
+        row_start += 1
+
+        # get employee list who have a benefit for fuel
+        fules = self.env['hr.payroll.payment.deduction'].search([('input_types.code', '=', 'FUEL')])
+
+        # get fuel rate
+        fuel_rates = self.env['hr.payroll.rate'].search(
+            [('code', '=', 'FUEL'), ('date_to', '>=', datetime.datetime.now())])
+
+        rate = 0
+        for fuel_rate in fuel_rates:
+            rate = fuel_rate.rate
+
+        no = 1  # counter
+        for fuel in fules:
+            sheet.write(row_start, 0, no, num_format_no)
+            sheet.write(row_start, 1, fuel.employee_id.name, num_format)
+            sheet.write(row_start, 2, fuel.amount, num_format)
+            sheet.write(row_start, 3, rate, num_format)
+            sheet.write(row_start, 4, rate * fuel.amount, num_format)
+            if fuel.employee_id.mobile_phone:
+                sheet.write(row_start, 5, fuel.employee_id.mobile_phone, num_format_no)
+            else:
+                sheet.write(row_start, 5, ' ', num_format_no)
+            if fuel.contract_id.analytic_account_id.name:
+                sheet.write(row_start, 6, fuel.contract_id.analytic_account_id.name, num_format_no)
+            else:
+                sheet.write(row_start, 6, ' ', num_format_no)
+
+            no += 1
+            row_start += 1
 
     def payroll_reconciliation_report(self, workbook):
         sheet = workbook.add_worksheet('Reconciliation')
