@@ -36,7 +36,7 @@
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
                             attrs="{'invisible': [('state', 'not in', ('stmg','mtmg'))]}"
-                            groups="droga_inventory.stores_manager,droga_inventory.marketing_manager,droga_inventory.stores_manager_ws"
+                            groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
@@ -71,6 +71,7 @@
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="product_uom_qty" string="Quantity"/>
                                     <field name="price_unit_cons"/>
+                                    <field name="available_qty" groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"/>
                                     <field name="amount" sum="Total"/>
                                     <field name="warehouse_id" options="{'no_create':True,'no_open':True}"
                                            string="Receipt warehouse"/>

@@ -118,6 +118,19 @@ class product_alerts(models.Model):
             'target': 'new',
         }
 
+    def open_stock_on_hand(self):
+        return {
+            'name': 'Stock on hand',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'stock.quant',
+            'view_id': self.env.ref('stock.view_stock_quant_tree_editable').id,
+            'type': 'ir.actions.act_window',
+            'domain':
+                ([('product_id.product_tmpl_id', '=', self.id),('location_id.usage','=','internal')]),
+            'target': 'new',
+        }
+
     def update_qty(self):
         pros=self.env['product.template'].search([])
         for rec in pros:

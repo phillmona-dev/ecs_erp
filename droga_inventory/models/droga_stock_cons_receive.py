@@ -183,7 +183,20 @@ class droga_stock_cons_receive_detail(models.Model):
 
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
                                   domain="[('category_id', '=', product_uom_category_id)]")
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('cancel', 'Cancelled'),  # When requester cancels it from draft
+        ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
+        ('mg', 'Export manager'),
+        ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
+        ('sc', 'Sent to CU'),
+        ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
+        ('processed', 'Processed'),  # When request is processed
 
+        ('done', 'Received'),  # When request is received
+    ], string='Status', default="draft", readonly=True, tracking=True,related='cons_header.state',
+        help=" * Requested: The consignment receive order is sent to warehouse.\n"
+             " * Done: The consignment items are received by warehouse.\n")
     @api.depends('price_unit_cons', 'product_uom_qty')
     def compute_amount(self):
         for rec in self:
@@ -206,3 +219,33 @@ class droga_stock_cons_receive_detail(models.Model):
 
     # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
+    available_qty = fields.Float('Available', readonly=True, compute="get_count")
+
+    @api.depends('state', 'product_id', 'product_uom', 'warehouse_id')
+    def get_count(self):
+        for rec in self:
+            rate = rec.product_uom.factor / (
+                rec.product_id.uom_id.factor if rec.product_id.uom_id.factor != 0 else (
+                    rec.product_uom.factor if rec.product_uom.factor != 0 else 1))
+            rec.available_qty = rec.available_qty + ((self._get_avail_qty_per_warehouse(rec.product_id,
+                                                                                        rec.warehouse_id) - self._get_outgoing_qty_per_warehouse(
+                rec.product_id, rec.warehouse_id)) * (rate))
+
+    def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
+        selfsud = self.sudo()
+        moves = selfsud.env['stock.move'].search(
+            [('product_id', '=', product_id.id), ('location_id.warehouse_id', '=', warehouse_id.id),
+             ('location_id.usage', '=', 'internal'), ('location_dest_id.usage', '!=', 'internal'),
+             ('state', 'not in', ['done', 'cancel', 'draft'])])
+        return sum(moves.mapped('reserved_qty'))
+
+    def _get_avail_qty_per_warehouse(self, product_id, warehouse_id):
+
+        selfsud = self.sudo()
+        tot_quantity = 0.0
+        for location_id in selfsud.env['stock.location'].search(
+                [('warehouse_id', '=', warehouse_id.id), ('usage', '=', 'internal')]):
+            quants = selfsud.env['stock.quant'].search(
+                [('product_id', '=', product_id.id), ('location_id', '=', location_id.id)])
+            tot_quantity = tot_quantity + sum(quants.mapped('quantity'))
+        return tot_quantity

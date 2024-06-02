@@ -90,6 +90,13 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
+    <record model="ir.rule" id="droga_inventory_consignment_report">
+        <field name="name">Consignment</field>
+        <field name="model_id" ref="model_droga_inventory_consignment_report"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
     <record model="ir.rule" id="droga_stock_out_group_company">
         <field name="name">Stockout model multi-company</field>
         <field name="model_id" ref="model_product_availability_pharmacy"/>
