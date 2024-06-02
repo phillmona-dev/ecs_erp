@@ -50,12 +50,12 @@
                                    attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
                             <field name="issue_type" required="True"
                                    readonly="1"></field>
-                            <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}"
-                                   widget="many2many_tags" readonly="1"></field>
                         </group>
                         <group>
                             <field name="receipt_date"
                                    attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="cons_ref" attrs="{'invisible': [('cons_ref', '=', False)]}"
+                                   widget="many2many_tags" readonly="1"></field>
                             <field name="remark"></field>
                         </group>
                     </group>

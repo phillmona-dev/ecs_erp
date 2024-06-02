@@ -249,7 +249,7 @@
         <field name="res_model">droga.inventory.consignment.receive</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'default_issue_type': 'SIR','default_menu_from':'SR'}</field>
-        <field name="domain">[('create_uid','=',uid),,('issue_type','=','SIR')]</field>
+        <field name="domain">[('create_uid','=',uid),('issue_type','=','SIR')]</field>
     </record>
 
 
