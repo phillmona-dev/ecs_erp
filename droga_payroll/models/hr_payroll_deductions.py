@@ -32,3 +32,5 @@ class HrPayrollRates(models.Model):
     rate = fields.Float("Rate",digits=(12, 4))
     date_from = fields.Date("Date From")
     date_to = fields.Date("Date To")
+
+

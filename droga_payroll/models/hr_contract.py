@@ -1,3 +1,5 @@
+import datetime
+
 from odoo import models, fields, api
 from datetime import date
 
@@ -65,3 +67,15 @@ class HrContract(models.Model):
                     amount = payment_deduction.amount
 
         return amount
+
+    def get_fixed_rate(self,pd_code):
+
+        # get fuel rate
+        rates = self.env['hr.payroll.rate'].search(
+            [('code', '=', pd_code), ('date_to', '>=', datetime.datetime.now())])
+
+        rate = 0
+        for rate in rates:
+            rate = rate.rate
+
+        return rate
