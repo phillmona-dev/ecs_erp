@@ -33,6 +33,7 @@
                         <field name="job_id"/>
                         <field name="sales_commission"/>
                         <field name="has_company_vehicle"/>
+                        <field name="paid_by_usd"/>
                     </group>
                     <field name="salary_structure" mode="tree"
                            attrs="{'invisible': [('custom_salary_structure', '==',True )]}">

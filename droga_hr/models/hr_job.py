@@ -6,8 +6,10 @@ class HrJob(models.Model):
 
     salary_structure = fields.One2many("hr.job.salary", "job_id")
     job_grade = fields.Many2one("hr.job.grade")
+    currency = fields.Many2one("res.currency", string="Currency")
 
-    #_sql_constraints = [('name_unique', 'unique(name)', 'Job position must be unique')]
+    # _sql_constraints = [('name_unique', 'unique(name)', 'Job position must be unique')]
+
 
 class HrJobSalary(models.Model):
     _name = 'hr.job.salary'
@@ -22,6 +24,7 @@ class HrJobSalary(models.Model):
     salary_detail = fields.One2many("hr.job.salary.detail", "job_detail_id")
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
+    currency = fields.Many2one("res.currency", string="Currency")
 
 
 class HrJobSalaryDetail(models.Model):
@@ -49,8 +52,6 @@ class HrJobSalaryPayment(models.Model):
                                  index=True, default=lambda self: self.env.company.id)
 
     _sql_constraints = [('code_unique', 'unique(code)', 'Code must be unique')]
-
-
 
 
 class HrJobCrade(models.Model):

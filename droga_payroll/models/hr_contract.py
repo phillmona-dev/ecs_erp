@@ -22,6 +22,7 @@ class HrContract(models.Model):
     salary_structure = fields.One2many(related="job_id.salary_structure")
     salary_structure_custom = fields.One2many("hr.job.salary", "contract_id")
     payment_deductions = fields.One2many("hr.payroll.payment.deduction", 'contract_id')
+    paid_by_usd = fields.Boolean("Payment Currency USD")
 
     # sales commission
     sales_commission = fields.Float("Sales Commission")
@@ -58,7 +59,8 @@ class HrContract(models.Model):
         amount = 0
         for record in self:
             if record.state == 'open':
-                payment_deductions = record.payment_deductions.search([('input_types.code', '=', pd_code),('contract_id','=',record.id)])
+                payment_deductions = record.payment_deductions.search(
+                    [('input_types.code', '=', pd_code), ('contract_id', '=', record.id)])
                 for payment_deduction in payment_deductions:
                     amount = payment_deduction.amount
 
