@@ -650,7 +650,7 @@ class PayrollMasterReports(models.Model):
                     sheet.write(row_start, 6, payslip_detail.total, num_format)
                     saco_loan_payment_total += payslip_detail.total
                 elif payslip_detail.code == 'COSTSHA':  # cost sharing
-                    sheet.write(row_start, 8, payslip_detail.total, num_format)
+                    sheet.write(row_start, 7, payslip_detail.total, num_format)
                     cost_sharing_total += payslip_detail.total
 
             row_start += 1
