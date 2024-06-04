@@ -68,7 +68,7 @@ class HrContract(models.Model):
 
         return amount
 
-    def get_fixed_rate(self,pd_code):
+    def get_fixed_rate(self, pd_code):
 
         # get fuel rate
         rates = self.env['hr.payroll.rate'].search(
@@ -77,5 +77,16 @@ class HrContract(models.Model):
         rate = 0
         for rate in rates:
             rate = rate.rate
+
+        return rate
+
+    def get_variable_payment(self, employee_id, variable_payment_type):
+        rate = 0
+        variable_payments = self.env["hr.payroll.variable.payment"].search(
+            [('employee_id', '=', employee_id), ('input_types.code', '=', variable_payment_type),
+             ('status', '=', 'Not Paid')])
+
+        for variable_payment in variable_payments:
+            rate = variable_payment.rate
 
         return rate

@@ -9,10 +9,13 @@
                   groups="hr.group_hr_user" sequence="1"/>
 
         <menuitem id="hr_payroll_rate_tree_menu" name="Rates"
-              action="hr_payroll_rate_tree_action"
-              groups="hr.group_hr_user" sequence="2"/>
-    </menuitem>
+                  action="hr_payroll_rate_tree_action"
+                  groups="hr.group_hr_user" sequence="2"/>
 
+        <menuitem id="hr_payroll_variable_payment_tree_menu" name="Variable Payments"
+                  action="hr_payroll_variable_payment_tree_action"
+                  groups="hr.group_hr_user" sequence="3"/>
+    </menuitem>
 
 
 </odoo>

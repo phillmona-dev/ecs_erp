@@ -15,6 +15,9 @@ class HrPayrollPaymentDeductions(models.Model):
     total_amount = fields.Float("Total Amount")
     rem_amount = fields.Float("Remaining Amount")
 
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                                 index=True, default=lambda self: self.env.company.id)
+
 
 class HrPayrollVariablePayments(models.Model):
     _name = 'hr.payroll.variable.payment'
@@ -23,14 +26,22 @@ class HrPayrollVariablePayments(models.Model):
     input_types = fields.Many2one('hr.payslip.input.type', 'Input Types')
     fiscal_year = fields.Many2one("account.fiscal.year", "Fiscal Year")
     period = fields.Many2one("account.fiscal.year.period", domain="[('fiscal_year_id', '=', fiscal_year)]")
+    rate = fields.Float("Rate", digits=(12, 4))
+    status = fields.Selection([('Not Paid', 'Not Paid'), ('Paid', 'Paid')], default='Not Paid')
+
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                                 index=True, default=lambda self: self.env.company.id)
+
+
 
 
 class HrPayrollRates(models.Model):
     _name = 'hr.payroll.rate'
 
     code = fields.Char("Code")
-    rate = fields.Float("Rate",digits=(12, 4))
+    rate = fields.Float("Rate", digits=(12, 4))
     date_from = fields.Date("Date From")
     date_to = fields.Date("Date To")
 
-
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                                 index=True, default=lambda self: self.env.company.id)
