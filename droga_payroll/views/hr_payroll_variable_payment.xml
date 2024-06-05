@@ -17,6 +17,23 @@
         </field>
     </record>
 
+    <!-- search -->
+    <record id="hr_payroll_variable_payment_search_view" model="ir.ui.view">
+        <field name="name">hr.payroll.variable.payment.search</field>
+        <field name="model">hr.payroll.variable.payment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id" />
+                <field name="input_types" />
+                <field name="fiscal_year" />
+                <field name="period" />
+                <field name="rate"/>
+                <field name="status"/>
+            </search>
+        </field>
+    </record>
+
+
     <!-- action view payroll variable payment -->
     <record id="hr_payroll_variable_payment_tree_action" model="ir.actions.act_window">
         <field name="name">Payroll Variable Payments</field>
