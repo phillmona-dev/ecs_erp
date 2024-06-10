@@ -595,8 +595,9 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 4, 'Fuel', title_format)
         sheet.write(row_start, 5, 'SACO Saving', title_format)
         sheet.write(row_start, 6, 'SACO Loan Payment', title_format)
-        sheet.write(row_start, 7, 'Others', title_format)
-        sheet.write(row_start, 8, 'Total', title_format)
+        sheet.write(row_start, 7, 'Cost Sharing', title_format)
+        sheet.write(row_start, 8, 'Others', title_format)
+        sheet.write(row_start, 9, 'Total', title_format)
         row_start += 1
 
         # search based on cost center
@@ -610,6 +611,7 @@ class PayrollMasterReports(models.Model):
         fuel_total = 0
         saco_saving_total = 0
         saco_loan_payment_total = 0
+        cost_sharing_total=0
         others_total = 0
 
         for record in slips:
@@ -624,6 +626,7 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 6, num, num_format)
             sheet.write(row_start, 7, num, num_format)
             sheet.write(row_start, 8, num, num_format)
+            sheet.write(row_start, 9, num, num_format)
 
             # load data
             # get payroll detail
@@ -646,6 +649,9 @@ class PayrollMasterReports(models.Model):
                 elif payslip_detail.code == 'SACOPAY':  # saco payment
                     sheet.write(row_start, 6, payslip_detail.total, num_format)
                     saco_loan_payment_total += payslip_detail.total
+                elif payslip_detail.code == 'COSTSHA':  # cost sharing
+                    sheet.write(row_start, 7, payslip_detail.total, num_format)
+                    cost_sharing_total += payslip_detail.total
 
             row_start += 1
 
@@ -656,7 +662,8 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 4, fuel_total, num_format_sub_total)
         sheet.write(row_start, 5, saco_saving_total, num_format_sub_total)
         sheet.write(row_start, 6, saco_loan_payment_total, num_format_sub_total)
-        sheet.write(row_start, 7, 0, num_format_sub_total)
+        sheet.write(row_start, 7, cost_sharing_total, num_format_sub_total)
+        sheet.write(row_start, 8, 0, num_format_sub_total)
 
     # get employee mobile card excel
     def mobile_card_report(self, workbook):
