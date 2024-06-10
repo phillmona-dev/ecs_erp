@@ -68,16 +68,20 @@
                     <field name="active" invisible="1"/>
                     <group col="1">
                         <field name="detailed_type"/>
-
-                        <field name="emergency_order_point"/>
-                        <field name="pharmacy_order_point"></field>
-                        <field name="maximum_stock_level"/>
-
-                        <field name="average_month_consumption"/>
-                        <field name="lead_time_in_days"></field>
                         <field name="notification_for"></field>
                         <field name="is_core_product" readonly="1"/>
                         <field name="is_core_product" groups="droga_inventory.inventory_core"/>
+                    </group>
+
+                    <group string="Import and wholesale analysis">
+                        <field name="emergency_order_point" readonly="1"/>
+                        <field name="maximum_stock_level"/>
+                        <field name="average_month_consumption" readonly="1"/>
+                        <field name="lead_time_in_days"></field>
+                    </group>
+                    <group string="Pharmacy analysis">
+                        <field name="pharmacy_order_point"></field>
+                        <field name="average_month_consumption_phar" readonly="1"/>
                     </group>
                     <group string="Origin">
                         <field name="manufacturing" required="True"></field>

@@ -918,15 +918,13 @@ class droga_stock_product_extension(models.Model):
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
-    lead_time_in_days = fields.Integer('Lead time in days')
+    lead_time_in_days = fields.Integer('Lead time in days',default=120)
     maximum_stock_level = fields.Float('Maximum stock level')
-    average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
+    average_month_consumption = fields.Float('Avg. monthly cons.',store=True,help="Average monthly consumption")
+    average_month_consumption_phar = fields.Float('Avg. monthly cons. pharmacy',store=True,help="Average monthly consumption")
     is_core_product = fields.Boolean('Is core product for promoters',tracking=True)
     prod_approver = fields.Many2one('res.users', store=True)
 
-    def _get_avg_monthly_consumption(self):
-        for rec in self:
-            rec.average_month_consumption=0
 
     has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')

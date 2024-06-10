@@ -11,6 +11,7 @@
                 <field name="categ_id"></field>
                 <field name="default_warehouse"></field>
                 <field name="average_month_consumption"></field>
+                <field name="average_month_consumption_phar"></field>
                 <field name="availability" invisible="1"></field>
                 <field name="availability" decoration-success="availability =='Available'" decoration-warning="availability =='Needs reordering'"
                        decoration-danger="availability == 'Stock out'" widget="badge"></field>
@@ -29,6 +30,7 @@
                 <field name="categ_id"></field>
                 <field name="default_warehouse"></field>
                 <field name="average_month_consumption"></field>
+                <field name="average_month_consumption_phar"></field>
                 <field name="availability"></field>
                 <filter name="core_products" string="Core products" domain="[('is_core_product', '=', True)]" />
 
