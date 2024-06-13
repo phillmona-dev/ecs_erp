@@ -319,7 +319,7 @@ class PayrollMasterReports(models.Model):
                     sheet.write(row_start, 11, payslip_detail.total, num_format)
                     acting_sub_total += payslip_detail.total
 
-                elif payslip_detail.code == 'XXXX':  # Commission
+                elif payslip_detail.code == 'COMMTOTAL':  # Commission
                     sheet.write(row_start, 12, payslip_detail.total, num_format)
                     commission_sub_total += payslip_detail.total
                 elif payslip_detail.code == 'PARLUN':  # Parking & lunch
