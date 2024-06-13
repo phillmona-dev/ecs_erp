@@ -24,9 +24,9 @@ class HrPayslip(models.Model):
 
     def _get_contractual_workdays(self, contract, date_from, date_to):
         total_days = (date_to - date_from).days + 1
-        total_working_days = (date_to-contract.date_start).days + 1
+        total_working_days = (date_to - contract.date_start).days + 1
 
         if total_working_days >= total_days:
             return 0
         else:
-            30 - total_working_days
+            return 30 - total_working_days
