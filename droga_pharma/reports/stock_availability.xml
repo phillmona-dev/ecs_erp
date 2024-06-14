@@ -39,6 +39,7 @@
                 <filter name="Up_to_Date" string="Up-to-Date" domain="[('expiry_status', '=', 'Up-to-Date')]" />
                 <filter name="near_expiry" string="Near Expiry" domain="[('expiry_status', '=', 'Near Expiry')]" />
                 <filter name="expired" string="Expired" domain="[('expiry_status', '=', 'Expired')]" />
+                <filter name="my_pharmacy" string="My Pharmacy" domain="[('has_access','=',True)]"/>
 
                 <filter name="prod" string="Product" context="{'group_by':'prod'}"/>
                 <filter name="group_categ" string="Category" context="{'group_by':'categ_id'}"/>
@@ -53,7 +54,7 @@
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="stock_availability_pharma_all_search"></field>
         <field name="view_id" ref="stock_availability_pharma_tree"/>
-        <field name="domain">[('wh_type', '=', 'PH'),('has_access','=',True)]</field>
-        <field name="context">{'search_default_stock_out':1,'search_default_near_expiry':1}</field>
+        <field name="domain">[('wh_type', '=', 'PH')]</field>
+        <field name="context">{'search_default_my_pharmacy':1}</field>
     </record>
 </odoo>

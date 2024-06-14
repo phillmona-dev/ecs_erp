@@ -79,7 +79,6 @@
                         <div style="width: 50%;">
                             <div>
                                 <group string="Minor alignment Info">
-                                    <field name="sales_origin"/>
                                     <field name="minor_align"/>
                                     <field name="decision"/>
                                     <field name="referral"/>
