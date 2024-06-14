@@ -66,7 +66,7 @@ class AccountLoanRenewSchedule(models.Model):
         schedule = self.env['account.loan.schedule'].search(
             [('name', '!=', False)])              
         for predone in schedule:
-            nathan = self.env['account.loan.repayment'].create({'expected_payment_date': predone.payment_date, 'payment_term': predone.name,
+            loan = self.env['account.loan.repayment'].create({'expected_payment_date': predone.payment_date, 'payment_term': predone.name,
                  })
     @api.model
     def write(self, values):

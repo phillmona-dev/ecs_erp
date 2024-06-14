@@ -69,6 +69,25 @@ class sales_integ(models.Model):
     has_mtm_products = fields.Boolean(compute='_compute_mtm_counsil')
     has_counsell_products = fields.Boolean(compute='_compute_mtm_counsil')
 
+    def update_minor_aliment(self):
+        for rec in self:
+            rec.minor_align_header.aliment_treatments.unlink()
+            rec.minor_align_header.write({
+                'treatment': [(5, 0, 0)]
+            })
+            for r in rec.order_line:
+                if r.order_id.state in ('done','sale','dispense'):
+                    val={
+                        'product':r.product_id.id,
+                        'parent_minor_alignment_prod':rec.minor_align_header.id
+                    }
+
+                    rec.minor_align_header.write({
+                        'treatment': [(4, r.product_id.product_tmpl_id.id)]
+                    })
+
+                    self.env['droga.pharma.minor.alignment.products'].create(val)
+
     @api.depends('partner_id')
     def _get_mature_amount_pharma(self):
         for rec in self:
