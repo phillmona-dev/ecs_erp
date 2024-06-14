@@ -79,7 +79,8 @@ class sales_integ(models.Model):
                 if r.order_id.state in ('done','sale','dispense'):
                     val={
                         'product':r.product_id.id,
-                        'parent_minor_alignment_prod':rec.minor_align_header.id
+                        'parent_minor_alignment_prod':rec.minor_align_header.id,
+                        'quantity':r.product_uom_pharma_qty
                     }
 
                     rec.minor_align_header.write({
