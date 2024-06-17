@@ -30,3 +30,10 @@ class HrPayslip(models.Model):
             return 0
         else:
             return 30 - total_working_days
+
+
+class HrPayslipLine(models.Model):
+    _inherit = 'hr.payslip.line'
+
+    period = fields.Many2one(related="slip_id.payslip_run_id.period", store=True)
+    badge_id = fields.Char(related="employee_id.barcode")
