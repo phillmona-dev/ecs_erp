@@ -411,6 +411,26 @@ class val_layer(models.Model):
             else:
                 rec.date_month='0'
 
+    @api.model
+    def create(self, vals):
+        ret = super(val_layer, self).create(vals)
+
+        if ret.origin.startswith('SOD'):
+            acc_move = self.env['account.move'].search([('invoice_origin', '=', ret.origin)])
+            for mv in acc_move:
+                mv.sales_cost = abs(
+                    sum(self.env['stock.valuation.layer'].search([('origin', '=', ret.origin)]).mapped('value')))
+
+        return ret@api.model
+    def create(self, vals):
+        ret=super(val_layer, self).create(vals)
+
+        if ret.origin.startswith('SOD'):
+            acc_move=self.env['account.move'].search([('invoice_origin','=',ret.origin)])
+            for mv in acc_move:
+                mv.sales_cost=abs(sum(self.env['stock.valuation.layer'].search([('origin','=',ret.origin)]).mapped('value')))
+
+        return ret
 class stock_move_mail_added(models.Model):
     _name = "stock.move"
     _inherit = ['stock.move','mail.thread', 'mail.activity.mixin', 'image.mixin']

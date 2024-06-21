@@ -34,6 +34,8 @@ class account_move(models.Model):
     customer_name1 = fields.Char(compute='_compute_order_from', string='Customer Name')
     cust_id = fields.Char(compute='_compute_order_from', string='Customer Name')
 
+    sales_cost = fields.Float('Sales Cost',store=True)
+
     pos_device_ip_address = fields.Char("POS IP Address", compute='get_pos_address')
     pos_xml_folder = fields.Char("XML Folder Path", compute='get_pos_address')
     total_amount_word = fields.Char(compute="_get_total_amount_word")
