@@ -19,10 +19,19 @@ class droga_pharma_minor_alignment(models.Model):
 
     # Related fields
     client = fields.Many2one('res.partner')
+    client2 = fields.Many2one('res.partner.pharma2')
     customer = fields.Many2one('droga.pharma.cust.employees', related='sales_origin.customer_emp')
     client_descr = fields.Char(related='sales_origin.emp_descr')
     sales_origin = fields.Many2one('sale.order')
-    mobile = fields.Char("Mobile", related='client.phone', store=True)
+    mobile = fields.Char("Mobile", compute='get_mobile',reverse='_update_mob')
+    def _update_mob(self):
+        for rec in self:
+            rec.client2.partner.mobile = rec.mobile
+
+    @api.depends('client2')
+    def get_mobile(self):
+        for rec in self:
+            rec.mobile=rec.client2.partner.mobile
     medical = fields.Html("Medical History", store=True, compute='get_cust_hist', inverse='update_medical',
                           tracking=True)
     medication_history = fields.Html("Medication History and adherence", store=True, compute='get_cust_hist',
@@ -35,35 +44,35 @@ class droga_pharma_minor_alignment(models.Model):
 
     def get_cust_hist(self):
         for rec in self:
-            rec.medical = rec.client.medical_history
-            rec.medication_history = rec.client.medication_history
-            rec.immunization = rec.client.immunization
-            rec.adr = rec.client.adr_allergy
-            rec.dob = rec.client.dob
-            rec.gender = rec.client.gender
+            rec.medical = rec.client2.partner.medical_history
+            rec.medication_history = rec.client2.partner.medication_history
+            rec.immunization = rec.client2.partner.immunization
+            rec.adr = rec.client2.partner.adr_allergy
+            rec.dob = rec.client2.partner.dob
+            rec.gender = rec.client2.partner.gender
 
     def update_adr(self):
         for rec in self:
-            rec.client.adr_allergy = rec.adr
+            rec.client2.partner.adr_allergy = rec.adr
 
     def update_immunization(self):
         for rec in self:
-            rec.client.immunization = rec.immunization
+            rec.client2.partner.immunization = rec.immunization
 
     def update_medication_history(self):
         for rec in self:
-            rec.client.medication_history = rec.medication_history
+            rec.client2.partner.medication_history = rec.medication_history
 
     def update_medical(self):
         for rec in self:
-            rec.client.medical_history = rec.medical
+            rec.client2.partner.medical_history = rec.medical
 
     def get_dob(self):
         for rec in self:
-            rec.dob = rec.client.dob
+            rec.dob = rec.client2.partner.dob
     def inverse_dob(self):
         for rec in self:
-            rec.client.dob = rec.dob
+            rec.client2.partner.dob = rec.dob
 
     def init_sales(self):
         order_lines = []
@@ -88,7 +97,7 @@ class droga_pharma_minor_alignment(models.Model):
                 'product_template_id': line.product.product_tmpl_id.id,
                 'product_uom': line.product.product_tmpl_id.uom_id.id,
                 'product_id':line.product.id,
-                'product_uom_qty': line.quantity,
+                'product_uom_pharma_qty': line.quantity,
                 'price_unit': line.product.product_tmpl_id.list_price_phar,
             })
 
@@ -100,7 +109,7 @@ class droga_pharma_minor_alignment(models.Model):
             'view_id': self.env.ref('droga_pharma.view_order_form_pharma').id,
             'type': 'ir.actions.act_window',
             'context': {
-                'default_partner_id': self.client.id,
+                'default_partner_custom': self.client2.id,
                 'default_order_line': order_lines,
                 'default_state':'draft',
                 'default_minor_align_header':self.id,

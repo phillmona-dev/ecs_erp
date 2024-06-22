@@ -421,7 +421,6 @@ class val_layer(models.Model):
                 for mv in acc_move:
                     mv.sales_cost = abs(
                         sum(self.env['stock.valuation.layer'].search([('origin', '=', ret.origin)]).mapped('value')))
-
         return ret
 class stock_move_mail_added(models.Model):
     _name = "stock.move"
