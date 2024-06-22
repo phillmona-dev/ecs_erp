@@ -19,7 +19,7 @@ class droga_pharma_minor_alignment(models.Model):
 
     # Related fields
     client = fields.Many2one('res.partner')
-    client2 = fields.Many2one('res.partner.pharma2')
+    client2 = fields.Many2one('res.partner.pharma2',string='Client')
     customer = fields.Many2one('droga.pharma.cust.employees', related='sales_origin.customer_emp')
     client_descr = fields.Char(related='sales_origin.emp_descr')
     sales_origin = fields.Many2one('sale.order')

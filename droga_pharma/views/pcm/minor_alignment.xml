@@ -25,6 +25,8 @@
         <field name="model">droga.pharma.minor.alignment</field>
         <field name="arch" type="xml">
             <tree string="Minor Aliments" create="1" delete="0">
+                <field name="client2"/>
+                <field name="mobile"/>
                 <field name="minor_align"></field>
                 <field name="decision"></field>
                 <field name="referral"></field>
