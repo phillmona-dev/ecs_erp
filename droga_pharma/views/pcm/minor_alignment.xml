@@ -67,7 +67,7 @@
                         <div style="width: 50%;">
                             <div>
                                 <group string="Patient's Personal Info">
-                                    <field name="client2"/>
+                                    <field name="client2" required="1"/>
                                     <field name="dob" readonly="0"/>
                                     <field name="age"/>
                                     <field name="profession" readonly="0"/>
