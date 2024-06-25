@@ -678,6 +678,17 @@ class sale_order_ext(models.Model):
         self.action_confirm()
         self.create_inv_local()
 
+    def cancel_sales(self):
+        for rec in self:
+            if (rec.state=='draft' or rec.state=='sale') and len(self.env["account.move"].search([('invoice_origin', '=', rec.name)]))==0:
+                rec._action_cancel()
+
+    def _prepare_confirmation_values(self):
+
+        return {
+            'state': 'sale'
+        }
+
     def create_inv_local(self):
         # self.action_confirm()
         x = {

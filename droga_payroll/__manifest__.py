@@ -20,13 +20,18 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_contract', 'hr_payroll','droga_hr'],
+    'depends': ['base', 'hr', 'hr_contract', 'hr_payroll', 'droga_hr'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/hr_payslip_run.xml',
         'views/hr_contract.xml',
+        'views/hr_payroll_payment_deduction.xml',
+        'views/hr_payroll_rate.xml',
+        'views/hr_payroll_variable_payment.xml',
+        'report/hr_payslip_line.xml',
+        'views/Menu.xml',
         'report/hr_payslip_run.xml',
 
     ],

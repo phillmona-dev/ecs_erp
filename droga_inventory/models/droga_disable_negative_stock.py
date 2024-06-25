@@ -13,6 +13,7 @@ class StockQuant(models.Model):
     import_counted=fields.Float('Import counted')
     import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
 
+
     def write(self, vals):
         if 'import_counted' in vals:
             for res in self:
@@ -57,7 +58,7 @@ class StockQuant(models.Model):
             if (
                 float_compare(quant.quantity, 0, precision_digits=p) == -1
                 and quant.product_id.type == "product"
-                and quant.location_id.usage in ["internal", "transit","production"]
+                and quant.location_id.usage in ["internal", "transit"]
             ):
                 msg_add = ""
                 if quant.lot_id:
@@ -78,6 +79,22 @@ class StockQuant(models.Model):
                         "complete_name": quant.location_id.complete_name,
                     }
                 )
+            #Pharmacy stock out tracker
+            if quant.location_id.usage=="internal":
+                stock_hist=self.env['product.availability.pharmacy'].search([('prod','=',quant.product_id.id),('batch_id','=',quant.lot_id.id),('warehouse','=',quant.location_id.warehouse_id.id)])
+                if len(stock_hist)==0:
+                    stock_tracker_vals = {
+                        'prod': quant.product_id.id,
+                        'warehouse': quant.location_id.warehouse_id.id,
+                        'stock_quantity_total': quant.quantity,
+                        'batch_id':quant.lot_id.id
+                    }
+                    self.env['product.availability.pharmacy'].create(stock_tracker_vals)
+                else:
+                    prod_sum_phar = sum(self.env['stock.quant'].search(
+                        [('product_id', '=', quant.product_id.id), ('location_id.warehouse_id', '=', quant.warehouse_id.id)]).mapped(
+                        'quantity'))
+                    stock_hist[0].write({'stock_quantity_total': prod_sum_phar})
 
             prod_sum =  sum(self.env['stock.quant'].search(
                 [('product_id', '=', quant.product_id.id), ('location_id.usage', '=', 'internal')]).mapped('quantity'))

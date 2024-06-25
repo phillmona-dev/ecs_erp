@@ -59,12 +59,12 @@ class droga_tender_master(models.Model):
 
     def _compute_ordered_delivered_qty(self):
         for rec in self:
-            if len(self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id)]))==0:
+            if len(self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id),'|', ('active','=',True),  ('active','=',False)]))==0:
                 rec.ordered_qty = 0
                 rec.delivered_qty = 0
                 rec.remaining_qty=rec.award_quantity
             else:
-                prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id)]).ids
+                prod_id=self.env['product.product'].search([('product_tmpl_id','=',rec.droga_product.id),'|', ('active','=',True),  ('active','=',False)]).ids
                 ten_sales=self.env['sale.order'].search([('state','=','sale'),('tender_origin_form_tender','=',rec.parent_tender_performance.id)]).ids
 
                 rec.ordered_qty=sum(self.env['sale.order.line'].search([('order_id','in',ten_sales),('product_id','in',prod_id)]).mapped('product_uom_qty'))

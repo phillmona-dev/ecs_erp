@@ -49,7 +49,13 @@ class droga_stock_move_line_extension(models.Model):
 
     reserved_uom_qty_done = fields.Float('Reserved', compute='_get_on_hand')
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False, compute='_get_pharma_unit',store=True)
+    fs_number=fields.Char('FS Number',compute='_get_fs_num',store=True,default=' ')
 
+    def _get_fs_num(self):
+        for rec in self:
+            sale=self.env['account.move'].search([('invoice_origin','=',rec.move_id.origin)])
+            if len(sale)>0:
+                rec.fs_number=sale[0].FSInvoiceNumber
     @api.depends('move_id.pharmacy_unit')
     def _get_pharma_unit(self):
         for rec in self:
@@ -405,6 +411,17 @@ class val_layer(models.Model):
             else:
                 rec.date_month='0'
 
+    @api.model
+    def create(self, vals):
+        ret = super(val_layer, self).create(vals)
+
+        if ret.origin:
+            if ret.origin.startswith('SOD'):
+                acc_move = self.env['account.move'].search([('invoice_origin', '=', ret.origin)])
+                for mv in acc_move:
+                    mv.sales_cost = abs(
+                        sum(self.env['stock.valuation.layer'].search([('origin', '=', ret.origin)]).mapped('value')))
+        return ret
 class stock_move_mail_added(models.Model):
     _name = "stock.move"
     _inherit = ['stock.move','mail.thread', 'mail.activity.mixin', 'image.mixin']
@@ -420,6 +437,7 @@ class droga_stock_move_extension(models.Model):
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
+    cons_price=fields.Float('Consignment payable')
 
     @api.depends('picking_id.pharmacy_unit')
     def _get_pharma_unit(self):
@@ -911,15 +929,13 @@ class droga_stock_product_extension(models.Model):
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
                                       company_dependent=True, check_company=True)
     emergency_order_point=fields.Float('Emergency order point')
-    lead_time_in_days = fields.Integer('Lead time in days')
+    lead_time_in_days = fields.Integer('Lead time in days',default=120)
     maximum_stock_level = fields.Float('Maximum stock level')
-    average_month_consumption = fields.Float('Avg. monthly cons.',compute='_get_avg_monthly_consumption',help="Average monthly consumption")
+    average_month_consumption = fields.Float('Avg. monthly cons.',store=True,help="Average monthly consumption")
+    average_month_consumption_phar = fields.Float('Avg. monthly cons. pharmacy',store=True,help="Average monthly consumption")
     is_core_product = fields.Boolean('Is core product for promoters',tracking=True)
     prod_approver = fields.Many2one('res.users', store=True)
 
-    def _get_avg_monthly_consumption(self):
-        for rec in self:
-            rec.average_month_consumption=0
 
     has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
@@ -1073,6 +1089,7 @@ class product_selection_field(models.Model):
         ('EX','Export items'),
     ('OS', 'Office supplies')], string='Group type.')
     reservation_period=fields.Float('Reservation period in Hrs',default=0)
+    batch_expiry_alert_date = fields.Float('Batch expiry alert in days', default=90)
 
 class ResUsers(models.Model):
     _inherit = 'res.users'

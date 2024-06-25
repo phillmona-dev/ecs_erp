@@ -751,11 +751,4 @@ class AccountLoanSchedule(models.Model):
     def create(self, values):
         return super(AccountLoanSchedule, self).create(values)
 
-    # @api.depends("payment_date")
-    # def _compute_penalitydaily(self):
 
-    #     schedule = self.env['account.loan.schedule'].search(
-    #         [('name', '!=', False),('acount_loan_id','=',)])
-    #     for predone in schedule:
-    #         nathan = self.env['account.loan.repayment'].create({'expected_payment_date': predone.payment_date, 'payment_term': predone.name,
-    #              })

@@ -46,6 +46,7 @@
                         </group>
                         <group>
                             <field name="request_date" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
+                            <field name="consignment_item" attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','processed','done'))]}"></field>
                             <field name="transfer_picking" readonly="1" widget="many2many_tags" attrs="{'invisible': [('state', 'in', ('draft'))]}"></field>
                         </group>
                     </group>
@@ -56,6 +57,7 @@
                                     <field name="company_id" invisible="1"/>
                                     <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
                                     <field name="product_uom" domain="['|',('id', '=', import_uom),('id','=',pharma_uom)]"/>
+                                    <field name="cons_price" attrs="{'column_invisible': [('parent.consignment_item', '=', False)]}"></field>
                                     <field name="product_uom_qty" string="Request"/>
                                     <field name="available_qty" groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"/>
                                     <field name="product_uom_category_id" invisible="1"/>

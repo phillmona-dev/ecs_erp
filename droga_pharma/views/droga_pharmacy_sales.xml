@@ -135,16 +135,18 @@
                             groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_ip_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'sale')]}"/>
-                    <button name="set_to_draft"
-                            string="Set to Draft" font-size="16px"
+                    <button name="cancel_sales"
+                            string="Cancel" font-size="16px"
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
-                            type="object" class="btn-primary" data-hotkey="q"
+                            type="object" class="oe_highlight btn-danger" data-hotkey="q"
                             attrs="{'invisible': ['|',('state','not in',('draft','sale')),('invoice_status', '!=', 'to invoice')]}"/>
+                    <!--
                     <button name="action_cancel"
                             string="Cancel" font-size="16px"
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin"
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': ['|',('state','not in',('draft','sale')),('invoice_status', '!=', 'to invoice')]}"/>
+                            -->
                     <button name="action_confirm"
                             string="Confirm" font-size="16px"
                             groups="droga_pharma.pharma_director"
@@ -166,11 +168,7 @@
                             type="object" class="btn-primary" data-hotkey="q"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <button type="object" string="Dispense for manual sales" name="disp_products_manual"
-                            groups="droga_inventory.inventory_stk"
-                            attrs="{'invisible': ['|',('state','=','dispense'),'|',('invoice_status','!=','invoiced'),('state', '!=', 'sale')]}"
-                            class="oe_highlight"></button>
-                    <button type="object" string="Dispense for manual sales" name="disp_products_manual"
-                            groups="droga_pharma.pharma_di_admin"
+                            groups="droga_pharma.pharma_di_admin,droga_pharma.pharma_dp_admin"
                             attrs="{'invisible': ['|',('state','=','dispense'),('state', '!=', 'sale')]}"
                             class="oe_highlight"></button>
                     <field name="state" widget="statusbar" statusbar_visible="draft,sale,dispense"/>
@@ -191,7 +189,7 @@
                                 class="oe_stat_button"
                                 string="MTM orders"
                                 icon="fa-credit-card-alt"
-                                attrs="{'invisible': ['|', ('has_mtm_products', '=', False), ('invoice_status', '!=', 'invoiced')]}">
+                                attrs="{'invisible': ['|', ('has_mtm_products', '=', False), ('state', '!=', 'dispense')]}">
 
                         </button>
 
@@ -208,7 +206,7 @@
                                 class="oe_stat_button"
                                 string="Counselling orders"
                                 icon="fa-credit-card-alt"
-                                attrs="{'invisible': ['|', ('has_counsell_products', '=', False), ('invoice_status', 'not in', ('invoiced','no'))]}">
+                                attrs="{'invisible': ['|', ('has_counsell_products', '=', False),  ('state', '!=', 'dispense')]}">
                         </button>
                         <field name="show_beauty_button" invisible="1"></field>
                         <field name="show_vit_button" invisible="1"></field>

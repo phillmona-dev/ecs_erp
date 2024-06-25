@@ -36,6 +36,7 @@ class droga_stock_transfer_custom(models.Model):
         'stock.warehouse', "Source warehouse")
     location_filter = fields.Char(compute='_filter_location_access',readonly=True,store=False)
     store_manager = fields.Many2one('res.users', compute='_get_approvers')
+    consignment_item=fields.Boolean(store=True,string='Consignment Item')
 
     def _get_approvers(self):
         for rec in self:
@@ -196,6 +197,7 @@ class droga_stock_transfer_custom_detail(models.Model):
     warehouse_id=fields.Many2one(
         'stock.warehouse', "Source warehouse",
         state={'draft': [('readonly', False)]})
+    cons_price=fields.Float('Consignment payable')
     @api.depends('location_source_id')
     def _get_wh(self):
         for rec in self:

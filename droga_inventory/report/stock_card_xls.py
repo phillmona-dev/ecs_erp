@@ -123,6 +123,8 @@ class inventory_stock_card_xls(models.TransientModel):
                         sheet.write(row_start, 9, move_line['lot_id'].name)
                     if move_line['expiration_date']:
                         sheet.write(row_start, 10, move_line['expiration_date'], date_format)
+                    if move_line['fs_number']:
+                        sheet.write(row_start, 11, move_line['fs_number'], date_format)
                     row_start+=1
             row_start+=5
 
@@ -175,7 +177,7 @@ class inventory_stock_card_xls(models.TransientModel):
             if stock_move['lot_id'].name:
                 sheet.write(row_start, 9, stock_move['lot_id'].name)
             if stock_move['expiration_date']:
-                sheet.write(row_start, 10, stock_move['expiration_date'], date_format)
+                sheet.write(row_start, 10, stock_move['expiration_date'])
 
         return 1
 
@@ -241,7 +243,7 @@ class inventory_stock_card_xls(models.TransientModel):
         sheet.set_row(row_start, 30)
         sheet.set_row(row_start+1, 30)
 
-        sheet.merge_range('A'+str(row_start+1)+':L'+str(row_start+1), 'DROGA PHARMA P.L.C', header_format)
+        sheet.merge_range('A'+str(row_start+1)+':L'+str(row_start+1), 'DROGA PHARMA P.L.C' if self.env.company.id==1 else self.env.company.name, header_format)
         sheet.merge_range('A'+str(row_start+2)+':L'+str(row_start+2), 'Stock record card', main_title_format)
         sheet.merge_range('A'+str(row_start+3)+':L'+str(row_start+3), 'Product name, strength and dosage form : '+prod.default_code+'-'+prod.name, parameter_format)
 
@@ -275,7 +277,7 @@ class inventory_stock_card_xls(models.TransientModel):
 
         sheet.merge_range('J'+str(row_start+9)+':J'+str(row_start+11), 'Batch #', title_format)
         sheet.merge_range('K'+str(row_start+9)+':K'+str(row_start+11), 'Expiry\nDate', title_format)
-        sheet.merge_range('L'+str(row_start+9)+':L'+str(row_start+11), 'Remark', title_format)
+        sheet.merge_range('L'+str(row_start+9)+':L'+str(row_start+11), 'FS Number', title_format)
 
         return sheet
 

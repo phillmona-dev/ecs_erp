@@ -9,7 +9,7 @@ class droga_crm_grade_vs_schedule(models.Model):
     _auto = False
 
     customer_name=fields.Char('Customer')
-    company_id = fields.Char('Company ID')
+    company_id = fields.Many2one('res.company', 'Company ID')
     name=fields.Char('Name')
     state=fields.Char('State')
     consid=fields.Char('Consignment ID')
@@ -18,6 +18,7 @@ class droga_crm_grade_vs_schedule(models.Model):
     tender_origin=fields.Char('Tender origin')
     sales_order = fields.Char('Sales order')
     trans_date = fields.Date('Date')
+    req_user=fields.Char('Requesting user')
 
     def open_cons(self):
         if self.name.startswith('CON/ISSUE'):
@@ -51,7 +52,7 @@ when 'pmg' then 'Project Engineer' end as state,issue_date as trans_date,id as c
 case issue_type when 'CONI' then 'Consignment' when 'INC' then 'Internal consumption' when 'PRI' then 'Project internal' when 'PRC' then 'Project contractor'
 when 'SIF' then 'Free sample' when 'SIR' then 'Sample issue to be returned' when 'SAP' then 'Free sample' when 'SUBL' then 'Cleaning unit issue' when 'BAGI' then 'Bag issue order' end as type
 ,consignment_reference as store_reference,(select y.ten_id from droga_tender_master y where y.id=droga_inventory_consignment_issue.tender_origin_form) as tender_origin 
-,(select y.name from sale_order y where y.id=droga_inventory_consignment_issue.subcontract_issue_origin_form or y.id=droga_inventory_consignment_issue.bag_issue_order) as sales_order from droga_inventory_consignment_issue
+,(select y.name from sale_order y where y.id=droga_inventory_consignment_issue.subcontract_issue_origin_form or y.id=droga_inventory_consignment_issue.bag_issue_order) as sales_order,user_id_des as req_user from droga_inventory_consignment_issue
 
 union
 
@@ -62,7 +63,7 @@ when 'pmg' then 'Project Engineer' end as state,receipt_date as trans_date,id as
 case issue_type when 'CONR' then 'Consignment recieve' when 'INC' then 'Internal consumption' when 'PRI' then 'Project internal' when 'PRC' then 'Project contractor'
 when 'SIF' then 'Free sample' when 'SAR' then 'Sample issue to be returned' when 'SIR' then 'Sample issue to be returned' when 'SUBL' then 'Cleaning unit issue' when 'BAGI' then 'Bag issue order' end as type
 ,consignment_reference as store_reference,' ' as tender_origin 
-,(select y.name from sale_order y where y.id=droga_inventory_consignment_receive.subcontractor_return_origin_form) as sales_order from droga_inventory_consignment_receive) g
+,(select y.name from sale_order y where y.id=droga_inventory_consignment_receive.subcontractor_return_origin_form) as sales_order,user_id_des as req_user from droga_inventory_consignment_receive) g
            )
         """)
 
