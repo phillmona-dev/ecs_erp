@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="email_template_payslip" model="mail.template">
+            <field name="name">Payslip</field>
+            <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+            <field name="subject">Payslip for month</field>
+            <field name="partner_to">{{ object.employee_id.id }}</field>
+            <field name="description">Payslip report for the employee {{ object.name }}</field>
+            <field name="body_html">
+                <![CDATA[
+                    <div class="container">
+                        <p>Dear <t t-out="object.employee_id.name"/>,</p>
+                        <p>Please find below the details of your payslip for the period <t t-out="object.date_from"/> to <t t-out="object.date_to"/>:</p>
+                        <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="object.line_ids" t-as="line">
+                                    <tr>
+                                      <t t-if="line.name in ['Gross', 'Deduction', 'Net Salary']">
+                                            <td><strong><t t-out="line.name"/></strong></td>
+                                            <td align="right"><strong><t t-esc="'{:,.2f}'.format(line.total)"/></strong></td>
+                                       </t>
+                                       <t t-else>
+                                          <td><t t-out="line.name"/></td>
+                                          <td align="right"><t t-esc="'{:,.2f}'.format(line.total)"/></td>
+                                       </t>
+
+
+
+
+
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <p>Regards,</p>
+                    </div>
+                    </div>
+                ]]>
+            </field>
+
+            <field name="email_to">{{object.employee_id.work_email}}</field>
+
+            <field name="report_name">RFQ_{{ (object.name or '').replace('/','_') }}</field>
+            <field name="lang">{{ object.employee_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

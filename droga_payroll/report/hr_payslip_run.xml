@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_draft']" position="after">
                 <button string="Report" name="droga_payroll_sheet_report_action" type="object"/>
+                <button string="Send Payslip email" name="action_send_payslip_email" type="object"/>
             </xpath>
         </field>
     </record>

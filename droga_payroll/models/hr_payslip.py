@@ -31,6 +31,29 @@ class HrPayslip(models.Model):
         else:
             return 30 - total_working_days
 
+    def send_email_with_attachment(self, record_id, attachment):
+        template_id = self.env.ref('droga_payroll.email_template_payslip').id
+        email_template = self.env['mail.template'].browse(template_id)
+        # Attach the file
+        attachment_id = self.env['ir.attachment'].create({
+            'name': attachment.name,
+            'type': 'binary',
+            'datas': attachment.datas,
+            'store_fname': attachment.store_fname,
+            'mimetype': attachment.mimetype,
+            'res_model': 'your.model',
+            'res_id': record_id,
+        })
+        # Send the email
+        email_template.send_mail(record_id, force_send=True,
+                                 email_values={'attachment_ids': [(6, 0, [attachment_id.id])]})
+
+    def action_send_email(self):
+
+        mail_template = self.env.ref('droga_payroll.email_template_payslip')
+
+        mail_template.send_mail(self.id, force_send=True)
+
 
 class HrPayslipLine(models.Model):
     _inherit = 'hr.payslip.line'
