@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from datetime import timedelta
+from odoo.exceptions import ValidationError
 
 
 class HrPayslip(models.Model):
@@ -50,9 +51,13 @@ class HrPayslip(models.Model):
 
     def action_send_email(self):
 
-        mail_template = self.env.ref('droga_payroll.email_template_payslip')
+        if self.state == 'close':
 
-        mail_template.send_mail(self.id, force_send=True)
+            mail_template = self.env.ref('droga_payroll.email_template_payslip')
+            mail_template.send_mail(self.id, force_send=True)
+        else:
+            raise ValidationError(
+                "The status must be changed to done to send payslip email")
 
 
 class HrPayslipLine(models.Model):
