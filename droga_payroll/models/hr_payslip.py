@@ -50,7 +50,6 @@ class HrPayslip(models.Model):
                                  email_values={'attachment_ids': [(6, 0, [attachment_id.id])]})
 
     def action_send_email(self):
-
         mail_template = self.env.ref('droga_payroll.email_template_payslip')
         mail_template.send_mail(self.id, force_send=True)
 
