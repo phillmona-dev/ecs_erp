@@ -51,13 +51,10 @@ class HrPayslip(models.Model):
 
     def action_send_email(self):
 
-        if self.state == 'close':
+        mail_template = self.env.ref('droga_payroll.email_template_payslip')
+        mail_template.send_mail(self.id, force_send=True)
 
-            mail_template = self.env.ref('droga_payroll.email_template_payslip')
-            mail_template.send_mail(self.id, force_send=True)
-        else:
-            raise ValidationError(
-                "The status must be changed to done to send payslip email")
+
 
 
 class HrPayslipLine(models.Model):
