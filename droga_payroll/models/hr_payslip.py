@@ -9,7 +9,7 @@ class HrPayslip(models.Model):
     days_outside_contract = fields.Float(string="Days Outside Contract", compute="_compute_days_outside_contract")
     period = fields.Many2one(related="payslip_run_id.period", store=True)
     mail_server = fields.Char(compute="get_outgoing_email")
-   
+    
 
     @api.depends('employee_id', 'date_from', 'date_to')
     def get_outgoing_email(self):
