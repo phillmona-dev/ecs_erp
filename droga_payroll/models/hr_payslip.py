@@ -7,6 +7,7 @@ class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
     days_outside_contract = fields.Float(string="Days Outside Contract", compute="_compute_days_outside_contract")
+    period = fields.Many2one(related="payslip_run_id.period", store=True)
 
     @api.depends('employee_id', 'date_from', 'date_to')
     def _compute_days_outside_contract(self):
