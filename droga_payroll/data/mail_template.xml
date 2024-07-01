@@ -46,7 +46,6 @@
                     </div>
                 ]]>
             </field>
-             <field name="email_to">{{ object.company_id.email_formatted }}</field>
             <field name="email_to">{{object.employee_id.work_email}}</field>
 
 
