@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 class HrPayslipRun(models.Model):
@@ -26,6 +27,19 @@ class HrPayslipRun(models.Model):
                 'default_batch': self.id
             }
         }
+
+    def action_send_payslip_email(self):
+
+        if self.state == 'close':
+
+            mail_template = self.env.ref('droga_payroll.email_template_payslip')
+
+            for record in self.slip_ids:
+                if record.employee_id.work_email:
+                    mail_template.send_mail(record.id, force_send=True)
+        else:
+            raise ValidationError(
+                "The status must be changed to done to send payslip email")
 
     @api.onchange("period")
     def _on_period_change(self):

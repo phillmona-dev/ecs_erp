@@ -31,6 +31,8 @@
         'views/hr_payroll_rate.xml',
         'views/hr_payroll_variable_payment.xml',
         'report/hr_payslip_line.xml',
+        'data/mail_template.xml',
+        'views/hr_payslip.xml',
         'views/Menu.xml',
         'report/hr_payslip_run.xml',
 
