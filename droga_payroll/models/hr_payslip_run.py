@@ -12,7 +12,20 @@ class HrPayslipRun(models.Model):
     date_start = fields.Date(string='Date From')
     date_end = fields.Date(string='Date To')
 
+    def action_paid(self):
+        # Call the original 'action_paid' method
+        result = super(HrPayslipRun, self).action_paid()
+        # update variable transactions to paid
+        variable_transactions = self.env["hr.payroll.variable.payment"].search([('period', '=', self.period.id)])
+
+        for record in variable_transactions:
+            record.write({'status': 'Paid'})
+
+        return result
+
     def droga_payroll_sheet_report_action(self):
+
+
         view = self.env.ref(
             'droga_payroll.droga_payroll_sheet_report_form')
 
