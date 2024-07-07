@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from datetime import date
+from odoo.exceptions import ValidationError
 
 
 class HrPayrollPaymentDeductions(models.Model):
@@ -32,7 +33,17 @@ class HrPayrollVariablePayments(models.Model):
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
 
+    def write(self, vals):
+        for record in self:
+            if record.status == 'Paid':
+                raise ValidationError('You cannot update records with status "paid".')
+        return super(HrPayrollVariablePayments, self).write(vals)
 
+    def unlink(self):
+        for record in self:
+            if record.status == 'Paid':
+                raise ValidationError('You cannot delete records with status "paid".')
+        return super(HrPayrollVariablePayments, self).unlink()
 
 
 class HrPayrollRates(models.Model):
