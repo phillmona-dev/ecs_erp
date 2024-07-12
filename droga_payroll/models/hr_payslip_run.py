@@ -61,7 +61,7 @@ class HrPayslipRun(models.Model):
             for payslip in self:
                 try:
                     mail_template = self.env.ref('droga_payroll.email_template_payslip')
-                    if mail_template:
+                    if mail_template and payslip.employee_id.work_email:
                         # Sanitize dynamic content
                         sanitized_employee_name = payslip.employee_id.name.replace('\n', ' ').replace('\r', ' ')
                         sanitized_period_description = payslip.period.description.replace('\n', ' ').replace('\r',
