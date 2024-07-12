@@ -58,7 +58,7 @@ class HrPayslipRun(models.Model):
 
         if self.state == 'close':
 
-            for payslip in self:
+            for payslip in self.slip_ids:
                 try:
                     mail_template = self.env.ref('droga_payroll.email_template_payslip')
                     if mail_template and payslip.employee_id.work_email:
