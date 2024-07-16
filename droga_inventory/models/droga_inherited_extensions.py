@@ -978,6 +978,8 @@ class droga_stock_product_extension(models.Model):
                 rec.has_access = False
 
     def write(self, vals_list):
+        if not self.env.user.has_group('droga_inventory.droga_prod_app'):
+            raise UserError("You can not update a product (only users with 'Product registration approver' role can edit. Please contact your supervisor.")
 
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager') and 'seller_ids' not in vals_list and 'invoice_policy' not in vals_list and 'most_recent_trans_date' not in vals_list and 'stock_quantity_total' not in vals_list and 'crm_group' not in vals_list:
             raise UserError("You can not update a product. Please contact your supervisor.")
