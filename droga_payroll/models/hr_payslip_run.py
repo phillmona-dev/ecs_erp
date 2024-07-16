@@ -1,6 +1,10 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
 
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
@@ -8,9 +12,19 @@ class HrPayslipRun(models.Model):
     # add year and period
     fiscal_year = fields.Many2one("account.fiscal.year", "Fiscal Year")
     period = fields.Many2one("account.fiscal.year.period", domain="[('fiscal_year_id', '=', fiscal_year)]")
+    mail_server = fields.Char(compute="get_outgoing_email")
 
     date_start = fields.Date(string='Date From')
     date_end = fields.Date(string='Date To')
+
+    @api.depends('date_start', 'date_end')
+    def get_outgoing_email(self):
+        self.mail_server = ""
+        # Search for the outgoing mail server with the lowest priority (default)
+        mail_servers = self.env['ir.mail_server'].search([], order='sequence', limit=1)
+
+        if mail_servers:
+            self.mail_server = mail_servers.smtp_user
 
     def action_paid(self):
         # Call the original 'action_paid' method
@@ -24,7 +38,6 @@ class HrPayslipRun(models.Model):
         return result
 
     def droga_payroll_sheet_report_action(self):
-
 
         view = self.env.ref(
             'droga_payroll.droga_payroll_sheet_report_form')
@@ -45,11 +58,32 @@ class HrPayslipRun(models.Model):
 
         if self.state == 'close':
 
-            mail_template = self.env.ref('droga_payroll.email_template_payslip')
+            for payslip in self.slip_ids:
+                try:
+                    mail_template = self.env.ref('droga_payroll.email_template_payslip')
+                    if mail_template and payslip.employee_id.work_email:
+                        # Sanitize dynamic content
+                        sanitized_employee_name = payslip.employee_id.name.replace('\n', ' ').replace('\r', ' ')
+                        sanitized_period_description = payslip.period.description.replace('\n', ' ').replace('\r',
+                                                                                                             ' ') if payslip.period else ''
+                        sanitized_date_from = payslip.date_from or ''
+                        sanitized_date_to = payslip.date_to or ''
 
-            for record in self.slip_ids:
-                if record.employee_id.work_email:
-                    mail_template.send_mail(record.id, force_send=True)
+                        # Update context with sanitized content
+                        context = {
+                            'default_employee_name': sanitized_employee_name,
+                            'default_period_description': sanitized_period_description,
+                            'default_date_from': sanitized_date_from,
+                            'default_date_to': sanitized_date_to
+                        }
+
+                        # Send email with context
+                        mail_template.with_context(context).send_mail(payslip.id, force_send=True)
+                        _logger.info(f'Payslip email sent successfully for {payslip.employee_id.name}')
+                    else:
+                        _logger.warning('Email template not found: droga_payroll.email_template_payslip')
+                except Exception as e:
+                    _logger.error(f'Error sending payslip email for {payslip.employee_id.name}: {str(e)}')
         else:
             raise ValidationError(
                 "The status must be changed to done to send payslip email")
