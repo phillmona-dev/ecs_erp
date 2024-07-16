@@ -1190,6 +1190,129 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+
+        <record id="seq_promotional_padd" model="ir.sequence">
+            <field name="name">Promotional items issue PADD store</field>
+            <field name="code">droga.inventory.promotional.sequence.padd</field>
+            <field name="prefix">PRO/PADD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_payd" model="ir.sequence">
+            <field name="name">Promotional items issue PAYD store</field>
+            <field name="code">droga.inventory.promotional.sequence.payd</field>
+            <field name="prefix">PRO/PAYD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_pbed" model="ir.sequence">
+            <field name="name">Promotional items issue PBED store</field>
+            <field name="code">droga.inventory.promotional.sequence.pbed</field>
+            <field name="prefix">PRO/PBED/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_pddd" model="ir.sequence">
+            <field name="name">Promotional items issue PDDD store</field>
+            <field name="code">droga.inventory.promotional.sequence.pddd</field>
+            <field name="prefix">PRO/PDDD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_pfgd" model="ir.sequence">
+            <field name="name">Promotional items issue PFGD store</field>
+            <field name="code">droga.inventory.promotional.sequence.pfgd</field>
+            <field name="prefix">PRO/PFGD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_phad" model="ir.sequence">
+            <field name="name">Promotional items issue PHAD store</field>
+            <field name="code">droga.inventory.promotional.sequence.phad</field>
+            <field name="prefix">PRO/PHAD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_plbd" model="ir.sequence">
+            <field name="name">Promotional items issue PLBD store</field>
+            <field name="code">droga.inventory.promotional.sequence.plbd</field>
+            <field name="prefix">PRO/PLBD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_pmgd" model="ir.sequence">
+            <field name="name">Promotional items issue PMGD store</field>
+            <field name="code">droga.inventory.promotional.sequence.pmgd</field>
+            <field name="prefix">PRO/PMGD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_psbd" model="ir.sequence">
+            <field name="name">Promotional items issue PSBD store</field>
+            <field name="code">droga.inventory.promotional.sequence.psbd</field>
+            <field name="prefix">PRO/PSBD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_pshd" model="ir.sequence">
+            <field name="name">Promotional items issue PSHD store</field>
+            <field name="code">droga.inventory.promotional.sequence.pshd</field>
+            <field name="prefix">PRO/PSHD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_psnd" model="ir.sequence">
+            <field name="name">Promotional items issue PSND store</field>
+            <field name="code">droga.inventory.promotional.sequence.psnd</field>
+            <field name="prefix">PRO/PSND/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_promotional_pspd" model="ir.sequence">
+            <field name="name">Promotional items issue PSPD store</field>
+            <field name="code">droga.inventory.promotional.sequence.pspd</field>
+            <field name="prefix">PRO/PSPD/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
     </data>
 </odoo>
 

@@ -243,14 +243,17 @@ class droga_cons_inherit(models.Model):
         for det in self.detail_entries:
             raw_details = self.env['droga.export.items.composition'].search(
                 [('raw_item', 'in', det.product_id.product_tmpl_id.ids)])
-
-            #Total number of finished goods
-            total_qty_finished=det.product_uom_qty*sum(self.env['droga.export.items.composition.fin.goods'].search(
-                [('id', 'in', raw_details[0].items_detail.ids),('type','=','finish')]).mapped('rate_in_pct'))/100
-            # Total number of byproduct goods
-            total_qty_byproduct = det.product_uom_qty * sum(self.env['droga.export.items.composition.fin.goods'].search(
-                [('id', 'in', raw_details[0].items_detail.ids), ('type', '=', 'byproduct')]).mapped('rate_in_pct')) / 100
-            #Total number sent to cleaning unit
+            if len(raw_details)==0:
+                total_qty_finished=0
+                total_qty_byproduct=0
+            else:
+                #Total number of finished goods
+                total_qty_finished=det.product_uom_qty*sum(self.env['droga.export.items.composition.fin.goods'].search(
+                    [('id', 'in', raw_details[0].items_detail.ids),('type','=','finish')]).mapped('rate_in_pct'))/100
+                # Total number of byproduct goods
+                total_qty_byproduct = det.product_uom_qty * sum(self.env['droga.export.items.composition.fin.goods'].search(
+                    [('id', 'in', raw_details[0].items_detail.ids), ('type', '=', 'byproduct')]).mapped('rate_in_pct')) / 100
+                #Total number sent to cleaning unit
             total_qty = det.product_uom_qty
 
             # Total cost for finished goods
@@ -263,12 +266,13 @@ class droga_cons_inherit(models.Model):
                 [('issue_export_origin_form', '=', self.id), ('type_apply', '=', 'All')]).mapped(
                 'amount_for_order'))
 
-            #This variable is used to add markup and accomodate waste material cost and priorate them to finished and by-products
-            waste_increase_rate=total_qty/(total_qty_finished+total_qty_byproduct)
+            if total_qty_finished+total_qty_byproduct!=0:
+                #This variable is used to add markup and accomodate waste material cost and priorate them to finished and by-products
+                waste_increase_rate=total_qty/(total_qty_finished+total_qty_byproduct)
 
             if len(raw_details) > 0:
                 for it in raw_details[0].items_detail:
-                    if it['type'] == 'waste':
+                    if it['type'] == 'waste' or total_qty_finished+total_qty_byproduct!=0:
                         continue
                     if it['type'] == 'finish':
                         unit_cost=(it.items_header[0].raw_item.standard_price*waste_increase_rate) +(det.proc_cost*waste_increase_rate)+(total_cost_build_finish/total_qty_finished)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
