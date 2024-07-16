@@ -241,6 +241,15 @@ class account_move(models.Model):
                     self.id) + '&field=fileout&download=true&filename=' + name_of_file + ".xml",
             }
 
+    @api.model
+    def create(self, vals):
+        res = super(account_move, self).create(vals)
+        if res.invoice_origin:
+            if res.invoice_origin.startswith('SOD'):
+                res.sales_cost = abs(
+                        sum(self.env['stock.valuation.layer'].search([('origin', '=', res.invoice_origin)]).mapped('value')))
+        return res
+
     def print_to_pos_peds(self):
 
         context = self._context

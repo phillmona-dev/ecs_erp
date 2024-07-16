@@ -107,9 +107,9 @@
             </xpath>
 
             <xpath expr="//field[@name='amount_total_in_currency_signed']" position="before">
-                <field name="sales_cost"/>
-                <field name="core_amt"/>
-                <field name="non_core_amt"/>
+                <field name="sales_cost" sum="Total"/>
+                <field name="core_amt" sum="Total"/>
+                <field name="non_core_amt" sum="Total"/>
             </xpath>
         </field>
     </record>
