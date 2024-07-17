@@ -135,7 +135,7 @@ class AccountMove(models.Model):
                             analytic_plans = self.env['account.analytic.account'].search(
                                 [('id', '=', analytic_distribution_id)])
                             for analytic_plan in analytic_plans:
-                                if analytic_plan.plan_id.complete_name == 'Profit Center':
+                                if analytic_plan.plan_id.complete_name == 'Profit / Cost Center':
                                     record.cost_center = analytic_plan.display_name
                                 elif analytic_plan.plan_id.complete_name == 'Sales Channel':
                                     record.sales_channel = analytic_plan.display_name
@@ -202,7 +202,7 @@ class AccountMove(models.Model):
                             analytic_plans = self.env['account.analytic.account'].search(
                                 [('id', '=', analytic_distribution_id)])
                             for analytic_plan in analytic_plans:
-                                if analytic_plan.plan_id.complete_name == 'Profit Center':
+                                if analytic_plan.plan_id.complete_name == 'Profit / Cost Center':
                                     cost_center = analytic_plan.display_name
                                 elif analytic_plan.plan_id.complete_name == 'Sales Channel':
                                     sales_channel = analytic_plan.display_name
