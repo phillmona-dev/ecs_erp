@@ -34,6 +34,7 @@
         'data/mail_template.xml',
         'views/hr_payslip.xml',
         'views/Menu.xml',
+        'views/hr_payslip_employees.xml',
         'report/hr_payslip_run.xml',
 
     ],

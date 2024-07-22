@@ -70,6 +70,11 @@
 
             </xpath>
 
+            <xpath expr="//field[@name='address_id']" position="before">
+                <field name="division" options="{'no_create':True,'no_open':True}"/>
+
+            </xpath>
+
 
         </field>
     </record>
