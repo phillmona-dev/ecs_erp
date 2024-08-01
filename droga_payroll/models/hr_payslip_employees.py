@@ -16,4 +16,10 @@ class HrPayslipEmployees(models.TransientModel):
                     domain,
                     [('division', '=', self.division.id)]
                 ])
+
+            if wizard.department_id:
+                domain = expression.AND([
+                    domain,
+                    [('department_id', 'child_of', self.department_id.id)]
+                ])
             wizard.employee_ids = self.env['hr.employee'].search(domain)
