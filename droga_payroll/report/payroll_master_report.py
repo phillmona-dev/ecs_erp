@@ -620,10 +620,10 @@ class PayrollMasterReports(models.Model):
         fuel_total = 0
         saco_saving_total = 0
         saco_loan_payment_total = 0
-        saco_registration_total=0
-        saco_additional_payment_total=0
-        saco_share_payment_total=0
-        cost_sharing_total=0
+        saco_registration_total = 0
+        saco_additional_payment_total = 0
+        saco_share_payment_total = 0
+        cost_sharing_total = 0
         others_total = 0
 
         for record in slips:
@@ -642,7 +642,6 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 10, num, num_format)
             sheet.write(row_start, 11, num, num_format)
             sheet.write(row_start, 12, num, num_format)
-
 
             # load data
             # get payroll detail
@@ -929,9 +928,11 @@ class PayrollMasterReports(models.Model):
     def get_period(self):
         # get the last two items
         period = ''
+        company_id = ''
         for record in self.batch:
             period_last = record.period.name[-2:]
             period_first = record.period.name[0:4]
+            company_id = record.company_id.id
 
             period_last = int(period_last)
             period_first = int(period_first)
@@ -942,10 +943,12 @@ class PayrollMasterReports(models.Model):
                 period_last -= 1
                 period = str(period_first) + "{0:0=2d}".format(period_last)
 
-        periods = self.env['account.fiscal.year.period'].search([('name', '=', period)])
+        periods = self.env['account.fiscal.year.period'].search(
+            [('name', '=', period)])
 
         for x in periods:
-            period = x
+            if x.fiscal_year_id.company_id.id == company_id:
+                period = x
 
         return period
 
