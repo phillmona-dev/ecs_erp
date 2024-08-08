@@ -979,6 +979,6 @@ class PayrollMasterReports(models.Model):
 
         for slips in batch.slip_ids:
             if slips.employee_id.id == emp_id:
-                net_wage = slips.net_wage
+                net_wage += slips.net_wage
 
         return net_wage
