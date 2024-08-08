@@ -604,11 +604,9 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 7, 'SACO Saving Additional', title_format)
         sheet.write(row_start, 8, 'SACO Share Purchase', title_format)
         sheet.write(row_start, 9, 'SACO Payment Deduction', title_format)
-        sheet.write(row_start, 10, 'SACO Saving', title_format)
-        sheet.write(row_start, 11, 'SACO Loan Payment', title_format)
-        sheet.write(row_start, 12, 'Cost Sharing', title_format)
-        sheet.write(row_start, 13, 'Others', title_format)
-        sheet.write(row_start, 14, 'Total', title_format)
+        sheet.write(row_start, 10, 'Cost Sharing', title_format)
+        sheet.write(row_start, 11, 'Others', title_format)
+        sheet.write(row_start, 12, 'Total', title_format)
         row_start += 1
 
         # search based on cost center
@@ -644,8 +642,7 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 10, num, num_format)
             sheet.write(row_start, 11, num, num_format)
             sheet.write(row_start, 12, num, num_format)
-            sheet.write(row_start, 13, num, num_format)
-            sheet.write(row_start, 14, num, num_format)
+
 
             # load data
             # get payroll detail
@@ -702,8 +699,6 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 10, cost_sharing_total, num_format_sub_total)
         sheet.write(row_start, 11, 0, num_format_sub_total)
         sheet.write(row_start, 12, 0, num_format_sub_total)
-        sheet.write(row_start, 13, 0, num_format_sub_total)
-        sheet.write(row_start, 14, 0, num_format_sub_total)
 
     # get employee mobile card excel
     def mobile_card_report(self, workbook):
