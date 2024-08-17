@@ -170,6 +170,9 @@ class cust_sales_credit_limit(models.Model):
                         message = message + (
                             '\n' if message else '') + "Please settle matured amounts before initiating another sales!"
             else:
+                if so.payment_term_id.apply_credit_limit and so.payment_term_id.id not in so.partner_id.property_supplier_payment_term_id.allowed_terms.ids:
+                    message = message + (
+                        '\n' if message else '') + "Payment term is not allowed for customer"
                 if so.partner_id.available_amount < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [
                     15390]:
                     message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
@@ -354,6 +357,11 @@ class payment_term_no_credit(models.Model):
     used_under = fields.Selection([
         ('BT', 'Both'),
         ('DR', 'Droga'), ('PC', 'Pharmacy chain')], string='Term used under')
+    allowed_terms=fields.Many2many('account.payment.term',
+        relation='account_payment_term_rel',
+        column1='payment_term_id',
+        column2='related_payment_term_id',
+        string='Related Payment Terms')
 
     def write(self, vals_list):
         if not self.env.user.has_group('droga_sales.payment_term_update'):
