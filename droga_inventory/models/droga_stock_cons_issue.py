@@ -14,7 +14,7 @@ class droga_stock_cons_issue(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
-        ('stmg', 'Store manager'),  #Issue sent to store manager for warehouse allocation
+        ('stmg', 'Operations / Store manager'),  #Issue sent to store manager for warehouse allocation
         ('pmg','Project Engineer'),
         ('mg', 'Export manager'),
         ('waiting', 'Requested'),   #When consignment is waiting for storekeeper to issue at warehouse
@@ -53,9 +53,9 @@ class droga_stock_cons_issue(models.Model):
                 lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             if len(rec.detail_entries) >0:
                 if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
-                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
+                    rec.store_manager = self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
                 lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
-                        self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
+                        self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
                 lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
                 elif rec.detail_entries[0].warehouse_id.wh_type == 'PH':
@@ -65,9 +65,9 @@ class droga_stock_cons_issue(models.Model):
                 lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
                 else:
-                    rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.filtered(
+                    rec.store_manager = self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
                 lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
-                        self.env.ref("droga_inventory.stores_manager").users.filtered(
+                        self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
                 lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
 
     @api.model

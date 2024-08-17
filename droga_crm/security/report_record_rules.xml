@@ -7,4 +7,5 @@
         <field name = "perm_read" eval = "True" />
         <field name = "domain_force"> [('is_record_owner', '=', True)] </field>
     </record>
+
 </odoo>
