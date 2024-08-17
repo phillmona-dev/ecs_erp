@@ -17,7 +17,7 @@ class sale_order_extension(models.Model):
     po_tender=fields.Many2many('purchase.order',string='Purchase order')
     client_po_ref=fields.Char('Client PO ref')
 class accoumt_move(models.Model):
-    _inherit='account.move'
+    _inherit = 'account.move'
 
     @api.model
     def create(self, vals):
@@ -38,7 +38,7 @@ class accoumt_move(models.Model):
                             chd.write({'latest_invoice_date': datetime.today()})
         return res
 class pur_request_extension(models.Model):
-    _inherit='droga.purchase.request.local'
+    _inherit = 'droga.purchase.request.local'
     tender_origin_form_tender = fields.Many2one('droga.tender.master', readonly=True)
 
 class sale_order_line_extension(models.Model):

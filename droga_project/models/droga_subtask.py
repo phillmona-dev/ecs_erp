@@ -2,8 +2,10 @@ from odoo import fields, models, api
 from odoo.exceptions import UserError
 
 class drogaanalyticext(models.Model):
-    _inherit='account.analytic.account'
+    _inherit = 'account.analytic.account'
     project=fields.Many2one('project.project')
+    profit_center=fields.Many2one('account.analytic.account',domain=[
+        ('plan_id', '=', 'Cost Center')])
 
 class droga_project_task_problems(models.Model):
     _name='project.task.problems'

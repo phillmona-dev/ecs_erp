@@ -527,6 +527,12 @@ class PayrollMasterReports(models.Model):
         sheet.set_column('I:I', 10)
         sheet.set_column('J:J', 10)
         sheet.set_column('K:K', 10)
+        sheet.set_column('L:L', 10)
+        sheet.set_column('M:M', 10)
+        sheet.set_column('N:N', 10)
+        sheet.set_column('O:O', 10)
+        sheet.set_column('P:P', 10)
+        sheet.set_column('Q:Q', 10)
 
         row_start = 2
 
@@ -593,11 +599,14 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 2, 'Canteen', title_format)
         sheet.write(row_start, 3, 'Loan', title_format)
         sheet.write(row_start, 4, 'Fuel', title_format)
-        sheet.write(row_start, 5, 'SACO Saving', title_format)
-        sheet.write(row_start, 6, 'SACO Loan Payment', title_format)
-        sheet.write(row_start, 7, 'Cost Sharing', title_format)
-        sheet.write(row_start, 8, 'Others', title_format)
-        sheet.write(row_start, 9, 'Total', title_format)
+        sheet.write(row_start, 5, 'SACO Regsitration', title_format)
+        sheet.write(row_start, 6, 'SACO Saving', title_format)
+        sheet.write(row_start, 7, 'SACO Saving Additional', title_format)
+        sheet.write(row_start, 8, 'SACO Share Purchase', title_format)
+        sheet.write(row_start, 9, 'SACO Payment Deduction', title_format)
+        sheet.write(row_start, 10, 'Cost Sharing', title_format)
+        sheet.write(row_start, 11, 'Others', title_format)
+        sheet.write(row_start, 12, 'Total', title_format)
         row_start += 1
 
         # search based on cost center
@@ -611,7 +620,10 @@ class PayrollMasterReports(models.Model):
         fuel_total = 0
         saco_saving_total = 0
         saco_loan_payment_total = 0
-        cost_sharing_total=0
+        saco_registration_total = 0
+        saco_additional_payment_total = 0
+        saco_share_payment_total = 0
+        cost_sharing_total = 0
         others_total = 0
 
         for record in slips:
@@ -627,6 +639,9 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 7, num, num_format)
             sheet.write(row_start, 8, num, num_format)
             sheet.write(row_start, 9, num, num_format)
+            sheet.write(row_start, 10, num, num_format)
+            sheet.write(row_start, 11, num, num_format)
+            sheet.write(row_start, 12, num, num_format)
 
             # load data
             # get payroll detail
@@ -643,14 +658,29 @@ class PayrollMasterReports(models.Model):
                 elif payslip_detail.code == 'NFALL':  # fuel
                     sheet.write(row_start, 4, payslip_detail.total, num_format)
                     fuel_total += payslip_detail.total
-                elif payslip_detail.code == 'SACOSAV':  # saco saving
+
+                elif payslip_detail.code == 'SACOREG':  # saco Registration
                     sheet.write(row_start, 5, payslip_detail.total, num_format)
-                    saco_saving_total += payslip_detail.total
-                elif payslip_detail.code == 'SACOPAY':  # saco payment
+                    saco_registration_total += payslip_detail.total
+
+                elif payslip_detail.code == 'SACOSAV':  # saco saving
                     sheet.write(row_start, 6, payslip_detail.total, num_format)
-                    saco_loan_payment_total += payslip_detail.total
-                elif payslip_detail.code == 'COSTSHA':  # cost sharing
+                    saco_saving_total += payslip_detail.total
+
+                elif payslip_detail.code == 'SACOSAVAD':  # saco additional payment
                     sheet.write(row_start, 7, payslip_detail.total, num_format)
+                    saco_additional_payment_total += payslip_detail.total
+
+                elif payslip_detail.code == 'SACOSHA':  # saco share payment
+                    sheet.write(row_start, 8, payslip_detail.total, num_format)
+                    saco_share_payment_total += payslip_detail.total
+
+                elif payslip_detail.code == 'SACOPAY':  # saco payment deduction
+                    sheet.write(row_start, 9, payslip_detail.total, num_format)
+                    saco_loan_payment_total += payslip_detail.total
+
+                elif payslip_detail.code == 'COSTSHA':  # cost sharing
+                    sheet.write(row_start, 10, payslip_detail.total, num_format)
                     cost_sharing_total += payslip_detail.total
 
             row_start += 1
@@ -660,10 +690,14 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 2, canteen_total, num_format_sub_total)
         sheet.write(row_start, 3, loan_total, num_format_sub_total)
         sheet.write(row_start, 4, fuel_total, num_format_sub_total)
-        sheet.write(row_start, 5, saco_saving_total, num_format_sub_total)
-        sheet.write(row_start, 6, saco_loan_payment_total, num_format_sub_total)
-        sheet.write(row_start, 7, cost_sharing_total, num_format_sub_total)
-        sheet.write(row_start, 8, 0, num_format_sub_total)
+        sheet.write(row_start, 5, saco_registration_total, num_format_sub_total)
+        sheet.write(row_start, 6, saco_saving_total, num_format_sub_total)
+        sheet.write(row_start, 7, saco_additional_payment_total, num_format_sub_total)
+        sheet.write(row_start, 8, saco_share_payment_total, num_format_sub_total)
+        sheet.write(row_start, 9, saco_loan_payment_total, num_format_sub_total)
+        sheet.write(row_start, 10, cost_sharing_total, num_format_sub_total)
+        sheet.write(row_start, 11, 0, num_format_sub_total)
+        sheet.write(row_start, 12, 0, num_format_sub_total)
 
     # get employee mobile card excel
     def mobile_card_report(self, workbook):
@@ -894,9 +928,11 @@ class PayrollMasterReports(models.Model):
     def get_period(self):
         # get the last two items
         period = ''
+        company_id = ''
         for record in self.batch:
             period_last = record.period.name[-2:]
             period_first = record.period.name[0:4]
+            company_id = record.company_id.id
 
             period_last = int(period_last)
             period_first = int(period_first)
@@ -907,10 +943,12 @@ class PayrollMasterReports(models.Model):
                 period_last -= 1
                 period = str(period_first) + "{0:0=2d}".format(period_last)
 
-        periods = self.env['account.fiscal.year.period'].search([('name', '=', period)])
+        periods = self.env['account.fiscal.year.period'].search(
+            [('name', '=', period)])
 
         for x in periods:
-            period = x
+            if x.fiscal_year_id.company_id.id == company_id:
+                period = x
 
         return period
 
@@ -944,6 +982,6 @@ class PayrollMasterReports(models.Model):
 
         for slips in batch.slip_ids:
             if slips.employee_id.id == emp_id:
-                net_wage = slips.net_wage
+                net_wage += slips.net_wage
 
         return net_wage

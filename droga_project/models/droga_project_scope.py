@@ -3,7 +3,7 @@ from datetime import datetime
 from odoo import models, fields, api
 
 class droga_project_version_extension(models.Model):
-    _inherit='project.project'
+    _inherit = 'project.project'
     version=fields.One2many('project.scope.version','project')
 
     def project_versions(self):

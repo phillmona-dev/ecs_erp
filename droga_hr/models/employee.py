@@ -23,6 +23,8 @@ class Employee(models.Model):
     check_in = fields.Boolean("Check In", default=True)
     check_out = fields.Boolean("Check Out", default=True)
 
+    division = fields.Many2one("droga.hr.division", "Division", required=True)
+
     @api.model
     def create(self, vals):
         # get sequence number for each company
@@ -65,3 +67,5 @@ class EmployeePublic(models.Model):
     is_attendance_required = fields.Boolean("Attendance Required", default=True)
     check_in = fields.Boolean("Check In", default=True)
     check_out = fields.Boolean("Check Out", default=True)
+
+    division = fields.Many2one("droga.hr.division", "Division", required=True)

@@ -112,7 +112,7 @@ class droga_sales_cost_of_sales_view(models.Model):
     product_descr = fields.Char('Product Description')
     product_categ = fields.Char('Product Category')
     sales_ref = fields.Char('Sales Ref')
-    order_from = fields.Char('Profit center')
+    order_from = fields.Char('Profit / Cost Center')
     sales_date=fields.Date('Sales Date')
     sale_line_id = fields.Integer('sale_order_line')
     invoiced_amt=fields.Float('Invoiced amount')

@@ -336,7 +336,7 @@
                         id="droga_pharma_update_uom"
                         name="Update uom"
                         action="droga_pharma_update_stock_action"
-                        groups="droga_pharma.pharma_director"
+                        groups="droga_pharma.pharma_director,droga_pharma.pharma_settings_admin"
                         sequence="18"/>
 
             </menuitem>

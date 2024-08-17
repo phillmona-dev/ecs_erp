@@ -460,6 +460,15 @@ class account_move_line(models.Model):
     item_uom_alternate = fields.Char("UoM Alternate", default="")
     account = fields.Char(related='account_id.code', store=True)
     origin_ref = fields.Char(compute="get_origin_ref", string="Origin reference", store=True)
+    profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True)
+
+    @api.depends('analytic_distribution')
+    def get_acc_move(self):
+        for rec in self:
+            pass
+            #rec.analytic_distribution.items()
+            #for key, value in my_dict.items():
+            #print(f"Key: {key}, Value: {value}")
 
     def get_origin_ref(self):
         for record in self:

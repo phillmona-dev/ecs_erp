@@ -56,7 +56,7 @@ class HrPayslipRun(models.Model):
 
     def action_send_payslip_email(self):
 
-        if self.state == 'close':
+        if self.state == 'close' or self.state == 'paid':
 
             for payslip in self.slip_ids:
                 try:

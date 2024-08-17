@@ -3,7 +3,7 @@ import datetime
 
 
 class droga_tender_master_related(models.Model):
-    _inherit='droga.tender.master'
+    _inherit = 'droga.tender.master'
     cus_type = fields.Many2one(related='customer.customer_type', string='Customer type',store=True)
     phone_add = fields.Char(related='customer.master_cust_id.phone', string='Phone number')
     bid_security_amount_char = fields.Char('Security amount', required=True)

@@ -45,4 +45,9 @@
                   sequence="2"/>
     </menuitem>
 
+    <menuitem id="hr_division_job_menu" name="Divisions" action="view_hr_division_job_action"
+              groups="hr.group_hr_user" parent="hr.menu_config_employee" sequence="100"/>
+
+
+
 </odoo>
