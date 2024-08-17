@@ -10,7 +10,7 @@ from odoo.tools import get_lang
 
 
 class droga_pharma_prod_ext(models.Model):
-    _inherit='product.template'
+    _inherit = 'product.template'
 
     pharma_prod_categ=fields.Many2one('droga.pharma.prod.categ',string='Product category')
     pharma_filler=fields.Char(compute='_fill_fields')
@@ -71,7 +71,7 @@ class droga_pharma_prod_ext(models.Model):
         return res
 
 class droga_pharma_dispensary_type(models.Model):
-    _inherit='stock.location'
+    _inherit = 'stock.location'
 
     pharmacy_location_type=fields.Selection([('Dispensary', 'Dispensary'), ('Store', 'Store'), ('Mix Location', 'Mix Location')],
                             default='Dispensary',string='Pharmacy Location')
@@ -81,11 +81,11 @@ class droga_pharma_dispensary_type(models.Model):
     ('PH', 'Pharmacy'),], string='Warehouse type.',related='warehouse_id.wh_type')
 
 class droga_pharma_wh_has_dispensary(models.Model):
-    _inherit='stock.warehouse'
+    _inherit = 'stock.warehouse'
     linked_analytic = fields.Many2one('account.analytic.account')
 
 class droga_pharma_lot_extension(models.Model):
-    _inherit='stock.lot'
+    _inherit = 'stock.lot'
     _rec_name='lot_descr'
     _order = 'expiration_date asc, name, id'
     lot_descr = fields.Char('Lot', compute='_get_lot_descr')
@@ -98,7 +98,7 @@ class droga_pharma_lot_extension(models.Model):
                 rec.lot_descr = rec.name
 
 class droga_purchase_uom_extension(models.Model):
-    _inherit='purchase.order.line'
+    _inherit = 'purchase.order.line'
     import_uom = fields.Many2one(related='product_id.import_uom_new', store=True)
     pharma_uom = fields.Many2one(related='product_id.uom_id', store=True)
     request_type=fields.Selection(related='order_id.request_type')
@@ -148,7 +148,7 @@ class droga_purchase_uom_extension(models.Model):
         self._compute_tax_id()
 
 class droga_stock_quant(models.Model):
-    _inherit='stock.quant'
+    _inherit = 'stock.quant'
     warehouse_id = fields.Many2one('stock.warehouse', related='location_id.warehouse_id',store=True)
     branch_id=fields.Many2one('account.analytic.account', related='warehouse_id.linked_analytic',store=True)
     wh_type = fields.Selection([
@@ -394,5 +394,5 @@ class droga_stock_cons_issue_detail_inherit(models.Model):
                 rec.is_prod_available = 'True'
 
 class free_sample_detail(models.Model):
-    _inherit='droga.inventory.cons.issue.detail'
+    _inherit = 'droga.inventory.cons.issue.detail'
     product_uom_pharma=fields.Many2one('uom.uom',string='UOM')

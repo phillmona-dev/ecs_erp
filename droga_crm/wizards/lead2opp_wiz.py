@@ -59,7 +59,7 @@ class lead2opp_inherit(models.TransientModel):
 
 
 class lead_ext(models.Model):
-    _inherit='crm.lead'
+    _inherit = 'crm.lead'
 
     def redirect_lead_opportunity_view(self):
         pass

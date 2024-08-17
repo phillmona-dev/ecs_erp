@@ -79,7 +79,7 @@ class prod_availability(models.Model):
             else:
                 rec.has_access = False
 class product_alerts(models.Model):
-    _inherit='product.template'
+    _inherit = 'product.template'
     most_recent_so_alert_date=fields.Date('Most recent alert time',default=datetime.now().date(),store=True)
     pharmacy_order_point=fields.Float('Pharmacy emergency order point per branch')
     most_recent_order_alert_date = fields.Date('Most recent minimum level order alert time', default=datetime.now().date(), store=True)

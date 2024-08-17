@@ -3,7 +3,7 @@ from odoo.addons.mail.models.mail_thread import MailThread
 from odoo.exceptions import UserError
 
 class droga_tender_sale_line_extension(models.Model):
-    _inherit='sale.order.line'
+    _inherit = 'sale.order.line'
     tender_line=fields.Many2one('droga.tender.performance.evaluation')
 
 class droga_tender_master(models.Model):

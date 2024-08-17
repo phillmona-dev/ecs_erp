@@ -6,7 +6,7 @@ from odoo.exceptions import ValidationError, UserError
 
 
 class droga_pharma_customer(models.Model):
-    _inherit='res.partner'
+    _inherit = 'res.partner'
     allowed_product_groups = fields.Many2many('product.category')
     employees = fields.One2many('droga.pharma.cust.employees', 'parent_customer')
     memberships_partner=fields.One2many('droga.pharma.membership', 'parent_customer')

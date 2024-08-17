@@ -1122,7 +1122,7 @@ class sale_order_line_mail_inherit(models.Model):
 
 
 class account_move_inherit(models.Model):
-    _inherit='account.move'
+    _inherit = 'account.move'
     account_move_linked_analytic = fields.Many2one('account.analytic.account')
 
     @api.model

@@ -655,7 +655,7 @@ class HrEmployee(models.Model):
 
 
 class HrEmployeePublic(models.Model):
-    _inherit='hr.employee.public'
+    _inherit = 'hr.employee.public'
     driver_license_type=fields.Selection([
         ('type_a', 'Automobile'),
         ('type_b', 'Hizb 1'),

@@ -48,7 +48,7 @@ class product_link_group(models.Model):
     crm_group=fields.Many2one('droga.crm.settings.prod_group')
 
 class droga_product_template(models.Model):
-    _inherit='product.template'
+    _inherit = 'product.template'
     crm_group=fields.Many2one('droga.crm.settings.prod_group',string='CRM Product Group',domain=[('status', '=', 'Active')])
 
     def _is_prod_avail(self):

@@ -2,7 +2,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 class droga_export_detail_ext(models.Model):
-    _inherit='droga.inventory.cons.receive.detail'
+    _inherit = 'droga.inventory.cons.receive.detail'
     product_uom_qty_esti = fields.Float(
         'Request',
         digits='Product Unit of Measure', store=True,

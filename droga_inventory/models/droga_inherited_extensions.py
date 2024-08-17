@@ -356,7 +356,7 @@ class droga_stock_picking_type_extension(models.Model):
                 rec.has_access=False
 
 class droga_stock_uom_extension(models.Model):
-    _inherit='uom.uom'
+    _inherit = 'uom.uom'
     uom_title=fields.Char('UOM invoice name')
 
     @api.model
@@ -382,7 +382,7 @@ class droga_stock_uom_extension(models.Model):
         return result
 
 class val_layer(models.Model):
-    _inherit='stock.valuation.layer'
+    _inherit = 'stock.valuation.layer'
     reference = fields.Char(related='stock_move_id.reference',store=True)
     trans_type_detail = fields.Many2one('droga.inventory.transaction.types', 'Stock Move Detail', compute='_get_trans_type',store=True)
     trans_type = fields.Many2one('droga.inventory.transaction.types', 'Stock Move',

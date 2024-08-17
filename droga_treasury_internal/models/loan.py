@@ -165,7 +165,7 @@ class AccountLoanModifaied(models.Model):
 
 class AccountLoanRepayment(models.Model):
     
-    _inherit='account.loan.repayment'
+    _inherit = 'account.loan.repayment'
     @api.onchange('value_date')
     def _onchange_Next_Date(self):
         for record in self:
