@@ -132,7 +132,7 @@
                   groups="account.group_account_manager"
                   sequence="4"/>
 
-        <menuitem id="droga_trial_balance_report_tree_menu" name="Trial Balance by Cost Center"
+        <menuitem id="droga_trial_balance_report_tree_menu" name="Ledger detail by Cost Center"
                   action="view_move_line_trial_balance_action"
                   groups="account.group_account_manager"
                   sequence="5"/>
