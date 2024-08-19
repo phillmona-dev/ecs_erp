@@ -963,7 +963,7 @@ class sale_order_ext(models.Model):
                 if so.payment_term_id.apply_credit_limit and so.payment_term_id.id not in so.partner_id.property_supplier_payment_term_id.allowed_terms.ids:
                     message = message + (
                         '\n' if message else '') + "Payment term is not allowed for customer"
-            if so.amount_total < so.payment_term_id.min_amount and not so.tender_origin_form_tender:
+            if so.amount_total < so.payment_term_id.min_amount and not so.tender_origin_form_tender and not so.order_from.startswith('PT'):
                 message = message + (
                     '\n' if message else '') + "Minimum order amount for " + so.payment_term_id.name + " is " + str(
                     so.payment_term_id.min_amount)

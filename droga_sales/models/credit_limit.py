@@ -181,7 +181,7 @@ class cust_sales_credit_limit(models.Model):
                     message = message + (
                         '\n' if message else '') + "Please settle matured amounts before initiating another sales!"
 
-            if so.amount_total < so.payment_term_id.min_amount and not so.tender_origin_form_tender:
+            if so.amount_total < so.payment_term_id.min_amount and not so.tender_origin_form_tender and not so.order_from.startswith('PT'):
                 message = message + (
                     '\n' if message else '') + "Minimum order amount for " + so.payment_term_id.name + " is " + str(
                     so.payment_term_id.min_amount)
