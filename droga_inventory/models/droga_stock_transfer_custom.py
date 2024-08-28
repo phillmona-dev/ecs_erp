@@ -1,7 +1,7 @@
 import json
 from operator import mod
 from odoo import fields, models, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools.view_validation import READONLY
 
 
@@ -110,6 +110,9 @@ class droga_stock_transfer_custom(models.Model):
 
 
     def request(self):
+        if self.location_dest_id.warehouse_id.wh_type=="PH":
+            raise ValidationError(
+                "For pharmacy transactions, please use the menu under Pharmacy chain.")
         self.ensure_one()
         self._get_approvers()
         self.state = 'stmg'

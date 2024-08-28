@@ -141,6 +141,9 @@ class AccountMove(models.Model):
                                     record.sales_channel = analytic_plan.display_name
                         break
 
+                if record.cost_center=="Others" and record.stock_move_id:
+                    record.cost_center=record.stock_move_id.trans_warehouse.linked_analytic.display_name
+
     @api.depends('invoice_date', 'invoice_payment_term_id')
     def update_due_days(self):
         for record in self:
