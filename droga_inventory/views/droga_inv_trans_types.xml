@@ -13,6 +13,7 @@
         <field name="arch" type="xml">
             <tree string="" editable="bottom">
                 <field name="from_loc"></field>
+                <field name="qty_flag"></field>
                 <field name="from_con_type"></field>
                 <field name="to_loc"></field>
                 <field name="to_con_type"></field>

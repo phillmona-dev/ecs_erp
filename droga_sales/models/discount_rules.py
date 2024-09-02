@@ -10,7 +10,6 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
 from odoo.http import request
 
-
 class droga_price_discount_per_type(models.Model):
     _name = 'droga.price.discount.per.type'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']

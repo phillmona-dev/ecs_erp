@@ -5,6 +5,7 @@ class inventory_trans_types(models.Model):
     _name='droga.inventory.transaction.types'
     from_loc=fields.Selection([('customer','Customer location'),('production','Production'),('view','View'),('transit','Transit location'),
                                ('supplier','Vendor location'),('inventory','Inventory loss'),('internal','Internal location')])
+    qty_flag=fields.Selection([('-1','-1'),('1','1')])
     from_con_type = fields.Selection([
         ('CONI', 'Consignment customer location'),
         ('CONR', 'Consignment vendor location'),
