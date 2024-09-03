@@ -24,6 +24,7 @@ class HrPayrollVariablePayments(models.Model):
     _name = 'hr.payroll.variable.payment'
 
     employee_id = fields.Many2one('hr.employee', rquired=True)
+    division = fields.Many2one(related="employee_id.division")
     input_types = fields.Many2one('hr.payslip.input.type', 'Input Types')
     fiscal_year = fields.Many2one("account.fiscal.year", "Fiscal Year")
     period = fields.Many2one("account.fiscal.year.period", domain="[('fiscal_year_id', '=', fiscal_year)]")
@@ -33,11 +34,11 @@ class HrPayrollVariablePayments(models.Model):
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
 
-    #def write(self, vals):
-        #for record in self:
-            #if record.status == 'Paid':
-                #raise ValidationError('You cannot update records with status "paid".')
-        #return super(HrPayrollVariablePayments, self).write(vals)
+    # def write(self, vals):
+    # for record in self:
+    # if record.status == 'Paid':
+    # raise ValidationError('You cannot update records with status "paid".')
+    # return super(HrPayrollVariablePayments, self).write(vals)
 
     def unlink(self):
         for record in self:
