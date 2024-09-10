@@ -85,13 +85,12 @@ class HrPayslipRun(models.Model):
             except Exception as e:
                 _logger.error(f'Error sending payslip email for {payslip.employee_id.name}: {str(e)}')
 
-    else:
-    raise ValidationError(
-        "The status must be changed to done to send payslip email")
+    # else:
+    # raise ValidationError(
+    # "The status must be changed to done to send payslip email")
 
-
-@api.onchange("period")
-def _on_period_change(self):
-    for record in self:
-        record.date_start = record.period.date_from
-        record.date_end = record.period.date_to
+    @api.onchange("period")
+    def _on_period_change(self):
+        for record in self:
+            record.date_start = record.period.date_from
+            record.date_end = record.period.date_to
