@@ -56,40 +56,42 @@ class HrPayslipRun(models.Model):
 
     def action_send_payslip_email(self):
 
-        if self.state == 'close' or self.state == 'paid':
+        # if self.state == 'close' or self.state == 'paid':
 
-            for payslip in self.slip_ids:
-                try:
-                    mail_template = self.env.ref('droga_payroll.email_template_payslip')
-                    if mail_template and payslip.employee_id.work_email:
-                        # Sanitize dynamic content
-                        sanitized_employee_name = payslip.employee_id.name.replace('\n', ' ').replace('\r', ' ')
-                        sanitized_period_description = payslip.period.description.replace('\n', ' ').replace('\r',
-                                                                                                             ' ') if payslip.period else ''
-                        sanitized_date_from = payslip.date_from or ''
-                        sanitized_date_to = payslip.date_to or ''
+        for payslip in self.slip_ids:
+            try:
+                mail_template = self.env.ref('droga_payroll.email_template_payslip')
+                if mail_template and payslip.employee_id.work_email:
+                    # Sanitize dynamic content
+                    sanitized_employee_name = payslip.employee_id.name.replace('\n', ' ').replace('\r', ' ')
+                    sanitized_period_description = payslip.period.description.replace('\n', ' ').replace('\r',
+                                                                                                         ' ') if payslip.period else ''
+                    sanitized_date_from = payslip.date_from or ''
+                    sanitized_date_to = payslip.date_to or ''
 
-                        # Update context with sanitized content
-                        context = {
-                            'default_employee_name': sanitized_employee_name,
-                            'default_period_description': sanitized_period_description,
-                            'default_date_from': sanitized_date_from,
-                            'default_date_to': sanitized_date_to
-                        }
+                    # Update context with sanitized content
+                    context = {
+                        'default_employee_name': sanitized_employee_name,
+                        'default_period_description': sanitized_period_description,
+                        'default_date_from': sanitized_date_from,
+                        'default_date_to': sanitized_date_to
+                    }
 
-                        # Send email with context
-                        mail_template.with_context(context).send_mail(payslip.id, force_send=True)
-                        _logger.info(f'Payslip email sent successfully for {payslip.employee_id.name}')
-                    else:
-                        _logger.warning('Email template not found: droga_payroll.email_template_payslip')
-                except Exception as e:
-                    _logger.error(f'Error sending payslip email for {payslip.employee_id.name}: {str(e)}')
-        else:
-            raise ValidationError(
-                "The status must be changed to done to send payslip email")
+                    # Send email with context
+                    mail_template.with_context(context).send_mail(payslip.id, force_send=True)
+                    _logger.info(f'Payslip email sent successfully for {payslip.employee_id.name}')
+                else:
+                    _logger.warning('Email template not found: droga_payroll.email_template_payslip')
+            except Exception as e:
+                _logger.error(f'Error sending payslip email for {payslip.employee_id.name}: {str(e)}')
 
-    @api.onchange("period")
-    def _on_period_change(self):
-        for record in self:
-            record.date_start = record.period.date_from
-            record.date_end = record.period.date_to
+    else:
+    raise ValidationError(
+        "The status must be changed to done to send payslip email")
+
+
+@api.onchange("period")
+def _on_period_change(self):
+    for record in self:
+        record.date_start = record.period.date_from
+        record.date_end = record.period.date_to
