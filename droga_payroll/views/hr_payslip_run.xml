@@ -11,7 +11,7 @@
                 <group>
                     <group>
                         <field name="batch" options="{'no_create':True,'no_open':True}" invisible="1"/>
-                        <field name="cost_center" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
+                        <field name="cost_center_analytic" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
                     </group>
                 </group>
                 <footer>

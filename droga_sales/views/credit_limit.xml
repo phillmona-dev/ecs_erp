@@ -72,6 +72,8 @@
                 <field name="min_amount"/>
                 <label for="used_under"></label>
                 <field name="used_under"></field>
+                <label for="allowed_terms"></label>
+                <field name="allowed_terms" widget="many2many_tags"></field>
             </xpath>
             <xpath expr="//form/sheet" position="after">
                 <div class="oe_chatter">

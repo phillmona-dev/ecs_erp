@@ -460,15 +460,36 @@ class account_move_line(models.Model):
     item_uom_alternate = fields.Char("UoM Alternate", default="")
     account = fields.Char(related='account_id.code', store=True)
     origin_ref = fields.Char(compute="get_origin_ref", string="Origin reference", store=True)
-    profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True)
+    profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True,default='-')
+
+    @api.model
+    def create(self, vals):
+        ret= super(account_move_line, self).create(vals)
+        for rec in ret:
+            if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
+                if rec.account.startswith('5'):
+                    analytic=self.env['stock.move.line'].search([('move_id','=',rec.move_id.stock_move_id.id)])
+                    if len(analytic)>0:
+                        rec.profit_cost_center=analytic[0].trans_warehouse.linked_analytic.name if analytic[0].trans_warehouse.linked_analytic else rec.profit_cost_center
+        return ret
 
     @api.depends('analytic_distribution')
     def get_acc_move(self):
         for rec in self:
-            pass
-            #rec.analytic_distribution.items()
-            #for key, value in my_dict.items():
-            #print(f"Key: {key}, Value: {value}")
+            if rec.profit_cost_center=='-' and rec.analytic_distribution:
+                if rec.company_id.id==2:
+                    for key, value in rec.analytic_distribution.items():
+                        analytics=self.env['account.analytic.account'].search([('id','=',key),('plan_id','in',(16,19))])
+                        if len(analytics)>0:
+                            rec.profit_cost_center=analytics[0].name
+                else:
+                    for key, value in rec.analytic_distribution.items():
+                        analytics = self.env['account.analytic.account'].search(
+                            [('id', '=', key), ('plan_id', 'in', (1, 2))])
+                        if len(analytics) > 0:
+                            rec.profit_cost_center = analytics[0].profit_center.name if analytics[0].plan_id.id == 2 and analytics[
+                                0].profit_center else analytics[0].name
+
 
     def get_origin_ref(self):
         for record in self:

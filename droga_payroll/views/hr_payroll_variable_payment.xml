@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name="employee_id" options="{'no_create':True,'no_open':True}"/>
+                <field name="division" options="{'no_create':True,'no_open':True}" />
                 <field name="input_types" options="{'no_create':True,'no_open':True}"/>
                 <field name="fiscal_year" options="{'no_create':True,'no_open':True}"/>
                 <field name="period" options="{'no_create':True,'no_open':True}"/>

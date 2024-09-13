@@ -189,7 +189,7 @@ class product_offering_report(models.TransientModel):
     @staticmethod
     def generate_report(self):
         if self.prod_group:
-            excel_data = self.header_cost_list.products_detail.search([('pharmacy_group_id', 'in', self.prod_group.ids)])
+            excel_data = self.header_cost_list.products_detail.filtered(lambda x: x.pharmacy_group_id.id in self.prod_group.ids)
         else:
             excel_data = self.header_cost_list.products_detail
 
@@ -277,7 +277,7 @@ class product_offering_report(models.TransientModel):
             sheet.write(row, 0, prod.product.default_code,fields_format)
             sheet.write(row, 1, prod.product.name,fields_format)
             sheet.write(row, 2, prod.pharmacy_group_id.categ,fields_format)
-            sheet.write(row, 3, prod.uom.name,fields_format)
+            sheet.write(row, 3, prod.uom.name if prod.uom else ' ',fields_format)
             sheet.write(row, 4, prod.rev_selling_price,num_format)
 
 

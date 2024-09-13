@@ -160,7 +160,7 @@ class cust_sales_credit_limit(models.Model):
                 # raise ValidationError("Please login before registering a sales order!")
             if so.order_from:
                 if so.order_from.startswith('PH'):
-                    if so.partner_id.available_amount_pharma < so.amount_total and so.payment_term_id.apply_credit_limit:
+                    if so.partner_id.available_amount_pharma < so.amount_total and so.payment_term_id.apply_credit_limit and so.company_id in (1,2):
                         message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
                         # raise ValidationError("You cannot exceed credit limit!")
                     if so.customer_emp:
@@ -170,15 +170,18 @@ class cust_sales_credit_limit(models.Model):
                         message = message + (
                             '\n' if message else '') + "Please settle matured amounts before initiating another sales!"
             else:
+                if so.payment_term_id.apply_credit_limit and so.payment_term_id.id not in so.partner_id.property_supplier_payment_term_id.allowed_terms.ids and so.company_id.id in (1,2):
+                    message = message + (
+                        '\n' if message else '') + "Payment term is not allowed for customer"
                 if so.partner_id.available_amount < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [
-                    15390]:
+                    15390] and so.company_id in (1,2):
                     message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
                     # raise ValidationError("You cannot exceed credit limit!")
                 if so.mature_amount > 0:
                     message = message + (
                         '\n' if message else '') + "Please settle matured amounts before initiating another sales!"
 
-            if so.amount_total < so.payment_term_id.min_amount and not so.tender_origin_form_tender and not so.order_from:
+            if so.amount_total < so.payment_term_id.min_amount and not so.tender_origin_form_tender and (not so.order_from.startswith('PT') if type(so.order_from) is str else True) and so.company_id.id in (1,2):
                 message = message + (
                     '\n' if message else '') + "Minimum order amount for " + so.payment_term_id.name + " is " + str(
                     so.payment_term_id.min_amount)
@@ -354,6 +357,11 @@ class payment_term_no_credit(models.Model):
     used_under = fields.Selection([
         ('BT', 'Both'),
         ('DR', 'Droga'), ('PC', 'Pharmacy chain')], string='Term used under')
+    allowed_terms=fields.Many2many('account.payment.term',
+        relation='account_payment_term_rel',
+        column1='payment_term_id',
+        column2='related_payment_term_id',
+        string='Related Payment Terms')
 
     def write(self, vals_list):
         if not self.env.user.has_group('droga_sales.payment_term_update'):

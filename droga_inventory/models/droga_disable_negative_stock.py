@@ -12,9 +12,21 @@ class StockQuant(models.Model):
     import_diff = fields.Float('Import difference', compute='_get_import_counted', store=True)
     import_counted=fields.Float('Import counted')
     import_uom = fields.Many2one('uom.uom', related='product_id.import_uom_new')
-
+    difference_custom=fields.Float('Difference_Custom')
+    diff_date=fields.Date('Diff_Date')
 
     def write(self, vals):
+        if 'diff_date' in vals or 'difference_custom' in vals:
+            for res in self:
+                if res.company_id.id == 1 and res.product_id.import_uom_new.factor != 0 and (res.wh_type=='IM' or res.wh_type=='WS'):
+                #Import transactions
+                    res.inventory_quantity=((vals["difference_custom"]) * (res.product_id.uom_id.factor / res.product_id.import_uom_new.factor))+ res.quantity
+                else:
+                    res.inventory_quantity=vals["difference_custom"] + res.quantity
+                res.product_id.product_tmpl_id.adj_date = vals["diff_date"]
+                res.action_apply_inventory()
+                res.product_id.product_tmpl_id.adj_date=False
+
         if 'import_counted' in vals:
             for res in self:
                 if res.company_id.id == 1 and res.product_id.import_uom_new.factor != 0:

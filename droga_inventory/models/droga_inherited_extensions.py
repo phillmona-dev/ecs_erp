@@ -391,6 +391,7 @@ class val_layer(models.Model):
     date_month = fields.Char(string='Date Month', compute='_get_date_month', store=True, readonly=True)
     warehouse=fields.Many2one('stock.warehouse',store=True,compute='_get_trans_type')
     origin=fields.Char(related='stock_move_id.origin',store=True)
+    cr_date=fields.Datetime('Create date with adjustment',default=datetime.now())
     @api.depends('stock_move_id.trans_type','stock_move_id.trans_type_detail')
     def _get_trans_type(self):
         for rec in self:
@@ -415,6 +416,14 @@ class val_layer(models.Model):
     def create(self, vals):
         ret = super(val_layer, self).create(vals)
 
+        for res in ret:
+            if res.product_id.product_tmpl_id.adj_date:
+                vals['cr_date']=res.product_id.product_tmpl_id.adj_date
+                res.write({'cr_date':datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())})
+                #res.account_move_id.write({'date':datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())})
+                #for mv in res.account_move_id.line_ids:
+                #    mv.write({'date':datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())})
+
         if ret.origin:
             if ret.origin.startswith('SOD'):
                 acc_move = self.env['account.move'].search([('invoice_origin', '=', ret.origin)])
@@ -422,6 +431,18 @@ class val_layer(models.Model):
                     mv.sales_cost = abs(
                         sum(self.env['stock.valuation.layer'].search([('origin', '=', ret.origin)]).mapped('value')))
         return ret
+
+class droga_inv_account_move(models.Model):
+    _inherit = 'account.move'
+    @api.model
+    def create(self,vals):
+        to_ret=super(droga_inv_account_move, self).create(vals)
+        if to_ret.stock_move_id:
+            to_ret.date=to_ret.stock_move_id.date
+            for mv in to_ret.line_ids:
+                mv.date=to_ret.stock_move_id.date
+        return to_ret
+
 class stock_move_mail_added(models.Model):
     _name = "stock.move"
     _inherit = ['stock.move','mail.thread', 'mail.activity.mixin', 'image.mixin']
@@ -438,6 +459,8 @@ class droga_stock_move_extension(models.Model):
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
     cons_price=fields.Float('Consignment payable')
+
+
 
     @api.depends('picking_id.pharmacy_unit')
     def _get_pharma_unit(self):
@@ -649,6 +672,15 @@ class droga_stock_move_extension(models.Model):
                 rec.has_read_access = True
             else:
                 rec.has_read_access = False
+
+    def write(self,vals_list):
+        if 'date' in vals_list:
+            for res in self:
+                if res.location_id.name == 'Inventory adjustment' or res.location_dest_id.name == 'Inventory adjustment' and res.product_id.product_tmpl_id.adj_date:
+                    vals_list['date'] = datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())
+                    for mv_line in res.move_line_ids:
+                        mv_line.date = datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())
+        return super(droga_stock_move_extension, self).write(vals_list)
 
     @api.model
     def create(self, vals_list):

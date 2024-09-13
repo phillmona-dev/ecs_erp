@@ -19,6 +19,7 @@ class sales_target_header(models.Model):
     date_from_rep=fields.Date('Date from')
     date_to_rep = fields.Date('Date to')
     header_description=fields.Char(compute='_get_descr')
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     def _get_descr(self):
         for rec in self:

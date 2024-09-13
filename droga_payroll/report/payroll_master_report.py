@@ -18,6 +18,7 @@ class PayrollMasterReports(models.Model):
     batch = fields.Many2one('hr.payslip.run', required=True)
     fileout = fields.Binary('File', readonly=True)
     cost_center = fields.Many2many("hr.department")
+    cost_center_analytic = fields.Many2many("account.analytic.account", domain=[('plan_id.name', '=', 'Cost Center')])
 
     def convert_to_word(self, num):
         num_strings = str(num)
@@ -260,8 +261,10 @@ class PayrollMasterReports(models.Model):
         net_pay_sub_total = 0
 
         # search based on cost center
-        if self.cost_center.ids:
-            slips = self.batch.slip_ids.search([('employee_id.department_id', 'in', self.cost_center.ids)])
+        if self.cost_center_analytic.ids:
+            slips = self.batch.slip_ids.search(
+                [('contract_id.analytic_account_id', 'in', self.cost_center_analytic.ids),
+                 ('period', '=', self.batch.period.id)])
         else:
             slips = self.batch.slip_ids
 
@@ -270,9 +273,9 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 1, record.employee_id.barcode, border)
             sheet.write(row_start, 2, record.employee_id.name, border)
             sheet.write(row_start, 3, record.employee_id.job_title, border)
-            sheet.write(row_start, 4, record.employee_id.department_id.name, border)
+            sheet.write(row_start, 4, record.contract_id.analytic_account_id.name, border)
 
-            # format
+            # formatemployee_id
             num = 0
             sheet.write(row_start, 5, num, num_format)
             sheet.write(row_start, 6, num, num_format)
@@ -470,8 +473,11 @@ class PayrollMasterReports(models.Model):
             total_net_pay = 0
 
             # search based on cost center
-            if self.cost_center.ids:
-                slips = self.batch.slip_ids.search([('employee_id.department_id', 'in', self.cost_center.ids)])
+            # search based on cost center
+            if self.cost_center_analytic.ids:
+                slips = self.batch.slip_ids.search(
+                    [('contract_id.analytic_account_id', 'in', self.cost_center_analytic.ids),
+                     ('period', '=', self.batch.period.id)])
             else:
                 slips = self.batch.slip_ids
 
@@ -610,8 +616,11 @@ class PayrollMasterReports(models.Model):
         row_start += 1
 
         # search based on cost center
-        if self.cost_center.ids:
-            slips = self.batch.slip_ids.search([('employee_id.department_id', 'in', self.cost_center.ids)])
+        # search based on cost center
+        if self.cost_center_analytic.ids:
+            slips = self.batch.slip_ids.search(
+                [('contract_id.analytic_account_id', 'in', self.cost_center_analytic.ids),
+                 ('period', '=', self.batch.period.id)])
         else:
             slips = self.batch.slip_ids
 
@@ -905,17 +914,24 @@ class PayrollMasterReports(models.Model):
 
         # search employees from hr.employee
         employees = self.env['hr.employee'].search([('id', 'in', emp_list)])
+        # search based on cost center
+        if self.cost_center_analytic.ids:
+            slips = self.batch.slip_ids.search(
+                [('contract_id.analytic_account_id', 'in', self.cost_center_analytic.ids),
+                 ('period', '=', self.batch.period.id)])
+        else:
+            slips = self.batch.slip_ids
 
         current_period = self.batch.period
         previous_period = self.get_period()
 
-        for record in employees:
+        for record in slips:
             sheet.write(row_start, 0, row_start - 2, border)
-            sheet.write(row_start, 1, record.barcode, border)
-            sheet.write(row_start, 2, record.name, border)
+            sheet.write(row_start, 1, record.employee_id.barcode, border)
+            sheet.write(row_start, 2, record.employee_id.name, border)
 
-            previous_net_wage = self.get_net_pay_amount(previous_period, record.id)
-            current_net_wage = self.get_net_pay_amount(current_period, record.id)
+            previous_net_wage = self.get_net_pay_amount(previous_period, record.employee_id.id)
+            current_net_wage = self.get_net_pay_amount(current_period, record.employee_id.id)
             difference = previous_net_wage - current_net_wage
 
             sheet.write(row_start, 3, previous_net_wage, num_format)
