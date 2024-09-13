@@ -84,7 +84,7 @@ class inventory_stock_card_xls(models.TransientModel):
         green = workbook.add_format({'bold': True,'fg_color': '#3CB371'})
 
 
-        sheet.write(0, 0, 'Database ID', green)
+        sheet.write(0, 0, 'External ID', green)
         sheet.write(0, 1, 'Product code', bold)
         sheet.write(0, 2, 'Product description', bold)
         sheet.write(0, 3, 'Lot/Serial', bold)

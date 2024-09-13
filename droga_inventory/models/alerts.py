@@ -89,6 +89,7 @@ class product_alerts(models.Model):
     availability=fields.Char('Availability',compute='_compute_availability',store=True)
     notification_for=fields.Selection([('All', 'All'), ('Pharma', 'Pharma'),('Import','Import')],
                               tracking=True)
+    adj_date=fields.Date('Adjustment date')
     tracking = fields.Selection([
         ('serial', 'By Unique Serial Number'),
         ('lot', 'By Lots'),
