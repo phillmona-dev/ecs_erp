@@ -73,6 +73,7 @@ class transfer_request_inherit(models.Model):
     _inherit = 'droga.inventory.transfer.custom'
     pharmacy_manager = fields.Many2one('res.users', compute='_get_pharma_approvers', store=True)
 
+
     def _get_pharma_approvers(self):
         for rec in self:
             rec.pharmacy_manager = self.env.ref("droga_pharma.pharma_supply_chain_manager").users.filtered(
@@ -110,6 +111,10 @@ class transfer_request_inherit(models.Model):
         #self.state = 'phmg'
 
     def confirm_ph(self):
+        self.set_activity_done()
+        self.state='stmgp'
+
+    def confirm_im(self):
         self.set_activity_done()
         for wh in self['location_id']:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
