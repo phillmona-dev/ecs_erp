@@ -102,7 +102,7 @@ class transfer_request_inherit(models.Model):
                         subtype_xmlid='mail.mt_comment',
                         author_id=2,
                     )
-            self.confirm_ph()
+            self.confirm_im()
         #if self.location_dest_id.complete_name[0:3]==self.location_id.code[0:3]:
         #    self.confirm_ph()
         #self._get_pharma_approvers()
@@ -112,7 +112,10 @@ class transfer_request_inherit(models.Model):
 
     def confirm_ph(self):
         self.set_activity_done()
-        self.state='stmgp'
+        if self.location_id.wh_type != "PH":
+            self.state='stmgp'
+        else:
+            self.confirm_im();
 
     def confirm_im(self):
         self.set_activity_done()
