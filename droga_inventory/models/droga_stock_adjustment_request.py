@@ -18,12 +18,15 @@ class droga_stock_adjustment_request(models.Model):
     request_date_time = fields.Datetime('Request Date', default=fields.Datetime.now)
     stock_adjustment_detail_entries = fields.One2many('droga.stock.adjustment.request.detail',
                                                       'stock_adjustment_header')
+    order_from=fields.Char('Order from',default='IM')
     remark=fields.Char('Adjustment description',required=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),  # When requester cancels it from draft
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
+        ('stmgp', 'Supply chain manager'),
         ('finmg', 'Finance approver'),
+        ('finmgp', 'Finance pharmacy approver'),
         ('waiting', 'Requested'),  # When consignment is waiting for storekeeper to issue at warehouse
         ('reject', 'Rejected'),  # When request is rejected by issuer store keeper
         ('processed', 'Processed'),  # When request is processed
@@ -34,14 +37,24 @@ class droga_stock_adjustment_request(models.Model):
     finance_controller=fields.Many2one('res.users',compute='_get_approvers')
     def _get_approvers(self):
         for rec in self:
-            rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
-                self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+            if rec.order_from=="PH":
+                rec.store_manager = self.env.ref("droga_pharma.pharma_br_admin").users.ids[0] if len(
+                    self.env.ref("droga_pharma.pharma_supply_chain_manager").users.ids) > 0 else None
 
-            rec.finance_wf_manager=self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids[0] if len(
-                self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids) > 0 else None
+                rec.finance_wf_manager = self.env.ref("droga_pharma.pharma_fin").users.ids[0] if len(
+                    self.env.ref("droga_pharma.pharma_fin").users.ids) > 0 else None
 
-            rec.finance_controller = self.env.ref("droga_inventory.inv_prod_fin").users.ids[0] if len(
-                self.env.ref("droga_inventory.inv_prod_fin").users.ids) > 0 else None
+                rec.finance_controller = self.env.ref("droga_pharma.pharma_fin").users.ids[0] if len(
+                    self.env.ref("droga_pharma.pharma_fin").users.ids) > 0 else None
+            else:
+                rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                    self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
+
+                rec.finance_wf_manager=self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids[0] if len(
+                    self.env.ref("droga_inventory.inv_prod_fin_wf").users.ids) > 0 else None
+
+                rec.finance_controller = self.env.ref("droga_inventory.inv_prod_fin").users.ids[0] if len(
+                    self.env.ref("droga_inventory.inv_prod_fin").users.ids) > 0 else None
 
     @api.model
     def create(self, vals_list):
@@ -88,21 +101,43 @@ class droga_stock_adjustment_request(models.Model):
 
     def action_open_adj(self):
         self.set_activity_done()
-        return {
-            'name': 'Stock adjustement',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'stock.picking',
-            'view_id': self.env.ref('stock.view_picking_form').id,
-            'type': 'ir.actions.act_window',
-            'context': {
-                'default_origin': self.name,
-                'default_request_no': self.name,
-                'default_from_reconcile_menu':True,
-                'default_state':'draft',
-                'default_to_correct_pick':self.to_correct_ref.id
+
+        mv_id=self.env['stock.picking'].search([('to_correct_pick','=',self.to_correct_ref.id)])
+        if len(mv_id)==0:
+
+            return {
+                'name': 'Stock adjustement',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'stock.picking',
+                'view_id': self.env.ref('stock.view_picking_form').id,
+                'type': 'ir.actions.act_window',
+                'context': {
+                    'default_origin': self.name,
+                    'default_request_no': self.name,
+                    'default_from_reconcile_menu':True,
+                    'default_state':'draft',
+                    'default_to_correct_pick':self.to_correct_ref.id
+                }
             }
-        }
+        else:
+            return {
+                'name': 'Stock adjustement',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'stock.picking',
+                'view_id': self.env.ref('stock.view_picking_form').id,
+                'type': 'ir.actions.act_window',
+                'res_id':mv_id[0].id,
+                'context': {
+                    'default_origin': self.name,
+                    'default_request_no': self.name,
+                    'default_from_reconcile_menu': True,
+                    'default_state': 'draft',
+                    'default_to_correct_pick': self.to_correct_ref.id
+                }
+            }
+
 class droga_stock_adjustment_request_detail(models.Model):
     _name = 'droga.stock.adjustment.request.detail'
     _description = 'Store adjustment request detail'

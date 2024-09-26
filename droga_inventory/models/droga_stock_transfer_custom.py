@@ -15,7 +15,7 @@ class droga_stock_transfer_custom(models.Model):
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
-        ('stmgp', 'Store manager'),
+        ('stmgp', 'Stores manager'),
         ('phmg', 'Supply chain manager'),
         ('waiting', 'Requested'),   #When request is waiting for approval/response
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper

@@ -90,6 +90,9 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='amend']" position="after">
                 <button name="confirm_ph" attrs="{'invisible': [('state', 'not in', ('phmg'))]}" groups="droga_pharma.pharma_supply_chain_manager" string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+            </xpath>
+
+            <xpath expr="//header" position="inside">
                 <button name="confirm_im"
                             attrs="{'invisible': [('state', 'not in', ('stmgp'))]}"
                             groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
