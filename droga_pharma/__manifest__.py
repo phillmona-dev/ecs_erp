@@ -78,6 +78,7 @@
         'views/cust_approval_kanban.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
         'views/inventory/location_extension.xml',
+        'views/inventory/droga_inv_adj.xml',
         'views/inventory/droga_pharma_inventory_menus.xml',
         'views/inventory/inventory_delivery_slip_extension.xml',
         'views/inventory/inter_pharmacy_transfer_custom.xml',

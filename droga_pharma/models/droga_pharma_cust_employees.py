@@ -70,7 +70,7 @@ class droga_pharma_customer(models.Model):
                 if disc.reward_req_points <= sum(self.env['droga.pharma.points.earned'].search(
                         [('customer', '=', rec.id), ('type', '=', disc.type), (
                                 'earned_date', '>=',
-                                date.today() + timedelta(days=-disc.reward_req_frequ))]).mapped(
+                                date.today() - timedelta(days=disc.reward_req_frequ))]).mapped(
                     'points_earned')):
                     if disc.type == "Referral reward":
                         rec.show_beauty_button = True

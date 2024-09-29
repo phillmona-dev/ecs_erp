@@ -29,8 +29,12 @@
                             attrs="{'invisible': [('state', 'not in', ('phmg'))]}"
                             groups="droga_pharma.pharma_supply_chain_manager"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="confirm_im"
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
+                            groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="reset_order"
-                            attrs="{'invisible': [('state', 'not in', ('phmg'))]}"  groups="droga_pharma.pharma_supply_chain_manager"
+                            attrs="{'invisible': [('state', 'not in', ('phmg','stmg'))]}"  groups="droga_pharma.pharma_supply_chain_manager,droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
                             string="Reset to draft" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
@@ -86,6 +90,13 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='amend']" position="after">
                 <button name="confirm_ph" attrs="{'invisible': [('state', 'not in', ('phmg'))]}" groups="droga_pharma.pharma_supply_chain_manager" string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+            </xpath>
+
+            <xpath expr="//header" position="inside">
+                <button name="confirm_im"
+                            attrs="{'invisible': [('state', 'not in', ('stmgp'))]}"
+                            groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
             </xpath>
         </field>
     </record>

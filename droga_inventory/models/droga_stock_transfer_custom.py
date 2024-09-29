@@ -15,6 +15,7 @@ class droga_stock_transfer_custom(models.Model):
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),    #When requester cancels it from draft
         ('stmg', 'Store manager'),  # Issue sent to store manager for warehouse allocation
+        ('stmgp', 'Stores manager'),
         ('phmg', 'Supply chain manager'),
         ('waiting', 'Requested'),   #When request is waiting for approval/response
         ('reject', 'Rejected'),     #When request is rejected by issuer store keeper
@@ -40,8 +41,15 @@ class droga_stock_transfer_custom(models.Model):
 
     def _get_approvers(self):
         for rec in self:
+            if self.location_dest_id.warehouse_id.wh_type == "PH":
+                if self.location_id.wh_type == 'WS':
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
+                else:
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
 
-            if len(rec.detail_entries) > 0:
+            elif len(rec.detail_entries) > 0:
                 if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
                     rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
                         self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None

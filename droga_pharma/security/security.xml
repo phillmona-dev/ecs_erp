@@ -8,7 +8,10 @@
         <field name="name">Pharmacy branch admin</field>
         <field name="category_id" ref="pharma_management"/>
     </record>
-
+    <record id="pharma_fin" model="res.groups">
+        <field name="name">Pharmacy finance manager</field>
+        <field name="category_id" ref="pharma_management"/>
+    </record>
     <record id="pharma_dp_admin" model="res.groups">
         <field name="name">Dispensing Pharmacist</field>
         <field name="category_id" ref="pharma_management"/>
