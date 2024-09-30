@@ -44,6 +44,10 @@ class StockQuant(models.Model):
             else:
                 rec.inventory_quantity=rec.import_counted
 
+    @api.model
+    def _unlink_zero_quants(self):
+        pass
+
     @api.depends('quantity','product_id.import_uom_new')
     def _get_on_hand(self):
         for rec in self:
