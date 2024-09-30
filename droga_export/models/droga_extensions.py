@@ -272,7 +272,7 @@ class droga_cons_inherit(models.Model):
 
             if len(raw_details) > 0:
                 for it in raw_details[0].items_detail:
-                    if it['type'] == 'waste' or total_qty_finished+total_qty_byproduct!=0:
+                    if it['type'] == 'waste':
                         continue
                     if it['type'] == 'finish':
                         unit_cost=(it.items_header[0].raw_item.standard_price*waste_increase_rate) +(det.proc_cost*waste_increase_rate)+(total_cost_build_finish/total_qty_finished)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
