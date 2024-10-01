@@ -13,6 +13,7 @@
         <field name="arch" type="xml">
             <tree string="" delete="0">
                 <field name="cont_type"></field>
+                <field name="pharmacy_group_id"></field>
                 <field name="discount"></field>
                 <field name="status"></field>
             </tree>
@@ -27,6 +28,7 @@
                 <sheet>
                     <group>
                         <field name="cont_type"></field>
+                        <field name="pharmacy_group_id" widget="many2many_tags"></field>
                         <field name="discount"></field>
                         <field name="remark"></field>
                         <field name="status"></field>
