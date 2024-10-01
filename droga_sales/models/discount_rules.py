@@ -257,12 +257,12 @@ class sale_order_line(models.Model):
                 partner_state=self.order_id.partner_id.state
 
             for disc in discount_per_person:
-                if disc.cont_type=="hp" and self.order_id.partner_id.profession=="hp" and partner_state=='active':
+                if disc.cont_type=="hp" and self.order_id.partner_id.profession=="hp" and partner_state=='active' and line.product_id.product_tmpl_id.pharmacy_group_id.id in disc.pharmacy_group_id.ids:
                     rate=1 + (disc.discount / 100)
                     line.disc_applied=disc.discount
                     line.order_id.points_to_deduct = 1
                     line.order_id.deduct_type = 'Discount for health professional'
-                elif disc.cont_type=='bp' and breat_feed_children>0 and self.order_id.partner_id.gender=='Female':
+                elif disc.cont_type=='bp' and breat_feed_children>0 and self.order_id.partner_id.gender=='Female' and line.product_id.product_tmpl_id.pharmacy_group_id.id in disc.pharmacy_group_id.ids:
                     rate = 1 + (disc.discount / 100)
                     line.disc_applied = disc.discount
                     line.order_id.points_to_deduct = 1
