@@ -761,6 +761,9 @@ class droga_stock_picking_extension(models.Model):
         ], string='Cons/sample Type',related='location_dest_id.con_type')
     pharmacy_unit=fields.Boolean('Pharmacy unit',default=False,store=True)
 
+    def _check_expired_lots(self):
+        return False
+
     def _get_loc_descr(self):
         for rec in self:
             rec.from_wh=rec.location_id.warehouse_id.name if rec.location_id.warehouse_id else rec.location_id.name
