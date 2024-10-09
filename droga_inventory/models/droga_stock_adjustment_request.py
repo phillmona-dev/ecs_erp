@@ -38,7 +38,7 @@ class droga_stock_adjustment_request(models.Model):
     def _get_approvers(self):
         for rec in self:
             if rec.order_from=="PH":
-                rec.store_manager = self.env.ref("droga_pharma.pharma_br_admin").users.ids[0] if len(
+                rec.store_manager = self.env.ref("droga_pharma.pharma_supply_chain_manager").users.ids[0] if len(
                     self.env.ref("droga_pharma.pharma_supply_chain_manager").users.ids) > 0 else None
 
                 rec.finance_wf_manager = self.env.ref("droga_pharma.pharma_fin").users.ids[0] if len(

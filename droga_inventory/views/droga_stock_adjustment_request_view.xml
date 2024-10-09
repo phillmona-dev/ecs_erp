@@ -27,7 +27,9 @@
                     <button name="action_open_adj"
                             attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
                             string="Open adjustement" groups="droga_inventory.inv_prod_fin" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,finmg,waiting,processed"/>
+                    <field name="order_from" invisible="1"></field>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,finmg,waiting,processed" attrs="{'invisible': [('order_from', 'in', ['PH'])]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmgp,finmgp,waiting,processed" attrs="{'invisible': [('order_from', 'not in', ['PH'])]}"/>
                 </header>
                 <sheet>
                     <group string="Stock Adjustment Request Form">

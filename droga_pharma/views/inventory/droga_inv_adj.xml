@@ -19,7 +19,7 @@
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
                             attrs="{'invisible': [('state', 'not in', ('stmgp','finmgp','mtmg'))]}"
-                            groups="droga_inventory.stores_manager,droga_inventory.inv_prod_fin_wf"
+                            groups="droga_inventory.pharma_supply_chain_manager,droga_pharma.pharma_fin"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
@@ -63,6 +63,31 @@
                     </div>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <record id="droga_stock_adjustment_request_form_pharma_inherit" model="ir.ui.view">
+        <field name="name">droga.stock.adjustment.request.inherit</field>
+        <field name="model">droga.stock.adjustment.request</field>
+        <field name="inherit_id" ref="droga_inventory.droga_stock_adjustment_request_form"/>
+        <field name="arch" type="xml">
+            <button name="request" position="after">
+                <button name="stmgp_approve"
+                            attrs="{'invisible': [('state', 'not in', ('stmgp'))]}"
+                            groups="droga_pharma.pharma_supply_chain_manager"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="finp_approve"
+                            attrs="{'invisible': [('state', 'not in', ('finmgp'))]}"
+                            groups="droga_pharma.pharma_fin"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="amend"
+                            attrs="{'invisible': [('state', 'not in', ('stmgp','finmgp','mtmg'))]}"
+                            groups="droga_inventory.pharma_supply_chain_manager,droga_pharma.pharma_fin"
+                            string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
+                    <button name="action_open_adj"
+                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
+                            string="Open adjustement" groups="droga_inventory.inv_prod_fin" type="object" class="oe_highlight" data-hotkey="v"/>
+            </button>
         </field>
     </record>
 
