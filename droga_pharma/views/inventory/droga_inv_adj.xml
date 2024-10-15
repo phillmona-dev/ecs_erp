@@ -112,7 +112,7 @@
         <field name="name">Stock adjustment request</field>
         <field name="res_model">droga.stock.adjustment.request</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">['|',('has_access','=',True),('create_uid','=',uid)]</field>
         <field name="context">
             {'default_order_from':'PH'}</field>
         <field name="view_ids" eval="[(5, 0, 0),
