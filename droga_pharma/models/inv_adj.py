@@ -9,14 +9,14 @@ class droga_inv_adj(models.Model):
 
     def _search_has_access(self, operator,value):
         if operator == '=' and len(self.env['res.groups'].search([('name', 'in', ('Pharmacy finance manager','Finance inventory workflow approver'))]))>0:
-            has_access = self.env['droga.stock.adjustment.request'].sudo().search([('order_from','=','PH'),('state','in',('waiting','processed','done'))])
+            has_access = self.env['droga.stock.adjustment.request'].sudo().search([('order_from','=','PH'),('state','in',('waiting','processed','done','finmgp'))])
             return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id', 'in', [])]
 
     def _compute_has_access(self):
         for rec in self:
-            if len(self.env['res.groups'].search([('name', 'in', ('Pharmacy finance manager','Finance inventory workflow approver'))]))>0 and rec.order_from=='PH' and rec.state in ('waiting','processed','done'):
+            if len(self.env['res.groups'].search([('name', 'in', ('Pharmacy finance manager','Finance inventory workflow approver'))]))>0 and rec.order_from=='PH' and rec.state in ('waiting','finmgp','processed','done'):
                 rec.has_access = True
             else:
                 rec.has_access = False

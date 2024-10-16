@@ -26,7 +26,7 @@
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_open_adj"
                             attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
-                            string="Open adjustement" groups="droga_inventory.inv_prod_fin" type="object" class="oe_highlight" data-hotkey="v"/>
+                            string="Open adjustement" groups="droga_inventory.inv_prod_fin,droga_pharma.pharma_fin" type="object" class="oe_highlight" data-hotkey="v"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,stmgp,finmgp,waiting,processed"/>
                 </header>
                 <sheet>
@@ -86,7 +86,7 @@
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_open_adj"
                             attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
-                            string="Open adjustement" groups="droga_inventory.inv_prod_fin" type="object" class="oe_highlight" data-hotkey="v"/>
+                            string="Open adjustement" groups="droga_inventory.inv_prod_fin,droga_pharma.pharma_fin" type="object" class="oe_highlight" data-hotkey="v"/>
             </button>
         </field>
     </record>
@@ -128,6 +128,6 @@
               name="Stock adjustment request"
               parent="droga_pharma.droga_pharma_inventory"
               sequence="4"
-              groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+              groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager,droga_pharma.pharma_fin"
               action="droga_stock_adjustment_request_view_id_pharma"/>
 </odoo>
