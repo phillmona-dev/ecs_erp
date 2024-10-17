@@ -83,5 +83,24 @@
         </field>
     </record>
 
-
+    <record id="droga_sub_contract_receive_view_form_inherit" model="ir.ui.view">
+        <field name="name">Sub cont receive inherit</field>
+        <field name="model">droga.inventory.consignment.receive</field>
+        <field name="inherit_id" ref="droga_inventory.droga_inventory_consignment_receive_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='amend']" position="before">
+                <button name="mg_approve"
+                            attrs="{'invisible': [('state', 'not in', ('mg'))]}"
+                            groups="droga_export.export_manager"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="amend"
+                            attrs="{'invisible': [('state', 'not in', ('mg','mtmg'))]}"
+                            groups="droga_inventory.stores_manager,droga_inventory.marketing_manager"
+                            string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
+                    <button name="action_cancel"
+                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
+                            string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
