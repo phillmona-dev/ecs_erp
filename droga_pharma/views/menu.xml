@@ -12,7 +12,7 @@
 
     <menuitem id="pharma_main_menu" name="Pharmacy chain"
               web_icon="droga_pharma,static/description/icon.png"
-              groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_supply_chain_manager,pharma_di_admin,pharma_director"
+              groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_supply_chain_manager,pharma_di_admin,pharma_director,droga_pharma.pharma_fin"
               sequence="10">
 
         <menuitem

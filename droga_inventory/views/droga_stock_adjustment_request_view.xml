@@ -25,9 +25,11 @@
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_open_adj"
-                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
-                            string="Open adjustement" groups="droga_inventory.inv_prod_fin" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,finmg,waiting,processed"/>
+                            attrs="{'invisible': [('state', 'not in', ('waiting','processed'))]}"
+                            string="Open adjustement" groups="droga_inventory.inv_prod_fin_wf" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <field name="order_from" invisible="1"></field>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmg,finmg,waiting,processed" attrs="{'invisible': [('order_from', 'in', ['PH'])]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,stmgp,finmgp,waiting,processed" attrs="{'invisible': [('order_from', 'not in', ['PH'])]}"/>
                 </header>
                 <sheet>
                     <group string="Stock Adjustment Request Form">
@@ -107,7 +109,7 @@
         <field name="name">Stock adjustment request</field>
         <field name="res_model">droga.stock.adjustment.request</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('state','in',('waiting','processed'))]</field>
+        <field name="domain">[('order_from','!=','PH'),('state','in',('waiting','processed'))]</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_stock_adjustment_request_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('droga_stock_adjustment_request_form')})]"/>

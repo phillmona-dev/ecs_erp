@@ -8,9 +8,22 @@ class droga_export_detail_ext(models.Model):
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True)
 
+    @api.model
+    def create(self, vals):
+        if 'product_uom' not in vals:
+            vals["product_uom"]=self.env["product.product"].search([('id','=',vals["product_id"])])[0].uom_id.id
+        return super(droga_export_detail_ext, self).create(vals)
+
 class inventory_return_extension(models.Model):
     _inherit = 'droga.inventory.consignment.receive'
     subcontractor_return_origin_form = fields.Many2one('droga.inventory.consignment.issue', readonly=True)
+    export_manager = fields.Many2one('res.users', compute='_get_approvers')
+
+    def _get_approvers(self):
+        for rec in self:
+            rec.export_manager = self.env.ref("droga_export.export_manager").users.ids[0] if len(
+                self.env.ref("droga_export.export_manager").users.ids) > 0 else None
+
     def request_mg(self):
         self.set_activity_done()
         self.ensure_one()

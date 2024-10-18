@@ -19,14 +19,14 @@
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
                             attrs="{'invisible': [('state', 'not in', ('stmgp','finmgp','mtmg'))]}"
-                            groups="droga_inventory.stores_manager,droga_inventory.inv_prod_fin_wf"
+                            groups="droga_inventory.pharma_supply_chain_manager,droga_pharma.pharma_fin"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_open_adj"
                             attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
-                            string="Open adjustement" groups="droga_inventory.inv_prod_fin" type="object" class="oe_highlight" data-hotkey="v"/>
+                            string="Open adjustement" groups="droga_inventory.inv_prod_fin,droga_pharma.pharma_fin" type="object" class="oe_highlight" data-hotkey="v"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,stmgp,finmgp,waiting,processed"/>
                 </header>
                 <sheet>
@@ -66,6 +66,31 @@
         </field>
     </record>
 
+    <record id="droga_stock_adjustment_request_form_pharma_inherit" model="ir.ui.view">
+        <field name="name">droga.stock.adjustment.request.inherit</field>
+        <field name="model">droga.stock.adjustment.request</field>
+        <field name="inherit_id" ref="droga_inventory.droga_stock_adjustment_request_form"/>
+        <field name="arch" type="xml">
+            <button name="request" position="after">
+                <button name="stmgp_approve"
+                            attrs="{'invisible': [('state', 'not in', ('stmgp'))]}"
+                            groups="droga_pharma.pharma_supply_chain_manager"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="finp_approve"
+                            attrs="{'invisible': [('state', 'not in', ('finmgp'))]}"
+                            groups="droga_pharma.pharma_fin"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="amend"
+                            attrs="{'invisible': [('state', 'not in', ('stmgp','finmgp','mtmg'))]}"
+                            groups="droga_inventory.pharma_supply_chain_manager,droga_pharma.pharma_fin"
+                            string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
+                    <button name="action_open_adj"
+                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
+                            string="Open adjustement" groups="droga_inventory.inv_prod_fin,droga_pharma.pharma_fin" type="object" class="oe_highlight" data-hotkey="v"/>
+            </button>
+        </field>
+    </record>
+
     <record id="droga_stock_adjustment_request_tree_pharma" model="ir.ui.view">
         <field name="model">droga.stock.adjustment.request</field>
         <field name="name">Stock Adjustment request</field>
@@ -87,7 +112,7 @@
         <field name="name">Stock adjustment request</field>
         <field name="res_model">droga.stock.adjustment.request</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">['|',('has_access','=',True),('create_uid','=',uid)]</field>
         <field name="context">
             {'default_order_from':'PH'}</field>
         <field name="view_ids" eval="[(5, 0, 0),
@@ -103,6 +128,6 @@
               name="Stock adjustment request"
               parent="droga_pharma.droga_pharma_inventory"
               sequence="4"
-              groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
+              groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager,droga_pharma.pharma_fin"
               action="droga_stock_adjustment_request_view_id_pharma"/>
 </odoo>

@@ -30,6 +30,10 @@
                             groups="droga_pharma.pharma_supply_chain_manager"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="confirm_im"
+                            attrs="{'invisible': [('state', 'not in', ('stmgp'))]}"
+                            groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
+                            string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="confirm_im"
                             attrs="{'invisible': [('state', 'not in', ('stmg'))]}"
                             groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
@@ -39,7 +43,7 @@
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,processed,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,phmg,stmgp,waiting,processed,done"/>
                 </header>
                 <sheet>
                     <group string="Store transfer request">
@@ -90,14 +94,12 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='amend']" position="after">
                 <button name="confirm_ph" attrs="{'invisible': [('state', 'not in', ('phmg'))]}" groups="droga_pharma.pharma_supply_chain_manager" string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
-            </xpath>
-
-            <xpath expr="//header" position="inside">
                 <button name="confirm_im"
                             attrs="{'invisible': [('state', 'not in', ('stmgp'))]}"
                             groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
             </xpath>
+
         </field>
     </record>
 

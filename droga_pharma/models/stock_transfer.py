@@ -12,12 +12,12 @@ class picking_inherit(models.Model):
     picking_type_id_pharmacy = fields.Many2one(
         'stock.picking.type', 'Operation Type',
         required=False, check_company=True)
-    show_set_to_draft=fields.Boolean(compute='_show_set_to_draft')
+    show_set_to_draft = fields.Boolean(compute='_show_set_to_draft')
 
     def _show_set_to_draft(self):
         for rec in self:
             if not rec.name.startswith('MT'):
-                rec.show_set_to_draft=True
+                rec.show_set_to_draft = True
             else:
                 rec.show_set_to_draft = False
 
@@ -33,46 +33,67 @@ class picking_inherit(models.Model):
         for record in self:
             record.picking_type_id = record.picking_type_id_pharmacy
 
-    from_wh_rep=fields.Char('From warehouse',compute='_get_info')
+    from_wh_rep = fields.Char('From warehouse', compute='_get_info')
     to_wh_rep = fields.Char('To warehouse', compute='_get_info')
     from_user = fields.Char('From user', compute='_get_info')
     to_user = fields.Char('To user', compute='_get_info')
 
     def _get_info(self):
         for rec in self:
-            if rec.picking_type_id.sequence_code=="MTOV":
-                rec.from_wh_rep=rec.from_wh
+            if rec.picking_type_id.sequence_code == "MTOV":
+                rec.from_wh_rep = rec.from_wh
                 rec.to_wh_rep = rec.to_wh
 
                 rec_message_ids = self.env['mail.message'].search([('res_id', '=', rec.id)]).ids
-                rec.from_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)]) else '-'
-                receiver_pick = self.env['stock.picking'].search([('origin', '=', rec.name)])[0] if self.env['stock.picking'].search([('origin', '=', rec.name)]) else False
+                rec.from_user = self.env['mail.tracking.value'].search(
+                    [('model', '=', 'stock.picking'), ('field_desc', '=', 'Status'), ('new_value_char', '=', 'Done'),
+                     ('mail_message_id', 'in', rec_message_ids)])[0].create_uid.name if self.env[
+                    'mail.tracking.value'].search(
+                    [('model', '=', 'stock.picking'), ('field_desc', '=', 'Status'), ('new_value_char', '=', 'Done'),
+                     ('mail_message_id', 'in', rec_message_ids)]) else '-'
+                receiver_pick = self.env['stock.picking'].search([('origin', '=', rec.name)])[0] if self.env[
+                    'stock.picking'].search([('origin', '=', rec.name)]) else False
                 if receiver_pick:
                     receiver_message_ids = self.env['mail.message'].search([('res_id', '=', receiver_pick.id)]).ids
-                    rec.to_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',receiver_message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',receiver_message_ids)]) else '-'
+                    rec.to_user = self.env['mail.tracking.value'].search(
+                        [('model', '=', 'stock.picking'), ('field_desc', '=', 'Status'),
+                         ('new_value_char', '=', 'Done'), ('mail_message_id', 'in', receiver_message_ids)])[
+                        0].create_uid.name if self.env['mail.tracking.value'].search(
+                        [('model', '=', 'stock.picking'), ('field_desc', '=', 'Status'),
+                         ('new_value_char', '=', 'Done'), ('mail_message_id', 'in', receiver_message_ids)]) else '-'
                 else:
-                    rec.to_user='-'
+                    rec.to_user = '-'
             else:
                 sender_pick = self.env['stock.picking'].search([('name', '=', rec.origin)])
-                if sender_pick and rec.picking_type_id.sequence_code=="MTIV":
-                    message_ids=self.env['mail.message'].search([('res_id', '=', sender_pick.id)]).ids
+                if sender_pick and rec.picking_type_id.sequence_code == "MTIV":
+                    message_ids = self.env['mail.message'].search([('res_id', '=', sender_pick.id)]).ids
 
                     rec.from_wh_rep = sender_pick.from_wh
-                    rec.from_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',message_ids)]) else '-'
+                    rec.from_user = self.env['mail.tracking.value'].search(
+                        [('model', '=', 'stock.picking'), ('field_desc', '=', 'Status'),
+                         ('new_value_char', '=', 'Done'), ('mail_message_id', 'in', message_ids)])[0].create_uid.name if \
+                    self.env['mail.tracking.value'].search(
+                        [('model', '=', 'stock.picking'), ('field_desc', '=', 'Status'),
+                         ('new_value_char', '=', 'Done'), ('mail_message_id', 'in', message_ids)]) else '-'
 
                     rec_message_ids = self.env['mail.message'].search([('res_id', '=', rec.id)]).ids
                     rec.to_wh_rep = sender_pick.to_wh
-                    rec.to_user = self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)])[0].create_uid.name if self.env['mail.tracking.value'].search([('model', '=', 'stock.picking'),('field_desc','=','Status'),('new_value_char','=','Done'),('mail_message_id','in',rec_message_ids)]) else '-'
+                    rec.to_user = self.env['mail.tracking.value'].search(
+                        [('model', '=', 'stock.picking'), ('field_desc', '=', 'Status'),
+                         ('new_value_char', '=', 'Done'), ('mail_message_id', 'in', rec_message_ids)])[
+                        0].create_uid.name if self.env['mail.tracking.value'].search(
+                        [('model', '=', 'stock.picking'), ('field_desc', '=', 'Status'),
+                         ('new_value_char', '=', 'Done'), ('mail_message_id', 'in', rec_message_ids)]) else '-'
                 else:
                     rec.from_wh_rep = '-'
                     rec.from_user = '-'
                     rec.to_wh_rep = '-'
                     rec.to_user = '-'
 
+
 class transfer_request_inherit(models.Model):
     _inherit = 'droga.inventory.transfer.custom'
     pharmacy_manager = fields.Many2one('res.users', compute='_get_pharma_approvers', store=True)
-
 
     def _get_pharma_approvers(self):
         for rec in self:
@@ -89,10 +110,12 @@ class transfer_request_inherit(models.Model):
             self.state = 'phmg'
         else:
             if self.location_dest_id.complete_name[0:3] != self.location_id.code[0:3]:
-                #Post on message board here
+                # Post on message board here
                 channels = self.env['mail.channel'].search([('name', '=', 'Pharmacy inter-store')])
 
-                message = "Inter-store transaction request has been initiated by " +str.upper(self.location_dest_id.complete_name)+'. The requested store is '+ str.upper(self.location_id.name) + "."
+                message = "Inter-store transaction request has been initiated by " + str.upper(
+                    self.location_dest_id.complete_name) + '. The requested store is ' + str.upper(
+                    self.location_id.name) + "."
                 message = message + '   Inter-store request number - ' + self.name
                 for c in channels:
                     c.message_post(
@@ -103,17 +126,17 @@ class transfer_request_inherit(models.Model):
                         author_id=2,
                     )
             self.confirm_im()
-        #if self.location_dest_id.complete_name[0:3]==self.location_id.code[0:3]:
+        # if self.location_dest_id.complete_name[0:3]==self.location_id.code[0:3]:
         #    self.confirm_ph()
-        #self._get_pharma_approvers()
-        #if not self.pharmacy_manager:
+        # self._get_pharma_approvers()
+        # if not self.pharmacy_manager:
         #    raise UserError("Pharmacy operations manager not configured, please contact IT.")
-        #self.state = 'phmg'
+        # self.state = 'phmg'
 
     def confirm_ph(self):
         self.set_activity_done()
         if self.location_id.wh_type != "PH":
-            self.state='stmgp'
+            self.state = 'stmgp'
         else:
             self.confirm_im();
 
@@ -127,16 +150,16 @@ class transfer_request_inherit(models.Model):
 
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=', 'MTOV'), ('warehouse_id', '=', wh.id)]).id
-            locs=self.env['stock.location'].search(
+            locs = self.env['stock.location'].search(
                 [('usage', '=', 'internal'), ('con_type', '=', False), ('wcode', '=', wh.code)])
 
-            if len(locs)==0:
+            if len(locs) == 0:
                 locs = self.env['stock.location'].search(
                     [('usage', '=', 'production'), ('con_type', '=', False), ('wcode', '=', wh.code)])
                 if len(locs) == 0:
                     raise UserError("Issuing warehouse doesn't have internal location.")
 
-            if self.consignment_item and len(self.detail_entries.filtered(lambda ent: ent.cons_price == 0))>0:
+            if self.consignment_item and len(self.detail_entries.filtered(lambda ent: ent.cons_price == 0)) > 0:
                 raise UserError("Consignment price should be filled for all entries.")
 
             def_location_id = locs[0].id
@@ -151,7 +174,7 @@ class transfer_request_inherit(models.Model):
                 'state': 'draft',
                 'trans_issue_request': self.id,
                 'scheduled_date': self.request_date,
-                'requested_by':self.create_uid
+                'requested_by': self.create_uid
             }
             picking_id = self.env['stock.picking'].sudo().create(picking_vals)
 
@@ -167,10 +190,11 @@ class transfer_request_inherit(models.Model):
                     'name': picking_id.name,
                     'product_id': rec['product_id'].id,
                     'product_uom': rec["product_id"].uom_id.id,
-                    'product_uom_qty': rec['product_uom_qty']*(rec["product_id"].uom_id.factor/rec["product_uom"].factor),
+                    'product_uom_qty': rec['product_uom_qty'] * (
+                                rec["product_id"].uom_id.factor / rec["product_uom"].factor),
                     'location_id': def_location_id,
                     'location_dest_id': self.location_dest_id.id,
-                    'cons_price':rec['cons_price'],
+                    'cons_price': rec['cons_price'],
                     # 'state': 'waiting',
                     # 'state': 'confirmed',
                     'state': 'draft',
@@ -181,5 +205,3 @@ class transfer_request_inherit(models.Model):
             picking_id.action_assign()
             picking_id.state = 'assigned'
         self.state = 'waiting'
-
-
