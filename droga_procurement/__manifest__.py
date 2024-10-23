@@ -50,7 +50,8 @@
         'report/procurement_lead_time.xml',
         'data/mail_template.xml',
         'views/menu.xml',
-        'report/purchase_items_list.xml'
+        'report/purchase_items_list.xml',
+        'report/purchase_report.xml'
 
     ],
     # only loaded in demonstration mode
