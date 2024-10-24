@@ -31,7 +31,7 @@
         <field name="name">purchase.order.line.tree.pharmacy.invoice</field>
         <field name="model">purchase.order.line</field>
         <field name="arch" type="xml">
-            <tree string="Sales order" delete="false" create="false">
+            <tree string="Purchase order" delete="false" create="false">
                 <field name="name" optional="hide"></field>
                 <field name="order_id"></field>
                 <field name="itemcode" string="Code"></field>
@@ -53,7 +53,7 @@
         <field name="name">purchase.order.line.search.pharma.by.pharmacy</field>
         <field name="model">purchase.order.line</field>
         <field name="arch" type="xml">
-            <search string="Sales order">
+            <search string="Purchase order">
                 <field name="name" optional="hide"></field>
                 <field name="partner_id" string="Supplier"></field>
                 <field name="order_id"></field>
