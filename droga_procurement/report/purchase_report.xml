@@ -8,7 +8,12 @@
         <field name="arch" type="xml">
 
             <xpath expr="//field[@name='order_id']" position="after">
-                <field name="grns" widget="many2many_tags"/>
+                <field name="grns" widget="many2many_tags" optional="show"/>
+            </xpath>
+
+            <xpath expr="//field[@name='price_total']" position="after">
+                <field name="landed_cost" sum="landed_cost" optional="show"/>
+                <field name="po_and_lc_total" sum="po_and_lc_total" optional="show"/>
             </xpath>
 
         </field>
