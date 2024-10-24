@@ -100,7 +100,11 @@
                             name="Purchase per supplier"
                             action="droga_pharma_purchases_detail_pharmacy_action"
                             sequence="3"/>
-
+                    <menuitem
+                            id="top_droga_pharma_purchase_pharmacy"
+                            name="Top 20 suppliers"
+                            action="drop_top_supp_pharmas_detail_pharmacy_action"
+                            sequence="4"/>
 
                 </menuitem>
 

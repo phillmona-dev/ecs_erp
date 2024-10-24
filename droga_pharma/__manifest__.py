@@ -61,6 +61,7 @@
         'views/inventory/droga_stock_consignment_receipt_pharma.xml',
         'reports/sales_report.xml',
         'reports/purchase_detail.xml',
+        'reports/purchase_top20.xml',
         'reports/sales_detail_report.xml',
         'reports/inventory_report.xml',
         'reports/points_enquiry.xml',
