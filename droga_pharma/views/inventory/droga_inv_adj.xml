@@ -25,7 +25,7 @@
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="action_open_adj"
-                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
+                            attrs="{'invisible': [('state', 'not in', ('waiting','processed'))]}"
                             string="Open adjustement" groups="droga_inventory.inv_prod_fin,droga_pharma.pharma_fin" type="object" class="oe_highlight" data-hotkey="v"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,stmgp,finmgp,waiting,processed"/>
                 </header>
@@ -85,7 +85,7 @@
                             groups="droga_inventory.pharma_supply_chain_manager,droga_pharma.pharma_fin"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_open_adj"
-                            attrs="{'invisible': [('state', 'not in', ('waiting'))]}"
+                            attrs="{'invisible': [('state', 'not in', ('waiting','processed'))]}"
                             string="Open adjustement" groups="droga_inventory.inv_prod_fin,droga_pharma.pharma_fin" type="object" class="oe_highlight" data-hotkey="v"/>
             </button>
         </field>
