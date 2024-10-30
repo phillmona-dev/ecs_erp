@@ -102,7 +102,7 @@ class droga_stock_adjustment_request(models.Model):
     def action_open_adj(self):
         self.set_activity_done()
 
-        mv_id=self.env['stock.picking'].search([('to_correct_pick','=',self.to_correct_ref.id)])
+        mv_id=self.env['stock.picking'].search([('request_no','=',self.name)])
         if len(mv_id)==0:
 
             return {
