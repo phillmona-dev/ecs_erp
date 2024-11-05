@@ -52,6 +52,8 @@ class AccountMove(models.Model):
 
     payment_request_id = fields.Integer(related='payment_id.payment_request_id.id')
 
+    bank_payment_ref = fields.Char("Payment Ref", store=True)
+
     @api.model
     def create(self, vals):
         # Check withholding
@@ -141,8 +143,8 @@ class AccountMove(models.Model):
                                     record.sales_channel = analytic_plan.display_name
                         break
 
-                if record.cost_center=="Others" and record.stock_move_id:
-                    record.cost_center=record.stock_move_id.trans_warehouse.linked_analytic.display_name
+                if record.cost_center == "Others" and record.stock_move_id:
+                    record.cost_center = record.stock_move_id.trans_warehouse.linked_analytic.display_name
 
     @api.depends('invoice_date', 'invoice_payment_term_id')
     def update_due_days(self):
@@ -339,6 +341,74 @@ class AccountMove(models.Model):
 
         raise AssertionError('num is too large: %s' % str(num))
 
+    def update_payment_ref_to_move_line(self):
+        self.env.cr.execute("""
+                        WITH limited_updates AS (
+    SELECT am.id AS am_id, dap.bank_payment_ref
+    FROM account_move am
+    JOIN (
+        SELECT move_id, string_agg(name, '-') AS bank_payment_ref
+        FROM droga_account_payment_link_data
+        GROUP BY move_id
+    ) AS dap ON am.id = dap.move_id
+    WHERE am.move_type IN ('out_invoice', 'in_invoice')
+    LIMIT 300000
+)
+UPDATE account_move
+SET bank_payment_ref = COALESCE(limited_updates.bank_payment_ref, '')
+FROM limited_updates
+WHERE account_move.id = limited_updates.am_id;
+                    """)
+
+        # Commit the transaction to ensure the data is saved
+        self.env.cr.commit()
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    bank_payment_ref = fields.Char("Payment Ref", store=True)
+
+    @api.depends("move_id", "payment_ids")
+    def get_bank_payment_ref(self):
+        lines = self.env["account.move.line"].search([])
+        for record in lines:
+            record.bank_payment_ref = ""
+
+            # Assuming invoice_id is the ID of the invoice you want to check
+            invoice = record.move_id
+
+            # Initialize an empty recordset to store the linked payments
+            linked_payments = self.env['account.payment']
+
+            # Loop through each account.move.line in the invoice to find linked payments
+            for line in invoice.line_ids:
+                # Check for reconciled debit and credit move lines that match this invoice line
+                partials = line.matched_debit_ids + line.matched_credit_ids
+
+                # Extract the payments linked through reconciliation
+                for partial in partials:
+                    if partial.debit_move_id.move_id.payment_id:
+                        linked_payments |= partial.debit_move_id.move_id.payment_id
+                    if partial.credit_move_id.move_id.payment_id:
+                        linked_payments |= partial.credit_move_id.move_id.payment_id
+
+            # Display or process the linked payment information
+            ref = "; ".join(payment.name for payment in linked_payments)
+
+            record.write({'bank_payment_ref': ref})
+
+    def update_payment_ref(self):
+        # Execute the SQL insert statement
+        self.env.cr.execute(""" delete from  droga_account_payment_link_data""")
+        self.env.cr.commit()
+
+        self.env.cr.execute("""
+                INSERT INTO droga_account_payment_link_data (id, payment_id, move_id,payment_move_id,name)
+                SELECT id, payment_id, move_id,payment_move_id,name FROM droga_account_payment_link
+            """)
+
+        # Commit the transaction to ensure the data is saved
+        self.env.cr.commit()
 
 # CRV document tracking
 class AccountCrv(models.Model):
@@ -371,7 +441,6 @@ class AccountCrv(models.Model):
     def unlink(self):
         raise ValidationError(
             "You can't delete CRV Record")
-
 
 class AccountWithholding(models.Model):
     _name = 'account.move.withholding'

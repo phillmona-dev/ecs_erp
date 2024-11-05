@@ -24,7 +24,9 @@ class PaymentReport(models.Model):
     settled_amount = fields.Float("Settled Amount")
     due_days = fields.Integer("Due Days")
     paid_passed_days = fields.Integer("Paid Passed Days")
-    company_id=fields.Many2one("res.company")
+    # payment_id = fields.Many2one("account.payment")
+    # move_id = fields.Many2one("account.move")
+    company_id = fields.Many2one("res.company")
 
     def compute_sales_info(self):
         for record in self:
@@ -64,7 +66,7 @@ x.sales_initiator,x.invoice_date_due,x.paid_date,x.total_amount,x.paid_amount,x.
 select ap.partner_id,'Customer' as payment_type,'' as category,'' as division,am."name" as invoice_no,am.sales_type,am.sales_initiator,
 am.invoice_date_due,apr.max_date as paid_date,
 am.amount_total_signed as total_amount,ap.amount  as paid_amount,apr.amount as settled_amount,
-(apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days,am.company_id 
+(apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days,ap.id as payment_id,am.id as move_id,am.company_id 
 from account_move am inner join account_move_line aml on  am.id=aml.move_id 
 inner join account_partial_reconcile apr on aml.id=apr.debit_move_id 
 inner join account_payment ap on ap.id=(select distinct payment_id  from account_move_line   where id=apr.credit_move_id)
@@ -76,7 +78,7 @@ union
 select ap.partner_id,'Vendor' as payment_type,'' as category,'' as division,am."name" as invoice_no,am.sales_type,am.sales_initiator,
 am.invoice_date_due,apr.max_date as paid_date,
 abs(am.amount_total_signed) as total_amount,ap.amount  as paid_amount,apr.amount as settled_amount,
-(apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days,am.company_id 
+(apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days,ap.id as payment_id,am.id as move_id,am.company_id 
 from account_move am inner join account_move_line aml on  am.id=aml.move_id 
 inner join account_partial_reconcile apr on aml.id=apr.credit_move_id  
 inner join account_payment ap on ap.id=(select distinct payment_id  from account_move_line   where id=apr.debit_move_id)
@@ -85,3 +87,50 @@ where aml.display_type ='payment_term' and ap.payment_type='outbound' and am.sta
 
  
                            )""")
+
+
+class AccountPaymentLinK(models.Model):
+    _name = 'droga.account.payment.link'
+
+    _auto = False
+
+    id = fields.Integer('Id')
+    payment_id = fields.Many2one("account.payment")
+    move_id = fields.Many2one("account.move")
+    payment_move_id = fields.Many2one("account.move")
+    name = fields.Char("Name")
+
+    def init(self):
+        drop_view_if_exists(self.env.cr, 'droga_account_payment_link')
+        self.env.cr.execute("""
+                               create or replace view droga_account_payment_link as (
+
+                                    select row_number()over() as id,payment_id,move_id,payment_move_id,(select name from account_move where id=x.payment_move_id ) as name from(
+                                select ap.id as payment_id,aml.move_id,ap.move_id as payment_move_id
+                                from account_move am 
+                                inner join account_move_line aml on  am.id=aml.move_id 
+                                inner join account_partial_reconcile apr on aml.id=apr.debit_move_id 
+                                inner join account_payment ap on ap.id=(select distinct payment_id  from account_move_line   where id=apr.credit_move_id)
+                                where aml.display_type ='payment_term' and ap.payment_type='inbound' 
+                                
+                                
+                                union 
+                                
+                                select ap.id as payment_id,aml.move_id,ap.move_id as payment_move_id
+                                from account_move am 
+                                inner join account_move_line aml on  am.id=aml.move_id 
+                                inner join account_partial_reconcile apr on aml.id=apr.credit_move_id  
+                                inner join account_payment ap on ap.id=(select distinct payment_id  from account_move_line   where id=apr.debit_move_id)
+                                where aml.display_type ='payment_term' and ap.payment_type='outbound')x
+
+                               )""")
+
+
+class AccountPaymentLinkTable(models.Model):
+    _name = "droga.account.payment.link.data"
+
+    payment_id = fields.Many2one("account.payment")
+    move_id = fields.Many2one("account.move")
+    move_line_id = fields.Many2one("account.move.line")
+    payment_move_id = fields.Many2one("account.move")
+    name = fields.Char("Name")
