@@ -27,7 +27,7 @@ class HrPayrollPaymentDeductions(models.Model):
             active_contract = pd.employee_id.contract_id.filtered(lambda c: c.state == 'open')
             if active_contract:
                 # update the contract id
-                pds.contract_id = active_contract.id
+                pd.contract_id = active_contract.id
 
 
 class HrPayrollVariablePayments(models.Model):
