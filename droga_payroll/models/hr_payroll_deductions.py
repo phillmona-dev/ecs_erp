@@ -19,6 +19,16 @@ class HrPayrollPaymentDeductions(models.Model):
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
 
+    def update_contract_id(self):
+        pds = self.env["hr.payroll.payment.deduction"].search([('contract_id.state', '!=', 'open')])
+
+        for pd in pds:
+            # Get the active contract for the employee
+            active_contract = pd.employee_id.contract_id.filtered(lambda c: c.state == 'open')
+            if active_contract:
+                # update the contract id
+                pds.contract_id = active_contract.id
+
 
 class HrPayrollVariablePayments(models.Model):
     _name = 'hr.payroll.variable.payment'
