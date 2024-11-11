@@ -556,8 +556,7 @@ class droga_stock_move_extension(models.Model):
                             rec.trans_type_detail = 42
                     elif trans_type[0].id == 25 or trans_type[0].id == 28:
                         trans_type_det = self.env["droga.inventory.transaction.types"].search(
-                            [('from_con_type', '=', rec.location_id.con_type),
-                             ('to_con_type', '=', rec.location_dest_id.con_type)])
+                            [('to_con_type', '=', rec.location_dest_id.con_type)])
                         if len(trans_type_det) == 0:
                             rec.trans_type_detail = trans_type[0].id
                         else:
