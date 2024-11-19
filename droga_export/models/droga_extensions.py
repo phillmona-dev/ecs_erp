@@ -7,7 +7,7 @@ class droga_export_detail_ext(models.Model):
         'Request',
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True)
-
+    prodct_id_esti=fields.Many2one('product.product',store=True,string='Product from setup')
     @api.model
     def create(self, vals):
         if 'product_uom' not in vals:
@@ -296,6 +296,8 @@ class droga_cons_inherit(models.Model):
 
                     items.append({
                         'product_id': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
+                            0].id,
+                        'prodct_id_esti': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
                             0].id,
                         'product_uom_qty': uom_rate*det.product_uom_qty * it['rate_in_pct'] / 100,
                         'product_uom_qty_esti': uom_rate*det.product_uom_qty * it['rate_in_pct'] / 100,

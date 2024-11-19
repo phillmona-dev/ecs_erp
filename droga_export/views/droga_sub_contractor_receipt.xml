@@ -49,6 +49,7 @@
                         <group>
                             <field name="receipt_date"
                                    attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}"></field>
+                            <field name="cons_ref" widget="many2many_tags"></field>
                             <field name="remark"></field>
                         </group>
                     </group>
@@ -58,7 +59,9 @@
                                    attrs="{'readonly': [('state', 'in', ('waiting','reject','cancel','done'))]}">
                                 <tree editable="1" create="0" delete="1">
                                     <field name="company_id" invisible="1"/>
-                                    <field name="product_id" readonly="1" force_save="1" options="{'no_create':True,'no_open':True}"
+                                    <field name="prodct_id_esti" readonly="1" force_save="1" options="{'no_create':True,'no_open':True}"
+                                           required="1"/>
+                                    <field name="product_id" readonly="0" force_save="1" options="{'no_create':True,'no_open':True}"
                                            required="1"/>
                                     <field name="product_uom" options="{'no_create':True,'no_open':True}" readonly="1"/>
                                     <field name="product_uom_category_id" invisible="1"/>
