@@ -942,7 +942,7 @@ class sale_order_ext(models.Model):
                 message = message + ('\n' if message else '') + message + "Tin No must be registered for customer!"
                 # raise ValidationError("Tin No must be registered for customer!")
             if so.order_from.startswith('PH'):
-                if so.partner_id.available_amount_pharma < so.amount_total and so.payment_term_id.apply_credit_limit and so.company_id in (1,2):
+                if so.partner_id.available_amount_pharma < so.amount_total and so.payment_term_id.apply_credit_limit and so.company_id.id in (1,2):
                     message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
                     # raise ValidationError("You cannot exceed credit limit!")
                 if so.customer_emp:
@@ -953,7 +953,7 @@ class sale_order_ext(models.Model):
                         '\n' if message else '') + "Please settle matured amounts before initiating another sales!"
             else:
                 if so.partner_id.available_amount < so.amount_total and so.payment_term_id.apply_credit_limit and not so.partner_id.id in [
-                    15390] and so.company_id in (1,2):
+                    15390] and so.company_id.id in (1,2):
                     message = message + ('\n' if message else '') + "You cannot exceed credit limit!"
                     # raise ValidationError("You cannot exceed credit limit!")
                 if so.mature_amount > 0:
