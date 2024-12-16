@@ -60,7 +60,7 @@ class inventory_return_extension(models.Model):
                 'location_dest_id': def_loc_id,
                 'cons_receive_request': self.id,
                 # 'auto_generated': True,
-                # 'origin': self.name,
+                'origin': self.subcontractor_return_origin_form.subcontract_issue_origin_form.name,
                 'state': 'confirmed',
                 'scheduled_date': self.receipt_date
             }
@@ -80,9 +80,10 @@ class inventory_return_extension(models.Model):
                         'name': picking_id.name,
                         'product_id': rec['product_id'].id,
                         'product_uom': rec['product_uom'].id,
-                        'product_uom_qty': rec['product_uom_qty'],
+                        'product_uom_qty': round(rec['product_uom_qty'],4),
                         'price_unit': rec['price_unit_cons'],
                         'location_id': cons_vendor,
+                        'origin': self.subcontractor_return_origin_form.subcontract_issue_origin_form.name,
                         'location_dest_id': def_loc_id,
                         'state': 'confirmed',
                         'company_id': self.company_id.id
@@ -213,7 +214,7 @@ class droga_cons_inherit(models.Model):
                 'picking_type_id': pick_type_id,
                 'location_id': def_loc_id,
                 'location_dest_id': cust_locat,
-                # 'origin': self.name,
+                'origin': self.subcontract_issue_origin_form.name,
                 'cons_sample_issue_request': self.id,
                 'state': 'confirmed',
                 'scheduled_date': self.issue_date
@@ -234,8 +235,9 @@ class droga_cons_inherit(models.Model):
                         'name': picking_id.name,
                         'product_id': rec['product_id'].id,
                         'product_uom': rec['product_uom'].id,
-                        'product_uom_qty': rec['product_uom_qty'],
+                        'product_uom_qty': round(rec['product_uom_qty'],4),
                         'location_id': def_loc_id,
+                        'origin': self.subcontract_issue_origin_form.name,
                         'location_dest_id': cust_locat,
                         'state': 'confirmed',
                         'company_id': self.company_id.id
@@ -300,7 +302,7 @@ class droga_cons_inherit(models.Model):
                         'prodct_id_esti': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[
                             0].id,
                         'product_uom_qty': uom_rate*det.product_uom_qty * it['rate_in_pct'] / 100,
-                        'product_uom_qty_esti': uom_rate*det.product_uom_qty * it['rate_in_pct'] / 100,
+                        'product_uom_qty_esti':uom_rate*det.product_uom_qty * it['rate_in_pct'] / 100,
                         'product_uom': it['item'].uom_id.id,
 
 
