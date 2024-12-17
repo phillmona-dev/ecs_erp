@@ -278,6 +278,33 @@ class purchase_order(models.Model):
                     message = message + 'Product ' + line.product_id.default_code + ' has been updated with ' + \
                               new_items[0].default_code + ', '
 
+            sup_id=4
+
+            if res.company_id.id==1 and (res.request_type=='Local' or res.request_type=='Pharmacy'):
+                #Droga local
+                sup_id=4
+            elif res.company_id.id==1 and res.request_type=='Foregin':
+                # Droga Foregin
+                sup_id = 263
+            elif res.company_id.id == 2 and res.request_type == 'Local':
+                # EMA local
+                sup_id = 842
+            elif res.company_id.id == 2 and res.request_type == 'Foregin':
+                # EMA Foregin
+                sup_id = 843
+
+            recs=self.env['ir.property'].search([('name','=','property_stock_supplier'),('res_id', '=', 'res.partner,%s' % res.partner_id.id)])
+            if not recs:
+                self.env['ir.property'].sudo().create({
+                    'res_id': 'res.partner,'+str(res.partner_id.id),
+                    'name':'property_stock_supplier',
+                    'value':'stock.location,'+str(sup_id),
+                    'fields_id':6384,
+                    'type':'many2one'
+                })
+            else:
+                recs[0].sudo().write({'value': 'stock.location,'+str(sup_id)})
+
         if len(message) > 5:
             raise UserError(message)
 
