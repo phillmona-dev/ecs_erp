@@ -293,7 +293,7 @@ class purchase_order(models.Model):
                 # EMA Foregin
                 sup_id = 843
 
-            recs=self.env['ir.property'].search([('name','=','property_stock_supplier'),('res_id', '=', 'res.partner,%s' % res.partner_id.id)])
+            recs=self.env['ir.property'].sudo().search([('name','=','property_stock_supplier'),('res_id', '=', 'res.partner,%s' % res.partner_id.id)])
             if not recs:
                 self.env['ir.property'].sudo().create({
                     'res_id': 'res.partner,'+str(res.partner_id.id),
