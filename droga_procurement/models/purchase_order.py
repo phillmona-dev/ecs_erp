@@ -292,6 +292,18 @@ class purchase_order(models.Model):
             elif res.company_id.id == 2 and res.request_type == 'Foregin':
                 # EMA Foregin
                 sup_id = 843
+            elif res.company_id.id == 10 and res.request_type == 'Local':
+                # Somaliland local
+                sup_id = 871
+            elif res.company_id.id == 10 and res.request_type == 'Foregin':
+                # Somaliland Foregin
+                sup_id = 872
+            elif res.company_id.id == 22 and res.request_type == 'Local':
+                # Rwanda local
+                sup_id = 873
+            elif res.company_id.id == 22 and res.request_type == 'Foregin':
+                # Rwanda Foregin
+                sup_id = 874
 
             recs=self.env['ir.property'].sudo().search([('name','=','property_stock_supplier'),('res_id', '=', 'res.partner,%s' % res.partner_id.id)])
             if not recs:
