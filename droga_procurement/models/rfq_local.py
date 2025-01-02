@@ -244,7 +244,7 @@ class Rfq_Local(models.Model):
 
         if suppliers:
             # close the status of purchase request commitment budget
-            self.close_purchase_request_commitment_budget()
+            #self.close_purchase_request_commitment_budget()
 
             for supplier in suppliers:
                 vals = {'name': 'New', 'state': 'draft', 'date_order': datetime.now(),

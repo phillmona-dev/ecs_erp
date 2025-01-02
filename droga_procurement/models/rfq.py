@@ -468,28 +468,28 @@ class Rfq(models.Model):
                 purchase_order = self.env['purchase.order'].create(vals)
 
             # create purchase order commitment budget
-            for line in self.rfq_lines:
-                # if line.winner == "Yes":
-                # get budgetary position and expense account from purchase request
-                purchase_request = self.env['droga.purhcase.request.line'].search(
-                    [('purhcase_request_id', '=', self.purhcase_request_id.id),
-                     ('product_id', '=', line.product_id.id)])
-
-                commitment_budget = {
-                    'document_type': 'PO',
-                    'purchase_order_id': purchase_order.id,
-                    'purchase_order_total_amount': purchase_order.amount_total,
-                    'budget_date': purchase_order.date_order,
-                    'budgetary_position': purchase_request.budgetary_position.id,
-                    'expense_account': purchase_request.expense_account.id,
-                    'analytic_account_id': self.purhcase_request_id.branch.id,
-                    'company_id': self.company_id.id,
-                    'state': 'Active'
-                }
-
-                # persist to database
-                self.env['droga.budget.commitment.budget'].create(
-                    commitment_budget)
+            # for line in self.rfq_lines:
+            #     # if line.winner == "Yes":
+            #     # get budgetary position and expense account from purchase request
+            #     purchase_request = self.env['droga.purhcase.request.line'].search(
+            #         [('purhcase_request_id', '=', self.purhcase_request_id.id),
+            #          ('product_id', '=', line.product_id.id)])
+            #
+            #     commitment_budget = {
+            #         'document_type': 'PO',
+            #         'purchase_order_id': purchase_order.id,
+            #         'purchase_order_total_amount': purchase_order.amount_total,
+            #         'budget_date': purchase_order.date_order,
+            #         'budgetary_position': purchase_request.budgetary_position.id,
+            #         'expense_account': purchase_request.expense_account.id,
+            #         'analytic_account_id': self.purhcase_request_id.branch.id,
+            #         'company_id': self.company_id.id,
+            #         'state': 'Active'
+            #     }
+            #
+            #     # persist to database
+            #     self.env['droga.budget.commitment.budget'].create(
+            #         commitment_budget)
 
         return {
             'type': 'ir.actions.client',
