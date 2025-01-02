@@ -22,9 +22,8 @@ class AgedPartnerBalanceReport(models.AbstractModel):
             (minus_days(date_to, 1), minus_days(date_to, 30)),
             (minus_days(date_to, 31), minus_days(date_to, 60)),
             (minus_days(date_to, 61), minus_days(date_to, 90)),
-            (minus_days(date_to, 91), minus_days(date_to, 180)),
-            (minus_days(date_to, 181), minus_days(date_to, 365)),
-            (minus_days(date_to, 366), False),
+            (minus_days(date_to, 91), minus_days(date_to, 120)),
+            (minus_days(date_to, 121), False),
         ]
 
         def build_result_dict(report, query_res_lines):
