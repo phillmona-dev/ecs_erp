@@ -67,7 +67,6 @@ class droga_price_discount_per_product_customer(models.Model):
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active',
                               tracking=True)
 
-
 class sale_order_line(models.Model):
     _inherit = 'sale.order.line'
 
@@ -212,20 +211,26 @@ class sale_order_line(models.Model):
 
     def _get_pharma_price_with_discount(self,line):
         line.disc_applied = 0
+        rate=1
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),
                                                                   ('header.customer', '=', line.order_id.partner_id.id),
                                                                   ('header.date_from', '<', datetime.today()),
                                                                   ('header.date_to', '>', datetime.today()),
                                                                   ('header.status', '=', 'Active')])
+        discount_per_branch_group = self.env['droga.price.discount.per.branch.group'].search(
+            [('status', '=', 'Active'), ('prod_grp', '=', line.product_id.product_tmpl_id.pharmacy_group_id.id),
+             ('branch', '=', line.order_id.wareh.id)])
+        for disc in discount_per_branch_group:
+            rate = 1 + (disc.percent / 100)
+
         if len(cont_prices) > 0:
             line.order_id.points_to_deduct=0
             return cont_prices[0]["selling_price"]
         elif line.order_id.partner_id.is_company:
             line.order_id.points_to_deduct = 0
-            return line.product_id.list_price_phar
+            return line.product_id.list_price_phar*rate
         else:
             #Accumulated points discount
-            rate = 1
             discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Purchase reward','Discount for loyal customer')),('status','=','Active')])
             for disc in discount_per_acc:
                 if len(line.order_id.ids)>0:
@@ -267,6 +272,7 @@ class sale_order_line(models.Model):
                     line.disc_applied = disc.discount
                     line.order_id.points_to_deduct = 1
                     line.order_id.deduct_type = 'Discount for breast feed'
+
 
             if rate!=1:
                 return line.product_id.list_price_phar * rate
