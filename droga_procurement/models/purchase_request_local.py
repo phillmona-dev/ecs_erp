@@ -44,7 +44,6 @@ class purchase_request_local(models.Model):
             elif r1.total_amount <= 500000 and r1.request_type == "Pharmacy":
                 r1.write({'wf_state': 'Approved'})
 
-
     def get_current_uid(self):
         for record in self:
             if self.env.context.get('uid', False):
@@ -258,6 +257,7 @@ class purchase_request_local(models.Model):
 
     # approve request
     def approve_request(self):
+        self.set_activity_done()
         self.write({'state': 'Approved'})
         self.write({'wf_state': 'Approved'})
         # record commitment budget
@@ -373,6 +373,15 @@ class purchase_request_local(models.Model):
                 xx.rfq_count = rfq_count
                 xx.po_count = po_count
                 xx.grn_count = grn_count
+
+    def make_done_approved_requests(self):
+        ceo_approved_prs = self.env["droga.purchase.request.local"].search([('state', '=', 'Approved')])
+
+        for pr in ceo_approved_prs:
+            activity = self.env["mail.activity"].search(
+                [('res_name', '=', pr.name)])
+            if activity:
+                activity.sudo().unlink()
 
 
 class purchase_request_line_local(models.Model):
