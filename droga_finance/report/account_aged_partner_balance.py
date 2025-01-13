@@ -23,7 +23,7 @@ class AgedPartnerBalanceReport(models.AbstractModel):
             (minus_days(date_to, 31), minus_days(date_to, 60)),
             (minus_days(date_to, 61), minus_days(date_to, 90)),
             (minus_days(date_to, 91), minus_days(date_to, 120)),
-            (minus_days(date_to, 181), minus_days(date_to, 365)),
+            (minus_days(date_to, 121), minus_days(date_to, 365)),
             (minus_days(date_to, 366), False),
         ]
 
@@ -205,7 +205,7 @@ class AgedPartnerBalanceReport(models.AbstractModel):
 
     def _common_custom_unfold_all_batch_data_generator(self, internal_type, report, options, lines_to_expand_by_function):
         rslt = {} # In the form {full_sub_groupby_key: all_column_group_expression_totals for this groupby computation}
-        report_periods = 7 # The report has 6 periods
+        report_periods = 7 # The report has 7 periods
 
         for expand_function_name, lines_to_expand in lines_to_expand_by_function.items():
             for line_to_expand in lines_to_expand: # In standard, this loop will execute only once
