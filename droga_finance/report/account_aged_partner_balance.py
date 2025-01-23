@@ -23,7 +23,7 @@ class AgedPartnerBalanceReport(models.AbstractModel):
             (minus_days(date_to, 31), minus_days(date_to, 60)),
             (minus_days(date_to, 61), minus_days(date_to, 90)),
             (minus_days(date_to, 91), minus_days(date_to, 120)),
-            (minus_days(date_to, 181), minus_days(date_to, 365)),
+            (minus_days(date_to, 121), minus_days(date_to, 365)),
             (minus_days(date_to, 366), False),
         ]
 
@@ -202,5 +202,54 @@ class AgedPartnerBalanceReport(models.AbstractModel):
                 rslt.append((grouping_key, build_result_dict(report, query_res_lines)))
 
             return rslt
+
+    def _common_custom_unfold_all_batch_data_generator(self, internal_type, report, options, lines_to_expand_by_function):
+        rslt = {} # In the form {full_sub_groupby_key: all_column_group_expression_totals for this groupby computation}
+        report_periods = 7 # The report has 7 periods
+
+        for expand_function_name, lines_to_expand in lines_to_expand_by_function.items():
+            for line_to_expand in lines_to_expand: # In standard, this loop will execute only once
+                if expand_function_name == '_report_expand_unfoldable_line_with_groupby':
+                    report_line_id = report._get_res_id_from_line_id(line_to_expand['id'], 'account.report.line')
+                    expressions_to_evaluate = report.line_ids.expression_ids.filtered(lambda x: x.report_line_id.id == report_line_id and x.engine == 'custom')
+
+                    if not expressions_to_evaluate:
+                        continue
+
+                    for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+                        # Get all aml results by partner
+                        aml_data_by_partner = {}
+                        for aml_id, aml_result in self._aged_partner_report_custom_engine_common(column_group_options, internal_type, 'id', None):
+                            aml_result['aml_id'] = aml_id
+                            aml_data_by_partner.setdefault(aml_result['partner_id'], []).append(aml_result)
+
+                        # Iterate on results by partner to generate the content of the column group
+                        partner_expression_totals = rslt.setdefault(f"[{report_line_id}]=>partner_id", {})\
+                                                        .setdefault(column_group_key, {expression: {'value': []} for expression in expressions_to_evaluate})
+                        for partner_id, aml_data_list in aml_data_by_partner.items():
+                            partner_values = self._prepare_partner_values()
+                            for i in range(report_periods):
+                                partner_values[f'period{i}'] = 0
+
+                            # Build expression totals under the right key
+                            partner_aml_expression_totals = rslt.setdefault(f"[{report_line_id}]partner_id:{partner_id}=>id", {})\
+                                                                .setdefault(column_group_key, {expression: {'value': []} for expression in expressions_to_evaluate})
+                            for aml_data in aml_data_list:
+                                for i in range(report_periods):
+                                    period_value = aml_data[f'period{i}']
+                                    partner_values[f'period{i}'] += period_value
+                                    partner_values['total'] += period_value
+
+                                for expression in expressions_to_evaluate:
+                                    partner_aml_expression_totals[expression]['value'].append(
+                                        (aml_data['aml_id'], aml_data[expression.subformula])
+                                    )
+
+                            for expression in expressions_to_evaluate:
+                                partner_expression_totals[expression]['value'].append(
+                                    (partner_id, partner_values[expression.subformula])
+                                )
+
+        return rslt
 
 
