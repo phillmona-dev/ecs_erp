@@ -18,7 +18,7 @@ class DrogaMonthlyclose(models.Model):
     interest=fields.Float(string='Interest',readonly=False)
     penality=fields.Float(string='Penalty',readonly=False)
     recipt=fields.Float  (string='Recipt',readonly=False)
-   # end_day=fields.Date("Closing Day",compute="_compute_start_field")  
+   # end_day=fields.Date("Closing Day",compute="_compute_start_field")
     post=fields.Many2one(string='Account Move',comodel_name='account.move')
    
     name= fields.Char(string="Month",readonly=False)

@@ -980,11 +980,12 @@ class PayrollMasterReports(models.Model):
         current_period_employees = self.batch
 
         # get previous period employee list
-        previous_period_employees = self.env['hr.payslip.run'].search([('period', '=', previous_period.id)])
+        if previous_period:
+            previous_period_employees = self.env['hr.payslip.run'].search([('period', '=', previous_period.id)])
 
-        # add employee list from previous period
-        for record in previous_period_employees.slip_ids.employee_id:
-            unique_employee_list.append(record.id)
+            # add employee list from previous period
+            for record in previous_period_employees.slip_ids.employee_id:
+                unique_employee_list.append(record.id)
 
         for record in current_period_employees.slip_ids.employee_id:
             if record.id not in unique_employee_list:
