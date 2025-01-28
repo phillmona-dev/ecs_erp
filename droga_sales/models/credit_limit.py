@@ -84,7 +84,7 @@ class cust_sales_credit_limit(models.Model):
 
     order_type = fields.Selection([
         ('IM', 'Import'),
-        ('WS', 'Wholesale')], string='Order type')
+        ('WS', 'Wholesale')], string='Order from')
     order_from = fields.Char('Order from')
 
     @api.depends('payment_term_id')
