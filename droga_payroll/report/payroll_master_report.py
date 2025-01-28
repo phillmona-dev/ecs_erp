@@ -995,10 +995,11 @@ class PayrollMasterReports(models.Model):
 
     def get_net_pay_amount(self, period, emp_id):
         net_wage = 0
-        batch = self.env['hr.payslip.run'].search([('period', '=', period.id)])
+        if (hasattr(period, 'id')):
+            batch = self.env['hr.payslip.run'].search([('period', '=', period.id)])
 
-        for slips in batch.slip_ids:
-            if slips.employee_id.id == emp_id:
-                net_wage += slips.net_wage
+            for slips in batch.slip_ids:
+                if slips.employee_id.id == emp_id:
+                    net_wage += slips.net_wage
 
         return net_wage
