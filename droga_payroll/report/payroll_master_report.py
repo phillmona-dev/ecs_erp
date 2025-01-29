@@ -611,8 +611,9 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 8, 'SACO Share Purchase', title_format)
         sheet.write(row_start, 9, 'SACO Payment Deduction', title_format)
         sheet.write(row_start, 10, 'Cost Sharing', title_format)
-        sheet.write(row_start, 11, 'Others', title_format)
-        sheet.write(row_start, 12, 'Total', title_format)
+        sheet.write(row_start, 11, 'Sport Contribution', title_format)
+        sheet.write(row_start, 12, 'Others', title_format)
+        sheet.write(row_start, 13, 'Total', title_format)
         row_start += 1
 
         # search based on cost center
@@ -633,6 +634,7 @@ class PayrollMasterReports(models.Model):
         saco_additional_payment_total = 0
         saco_share_payment_total = 0
         cost_sharing_total = 0
+        sport_contribution_total = 0
         others_total = 0
 
         for record in slips:
@@ -651,6 +653,7 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 10, num, num_format)
             sheet.write(row_start, 11, num, num_format)
             sheet.write(row_start, 12, num, num_format)
+            sheet.write(row_start, 13, num, num_format)
 
             # load data
             # get payroll detail
@@ -691,6 +694,9 @@ class PayrollMasterReports(models.Model):
                 elif payslip_detail.code == 'COSTSHA':  # cost sharing
                     sheet.write(row_start, 10, payslip_detail.total, num_format)
                     cost_sharing_total += payslip_detail.total
+                elif payslip_detail.code == 'SPOCONT':  # sport contribution
+                    sheet.write(row_start, 11, payslip_detail.total, num_format)
+                    sport_contribution_total += payslip_detail.total
 
             row_start += 1
 
@@ -704,9 +710,11 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 7, saco_additional_payment_total, num_format_sub_total)
         sheet.write(row_start, 8, saco_share_payment_total, num_format_sub_total)
         sheet.write(row_start, 9, saco_loan_payment_total, num_format_sub_total)
+
         sheet.write(row_start, 10, cost_sharing_total, num_format_sub_total)
-        sheet.write(row_start, 11, 0, num_format_sub_total)
+        sheet.write(row_start, 11, sport_contribution_total, num_format_sub_total)
         sheet.write(row_start, 12, 0, num_format_sub_total)
+        sheet.write(row_start, 13, 0, num_format_sub_total)
 
     # get employee mobile card excel
     def mobile_card_report(self, workbook):
