@@ -22,7 +22,7 @@ class droga_stock_move_line_extension(models.Model):
                                        required=True, compute="_compute_location_id", store=True, readonly=False,
                                        precompute=True)
     source_wh_type = fields.Selection([
-        ('IM', 'Import'),
+        ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'), ('PT', 'Physiotherapy'),
         ('PH', 'Pharmacy'), ('PR', 'Project')], compute='_get_source_type',store=True)
 
@@ -157,7 +157,7 @@ class droga_warehouse_extension(models.Model):
                                 search='_search_has_no_access')
     has_dispensary_location = fields.Boolean("Has dispensary location")
     wh_type=fields.Selection([
-        ('IM','Import'),
+        ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.')
 
@@ -454,7 +454,7 @@ class droga_stock_move_extension(models.Model):
     reserve_indef=fields.Boolean('Reserve indefinitely',default=False,tracking=True)
     source_wh=fields.Char(related='location_id.warehouse_id.name')
     source_wh_type = fields.Selection([
-        ('IM','Import'),
+        ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)

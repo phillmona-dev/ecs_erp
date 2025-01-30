@@ -12,7 +12,7 @@ class prod_availability(models.Model):
     availability = fields.Char('Availability', compute='_compute_availability', store=True)
     categ_id=fields.Many2one('product.category',string='Product category',related='prod.product_tmpl_id.categ_id',store=True)
     wh_type = fields.Selection([
-        ('IM', 'Import'),
+        ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'), ('PT', 'Physiotherapy'),
         ('PH', 'Pharmacy'), ('PR', 'Project')], related='warehouse.wh_type', store=True)
     batch_id=fields.Many2one('stock.lot',string='Batch ID',readonly=True)

@@ -294,6 +294,6 @@
                     id="droga_sales_cons_return_menu"
                     name="Consignment return"
                     action="droga_sales.droga_sales_consignment_receipt_action"/>
-   </menuitem>
+        </menuitem>
     </menuitem>
 </odoo>

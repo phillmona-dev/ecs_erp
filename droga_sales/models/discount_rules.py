@@ -811,10 +811,17 @@ class sale_order_ext(models.Model):
                 lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
                     lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
-            rec.final_approver = self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
-                self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+
+            if rec.order_type=='EX':
+                rec.final_approver = self.env.ref("droga_sales.sales_droga_export_approver").users.filtered(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_sales.sales_droga_export_approver").users.filtered(
+                        lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+            else:
+                rec.final_approver = self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
+                        lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             if rec.order_type == 'IM':
                 rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(
                     lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
@@ -994,6 +1001,8 @@ class sale_order_ext(models.Model):
         # Physiotheraphy order automatic confirmation
         if self.order_type == 'PT':
             self.action_confirm()
+        elif self.order_type=='EX':
+            self.state = 'fia'
         # Manual price and discounts routing to price change approver
         elif ((self.manual_price and len(self.order_line.filtered(
                 lambda x: x.std_unit_price > x.price_unit > 0)) > 0) or self.tender_origin_form_tender) and self.state == 'draft':

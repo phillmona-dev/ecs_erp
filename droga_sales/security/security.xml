@@ -72,12 +72,3 @@
 </odoo>
 
 
-<!--
-    This is where you will create your groups.
-        ir.module.category is the module category
-        res.groups are the module user groups, they will refer to the master module category
-
-        For menu access, simply add groups="", in the menu definition
-        The csv file is a set of access rules for models
-            The format it takes is
-                id,                                 name,                 mo
