@@ -129,11 +129,11 @@
                         string="Confirm"/>
                 <button name="final_approval" type="object" class="btn-primary"
                         attrs="{'invisible': [('state', 'not in', ['fia'])]}"
-                        groups="droga_sales.sales_import_final_approve"
+                        groups="droga_sales.sales_import_final_approve,droga_sales.sales_droga_export_approver"
                         string="Confirm"/>
                 <button name="reject_order" type="object" class="oe_highlight btn-warning"
                         attrs="{'invisible': [('state', 'not in', ['price_request','req','fia'])]}"
-                        groups="droga_sales.sales_import_final_approve,droga_sales.sales_price_change_admin,droga_sales.sales_import_approve_admin,droga_sales.sales_wholesale_approve_admin"
+                        groups="droga_sales.sales_import_final_approve,droga_sales.sales_price_change_admin,droga_sales.sales_import_approve_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_droga_export_approver"
                         string="Reject"/>
             </xpath>
             <xpath expr="//form/header/button[@name='action_quotation_send']" position="attributes">
@@ -294,7 +294,4 @@
                     id="droga_sales_cons_return_menu"
                     name="Consignment return"
                     action="droga_sales.droga_sales_consignment_receipt_action"
-                    sequence="2"/>
-        </menuitem>
-    </menuitem>
-</odoo>
+   
