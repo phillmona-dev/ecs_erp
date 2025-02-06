@@ -18,7 +18,15 @@ class PayrollMasterReports(models.Model):
     batch = fields.Many2one('hr.payslip.run', required=True)
     fileout = fields.Binary('File', readonly=True)
     cost_center = fields.Many2many("hr.department")
-    cost_center_analytic = fields.Many2many("account.analytic.account", domain=[('plan_id.name', '=', 'Cost Center')])
+    # cost_center_analytic = fields.Many2many("account.analytic.account", domain=[('plan_id.name', '=', 'Cost Center')])
+
+    cost_center_analytic = fields.Many2many(
+        "account.analytic.account",
+        domain=lambda self: [
+            ('plan_id.name', '=', 'Cost Center'),
+            ('company_id', 'in', self.env.context.get('allowed_company_ids', []))
+        ]
+    )
 
     def convert_to_word(self, num):
         num_strings = str(num)
@@ -751,7 +759,9 @@ class PayrollMasterReports(models.Model):
         row_start += 1
 
         # get employee list who have a benefit for mobile card
-        mobile_cards = self.env['hr.payroll.payment.deduction'].search([('input_types.code', '=', 'MOBCAR')])
+        mobile_cards = self.env['hr.payroll.payment.deduction'].search(
+            [('input_types.code', '=', 'MOBCAR'),
+             ('company_id', 'in', self.batch.slip_ids.company_id.ids)])
 
         no = 1  # counter
         for mobile_card in mobile_cards:
@@ -808,11 +818,13 @@ class PayrollMasterReports(models.Model):
         row_start += 1
 
         # get employee list who have a benefit for fuel
-        fules = self.env['hr.payroll.payment.deduction'].search([('input_types.code', '=', 'FUEL')])
+        fules = self.env['hr.payroll.payment.deduction'].search(
+            [('input_types.code', '=', 'FUEL'), ('company_id', 'in', self.batch.slip_ids.company_id.ids)])
 
         # get fuel rate
         fuel_rates = self.env['hr.payroll.rate'].search(
-            [('code', '=', 'FUEL'), ('date_to', '>=', datetime.datetime.now())])
+            [('code', '=', 'FUEL'), ('date_to', '>=', datetime.datetime.now()),
+             ('company_id', 'in', self.batch.slip_ids.company_id.ids)])
 
         rate = 0
         for fuel_rate in fuel_rates:
