@@ -92,9 +92,9 @@ class HrContract(models.Model):
 
         return rate
 
-    @api.onchange('analytic_account_id')
-    def _on_analytic_id_changed(self):
-        for record in self:
-            if record.analytic_account_id.plan_id.name != 'Cost Center':
-                record.analytic_account_id = ''
-                raise ValidationError('Please select a cost center')
+    #@api.onchange('analytic_account_id')
+    #def _on_analytic_id_changed(self):
+        #for record in self:
+            #if record.analytic_account_id.plan_id.name != 'Cost Center' and record.analytic_account_id.plan_id.name != ' ':
+                #record.analytic_account_id = ''
+                #raise ValidationError('Please select a cost center')
