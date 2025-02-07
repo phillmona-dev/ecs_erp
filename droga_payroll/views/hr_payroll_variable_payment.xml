@@ -47,4 +47,13 @@
 
 
     </record>
+
+
+    <!-- rule for filtering data specific data -->
+    <record model="ir.rule" id="droga_hr_payroll_variable_payment_rule">
+        <field name="name">Payment and Deduction multi-company</field>
+        <field name="model_id" ref="model_hr_payroll_variable_payment"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
 </odoo>
