@@ -326,7 +326,7 @@ class purchase_order(models.Model):
     def create(self, vals):
         # get sequence number for each company
 
-        if 'Purchase' not in self.env['stock.picking.type'].browse(vals['picking_type_id']).name:
+        if not self.env['stock.picking.type'].browse(vals['picking_type_id']).avail_po:
             raise UserError('Please select either local or foreign purchase under \'Deliver To\' field.')
 
         company_id = vals.get('company_id', self.default_get(

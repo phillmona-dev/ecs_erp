@@ -300,7 +300,7 @@ class droga_stock_picking_type_extension(models.Model):
 
     request_type = fields.Selection(
         [("Local", "Local"), ("Foregin", "Foregin"), ("Pharmacy", "Pharmacy")], default="Local")
-
+    avail_po=fields.Boolean('Purchase order delivery type',default=False)
     #Overridden to add domain to picking type openings
     def _get_action(self, action_xmlid):
         action = self.env["ir.actions.actions"]._for_xml_id(action_xmlid)

@@ -19,6 +19,7 @@
             <xpath expr="//form/sheet/group/group/field[@name='warehouse_id']" position="after">
                 <field name="dispatch_location"/>
                 <field name="request_type"/>
+                <field name="avail_po"/>
             </xpath>
         </field>
     </record>
