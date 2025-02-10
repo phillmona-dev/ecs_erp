@@ -379,10 +379,10 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 11, acting_sub_total, num_format_sub_total)
 
         sheet.write(row_start, 12, other_sub_total, num_format_sub_total)
-        sheet.write(row_start, 13, gross_sub_total, num_format_sub_total)
+        sheet.write(row_start, 13, parking_lunch_total, num_format_sub_total)
 
         sheet.write(row_start, 14, commission_sub_total, num_format_sub_total)
-        sheet.write(row_start, 15, parking_lunch_total, num_format_sub_total)
+        sheet.write(row_start, 15, gross_sub_total, num_format_sub_total)
 
         sheet.write(row_start, 16, taxable_sub_total, num_format_sub_total)
 
