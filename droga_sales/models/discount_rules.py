@@ -305,7 +305,7 @@ class sale_order_line(models.Model):
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.product_uom_pharma_qty','order_id.total_disc_pharma')
     def _compute_price_unit(self):
         for line in self:
-            if line.order_id.state in ('sale', 'cancel', 'done', 'fia','dispense','done'):
+            if line.order_id.state in ('sale', 'cancel', 'done', 'fia','dispense','done') or line.is_downpayment:
                 return
             if line.order_from:
                 if line.order_from.startswith('PH'):
@@ -519,6 +519,8 @@ class sale_order_ext(models.Model):
     deduct_type=fields.Char('Type')
     deduct_descr=fields.Char(compute='_compute_desc')
     inv_number=fields.Char('Invoice Number')
+
+
     @api.depends('total_disc_pharma','deduct_type')
     def _compute_desc(self):
         for rec in self:
@@ -917,7 +919,7 @@ class sale_order_ext(models.Model):
                     ln.wareh = ln.product_id.default_warehouse
 
             order_lines_nowareh = self.order_line.filtered(
-                lambda x: not x.wareh)
+                lambda x: not x.wareh and x.product_id.name!='Down payment' and x.product_id.id)
 
             if (len(order_lines_nowareh) > 0):
                 message = message + ('\n' if message else '') + "Warehouse must be filled for each order line."

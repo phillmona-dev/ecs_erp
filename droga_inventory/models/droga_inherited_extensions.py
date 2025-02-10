@@ -1097,12 +1097,13 @@ class droga_stock_product_extension(models.Model):
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
         #If user has access to MI group, automatically assign ID
-        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self.env.company.id==1:
+        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self.env.company.id==1 and res.pharmacy_group_id:
             res.default_code=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             vals_list['default_code']=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             res.pharmacy_group_id.write({'id_counter': res.pharmacy_group_id.id_counter+1})
-        if not vals_list['default_code']:
-            raise UserError("Default code can not be empty.")
+        if "default_code" in vals_list:
+            if not vals_list['default_code']:
+                raise UserError("Default code can not be empty.")
         if res.company_id.id==2:
             res.order_type='ALL'
         if res.reg_status=='draft' and not res.categ_id.name.startswith('Office') and not res.categ_id.name.startswith('Fixed') and res.company_id.id==1 and not res.from_pharma:

@@ -43,6 +43,7 @@ class cust_contact_extension(models.Model):
     loc_history = fields.One2many('droga.crm.loc.history', 'partner')
     loc_set=fields.Boolean('Location set',default=False,compute='_is_loc_set',store=True)
     mature_individually = fields.Boolean('Mature individually', default=False)
+    show_percent=fields.Boolean('Show percentage for physiotherapy')
 
     @api.depends('partner_latitude','partner_longitude')
     def _is_loc_set(self):
@@ -193,6 +194,9 @@ class cust_contact_extension(models.Model):
                     """ update account_move set customer_category=%s where id=%s""",
                     (record.cust_type_ext.cust_org_type, account_move.id))
 
+class sale_order_inherit(models.Model):
+    _inherit = 'sale.order'
+    show_downpay = fields.Boolean(related='partner_id.show_percent')
 
 class cust_history(models.Model):
     _name = 'droga.crm.loc.history'
