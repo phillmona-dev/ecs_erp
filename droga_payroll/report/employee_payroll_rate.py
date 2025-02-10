@@ -72,8 +72,7 @@ class EmployeePayrollRate(models.Model):
 class EmployeePayrollRateRun(models.Model):
     _name = 'hr.employee.payroll.rate.run'
 
-    company_id = fields.Many2one('res.company', 'Company', domain=lambda self: [
-        ('company_id', 'in', self.env.context.get('allowed_company_ids', []))])
+    company_id = fields.Many2one('res.company', 'Company')
     fileout = fields.Binary('File', readonly=True)
 
     def droga_payroll_rate_report_action(self):
