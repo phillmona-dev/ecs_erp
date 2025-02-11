@@ -17,9 +17,15 @@
                   groups="hr.group_hr_user" sequence="3"/>
     </menuitem>
 
-     <menuitem id="menu_hr_payslip_line_tree" name="Payslip Lines"
+    <menuitem id="menu_hr_payslip_line_tree" name="Payslip Lines"
               parent="hr_payroll.menu_hr_payroll_report"
               action="action_hr_payslip_line_tree_action"/>
+
+    <menuitem
+            id="hr_employee_payroll_rate_run_menu" name="Employee Payroll Rate"
+            action="hr_employee_payroll_rate_run_action"
+            parent="hr_payroll.menu_hr_payroll_report"
+            sequence="100"/>
 
 
 </odoo>
