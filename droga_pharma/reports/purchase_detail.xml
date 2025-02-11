@@ -112,7 +112,7 @@
         <field name="limit">200</field>
         <field name="context">{'search_default_current_week_purchases':1}
         </field>
-        <field name="domain">[('order_id','like','PO-DP')]</field>
+        <field name="domain">[('request_type','like','Pharmacy')]</field>
         <field name="search_view_id" ref="droga_pharma_purchases_detail_pharmacy_search"></field>
         <field name="view_ids"
                    eval="[(5, 0, 0),
