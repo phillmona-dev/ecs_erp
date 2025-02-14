@@ -235,8 +235,8 @@
                                                    context="{'default_product_id': product_id, 'tree_view_ref':'product.product_packaging_tree_view', 'form_view_ref':'product.product_packaging_form_view'}"
                                                    groups="product.group_stock_packaging"/>
 
-                                            <label for="discount" groups="product.group_discount_per_so_line"/>
-                                            <div name="discount" groups="product.group_discount_per_so_line">
+                                            <label for="discount" invisible="1" groups="product.group_discount_per_so_line"/>
+                                            <div name="discount" invisible="1" groups="product.group_discount_per_so_line">
                                                 <field name="discount" class="oe_inline"/>
                                                 %
                                             </div>
