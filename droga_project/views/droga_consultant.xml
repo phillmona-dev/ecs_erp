@@ -30,13 +30,24 @@
                         <field name="consultant_descr"></field>
                         <field name="status"></field>
                     </group>
+
+                    <notebook>
+                        <page string="Projects">
+
+                            <field name="project_consulting" mode="tree" views="[(3, 'project.project_project_stage_view_tree')]">
+                                    <tree editable="bottom" create="0">
+                                        <field name="name"></field>
+                                    </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
     </record>
 
     <menuitem
-            id="droga_project_Consultants"
+            id="droga_project_consultants"
             name="Consultants Registry"
             action="droga_project_consultants_action"
             parent="project.menu_project_config"

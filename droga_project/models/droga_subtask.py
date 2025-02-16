@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 
@@ -29,7 +31,24 @@ class drogaSubTask(models.Model):
     contractor=fields.Many2one('res.partner')
     cost_center=fields.Many2one('account.analytic.account',domain=[('project', '=', False)])
     problems=fields.One2many('project.task.problems','task')
+    predecessors = fields.One2many('droga.sub.task.predecessor', 'task')
     planned_date_begin = fields.Datetime("Start date", tracking=True, task_dependency_tracking=True,default=fields.date.today())
+    task_description=fields.Char('Task Description')
+    task_duration=fields.Integer('Task duration')
+    consultants=fields.Many2many('droga.project.consultant')
+    contractors = fields.Many2many('droga.project.contractors')
+
+    @api.onchange('task_duration')
+    def _compute_planned_end_date(self):
+        if self.planned_date_begin and self.task_duration:
+            self.planned_date_end = self.planned_date_begin + timedelta(days=self.task_duration)
+
+    @api.onchange('planned_date_begin','planned_date_end')
+    def _compute_task_duration(self):
+        if self.planned_date_begin and not self.planned_date_end:
+            self.planned_date_end = self.planned_date_begin + timedelta(days=self.task_duration)
+        if self.planned_date_begin and self.planned_date_end:
+            self.task_duration = abs((self.planned_date_begin - self.planned_date_end).days)
 
     @api.depends('child_ids')
     def _compute_editable(self):
@@ -189,6 +208,14 @@ class drogaSubTask(models.Model):
     def unlink_(self):
         raise UserError(
             "Tasks can't be deleted. Please archive them instead.")
+
+class drogaSubTaskPredecessors(models.Model):
+    _name='droga.sub.task.predecessor'
+    task=fields.Many2one('project.task')
+    pid=fields.Many2one('project.project',related='task.project_id')
+    predecessor_task=fields.Many2one('project.task',domain="['&',('id','!=',task),('project_id', '=', pid)]",required=True)
+    predecessor_type = fields.Selection([('ff', 'Finish-to-Finish'), ('ss', 'Start-to-Start'), ('fs', 'Finish-to-Start'),('sf','Start-to-Finish')],required=True)
+
 
 class droga_subtask_local_purchase(models.Model):
     _inherit = 'purchase.order'

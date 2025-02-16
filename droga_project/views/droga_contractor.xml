@@ -30,6 +30,18 @@
                         <field name="contractor_descr"></field>
                         <field name="status"></field>
                     </group>
+
+                    <notebook>
+                        <page string="Projects">
+
+                            <field name="project_contracting" mode="tree" views="[(3, 'project.project_project_stage_view_tree')]">
+                                    <tree editable="bottom" create="0">
+                                        <field name="name"></field>
+                                    </tree>
+                            </field>
+                        </page>
+                    </notebook>
+
                 </sheet>
             </form>
         </field>
