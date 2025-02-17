@@ -19,6 +19,21 @@
             <xpath expr="//form/sheet/group/group/field[@name='warehouse_id']" position="after">
                 <field name="dispatch_location"/>
                 <field name="request_type"/>
+                <field name="avail_po"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="droga_stock_form_view_extension" model="ir.ui.view">
+        <field name="name">Form view</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_move_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group/group/div[2]/field[@name='qty_done']" position="attributes">
+                <attribute name="readonly">True</attribute>
+            </xpath>
+            <xpath expr="//form/sheet/group/group/field[@name='lot_id']" position="attributes">
+                <attribute name="readonly">True</attribute>
             </xpath>
         </field>
     </record>

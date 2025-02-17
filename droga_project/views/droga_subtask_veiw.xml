@@ -20,7 +20,8 @@
                 <field name="task_progress" attrs="{'readonly': [('task_editable', '=', False)]}"/>
                 <field name="task_editable" invisible="1"/>
                 <field name="task_weight" readonly="1"/>
-                <field name="sum_of_tasks" attrs="{'invisible': [('task_editable', '=', True)]}"/>
+                <field name="parent_id" invisible="1"/>
+                <field name="task_description" attrs="{'invisible': [('parent_id', '!=', False)]}"/>
             </xpath>
 
             <xpath expr="//field[@name='project_id']" position="replace">
@@ -37,16 +38,49 @@
             <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field/tree/field[@name='milestone_id']"
                    position="after">
                 <field name="task_weight"/>
-                <field name="task_editable" invisible="1"/>
-                <field name="task_progress" attrs="{'readonly': [('task_editable', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field/tree/field[@name='date_deadline']"
+                   position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
 
+            <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field/tree/field[@name='kanban_state']"
+                   position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field/tree/field[@name='user_ids']"
+                   position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field/tree/field[@name='stage_id']"
+                   position="attributes">
+                <attribute name="invisible">True</attribute>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='user_ids']" position="after">
-                <field name="contractor"/>
                 <field name="display_project_id" invisible="1"></field>
                 <field name="cost_center" domain="([('project','=',display_project_id)])"
                        options="{'no_create':True,'no_open':True}"/>
+                <field name="task_duration" string="Task duration in days"></field>
+
+                <label for="consultants" string="Consultants"/>
+                <div class="o_row">
+                    <field name="project_id" invisible="1"></field>
+                    <field name="consultants" domain="([('project_consulting','in',[project_id])])" class="oe_inline" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
+                    <label for="contractors" string="Contractors"/>
+                    <field name="contractors" domain="([('project_contracting','in',[project_id])])" class="oe_inline" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
+                </div>
+            </xpath>
+
+            <xpath expr="//field[@name='kanban_state']"
+                   position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/group/group/field[@name='user_ids']" position="attributes">
+                <attribute name="invisible">True</attribute>
             </xpath>
 
             <xpath expr="//field[@name='partner_id']" position="attributes">
@@ -57,6 +91,17 @@
                    position="attributes">
                 <attribute name="widget"></attribute>
             </xpath>
+
+            <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field/tree/field[@name='priority']"
+                   position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page[@name='sub_tasks_page']/field/tree/field[@name='sequence']"
+                   position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
             <xpath expr="//form/sheet/notebook/page[@name='extra_info']"
                    position="attributes">
                 <attribute name="invisible">True</attribute>
@@ -73,7 +118,7 @@
 
             <xpath expr="//form/sheet/notebook/page[@name='task_dependencies']"
                    position="attributes">
-                <attribute name="string">Depends on</attribute>
+                <attribute name="invisible">True</attribute>
             </xpath>
             <xpath expr="//form/sheet/notebook/page[@name='task_dependencies']"
                    position="after">
@@ -84,6 +129,16 @@
             </xpath>
             <xpath expr="//form/sheet/notebook/page[@name='task_dependencies']"
                    position="before">
+                <page string="Predecessors">
+                    <field name="predecessors">
+                        <tree editable="bottom">
+                            <field name="pid" invisible="1"></field>
+                            <field name="task" invisible="1"></field>
+                            <field name="predecessor_task" options="{'no_create':True,'no_open':True}"/>
+                            <field name="predecessor_type"/>
+                        </tree>
+                    </field>
+                </page>
                 <page string="Problems">
                     <field name="problems">
                         <tree editable="bottom">

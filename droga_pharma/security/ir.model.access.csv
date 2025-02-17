@@ -54,3 +54,4 @@ access_report_mtm_excel,mtm.report.wizard,model_mtm_report_wizard,base.group_use
 access_drug_information_query,Access Drug Information Query,model_drug_information_query,base.group_user,1,1,1,1
 access_mail_tracking_value_user,mail.tracking.value.user,mail.model_mail_tracking_value,base.group_user,1,0,0,0
 access_res_partner_pharma2,mail.res_partner_pharma2,model_res_partner_pharma2,base.group_user,1,1,1,1
+access_droga_price_discount_branch_product_group,droga_pharma.droga_price_discount_per_branch_group,model_droga_price_discount_per_branch_group,base.group_user,1,1,1,1

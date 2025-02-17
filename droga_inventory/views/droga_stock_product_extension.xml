@@ -28,7 +28,7 @@
                     attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app"
                     string="Reject"/>
                 </header>
-                <button string="Print Labels" type="object" name="action_open_label_layout" class="btn-primary"/>
+                <button string="Print Labels" type="object" name="action_open_label_layout" class="oe_highlight"/>
             </xpath>
 
 

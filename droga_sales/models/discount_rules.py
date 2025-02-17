@@ -67,7 +67,6 @@ class droga_price_discount_per_product_customer(models.Model):
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active',
                               tracking=True)
 
-
 class sale_order_line(models.Model):
     _inherit = 'sale.order.line'
 
@@ -212,20 +211,26 @@ class sale_order_line(models.Model):
 
     def _get_pharma_price_with_discount(self,line):
         line.disc_applied = 0
+        rate=1
         cont_prices = self.env["droga.pharma.price.list"].search([('product', '=', line.product_id.product_tmpl_id.id),
                                                                   ('header.customer', '=', line.order_id.partner_id.id),
                                                                   ('header.date_from', '<', datetime.today()),
                                                                   ('header.date_to', '>', datetime.today()),
                                                                   ('header.status', '=', 'Active')])
+        discount_per_branch_group = self.env['droga.price.discount.per.branch.group'].search(
+            [('status', '=', 'Active'), ('prod_grp', '=', line.product_id.product_tmpl_id.pharmacy_group_id.id),
+             ('branch', '=', line.order_id.wareh.id)])
+        for disc in discount_per_branch_group:
+            rate = 1 + (disc.percent / 100)
+
         if len(cont_prices) > 0:
             line.order_id.points_to_deduct=0
             return cont_prices[0]["selling_price"]
         elif line.order_id.partner_id.is_company:
             line.order_id.points_to_deduct = 0
-            return line.product_id.list_price_phar
+            return line.product_id.list_price_phar*rate
         else:
             #Accumulated points discount
-            rate = 1
             discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Purchase reward','Discount for loyal customer')),('status','=','Active')])
             for disc in discount_per_acc:
                 if len(line.order_id.ids)>0:
@@ -268,6 +273,7 @@ class sale_order_line(models.Model):
                     line.order_id.points_to_deduct = 1
                     line.order_id.deduct_type = 'Discount for breast feed'
 
+
             if rate!=1:
                 return line.product_id.list_price_phar * rate
 
@@ -299,7 +305,7 @@ class sale_order_line(models.Model):
                  'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.product_uom_pharma_qty','order_id.total_disc_pharma')
     def _compute_price_unit(self):
         for line in self:
-            if line.order_id.state in ('sale', 'cancel', 'done', 'fia','dispense','done'):
+            if line.order_id.state in ('sale', 'cancel', 'done', 'fia','dispense','done') or line.is_downpayment:
                 return
             if line.order_from:
                 if line.order_from.startswith('PH'):
@@ -513,6 +519,8 @@ class sale_order_ext(models.Model):
     deduct_type=fields.Char('Type')
     deduct_descr=fields.Char(compute='_compute_desc')
     inv_number=fields.Char('Invoice Number')
+
+
     @api.depends('total_disc_pharma','deduct_type')
     def _compute_desc(self):
         for rec in self:
@@ -805,10 +813,17 @@ class sale_order_ext(models.Model):
                 lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                 self.env.ref("droga_sales.sales_price_change_admin").users.filtered(
                     lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
-            rec.final_approver = self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
-                self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
-                    lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+
+            if rec.order_type=='EX':
+                rec.final_approver = self.env.ref("droga_sales.sales_droga_export_approver").users.filtered(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_sales.sales_droga_export_approver").users.filtered(
+                        lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+            else:
+                rec.final_approver = self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
+                    lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_sales.sales_import_final_approve").users.filtered(
+                        lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             if rec.order_type == 'IM':
                 rec.operation_approver = self.env.ref("droga_sales.sales_import_approve_admin").users.filtered(
                     lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
@@ -904,7 +919,7 @@ class sale_order_ext(models.Model):
                     ln.wareh = ln.product_id.default_warehouse
 
             order_lines_nowareh = self.order_line.filtered(
-                lambda x: not x.wareh)
+                lambda x: not x.wareh and x.product_id.name!='Down payment' and x.product_id.id)
 
             if (len(order_lines_nowareh) > 0):
                 message = message + ('\n' if message else '') + "Warehouse must be filled for each order line."
@@ -988,6 +1003,8 @@ class sale_order_ext(models.Model):
         # Physiotheraphy order automatic confirmation
         if self.order_type == 'PT':
             self.action_confirm()
+        elif self.order_type=='EX':
+            self.state = 'fia'
         # Manual price and discounts routing to price change approver
         elif ((self.manual_price and len(self.order_line.filtered(
                 lambda x: x.std_unit_price > x.price_unit > 0)) > 0) or self.tender_origin_form_tender) and self.state == 'draft':

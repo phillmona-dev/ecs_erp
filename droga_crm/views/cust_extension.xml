@@ -145,7 +145,7 @@
                            domain="([('parent_id','=',city_name),('status','=','Active')])"></field>
 
                     <field name="mature_individually" groups="droga_crm.tin_admin"></field>
-
+                    <field name="show_percent"></field>
                 </group>
 
             </xpath>

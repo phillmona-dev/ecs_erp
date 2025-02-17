@@ -42,8 +42,9 @@ class droga_pharma_prod_ext(models.Model):
         res = super(droga_pharma_prod_ext, self).create(vals_list)
         if not vals_list['categ_id']:
             raise UserError("Product category is mandatory.")
-        if not vals_list['default_code']:
-            raise UserError("Default code can not be empty.")
+        if "default_code" in vals_list:
+            if not vals_list['default_code']:
+                raise UserError("Default code can not be empty.")
         return res
 
     @api.model

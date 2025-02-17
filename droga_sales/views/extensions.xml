@@ -69,11 +69,12 @@
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='payment_term_id']" position="replace">
-                <field name="payment_term_id" options="{'no_open':True,'no_create': True}" domain="[('used_under', 'in', ('BT','DR'))]"/>
+                <field name="company_id" invisible="1"></field>
+                <field name="payment_term_id" options="{'no_open':True,'no_create': True}" domain="[('used_under', 'in', ('BT','DR')),('company_id','=',company_id)]"/>
                 <field name="show_invoice_button" invisible="1"></field>
                 <field name="mature_amount" style="color:red"
                        attrs="{'invisible': [('show_invoice_button', '=', False)]}"></field>
-                <field name="order_type"
+                <field name="order_type" string="Order from"
                        attrs="{'invisible': [('company_id', '!=', 1)],'required': [('company_id', '=', 1)]}"></field>
                 <field name="sales_order_type"></field>
                 <field name="company_id" invisible="1"></field>
@@ -128,11 +129,11 @@
                         string="Confirm"/>
                 <button name="final_approval" type="object" class="btn-primary"
                         attrs="{'invisible': [('state', 'not in', ['fia'])]}"
-                        groups="droga_sales.sales_import_final_approve"
+                        groups="droga_sales.sales_import_final_approve,droga_sales.sales_droga_export_approver"
                         string="Confirm"/>
                 <button name="reject_order" type="object" class="oe_highlight btn-warning"
                         attrs="{'invisible': [('state', 'not in', ['price_request','req','fia'])]}"
-                        groups="droga_sales.sales_import_final_approve,droga_sales.sales_price_change_admin,droga_sales.sales_import_approve_admin,droga_sales.sales_wholesale_approve_admin"
+                        groups="droga_sales.sales_import_final_approve,droga_sales.sales_price_change_admin,droga_sales.sales_import_approve_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_droga_export_approver"
                         string="Reject"/>
             </xpath>
             <xpath expr="//form/header/button[@name='action_quotation_send']" position="attributes">
@@ -158,8 +159,7 @@
                 <field name="company_id" invisible="1"></field>
                 <field name="contract_num"
                        attrs="{'invisible': [('company_id', '!=', 2)],'required': [('company_id', '=', 2)]}"></field>
-                <field name="currency_id" options='{"no_create":True,"no_open":True}'
-                       attrs="{'invisible': [('company_id', '!=', 2)],'required': [('company_id', '=', 2)]}"></field>
+                <field name="currency_id" options='{"no_create":True,"no_open":True}' required="1"></field>
                 <field name="supporters" attrs="{'invisible': [('company_id', '!=', 1)]}" widget="many2many_tags"
                        string="Supporters"></field>
                 <field name="cust_id" widget="char" string="Cust ID" readonly="1"
@@ -292,8 +292,7 @@
             <menuitem
                     id="droga_sales_cons_return_menu"
                     name="Consignment return"
-                    action="droga_sales.droga_sales_consignment_receipt_action"
-                    sequence="2"/>
+                    action="droga_sales.droga_sales_consignment_receipt_action"/>
         </menuitem>
     </menuitem>
 </odoo>

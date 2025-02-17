@@ -278,6 +278,45 @@ class purchase_order(models.Model):
                     message = message + 'Product ' + line.product_id.default_code + ' has been updated with ' + \
                               new_items[0].default_code + ', '
 
+            sup_id=4
+
+            if res.company_id.id==1 and (res.request_type=='Local' or res.request_type=='Pharmacy'):
+                #Droga local
+                sup_id=4
+            elif res.company_id.id==1 and res.request_type=='Foregin':
+                # Droga Foregin
+                sup_id = 263
+            elif res.company_id.id == 2 and res.request_type == 'Local':
+                # EMA local
+                sup_id = 842
+            elif res.company_id.id == 2 and res.request_type == 'Foregin':
+                # EMA Foregin
+                sup_id = 843
+            elif res.company_id.id == 10 and res.request_type == 'Local':
+                # Somaliland local
+                sup_id = 871
+            elif res.company_id.id == 10 and res.request_type == 'Foregin':
+                # Somaliland Foregin
+                sup_id = 872
+            elif res.company_id.id == 22 and res.request_type == 'Local':
+                # Rwanda local
+                sup_id = 873
+            elif res.company_id.id == 22 and res.request_type == 'Foregin':
+                # Rwanda Foregin
+                sup_id = 874
+
+            recs=self.env['ir.property'].sudo().search([('name','=','property_stock_supplier'),('res_id', '=', 'res.partner,%s' % res.partner_id.id)])
+            if not recs:
+                self.env['ir.property'].sudo().create({
+                    'res_id': 'res.partner,'+str(res.partner_id.id),
+                    'name':'property_stock_supplier',
+                    'value':'stock.location,'+str(sup_id),
+                    'fields_id':6384,
+                    'type':'many2one'
+                })
+            else:
+                recs[0].sudo().write({'value': 'stock.location,'+str(sup_id)})
+
         if len(message) > 5:
             raise UserError(message)
 
@@ -286,6 +325,10 @@ class purchase_order(models.Model):
     @api.model
     def create(self, vals):
         # get sequence number for each company
+
+        if "picking_type_id" in vals:
+            if not self.env['stock.picking.type'].browse(vals['picking_type_id']).avail_po:
+                raise UserError('Please select either local or foreign purchase under \'Deliver To\' field.')
 
         company_id = vals.get('company_id', self.default_get(
             ['company_id'])['company_id'])

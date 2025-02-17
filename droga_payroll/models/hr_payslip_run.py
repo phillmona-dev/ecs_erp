@@ -10,7 +10,9 @@ class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 
     # add year and period
-    fiscal_year = fields.Many2one("account.fiscal.year", "Fiscal Year")
+    fiscal_year = fields.Many2one("account.fiscal.year", "Fiscal Year",
+                                  domain=lambda self: [
+                                      ('company_id', '=', self.env.context.get('allowed_company_ids', []))])
     period = fields.Many2one("account.fiscal.year.period", domain="[('fiscal_year_id', '=', fiscal_year)]")
     mail_server = fields.Char(compute="get_outgoing_email")
 

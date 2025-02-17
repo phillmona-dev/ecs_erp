@@ -296,6 +296,11 @@
                             name="Rewards for breast feeders"
                             action="droga_pharma_breast_cont_type_action"
                             sequence="15"/>
+                    <menuitem
+                            id="droga_pharma_discount_branch_group"
+                            name="Discount per branch and product group"
+                            action="droga_sales_discount_per_branch_group_action"
+                            sequence="16"/>
                 </menuitem>
             </menuitem>
 

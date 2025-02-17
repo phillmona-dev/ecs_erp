@@ -18,7 +18,15 @@ class PayrollMasterReports(models.Model):
     batch = fields.Many2one('hr.payslip.run', required=True)
     fileout = fields.Binary('File', readonly=True)
     cost_center = fields.Many2many("hr.department")
-    cost_center_analytic = fields.Many2many("account.analytic.account", domain=[('plan_id.name', '=', 'Cost Center')])
+    # cost_center_analytic = fields.Many2many("account.analytic.account", domain=[('plan_id.name', '=', 'Cost Center')])
+
+    cost_center_analytic = fields.Many2many(
+        "account.analytic.account",
+        domain=lambda self: [
+            ('plan_id.name', '=', 'Cost Center'),
+            ('company_id', 'in', self.env.context.get('allowed_company_ids', []))
+        ]
+    )
 
     def convert_to_word(self, num):
         num_strings = str(num)
@@ -371,10 +379,10 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 11, acting_sub_total, num_format_sub_total)
 
         sheet.write(row_start, 12, other_sub_total, num_format_sub_total)
-        sheet.write(row_start, 13, gross_sub_total, num_format_sub_total)
+        sheet.write(row_start, 13, parking_lunch_total, num_format_sub_total)
 
         sheet.write(row_start, 14, commission_sub_total, num_format_sub_total)
-        sheet.write(row_start, 15, parking_lunch_total, num_format_sub_total)
+        sheet.write(row_start, 15, gross_sub_total, num_format_sub_total)
 
         sheet.write(row_start, 16, taxable_sub_total, num_format_sub_total)
 
@@ -611,8 +619,9 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 8, 'SACO Share Purchase', title_format)
         sheet.write(row_start, 9, 'SACO Payment Deduction', title_format)
         sheet.write(row_start, 10, 'Cost Sharing', title_format)
-        sheet.write(row_start, 11, 'Others', title_format)
-        sheet.write(row_start, 12, 'Total', title_format)
+        sheet.write(row_start, 11, 'Sport Contribution', title_format)
+        sheet.write(row_start, 12, 'Others', title_format)
+        sheet.write(row_start, 13, 'Total', title_format)
         row_start += 1
 
         # search based on cost center
@@ -633,6 +642,7 @@ class PayrollMasterReports(models.Model):
         saco_additional_payment_total = 0
         saco_share_payment_total = 0
         cost_sharing_total = 0
+        sport_contribution_total = 0
         others_total = 0
 
         for record in slips:
@@ -651,6 +661,7 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 10, num, num_format)
             sheet.write(row_start, 11, num, num_format)
             sheet.write(row_start, 12, num, num_format)
+            sheet.write(row_start, 13, num, num_format)
 
             # load data
             # get payroll detail
@@ -691,6 +702,9 @@ class PayrollMasterReports(models.Model):
                 elif payslip_detail.code == 'COSTSHA':  # cost sharing
                     sheet.write(row_start, 10, payslip_detail.total, num_format)
                     cost_sharing_total += payslip_detail.total
+                elif payslip_detail.code == 'SPOCONT':  # sport contribution
+                    sheet.write(row_start, 11, payslip_detail.total, num_format)
+                    sport_contribution_total += payslip_detail.total
 
             row_start += 1
 
@@ -704,9 +718,11 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 7, saco_additional_payment_total, num_format_sub_total)
         sheet.write(row_start, 8, saco_share_payment_total, num_format_sub_total)
         sheet.write(row_start, 9, saco_loan_payment_total, num_format_sub_total)
+
         sheet.write(row_start, 10, cost_sharing_total, num_format_sub_total)
-        sheet.write(row_start, 11, 0, num_format_sub_total)
+        sheet.write(row_start, 11, sport_contribution_total, num_format_sub_total)
         sheet.write(row_start, 12, 0, num_format_sub_total)
+        sheet.write(row_start, 13, 0, num_format_sub_total)
 
     # get employee mobile card excel
     def mobile_card_report(self, workbook):
@@ -743,7 +759,9 @@ class PayrollMasterReports(models.Model):
         row_start += 1
 
         # get employee list who have a benefit for mobile card
-        mobile_cards = self.env['hr.payroll.payment.deduction'].search([('input_types.code', '=', 'MOBCAR')])
+        mobile_cards = self.env['hr.payroll.payment.deduction'].search(
+            [('input_types.code', '=', 'MOBCAR'),
+             ('company_id', 'in', self.batch.slip_ids.company_id.ids)])
 
         no = 1  # counter
         for mobile_card in mobile_cards:
@@ -800,11 +818,13 @@ class PayrollMasterReports(models.Model):
         row_start += 1
 
         # get employee list who have a benefit for fuel
-        fules = self.env['hr.payroll.payment.deduction'].search([('input_types.code', '=', 'FUEL')])
+        fules = self.env['hr.payroll.payment.deduction'].search(
+            [('input_types.code', '=', 'FUEL'), ('company_id', 'in', self.batch.slip_ids.company_id.ids)])
 
         # get fuel rate
         fuel_rates = self.env['hr.payroll.rate'].search(
-            [('code', '=', 'FUEL'), ('date_to', '>=', datetime.datetime.now())])
+            [('code', '=', 'FUEL'), ('date_to', '>=', datetime.datetime.now()),
+             ('company_id', 'in', self.batch.slip_ids.company_id.ids)])
 
         rate = 0
         for fuel_rate in fuel_rates:
@@ -980,11 +1000,12 @@ class PayrollMasterReports(models.Model):
         current_period_employees = self.batch
 
         # get previous period employee list
-        previous_period_employees = self.env['hr.payslip.run'].search([('period', '=', previous_period.id)])
+        if hasattr(previous_period, 'id'):
+            previous_period_employees = self.env['hr.payslip.run'].search([('period', '=', previous_period.id)])
 
-        # add employee list from previous period
-        for record in previous_period_employees.slip_ids.employee_id:
-            unique_employee_list.append(record.id)
+            # add employee list from previous period
+            for record in previous_period_employees.slip_ids.employee_id:
+                unique_employee_list.append(record.id)
 
         for record in current_period_employees.slip_ids.employee_id:
             if record.id not in unique_employee_list:
@@ -994,10 +1015,11 @@ class PayrollMasterReports(models.Model):
 
     def get_net_pay_amount(self, period, emp_id):
         net_wage = 0
-        batch = self.env['hr.payslip.run'].search([('period', '=', period.id)])
+        if (hasattr(period, 'id')):
+            batch = self.env['hr.payslip.run'].search([('period', '=', period.id)])
 
-        for slips in batch.slip_ids:
-            if slips.employee_id.id == emp_id:
-                net_wage += slips.net_wage
+            for slips in batch.slip_ids:
+                if slips.employee_id.id == emp_id:
+                    net_wage += slips.net_wage
 
         return net_wage

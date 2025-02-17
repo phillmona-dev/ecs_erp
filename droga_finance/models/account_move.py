@@ -113,7 +113,7 @@ class AccountMove(models.Model):
     def _get_sales_info(self):
         self.sales_initiator = ''
         for record in self:
-            if record.move_type == 'out_invoice':
+            if record.move_type == 'out_invoice' or record.move_type=='in_invoice':
                 # get customer category
                 record.customer_category = 'Others'
                 record.cost_center = "Others"

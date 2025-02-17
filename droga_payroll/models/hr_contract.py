@@ -2,6 +2,7 @@ import datetime
 
 from odoo import models, fields, api
 from datetime import date
+from odoo.exceptions import ValidationError
 
 
 class HrContract(models.Model):
@@ -90,3 +91,10 @@ class HrContract(models.Model):
             rate = variable_payment.rate
 
         return rate
+
+    #@api.onchange('analytic_account_id')
+    #def _on_analytic_id_changed(self):
+        #for record in self:
+            #if record.analytic_account_id.plan_id.name != 'Cost Center' and record.analytic_account_id.plan_id.name != ' ':
+                #record.analytic_account_id = ''
+                #raise ValidationError('Please select a cost center')

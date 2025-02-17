@@ -42,6 +42,7 @@
         'views/rewards/droga_pharma_referral_gain_settings.xml',
         'views/rewards/droga_pharma_higher_value_settings.xml',
         'views/rewards/droga_pharma_breast_feed_cont_type.xml',
+        'views/rewards/discount_per_branch_group.xml',
         'views/selection_settings/current_status.xml',
         'views/selection_settings/drug_theraphy_problems.xml',
         'views/selection_settings/drug_theraphy_cause.xml',

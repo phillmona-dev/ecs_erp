@@ -11,6 +11,8 @@ class drogaProject(models.Model):
         ('wh_type', '=', 'PR')])
     project_forman = fields.Many2one('res.users',tracking=True)
     project_engineer = fields.Many2one('res.users',tracking=True)
+    contractors=fields.Many2many('droga.project.contractors',string='Contractors')
+    consultants = fields.Many2many('droga.project.consultant',string='Consultants')
 
     def _project_progress(self):
         for record in self:

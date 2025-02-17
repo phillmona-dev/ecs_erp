@@ -22,7 +22,7 @@ class droga_stock_move_line_extension(models.Model):
                                        required=True, compute="_compute_location_id", store=True, readonly=False,
                                        precompute=True)
     source_wh_type = fields.Selection([
-        ('IM', 'Import'),
+        ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'), ('PT', 'Physiotherapy'),
         ('PH', 'Pharmacy'), ('PR', 'Project')], compute='_get_source_type',store=True)
 
@@ -157,7 +157,7 @@ class droga_warehouse_extension(models.Model):
                                 search='_search_has_no_access')
     has_dispensary_location = fields.Boolean("Has dispensary location")
     wh_type=fields.Selection([
-        ('IM','Import'),
+        ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.')
 
@@ -300,7 +300,7 @@ class droga_stock_picking_type_extension(models.Model):
 
     request_type = fields.Selection(
         [("Local", "Local"), ("Foregin", "Foregin"), ("Pharmacy", "Pharmacy")], default="Local")
-
+    avail_po=fields.Boolean('Purchase order delivery type',default=False)
     #Overridden to add domain to picking type openings
     def _get_action(self, action_xmlid):
         action = self.env["ir.actions.actions"]._for_xml_id(action_xmlid)
@@ -454,7 +454,7 @@ class droga_stock_move_extension(models.Model):
     reserve_indef=fields.Boolean('Reserve indefinitely',default=False,tracking=True)
     source_wh=fields.Char(related='location_id.warehouse_id.name')
     source_wh_type = fields.Selection([
-        ('IM','Import'),
+        ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
@@ -1097,12 +1097,13 @@ class droga_stock_product_extension(models.Model):
         if not self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and not self.env.user.has_group('droga_inventory.inv_prod_sc_manager') and not self.env.user.has_group('droga_inventory.inv_prod_os_manager') and not self.env.user.has_group('droga_inventory.inv_prod_ex_manager'):
             raise UserError("You can not create a product. Please contact your supervisor.")
         #If user has access to MI group, automatically assign ID
-        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self.env.company.id==1:
+        if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self.env.company.id==1 and res.pharmacy_group_id:
             res.default_code=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             vals_list['default_code']=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             res.pharmacy_group_id.write({'id_counter': res.pharmacy_group_id.id_counter+1})
-        if not vals_list['default_code']:
-            raise UserError("Default code can not be empty.")
+        if "default_code" in vals_list:
+            if not vals_list['default_code']:
+                raise UserError("Default code can not be empty.")
         if res.company_id.id==2:
             res.order_type='ALL'
         if res.reg_status=='draft' and not res.categ_id.name.startswith('Office') and not res.categ_id.name.startswith('Fixed') and res.company_id.id==1 and not res.from_pharma:

@@ -273,4 +273,5 @@
             action="droga_sales_discount_per_prod_cust_action"
             parent="sale.menu_sales_config"
             sequence="20"/>
+
 </odoo>

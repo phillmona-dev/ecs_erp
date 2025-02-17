@@ -30,6 +30,7 @@
         'views/droga_contractor.xml',
         'views/droga_store_issue.xml',
         'views/analytic_inherit.xml',
+        'views/droga_consultant.xml',
         'report/tasks.xml',
         'report/projects.xml',
         'report/droga_project_list.xml'

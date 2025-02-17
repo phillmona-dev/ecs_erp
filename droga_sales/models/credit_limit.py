@@ -83,8 +83,8 @@ class cust_sales_credit_limit(models.Model):
         pass
 
     order_type = fields.Selection([
-        ('IM', 'Import'),
-        ('WS', 'Wholesale')], string='Order type')
+        ('IM', 'Import'),('EX','Export'),
+        ('WS', 'Wholesale')], string='Order from')
     order_from = fields.Char('Order from')
 
     @api.depends('payment_term_id')
@@ -283,7 +283,7 @@ class cust_sales_no_create_after_invoice(models.Model):
     batch_html = fields.Html('Batch No', compute='_get_expiry', default='')
 
     order_type = fields.Selection([
-        ('IM', 'Import'),
+        ('IM', 'Import'),('EX','Export'),
         ('WS', 'Wholesale')], string='Order type', related='order_id.order_type')
     import_quant_invoiced=fields.Float('Invoiced quantity', compute='_get_on_hand', store=True)
 

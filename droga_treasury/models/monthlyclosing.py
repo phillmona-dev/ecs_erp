@@ -10,18 +10,18 @@ class DrogaMonthlyclose(models.Model):
     _name = 'droga.monthly.close'
     _description = ''
 
-    closing_day = fields.Date(string='Closing Day',readonly=True)
-    starting_day= fields.Date(string='Starting Day',readonly=True)
-    et_year=fields.Integer(string="Ethiopian Year",readonly=True) 
-    Principal_payment=fields.Float(string='Principal Payment',readonly=True)
-    Interest_payment=fields.Float(string='Interest Payment',readonly=True)
-    interest=fields.Float(string='Interest',readonly=True)
-    penality=fields.Float(string='Penalty',readonly=True)
-    recipt=fields.Float  (string='Recipt',readonly=True)
-   # end_day=fields.Date("Closing Day",compute="_compute_start_field")  
+    closing_day = fields.Date(string='Closing Day',readonly=False)
+    starting_day= fields.Date(string='Starting Day',readonly=False)
+    et_year=fields.Integer(string="Ethiopian Year",readonly=False)
+    Principal_payment=fields.Float(string='Principal Payment',readonly=False)
+    Interest_payment=fields.Float(string='Interest Payment',readonly=False)
+    interest=fields.Float(string='Interest',readonly=False)
+    penality=fields.Float(string='Penalty',readonly=False)
+    recipt=fields.Float  (string='Recipt',readonly=False)
+   # end_day=fields.Date("Closing Day",compute="_compute_start_field")
     post=fields.Many2one(string='Account Move',comodel_name='account.move')
    
-    name= fields.Char(string="Month",readonly=True)
+    name= fields.Char(string="Month",readonly=False)
     acount_monthly_closing_id = fields.Many2one(comodel_name='account.loan', string="Bank") 
     _sql_constraints = [ ('unique_closing', 'unique(et_year, name,acount_monthly_closing_id)', 'Cannot Use one tr')	]
     
