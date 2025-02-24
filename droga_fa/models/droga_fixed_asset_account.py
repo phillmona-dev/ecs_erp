@@ -38,6 +38,18 @@ class AccountAsset(models.Model):
             else:
                 raise ValidationError("Asset code is already generated")
 
+    def button_update_analytic(self):
+        self.ensure_one()
+        # Get analytic id
+        new_analytic_id = self.analytic_distribution
+
+        # Update draft depreciation moves
+        draft_lines = self.depreciation_move_ids
+        for line in draft_lines:
+            for move_line in line.line_ids:
+                if move_line.account_id != self.account_depreciation_id: #check if account is  expense account
+                    move_line.write({'analytic_distribution': new_analytic_id})
+
     @api.constrains('asset_number')
     def _check_asset_no_unique(self):
         counts = self.search_count(

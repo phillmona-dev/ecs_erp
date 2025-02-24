@@ -27,6 +27,11 @@
                 <button type="object" name="generate_asset_id" string="Get Asset Code"
                         attrs="{'invisible': [('asset_number', '=', True)]}"/>
             </xpath>
+
+             <xpath expr="//button[@name='set_to_cancelled']" position="after">
+                <button type="object" name="button_update_analytic" string="Update Analytics"
+                    groups="droga_finance.account_chief_finance_officer_group"    />
+            </xpath>
         </field>
     </record>
 

@@ -15,6 +15,10 @@
                 <button type="object" name="generate_withholding_ref" string="Withholding Ref"
                         attrs="{'invisible': ['|',('move_type', '!=', 'out_invoice'),('withholding_internal_ref', '=', True)]}"
                         groups="droga_finance.account_recivables_senior_accountant_group,droga_finance.account_recivables_accountant_group"/>
+
+                <button type="object" name="update_accounting_date" string="Update Accounting Date"
+
+                        groups="droga_finance.account_chief_finance_officer_group" />
             </xpath>
 
             <xpath expr="//field[@name='ref']" position="attributes">
