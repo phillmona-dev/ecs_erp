@@ -592,7 +592,7 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 11, 'Cost Sharing', title_format)
         sheet.write(row_start, 12, 'Sport Contribution', title_format)
         sheet.write(row_start, 13, 'Others', title_format)
-        sheet.write(row_start, 14, 'Total', title_format)
+        # sheet.write(row_start, 14, 'Total', title_format)
 
         row_start += 1
 
@@ -666,6 +666,7 @@ class PayrollMasterReports(models.Model):
                     totals['saco_additional_payment'] += payslip_detail.total
                 elif payslip_detail.code == 'EDIR':  # Edir
                     deductions['edir'] = payslip_detail.total
+                    totals['edir'] += payslip_detail.total
                 elif payslip_detail.code == 'EDIRR':  # Edir Registration
                     deductions['edir_registration'] = payslip_detail.total
                     totals['edir_registration'] += payslip_detail.total
