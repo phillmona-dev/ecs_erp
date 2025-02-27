@@ -615,6 +615,7 @@ class PayrollMasterReports(models.Model):
             'saco_registration': 0,
             'saco_additional_payment': 0,
             'edir': 0,
+            'edir_registration': 0,
             'saco_share_payment': 0,
             'cost_sharing': 0,
             'sport_contribution': 0,
@@ -635,6 +636,7 @@ class PayrollMasterReports(models.Model):
                 'saco_saving': 0,
                 'saco_additional_payment': 0,
                 'edir': 0,
+                'edir_registration': 0,
                 'saco_share_payment': 0,
                 'saco_loan_payment': 0,
                 'cost_sharing': 0,
@@ -662,9 +664,11 @@ class PayrollMasterReports(models.Model):
                 elif payslip_detail.code == 'SACOSAVAD':  # saco additional payment
                     deductions['saco_additional_payment'] = payslip_detail.total
                     totals['saco_additional_payment'] += payslip_detail.total
-                elif payslip_detail.code == 'EDIR' or payslip_detail.code == 'EDIRR':  # Edir
+                elif payslip_detail.code == 'EDIR':  # Edir
                     deductions['edir'] = payslip_detail.total
-                    totals['edir'] += payslip_detail.total
+                elif payslip_detail.code == 'EDIRR':  # Edir Registration
+                    deductions['edir_registration'] = payslip_detail.total
+                    totals['edir_registration'] += payslip_detail.total
                 elif payslip_detail.code == 'SACOSHA':  # saco share payment
                     deductions['saco_share_payment'] = payslip_detail.total
                     totals['saco_share_payment'] += payslip_detail.total
@@ -685,7 +689,7 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 5, deductions['saco_registration'], num_format)
             sheet.write(row_start, 6, deductions['saco_saving'], num_format)
             sheet.write(row_start, 7, deductions['saco_additional_payment'], num_format)
-            sheet.write(row_start, 8, deductions['edir'], num_format)
+            sheet.write(row_start, 8, deductions['edir'] + deductions['edir_registration'], num_format)
             sheet.write(row_start, 9, deductions['saco_share_payment'], num_format)
             sheet.write(row_start, 10, deductions['saco_loan_payment'], num_format)
             sheet.write(row_start, 11, deductions['cost_sharing'], num_format)
@@ -701,7 +705,7 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 5, totals['saco_registration'], num_format_sub_total)
         sheet.write(row_start, 6, totals['saco_saving'], num_format_sub_total)
         sheet.write(row_start, 7, totals['saco_additional_payment'], num_format_sub_total)
-        sheet.write(row_start, 8, totals['edir'], num_format_sub_total)
+        sheet.write(row_start, 8, totals['edir'] + totals['edir_registration'], num_format_sub_total)
         sheet.write(row_start, 9, totals['saco_share_payment'], num_format_sub_total)
         sheet.write(row_start, 10, totals['saco_loan_payment'], num_format_sub_total)
         sheet.write(row_start, 11, totals['cost_sharing'], num_format_sub_total)
