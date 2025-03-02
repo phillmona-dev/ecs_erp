@@ -425,11 +425,17 @@ class val_layer(models.Model):
                 #    mv.write({'date':datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())})
 
         if ret.origin:
-            if ret.origin.startswith('SOD'):
+            if ret.origin.startswith('SO'):
                 acc_move = self.env['account.move'].search([('invoice_origin', '=', ret.origin)])
                 for mv in acc_move:
                     mv.sales_cost = abs(
                         sum(self.env['stock.valuation.layer'].search([('origin', '=', ret.origin)]).mapped('value')))
+                    mvl=self.env['account.move.line'].search([('move_id', '=', mv.id)])
+                    for mvld in mvl:
+                        moves = self.env['stock.valuation.layer'].search(
+                            [('product_id', '=', mvld.product_id.id), ('origin', '=', mvld.move_id.invoice_origin)])
+                        mvld.sales_cost = mvld.quantity * abs(sum(moves.mapped('value'))) / abs(
+                        sum(moves.mapped('quantity'))) if abs(sum(moves.mapped('quantity')))>0 else 0
         return ret
 
 class droga_inv_account_move(models.Model):
