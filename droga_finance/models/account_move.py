@@ -113,7 +113,7 @@ class AccountMove(models.Model):
     def _get_sales_info(self):
         self.sales_initiator = ''
         for record in self:
-            if record.move_type == 'out_invoice' or record.move_type=='in_invoice':
+            if record.move_type == 'out_invoice' or record.move_type == 'in_invoice':
                 # get customer category
                 record.customer_category = 'Others'
                 record.cost_center = "Others"
@@ -143,6 +143,27 @@ class AccountMove(models.Model):
                                     record.sales_channel = analytic_plan.display_name
                         break
 
+                if record.cost_center == "Others" and record.stock_move_id:
+                    record.cost_center = record.stock_move_id.trans_warehouse.linked_analytic.display_name
+
+    def _get_sales_info_update(self):
+        self.sales_initiator = ''
+        moves = self.env['account.move'].search([('move_type', '=', 'in_invoice')])
+        for record in moves:
+            if record.move_type == 'in_invoice':
+                # get customer category
+                record.cost_center = "Others"
+                for o in record.invoice_line_ids:
+                    if o.analytic_distribution:
+                        analytic_distributions = o.analytic_distribution
+                        for analytic_distribution_id in analytic_distributions:
+                            # search analytic definition table
+                            analytic_plans = self.env['account.analytic.account'].search(
+                                [('id', '=', analytic_distribution_id)])
+                            for analytic_plan in analytic_plans:
+                                if analytic_plan.plan_id.complete_name == 'Cost Center':
+                                    record.cost_center = analytic_plan.display_name
+                        break
                 if record.cost_center == "Others" and record.stock_move_id:
                     record.cost_center = record.stock_move_id.trans_warehouse.linked_analytic.display_name
 
@@ -363,6 +384,13 @@ WHERE account_move.id = limited_updates.am_id;
         # Commit the transaction to ensure the data is saved
         self.env.cr.commit()
 
+    def update_accounting_date(self):
+        self.ensure_one()
+
+        for record in self:
+            record.write({'date': record.invoice_date})
+
+
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
@@ -410,6 +438,7 @@ class AccountMoveLine(models.Model):
         # Commit the transaction to ensure the data is saved
         self.env.cr.commit()
 
+
 # CRV document tracking
 class AccountCrv(models.Model):
     _name = 'account.move.crv'
@@ -441,6 +470,7 @@ class AccountCrv(models.Model):
     def unlink(self):
         raise ValidationError(
             "You can't delete CRV Record")
+
 
 class AccountWithholding(models.Model):
     _name = 'account.move.withholding'
