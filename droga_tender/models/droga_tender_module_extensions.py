@@ -23,7 +23,7 @@ class accoumt_move(models.Model):
     def create(self, vals):
         res=super(accoumt_move, self).create(vals)
         if res.invoice_origin:
-            if res.invoice_origin.startswith('SOD'):
+            if res.invoice_origin.startswith('SO'):
                 tenders=self.env['sale.order'].search([('name','=',res.invoice_origin)]).tender_origin_form_tender
                 for tend in tenders:
                     tend.write({'latest_invoice_date': datetime.today()})

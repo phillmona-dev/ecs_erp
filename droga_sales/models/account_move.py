@@ -245,7 +245,7 @@ class account_move(models.Model):
     def create(self, vals):
         res = super(account_move, self).create(vals)
         if res.invoice_origin:
-            if res.invoice_origin.startswith('SOD'):
+            if res.invoice_origin.startswith('SO'):
                 res.sales_cost = abs(
                         sum(self.env['stock.valuation.layer'].search([('origin', '=', res.invoice_origin)]).mapped('value')))
         return res
@@ -461,11 +461,18 @@ class account_move_line(models.Model):
     account = fields.Char(related='account_id.code', store=True)
     origin_ref = fields.Char(compute="get_origin_ref", string="Origin reference", store=True)
     profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True,default='-')
+    sales_cost = fields.Float('Sales Cost', store=True)
 
     @api.model
     def create(self, vals):
         ret= super(account_move_line, self).create(vals)
         for rec in ret:
+
+            if rec.move_id.invoice_origin:
+                if rec.move_id.invoice_origin.startswith('SO'):
+                    moves=self.env['stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
+                    rec.sales_cost = rec.quantity* abs(sum(moves.mapped('value')))/abs(sum(moves.mapped('quantity'))) if abs(sum(moves.mapped('quantity')))>0 else 0
+
             if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
                 if rec.account.startswith('5'):
                     analytic=self.env['stock.move.line'].search([('move_id','=',rec.move_id.stock_move_id.id)])
@@ -505,3 +512,11 @@ class account_move_line(models.Model):
     @api.onchange('analytic_distribution')
     def analytic_distribution(self):
         ValidationError("Hello")
+
+class AccountInvoiceReportSalesCost(models.Model):
+    _inherit = 'account.invoice.report'
+
+    sales_cost = fields.Float(string="Sales Cost")
+
+    def _select(self):
+        return super()._select() + ", line.sales_cost as sales_cost"

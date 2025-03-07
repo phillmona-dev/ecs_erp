@@ -34,18 +34,31 @@ export class PosFormController extends FormController {
 
     PrintToPos() {
 
+    // Get the print button
+    let printButton = document.getElementById("btnPosPrint"); // Replace with your actual button ID
+
+
+    //console.log(printButton);
+
+    if (printButton) {
+    printButton.disabled = true; // Disable the button
+}
+
         //get sales order id
          var invoice_origin=this.model.root.data.invoice_origin;
 
         console.log(this.model.root.data);
         if (this.model.root.data.pos_device_ip_address === "") {
             Dialog.alert(this, _t("The POS device IP address is not set for the current user, please contact the system administrator to set it."));
+            printButton.disabled = false;
             return;
         } else if (this.model.root.data.is_invoice_printed_pos === true) {
             Dialog.alert(this, _t("The current invoice has already been printed!"));
+            printButton.disabled = false;
             return;
         } else if (this.model.root.data.state !== "posted") {
             Dialog.alert(this, _t("Please confirm the invoice before you send it to the POS printer."));
+            printButton.disabled = false;
             return;
         }
 
@@ -178,12 +191,14 @@ export class PosFormController extends FormController {
 
                 } else {
                     Dialog.alert(this, _t(data.ShortMessage));
+                    printButton.disabled = false;
                 }
             })
             .catch((error) => {
                 //unblock UI
                 console.log(error);
                 framework.unblockUI();
+                printButton.disabled = false;
                 Dialog.alert(this, _t("Error"));
             });
     }
