@@ -147,7 +147,7 @@
                             </div>
                             <field name="week_1_domain" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
@@ -168,7 +168,7 @@
                                 </tree>
                                 <form string="Week 1">
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
@@ -185,7 +185,7 @@
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile" limit="500">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
 
@@ -237,7 +237,7 @@
                             </div>
                             <field name="week_2_domain" mode="kanban,tree">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
@@ -258,7 +258,7 @@
                                 </tree>
                                 <form string="Week 1">
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
@@ -275,7 +275,7 @@
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile" limit="500">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
 
@@ -327,7 +327,7 @@
                             </div>
                             <field name="week_3_domain" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
@@ -348,7 +348,7 @@
                                 </tree>
                                 <form string="Week 1">
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
@@ -365,7 +365,7 @@
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile" limit="500">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
 
@@ -417,7 +417,7 @@
                             </div>
                             <field name="week_4_domain" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
@@ -438,7 +438,7 @@
                                 </tree>
                                 <form string="Week 1">
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
@@ -455,7 +455,7 @@
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile" limit="500">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
 
@@ -508,7 +508,7 @@
                             </div>
                             <field name="week_5_domain" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
@@ -529,7 +529,7 @@
                                 </tree>
                                 <form string="Week 1">
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
@@ -546,7 +546,7 @@
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile" limit="500">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
 
@@ -593,7 +593,7 @@
                         <page string="All weeks">
                             <field name="plan_detail" mode="tree,kanban">
                                 <tree editable="top" delete="1" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
@@ -614,7 +614,7 @@
                                 </tree>
                                 <form string="All weeks">
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                         <field name="visit_date"></field>
                                         <field name="planned_visit_selection"></field>
@@ -631,7 +631,7 @@
                                     </group>
                                 </form>
                                 <kanban class="o_kanban_mobile" limit="500">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}"
+                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
 

@@ -146,6 +146,7 @@
     <record model="ir.actions.act_window" id="crm.crm_lead_action_pipeline">
         <field name="domain">[('is_record_owner','=',True)]</field>
         <field name="context">{'search_default_activities_today': 1}</field>
+        <field name="view_mode">tree,graph,pivot,form,calendar,activity</field>
     </record>
     <!-- Leads menu rename -->
     <record model="ir.ui.menu" id="crm.crm_menu_leads">
