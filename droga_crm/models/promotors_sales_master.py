@@ -12,6 +12,7 @@ class droga_promotors_sales_master(models.Model):
     p_id = fields.Char('Promotor/Sales ID',default='12345', required=True,tracking=True)
     p_regions =fields.Many2many('droga.crm.settings.city', required=True)
     p_groups=fields.Many2many('droga.crm.settings.prod_group',required=True)
+    supervisor = fields.Many2one('droga.pro.sales.master',string='Supervisor', required=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],
                             required=True,default='Active')
     is_pm=fields.Boolean('Is PM',default=False)
