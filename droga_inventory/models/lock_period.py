@@ -10,7 +10,7 @@ class LockPeriod(models.Model):
 
     _inherit = 'mail.thread'
     _name = 'droga.inv.lock_period'
-
+    company_id=fields.Many2one('res.company',string='Company ID')
     name = fields.Char(
         string='Name',
         help="Give a name to the lock")
@@ -47,15 +47,16 @@ class StockMove(models.Model):
 
     _inherit = 'stock.move'
 
-    #@api.constrains('date_expected', 'state')
+    @api.constrains('date_expected', 'state')
     def check_date_expected(self):
         lock_period_obj = self.env[
             'droga.inv.lock_period']
         uid = self.env.user.id
         for rec in self:
             date_expected = rec.mapped('date')[0]
+            cid = rec.mapped('company_id')[0]
             all_lock_period = lock_period_obj.search([
-                ('date_start', '<=', date_expected),
+                ('date_start', '<=', date_expected),('company_id','=',cid.id),
                 ('date_end', '>=', date_expected)])
 
             for lock_period in all_lock_period:
@@ -76,8 +77,9 @@ class SalesOrder(models.Model):
         uid = self.env.user.id
         for rec in self:
             date_expected = rec.mapped('date_order')[0]
+            cid = rec.mapped('company_id')[0]
             all_lock_period = lock_period_obj.search([
-                ('date_start', '<=', date_expected),
+                ('date_start', '<=', date_expected),('company_id','=',cid.id),
                 ('date_end', '>=', date_expected)])
 
             for lock_period in all_lock_period:
@@ -98,8 +100,9 @@ class PurchaseOrder(models.Model):
         uid = self.env.user.id
         for rec in self:
             date_expected = rec.mapped('date_order')[0]
+            cid = rec.mapped('company_id')[0]
             all_lock_period = lock_period_obj.search([
-                ('date_start', '<=', date_expected),
+                ('date_start', '<=', date_expected),('company_id','=',cid.id),
                 ('date_end', '>=', date_expected)])
 
             for lock_period in all_lock_period:
