@@ -63,7 +63,7 @@ class PaymentReport(models.Model):
 
                                 select row_number()over() as id,x.partner_id,x.payment_type,x.category,x.division,x.sales_channel,x.invoice_no,x.sales_type,
 x.sales_initiator,x.invoice_date_due,x.paid_date,x.total_amount,x.paid_amount,x.settled_amount,x.due_days,x.paid_passed_days,x.company_id  from(
-select ap.partner_id,'Customer' as payment_type,category,division,sales_channel,am."name" as invoice_no,am.sales_type,am.sales_initiator,
+select ap.partner_id,'Customer' as payment_type,ap.category,ap.division,ap.sales_channel,am."name" as invoice_no,am.sales_type,am.sales_initiator,
 am.invoice_date_due,apr.max_date as paid_date,
 am.amount_total_signed as total_amount,ap.amount  as paid_amount,apr.amount as settled_amount,
 (apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days,ap.id as payment_id,am.id as move_id,am.company_id 
@@ -75,7 +75,7 @@ where aml.display_type ='payment_term' and ap.payment_type='inbound' and am.stat
 
 union 
 
-select ap.partner_id,'Vendor' as payment_type,category,division,sales_channel,am."name" as invoice_no,am.sales_type,am.sales_initiator,
+select ap.partner_id,'Vendor' as payment_type,ap.category,ap.division,ap.sales_channel,am."name" as invoice_no,am.sales_type,am.sales_initiator,
 am.invoice_date_due,apr.max_date as paid_date,
 abs(am.amount_total_signed) as total_amount,ap.amount  as paid_amount,apr.amount as settled_amount,
 (apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days,ap.id as payment_id,am.id as move_id,am.company_id 
