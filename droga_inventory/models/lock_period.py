@@ -45,15 +45,15 @@ class LockPeriod(models.Model):
 class StockMove(models.Model):
     """."""
 
-    _inherit = 'stock.move'
+    _inherit = 'stock.picking'
 
-    #@api.constrains('date_expected', 'state')
+    @api.constrains('scheduled_date', 'state')
     def check_date_expected(self):
         lock_period_obj = self.env[
             'droga.inv.lock_period']
         uid = self.env.user.id
         for rec in self:
-            date_expected = rec.mapped('date')[0]
+            date_expected = rec.mapped('scheduled_date')[0]
             cid = rec.mapped('company_id')[0]
             all_lock_period = lock_period_obj.search([
                 ('date_start', '<=', date_expected),('company_id','=',cid.id),
