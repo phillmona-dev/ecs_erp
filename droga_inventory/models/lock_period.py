@@ -47,7 +47,7 @@ class StockMove(models.Model):
 
     _inherit = 'stock.move'
 
-    @api.constrains('date_expected', 'state')
+    #@api.constrains('date_expected', 'state')
     def check_date_expected(self):
         lock_period_obj = self.env[
             'droga.inv.lock_period']
