@@ -29,6 +29,26 @@ class AccountPayment(models.Model):
 
     @api.model
     def create(self, vals):
+        # get divison and sales channel
+
+        # search account move
+        ref = vals.get('ref')  # Safely get 'ref' to avoid KeyError
+        if ref:
+            account_move = self.env["account.move"].sudo().search([('name', '=', ref)])
+            for o in account_move.invoice_line_ids:
+                if o.analytic_distribution:
+                    analytic_distributions = o.analytic_distribution
+                    for analytic_distribution_id in analytic_distributions:
+                        # search analytic definition table
+                        analytic_plans = self.env['account.analytic.account'].search(
+                            [('id', '=', analytic_distribution_id)])
+                        for analytic_plan in analytic_plans:
+                            if analytic_plan.plan_id.complete_name == 'Profit / Cost Center':
+                                vals.update({'division': analytic_plan.display_name})
+                            elif analytic_plan.plan_id.complete_name == 'Sales Channel':
+                                vals.update({'sales_channel': analytic_plan.display_name})
+                    break
+
         res = super(AccountPayment, self).create(vals)
         # enable when manual transaction number stops
         self.generate_transaction_type(res)
@@ -152,7 +172,7 @@ class AccountPayment(models.Model):
 
     def update_sale_info(self):
 
-        payments = self.env['account.payment'].search([])
+        payments = self.env['account.payment'].search([('division', '=', False), ('payment_type', '=', 'inbound')])
 
         for record in payments:
             record.category = ""
