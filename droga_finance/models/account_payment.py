@@ -23,8 +23,32 @@ class AccountPayment(models.Model):
     amount_total_word = fields.Char(
         compute='_compute_amount_word')
 
+    category = fields.Char("Customer Category")
+    division = fields.Char("Division")
+    sales_channel = fields.Char("Sales Channel")
+
     @api.model
     def create(self, vals):
+        # get divison and sales channel
+
+        # search account move
+        ref = vals.get('ref')  # Safely get 'ref' to avoid KeyError
+        if ref:
+            account_move = self.env["account.move"].sudo().search([('name', '=', ref)])
+            for o in account_move.invoice_line_ids:
+                if o.analytic_distribution:
+                    analytic_distributions = o.analytic_distribution
+                    for analytic_distribution_id in analytic_distributions:
+                        # search analytic definition table
+                        analytic_plans = self.env['account.analytic.account'].search(
+                            [('id', '=', analytic_distribution_id)])
+                        for analytic_plan in analytic_plans:
+                            if analytic_plan.plan_id.complete_name == 'Profit / Cost Center':
+                                vals.update({'division': analytic_plan.display_name})
+                            elif analytic_plan.plan_id.complete_name == 'Sales Channel':
+                                vals.update({'sales_channel': analytic_plan.display_name})
+                    break
+
         res = super(AccountPayment, self).create(vals)
         # enable when manual transaction number stops
         self.generate_transaction_type(res)
@@ -145,6 +169,37 @@ class AccountPayment(models.Model):
 
                         s_word = ' '.join(second_items)
                         record.second_line_amount_word = s_word
+
+    def update_sale_info(self):
+
+        payments = self.env['account.payment'].search([('division', '=', False), ('payment_type', '=', 'inbound')])
+
+        for record in payments:
+            record.category = ""
+            record.division = ""
+            record.sales_channel = ""
+            if record.payment_type == 'Customer':
+                # get customer category
+                record.category = 'Others'
+                record.division = "Others"
+                record.sales_channel = "Marketing"
+                record.category = record.partner_id.cust_type_ext.cust_org_type
+
+                # search account move
+                account_move = self.env["account.move"].sudo().search([('name', '=', record.invoice_no)])
+                for o in account_move.invoice_line_ids:
+                    if o.analytic_distribution:
+                        analytic_distributions = o.analytic_distribution
+                        for analytic_distribution_id in analytic_distributions:
+                            # search analytic definition table
+                            analytic_plans = self.env['account.analytic.account'].search(
+                                [('id', '=', analytic_distribution_id)])
+                            for analytic_plan in analytic_plans:
+                                if analytic_plan.plan_id.complete_name == 'Profit / Cost Center':
+                                    record.division = analytic_plan.display_name
+                                elif analytic_plan.plan_id.complete_name == 'Sales Channel':
+                                    record.sales_channel = analytic_plan.display_name
+                        break
 
 
 class AccountPaymentRegister(models.TransientModel):

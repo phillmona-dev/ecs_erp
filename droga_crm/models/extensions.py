@@ -248,12 +248,12 @@ class crm_lead_extension(models.Model):
     is_from_plan=fields.Boolean(Default=False,string='From plan')
 
     planned_visit_selection = fields.Selection([
-        ('Early Morning', 'Early Morning'),
-        ('Late Morning', 'Late Morning'),
-        ('Lunch', 'Lunch'),
-        ('Early Afternoon', 'Early Afternoon'),
-        ('Late Afternoon', 'Late Afternoon'),
-    ], string='Visit session', default="Early Morning")
+        ('2-4 seat', '2-4 seat'),
+        ('4-6 seat', '4-6 seat'),
+        ('6-8 seat', '6-8 seat'),
+        ('8-10 seat', '8-10 seat'),
+        ('10-12 seat', '10-12 seat'),
+    ], string='Visit session', default="2-4 seat")
     specialty = fields.Many2one('droga.cust.specialty', string='Specialty', related='contact_custom.specialty')
     phone = fields.Char(
         'Phone', tracking=50,

@@ -68,7 +68,7 @@ class account_move(models.Model):
                 if rec.FSInvoiceNumber:
                     sale.write({'inv_number': sale.inv_number+', '+rec['FSInvoiceNumber'] if sale.inv_number else rec['FSInvoiceNumber']})
 
-    @api.depends('invoice_line_ids.price_subtotal')
+    @api.depends('invoice_line_ids.price_subtotal','state')
     def _get_core_amt(self):
 
         for rec in self:

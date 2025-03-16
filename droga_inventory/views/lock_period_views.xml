@@ -9,6 +9,7 @@
                 <field name="name"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
+                <field name="company_id"/>
             </tree>
 
         </field>
@@ -20,6 +21,7 @@
         <field name="arch" type="xml">
             <search string="Recherche des periode bloquee">
                 <field name="name"/>
+                <field name="company_id"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
             </search>
@@ -41,6 +43,9 @@
                     <group colspan="4" col="4">
                         <group colspan="2">
                             <field name="name"/>
+                            <field name="company_id" options="{'no_create':True,'no_open':True}"/>
+                        </group>
+                        <group>
                             <field name="date_start"/>
                             <field name="date_end"/>
                         </group>

@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
+
+    <!-- Customer action add domain to filter by region -->
+    <record id="action_customer_custom" model="ir.actions.act_window">
+        <field name="name">Customer registry</field>
+        <field name="res_model">res.partner</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="domain">[('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('base.view_partner_tree')}),
+        (0, 0, {'view_mode': 'form', 'view_id': ref('droga_crm.crm_partner_view')}),
+        (0, 0, {'view_mode': 'kanban', 'view_id': ref('base.res_partner_kanban_view')})]"></field>
+
+    </record>
+
     <!-- Root menu access to MR -->
     <menuitem name="CRM"
               id="crm.crm_menu_root"
@@ -18,7 +33,7 @@
             id="res_partner_menu_customer"
             name="Customers"
             parent="crm.crm_menu_root"
-            action="base.action_partner_form"
+            action="action_customer_custom"
             sequence="5"/>
 
     <menuitem
@@ -120,9 +135,10 @@
         <field name="view_mode">tree,kanban,form,activity,map</field>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('base.view_partner_tree')}),
+        (0, 0, {'view_mode': 'form', 'view_id': ref('base.view_partner_form')}),
         (0, 0, {'view_mode': 'kanban', 'view_id': ref('base.res_partner_kanban_view')})]"></field>
-    </record>
 
+    </record>
     <menuitem
         id="crm.crm_lead_menu_my_activities"
         name="My Activities"

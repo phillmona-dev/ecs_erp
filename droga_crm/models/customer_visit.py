@@ -459,12 +459,12 @@ class customer_visit_detail(models.Model):
         ('scheduled', 'Scheduled'),
     ], string='Status', default="active", readonly=True, tracking=True)
     planned_visit_selection=fields.Selection([
-        ('Early Morning', 'Early Morning'),
-        ('Late Morning', 'Late Morning'),
-        ('Lunch', 'Lunch'),
-        ('Early Afternoon', 'Early Afternoon'),
-        ('Late Afternoon', 'Late Afternoon'),
-    ], string='Visit session', default="Early Morning")
+        ('2-4 seat', '2-4 seat'),
+        ('4-6 seat', '4-6 seat'),
+        ('6-8 seat', '6-8 seat'),
+        ('8-10 seat', '8-10 seat'),
+        ('10-12 seat', '10-12 seat'),
+    ], string='Visit session', default="2-4 seat")
     day_and_date=fields.Char('Visit Date',compute='_get_visit_date_and_day')
 
     cont_plan_des=fields.Text('Plan',compute='_compute_contact_plan')

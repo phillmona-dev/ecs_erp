@@ -10,7 +10,7 @@ class LockPeriod(models.Model):
 
     _inherit = 'mail.thread'
     _name = 'droga.inv.lock_period'
-
+    company_id=fields.Many2one('res.company',string='Company ID')
     name = fields.Char(
         string='Name',
         help="Give a name to the lock")
@@ -42,29 +42,29 @@ class LockPeriod(models.Model):
         raise UserError(
             "You can't delete lock period entries, change the date range instead.")
 
-class StockMove(models.Model):
-    """."""
-
-    _inherit = 'stock.move'
-
-    #@api.constrains('date_expected', 'state')
-    def check_date_expected(self):
-        lock_period_obj = self.env[
-            'droga.inv.lock_period']
-        uid = self.env.user.id
-        for rec in self:
-            date_expected = rec.mapped('date')[0]
-            all_lock_period = lock_period_obj.search([
-                ('date_start', '<=', date_expected),
-                ('date_end', '>=', date_expected)])
-
-            for lock_period in all_lock_period:
-
-                if uid in lock_period.excluded_users.mapped('id'):
-                    continue
-
-                raise UserError('Inventory transaction is closed for the period between %s and %s.'%
-                              (lock_period.date_start, lock_period.date_end))
+# class StockMove(models.Model):
+#     """."""
+#
+#     # _inherit = 'stock.picking'
+    # @api.constrains('scheduled_date', 'state')
+    # def check_date_expected(self):
+    #     lock_period_obj = self.env[
+    #         'droga.inv.lock_period']
+    #     uid = self.env.user.id
+    #     for rec in self:
+    #         date_expected = rec.mapped('scheduled_date')[0]
+    #         cid = rec.mapped('company_id')[0]
+    #         all_lock_period = lock_period_obj.search([
+    #             ('date_start', '<=', date_expected),('company_id','=',cid.id),
+    #             ('date_end', '>=', date_expected)])
+    #
+    #         for lock_period in all_lock_period:
+    #
+    #             if uid in lock_period.excluded_users.mapped('id'):
+    #                 continue
+    #
+    #             raise UserError('Inventory transaction is closed for the period between %s and %s.'%
+    #                           (lock_period.date_start, lock_period.date_end))
 
 class SalesOrder(models.Model):
     _inherit = 'sale.order'
@@ -76,8 +76,9 @@ class SalesOrder(models.Model):
         uid = self.env.user.id
         for rec in self:
             date_expected = rec.mapped('date_order')[0]
+            cid = rec.mapped('company_id')[0]
             all_lock_period = lock_period_obj.search([
-                ('date_start', '<=', date_expected),
+                ('date_start', '<=', date_expected),('company_id','=',cid.id),
                 ('date_end', '>=', date_expected)])
 
             for lock_period in all_lock_period:
@@ -98,8 +99,9 @@ class PurchaseOrder(models.Model):
         uid = self.env.user.id
         for rec in self:
             date_expected = rec.mapped('date_order')[0]
+            cid = rec.mapped('company_id')[0]
             all_lock_period = lock_period_obj.search([
-                ('date_start', '<=', date_expected),
+                ('date_start', '<=', date_expected),('company_id','=',cid.id),
                 ('date_end', '>=', date_expected)])
 
             for lock_period in all_lock_period:
