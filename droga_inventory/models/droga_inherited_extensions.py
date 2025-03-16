@@ -392,6 +392,7 @@ class val_layer(models.Model):
     warehouse=fields.Many2one('stock.warehouse',store=True,compute='_get_trans_type')
     origin=fields.Char(related='stock_move_id.origin',store=True)
     cr_date=fields.Datetime('Create date with adjustment',default=datetime.now())
+
     @api.depends('stock_move_id.trans_type','stock_move_id.trans_type_detail')
     def _get_trans_type(self):
         for rec in self:
@@ -423,6 +424,12 @@ class val_layer(models.Model):
                 #res.account_move_id.write({'date':datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())})
                 #for mv in res.account_move_id.line_ids:
                 #    mv.write({'date':datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())})
+            if res.stock_move_id:
+                res.move_date=res.stock_move_id.date
+            elif res.cr_date:
+                res.move_date=res.create_date
+            else:
+                res.move_date = res.write_date
 
         if ret.origin:
             if ret.origin.startswith('SO'):
