@@ -426,10 +426,8 @@ class val_layer(models.Model):
                 #    mv.write({'date':datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())})
             if res.stock_move_id:
                 res.move_date=res.stock_move_id.date
-            elif res.cr_date:
-                res.move_date=res.create_date
             else:
-                res.move_date = res.write_date
+                res.move_date = res.create_date
 
         if ret.origin:
             if ret.origin.startswith('SO'):

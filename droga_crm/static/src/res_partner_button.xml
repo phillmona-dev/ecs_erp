@@ -3,11 +3,12 @@
     <t t-name="droga_pharma.JsFormView"
        t-inherit="web.FormView" t-inherit-mode="primary" owl="1">
 
-
         <xpath expr="//ActionMenus" position="after">
+
             <button class="btn btn-info" type="button" t-on-click="cust_loc_func">
                 Set Location
             </button>
+
         </xpath>
     </t>
 </templates>

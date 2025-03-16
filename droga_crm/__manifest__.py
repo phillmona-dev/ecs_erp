@@ -22,6 +22,7 @@
     'data': [
         'security/security.xml',
         'reports/leads_report.xml',
+        'views/customers_crm.xml',
         'views/module_menus.xml',
         'security/ir.model.access.csv',
         'reports/excel_reports/visit_plan.xml',

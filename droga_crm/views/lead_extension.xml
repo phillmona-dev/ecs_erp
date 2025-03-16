@@ -39,11 +39,45 @@
 
             <xpath expr="//form/sheet/notebook/page[@name='internal_notes']" position="replace">
                 <page string="Items" name="ord_qty">
-                    <field name="ordered_prods" mode="tree">
+                    <field name="ordered_prods" mode="tree,kanban">
                         <tree editable="bottom" delete="0">
                             <field name="prod" options="{'no_create':True,'no_open':True}"/>
                             <field name="qty"/>
                         </tree>
+                        <form string="Follow up visits">
+                            <group>
+                                <field name="prod" options="{'no_create':True,'no_open':True}"/>
+                                <field name="qty"/>
+                            </group>
+                        </form>
+
+                        <kanban class="o_kanban_mobile" limit="500">
+                            <field name="prod" options="{'no_create':True,'no_open':True}"/>
+                                <field name="qty"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
+                                        <div class="oe_kanban_details">
+                                            <ul>
+                                                <li>
+                                                    <strong class="o_kanban_record_title">Product:
+                                                        <field name="prod"></field>
+                                                    </strong>
+                                                </li>
+
+                                                <li>
+                                                    Quantity:
+                                                    <field name="qty"></field>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+
+
+                        </kanban>
+
                     </field>
                     <field name="description" string="Notes" placeholder="Add a description..."
                            options="{'collaborative': true}"/>
@@ -389,4 +423,26 @@
                 </xpath>
             </field>
         </record>
+
+    <record id="view_crm_oppor_case_override_my_activities_filter" model="ir.ui.view">
+            <field name="name">crm.oppor.search.override.myactivities</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='activities_overdue']" position="replace">
+                    <filter string="Past Visits" name="activities_overdue"
+                        domain="[('date_planned', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all opportunities for which the next action date is before today"/>
+                </xpath>
+                <xpath expr="//filter[@name='activities_today']" position="replace">
+                    <filter string="Today Visits" name="activities_today"
+                        domain="[('date_planned', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                </xpath>
+                <xpath expr="//filter[@name='activities_upcoming_all']" position="replace">
+                    <filter string="Future Visits" name="activities_upcoming_all"
+                        domain="[('date_planned', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                </xpath>
+            </field>
+        </record>
+
 </odoo>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+    <record id="crm_partner_view" model="ir.ui.view">
+        <field name="name">res.partner.crm.form</field>
+        <field name="model">res.partner</field>
+        <field name="priority" eval="1"/>
+
+        <field name="arch" type="xml">
+            <form string="Partners" js_class="js_form_view" delete="0">
+                <sheet>
+
+                    <div class="oe_button_box" name="button_box">
+
+                    </div>
+
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="avatar_128" invisible="1"/>
+                    <field name="image_1920" widget='image' class="oe_avatar"
+                           options='{"preview_image": "avatar_128"}'/>
+                    <div class="oe_title mb24">
+                        <field name="is_company" invisible="1"/>
+                        <field name="commercial_partner_id" invisible="1"/>
+                        <field name="active" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="country_code" invisible="1"/>
+                        <field name="company_type" widget="radio" options="{'horizontal': true}"/>
+                        <h1>
+                            <field id="company" class="text-break" name="name" default_focus="1"
+                                   placeholder="e.g. Lumber Inc"
+                                   attrs="{  'invisible': [('is_company','=', False)]}"/>
+                            <field id="individual" class="text-break" name="name" default_focus="1"
+                                   placeholder="e.g. Brandom Freeman"
+                                   attrs="{  'invisible': [('is_company','=', True)]}"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="cust_grade" options="{'no_create':True,'no_open':True}" required="1" placeholder="Eg A/B/C/D"/>
+                            <field name="cust_type_ext" options="{'no_create':True,'no_open':True}" required="1"/>
+                            <field name="city_name" domain="([('city_avail', '=',True),('status','=','Active')])"
+                               options="{'no_create':True,'no_open':True}" required="1"
+                               string="City/sub-city team"></field>
+                            <field name="x_delivery_address"/>
+                            <field name="mature_individually" groups="droga_crm.tin_admin"></field>
+                            <field name="show_percent" groups="droga_crm.tin_admin"></field>
+                        </group>
+                        <group>
+                            <field name="vat" placeholder="e.g. 0000000001"/>
+                            <field name="mobile" widget="phone"/>
+                            <field name="key_account" groups="droga_crm.tin_admin"/>
+                            <field name="x_exclude_maturity_for_reconciliation" groups="droga_crm.tin_admin"></field>
+
+                        </group>
+
+
+
+                    </group>
+
+                    <notebook>
+                        <page string="Contacts" >
+                    <field name="contacts" mode="tree,kanban">
+                        <tree editable="1" create="1" delete="0">
+                            <field name="specialty" domain="([('status','=','Active')])"
+                                   options="{'no_create':True,'no_open':True}"/>
+                            <field name="contact_name"/>
+                            <field name="job_position"/>
+                            <field name="gender"/>
+                            <field name="mobile"/>
+                            <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
+                            <field name="cont_grade" options="{'no_create':True,'no_open':True}"
+                                   domain="([('status','=','Active'),('cont_include','=',True)])"/>
+                            <field name="days" widget="many2many_tags"/>
+                        </tree>
+                        <form>
+                            <group>
+                                <field name="specialty" domain="([('status','=','Active')])"
+                                       options="{'no_create':True,'no_open':True}"/>
+                                <field name="contact_name"/>
+                                <field name="job_position"/>
+                                <field name="gender"/>
+                                <field name="mobile"/>
+                                <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
+                                <field name="cont_grade" options="{'no_create':True,'no_open':True}"
+                                       domain="([('status','=','Active'),('cont_include','=',True)])"/>
+                                <field name="days" widget="many2many_tags"/>
+                            </group>
+                        </form>
+                        <kanban class="o_kanban_mobile">
+                            <field name="specialty" domain="([('status','=','Active')])"
+                                   options="{'no_create':True,'no_open':True}"/>
+                            <field name="contact_name"/>
+                            <field name="job_position"/>
+                            <field name="gender"/>
+                            <field name="mobile"/>
+                            <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
+                            <field name="cont_grade" options="{'no_create':True,'no_open':True}"
+                                   domain="([('status','=','Active'),('cont_include','=',True)])"/>
+                            <field name="days" widget="many2many_tags"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div t-attf-class="oe_kanban_global_click" on_create="quick_create">
+                                        <div class="oe_kanban_details">
+                                            <ul>
+                                                <li>
+                                                    <strong><field name="contact_name"></field></strong>
+                                                </li>
+                                                <li>
+                                                    Specialty:
+                                                    <field name="specialty"></field>
+                                                    <span></span>-
+                                                    <span></span>
+                                                    Job Position:
+                                                    <field name="job_position"></field>
+                                                </li>
+                                                <li>
+                                                    Gender:
+                                                    <field name="gender"></field>
+                                                    <span></span>-
+                                                    <span></span>
+                                                    Mobile:
+                                                    <field name="mobile"></field>
+                                                </li>
+
+
+                                            </ul>
+
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+
+                        </kanban>
+                    </field>
+                </page>
+                        <page string="Location update history">
+                    <group col="1">
+                        <group>
+                            <field name="partner_latitude" readonly="1"></field>
+                            <field name="partner_longitude" readonly="1"></field>
+                        </group>
+
+                            <field name="loc_history" mode="tree">
+                                <tree create="0" editable="0" delete="0">
+                                    <field name="update_user_loc" readonly="1"></field>
+                                    <field name="update_date" readonly="1"></field>
+                                    <field name="old_lati" readonly="1"></field>
+                                    <field name="new_lati" readonly="1"></field>
+                                    <field name="old_long" readonly="1"></field>
+                                    <field name="new_long" readonly="1"></field>
+                                </tree>
+                            </field>
+
+                    </group>
+                </page>
+                    </notebook>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
