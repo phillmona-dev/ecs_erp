@@ -29,7 +29,7 @@
                 <field name="source_name"/>
                 <field name="state"/>
                 <field name="sales_area"/>
-                <field name="user"/>
+                <field name="sales_rep" string="User"/>
                 <field name="activity_date"/>
                 <field name="action_date"/>
                 <field name="res_model_descr"/>

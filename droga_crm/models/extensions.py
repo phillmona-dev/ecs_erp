@@ -228,6 +228,7 @@ class sales_team_extension(models.Model):
     _inherit = 'crm.team'
     _rec_name = 'city_name'
     city_name = fields.Many2one('droga.crm.settings.city')
+    team_leader = fields.Many2one('droga.pro.sales.master',string='Team leader')
 
 
 class crm_lead_extension(models.Model):
@@ -399,6 +400,8 @@ class crm_lead_extension(models.Model):
 
     @api.model
     def create(self, vals):
+        vals.update({'name': vals['name'].replace("opportunity", "") + "lead"})
+        to_return=0
 
         if 'leads' in vals:
             lead = self.env['crm.lead'].search([('id', '=', vals['leads'])])
@@ -420,10 +423,28 @@ class crm_lead_extension(models.Model):
                 # 'contact_name': det['visit_contact'].name,
             }
 
-            return super(crm_lead_extension, self).create(lead_vals)
+            to_return= super(crm_lead_extension, self).create(lead_vals)
         else:
-            vals.update({'name': vals['name'].replace("opportunity", "") + "lead"})
-            return super(crm_lead_extension, self).create(vals)
+
+            to_return= super(crm_lead_extension, self).create(vals)
+
+        self.env['droga.crm.done.activity'].create(
+            {'name': vals['name'], 'activity_date': vals['date_planned'],
+             'type': vals['type'], 'from_visit_plan': False if
+            'is_from_plan' not in vals else vals['is_from_plan'],
+             'sales_rep':
+                 self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[
+                     0].id if len(self.env['droga.pro.sales.master.visit'].search(
+                     [('s_id', '=', request.session.sid)])) > 0 else False,
+             'state': 'Open', 'source_name': vals['name'], 'act_id': 0,
+             'source_id': to_return.id,
+             'sales_area': to_return.partner_id.city_name.city_descr,
+             'res_model_id': 530, 'res_model_descr': 'Lead',
+             'act_note': vals['name'], 'res_model': 'crm.lead',
+             'user': self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[
+                 0].id if len(self.env['droga.pro.sales.master.visit'].search(
+                 [('s_id', '=', request.session.sid)])) > 0 else False})
+        return to_return
 
 
 class crm_prod_template_extension(models.Model):

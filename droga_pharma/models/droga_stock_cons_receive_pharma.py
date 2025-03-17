@@ -6,7 +6,7 @@ from odoo.tools.view_validation import READONLY
 
 class droga_stock_cons_receive_pharma(models.Model):
     _name = 'droga.inventory.consignment.receive.pharma'
-    _description = 'Store Receive'
+    _description = 'Store Receive and issue for pharma consignment'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char('Name', default='New')
@@ -38,7 +38,7 @@ class droga_stock_cons_receive_pharma(models.Model):
 
     consignment_reference = fields.Char(string='Order reference', default='', readonly=True)
 
-    issue_type = fields.Selection([('CONR', 'Consignment recieve')],
+    issue_type = fields.Selection([('CONR', 'Consignment recieve'),('CONRN', 'Consignment return')],
                                   string='Return type', required=True,default='CONR')
     supply_chain_manager = fields.Many2one('res.users', compute='_get_approvers_pharma',store=True)
 
@@ -55,6 +55,9 @@ class droga_stock_cons_receive_pharma(models.Model):
     @api.model
     def create(self, vals_list):
         #self._get_approvers_pharma()
+        to_ret=super(droga_stock_cons_receive_pharma, self).create(vals_list)
+        if to_ret.issue_type=='CONRN' and [item for item in to_ret.detail_entries['product_id'].ids if item not in to_ret.cons_origin.detail_entries['product_id'].ids]:
+            raise UserError("Please make sure all items are found in the original consignment receipt.")
         if vals_list.get('name', 'New') == 'New':
             if len(vals_list['detail_entries'])==0:
                 raise UserError("At least one product must be requested to save record.")
@@ -62,7 +65,7 @@ class droga_stock_cons_receive_pharma(models.Model):
             if not _name:
                 raise UserError("Order sequence not found.")
             vals_list['name']=_name
-        return super(droga_stock_cons_receive_pharma, self).create(vals_list)
+        return to_ret
 
     def action_cancel(self):
         self.state = 'cancel'
@@ -82,11 +85,11 @@ class droga_stock_cons_receive_pharma(models.Model):
         self.set_activity_done()
 
         pick_type_id = self.env['stock.picking.type'].sudo().search(
-            [('sequence_code', '=','CONR'), ('warehouse_id', '=', self.warehouse_id.id)]).id
+            [('sequence_code', '=',self.issue_type), ('warehouse_id', '=', self.warehouse_id.id)]).id
         if not pick_type_id :
             raise UserError("Picking type is not configured for one of the warehouses.")
 
-        cons_vendor=self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
+        cons_vendor=self.env['stock.location'].search([('con_type', '=', 'CONR')]).id
 
         if not cons_vendor:
             raise UserError("Consignment vendor location not set. Please configure accordingly.")
@@ -100,12 +103,15 @@ class droga_stock_cons_receive_pharma(models.Model):
         if not def_loc_id:
             raise UserError("Store location not set for receiver warehouse. Please configure accordingly.")
 
+        loc_id=cons_vendor if self.issue_type=='CONR' else def_loc_id
+        loc_dest_id=cons_vendor if self.issue_type=='CONRN' else def_loc_id
+
         picking_vals = {
             'partner_id': self.supplier.id,
             'company_id': self.env.company.id,
             'picking_type_id': pick_type_id,
-            'location_id': cons_vendor,
-            'location_dest_id': def_loc_id,
+            'location_id': loc_id,
+            'location_dest_id': loc_dest_id,
             'cons_receive_request_pharma': self.id,
             #'auto_generated': True,
             #'origin': self.name,
@@ -129,8 +135,8 @@ class droga_stock_cons_receive_pharma(models.Model):
                 'product_uom': rec["product_id"].uom_id.id,
                 'product_uom_qty': rec['product_uom_qty']*(rec["product_id"].uom_id.factor/rec["product_uom"].factor),
                 'price_unit': rec['price_unit_cons'],
-                'location_id': cons_vendor,
-                'location_dest_id': def_loc_id,
+                'location_id': loc_id,
+                'location_dest_id': loc_dest_id,
                 'state': 'confirmed',
                 'company_id': self.env.company.id
             }
@@ -148,6 +154,43 @@ class droga_stock_cons_receive_pharma(models.Model):
         for act in activity:
             act.sudo().action_done()
 
+    def taskPaymentRequest(self):
+        return {
+            'name': 'Payment Request',
+            'view_type': 'tree',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.account.payment.request',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_cons_ref_pay': self.id,
+                # 'default_issue_type': 'SIF'
+            },
+            'domain':
+                ([('task_payment_request_reference', '=', self.id)])
+        }
+
+    cons_origin = fields.Many2one('droga.inventory.consignment.receive.pharma', required=True)
+    def cons_return(self):
+        return {
+            'name': 'Consignment Return',
+            'view_type': 'tree',
+            'view_mode': 'tree,form',
+            'res_model': 'droga.inventory.consignment.receive.pharma',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_cons_origin': self.id,
+                'default_issue_type': 'CONRN',
+                'default_supplier': self.supplier.id,
+                'default_warehouse_id': self.warehouse_id.id
+            },
+            'domain':
+                ([('cons_origin', '=', self.id)])
+        }
+class droga_cons_task_payment_request(models.Model):
+    _inherit = 'droga.account.payment.request'
+    cons_ref_pay = fields.Many2one('droga.inventory.consignment.receive.pharma', readonly=True)
 
 class droga_stock_cons_receive_detail_pharma(models.Model):
     _name = 'droga.inventory.cons.receive.detail.pharma'
@@ -200,3 +243,9 @@ class droga_stock_picking_extension_pharma(models.Model):
     _inherit = 'stock.picking'
 
     cons_receive_request_pharma = fields.Many2one('droga.inventory.consignment.receive.pharma','Consignment receive request')
+
+    def button_validate(self):
+        if self.cons_receive_request_pharma:
+            self.cons_receive_request_pharma.write({'state': 'done'})
+
+        return super(droga_stock_picking_extension_pharma, self).button_validate()

@@ -44,6 +44,14 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
+                    <field name="state" invisible="1"></field>
+                    <field name="issue_type" invisible="1"></field>
+                    <div class="oe_button_box" name="button_box">
+                    <button name="taskPaymentRequest" string="Payment Request" attrs="{'invisible': ['|',('issue_type','not in',('CONR')),('state', 'not in', ('done'))]}" type="object" class="oe_stat_button"
+                        icon="fa-list"/>
+                    <button name="cons_return" string="Consignment Return" attrs="{'invisible': ['|',('issue_type','not in',('CONR')),('state', 'not in', ('done'))]}" type="object" class="oe_stat_button"
+                        icon="fa-list"/>
+                    </div>
                     <group string="Store receive request">
                         <group>
                             <field name="supplier"
