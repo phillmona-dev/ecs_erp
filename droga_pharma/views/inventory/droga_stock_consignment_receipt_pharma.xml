@@ -98,5 +98,16 @@
         </field>
     </record>
 
+    <record id="droga_pharma_task_payment_request_inherited_form" model="ir.ui.view">
+        <field name="name">droga.pharma.payment.request.inherited</field>
+        <field name="model">droga.account.payment.request</field>
+        <field name="inherit_id" ref="droga_finance.droga_account_payment_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group/group/field[1]" position="after">
+                <field name="cons_ref_pay"
+                       attrs="{'invisible': [('cons_ref_pay', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

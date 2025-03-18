@@ -58,6 +58,10 @@ class droga_stock_cons_receive_pharma(models.Model):
         to_ret=super(droga_stock_cons_receive_pharma, self).create(vals_list)
         if to_ret.issue_type=='CONRN' and [item for item in to_ret.detail_entries['product_id'].ids if item not in to_ret.cons_origin.detail_entries['product_id'].ids]:
             raise UserError("Please make sure all items are found in the original consignment receipt.")
+        if to_ret.issue_type == 'CONR':
+            for item in to_ret.detail_entries['product_id']:
+                if 'CONS-' not in item.default_code:
+                    raise UserError("Only consignment items that start with CONS can be requested here.")
         if vals_list.get('name', 'New') == 'New':
             if len(vals_list['detail_entries'])==0:
                 raise UserError("At least one product must be requested to save record.")
@@ -167,7 +171,7 @@ class droga_stock_cons_receive_pharma(models.Model):
                 # 'default_issue_type': 'SIF'
             },
             'domain':
-                ([('task_payment_request_reference', '=', self.id)])
+                ([('cons_ref_pay', '=', self.id)])
         }
 
     cons_origin = fields.Many2one('droga.inventory.consignment.receive.pharma', required=True)

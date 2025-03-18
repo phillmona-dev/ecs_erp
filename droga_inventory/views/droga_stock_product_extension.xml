@@ -176,6 +176,7 @@
                         <field name="default_warehouse" string="Default warehouse"
                                options="{'no_create':True,'no_open':True}"/>
                         <field name="bought_locally"/>
+                        <field name="cons_item"/>
                         <field name="old_ref"></field>
                     </group>
                 </group>

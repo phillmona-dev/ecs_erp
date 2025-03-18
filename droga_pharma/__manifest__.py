@@ -58,6 +58,9 @@
         'views/pcm/minor_alignment.xml',
         'views/pcm/counselling.xml',
         'views/pcm/follow_up_detail.xml',
+        'views/pcm/droga_health_screening_blood_pressure.xml',
+        'views/pcm/droga_health_screening_glucose.xml',
+        'views/pcm/droga_health_screening_weight.xml',
         'views/inventory/product.xml',
         'views/inventory/droga_stock_consignment_receipt_pharma.xml',
         'reports/sales_report.xml',
@@ -92,7 +95,7 @@
 
     # any module necessary for this one to work correctly
 
-    'depends': ['base', 'hr', 'droga_sales','droga_crm',
+    'depends': ['base', 'hr', 'droga_sales','droga_crm','droga_finance',
                 'mail', 'stock', 'http_routing', 'sale',
                 'resource', 'stock', 'droga_inventory',
                 'web', 'crm'],
