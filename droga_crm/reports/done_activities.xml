@@ -25,7 +25,6 @@
         <field name="model">droga.crm.done.activity</field>
         <field name="arch" type="xml">
             <search string="Done Activities">
-                <field name="feedback"/>
                 <field name="source_name"/>
                 <field name="state"/>
                 <field name="sales_area"/>

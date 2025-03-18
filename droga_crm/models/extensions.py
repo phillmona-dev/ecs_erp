@@ -251,9 +251,9 @@ class crm_lead_extension(models.Model):
     planned_visit_selection = fields.Selection([
         ('2-4 seat', '2-4 seat'),
         ('4-6 seat', '4-6 seat'),
-        ('6-8 seat', '6-8 seat'),
-        ('8-10 seat', '8-10 seat'),
-        ('10-12 seat', '10-12 seat'),
+        ('6-7 seat', '6-7 seat'),
+        ('7-9 seat', '7-9 seat'),
+        ('9-11 seat', '9-11 seat'),
     ], string='Visit session', default="2-4 seat")
     specialty = fields.Many2one('droga.cust.specialty', string='Specialty', related='contact_custom.specialty')
     phone = fields.Char(
