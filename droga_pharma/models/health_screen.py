@@ -75,7 +75,7 @@ class DrogaHealthScreening(models.Model):
 
         customer = self.client_id.partner
 
-        default_product = self.env['product.product'].search([('sale_ok', '=', True)], limit=1)
+        default_product = self.env['product.product'].search([('id', '=', 40960)], limit=1)
         if not default_product:
             raise UserError("No products available in the catalog. Please add at least one saleable product.")
 
@@ -84,11 +84,10 @@ class DrogaHealthScreening(models.Model):
             'partner_custom': self.client_id.id,
             'client_order_ref': self.client_id.name,
             'order_line': [(0, 0, {
-                'product_id': default_product.id,
+                'product_id': 40960,
                 'name': default_product.name,
                 'product_uom': default_product.uom_id.id,
                 'product_uom_qty': 1,
-                'price_unit': 120.0,
             })],
             'state': 'draft',
             'payment_term_id': 11,
