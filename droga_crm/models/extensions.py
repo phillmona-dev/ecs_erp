@@ -226,7 +226,7 @@ class account_move_pr_sales(models.Model):
 
 class sales_team_extension(models.Model):
     _inherit = 'crm.team'
-    _rec_name = 'city_name'
+    _rec_name = 'name'
     city_name = fields.Many2one('droga.crm.settings.city')
     team_leader = fields.Many2one('droga.pro.sales.master',string='Team leader')
 
