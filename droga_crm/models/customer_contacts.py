@@ -53,7 +53,7 @@ class droga_crm_contacts(models.Model):
         if operator == '=':
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             if self.env.user.has_group('droga_crm.crm_cust'):
-                has_access = self.env['droga.crm.contacts'].sudo().search([()])
+                has_access = self.env['droga.crm.contacts'].sudo().search([])
                 return [('id', 'in', [x.id for x in has_access] if has_access else False)]
             elif not request or len(ses) == 0:
                 return [('id', 'in', [])]
