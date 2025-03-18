@@ -59,8 +59,8 @@ class droga_crm_contacts(models.Model):
                 return [('id', 'in', [])]
             else:
                 has_access = self.env['droga.crm.contacts'].sudo().search(
-                    [('sales_teams', 'in', ses[0].pro_id[0].team.shares_group_with.ids)])
-                return [('id', 'in', [x.id for x in has_access])] if has_access else [('id', 'in', [])]
+                    [('sales_teams', 'in', ses[0].pro_id[0].team.shares_group_with.ids if len(ses)>0 else [])])
+                return [('id', 'in', [x.id for x in has_access] if has_access else [])]
         else:
             return [('id', 'in', [])]
 
