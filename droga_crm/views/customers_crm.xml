@@ -61,7 +61,7 @@
 
                     <notebook>
                         <page string="Contacts" >
-                    <field name="contacts" mode="tree,kanban">
+                    <field name="contacts" mode="tree,kanban" >
                         <tree editable="1" create="1" delete="0">
                             <field name="specialty" domain="([('status','=','Active')])"
                                    options="{'no_create':True,'no_open':True}"/>
@@ -72,6 +72,7 @@
                             <field name="contact_tobe_accessed_by" options="{'no_create':True,'no_open':True}"/>
                             <field name="cont_grade" options="{'no_create':True,'no_open':True}"
                                    domain="([('status','=','Active'),('cont_include','=',True)])"/>
+                            <field name="sales_teams" widget="many2many_tags" readonly="True"/>
                             <field name="days" widget="many2many_tags"/>
                         </tree>
                         <form>

@@ -1,4 +1,6 @@
 from odoo import models,fields
+from odoo.http import request
+
 
 class droga_crm_contacts(models.Model):
     _name='droga.crm.contacts'
@@ -24,6 +26,47 @@ class droga_crm_contacts(models.Model):
 
     days=fields.Many2many('droga.crm.settings.day',string='Day')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
+
+    def _get_teams(self):
+        if not self.env.user.name.upper().startswith('CRM'):
+            return False
+        else:
+            if not request:
+                return False
+            ses = self.env['droga.pro.sales.master.visit'].sudo().search([('s_id', '=', request.session.sid)])
+
+            if len(ses) == 0:
+                return False
+            return ses[0].pro_id[0].team.shares_group_with.ids
+    sales_teams=fields.Many2many(
+        'crm.team',
+        'crm_team_cont_groups',  # Explicitly defined junction table name
+        'team_id',
+        'shared_team_id',
+        string='Shared Groups',default=_get_teams
+    )
+
+    has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
+                                search='_search_has_access')
+
+    def _search_has_access(self, operator, value):
+        if operator == '=':
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            if self.env.user.has_group('droga_crm.crm_cust'):
+                has_access = self.env['droga.crm.contacts'].sudo().search([()])
+                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+            elif not request or len(ses) == 0:
+                return [('id', 'in', [])]
+            else:
+                has_access = self.env['droga.crm.contacts'].sudo().search(
+                    [('sales_teams', 'in', ses[0].pro_id[0].team.shares_group_with.ids)])
+                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+        else:
+            return [('id', 'in', [])]
+
+    def _compute_has_access(self):
+        for rec in self:
+            rec.has_access = False
 
     def _get_descr(self):
         for record in self:

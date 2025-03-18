@@ -29,7 +29,6 @@
         'reports/core_products.xml',
         'views/cust_extension.xml',
         'views/customer_visits.xml',
-        'views/contacts.xml',
         'views/sales_target.xml',
         'views/settings/cust_grade.xml',
         'views/settings/specialty.xml',

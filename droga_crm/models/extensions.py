@@ -34,7 +34,7 @@ class cust_contact_extension(models.Model):
     city_name = fields.Many2one('droga.crm.settings.city', tracking=True)
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
-    contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
+    contacts = fields.One2many('droga.crm.contacts', 'parent_customer',domain=[('has_access', '=', True)])
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
     x_exclude_maturity_for_reconciliation = fields.Boolean('Temporarly exclude maturity for reconciliation',tracking=True)
@@ -229,7 +229,14 @@ class sales_team_extension(models.Model):
     _rec_name = 'name'
     city_name = fields.Many2one('droga.crm.settings.city')
     team_leader = fields.Many2one('droga.pro.sales.master',string='Team leader')
-
+    shares_group_with=fields.Many2many('crm.team',string='Shares contacts with')
+    shares_group_with = fields.Many2many(
+        'crm.team',
+        'crm_team_shared_groups',  # Explicitly defined junction table name
+        'team_id',
+        'shared_team_id',
+        string='Shared Groups'
+    )
 
 class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'

@@ -168,7 +168,7 @@
                     <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one"
                            required="True" string="Customer"
                            invisible="True"/>
-                    <field name="contact_custom" options="{'no_create':True,'no_open':True}"></field>
+                    <field name="contact_custom" domain="([('parent_customer','=',partner_id),('has_access','=',True)])" options="{'no_create':True,'no_open':True}"></field>
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned" required="True"/>
                     <field name="referral_distri" widget="many2many_tags"></field>
@@ -203,7 +203,7 @@
                     <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one"
                            required="True" string="Customer"
                            invisible="True"/>
-                    <field name="contact_custom" domain="([('parent_customer','=',partner_id)])"
+                    <field name="contact_custom" domain="([('parent_customer','=',partner_id),('has_access','=',True)])"
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned" required="True" string="Opportunity date"/>
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>

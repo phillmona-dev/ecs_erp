@@ -692,7 +692,7 @@
                             <field name="contacts_schedule" mode="tree,kanban">
                                 <tree editable="bottom" delete="0">
                                     <field name="cust"/>
-                                    <field name="contact_custom" domain="([('parent_customer','=',cust)])"
+                                    <field name="contact_custom" domain="([('parent_customer','=',cust),('has_access','=',True)])"
                                            options="{'no_create':True,'no_open':True}"></field>
                                     <field name="co_travel_crm" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
@@ -703,7 +703,7 @@
                                 <form>
                                     <group>
                                         <field name="cust"/>
-                                        <field name="contact_custom" domain="([('parent_customer','=',cust)])"
+                                        <field name="contact_custom" domain="([('parent_customer','=',partner_id),('has_access','=',True)])"
                                                options="{'no_create':True,'no_open':True}"></field>
                                         <field name="co_travel_crm" widget="many2many_tags"
                                                options="{'no_create':True,'no_open':True}"/>
@@ -714,7 +714,7 @@
                                 </form>
                                 <kanban>
                                     <field name="cust"/>
-                                    <field name="contact_custom" domain="([('parent_customer','=',cust)])"
+                                    <field name="contact_custom" domain="([('parent_customer','=',partner_id),('has_access','=',True)])"
                                            options="{'no_create':True,'no_open':True}"></field>
                                     <field name="co_travel_crm" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
