@@ -106,8 +106,8 @@
         <field name="inherit_id" ref="account.view_account_payment_search"/>
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
-                <field name="transaction_no" optional="show"/>
-                <field name="division" optional="show"/>
+                <field name="transaction_no"/>
+                <field name="division" />
             </xpath>
         </field>
     </record>
