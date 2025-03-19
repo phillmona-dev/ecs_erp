@@ -891,6 +891,7 @@ class droga_stock_product_extension(models.Model):
     ('PT', 'Physiotherapy only'),('PH', 'Pharmacy only'),('ALL','ALL')], string='Product used under')
     from_pharma=fields.Boolean('Created from pharmacy menu',default=False,store=False)
     bought_locally=fields.Boolean('Bought Locally',default=False)
+    cons_item = fields.Boolean('Consignment item', default=False)
     pharmacy_group_id=fields.Many2one('droga.prod.categ.pharma')
     list_price = fields.Float(
         'Sales Price', default=1.0,
@@ -1109,7 +1110,7 @@ class droga_stock_product_extension(models.Model):
             raise UserError("You can not create a product. Please contact your supervisor.")
         #If user has access to MI group, automatically assign ID
         if self.env.user.has_group('droga_inventory.inv_prod_mi_manager') and self.env.company.id==1 and res.pharmacy_group_id:
-            res.default_code=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
+            res.default_code=('CONS-' if res.cons_item else '')+ res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             vals_list['default_code']=res.pharmacy_group_id.id_sequence+('0'*(3-len(str(res.pharmacy_group_id.id_counter))))+ str(res.pharmacy_group_id.id_counter)
             res.pharmacy_group_id.write({'id_counter': res.pharmacy_group_id.id_counter+1})
         if "default_code" in vals_list:

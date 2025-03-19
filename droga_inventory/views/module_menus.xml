@@ -78,5 +78,11 @@
         id="stock.stock_move_line_menu" name="Stock report by item"
         parent="stock.menu_warehouse_report" sequence="200"/>
 
+    <menuitem
+        action="stock_barcode.product_action_barcodes"
+        id="droga_barcode" name="Droga barcodes"
+        parent="stock.menu_stock_inventory_control" sequence="6"/>
+
+
     <menuitem action="stock.stock_move_action" name="Stock summary by reference" id="stock.stock_move_menu" parent="stock.menu_warehouse_report" sequence="230" groups="stock.group_stock_manager"/>
 </odoo>

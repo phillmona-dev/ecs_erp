@@ -19,6 +19,7 @@
                 <field name="supervisor" options="{'no_create':True,'no_open':True}"></field>
                 <field name="status"></field>
                 <field name="is_pm"></field>
+                <field name="team" options="{'no_create':True,'no_open':True}"></field>
                 <button type="object" string="Change ID to 12345" name="change_id" confirm="Are you sure you want to change ID?"
                                     class="oe_highlight"></button>
             </tree>

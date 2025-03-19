@@ -44,6 +44,14 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,stmg,waiting,done"/>
                 </header>
                 <sheet>
+                    <field name="state" invisible="1"></field>
+                    <field name="issue_type" invisible="1"></field>
+                    <div class="oe_button_box" name="button_box">
+                    <button name="taskPaymentRequest" string="Payment Request" attrs="{'invisible': ['|',('issue_type','not in',('CONR')),('state', 'not in', ('done'))]}" type="object" class="oe_stat_button"
+                        icon="fa-list"/>
+                    <button name="cons_return" string="Consignment Return" attrs="{'invisible': ['|',('issue_type','not in',('CONR')),('state', 'not in', ('done'))]}" type="object" class="oe_stat_button"
+                        icon="fa-list"/>
+                    </div>
                     <group string="Store receive request">
                         <group>
                             <field name="supplier"
@@ -90,5 +98,16 @@
         </field>
     </record>
 
+    <record id="droga_pharma_task_payment_request_inherited_form" model="ir.ui.view">
+        <field name="name">droga.pharma.payment.request.inherited</field>
+        <field name="model">droga.account.payment.request</field>
+        <field name="inherit_id" ref="droga_finance.droga_account_payment_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group/group/field[1]" position="after">
+                <field name="cons_ref_pay"
+                       attrs="{'invisible': [('cons_ref_pay', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

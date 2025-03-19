@@ -15,6 +15,7 @@
               groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_supply_chain_manager,pharma_di_admin,pharma_director,droga_pharma.pharma_fin"
               sequence="10">
 
+
         <menuitem
                 id="droga_sales_pharmacy_menu"
                 name="Sales order"
@@ -60,6 +61,27 @@
                 name="Promotional issue request"
                 action="droga_pharma_free_sample_consignment_issue_action"
                 sequence="32"/>
+
+          <menuitem id="droga_health_screening_menu"
+                  name="Health Screening"
+                  sequence="40">
+             <menuitem id="droga_weight_menu"
+                  name="Weight"
+                  action="droga_weight_action"
+                  sequence="43"/>
+            <menuitem id="droga_bp_menu"
+                  name="Blood Pressure"
+                  action="droga_bp_action"
+                  sequence="48"/>
+            <menuitem id="droga_glucose_menu"
+                  name="Glucose"
+                  action="droga_glucose_action"
+                  sequence="53"/>
+            </menuitem>
+
+
+
+
         </menuitem>
 
 

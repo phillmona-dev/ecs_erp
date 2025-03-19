@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+    <record id="droga_weight_tree" model="ir.ui.view">
+        <field name="name">droga.weight.tree</field>
+        <field name="model">droga.health.screening</field>
+        <field name="arch" type="xml">
+            <tree string="Weight Records" create="1" delete="1">
+                <field name="client_id"/>
+                <field name="mobile"/>
+                <field name="age"/>
+                <field name="sex"/>
+                <field name="patient_condition"/>
+                <field name="weight"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_weight_form" model="ir.ui.view">
+        <field name="name">droga.weight.form</field>
+        <field name="model">droga.health.screening</field>
+        <field name="arch" type="xml">
+           <form string="Weight Form" delete="1">
+            <sheet>
+                <group>
+                    <group string="Patient's Personal Info">
+                        <field name="client_id" options='{"no_open":True,"no_create": True}'/>
+                        <field name="age"/>
+                        <field name="mobile"/>
+                        <field name="sex"/>
+                        <field name="patient_condition"/>
+                    </group>
+                     <group string="Weight Details">
+                            <field name="weight"/>
+                            <field name="screening_type"/>
+                     </group>
+                </group>
+            </sheet>
+        </form>
+        </field>
+    </record>
+
+    <record id="droga_weight_action" model="ir.actions.act_window">
+        <field name="name">Weight</field>
+        <field name="res_model">droga.health.screening</field>
+         <field name="domain">[('screening_type', '=', 'weight')]</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5,0,0), (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_weight_tree')}), (0, 0, {'view_mode': 'form', 'view_id': ref('droga_weight_form')})]"/>
+    </record>
+
+</odoo>

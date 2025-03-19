@@ -380,7 +380,4 @@ class droga_tender_master(models.Model):
 
     def action_set_archive(self):
         for rec in self:
-            if rec.active:
-                rec.active = False
-            else:
-                rec.active = True
+            rec.active=not rec.active

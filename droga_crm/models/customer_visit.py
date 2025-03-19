@@ -13,6 +13,8 @@ except ImportError:
     from calendar import _monthlen as monthlen
 
 from odoo import models, fields, api
+from datetime import datetime
+import datetime
 
 class customer_visit_header(models.Model):
     _name='droga.customer.visit.header'
@@ -376,6 +378,16 @@ class customer_visit_header(models.Model):
         if len(self.env['droga.customer.visit.header'].search([('id','!=',res.id),('pr_sales', '=', vals_list['pr_sales']),('month', '=', vals_list['month']),('year', '=', vals_list['year'])]))>0:
             raise ValidationError("The combination month/year type for user already exists!")
 
+        if int(vals_list['month']) != fields.date.today().month + 1:
+            raise ValidationError(
+                "Please enter plan for " + datetime.strptime(str(fields.date.today().month + 1 % 12), '%m').strftime(
+                    '%B') + " month only.")
+
+        if int(vals_list['year'])!=int(fields.date.today().year) and int(fields.date.today().month)!=12:
+            raise ValidationError("Please enter plan for current year only.")
+        if vals_list['year']==fields.date.today().year and fields.date.today().month==12:
+            raise ValidationError("Please enter plan for next year only since we are in december.")
+
         week_num=0
         #Creates a list of visit details for user under month
         plan_vals_all=[]        #plan_vals_all is a list of all to be created visit details
@@ -461,9 +473,9 @@ class customer_visit_detail(models.Model):
     planned_visit_selection=fields.Selection([
         ('2-4 seat', '2-4 seat'),
         ('4-6 seat', '4-6 seat'),
-        ('6-8 seat', '6-8 seat'),
-        ('8-10 seat', '8-10 seat'),
-        ('10-12 seat', '10-12 seat'),
+        ('6-7 seat', '6-7 seat'),
+        ('7-9 seat', '7-9 seat'),
+        ('9-11 seat', '9-11 seat'),
     ], string='Visit session', default="2-4 seat")
     day_and_date=fields.Char('Visit Date',compute='_get_visit_date_and_day')
 

@@ -34,7 +34,7 @@ class cust_contact_extension(models.Model):
     city_name = fields.Many2one('droga.crm.settings.city', tracking=True)
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
-    contacts = fields.One2many('droga.crm.contacts', 'parent_customer')
+    contacts = fields.One2many('droga.crm.contacts', 'parent_customer',domain=[('has_access', '=', True)])
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
     x_exclude_maturity_for_reconciliation = fields.Boolean('Temporarly exclude maturity for reconciliation',tracking=True)
@@ -226,9 +226,17 @@ class account_move_pr_sales(models.Model):
 
 class sales_team_extension(models.Model):
     _inherit = 'crm.team'
-    _rec_name = 'city_name'
+    _rec_name = 'name'
     city_name = fields.Many2one('droga.crm.settings.city')
-
+    team_leader = fields.Many2one('droga.pro.sales.master',string='Team leader')
+    shares_group_with=fields.Many2many('crm.team',string='Shares contacts with')
+    shares_group_with = fields.Many2many(
+        'crm.team',
+        'crm_team_shared_groups',  # Explicitly defined junction table name
+        'team_id',
+        'shared_team_id',
+        string='Shared Groups'
+    )
 
 class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
@@ -250,9 +258,9 @@ class crm_lead_extension(models.Model):
     planned_visit_selection = fields.Selection([
         ('2-4 seat', '2-4 seat'),
         ('4-6 seat', '4-6 seat'),
-        ('6-8 seat', '6-8 seat'),
-        ('8-10 seat', '8-10 seat'),
-        ('10-12 seat', '10-12 seat'),
+        ('6-7 seat', '6-7 seat'),
+        ('7-9 seat', '7-9 seat'),
+        ('9-11 seat', '9-11 seat'),
     ], string='Visit session', default="2-4 seat")
     specialty = fields.Many2one('droga.cust.specialty', string='Specialty', related='contact_custom.specialty')
     phone = fields.Char(
@@ -399,6 +407,8 @@ class crm_lead_extension(models.Model):
 
     @api.model
     def create(self, vals):
+        vals.update({'name': vals['name'].replace("opportunity", "") + "lead"})
+        to_return=0
 
         if 'leads' in vals:
             lead = self.env['crm.lead'].search([('id', '=', vals['leads'])])
@@ -420,10 +430,28 @@ class crm_lead_extension(models.Model):
                 # 'contact_name': det['visit_contact'].name,
             }
 
-            return super(crm_lead_extension, self).create(lead_vals)
+            to_return= super(crm_lead_extension, self).create(lead_vals)
         else:
-            vals.update({'name': vals['name'].replace("opportunity", "") + "lead"})
-            return super(crm_lead_extension, self).create(vals)
+
+            to_return= super(crm_lead_extension, self).create(vals)
+
+        self.env['droga.crm.done.activity'].create(
+            {'name': vals['name'], 'activity_date': vals['date_planned'],
+             'type': vals['type'], 'from_visit_plan': False if
+            'is_from_plan' not in vals else vals['is_from_plan'],
+             'sales_rep':
+                 self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[
+                     0].id if len(self.env['droga.pro.sales.master.visit'].search(
+                     [('s_id', '=', request.session.sid)])) > 0 else False,
+             'state': 'Open', 'source_name': vals['name'], 'act_id': 0,
+             'source_id': to_return.id,
+             'sales_area': to_return.partner_id.city_name.city_descr,
+             'res_model_id': 530, 'res_model_descr': 'Lead',
+             'act_note': vals['name'], 'res_model': 'crm.lead',
+             'user': self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[
+                 0].id if len(self.env['droga.pro.sales.master.visit'].search(
+                 [('s_id', '=', request.session.sid)])) > 0 else False})
+        return to_return
 
 
 class crm_prod_template_extension(models.Model):

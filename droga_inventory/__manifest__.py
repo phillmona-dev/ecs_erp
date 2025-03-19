@@ -51,7 +51,7 @@
 
     'depends': ['base',
                 'mail','stock',
-                'resource', 'droga_procurement',
+                'resource', 'droga_procurement','stock_barcode',
                 'web', 'crm'],
     "license": "AGPL-3",
     # only loaded in demonstration mode
