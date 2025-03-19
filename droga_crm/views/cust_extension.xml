@@ -190,6 +190,7 @@
             <xpath expr="//form/sheet/group/group/field[@name='user_id']" position="replace">
                 <field name="team_leader" options="{'no_create':True,'no_open':True}" domain="([('status','=','Active')])"></field>
                 <field name="shares_group_with" widget="many2many_tags" options="{'no_create':True,'no_open':True}"></field>
+                <field name="visits_perday_peremployee"></field>
             </xpath>
 
         </field>

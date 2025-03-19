@@ -13,6 +13,8 @@ class cust_contact_extension(models.Model):
     company_type = fields.Selection(string='Company Type',
                                     selection=[('company', 'Company'), ('person', 'Individual')], default='company')
     cust_grade = fields.Many2one('droga.cust.grade', string='Customer grade')
+    biofarm_grade = fields.Many2one('droga.cust.grade', string='Biofarm grade')
+    ilko_grade = fields.Many2one('droga.cust.grade', string='ILKO grade')
     cust_type_ext = fields.Many2one('droga.cust.type', string='Customer type', tracking=True)
     contact_tobe_accessed_by = fields.Selection(
         [('Promotors', 'Promotors'), ('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
@@ -237,6 +239,7 @@ class sales_team_extension(models.Model):
         'shared_team_id',
         string='Shared Groups'
     )
+    visits_perday_peremployee=fields.Integer('Visits required per day per employee')
 
 class crm_lead_extension(models.Model):
     _inherit = 'crm.lead'
