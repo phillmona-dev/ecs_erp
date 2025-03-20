@@ -78,6 +78,12 @@
         <field name="domain">[('res_model', '=', 'crm.lead')]</field>
     </record>
 
+    <record model="ir.rule" id="activity_per_company">
+        <field name="name">Activity multi-company</field>
+        <field name="model_id" ref="model_droga_crm_done_activity"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
 
     <menuitem
             id="menu_done_activity"

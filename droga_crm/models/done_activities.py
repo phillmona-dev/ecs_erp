@@ -25,6 +25,7 @@ class done_activity(models.Model):
     act_note = fields.Text('Act. note')
     act_id=fields.Integer('Activity ID')
     from_visit_plan=fields.Boolean('Visit planned?')
+    company_id = fields.Many2one('res.company', string='Company', related='lead_id.company_id')
     check_in = fields.Char('Check in',compute='_getcheckin',store=True)
     check_out = fields.Char('Check out',compute='_getcheckout',store=True)
     check_in_dt = fields.Datetime('Check in datetime',compute='_getcheckin',store=True)
