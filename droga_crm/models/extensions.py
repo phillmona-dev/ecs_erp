@@ -257,7 +257,9 @@ class crm_lead_extension(models.Model):
     date_planned = fields.Datetime('Lead date', default=fields.Date.today())
     origin_user_id = fields.Many2one('res.users')
     is_from_plan=fields.Boolean(Default=False,string='From plan')
-
+    type = fields.Selection([
+        ('lead', 'Lead'), ('opportunity', 'Opportunity')], required=True, tracking=15, index=True,
+        default='lead')
     planned_visit_selection = fields.Selection([
         ('2-4 seat', '2-4 seat'),
         ('4-6 seat', '4-6 seat'),
@@ -442,6 +444,7 @@ class crm_lead_extension(models.Model):
             {'name': vals['name'], 'activity_date': vals['date_planned'],
              'type': vals['type'], 'from_visit_plan': False if
             'is_from_plan' not in vals else vals['is_from_plan'],
+             'lead_id': to_return.id,
              'sales_rep':
                  self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[
                      0].id if len(self.env['droga.pro.sales.master.visit'].search(
@@ -449,7 +452,7 @@ class crm_lead_extension(models.Model):
              'state': 'Open', 'source_name': vals['name'], 'act_id': 0,
              'source_id': to_return.id,
              'sales_area': to_return.partner_id.city_name.city_descr,
-             'res_model_id': 530, 'res_model_descr': 'Lead',
+             'res_model_id': 530, 'res_model_descr': 'Lead visit',
              'act_note': vals['name'], 'res_model': 'crm.lead',
              'user': self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[
                  0].id if len(self.env['droga.pro.sales.master.visit'].search(

@@ -16,6 +16,7 @@ class done_activity(models.Model):
     sales_rep=fields.Many2one('droga.pro.sales.master','User')
     type = fields.Char('Act. type')
     user = fields.Char('User')
+    lead_id=fields.Many2one('crm.lead')
     activity_date=fields.Date('Act. planned date')
     action_date = fields.Date('Actual act. date')
     res_model=fields.Char('Record type')
@@ -24,7 +25,24 @@ class done_activity(models.Model):
     act_note = fields.Text('Act. note')
     act_id=fields.Integer('Activity ID')
     from_visit_plan=fields.Boolean('Visit planned?')
+    check_in = fields.Char('Check in',compute='_getcheckin',store=True)
+    check_out = fields.Char('Check out',compute='_getcheckout',store=True)
+    check_in_dt = fields.Datetime('Check in datetime',compute='_getcheckin',store=True)
+    check_out_dt = fields.Datetime('Check out datetime',compute='_getcheckout',store=True)
 
+    @api.depends('lead_id.check_in_descr')
+    def _getcheckin(self):
+        for rec in self:
+            rec.check_in=rec.lead_id.check_in_descr
+            rec.check_in_dt=rec.lead_id.check_in_time_and_date
+            rec.state='Pending'
+
+    @api.depends('lead_id.check_out_descr')
+    def _getcheckout(self):
+        for rec in self:
+            rec.check_out = rec.lead_id.check_out_descr
+            rec.check_out_dt=rec.lead_id.check_out_time_and_date
+            rec.state = 'Done'
 
 class mail_activity_extension(models.Model):
     _inherit = "mail.activity"
@@ -48,16 +66,17 @@ class mail_activity_extension(models.Model):
             if activity.res_model_id.model == 'crm.lead':
                 done_act.create(
                     {'name': activity.summary, 'activity_date': activity.date_deadline,
+                     'lead_id':activity.res_id if activity.res_model_id.model == 'crm.lead' else False,
                      'type': activity.activity_type_id.name, 'from_visit_plan': True if (
                                 activity.res_model_id.model == 'crm.lead' and self.env['crm.lead'].search(
                             [('id', '=', activity.res_id)]).plan_id) else False,
                      'sales_rep':self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[0].id if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)]))>0 else False,
-                     'state': 'Open', 'source_name': activity.res_name+'-'+activity.summary, 'act_id': activity.id, 'source_id': activity.res_id,
+                     'state': 'Open', 'source_name': activity.res_name+('-'+activity.summary if activity.summary else ''), 'act_id': activity.id, 'source_id': activity.res_id,
                      'sales_area': self.env['crm.lead'].search([('id', '=',
                                                                  activity.res_id)]).partner_id.city_name.city_descr if activity.res_model_id.model == 'crm.lead' else activity.res_model_id.name,
-                     'res_model_id': activity.res_model_id, 'res_model_descr': capwords(self.env['crm.lead'].search([('id',
+                     'res_model_id': activity.res_model_id, 'res_model_descr': (capwords(self.env['crm.lead'].search([('id',
                                                                                                                       '=',
-                                                                                                                      activity.res_id)]).type) if activity.res_model_id.model == 'crm.lead' else activity.res_model_id.name,
+                                                                                                                      activity.res_id)]).type) if activity.res_model_id.model == 'crm.lead' else activity.res_model_id.name) +' '+activity.activity_type_id.name,
                      'act_note': activity.note if activity.note else '', 'res_model': activity.res_model,
                      'user': activity.user_id.name})
         return res

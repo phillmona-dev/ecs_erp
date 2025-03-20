@@ -27,7 +27,9 @@
             parent="crm.crm_menu_root"
             groups="crm_sr"
             sequence="1"/>
-
+    <record id="crm.menu_crm_opportunities" model="ir.ui.menu">
+            <field name="active">False</field> <!-- This hides the menu item -->
+        </record>
     <!-- Customer menu move to parent menu -->
     <menuitem
             id="res_partner_menu_customer"

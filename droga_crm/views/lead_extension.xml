@@ -44,7 +44,7 @@
                             <field name="prod" options="{'no_create':True,'no_open':True}"/>
                             <field name="qty"/>
                         </tree>
-                        <form string="Follow up visits">
+                        <form string="Items">
                             <group>
                                 <field name="prod" options="{'no_create':True,'no_open':True}"/>
                                 <field name="qty"/>
@@ -183,6 +183,7 @@
                     <field name="phone" string="Mobile"/>
                     <field name="planned_visit_selection"/>
                     <field name="check_out_descr" readonly="1"/>
+                    <field name="type" groups="droga_crm.crm_sr"/>
                 </group>
             </xpath>
 
@@ -209,6 +210,7 @@
                     <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
                     <field name="referral_distri" widget="many2many_tags"></field>
                     <field name="check_in_descr" readonly="1"/>
+                    <field name="visit_status"></field>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'lead')]}">
                     <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
@@ -228,7 +230,8 @@
                     <field name="phone" string="Mobile" widget="phone"/>
                     <field name="closed_sales" readonly="1"/>
                     <field name="check_out_descr" readonly="1"/>
-                    <field name="visit_status"></field>
+                    <field name="type" groups="droga_crm.crm_sr"/>
+
                     <label for="email_from" class="oe_inline"/>
                     <div class="o_row o_row_readonly" invisible="1">
                         <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger"
@@ -259,6 +262,14 @@
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='priority']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='stage_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
 

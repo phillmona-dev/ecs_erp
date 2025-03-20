@@ -168,6 +168,12 @@
                             action="droga_pharma_inv_availability_all_warehouse_action"
                             groups="droga_pharma.pharma_dp_admin,droga_pharma.pharma_br_admin,droga_pharma.pharma_di_admin,droga_pharma.pharma_supply_chain_manager"
                             sequence="6"/>
+                    <menuitem
+                            id="droga_pharma_consignment_menu2"
+                            name="Consignments"
+                            action="droga_inventory_consignment_receipt_action_pharmacy_report"
+                            groups="droga_pharma.pharma_director,droga_pharma.pharma_supply_chain_manager"
+                            sequence="7"/>
                 </menuitem>
                 <menuitem
                         id="droga_pharma_report_mtm"

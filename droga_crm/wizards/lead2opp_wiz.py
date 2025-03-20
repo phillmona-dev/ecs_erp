@@ -1,4 +1,5 @@
 from odoo import models,fields,api
+from odoo.exceptions import ValidationError
 from odoo.http import request
 
 
@@ -14,6 +15,11 @@ class lead2opp_inherit(models.TransientModel):
         ('nothing', 'Do not link to a customer')
     ], string='Related Customer', compute='_compute_action', readonly=False, store=True, compute_sudo=False)
 
+    def action_apply(self):
+        if self.partner_id.city_name.id not in self.pr_sales.p_regions.ids:
+            raise ValidationError(self.pr_sales.p_name+" does not have access to location.")
+        res = super(lead2opp_inherit, self).action_apply()
+        return res
 
     def _get_pr_sales_logged(self):
         if not request:

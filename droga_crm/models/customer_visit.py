@@ -270,16 +270,16 @@ class customer_visit_header(models.Model):
                 }
                 lead_created=self.env['crm.lead'].sudo().create(lead)
 
-                self.env['mail.activity'].sudo().create({
-                    'res_model_id': self.env.ref('crm.model_crm_lead').id,
-                    'res_name': descr,
-                    'res_id': lead_created.id,
-                    'user_id': self.user_id,
-                    'date_deadline': det['visit_date'],
-                    'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
-                    'summary': 'Visit ' + descr,
-                    'note': descr
-                })
+                # self.env['mail.activity'].sudo().create({
+                #     'res_model_id': self.env.ref('crm.model_crm_lead').id,
+                #     'res_name': descr,
+                #     'res_id': lead_created.id,
+                #     'user_id': self.user_id,
+                #     'date_deadline': det['visit_date'],
+                #     'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
+                #     'summary': 'Visit ' + descr,
+                #     'note': descr
+                # })
             else:
                 for contdet in det['contacts_schedule']:
 
@@ -309,24 +309,17 @@ class customer_visit_header(models.Model):
                     }
                     lead_created = self.env['crm.lead'].sudo().create(lead)
 
-                    #cont={
-                        #'contact_custom':contdet['contact_custom'].id,
-                        #'leads':lead_created.id,
-                       # 'core_products':contdet['core_products'],
-                      #  'co_travel_crm':contdet['co_travel'],
-                     #}
-                    #self.env['droga.crm.contacts.schedule'].sudo().create(cont)
 
-                    self.env['mail.activity'].sudo().create({
-                        'res_model_id': self.env.ref('crm.model_crm_lead').id,
-                        'res_name':descr,
-                        'res_id': lead_created.id,
-                        'user_id': self.user_id,
-                        'date_deadline':det['visit_date'],
-                        'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
-                        'summary': 'Visit '+descr,
-                        'note': descr
-                    })
+                    # self.env['mail.activity'].sudo().create({
+                    #     'res_model_id': self.env.ref('crm.model_crm_lead').id,
+                    #     'res_name':descr,
+                    #     'res_id': lead_created.id,
+                    #     'user_id': self.user_id,
+                    #     'date_deadline':det['visit_date'],
+                    #     'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
+                    #     'summary': 'Visit '+descr,
+                    #     'note': descr
+                    # })
 
             det['status'] = 'scheduled'
 
