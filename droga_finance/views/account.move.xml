@@ -185,7 +185,7 @@
             <xpath expr="//field[@name='name']" position="after">
                 <field name="transaction_type"/>
                 <field name="transaction_no" optional="show"/>
-                <field name="division" optional="show"/>
+
             </xpath>
         </field>
     </record>
