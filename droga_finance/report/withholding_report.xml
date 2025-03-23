@@ -3,7 +3,7 @@
 
     <!-- action for witholding report-->
     <record id="droga_finance_reports_withholding_excel_action" model="ir.actions.act_window">
-        <field name="name">Withholding Report - Excel</field>
+        <field name="name">MOR Reports - Excel</field>
         <field name="res_model">droga.finance.witholding.excel.report</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
