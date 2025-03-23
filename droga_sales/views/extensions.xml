@@ -210,6 +210,9 @@
         </field>
     </record>
 
+    <record id="account.res_partner_action_supplier" model="ir.actions.act_window">
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'tree', 'view_id': ref('base.view_partner_tree')}), (0, 0, {'view_mode': 'form', 'view_id': ref('base.view_partner_form')})]"/>
+    </record>
 
     <record id="droga_sales_free_sample_consignment_issue_action" model="ir.actions.act_window">
         <field name="name">Free sample request</field>

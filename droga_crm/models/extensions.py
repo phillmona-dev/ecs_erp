@@ -101,7 +101,7 @@ class cust_contact_extension(models.Model):
             # res.lati_custom=float(latitude)
 
             if not self.env.user.has_group('droga_crm.crm_cust_loc'):
-                pass
+                raise UserError("You can not set location.")
 
             if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])) > 0:
                 logged_user = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[
@@ -445,18 +445,13 @@ class crm_lead_extension(models.Model):
              'type': vals['type'], 'from_visit_plan': False if
             'is_from_plan' not in vals else vals['is_from_plan'],
              'lead_id': to_return.id,
-             'sales_rep':
-                 self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[
-                     0].id if len(self.env['droga.pro.sales.master.visit'].search(
-                     [('s_id', '=', request.session.sid)])) > 0 else False,
+             'sales_rep':vals['pr_sales'],
              'state': 'Open', 'source_name': vals['name'], 'act_id': 0,
              'source_id': to_return.id,
              'sales_area': to_return.partner_id.city_name.city_descr,
              'res_model_id': 530, 'res_model_descr': 'Lead visit',
              'act_note': vals['name'], 'res_model': 'crm.lead',
-             'user': self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[
-                 0].id if len(self.env['droga.pro.sales.master.visit'].search(
-                 [('s_id', '=', request.session.sid)])) > 0 else False})
+             'user': vals['pr_sales']})
         return to_return
 
 

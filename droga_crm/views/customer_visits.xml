@@ -777,6 +777,7 @@
             name="Visit plan and target"
             parent="crm.crm_menu_root"
             groups="crm_mr"
+            active="False"
             sequence="24"/>
 
     <menuitem

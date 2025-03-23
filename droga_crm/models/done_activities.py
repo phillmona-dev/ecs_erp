@@ -25,11 +25,33 @@ class done_activity(models.Model):
     act_note = fields.Text('Act. note')
     act_id=fields.Integer('Activity ID')
     from_visit_plan=fields.Boolean('Visit planned?')
-    company_id = fields.Many2one('res.company', string='Company', related='lead_id.company_id')
+    company_id = fields.Many2one('res.company', string='Company', related='lead_id.company_id',store=True)
     check_in = fields.Char('Check in',compute='_getcheckin',store=True)
     check_out = fields.Char('Check out',compute='_getcheckout',store=True)
     check_in_dt = fields.Datetime('Check in datetime',compute='_getcheckin',store=True)
     check_out_dt = fields.Datetime('Check out datetime',compute='_getcheckout',store=True)
+
+    has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
+                                search='_search_has_access')
+
+    def _search_has_access(self, operator, value):
+        if operator == '=':
+            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+            if self.env.user.has_group('droga_crm.crm_cust'):
+                has_access = self.env['droga.crm.done.activity'].sudo().search([])
+                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+            elif not request or len(ses) == 0:
+                return [('id', 'in', [])]
+            else:
+                has_access = self.env['droga.crm.done.activity'].sudo().search(
+                    ['|',('sales_rep.supervisor','=',ses[0].pro_id[0].id if len(ses) > 0 else False),('sales_rep', '=', ses[0].pro_id[0].id if len(ses) > 0 else False)])
+                return [('id', 'in', [x.id for x in has_access] if has_access else [])]
+        else:
+            return [('id', 'in', [])]
+
+    def _compute_has_access(self):
+        for rec in self:
+            rec.has_access = False
 
     @api.depends('lead_id.check_in_descr')
     def _getcheckin(self):
@@ -79,7 +101,7 @@ class mail_activity_extension(models.Model):
                                                                                                                       '=',
                                                                                                                       activity.res_id)]).type) if activity.res_model_id.model == 'crm.lead' else activity.res_model_id.name) +' '+activity.activity_type_id.name,
                      'act_note': activity.note if activity.note else '', 'res_model': activity.res_model,
-                     'user': activity.user_id.name})
+                     'user': self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])[0].pro_id[0].id if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)]))>0 else False})
         return res
 
     def action_feedback(self, feedback=False, attachment_ids=None):

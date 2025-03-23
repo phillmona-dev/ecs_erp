@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="stock_valuation_transactions_import_tree" model="ir.ui.view">
-        <field name="name">stock.valuation.tree.transaction.tree</field>
-        <field name="model">stock.valuation.layer</field>
+    <record id="droga_stock_valuation_transactions_import_tree" model="ir.ui.view">
+        <field name="name">droga.stock.valuation.tree.transaction.tree</field>
+        <field name="model">droga.stock.valuation.layer</field>
         <field name="arch" type="xml">
             <tree string="Stock transactions - All" delete="false" create="false">
                 <field name="id"/>
                 <field name="move_date"/>
+                <field name="move_type"/>
                 <field name="reference"/>
+                <field name="account_move_id" widget="many2one" options='{"no_open": False}'/>
+                <field name="inv_acc"/>
+                <field name="con_acc"/>
                 <field name="origin"/>
                 <field name='product_id'/>
                 <field name='categ_id'/>
@@ -15,16 +19,17 @@
                 <field name='quantity' sum="Total"/>
                 <field name='unit_cost' sum="Total"/>
                 <field name='value' sum="Total"/>
-                <field name='warehouse'/>
-                <field name="trans_type"></field>
-                <field name="trans_type_detail"></field>
+                <field name='remaining_qty' sum="Total"/>
+                <field name='remaining_value' sum="Total"/>
+                <field name='create_date'/>
+                <field name='move_date'/>
             </tree>
         </field>
     </record>
 
-    <record id="stock_valuation_transactions_import_search" model="ir.ui.view">
-        <field name="name">stock.valuation.tree.transaction.search</field>
-        <field name="model">stock.valuation.layer</field>
+    <record id="droga_stock_valuation_transactions_import_search" model="ir.ui.view">
+        <field name="name">droga.stock.valuation.tree.transaction.search</field>
+        <field name="model">droga.stock.valuation.layer</field>
         <field name="arch" type="xml">
             <search string="Stock on hand">
                 <field name="move_date"/>
@@ -36,7 +41,6 @@
                 <field name='quantity'/>
                 <field name='unit_cost'/>
                 <field name='value'/>
-                <field name='warehouse'/>
                 <filter string="Today"
                         domain="[('move_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('move_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
                         name="today_trans"></filter>
@@ -62,28 +66,23 @@
                         domain="[('move_date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
                         ('move_date','&lt;',time.strftime('%%Y-%%m-01'))]"
                         name="previous_month_trans"></filter>
-
-                <searchpanel>
-                    <field name="warehouse"></field>
-                    <field name="trans_type"></field>
-                </searchpanel>
             </search>
         </field>
     </record>
 
 
-    <record model="ir.actions.act_window" id="stock_valuation_transactions_import_action">
+    <record model="ir.actions.act_window" id="droga_stock_valuation_transactions_import_action">
         <field name="name">Stock transactions - ALL</field>
-        <field name="res_model">stock.valuation.layer</field>
+        <field name="res_model">droga.stock.valuation.layer</field>
         <field name="view_mode">tree</field>
-        <field name="search_view_id" ref="stock_valuation_transactions_import_search"></field>
-        <field name="view_id" ref="stock_valuation_transactions_import_tree"/>
+        <field name="search_view_id" ref="droga_stock_valuation_transactions_import_search"></field>
+        <field name="view_id" ref="droga_stock_valuation_transactions_import_tree"/>
     </record>
 
     <menuitem
             id="droga_sales_valuation_finance"
             name="Stock valuation by type"
-            action="stock_valuation_transactions_import_action"
+            action="droga_stock_valuation_transactions_import_action"
             parent="droga_finance.droga_reciveables_report"
             groups="droga_finance.business_control_specialist_group,droga_inventory.inv_prod_fin"
             sequence="25"/>

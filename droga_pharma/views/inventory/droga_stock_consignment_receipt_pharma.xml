@@ -4,14 +4,14 @@
         <field name="name">Store consignment receipt order</field>
         <field name="res_model">droga.inventory.consignment.receive.pharma</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">[('create_uid','=',uid),('issue_type','=','CONR')]</field>
     </record>
 
     <record id="droga_inventory_consignment_receipt_action_pharmacy_report" model="ir.actions.act_window">
         <field name="name">Store consignment receipt order</field>
         <field name="res_model">droga.inventory.consignment.receive.pharma</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('state','!=','draft')]</field>
+        <field name="domain">[('state','!=','draft'),('issue_type','=','CONR')]</field>
     </record>
 
     <record id="droga_inventory_consignment_receive_view_tree_pharmacy" model="ir.ui.view">

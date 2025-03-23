@@ -65,10 +65,15 @@ class droga_stock_cons_receive_pharma(models.Model):
         if vals_list.get('name', 'New') == 'New':
             if len(vals_list['detail_entries'])==0:
                 raise UserError("At least one product must be requested to save record.")
-            _name = self.env['ir.sequence'].next_by_code('droga.inventory.consignment.receipt.sequence')
+
+            if to_ret.issue_type == 'CONR':
+                _name = self.env['ir.sequence'].next_by_code('droga.inventory.consignment.receipt.sequence')
+            else:
+                _name = self.env['ir.sequence'].next_by_code('droga.inventory.consignment.return.sequence')
             if not _name:
                 raise UserError("Order sequence not found.")
             vals_list['name']=_name
+            to_ret.name=_name
         return to_ret
 
     def action_cancel(self):

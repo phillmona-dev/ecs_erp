@@ -373,7 +373,7 @@ class customer_visit_header(models.Model):
 
         if int(vals_list['month']) != fields.date.today().month + 1:
             raise ValidationError(
-                "Please enter plan for " + datetime.strptime(str(fields.date.today().month + 1 % 12), '%m').strftime(
+                "Please enter plan for " + datetime.datetime.strptime(str(fields.date.today().month + 1 % 12), '%m').strftime(
                     '%B') + " month only.")
 
         if int(vals_list['year'])!=int(fields.date.today().year) and int(fields.date.today().month)!=12:
