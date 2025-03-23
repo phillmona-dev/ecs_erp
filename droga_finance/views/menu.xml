@@ -114,7 +114,7 @@
 
     <menuitem id="droga_account_withholding_report" parent="account.menu_finance_reports" name="Reports"
               groups="account.group_account_manager">
-        <menuitem id="droga_account_withholding_report_menu" name="Withholding Report"
+        <menuitem id="droga_account_withholding_report_menu" name="MOR Reports"
                   action="droga_finance_reports_withholding_excel_action" groups="account.group_account_manager"
                   sequence="1"/>
 
