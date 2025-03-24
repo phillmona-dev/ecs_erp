@@ -441,17 +441,16 @@ class crm_lead_extension(models.Model):
             to_return= super(crm_lead_extension, self).create(vals)
 
         self.env['droga.crm.done.activity'].create(
-            {'name': vals['name'], 'activity_date': vals['date_planned'],
-             'type': vals['type'], 'from_visit_plan': False if
-            'is_from_plan' not in vals else vals['is_from_plan'],
+            {'name': to_return.name, 'activity_date': to_return.date_planned,
+             'type': to_return.type, 'from_visit_plan': to_return.is_from_plan,
              'lead_id': to_return.id,
-             'sales_rep':vals['pr_sales'],
-             'state': 'Open', 'source_name': vals['name'], 'act_id': 0,
+             'sales_rep':to_return.pr_sales.id,
+             'state': 'Open', 'source_name': to_return.name, 'act_id': 0,
              'source_id': to_return.id,
              'sales_area': to_return.partner_id.city_name.city_descr,
              'res_model_id': 530, 'res_model_descr': 'Lead visit',
-             'act_note': vals['name'], 'res_model': 'crm.lead',
-             'user': vals['pr_sales']})
+             'act_note': to_return.name, 'res_model': 'crm.lead',
+             'user': to_return.pr_sales.p_name})
         return to_return
 
 
