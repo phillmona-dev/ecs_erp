@@ -167,12 +167,13 @@
         <field name="view_mode">tree,graph,pivot,form,calendar,activity</field>
     </record>
     <!-- Leads menu rename -->
-    <record model="ir.ui.menu" id="crm.crm_menu_leads">
-        <field name="name">Visits/Leads</field>
-        
-
-    </record>
-
+    <menuitem
+        id="crm.crm_menu_leads"
+        name="Visits/Leads"
+        parent="crm.crm_menu_root"
+        action="crm.crm_lead_all_leads"
+        groups="droga_crm.crm_mr"
+        sequence="5"/>
     <!-- Leads report move menu -->
     <menuitem
         id="crm_opportunity_report_menu_lead"
