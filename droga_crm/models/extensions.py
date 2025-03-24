@@ -96,11 +96,11 @@ class cust_contact_extension(models.Model):
                 raise UserError("You can not edit name.")
         return super(cust_contact_extension, self).write(vals)
 
-    def update_current_locations(self, res_id, latitude, longitude):
+    def update_current_locations(self, res_id, latitude, longitude,can_set=False):
         for res in self.env['res.partner'].search([('id', '=', res_id)]):
             # res.lati_custom=float(latitude)
 
-            if not self.env.user.has_group('droga_crm.crm_cust_loc'):
+            if not self.env.user.has_group('droga_crm.crm_cust_loc') and not can_set:
                 raise UserError("You can not set location.")
 
             if len(self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])) > 0:
@@ -290,6 +290,8 @@ class crm_lead_extension(models.Model):
 
     def update_check_in_locations(self, res_id, lati, long):
         for res in self.env['crm.lead'].search([('id', '=', res_id)]):
+            if res.partner_id.partner_latitude==0:
+                res.partner_id.update_current_locations(res.partner_id.id,lati,long,True)
             # res.lati_custom=float(latitude)
             if res.check_in_lati == 0:
                 res.check_in_lati = float(lati)
