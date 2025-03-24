@@ -43,6 +43,7 @@ class GeneralLedgerReport(models.AbstractModel):
                        account_move_line.currency_id,
                        account_move_line.amount_currency,
                        move.bank_payment_ref,
+                       move.payment_reference,
                        ROUND(account_move_line.debit * currency_table.rate, currency_table.precision)   AS debit,
                        ROUND(account_move_line.credit * currency_table.rate, currency_table.precision)  AS credit,
                        ROUND(account_move_line.balance * currency_table.rate, currency_table.precision) AS balance,
