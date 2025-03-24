@@ -4,9 +4,9 @@ class update_acc(models.Model):
     _inherit='droga.stock.valuation.layer'
 
     def update_acc(self):
-        date_limit = datetime.date(2024, 7, 7)
-        #recs=self.env['droga.stock.valuation.layer'].search([('move_date','>',date_limit),('stock_move_id','!=',False),('inv_acc','=',False)],limit=10000)
-        recs = self.env['droga.stock.valuation.layer'].search(
+        #date_limit = datetime.date(2023, 7, 7)
+        #recs=self.env['droga.stock.valuation.layer'].search([('move_date','<',date_limit),('product_id.product_tmpl_id.categ_id','!=',40),('stock_move_id','!=',False),('inv_acc','=',False)],limit=20000)
+        recs = self.env['droga.stock.valuation.layer'].search(('product_id.product_tmpl_id.categ_id','!=',40),
             [ ('company_id','=',1),('stock_move_id', '!=', False), ('inv_acc', '=', False)], limit=30000)
         for rec in recs:
 
