@@ -86,9 +86,9 @@ class DrogaStockValuationLayer(models.Model):
         accounts = ret.product_id.product_tmpl_id.get_product_accounts()
         ret.inv_acc = accounts['stock_valuation']
 
-        ret._validate_accounting_entries_custom()
-        for svl in self:
-            svl.stock_move_id._account_analytic_entry_move()
+        # ret._validate_accounting_entries_custom()
+        # for svl in self:
+        #     svl.stock_move_id._account_analytic_entry_move()
 
         self.revaluate_after_date(ret)
 
