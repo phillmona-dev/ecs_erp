@@ -172,7 +172,7 @@
         name="Visits/Leads"
         parent="crm.crm_menu_root"
         action="crm.crm_lead_all_leads"
-        groups="droga_crm.crm_mr"
+        groups="droga_crm.crm_mr,droga_crm.crm_nsm,droga_crm.crm_rsm,droga_crm.crm_sr"
         sequence="5"/>
     <!-- Leads report move menu -->
     <menuitem

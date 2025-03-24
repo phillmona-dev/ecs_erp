@@ -426,7 +426,8 @@
                 </xpath>
                 <xpath expr="//filter[@name='activities_today']" position="replace">
                     <filter string="Today Visits" name="activities_today"
-                        domain="[('date_planned', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                        domain="[('date_planned', '&gt;=', context_today().strftime('%Y-%m-%d') + ' 00:00:00'),
+                        ('date_planned', '&lt;', context_today().strftime('%Y-%m-%d') + ' 23:59:59')]"/>
                 </xpath>
                 <xpath expr="//filter[@name='activities_upcoming_all']" position="replace">
                     <filter string="Future Visits" name="activities_upcoming_all"
