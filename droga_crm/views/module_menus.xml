@@ -169,6 +169,8 @@
     <!-- Leads menu rename -->
     <record model="ir.ui.menu" id="crm.crm_menu_leads">
         <field name="name">Visits/Leads</field>
+        <field name="groups">crm_mr</field>
+
     </record>
 
     <!-- Leads report move menu -->
