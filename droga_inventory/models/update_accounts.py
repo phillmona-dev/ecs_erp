@@ -6,8 +6,8 @@ class update_acc(models.Model):
     def update_acc(self):
         #date_limit = datetime.date(2023, 7, 7)
         #recs=self.env['droga.stock.valuation.layer'].search([('move_date','<',date_limit),('product_id.product_tmpl_id.categ_id','!=',40),('stock_move_id','!=',False),('inv_acc','=',False)],limit=20000)
-        recs = self.env['droga.stock.valuation.layer'].search(('product_id.product_tmpl_id.categ_id','!=',40),
-            [ ('company_id','=',1),('stock_move_id', '!=', False), ('inv_acc', '=', False)], limit=30000)
+        recs = self.env['droga.stock.valuation.layer'].search(
+            [ ('product_id.product_tmpl_id.categ_id','!=',40),('company_id','=',1),('stock_move_id', '!=', False), ('inv_acc', '=', False)], limit=30000)
         for rec in recs:
 
             if rec.stock_move_id.location_id.usage == 'supplier' and rec.stock_move_id.location_dest_id.usage != 'customer':
