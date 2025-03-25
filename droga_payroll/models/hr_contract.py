@@ -30,6 +30,9 @@ class HrContract(models.Model):
     # sales commission
     sales_commission = fields.Float("Sales Commission")
 
+    #
+    payments_deduction_links = fields.Many2many('hr.payslip.input.type', string='Payment & Deductions Groups')
+
     # get contract rate
     def get_employee_rate(self, payment_code):
         amount = 0
@@ -92,9 +95,19 @@ class HrContract(models.Model):
 
         return rate
 
-    #@api.onchange('analytic_account_id')
-    #def _on_analytic_id_changed(self):
-        #for record in self:
-            #if record.analytic_account_id.plan_id.name != 'Cost Center' and record.analytic_account_id.plan_id.name != ' ':
-                #record.analytic_account_id = ''
-                #raise ValidationError('Please select a cost center')
+    # check payment groups
+    def check_payment_groups(self, payment_type):
+        for record in self:
+            if payment_type in record.payments_deduction_links.mapped('code'):
+                return True
+            else:
+                return False
+
+        return False
+
+    # @api.onchange('analytic_account_id')
+    # def _on_analytic_id_changed(self):
+    # for record in self:
+    # if record.analytic_account_id.plan_id.name != 'Cost Center' and record.analytic_account_id.plan_id.name != ' ':
+    # record.analytic_account_id = ''
+    # raise ValidationError('Please select a cost center')
