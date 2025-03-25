@@ -33,7 +33,7 @@
                             attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_pt,droga_inventory.stores_manager_ws"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
-                            attrs="{'invisible': [('state', 'not in', ('stmg','stmgp'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_pr,droga_inventory.stores_manager_ws"
+                            attrs="{'invisible': [('state', 'not in', ('stmg','stmgp'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_pt,droga_inventory.stores_manager_ws"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
 
 

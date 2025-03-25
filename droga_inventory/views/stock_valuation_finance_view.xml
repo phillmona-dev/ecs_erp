@@ -37,6 +37,7 @@
                 <field name="origin"/>
                 <field name='product_id'/>
                 <field name='categ_id'/>
+                <field name='id'/>
                 <field name='uom_id'/>
                 <field name='quantity'/>
                 <field name='unit_cost'/>

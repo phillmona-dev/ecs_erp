@@ -87,7 +87,7 @@ class DrogaStockValuationLayer(models.Model):
         ret.inv_acc = accounts['stock_valuation']
 
         # ret._validate_accounting_entries_custom()
-        # for svl in self:
+        # for svl in ret:
         #     svl.stock_move_id._account_analytic_entry_move()
 
         self.revaluate_after_date(ret)
@@ -95,6 +95,9 @@ class DrogaStockValuationLayer(models.Model):
         return ret
 
     def _validate_accounting_entries_custom(self):
+        accounts = self.product_id.product_tmpl_id.get_product_accounts()
+        self.inv_acc = accounts['stock_valuation']
+
         am_vals = []
         for svl in self:
             if not svl.with_company(svl.company_id).product_id.valuation == 'custom_posting':
@@ -104,7 +107,7 @@ class DrogaStockValuationLayer(models.Model):
             move = svl.stock_move_id
             if not move:
                 move = svl.stock_valuation_layer_id.stock_move_id
-            am_vals += move.with_company(svl.company_id)._account_entry_move(svl.quantity, svl.description, svl.id, svl.value)
+            am_vals += move.with_company(svl.company_id)._account_entry_move_custom(svl.quantity, svl.description, svl.id, svl.value)
         for val in am_vals:
             self.con_acc=val['line_ids'][0][2]['account_id'] if val['line_ids'][0][2]['account_id']!=self.inv_acc.id else val['line_ids'][1][2]['account_id']
         if am_vals:
@@ -246,3 +249,85 @@ class ProductCategory(models.Model):
     property_valuation = fields.Selection(selection_add=[
         ('custom_posting', 'Custom Posting')
     ],company_dependent=True, copy=True, required=True,ondelete={'custom_posting': 'set default'})
+
+class StockMovesVal(models.Model):
+    _inherit='stock.move'
+    def _account_entry_move_custom(self, qty, description, svl_id, cost):
+        """ Accounting Valuation Entries """
+        self.ensure_one()
+        am_vals = []
+        if self.product_id.type != 'product':
+            # no stock valuation for consumable products
+            return am_vals
+        if self.restrict_partner_id and self.restrict_partner_id != self.company_id.partner_id:
+            # if the move isn't owned by the company, we don't make any valuation
+            return am_vals
+
+        company_from = self._is_out() and self.mapped('move_line_ids.location_id.company_id') or False
+        company_to = self._is_in() and self.mapped('move_line_ids.location_dest_id.company_id') or False
+
+        journal_id, acc_src, acc_dest, acc_valuation = self._get_accounting_data_for_valuation()
+        # Create Journal Entry for products arriving in the company; in case of routes making the link between several
+        # warehouse of the same company, the transit location belongs to this company, so we don't need to create accounting entries
+        if self._is_in():
+            if self._is_returned(valued_type='in'):
+                am_vals.append(self.with_company(company_to).with_context(is_returned=True)._prepare_account_move_vals_custom(acc_dest, acc_valuation, journal_id, qty, description, svl_id, cost))
+            else:
+                am_vals.append(self.with_company(company_to)._prepare_account_move_vals_custom(acc_src, acc_valuation, journal_id, qty, description, svl_id, cost))
+
+        # Create Journal Entry for products leaving the company
+        if self._is_out():
+            cost = -1 * cost
+            if self._is_returned(valued_type='out'):
+                am_vals.append(self.with_company(company_from).with_context(is_returned=True)._prepare_account_move_vals_custom(acc_valuation, acc_src, journal_id, qty, description, svl_id, cost))
+            else:
+                am_vals.append(self.with_company(company_from)._prepare_account_move_vals_custom(acc_valuation, acc_dest, journal_id, qty, description, svl_id, cost))
+
+        if self.company_id.anglo_saxon_accounting:
+            # Creates an account entry from stock_input to stock_output on a dropship move. https://github.com/odoo/odoo/issues/12687
+            if self._is_dropshipped():
+                if cost > 0:
+                    am_vals.append(self.with_company(self.company_id)._prepare_account_move_vals_custom(acc_src, acc_valuation, journal_id, qty, description, svl_id, cost))
+                else:
+                    cost = -1 * cost
+                    am_vals.append(self.with_company(self.company_id)._prepare_account_move_vals_custom(acc_valuation, acc_dest, journal_id, qty, description, svl_id, cost))
+            elif self._is_dropshipped_returned():
+                if cost > 0 and self.location_dest_id._should_be_valued():
+                    am_vals.append(self.with_company(self.company_id).with_context(is_returned=True)._prepare_account_move_vals_custom(acc_valuation, acc_src, journal_id, qty, description, svl_id, cost))
+                elif cost > 0:
+                    am_vals.append(self.with_company(self.company_id).with_context(is_returned=True)._prepare_account_move_vals_custom(acc_dest, acc_valuation, journal_id, qty, description, svl_id, cost))
+                else:
+                    cost = -1 * cost
+                    am_vals.append(self.with_company(self.company_id).with_context(is_returned=True)._prepare_account_move_vals_custom(acc_valuation, acc_src, journal_id, qty, description, svl_id, cost))
+
+        return am_vals
+
+    def _prepare_account_move_vals_custom(self, credit_account_id, debit_account_id, journal_id, qty, description, svl_id, cost):
+        self.ensure_one()
+        valuation_partner_id = self._get_partner_id_for_valuation_lines()
+        move_ids = self._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id, svl_id, description)
+        svl = self.env['droga.stock.valuation.layer'].browse(svl_id)
+        if self.env.context.get('force_period_date'):
+            date = self.env.context.get('force_period_date')
+        elif svl.account_move_line_id:
+            date = svl.account_move_line_id.date
+        else:
+            date = fields.Date.context_today(self)
+        return {
+            'journal_id': journal_id,
+            'line_ids': move_ids,
+            'partner_id': valuation_partner_id,
+            'date': date,
+            'ref': description,
+            'stock_move_id': self.id,
+            #'droga_stock_valuation_layer_ids': [(6, None, [svl_id])],
+            #'stock_valuation_layer_ids': [(6, None, [svl.svl_id])],
+            'move_type': 'entry',
+            'is_storno': self.env.context.get('is_returned') and self.env.company.account_storno,
+        }
+
+
+class DrogaAccountMove(models.Model):
+    _inherit = 'account.move'
+
+    droga_stock_valuation_layer_ids = fields.One2many('stock.valuation.layer', 'account_move_id', string='Stock Valuation Layer')
