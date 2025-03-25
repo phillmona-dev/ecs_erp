@@ -34,7 +34,7 @@
                         <field name="sales_commission"/>
                         <field name="has_company_vehicle"/>
                         <field name="paid_by_usd"/>
-                        <field name="payments_deduction_links" widget="many2many_tags" options="{'horizontal': true}"/>
+                        <field name="payments_deduction_links" widget="many2many_tags" options="{'no_create': true, 'no_open': true}"/>
                     </group>
                     <field name="salary_structure" mode="tree"
                            attrs="{'invisible': [('custom_salary_structure', '==',True )]}">
