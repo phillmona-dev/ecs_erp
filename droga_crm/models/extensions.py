@@ -231,7 +231,7 @@ class sales_team_extension(models.Model):
     _rec_name = 'name'
     city_name = fields.Many2one('droga.crm.settings.city')
     team_leader = fields.Many2one('droga.pro.sales.master',string='Team leader')
-    shares_group_with=fields.Many2many('crm.team',string='Shares contacts with')
+    #shares_group_with=fields.Many2many('crm.team',string='Shares contacts with')
     shares_group_with = fields.Many2many(
         'crm.team',
         'crm_team_shared_groups',  # Explicitly defined junction table name

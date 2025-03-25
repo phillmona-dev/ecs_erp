@@ -53,6 +53,11 @@ class droga_stock_cons_receive(models.Model):
                 lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
                     self.env.ref("droga_inventory.stores_manager_ws").users.filtered(
                 lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
+            elif rec.detail_entries[0].warehouse_id.wh_type == 'PT':
+                rec.store_manager = self.env.ref("droga_inventory.stores_manager_pt").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(
+                    self.env.ref("droga_inventory.stores_manager_pt").users.filtered(
+                lambda m: self.env.company.id in m.company_ids.ids).ids) > 0 else None
             else:
                 rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.filtered(
                 lambda m: self.env.company.id in m.company_ids.ids).ids[0] if len(

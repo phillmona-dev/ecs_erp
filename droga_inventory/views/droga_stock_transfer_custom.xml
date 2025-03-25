@@ -30,16 +30,16 @@
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
                             string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="stmg_approve"
-                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
+                            attrs="{'invisible': [('state', 'not in', ('stmg'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_pt,droga_inventory.stores_manager_ws"
                             string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
                     <button name="amend"
-                            attrs="{'invisible': [('state', 'not in', ('stmg','stmgp'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"
+                            attrs="{'invisible': [('state', 'not in', ('stmg','stmgp'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_pr,droga_inventory.stores_manager_ws"
                             string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
 
 
 
                     <button name="reset_order"
-                            attrs="{'invisible': [('state', 'not in', ('waiting','phmg','stmgp'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws,droga_pharma.pharma_supply_chain_manager"
+                            attrs="{'invisible': [('state', 'not in', ('waiting','phmg','stmgp'))]}"  groups="droga_inventory.stores_manager,droga_inventory.stores_manager_pt,droga_inventory.stores_manager_ws,droga_pharma.pharma_supply_chain_manager"
                             string="Reset to draft" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
                     <button name="action_cancel"
                             attrs="{'invisible': [('state', 'not in', ('draft'))]}"
@@ -68,7 +68,7 @@
                                     <field name="product_id" required="1" options="{'no_create':True,'no_open':True}" context="{'default_detailed_type': 'product'}"/>
                                     <field name="product_uom" domain="['|',('id', '=', import_uom),('id','=',pharma_uom)]"/>
                                     <field name="product_uom_qty" string="Request"/>
-                                    <field name="available_qty" groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws"/>
+                                    <field name="available_qty" groups="droga_inventory.stores_manager,droga_inventory.stores_manager_ws,droga_inventory.stores_manager_pt"/>
                                     <field name="product_uom_category_id" invisible="1"/>
                                     <field name="import_uom" invisible="1"/>
                                     <field name="pharma_uom" invisible="1"/>

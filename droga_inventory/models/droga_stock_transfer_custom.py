@@ -45,6 +45,9 @@ class droga_stock_transfer_custom(models.Model):
                 if self.location_id.wh_type == 'WS':
                     rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
                         self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
+                elif self.location_id.wh_type == 'PT':
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_pt").users.ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager_pt").users.ids) > 0 else None
                 else:
                     rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
                         self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
@@ -53,6 +56,9 @@ class droga_stock_transfer_custom(models.Model):
                 if rec.detail_entries[0].warehouse_id.wh_type == 'WS':
                     rec.store_manager = self.env.ref("droga_inventory.stores_manager_ws").users.ids[0] if len(
                         self.env.ref("droga_inventory.stores_manager_ws").users.ids) > 0 else None
+                elif rec.detail_entries[0].warehouse_id.wh_type == 'PT':
+                    rec.store_manager = self.env.ref("droga_inventory.stores_manager_pt").users.ids[0] if len(
+                        self.env.ref("droga_inventory.stores_manager_pt").users.ids) > 0 else None
                 else:
                     rec.store_manager = self.env.ref("droga_inventory.stores_manager").users.ids[0] if len(
                         self.env.ref("droga_inventory.stores_manager").users.ids) > 0 else None
@@ -121,6 +127,13 @@ class droga_stock_transfer_custom(models.Model):
         if self.location_dest_id.warehouse_id.wh_type=="PH":
             raise ValidationError(
                 "For pharmacy transactions, please use the menu under Pharmacy chain.")
+
+        unique_whs = self.detail_entries.mapped('warehouse_id.wh_type')
+        unique_whs = list(set(unique_whs))
+
+        if len(unique_whs)>1:
+                raise ValidationError(
+                    "Please request items either from import/wholesale/pharmacy or physiotherapy locations, don't mix them up.")
         self.ensure_one()
         self._get_approvers()
         self.state = 'stmg'
