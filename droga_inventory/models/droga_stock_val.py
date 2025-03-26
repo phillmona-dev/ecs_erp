@@ -305,8 +305,9 @@ class StockMovesVal(models.Model):
     def _prepare_account_move_vals_custom(self, credit_account_id, debit_account_id, journal_id, qty, description, svl_id, cost):
         self.ensure_one()
         valuation_partner_id = self._get_partner_id_for_valuation_lines()
-        move_ids = self._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id, svl_id, description)
         svl = self.env['droga.stock.valuation.layer'].browse(svl_id)
+        move_ids = self._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id, svl.svl_id, description)
+
         if self.env.context.get('force_period_date'):
             date = self.env.context.get('force_period_date')
         elif svl.account_move_line_id:
