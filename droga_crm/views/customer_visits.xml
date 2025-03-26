@@ -6,11 +6,12 @@
         <field name="name">droga.customer.visit.header.view.tree</field>
         <field name="model">droga.customer.visit.header</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top" delete="0">
+            <tree string="" create="1" delete="0">
                 <field name="pr_sales" options='{"no_open": True, "no_create": True}'></field>
                 <field name="pr_sales_logged" invisible="1"></field>
                 <field name="is_record_owner" invisible="1"/>
                 <field name="id" invisible="1"/>
+                <field name="weeks"></field>
                 <field name="month" attrs="{'readonly': [('id', '!=', False)]}"></field>
                 <field name="year" attrs="{'readonly': [('id', '!=', False)]}"></field>
                 <field name="pr_avail_areas" invisible="1"/>
@@ -116,6 +117,7 @@
                     <field name="pr_sales" options='{"no_open": True, "no_create": True}' readonly="1"></field>
                     <field name="pr_sales_logged" invisible="1"></field>
                     <field name="is_record_owner" invisible="1"/>
+                    <field name="weeks"></field>
                     <field name="month" attrs="{'readonly': [('id', '!=', False)]}"></field>
                     <field name="year" attrs="{'readonly': [('id', '!=', False)]}"></field>
                     <field name="state"></field>
@@ -777,7 +779,7 @@
             name="Visit plan and target"
             parent="crm.crm_menu_root"
             groups="crm_mr"
-            active="False"
+            active="True"
             sequence="24"/>
 
     <menuitem

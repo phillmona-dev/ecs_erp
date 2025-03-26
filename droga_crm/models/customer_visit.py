@@ -64,8 +64,6 @@ class customer_visit_header(models.Model):
            rec.is_approver=True if rec.approver==rec.pr_sales_logged else False
 
     is_record_owner=fields.Boolean('Show plan',store=False,compute="_is_record_owner",search="_search_field")
-
-
     is_approver=fields.Boolean('Is approver',store=False,compute="_is_record_owner",search="_search_field_app")
 
     def _search_field(self, operator, value):
@@ -94,7 +92,7 @@ class customer_visit_header(models.Model):
 
     userid = fields.Char("Promotor ID", default=lambda self: self.env.user.name,readonly=True,required=True)
     user_id = fields.Char("P.ID", default=lambda self: self.env.user.id, readonly=True, required=True)
-    year = fields.Selection(lambda self: self.get_years(), string='Year',store=True,required=True)
+
     city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city',required=False)
     descr=fields.Char('Visit description',compute='_get_descr')
     _order = 'year desc,month desc'
@@ -122,6 +120,13 @@ class customer_visit_header(models.Model):
          ('07', 'July'),
          ('08', 'August'), ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')], string='Month',required=True)
 
+    @api.model
+    def _default_week(self):
+        week_id = self.env['droga.crm.weeks'].find_week_record(self)
+        return week_id
+
+    weeks = fields.Many2one('droga.crm.weeks',string='Week', required=True,default=lambda self: self._default_week())
+
     def get_years(self):
         year_list = []
         #for i in range(datetime.date.today().year-2, datetime.date.today().year+2):
@@ -129,7 +134,7 @@ class customer_visit_header(models.Model):
             year_list.append((str(i), str(i)))
         return year_list
 
-
+    year = fields.Selection(lambda self: self.get_years(), string='Year', store=True, required=True)
     plan_detail=fields.One2many('droga.customer.visit.detail','visit_header')
     last_updated_date = fields.Date(default=fields.Date.today())
 
