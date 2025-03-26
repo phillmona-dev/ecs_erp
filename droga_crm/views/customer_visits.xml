@@ -11,7 +11,7 @@
                 <field name="pr_sales_logged" invisible="1"></field>
                 <field name="is_record_owner" invisible="1"/>
                 <field name="id" invisible="1"/>
-                <field name="weeks"></field>
+
                 <field name="month" attrs="{'readonly': [('id', '!=', False)]}"></field>
                 <field name="year" attrs="{'readonly': [('id', '!=', False)]}"></field>
                 <field name="pr_avail_areas" invisible="1"/>
@@ -117,7 +117,7 @@
                     <field name="pr_sales" options='{"no_open": True, "no_create": True}' readonly="1"></field>
                     <field name="pr_sales_logged" invisible="1"></field>
                     <field name="is_record_owner" invisible="1"/>
-                    <field name="weeks"></field>
+
                     <field name="month" attrs="{'readonly': [('id', '!=', False)]}"></field>
                     <field name="year" attrs="{'readonly': [('id', '!=', False)]}"></field>
                     <field name="state"></field>

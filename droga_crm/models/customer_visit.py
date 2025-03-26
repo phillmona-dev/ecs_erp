@@ -120,13 +120,7 @@ class customer_visit_header(models.Model):
          ('07', 'July'),
          ('08', 'August'), ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')], string='Month',required=True)
 
-    @api.model
-    def _default_week(self):
-        week_id = self.env['droga.crm.weeks'].find_week_record(self)
-        return week_id
-
-    weeks = fields.Many2one('droga.crm.weeks',string='Week', required=True,default=lambda self: self._default_week())
-
+    
     def get_years(self):
         year_list = []
         #for i in range(datetime.date.today().year-2, datetime.date.today().year+2):
