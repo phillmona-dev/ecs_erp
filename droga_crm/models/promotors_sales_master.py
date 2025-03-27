@@ -16,7 +16,7 @@ class droga_promotors_sales_master(models.Model):
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],
                             required=True,default='Active')
     is_pm=fields.Boolean('Is PM',default=False)
-    employee_access_users=fields.Many2one('res.users',string='Login user',required=True)
+    employee_access_users=fields.Many2one('res.users',string='Login user',required=True,domain=[('crm_double_authenticate','=',True)])
     res_user_name=fields.Char(related=employee_access_users.name)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     team=fields.Many2one('crm.team',string='Team',required=True)
@@ -37,6 +37,17 @@ class droga_promotors_sales_detail_visit(models.Model):
     _name = 'droga.pro.sales.master.visit'
     pro_id = fields.Many2one('droga.pro.sales.master', string='Promotor/Sales full name')
     s_id = fields.Char('Session ID')
+
+class droga_res_users(models.Model):
+    _inherit = 'res.users'
+    crm_double_authenticate=fields.Boolean(search='_has_access',store=False)
+
+    def _has_access(self, operator,value):
+        group=self.env['res.groups'].search([('name','=','CRM Double authenticate users')])
+        if group:
+            return [('id', 'in', group[0].users.ids)]
+        else:
+            return [('id', 'in', [])]
 
 
 class droga_promotors_sales_detail_entry_visit(models.TransientModel):

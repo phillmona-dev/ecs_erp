@@ -112,6 +112,7 @@ class DrogaStockValuationLayer(models.Model):
             self.con_acc=val['line_ids'][0][2]['account_id'] if val['line_ids'][0][2]['account_id']!=self.inv_acc.id else val['line_ids'][1][2]['account_id']
         if am_vals:
             account_moves = self.env['account.move'].sudo().create(am_vals)
+
             account_moves._post()
             self.account_move_id=account_moves.id
 
@@ -308,7 +309,10 @@ class StockMovesVal(models.Model):
         svl = self.env['droga.stock.valuation.layer'].browse(svl_id)
         move_ids = self._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id, svl.svl_id, description)
 
-        if self.env.context.get('force_period_date'):
+        #Custom added to back post
+        if svl.move_date:
+            date = svl.move_date
+        elif self.env.context.get('force_period_date'):
             date = self.env.context.get('force_period_date')
         elif svl.account_move_line_id:
             date = svl.account_move_line_id.date
