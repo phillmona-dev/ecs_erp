@@ -2,7 +2,7 @@ from datetime import datetime, date
 from datetime import timedelta
 
 
-from odoo import models, fields, api
+from odoo import models, fields, api,_
 from dateutil.relativedelta import relativedelta
 
 from odoo.exceptions import ValidationError, UserError
@@ -433,3 +433,22 @@ class sales_integ(models.Model):
                 self.env['droga.pharma.membership'].sudo().create(membership_vals)
         '''
         return res
+
+    @api.depends('product_id','state')
+    def _compute_name(self):
+        for line in self:
+            if not line.product_id:
+                continue
+            lang = line.order_id._get_lang()
+            if lang != self.env.lang:
+                line = line.with_context(lang=lang)
+            name = line._get_sale_order_line_multiline_description_sale()
+            if line.is_downpayment and not line.display_type:
+                context = {'lang': lang}
+                dp_state = line._get_downpayment_state()
+                if dp_state == 'draft':
+                    name = _("%(line_description)s (Draft)", line_description=name)
+                elif dp_state == 'cancel':
+                    name = _("%(line_description)s (Canceled)", line_description=name)
+                del context
+            line.name = name
