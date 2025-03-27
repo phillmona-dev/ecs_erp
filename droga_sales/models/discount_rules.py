@@ -661,9 +661,10 @@ class sale_order_ext(models.Model):
                 return [('id', 'in', [])]
             else:
                 is_rec_owner = self.env['sale.order'].sudo().search([('pr_sales', '=', ses[0].pro_id.ids[0])])
-                is_rec_inside_self = self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
-                return ['|', ('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),
-                        ('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+                #is_rec_inside_self = self.env['sale.order'].sudo().search([]).filtered(lambda x: x.pr_sales.id == ses[0].pro_id.ids[0])
+                #return ['|', ('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),
+                #        ('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+                return [('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False)]
         else:
             return [('id', 'in', [])]
 
@@ -1057,9 +1058,8 @@ class sale_order_ext(models.Model):
             else:
                 is_rec_owner = self.env['droga.customer.visit.header'].sudo().search(
                     [('pr_sales', '=', ses[0].pro_id.ids[0])])
-                is_rec_inside_self = self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
-                return ['|', ('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),
-                        ('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+
+                return [ ('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False)]
         else:
             return [('id', 'in', [])]
 

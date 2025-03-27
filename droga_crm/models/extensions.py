@@ -248,7 +248,7 @@ class crm_lead_extension(models.Model):
     ordered_prods = fields.One2many('droga.lead.ordered.products', 'leads')
     follow_up_visits = fields.One2many('crm.lead', 'leads')
     leads = fields.Many2one('crm.lead')
-    contact_custom = fields.Many2one('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]")
+    contact_custom = fields.Many2many('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]")
     city_name = fields.Many2one('droga.crm.settings.city', related='partner_id.city_name')
     core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])
     closed_sales = fields.Boolean('Sales is closed')
@@ -267,10 +267,7 @@ class crm_lead_extension(models.Model):
         ('7-9 seat', '7-9 seat'),
         ('9-11 seat', '9-11 seat'),
     ], string='Visit session', default="2-4 seat")
-    specialty = fields.Many2one('droga.cust.specialty', string='Specialty', related='contact_custom.specialty')
-    phone = fields.Char(
-        'Phone', tracking=50,
-        compute='_compute_phone', inverse='_inverse_phone', readonly=False, store=True)
+
 
     check_in_lati = fields.Float('Geo Latitude', digits=(10, 7))
     check_in_long = fields.Float('Geo Longtude', digits=(10, 7))
@@ -399,15 +396,15 @@ class crm_lead_extension(models.Model):
             upd_values['stage_id'] = stage.id
         return upd_values
 
-    @api.depends('contact_custom.mobile')
-    def _compute_phone(self):
-        for lead in self:
-            if lead.contact_custom.mobile and not lead.phone:
-                lead.phone = lead.contact_custom.mobile
+    # @api.depends('contact_custom.mobile')
+    # def _compute_phone(self):
+    #     for lead in self:
+    #         if lead.contact_custom.mobile and not lead.phone:
+    #             lead.phone = lead.contact_custom.mobile
 
-    def _inverse_phone(self):
-        for lead in self:
-            lead.contact_custom.mobile = lead.phone
+    # def _inverse_phone(self):
+    #     for lead in self:
+    #         lead.contact_custom.mobile = lead.phone
 
     def unlink(self):
         raise UserError("You can not delete the record. Please mark it as lost instead.")

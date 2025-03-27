@@ -16,7 +16,7 @@
     <menuitem id="sale.menu_sale_report"
             name="Reporting"
             action="sale.action_order_report_all"
-            groups="droga_crm.non_existent_group"
+              active="False"
             sequence="40"/>
 
 

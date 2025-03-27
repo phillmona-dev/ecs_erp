@@ -168,11 +168,13 @@
                     <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one"
                            required="True" string="Customer"
                            invisible="True"/>
-                    <field name="contact_custom" domain="([('parent_customer','=',partner_id),('has_access','=',True)])" options="{'no_create':True,'no_open':True}"></field>
-                    <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
-                    <field name="date_planned" required="True"/>
-                    <field name="referral_distri" widget="many2many_tags"></field>
+
+                    <field name="contact_custom" widget="many2many_tags" domain="([('parent_customer','=',partner_id),('has_access','=',True)])" options="{'no_create':True,'no_open':True}"></field>
+
+<!--                    <field name="specialty" options="{'no_create':True,'no_open':True}"></field>-->
                     <field name="check_in_descr" readonly="1"/>
+                    <field name="check_out_descr" readonly="1"/>
+                    <field name="date_planned" required="True"/>
                     <field name="visit_status"></field>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'opportunity')]}">>
@@ -182,7 +184,7 @@
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="phone" string="Mobile"/>
                     <field name="planned_visit_selection"/>
-                    <field name="check_out_descr" readonly="1"/>
+                    <field name="referral_distri" widget="many2many_tags"></field>
                     <field name="type" groups="droga_crm.crm_sr"/>
                 </group>
             </xpath>
@@ -207,9 +209,10 @@
                     <field name="contact_custom" domain="([('parent_customer','=',partner_id),('has_access','=',True)])"
                            options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned" required="True" string="Opportunity date"/>
-                    <field name="specialty" options="{'no_create':True,'no_open':True}"></field>
-                    <field name="referral_distri" widget="many2many_tags"></field>
+<!--                    <field name="specialty" options="{'no_create':True,'no_open':True}"></field>-->
+
                     <field name="check_in_descr" readonly="1"/>
+                    <field name="check_out_descr" readonly="1"/>
                     <field name="visit_status"></field>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'lead')]}">
@@ -229,7 +232,7 @@
                     <!--<field name="partner_name" string="Opportunity Descr." />-->
                     <field name="phone" string="Mobile" widget="phone"/>
                     <field name="closed_sales" readonly="1"/>
-                    <field name="check_out_descr" readonly="1"/>
+                    <field name="referral_distri" widget="many2many_tags"></field>
                     <field name="type" groups="droga_crm.crm_sr"/>
 
                     <label for="email_from" class="oe_inline"/>
@@ -323,8 +326,8 @@
                     <field name="company_id" groups="base.group_multi_company" optional="hide"/>
                     <field name="city" optional="hide"/>
                     <field name="state_id" optional="hide"/>
-                    <field name="contact_custom" optional="show"/>
-                    <field name="specialty" optional="hide"/>
+                    <field name="contact_custom" widget="many2many_tags" optional="show"/>
+<!--                    <field name="specialty" optional="hide"/>-->
                     <field name="phone" optional="hide" class="o_force_ltr"/>
                     <field name="date_planned" string="Lead date" optional="show"/>
                     <field name="check_in_descr" optional="show"/>
@@ -370,8 +373,8 @@
                     <field name="name" string="Opportunity" readonly="1"/>
                     <field name="partner_id" optional="show"/>
                     <field name="contact_name" optional="hide"/>
-                    <field name="contact_custom" string="Contact" optional="show"/>
-                    <field name="specialty" optional="show"/>
+                    <field name="contact_custom" widget="many2many_tags" string="Contact" optional="show"/>
+<!--                    <field name="specialty" optional="show"/>-->
                     <field name="phone" optional="show" class="o_force_ltr"/>
                     <field name="date_planned" string="Opportunity date" optional="show"/>
                     <field name="city_name" string="City/sub-city" optional="show"/>

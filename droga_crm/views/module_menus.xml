@@ -145,14 +145,14 @@
         id="crm.crm_lead_menu_my_activities"
         name="My Activities"
         parent="crm.crm_menu_sales"
-        groups="droga_crm.non_existent_group"
+        active="False"
         action="crm.crm_lead_action_my_activities"
         sequence="2"/>
 
     <!-- Hide default reporting menu -->
 
     <record model="ir.ui.menu" id="crm.crm_menu_report">
-        <field name="groups_id" eval="[(6,0,[ref('non_existent_group')])]"/>
+        <field name="active">False</field>
     </record>
 
     <!-- Lead menu domain -->

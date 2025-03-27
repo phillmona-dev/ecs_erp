@@ -29,6 +29,16 @@ class customer_visit_header(models.Model):
     pr_sales=fields.Many2one('droga.pro.sales.master',readonly=True,store=True,string="Promotor ID",default=_get_pr_sales_logged,required=True)
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     pr_avail_areas=fields.Many2many(related='pr_sales.p_regions')
+    visit_header=fields.Char('Description',store=True,compute='get_visit_descr')
+    @api.depends('weeks')
+    def get_visit_descr(self):
+        for rec in self:
+            if rec.weeks.id==self.env['droga.crm.weeks'].find_week_record(self):
+                rec.visit_header='Current Plan - '+rec.weeks.long_descr
+            elif rec.weeks.id==self.env['droga.crm.weeks'].get_next_week(self):
+                rec.visit_header = 'Next Plan - ' + rec.weeks.long_descr
+            else:
+                rec.visit_header = rec.weeks.long_descr
 
     def _get_approver(self):
         if not request:
@@ -51,12 +61,12 @@ class customer_visit_header(models.Model):
         return ses[0].pro_id[0].supervisor.id
 
     approver=fields.Many2one('droga.pro.sales.master',default=_get_approver,store=True,required=True,readonly=True)
-
+    active = fields.Boolean("Active", default=True)
 
     @api.depends('pr_sales_logged')
     def _is_record_owner(self):
        for rec in self:
-           if rec.pr_sales==rec.pr_sales_logged:
+           if rec.pr_sales==rec.pr_sales_logged or rec.approver==rec.pr_sales_logged:
                rec.is_record_owner=True
            else:
                rec.is_record_owner=False
@@ -72,9 +82,8 @@ class customer_visit_header(models.Model):
             if len(ses)==0:
                 return [('id','in',[])]
             else:
-                is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('pr_sales','=',ses[0].pro_id.ids[0])])
-                is_rec_inside_self=self.search([]).filtered(lambda x: x.pr_sales == ses[0].pro_id)
-                return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+                is_rec_owner=self.env['droga.customer.visit.header'].sudo().search(['|','&',('state','in',('approved','requested')),('approver','=',ses[0].pro_id.ids[0]),('pr_sales','=',ses[0].pro_id.ids[0])])
+                return [('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False)]
         else:
             return [('id','in',[])]
 
@@ -85,8 +94,9 @@ class customer_visit_header(models.Model):
                 return [('id','in',[])]
             else:
                 is_rec_owner=self.env['droga.customer.visit.header'].sudo().search([('approver','=',ses[0].pro_id.ids[0])])
-                is_rec_inside_self=self.search([]).filtered(lambda x: x.approver == ses[0].pro_id)
-                return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+                #is_rec_inside_self=self.search([]).filtered(lambda x: x.approver == ses[0].pro_id)
+                #return ['|',('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False),('id', 'in', [x.id for x in is_rec_inside_self] if is_rec_inside_self else False)]
+                return [ ('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False)]
         else:
             return [('id','in',[])]
 
@@ -95,7 +105,7 @@ class customer_visit_header(models.Model):
 
     city_name=fields.Many2one('droga.crm.settings.city',string='Sales city/sub-city',required=False)
     descr=fields.Char('Visit description',compute='_get_descr')
-    _order = 'year desc,month desc'
+    _order = 'weeks desc'
     date_from=fields.Date('Date from')
     date_to = fields.Date('Date to')
 
@@ -115,36 +125,20 @@ class customer_visit_header(models.Model):
         ('requested', 'Requested'),
         ('approved', 'Approved'),
     ], string='Status', default="draft", readonly=True)
-    month = fields.Selection(
-        [('01', 'January'), ('02', 'February'), ('03', 'March'), ('04', 'April'), ('05', 'May'), ('06', 'June'),
-         ('07', 'July'),
-         ('08', 'August'), ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')], string='Month',required=True)
 
-    
-    def get_years(self):
-        year_list = []
-        #for i in range(datetime.date.today().year-2, datetime.date.today().year+2):
-        for i in range(2022, 2100):
-            year_list.append((str(i), str(i)))
-        return year_list
 
-    year = fields.Selection(lambda self: self.get_years(), string='Year', store=True, required=True)
+    @api.model
+    def _default_week(self):
+        week_id = self.env['droga.crm.weeks'].get_next_week(self)
+        return week_id
+
+    weeks = fields.Many2one('droga.crm.weeks',string='Week',store=True, required=True,default=lambda self: self._default_week())
+
     plan_detail=fields.One2many('droga.customer.visit.detail','visit_header')
     last_updated_date = fields.Date(default=fields.Date.today())
 
-    week_1_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',domain=([('week_num','=','Week-1')]))
-    week_2_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
-                                    domain=([('week_num', '=', 'Week-2')]))
-    week_3_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
-                                    domain=([('week_num', '=', 'Week-3')]))
-    week_4_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
-                                    domain=([('week_num', '=', 'Week-4')]))
-    week_5_domain = fields.One2many('droga.customer.visit.detail', 'visit_header',
-                                    domain=([('week_num', '=', 'Week-5')]))
-    week_5_count=fields.Integer(compute='_get_wk5_count')
-    def _get_wk5_count(self):
-        for rec in self:
-            rec.week_5_count=len(rec.week_5_domain)
+    wk_descr=fields.Char(related='weeks.long_descr')
+    weeks_detail=fields.One2many('droga.customer.visit.detail', 'visit_header')
 
     def visit_detail_open(self):
         return {
@@ -161,74 +155,74 @@ class customer_visit_header(models.Model):
             'res_id': self.id,
         }
 
-    def plan_analysis(self):
-
-        views=self.env['droga.crm.grade.vs.schedule.trans'].search([('visit_header_id', '=', self.id)])
-        views.unlink()
-
-        regions=self.pr_sales.p_regions.ids
-        partners_list=self.env['res.partner'].search([('city_name','in',regions),('company_id','=',self.env.company.id)])
-        contacts_list=self.env['droga.crm.contacts'].search([('contact_area','in',regions),('company_id','=',self.env.company.id)])
-
-        for partner in partners_list:
-            planned_vis=len(self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)])) if self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)]) else 0
-            planned_vis_all = len(self.env['droga.customer.visit.detail'].search(
-                [('visit_header.month', '=', self.month),('visit_header.year', '=', self.year), ('visit_client', '=', partner.id)])) if self.env[
-                'droga.customer.visit.detail'].search(
-                [('visit_header.month', '=', self.month),('visit_header.year', '=', self.year), ('visit_client', '=', partner.id)]) else 0
-            vals = {
-                'month': self.month,
-                'month_des': calendar.month_name[int(self.month)],
-                'year': self.year,
-                'state': self.state,
-                'cust_name': partner.name,
-                'visit_header_id': self.id,
-                'required_visits': partner.cust_grade.visit_times_per_month if partner.cust_grade else 4,
-                'planned_visits': planned_vis,
-                'planned_visits_all': planned_vis_all,
-                'diff':planned_vis_all-partner.cust_grade.visit_times_per_month if partner.cust_grade else planned_vis_all-4,
-                'customer_type': partner.cust_type_ext.full_name,
-                'cust_type': 'Customer',
-                'cust_id': partner.id
-            }
-
-            self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
-        for cont in contacts_list:
-            planned_vis=len(self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)])) if self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)]) else 0
-            planned_vis_all = len(self.env['droga.crm.contacts.schedule'].search(
-                [('visits_header.month', '=', self.month), ('visits_header.year', '=', self.year),
-                 ('contact_custom','=',cont.id)])) if self.env[
-                'droga.crm.contacts.schedule'].search(
-                [('visits_header.month', '=', self.month), ('visits_header.year', '=', self.year),
-                 ('contact_custom','=',cont.id)]) else 0
-            vals = {
-                'month': self.month,
-                'month_des': calendar.month_name[int(self.month)],
-                'year': self.year,
-                'state': self.state,
-                'cust_name': cont.descr+' ('+cont.parent_customer.name+')',
-                'visit_header_id': self.id,
-                'required_visits': cont.cont_grade.visit_times_per_month if cont.cont_grade else 4,
-                'planned_visits': planned_vis,
-                'planned_visits_all': planned_vis_all,
-                'diff':planned_vis_all-cont.cont_grade.visit_times_per_month if cont.cont_grade else planned_vis_all-4,
-                'customer_type': cont.parent_customer.cust_type_ext.full_name,
-                'cust_type': 'Contact',
-                'cust_id': partner.id
-            }
-
-            self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
-        return {
-            'name': 'Plan analysis for '+self.userid+' - '+calendar.month_name[int(self.month)]+', '+self.year,
-            'view_mode': 'tree',
-            'view_type': 'form',
-            'res_model': 'droga.crm.grade.vs.schedule.trans',
-            'views': [[self.env.ref('droga_crm.droga_crm_required_vs_planned_tree').id, 'tree'],
-                      [self.env.ref('droga_crm.droga_crm_grade_vs_schedule_view_view_kanban').id, 'kanban']],
-            'type': 'ir.actions.act_window',
-            'domain': [('visit_header_id', '=', self.id)],
-            'context': {'search_default_group_cust_type':1},
-        }
+    # def plan_analysis(self):
+    #
+    #     views=self.env['droga.crm.grade.vs.schedule.trans'].search([('visit_header_id', '=', self.id)])
+    #     views.unlink()
+    #
+    #     regions=self.pr_sales.p_regions.ids
+    #     partners_list=self.env['res.partner'].search([('city_name','in',regions),('company_id','=',self.env.company.id)])
+    #     contacts_list=self.env['droga.crm.contacts'].search([('contact_area','in',regions),('company_id','=',self.env.company.id)])
+    #
+    #     for partner in partners_list:
+    #         planned_vis=len(self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)])) if self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)]) else 0
+    #         planned_vis_all = len(self.env['droga.customer.visit.detail'].search(
+    #             [('visit_header.month', '=', self.month),('visit_header.year', '=', self.year), ('visit_client', '=', partner.id)])) if self.env[
+    #             'droga.customer.visit.detail'].search(
+    #             [('visit_header.month', '=', self.month),('visit_header.year', '=', self.year), ('visit_client', '=', partner.id)]) else 0
+    #         vals = {
+    #             'month': self.month,
+    #             'month_des': calendar.month_name[int(self.month)],
+    #             'year': self.year,
+    #             'state': self.state,
+    #             'cust_name': partner.name,
+    #             'visit_header_id': self.id,
+    #             'required_visits': partner.cust_grade.visit_times_per_month if partner.cust_grade else 4,
+    #             'planned_visits': planned_vis,
+    #             'planned_visits_all': planned_vis_all,
+    #             'diff':planned_vis_all-partner.cust_grade.visit_times_per_month if partner.cust_grade else planned_vis_all-4,
+    #             'customer_type': partner.cust_type_ext.full_name,
+    #             'cust_type': 'Customer',
+    #             'cust_id': partner.id
+    #         }
+    #
+    #         self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
+    #     for cont in contacts_list:
+    #         planned_vis=len(self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)])) if self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)]) else 0
+    #         planned_vis_all = len(self.env['droga.crm.contacts.schedule'].search(
+    #             [('visits_header.month', '=', self.month), ('visits_header.year', '=', self.year),
+    #              ('contact_custom','=',cont.id)])) if self.env[
+    #             'droga.crm.contacts.schedule'].search(
+    #             [('visits_header.month', '=', self.month), ('visits_header.year', '=', self.year),
+    #              ('contact_custom','=',cont.id)]) else 0
+    #         vals = {
+    #             'month': self.month,
+    #             'month_des': calendar.month_name[int(self.month)],
+    #             'year': self.year,
+    #             'state': self.state,
+    #             'cust_name': cont.descr+' ('+cont.parent_customer.name+')',
+    #             'visit_header_id': self.id,
+    #             'required_visits': cont.cont_grade.visit_times_per_month if cont.cont_grade else 4,
+    #             'planned_visits': planned_vis,
+    #             'planned_visits_all': planned_vis_all,
+    #             'diff':planned_vis_all-cont.cont_grade.visit_times_per_month if cont.cont_grade else planned_vis_all-4,
+    #             'customer_type': cont.parent_customer.cust_type_ext.full_name,
+    #             'cust_type': 'Contact',
+    #             'cust_id': partner.id
+    #         }
+    #
+    #         self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
+    #     return {
+    #         'name': 'Plan analysis for '+self.userid+' - '+calendar.month_name[int(self.month)]+', '+self.year,
+    #         'view_mode': 'tree',
+    #         'view_type': 'form',
+    #         'res_model': 'droga.crm.grade.vs.schedule.trans',
+    #         'views': [[self.env.ref('droga_crm.droga_crm_required_vs_planned_tree').id, 'tree'],
+    #                   [self.env.ref('droga_crm.droga_crm_grade_vs_schedule_view_view_kanban').id, 'kanban']],
+    #         'type': 'ir.actions.act_window',
+    #         'domain': [('visit_header_id', '=', self.id)],
+    #         'context': {'search_default_group_cust_type':1},
+    #     }
 
     def request_approval(self):
         self._get_approver()
@@ -281,8 +275,11 @@ class customer_visit_header(models.Model):
                 # })
             else:
                 for contdet in det['contacts_schedule']:
+                    descr=''
+                    for cont in contdet['contact_custom']:
+                        descr+=(' - '+cont['specialty']['specialty']+' '+cont['contact_name'] if cont else '')
 
-                    descr = det['visit_client'].name + (' - '+contdet['contact_custom']['specialty']['specialty']+' '+contdet['contact_custom']['contact_name'] if contdet['contact_custom'] else '')+ (' : ' +prods if prods else '')
+                    descr = det['visit_client'].name +descr+ (' : ' +prods if prods else '')
                     descr = descr + ' - ' + det['visit_location'].name if det['visit_location'] else descr
                     lead = {
                         'name': descr,
@@ -291,7 +288,6 @@ class customer_visit_header(models.Model):
                         'pr_sales': self.pr_sales.id,
                         'pr_lead': self.pr_sales.id,
                         'team_id': 0,  # Fix me
-                        'phone':contdet['contact_custom']['mobile'] if contdet['contact_custom'] else None,
                         'company_id': self.env.company.id,
                         'type': 'lead',
                         'stage_id': 1,
@@ -299,7 +295,7 @@ class customer_visit_header(models.Model):
                         'is_from_plan': True,
                         'core_products': contdet['core_products'],
                         'co_travel_crm': contdet['co_travel_crm'],
-                        'contact_custom':contdet['contact_custom'].id,
+                        'contact_custom':contdet['contact_custom'].ids,
                         'expected_revenue': 0,
                         'date_planned': det['visit_date'],
                         'partner_id': det['visit_client'].id,
@@ -324,30 +320,6 @@ class customer_visit_header(models.Model):
 
         self.state='approved'
 
-    def date_iter(self,yearp, monthp):
-        dates=[]
-        monday_found=False
-
-        #The schedule starts from Monday and excludes sunday
-        for i in range(1, monthlen(yearp, monthp) + 1):
-            if (monday_found or datetime.date(yearp, monthp, i).weekday()==0) and (datetime.date(yearp, monthp, i).weekday() !=6):
-                monday_found=True
-                dates.append(datetime.date(yearp, monthp, i))
-
-        #From the second month, the schedule ends when it reaches Monday or Sunday
-        if monthp==12:
-            monthp=1
-            yearp=yearp+1
-        else:
-            monthp=monthp+1
-
-        for i in range(1, monthlen(yearp, monthp) + 1):
-            if datetime.date(yearp, monthp, i).weekday() not in (0,6):
-                dates.append(datetime.date(yearp, monthp, i))
-            else:
-                break
-        return dates
-
     @api.model
     def create(self, vals_list):
 
@@ -367,55 +339,22 @@ class customer_visit_header(models.Model):
 
         #custs['cust_grade']['visit_times_per_month']
 
-        if len(self.env['droga.customer.visit.header'].search([('id','!=',res.id),('pr_sales', '=', vals_list['pr_sales']),('month', '=', vals_list['month']),('year', '=', vals_list['year'])]))>0:
-            raise ValidationError("The combination month/year type for user already exists!")
-
-        if int(vals_list['month']) != fields.date.today().month + 1:
-            raise ValidationError(
-                "Please enter plan for " + datetime.datetime.strptime(str(fields.date.today().month + 1 % 12), '%m').strftime(
-                    '%B') + " month only.")
-
-        if int(vals_list['year'])!=int(fields.date.today().year) and int(fields.date.today().month)!=12:
-            raise ValidationError("Please enter plan for current year only.")
-        if vals_list['year']==fields.date.today().year and fields.date.today().month==12:
-            raise ValidationError("Please enter plan for next year only since we are in december.")
+        if len(self.env['droga.customer.visit.header'].search([('id','!=',res.id),('pr_sales', '=', vals_list['pr_sales']),('weeks', '=', res.weeks.id)]))>0:
+            raise ValidationError("The combination week/year type for user already exists!")
 
         week_num=0
         #Creates a list of visit details for user under month
         plan_vals_all=[]        #plan_vals_all is a list of all to be created visit details
 
-        dates=self.date_iter(int(vals_list['year']), int(vals_list['month']))
-        res.date_from = dates[0]
-        res.date_to = dates[len(dates) - 1]
-        for d in dates:
-            if d.weekday()==0:
-                week_num=week_num+1
-                if not res.wk1_from:
-                    res.wk1_from=d
-                elif not res.wk2_from:
-                    res.wk2_from = d
-                    res.wk1_to=d-timedelta(days=1)
-                elif not res.wk3_from:
-                    res.wk3_from = d
-                    res.wk2_to=d-timedelta(days=1)
-                elif not res.wk4_from:
-                    res.wk4_from = d
-                    res.wk3_to=d-timedelta(days=1)
-                elif not res.wk5_from:
-                    res.wk5_from = d
-                    res.wk4_to=d-timedelta(days=1)
 
-            plan_vals = {
+        date_from=res.weeks.date_from
+        counter=0
+        while counter<5:
+            plan_vals_all.append({
                 'visit_header': res.id,
-                'visit_date': d,
-                'week_num': 'Week-' + str(week_num),
-            }
-            plan_vals_all.append(plan_vals)
-
-        if not res.wk5_from:
-            res.wk4_to=dates[len(dates)-1]
-        else:
-            res.wk5_to = dates[len(dates) - 1]
+                'visit_date': date_from+timedelta(days=counter),
+            })
+            counter+=1
 
         for p in plan_vals_all:
             self.env['droga.customer.visit.detail'].create(p)
@@ -424,8 +363,7 @@ class customer_visit_header(models.Model):
     def _get_descr(self):
         for record in self:
             try:
-                record.descr= record.pr_sales.p_name + ' - ' + calendar.month_name[int(record.month)] + ', ' + str(
-                    record.year)
+                record.descr= record.pr_sales.p_name + ' - ' + record.weeks.descr
             except:
                 record.descr=record.pr_sales.p_name if record.pr_sales.p_name else '-'
 class customer_visit_detail(models.Model):
@@ -477,15 +415,16 @@ class customer_visit_detail(models.Model):
             descr=''
             try:
                 for sched in rec.contacts_schedule:
-                    descr=descr+(sched['contact_custom']['job_position']['job_position'] +' - ' if sched['contact_custom']['job_position'] else '')+(sched['contact_custom']['specialty']['specialty']+' - ' if sched['contact_custom']['specialty']['specialty'] else '')+sched['contact_custom']['contact_name']+' : ' if sched['contact_custom']['contact_name'] else ' '
+                    for cont in sched['contact_custom']:
+                        descr=descr+'\n'+(cont['job_position']['job_position'] +' - ' if cont['job_position'] else '')+(cont['specialty']['specialty']+' - ' if cont['specialty']['specialty'] else '')+cont['contact_name']+' : ' if cont['contact_name'] else ' '
 
                     for id, prod in enumerate(sched['core_products']):
-                        descr = descr + prod.name if id == 0 else descr + ', ' + prod['name']
+                        descr = descr +'\n' + prod.name if id == 0 else descr + ', ' + prod['name']
                     descr=descr+'\n'
 
                 rec.cont_plan_des=descr
             except:
-                rec.cont_plan_des = sched['contact_custom']['contact_name'] if sched['contact_custom']['contact_name'] else ' '
+                rec.cont_plan_des = rec.visit_client.name
     def _get_visit_date_and_day(self):
         for rec in self:
             rec.day_and_date=rec.visit_date_descr+'-'+rec.visit_date.strftime("%B %d,%Y")
@@ -542,19 +481,8 @@ class customer_visit_detail(models.Model):
         if not res.visit_date:
             raise ValidationError("Visit date must be entered.")
 
-        if res.visit_date<res.date_from or res.visit_date>res.date_to:
+        if res.visit_date<res.visit_header.weeks.date_from or res.visit_date>res.visit_header.weeks.date_to:
             raise ValidationError("Visit date must be between %s and %s." % (res.date_from,res.date_to))
-
-        if res.visit_header.wk1_from <= res.visit_date <= res.visit_header.wk1_to:
-            res.week_num='Week-1'
-        elif res.visit_header.wk2_from <= res.visit_date <= res.visit_header.wk2_to:
-            res.week_num='Week-2'
-        elif res.visit_header.wk3_from <= res.visit_date <= res.visit_header.wk3_to:
-            res.week_num = 'Week-3'
-        elif res.visit_header.wk4_from <= res.visit_date <= res.visit_header.wk4_to:
-            res.week_num='Week-4'
-        else:
-            res.week_num='Week-5'
 
         res.visit_header.last_updated_date=res.visit_date
 

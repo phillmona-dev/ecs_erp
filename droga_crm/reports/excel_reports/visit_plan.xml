@@ -26,8 +26,8 @@
 
     <menuitem
             id="menu_visit_reports"
-            name="Reports"
-            parent="crm.crm_menu_root"
+            name="CRM Reports"
+            groups="crm_mr"
             sequence="19"/>
 
     <menuitem

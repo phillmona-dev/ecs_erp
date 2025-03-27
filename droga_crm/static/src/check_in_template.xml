@@ -3,15 +3,13 @@
     <t t-name="check_in.JsFormView"
        t-inherit="web.FormView" t-inherit-mode="primary" owl="1">
 
-
         <xpath expr="//ActionMenus" position="before">
-            <button class="btn btn-info" type="button" t-on-click="onClickTestJavascript">
+            <button class="btn btn-info" type="button" t-on-click="checkIn">
                 Check in
             </button>
-            <button class="btn btn-info" style="margin-left:20px" type="button" t-on-click="onClickTestJavascriptout">
+            <button class="btn btn-info" style="margin-left:20px" type="button" t-on-click="checkOut">
                 Check out
             </button>
         </xpath>
     </t>
 </templates>
-

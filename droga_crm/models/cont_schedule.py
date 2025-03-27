@@ -5,8 +5,8 @@ from odoo.http import request
 
 class contacts_schedule(models.Model):
     _name='droga.crm.contacts.schedule'
-    contact_custom=fields.Many2one('droga.crm.contacts',string='Contact')
-    phone_no=fields.Char(related='contact_custom.mobile')
+    contact_custom=fields.Many2many('droga.crm.contacts',string='Contact')
+
     sales_close_descr=fields.Char(string='Sales closed?')
     sales_avail=fields.Boolean('Sales available?',default=False)
     sales_closed = fields.Boolean('Sales Closed?', default=False)
@@ -18,12 +18,22 @@ class contacts_schedule(models.Model):
     #custlead = fields.Many2one('res.partner', related='leads.partner_id')
     core_products = fields.Many2many('product.template')
 
-    @api.model
-    def create(self, vals_list):
-        if len(self.env['droga.crm.contacts.schedule'].search(
-                [('contact_custom', '=', vals_list['contact_custom']), ('visits', '=', vals_list['visits'])])) > 0:
-            raise ValidationError("Visit with the same customer/client/date already exists.!")
-        return super().create(vals_list)
+    cont_plan_des = fields.Text('Plan', compute='_compute_contact_plan')
+
+    @api.depends('co_travel_crm','core_products')
+    def _compute_contact_plan(self):
+        for rec in self:
+            descr = ''
+            for cont in rec.co_travel_crm:
+                descr = descr + '\n' + (
+                        cont.p_name + ' : ' if cont.p_name else ' ')
+
+            for id, prod in enumerate(rec['core_products']):
+                descr = descr + '\n' + prod.name if id == 0 else descr + ', ' + prod['name']
+            descr = descr + '\n'
+
+            rec.cont_plan_des = descr
+
 
 class lead_ordred_products(models.Model):
     _name='droga.lead.ordered.products'

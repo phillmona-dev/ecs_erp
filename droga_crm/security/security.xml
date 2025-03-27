@@ -46,11 +46,6 @@
         <field name="category_id" ref="crm_management"/>
     </record>
 
-    <record id="non_existent_group" model="res.groups">
-        <field name="name">No one access, used for hiding menus</field>
-        <field name="category_id" ref="crm_management"/>
-    </record>
-
     <record id="crm_emp_administrator" model="res.groups">
         <field name="name">CRM Employee administrator</field>
         <field name="category_id" ref="crm_management"/>

@@ -37,40 +37,37 @@ class CrmWeeks(models.Model):
         # This part would depend on your business logic
         return False
 
-    # def generate_odoo_week_values(self):
-    #     week_records = []
-    #
-    #     for year in range(2025, 2099):
-    #         # Find first day of the year
-    #         current_date = datetime(year, 1, 1)
-    #
-    #         # Find first Monday (weekday 0 is Monday)
-    #         while current_date.weekday() != 0:
-    #             current_date += timedelta(days=1)
-    #
-    #         # Start counting weeks from first Monday
-    #         week_num = 1
-    #         while current_date.year == year:
-    #             # Calculate dates
-    #             date_from = current_date
-    #             date_to = current_date + timedelta(days=6)
-    #
-    #             # Create record dictionary
-    #             record = {
-    #                 'descr': f"{year} Week {week_num}",
-    #                 'week_num': week_num,
-    #                 'date_from': date_from.strftime('%Y-%m-%d'),
-    #                 'date_to': date_to.strftime('%Y-%m-%d'),
-    #                 'year': str(year),
-    #             }
-    #             week_records.append(record)
-    #
-    #             # Move to next week
-    #             current_date += timedelta(days=7)
-    #             week_num += 1
-    #
-    #             # Stop if we enter next year
-    #             if current_date.year > year:
-    #                 break
-    #
-    #     self.env['droga.crm.weeks'].create(week_records)
+    @staticmethod
+    def get_next_week(self, search_date=None):
+        if search_date is None:
+            search_date = fields.Date.today() +timedelta(days=7)
+        elif isinstance(search_date, str):
+            search_date = datetime.strptime(search_date, '%Y-%m-%d')+timedelta(days=7)
+        elif isinstance(search_date, datetime):
+            search_date = search_date.date()+timedelta(days=7)
+
+        # Search for existing record
+        week = self.env['droga.crm.weeks'].search([
+            ('date_from', '<=', search_date),
+            ('date_to', '>=', search_date)
+        ], limit=1)
+
+        if week:
+            return week.id
+
+        # If not found, you might want to create it (optional)
+        # This part would depend on your business logic
+        return False
+
+    def update_weeks_info(self):
+        prev=self.env['droga.crm.weeks'].find_week_record(self,fields.Date.today() +timedelta(days=-7))
+        current = self.env['droga.crm.weeks'].find_week_record(self)
+        next = self.env['droga.crm.weeks'].get_next_week(self)
+        visits=self.env['droga.customer.visit.header'].search([('weeks','in',(prev,current,next))])
+        for vi in visits:
+            if vi.weeks.id==prev:
+                vi.visit_header=vi.weeks.long_descr
+            elif vi.weeks.id==current:
+                vi.visit_header = 'Current Plan - ' + vi.weeks.long_descr
+            else:
+                vi.visit_header = 'Next Plan - ' + vi.weeks.long_descr

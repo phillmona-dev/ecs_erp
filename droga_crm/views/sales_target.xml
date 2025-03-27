@@ -135,6 +135,7 @@
         action="droga_crm_saels_target_action"
         parent="menu_vist_log"
         groups="crm_nsm"
+        active="False"
         sequence="21"/>
 
 
