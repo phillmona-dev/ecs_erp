@@ -31,7 +31,7 @@ class StockValuationLayerInherit(models.Model):
 
 class DrogaStockValuationLayer(models.Model):
     _name = 'droga.stock.valuation.layer'
-    _description = 'Stock Valuation Layer'
+    _description = 'Droga Stock Valuation Layer'
     _order = 'product_id,move_date,move_type, id'
 
     _rec_name = 'product_id'
