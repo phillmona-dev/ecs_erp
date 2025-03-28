@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <!-- Tree View for Health Screening -->
+    <record id="droga_health_screening_tree" model="ir.ui.view">
+        <field name="name">droga.health.screening.tree</field>
+        <field name="model">droga.health.screening</field>
+        <field name="arch" type="xml">
+            <tree string="Health Screening Records">
+                <field name="client_id"/>
+                <field name="age"/>
+                <field name="sex"/>
+                <field name="mobile"/>
+                <field name="patient_condition"/>
+                <field name="weight"/>
+                <field name="bp_systolic"/>
+                <field name="bp_diastolic"/>
+                <field name="fasting_glucose"/>
+                <field name="rbs_glucose"/>
+                <field name="screening_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for Health Screening -->
+    <record id="droga_health_screening_form" model="ir.ui.view">
+        <field name="name">droga.health.screening.form</field>
+        <field name="model">droga.health.screening</field>
+        <field name="arch" type="xml">
+            <form string="Health Screening Form">
+                <sheet>
+                    <group>
+                        <field name="client_id"/>
+                        <field name="age"/>
+                        <field name="sex"/>
+                        <field name="mobile"/>
+                        <field name="patient_condition"/>
+                        <field name="weight"/>
+                        <field name="bp_systolic"/>
+                        <field name="bp_diastolic"/>
+                        <field name="fasting_glucose"/>
+                        <field name="rbs_glucose"/>
+                        <field name="screening_type"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open Health Screening Records (Tree and Form views) -->
+    <record id="droga_all_health_screening_action" model="ir.actions.act_window">
+        <field name="name">Health Screenings</field>
+        <field name="res_model">droga.health.screening</field>
+        <field name="view_mode">tree,form</field>  <!-- Added both tree and form views -->
+        <field name="view_ids" eval="[(5,0, 0, {'view_mode': 'tree', 'view_id': ref('droga_health_screening_tree')}), (0, 0, {'view_mode': 'form', 'view_id': ref('droga_health_screening_form')})]"/>
+    </record>
+
+</odoo>

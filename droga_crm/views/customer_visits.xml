@@ -122,8 +122,8 @@
 
                             <field name="weeks_detail" mode="tree,kanban">
                                 <tree delete="1" editable="true" create="0" expand="1">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
-                                           domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
+                                    <field name="partner_custom" required="True" options="{'no_create':True,'no_open':True}"></field>
+                                    <field name="visit_client" invisible="1" options="{'no_create':True,'no_open':True}" required="True"></field>
                                     <field name="cont_plan_des"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Contact plan"
@@ -140,7 +140,8 @@
                                 </tree>
                                 <form string="Weekly plan">
                                     <group>
-                                        <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
+                                        <field name="partner_custom" required="True" options="{'no_create':True,'no_open':True}"></field>
+                                        <field name="visit_client" options="{'no_create':True,'no_open':True}" invisible="1" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                         <field name="visit_date_descr"></field>
                                         <field name="planned_visit_selection"></field>
@@ -201,7 +202,8 @@
                                     </group>
                                 </form>visit_date
                                 <kanban class="o_kanban_mobile" limit="500" create="false">
-                                    <field name="visit_client" options="{'no_create':True,'no_open':True}" required="True"
+                                    <field name="partner_custom" required="True" options="{'no_create':True,'no_open':True}"></field>
+                                    <field name="visit_client" invisible="1" options="{'no_create':True,'no_open':True}" required="True"
                                            domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]"></field>
                                     <field name="cont_plan_des"></field>
 

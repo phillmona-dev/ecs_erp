@@ -372,6 +372,14 @@ class customer_visit_detail(models.Model):
     visit_header=fields.Many2one('droga.customer.visit.header', required=True)
 
     contacts_schedule = fields.One2many('droga.crm.contacts.schedule', 'visits')
+    partner_custom = fields.Many2one('res.partner.crm2', check_company=True,
+                                     domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]")
+
+    @api.onchange('partner_custom')
+    def _partner_custom_change(self):
+        for rec in self:
+            rec.visit_client = rec.partner_custom.partner if rec.partner_custom else False
+
     visit_client=fields.Many2one('res.partner','Customer')
     #visit_contact_custom = fields.Many2many('droga.crm.contacts',string='Contact')
     visit_location=fields.Char('Visit location')

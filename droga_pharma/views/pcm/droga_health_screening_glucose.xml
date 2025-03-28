@@ -32,15 +32,6 @@
                                                 type="object"
                                                 string="Initiate Sales"
                                                 class="oe_stat_button"/>
-                                        <button name="generate_pdf_report"
-                                                type="object"
-                                                string="PDF report"
-                                                class="oe_highlight"
-                                                icon="fa-file-pdf-o"
-                                                attrs="{'readonly': [('sale_order_id', '=', False)]}"/>
-                                        />
-
-
 
 
                     </div>
@@ -52,6 +43,7 @@
                         <field name="mobile"/>
                         <field name="sex"/>
                         <field name="patient_condition"/>
+                        <field name="wareh"/>
                     </group>
                     <group string="Medical Details">
                         <field name="weight"/>
@@ -69,12 +61,14 @@
         </field>
     </record>
 
+
     <record id="droga_glucose_action" model="ir.actions.act_window">
         <field name="name">Glucose</field>
         <field name="res_model">droga.health.screening</field>
          <field name="domain">[('screening_type', '=', 'glucose')]</field>
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5,0,0), (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_glucose_tree')}), (0, 0, {'view_mode': 'form', 'view_id': ref('droga_glucose_form')})]"/>
+
     </record>
 
 </odoo>

@@ -1,0 +1,67 @@
+<odoo>
+    <template id="glucose_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="droga_pharma.droga_pharma_header_layout"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row mt32">
+                            <div class="col-12">
+                                <div style="display: flex;">
+                                    <h2 style="display: inline; margin-right: 40%;">Glucose Report</h2>
+                                    <p style="display: inline;"><span t-field="doc.id"/></p>
+                                </div>
+                                <br/>
+                                <div style="display: flex;">
+                                    <h5>Name: <span t-field="doc.client_id"/></h5>
+                                    <h5>Age: <span t-field="doc.age"/></h5>
+                                </div>
+                                <br/>
+                                <h5>Mobile: <span t-field="doc.mobile"/></h5>
+                                <h5>Sex: <span t-field="doc.sex"/></h5>
+                                <br/>
+                                <h5>Patient Condition: <span t-field="doc.patient_condition"/></h5>
+                                <br/>
+                                <h5>Weight (KG): <span t-field="doc.weight"/></h5>
+                                <br/>
+                                <h5>Blood Pressure Readings:</h5>
+                                <table style="width: 100%; border: 1px solid black;">
+                                    <thead>
+                                        <tr>
+                                            <th>Systolic BP (mmHg)</th>
+                                            <th>Diastolic BP (mmHg)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: center;"><span t-field="doc.bp_systolic"/></td>
+                                            <td style="text-align: center;"><span t-field="doc.bp_diastolic"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <br/>
+                                <h5>Glucose Readings:</h5>
+                                <table style="width: 100%; border: 1px solid black;">
+                                    <thead>
+                                        <tr>
+                                            <th>Fasting Blood Glucose (mg/dL)</th>
+                                            <th>Postprandial Blood Glucose (mg/dL)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: center;"><span t-field="doc.fasting_glucose"/></td>
+                                            <td style="text-align: center;"><span t-field="doc.rbs_glucose"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <t t-call="droga_pharma.droga_pharma_footer_layout"/>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

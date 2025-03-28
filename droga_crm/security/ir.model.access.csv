@@ -32,6 +32,7 @@ access_droga_crm_sales_target_report,droga_crm.droga_crm_sales_target_report,mod
 access_droga_decimal_precision_config,droga_crm.decimal.precision.configuration,base.model_decimal_precision,droga_crm.crm_sr,1,1,0,0
 access_droga_crm_sales_target_detail_prompt,droga_crm.droga_crm_sales_target_detail_prompt,model_droga_crm_sales_target_detail_prompt,base.group_user,1,1,1,1
 access_droga_crm_weeks,droga_crm.droga_crm_weeks,model_droga_crm_weeks,base.group_user,1,1,1,1
+access_res_partner_crm2,droga_crm.res_partner_crm2,model_res_partner_crm2,base.group_user,1,1,1,1
 
 access_droga_crm_loc_history,droga_crm.droga.crm.loc.history,droga_crm.model_droga_crm_loc_history,base.group_user,1,1,1,1
 access_droga_res_partner,crm.res_partner,base.model_res_partner,droga_crm.crm_sr,1,1,1,1

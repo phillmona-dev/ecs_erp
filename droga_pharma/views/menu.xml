@@ -51,6 +51,7 @@
                     name="Minor Aliments"
                     action="droga_minor_aliment_view_action"
                     sequence="11"/>
+
             <menuitem
                 id="droga_prescription_menu"
                 name="Prescription"
@@ -200,6 +201,11 @@
                             name="Minor Aliments"
                             action="droga_pharma_aliment_action"
                             sequence="7"/>
+                    <menuitem
+                            id="droga_health_screening_all_reports"
+                            name="Health Screening Report"
+                            action="droga_all_health_screening_action"
+                            sequence="10"/>
                 </menuitem>
 
 

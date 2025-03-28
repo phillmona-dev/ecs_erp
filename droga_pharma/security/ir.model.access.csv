@@ -55,3 +55,4 @@ access_mail_tracking_value_user,mail.tracking.value.user,mail.model_mail_trackin
 access_res_partner_pharma2,mail.res_partner_pharma2,model_res_partner_pharma2,base.group_user,1,1,1,1
 access_droga_price_discount_branch_product_group,droga_pharma.droga_price_discount_per_branch_group,model_droga_price_discount_per_branch_group,base.group_user,1,1,1,1
 access_droga_health_screening,droga.health.screening,model_droga_health_screening,base.group_user,1,1,1,1
+

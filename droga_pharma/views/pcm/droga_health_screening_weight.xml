@@ -22,17 +22,19 @@
         <field name="arch" type="xml">
            <form string="Weight Form" delete="1">
             <sheet>
+
                 <group>
                     <group string="Patient's Personal Info">
                         <field name="client_id" options='{"no_open":True,"no_create": True}'/>
                         <field name="age"/>
                         <field name="mobile"/>
                         <field name="sex"/>
-                        <field name="patient_condition"/>
                     </group>
-                     <group string="Weight Details">
-                            <field name="weight"/>
-                            <field name="screening_type"/>
+                    <group string="Weight Details">
+                        <field name="wareh"/>
+                        <field name="patient_condition"/>
+                        <field name="weight"/>
+                        <field name="screening_type"/>
                      </group>
                 </group>
             </sheet>

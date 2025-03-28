@@ -24,18 +24,20 @@
         <field name="arch" type="xml">
            <form string="Blood Pressure Form" delete="1">
             <sheet>
+
                 <group>
                     <group string="Patient's Personal Info">
                         <field name="client_id" options='{"no_open":True,"no_create": True}'/>
                         <field name="age"/>
                         <field name="mobile"/>
                         <field name="sex"/>
-                        <field name="patient_condition"/>
+                        <field name="wareh"/>
                     </group>
                     <group string="Blood Pressure Details">
-                            <field name="bp_systolic"/>
-                            <field name="bp_diastolic"/>
-                            <field name="screening_type"/>
+                        <field name="patient_condition"/>
+                        <field name="bp_systolic"/>
+                        <field name="bp_diastolic"/>
+                        <field name="screening_type"/>
                     </group>
                 </group>
             </sheet>

@@ -36,6 +36,7 @@
     <record id="crm_cust" model="res.groups">
         <field name="name">CRM admin (all customers access)</field>
         <field name="category_id" ref="crm_management"/>
+        <field name="comment">The user will access all customers without restriction.</field>
     </record>
     <record id="tin_admin" model="res.groups">
         <field name="name">Tin no and customer name update access</field>
@@ -48,10 +49,12 @@
     <record id="crm_double_authenticate" model="res.groups">
         <field name="name">CRM Double authenticate users</field>
         <field name="category_id" ref="crm_management"/>
+        <field name="comment">The user will be able to access double authenticate feature for CRM.</field>
     </record>
     <record id="crm_emp_administrator" model="res.groups">
         <field name="name">CRM Employee administrator</field>
         <field name="category_id" ref="crm_management"/>
+        <field name="comment">The user will be able to create double authenticated users and view CRM activities reports.</field>
     </record>
 </odoo>
 

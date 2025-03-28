@@ -1,10 +1,24 @@
 from datetime import datetime, timedelta
 from math import radians, sin, cos, atan2, sqrt
 
-from odoo import models, fields, api
+from odoo import models, fields, api,_
 from odoo.exceptions import ValidationError, UserError
 from odoo.http import request
 
+class pharma_res_partner(models.Model):
+    _name='res.partner.crm2'
+    _rec_name = 'name'
+    partner=fields.Many2one('res.partner',required=True)
+    name=fields.Char(string='Name',compute='_get_name',store=True)
+    active = fields.Boolean(default=True,related='partner.active')
+    city_name = fields.Many2one('droga.crm.settings.city', related='partner.city_name')
+    company_id = fields.Many2one('res.company', 'Company', related='partner.company_id')
+    is_cust_available=fields.Boolean('Show cust', related='partner.is_cust_available')
+    is_company=fields.Boolean(string='Is a Company', related='partner.is_company')
+    @api.depends('partner.name','partner.city_name')
+    def _get_name(self):
+        for rec in self:
+            rec.name=(rec.partner.name if rec.partner.name else '')+(' - '+rec.partner.city_name.city_name) if rec.partner.city_name else ''
 
 class cust_contact_extension(models.Model):
     _inherit = 'res.partner'
@@ -133,7 +147,11 @@ class cust_contact_extension(models.Model):
             if vals['supplier_rank'] == 0 and vals['vat']:
                 if (len(vals['vat']) < 10 or len(vals['vat']) > 14) and vals['company_id']==1:
                     raise UserError("Length of Tin no should either be 10 or 13, please amend accordingly.")
-        return super(cust_contact_extension, self).create(vals)
+        result=super(cust_contact_extension, self).create(vals)
+        self.env['res.partner.crm2'].create({
+            'partner': result.id
+        })
+        return result
 
     @api.depends('location', 'area')
     def _get_add(self):
@@ -248,7 +266,6 @@ class crm_lead_extension(models.Model):
     ordered_prods = fields.One2many('droga.lead.ordered.products', 'leads')
     follow_up_visits = fields.One2many('crm.lead', 'leads')
     leads = fields.Many2one('crm.lead')
-    contact_custom = fields.Many2many('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]")
     city_name = fields.Many2one('droga.crm.settings.city', related='partner_id.city_name')
     core_products = fields.Many2many('product.template', domain=[('is_core_product', '=', 'true')])
     closed_sales = fields.Boolean('Sales is closed')
@@ -267,7 +284,6 @@ class crm_lead_extension(models.Model):
         ('7-9 seat', '7-9 seat'),
         ('9-11 seat', '9-11 seat'),
     ], string='Visit session', default="2-4 seat")
-
 
     check_in_lati = fields.Float('Geo Latitude', digits=(10, 7))
     check_in_long = fields.Float('Geo Longtude', digits=(10, 7))
@@ -303,7 +319,9 @@ class crm_lead_extension(models.Model):
 
     def update_check_out_locations(self, res_id, lati, long):
         for res in self.env['crm.lead'].search([('id', '=', res_id)]):
-            if res.check_out_lati == 0:
+            if not res.check_in_time_and_date:
+                res.update_check_in_locations(res_id,lati,long)
+            elif res.check_out_lati == 0:
                 res.check_out_lati = float(lati)
                 res.check_out_long = float(long)
                 dist = self.calculate_distance(float(lati), float(long), res.partner_id.partner_latitude,
@@ -351,11 +369,19 @@ class crm_lead_extension(models.Model):
             return False if len(ses) == 0 else ses[0].pro_id[0].p_regions.ids
 
     pr_avail_areas = fields.Many2many('droga.crm.settings.city', default=_get_areas)
+    contact_custom = fields.Many2many('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]")
     partner_id = fields.Many2one(
         'res.partner', string='Customer', check_company=True, index=True, tracking=10,
         domain="['&',('city_name', 'in',pr_avail_areas),'|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
     is_record_owner = fields.Boolean('Show lead', store=False, compute="_is_record_owner", search="_search_field")
+    partner_custom = fields.Many2one('res.partner.crm2',check_company=True,domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]")
+
+    @api.onchange('partner_custom')
+    def _partner_custom_change(self):
+        for rec in self:
+            rec.partner_id = rec.partner_custom.partner if rec.partner_custom else False
+
 
     @api.depends('pr_sales_logged')
     def _is_record_owner(self):
@@ -409,9 +435,16 @@ class crm_lead_extension(models.Model):
     def unlink(self):
         raise UserError("You can not delete the record. Please mark it as lost instead.")
 
+    @api.depends('partner_id')
+    def _compute_name(self):
+        for lead in self:
+            if lead.partner_id and lead.partner_id.name:
+                lead.name = _("%s's opportunity") % lead.partner_id.name
+
     @api.model
     def create(self, vals):
-        vals.update({'name': vals['name'].replace("opportunity", "") + "lead"})
+        if 'name' in vals:
+            vals.update({'name': vals['name'].replace("opportunity", "") + "lead"})
         to_return=0
 
         if 'leads' in vals:
