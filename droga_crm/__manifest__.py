@@ -63,7 +63,8 @@
             'droga_crm/static/src/check_in.js',
             'droga_crm/static/src/check_in_template.xml',
 
-
+            "/droga_crm/static/src/counter/counter.js",
+            "/droga_crm/static/src/counter/counter.xml",
         ],
 
     },

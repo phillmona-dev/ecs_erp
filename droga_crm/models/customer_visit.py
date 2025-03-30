@@ -30,6 +30,12 @@ class customer_visit_header(models.Model):
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log",store=False, default=_get_pr_sales_logged)
     pr_avail_areas=fields.Many2many(related='pr_sales.p_regions')
     visit_header=fields.Char('Description',store=True,compute='get_visit_descr')
+    deadline_in_secs=fields.Char('Deadline',compute='_get_deadline')
+
+    def _get_deadline(self):
+        for rec in self:
+            rec.deadline_in_secs=25200+(datetime.datetime.combine(rec.weeks.date_from,datetime.datetime.min.time()) -fields.Datetime.now()).total_seconds()
+
     @api.depends('weeks')
     def get_visit_descr(self):
         for rec in self:

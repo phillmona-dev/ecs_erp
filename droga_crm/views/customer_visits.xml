@@ -14,6 +14,8 @@
 
                 <field name="weeks" invisible="1" options='{"no_open": True, "no_create": True}'></field>
                 <field name="visit_header"></field>
+
+                <field name="deadline_in_secs" decoration-muted="1 == 1" widget="counter"></field>
                 <field name="pr_avail_areas" invisible="1"/>
                 <field name="state" decoration-success="state == 'approved'" decoration-warning="state=='requested'" decoration-info="state == 'draft'" widget="badge" ></field>
                 <field name="approver" options='{"no_open": True, "no_create": True}' readonly="True" required="True"></field>
@@ -68,6 +70,11 @@
                                         <field name="state" decoration-success="state == 'approved'" decoration-warning="state=='requested'" decoration-info="state == 'draft'" widget="badge" ></field>
                                     </li>
                                     <li>
+                                        <b>Deadline: </b>
+                                        <field name="deadline_in_secs" decoration-muted="1 == 1" widget="counter"></field>
+                                    </li>
+
+                                    <li>
                                         <strong>Approver: </strong>
                                         <field name="approver" options='{"no_open": True, "no_create": True}'></field>
                                     </li>
@@ -107,8 +114,9 @@
                     </div>
                     <group>
                         <group>
-                            <field name="weeks" readonly="1" options="{'no_create':True,'no_open':True}"></field>
+                            <field name="weeks" invisible="1" options="{'no_create':True,'no_open':True}"></field>
                             <field name="visit_header" string="Week Description" readonly="True"></field>
+                            <field name="deadline_in_secs" decoration-muted="1 == 1" widget="counter"></field>
                         </group>
                         <group>
                             <field name="approver" readonly="1" options="{'no_create':True,'no_open':True}" required="True"></field>
