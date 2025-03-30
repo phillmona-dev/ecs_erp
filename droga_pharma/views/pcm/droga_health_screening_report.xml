@@ -6,7 +6,7 @@
         <field name="name">droga.health.screening.tree</field>
         <field name="model">droga.health.screening</field>
         <field name="arch" type="xml">
-            <tree string="Health Screening Records">
+            <tree string="Health Screening Records" create="0">
                 <field name="client_id"/>
                 <field name="age"/>
                 <field name="sex"/>
@@ -22,25 +22,49 @@
         </field>
     </record>
 
+    <record id="droga_health_screening_search" model="ir.ui.view">
+        <field name="name">droga.health.screening.search</field>
+        <field name="model">droga.health.screening</field>
+        <field name="arch" type="xml">
+            <search string="Health Screening Records">
+                <field name="client_id"/>
+                <field name="age"/>
+                <field name="sex"/>
+                <field name="mobile"/>
+                <field name="patient_condition"/>
+                <field name="weight"/>
+                <field name="bp_systolic"/>
+                <field name="bp_diastolic"/>
+                <field name="fasting_glucose"/>
+                <field name="rbs_glucose"/>
+                <field name="screening_type"/>
+            </search>
+        </field>
+    </record>
+
     <!-- Form View for Health Screening -->
     <record id="droga_health_screening_form" model="ir.ui.view">
         <field name="name">droga.health.screening.form</field>
         <field name="model">droga.health.screening</field>
         <field name="arch" type="xml">
-            <form string="Health Screening Form">
+            <form string="Health Screening Form" create="0">
                 <sheet>
                     <group>
-                        <field name="client_id"/>
-                        <field name="age"/>
-                        <field name="sex"/>
-                        <field name="mobile"/>
-                        <field name="patient_condition"/>
-                        <field name="weight"/>
-                        <field name="bp_systolic"/>
-                        <field name="bp_diastolic"/>
-                        <field name="fasting_glucose"/>
-                        <field name="rbs_glucose"/>
-                        <field name="screening_type"/>
+                    <group>
+                        <field name="client_id" options="{'no_create':True,'no_open':True}" readonly="1"/>
+                        <field name="age" readonly="1"/>
+                        <field name="sex" readonly="1"/>
+                        <field name="mobile" readonly="1"/>
+                        <field name="patient_condition" readonly="1"/>
+                        <field name="weight" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="bp_systolic" readonly="1"/>
+                        <field name="bp_diastolic" readonly="1"/>
+                        <field name="fasting_glucose" readonly="1"/>
+                        <field name="rbs_glucose" readonly="1"/>
+                        <field name="screening_type" readonly="1"/>
+                    </group>
                     </group>
                 </sheet>
             </form>
@@ -52,7 +76,10 @@
         <field name="name">Health Screenings</field>
         <field name="res_model">droga.health.screening</field>
         <field name="view_mode">tree,form</field>  <!-- Added both tree and form views -->
-        <field name="view_ids" eval="[(5,0, 0, {'view_mode': 'tree', 'view_id': ref('droga_health_screening_tree')}), (0, 0, {'view_mode': 'form', 'view_id': ref('droga_health_screening_form')})]"/>
+        <field name="search_view_id" ref="droga_health_screening_search"></field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_health_screening_tree')}),
+         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_health_screening_form')})]"/>
     </record>
 
 </odoo>
