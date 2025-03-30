@@ -38,9 +38,9 @@ class CrmWeeks(models.Model):
         return False
 
     @staticmethod
-    def get_next_week(self, search_date=None):
+    def get_next_week(self, search_date=None,to_add_hours=0):
         if search_date is None:
-            search_date = fields.Date.today() +timedelta(days=7)
+            search_date = fields.Date.today() +timedelta(days=7)+timedelta(hours=to_add_hours)
         elif isinstance(search_date, str):
             search_date = datetime.strptime(search_date, '%Y-%m-%d')+timedelta(days=7)
         elif isinstance(search_date, datetime):

@@ -271,7 +271,7 @@ class crm_lead_extension(models.Model):
     closed_sales = fields.Boolean('Sales is closed')
     # co_travel_crm = fields.Many2many('hr.employee', string='Co-travelers')
     co_travel_crm = fields.Many2many('droga.pro.sales.master', string='Co-travelers')
-    date_planned = fields.Datetime('Lead date', default=fields.Date.today())
+    date_planned = fields.Date('Lead date', default=fields.Date.today())
     origin_user_id = fields.Many2one('res.users')
     is_from_plan=fields.Boolean(Default=False,string='From plan')
     type = fields.Selection([

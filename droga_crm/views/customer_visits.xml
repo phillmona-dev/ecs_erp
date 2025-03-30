@@ -129,7 +129,7 @@
                         <page string="Weekly schedule">
 
                             <field name="weeks_detail" mode="tree,kanban">
-                                <tree delete="1" editable="true" create="0" expand="1">
+                                <tree delete="0" editable="true" create="0" expand="1">
                                     <field name="partner_custom" required="True" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="visit_client" invisible="1" options="{'no_create':True,'no_open':True}" required="True"></field>
                                     <field name="cont_plan_des"></field>
@@ -274,8 +274,8 @@
                         <page string="Contacts schedule">
                             <field name="contacts_schedule" mode="tree,kanban">
                                 <tree editable="bottom" delete="0">
-                                    <field name="cust"/>
-                                    <field name="contact_custom" widget="many2many_tags" domain="([('parent_customer','=',cust),('has_access','=',True)])"
+                                    <field name="cust" required="True"/>
+                                    <field name="contact_custom" required="True" widget="many2many_tags" domain="([('parent_customer','=',cust),('has_access','=',True)])"
                                            options="{'no_create':True,'no_open':True}"></field>
                                     <field name="co_travel_crm" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>

@@ -32,6 +32,7 @@ class customer_visit_header(models.Model):
     visit_header=fields.Char('Description',store=True,compute='get_visit_descr')
     deadline_in_secs=fields.Char('Deadline',compute='_get_deadline')
 
+    @api.depends('weeks')
     def _get_deadline(self):
         for rec in self:
             rec.deadline_in_secs=25200+(datetime.datetime.combine(rec.weeks.date_from,datetime.datetime.min.time()) -fields.Datetime.now()).total_seconds()
@@ -135,7 +136,7 @@ class customer_visit_header(models.Model):
 
     @api.model
     def _default_week(self):
-        week_id = self.env['droga.crm.weeks'].get_next_week(self)
+        week_id = self.env['droga.crm.weeks'].get_next_week(self,to_add_hours=-7)
         return week_id
 
     weeks = fields.Many2one('droga.crm.weeks',string='Week',store=True, required=True,default=lambda self: self._default_week())
@@ -469,7 +470,7 @@ class customer_visit_detail(models.Model):
         self.env['droga.customer.visit.detail'].sudo().create(plan_vals)
     def visit_contact_open(self):
         return {
-            'name': str(self.visit_client.name)+' contacts visit' if str(self.visit_client.name) else ' Contacts visit',
+            'name': str(self.visit_client.name)+' contacts visit' if self.visit_client.name else ' Contacts visit',
             'view_mode': 'form',
             'view_type': 'form',
             'res_model': 'droga.customer.visit.detail',

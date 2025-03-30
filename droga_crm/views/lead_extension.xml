@@ -109,7 +109,7 @@
                                             <ul>
                                                 <li>
                                                     <strong class="o_kanban_record_title">Visit date:
-                                                        <field name="date_planned"></field>
+                                                        <field name="date_planned" readonly="1"></field>
                                                     </strong>
                                                 </li>
 
@@ -175,7 +175,7 @@
 <!--                    <field name="specialty" options="{'no_create':True,'no_open':True}"></field>-->
                     <field name="check_in_descr" readonly="1"/>
                     <field name="check_out_descr" readonly="1"/>
-                    <field name="date_planned" required="True"/>
+                    <field name="date_planned" readonly="1" required="True"/>
                     <field name="visit_status"></field>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'opportunity')]}">>
@@ -209,7 +209,7 @@
                            required="True" string="Customer"
                            invisible="True"/>
                     <field name="contact_custom" widget="many2many_tags" domain="([('parent_customer','=',partner_id),('has_access','=',True)])" options="{'no_create':True,'no_open':True}"></field>
-                    <field name="date_planned" required="True" string="Opportunity date"/>
+                    <field name="date_planned" readonly="1" required="True" string="Opportunity date"/>
 <!--                    <field name="specialty" options="{'no_create':True,'no_open':True}"></field>-->
 
                     <field name="check_in_descr" readonly="1"/>
@@ -330,7 +330,7 @@
                     <field name="contact_custom" widget="many2many_tags" optional="show"/>
 <!--                    <field name="specialty" optional="hide"/>-->
                     <field name="phone" optional="hide" class="o_force_ltr"/>
-                    <field name="date_planned" string="Lead date" optional="show"/>
+                    <field name="date_planned" readonly="1" string="Lead date" optional="show"/>
                     <field name="check_in_descr" optional="show"/>
                     <field name="check_out_descr" optional="show"/>
                     <field name="visit_status"></field>
@@ -377,7 +377,7 @@
                     <field name="contact_custom" widget="many2many_tags" string="Contact" optional="show"/>
 <!--                    <field name="specialty" optional="show"/>-->
                     <field name="phone" optional="show" class="o_force_ltr"/>
-                    <field name="date_planned" string="Opportunity date" optional="show"/>
+                    <field name="date_planned" readonly="1" string="Opportunity date" optional="show"/>
                     <field name="city_name" string="City/sub-city" optional="show"/>
                     <field name="email_from" optional="hide"/>
                     <field name="phone" class="o_force_ltr" optional="hide"/>
