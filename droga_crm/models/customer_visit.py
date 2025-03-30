@@ -31,11 +31,17 @@ class customer_visit_header(models.Model):
     pr_avail_areas=fields.Many2many(related='pr_sales.p_regions')
     visit_header=fields.Char('Description',store=True,compute='get_visit_descr')
     deadline_in_secs=fields.Char('Deadline',compute='_get_deadline')
+    is_readonly=fields.Boolean('Form readonly',compute='_get_deadline')
 
     @api.depends('weeks')
     def _get_deadline(self):
         for rec in self:
-            rec.deadline_in_secs=25200+(datetime.datetime.combine(rec.weeks.date_from,datetime.datetime.min.time()) -fields.Datetime.now()).total_seconds()
+            tleft=25200+(datetime.datetime.combine(rec.weeks.date_from,datetime.datetime.min.time()) -fields.Datetime.now()).total_seconds()
+            rec.deadline_in_secs=tleft
+            if tleft<=0:
+                rec.is_readonly=True
+            else:
+                rec.is_readonly = False
 
     @api.depends('weeks')
     def get_visit_descr(self):
@@ -377,7 +383,7 @@ class customer_visit_detail(models.Model):
     _name='droga.customer.visit.detail'
     _order = 'visit_date'
     visit_header=fields.Many2one('droga.customer.visit.header', required=True)
-
+    is_readonly=fields.Boolean(related='visit_header.is_readonly')
     contacts_schedule = fields.One2many('droga.crm.contacts.schedule', 'visits')
     partner_custom = fields.Many2one('res.partner.crm2', check_company=True,
                                      domain="[('is_company', '=',True),('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]")
@@ -460,7 +466,8 @@ class customer_visit_detail(models.Model):
 
     def add_visit(self):
 
-
+        if self.is_readonly:
+            raise ValidationError("Visit can not be edited.")
         plan_vals = {
             'visit_header': self.visit_header.id,
             'visit_date': self.visit_date,

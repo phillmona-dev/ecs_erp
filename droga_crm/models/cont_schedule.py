@@ -13,6 +13,7 @@ class contacts_schedule(models.Model):
     co_travel_crm = fields.Many2many('droga.pro.sales.master', string='Co-travelers')
     #leads=fields.Many2one('crm.lead','contacts_schedule')
     visits=fields.Many2one('droga.customer.visit.detail','contacts_schedule')
+    is_readonly=fields.Boolean(related='visits.is_readonly')
     visits_header = fields.Many2one(related='visits.visit_header',store=True)
     cust=fields.Many2one('res.partner',related='visits.visit_client')
     #custlead = fields.Many2one('res.partner', related='leads.partner_id')
