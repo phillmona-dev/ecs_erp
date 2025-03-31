@@ -18,7 +18,7 @@ class CrmWeeks(models.Model):
         Returns the record ID
         """
         if search_date is None:
-            search_date = fields.Date.today()
+            search_date = fields.Datetime.now()
         elif isinstance(search_date, str):
             search_date = datetime.strptime(search_date, '%Y-%m-%d')
         elif isinstance(search_date, datetime):
@@ -40,7 +40,7 @@ class CrmWeeks(models.Model):
     @staticmethod
     def get_next_week(self, search_date=None,to_add_hours=0):
         if search_date is None:
-            search_date = fields.Date.today() +timedelta(days=7)+timedelta(hours=to_add_hours)
+            search_date = fields.Datetime.now() +timedelta(days=7)+timedelta(hours=to_add_hours)
         elif isinstance(search_date, str):
             search_date = datetime.strptime(search_date, '%Y-%m-%d')+timedelta(days=7)
         elif isinstance(search_date, datetime):
@@ -60,7 +60,7 @@ class CrmWeeks(models.Model):
         return False
 
     def update_weeks_info(self):
-        prev=self.env['droga.crm.weeks'].find_week_record(self,fields.Date.today() +timedelta(days=-7))
+        prev=self.env['droga.crm.weeks'].find_week_record(self,fields.Datetime.now() +timedelta(days=-7))
         current = self.env['droga.crm.weeks'].find_week_record(self)
         next = self.env['droga.crm.weeks'].get_next_week(self)
         visits=self.env['droga.customer.visit.header'].search([('weeks','in',(prev,current,next))])

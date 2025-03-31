@@ -38,7 +38,7 @@ class customer_visit_header(models.Model):
         for rec in self:
             tleft=25200+(datetime.datetime.combine(rec.weeks.date_from,datetime.datetime.min.time()) -fields.Datetime.now()).total_seconds()
             rec.deadline_in_secs=tleft
-            if tleft<=0:
+            if tleft<=0 or rec.state=='approved':
                 rec.is_readonly=True
             else:
                 rec.is_readonly = False
@@ -255,6 +255,7 @@ class customer_visit_header(models.Model):
             descr = descr + ' - ' + det['visit_location'].name if det['visit_location'] else descr
             if descr=='' or not descr:
                 continue
+            par_cust=self.env['res.partner.crm2'].search([('partner','=',det['visit_client'].id)])
             if len(det['contacts_schedule'])<1:
                 lead = {
                     'name': descr,
@@ -271,21 +272,11 @@ class customer_visit_header(models.Model):
                     'expected_revenue': 0,
                     'date_planned': det['visit_date'],
                     'partner_id': det['visit_client'].id,
+                    'partner_custom':par_cust[0].id if par_cust else False,
                     'planned_visit_selection':det['planned_visit_selection']
                     #'contact_name': det['visit_contact'].name,
                 }
-                lead_created=self.env['crm.lead'].sudo().create(lead)
-
-                # self.env['mail.activity'].sudo().create({
-                #     'res_model_id': self.env.ref('crm.model_crm_lead').id,
-                #     'res_name': descr,
-                #     'res_id': lead_created.id,
-                #     'user_id': self.user_id,
-                #     'date_deadline': det['visit_date'],
-                #     'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
-                #     'summary': 'Visit ' + descr,
-                #     'note': descr
-                # })
+                self.env['crm.lead'].sudo().create(lead)
             else:
                 for contdet in det['contacts_schedule']:
                     descr=''
@@ -312,22 +303,11 @@ class customer_visit_header(models.Model):
                         'expected_revenue': 0,
                         'date_planned': det['visit_date'],
                         'partner_id': det['visit_client'].id,
+                        'partner_custom': par_cust[0].id if par_cust else False,
                         'planned_visit_selection': det['planned_visit_selection']
                         # 'contact_name': det['visit_contact'].name,
                     }
-                    lead_created = self.env['crm.lead'].sudo().create(lead)
-
-
-                    # self.env['mail.activity'].sudo().create({
-                    #     'res_model_id': self.env.ref('crm.model_crm_lead').id,
-                    #     'res_name':descr,
-                    #     'res_id': lead_created.id,
-                    #     'user_id': self.user_id,
-                    #     'date_deadline':det['visit_date'],
-                    #     'activity_type_id': self.env['mail.activity.type'].search([('category', '=', 'meeting')]).id,
-                    #     'summary': 'Visit '+descr,
-                    #     'note': descr
-                    # })
+                    self.env['crm.lead'].sudo().create(lead)
 
             det['status'] = 'scheduled'
 

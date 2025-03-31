@@ -444,7 +444,7 @@ class crm_lead_extension(models.Model):
     @api.model
     def create(self, vals):
         if 'name' in vals:
-            vals.update({'name': vals['name'].replace("opportunity", "") + "lead"})
+            vals.update({'name': vals['name'].replace("opportunity", "") + " lead"})
         to_return=0
 
         if 'leads' in vals:
