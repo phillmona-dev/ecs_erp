@@ -428,10 +428,13 @@
                         domain="[('date_planned', '&lt;', context_today().strftime('%Y-%m-%d'))]"
                         help="Show all opportunities for which the next action date is before today"/>
                 </xpath>
-                <xpath expr="//filter[@name='activities_today']" position="replace">
-                    <filter string="Today Visits" name="activities_today"
+                <xpath expr="//filter[@name='activities_today']" position="after">
+                    <filter string="Today Visits" name="activities_today_custom"
                         domain="[('date_planned', '&gt;=', context_today().strftime('%Y-%m-%d') + ' 00:00:00'),
                         ('date_planned', '&lt;', context_today().strftime('%Y-%m-%d') + ' 23:59:59')]"/>
+                </xpath>
+                <xpath expr="//filter[@name='activities_today']" position="attributes">
+                    <attribute name="invisible">True</attribute>
                 </xpath>
                 <xpath expr="//filter[@name='activities_upcoming_all']" position="replace">
                     <filter string="Future Visits" name="activities_upcoming_all"
@@ -450,9 +453,13 @@
                         domain="[('date_planned', '&lt;', context_today().strftime('%Y-%m-%d'))]"
                         help="Show all opportunities for which the next action date is before today"/>
                 </xpath>
-                <xpath expr="//filter[@name='activities_today']" position="replace">
-                    <filter string="Today Visits" name="activities_today"
-                        domain="[('date_planned', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <xpath expr="//filter[@name='activities_today']" position="after">
+                    <filter string="Today Visits" name="activities_today_custom"
+                        domain="[('date_planned', '&gt;=', context_today().strftime('%Y-%m-%d') + ' 00:00:00'),
+                        ('date_planned', '&lt;', context_today().strftime('%Y-%m-%d') + ' 23:59:59')]"/>
+                </xpath>
+                <xpath expr="//filter[@name='activities_today']" position="attributes">
+                    <attribute name="invisible">True</attribute>
                 </xpath>
                 <xpath expr="//filter[@name='activities_upcoming_all']" position="replace">
                     <filter string="Future Visits" name="activities_upcoming_all"
