@@ -1154,10 +1154,10 @@ class product_selection_field(models.Model):
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    warehouse_ids_im_ws = fields.Many2many('stock.warehouse', 'stock_warehouse_access_is_ws', 'uid', 'warehouse_id',domain="[('wh_type', '!=', 'PH')]",context={'active_test': False},
+    warehouse_ids_im_ws = fields.Many2many('stock.warehouse', 'stock_warehouse_access_is_ws', 'uid', 'warehouse_id',domain="[('wh_type', '!=', 'PH'),'|',('active','=',True),('active','=',False)]",context={'active_test': False},
                                             string='Stock warehouse access')
     warehouse_ids_ph = fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph', 'uid', 'warehouse_id',
-                                           domain="[('wh_type', '=', 'PH')]",context={'active_test': False},
+                                           domain="[('wh_type', '=', 'PH'),'|',('active','=',True),('active','=',False)]",context={'active_test': False},
                                            string='Stock warehouse access')
     warehouse_ids_ph_disp=fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph_disp', 'uid', 'warehouse_id',
                                            domain="[('wh_type', '=', 'PH'),('has_dispensary_location','=',True)]",context={'active_test': False},
