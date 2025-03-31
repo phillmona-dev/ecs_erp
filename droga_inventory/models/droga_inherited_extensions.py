@@ -184,7 +184,7 @@ class droga_warehouse_extension(models.Model):
                 return [('id', 'in', [])]
             else:
                 has_access = self.env['stock.warehouse'].sudo().search(
-                    [('code', 'in', compiled_wh_domain)])
+                    [('code', 'in', compiled_wh_domain),'|',('active','=',True),('active','=',False)])
                 return [('id', 'in', [x.id for x in has_access] if has_access else False)]
         else:
             return [('id', 'in', [])]
@@ -1154,16 +1154,16 @@ class product_selection_field(models.Model):
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    warehouse_ids_im_ws = fields.Many2many('stock.warehouse', 'stock_warehouse_access_is_ws', 'uid', 'warehouse_id',domain="[('wh_type', '!=', 'PH')]",
+    warehouse_ids_im_ws = fields.Many2many('stock.warehouse', 'stock_warehouse_access_is_ws', 'uid', 'warehouse_id',domain="[('wh_type', '!=', 'PH')]",context={'active_test': False},
                                             string='Stock warehouse access')
     warehouse_ids_ph = fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph', 'uid', 'warehouse_id',
-                                           domain="[('wh_type', '=', 'PH')]",
+                                           domain="[('wh_type', '=', 'PH')]",context={'active_test': False},
                                            string='Stock warehouse access')
     warehouse_ids_ph_disp=fields.Many2many('stock.warehouse', 'stock_warehouse_access_ph_disp', 'uid', 'warehouse_id',
-                                           domain="[('wh_type', '=', 'PH'),('has_dispensary_location','=',True)]",
+                                           domain="[('wh_type', '=', 'PH'),('has_dispensary_location','=',True)]",context={'active_test': False},
                                            string='Pharmacy sales access')
     warehouse_ids_pt_disp = fields.Many2many('stock.warehouse', 'stock_warehouse_access_pt_disp', 'uid', 'warehouse_id',
-                                             domain="[('wh_type', '=', 'PT')]",
+                                             domain="[('wh_type', '=', 'PT')]",context={'active_test': False},
                                              string='Physiotherapy sales access')
 
 

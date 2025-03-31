@@ -15,7 +15,7 @@ except ImportError:
 class inventory_stock_card_xls(models.TransientModel):
     _name='droga.pharma.reports.sc.excel'
 
-    warehouse=fields.Many2one('stock.warehouse','Warehouse')
+    warehouse=fields.Many2one('stock.warehouse','Warehouse',context={'active_test': False})
     product = fields.Many2one('product.product','Product')
     date_from=fields.Date('Date from', default=date(2022, 12, 20))
     date_to = fields.Date('Date to',default=fields.Date.today())

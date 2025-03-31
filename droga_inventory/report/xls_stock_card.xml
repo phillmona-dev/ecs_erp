@@ -14,7 +14,7 @@
             <form string="" delete="0">
                 <group>
                     <group>
-                        <field name="warehouse" domain="[('has_access','=',True)]" options="{'no_create':True,'no_open':True}"></field>
+                        <field name="warehouse" domain="[('has_access','=',True),'|',('active','=',True),('active','=',False)]" options="{'no_create':True,'no_open':True}"></field>
                         <field name="date_from"></field>
                     </group>
                     <group>

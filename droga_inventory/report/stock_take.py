@@ -15,7 +15,7 @@ except ImportError:
 class inventory_stock_card_xls(models.TransientModel):
     _name='droga.inventory.reports.stocktake.excel'
 
-    warehouse=fields.Many2one('stock.warehouse','Warehouse')
+    warehouse=fields.Many2one('stock.warehouse','Warehouse',context={'active_test': False})
     fileout = fields.Binary('File', readonly=True)
 
     def action_get_xls(self):
