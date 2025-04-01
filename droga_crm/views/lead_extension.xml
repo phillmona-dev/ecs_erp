@@ -309,6 +309,40 @@
         </field>
     </record>
 
+    <record id="crm_lead_extension_kanban_interface" model="ir.ui.view">
+        <field name="name">Lead kanban view modification</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_lead_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='priority']" position="after">
+                <field name="pr_sales"/>
+                <field name="is_from_plan"/>
+                <field name="date_planned"/>
+            </xpath>
+
+            <xpath expr="//div[@class='o_kanban_record_bottom']" position="replace">
+                <div>
+                                    <span class="o_kanban_record_subtitle"><field name="pr_sales"/></span>
+
+
+
+                    <div class="o_kanban_record_bottom">
+
+                                    <div class="oe_kanban_bottom_left">
+                                        From Plan
+                                        <field name="is_from_plan" title="From Plan"></field>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="date_planned"/>
+                                    </div>
+                                </div>
+
+
+                                </div>
+            </xpath>
+        </field>
+    </record>
+
     <record id="crm_lead_extension_tree" model="ir.ui.view">
         <field name="name">Tree view extension customization</field>
         <field name="model">crm.lead</field>

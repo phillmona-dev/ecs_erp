@@ -8,6 +8,7 @@
         <field name="type">ir.actions.act_window</field>
         <field name="domain">[('is_cust_available','=',True),('company_id','=',allowed_company_ids[0])]</field>
         <field name="view_mode">tree,form,kanban</field>
+        <field name="search_view_id" ref="base.view_res_partner_filter"/>
         <field name="view_ids" eval="[(5, 0, 0),
         (0, 0, {'view_mode': 'tree', 'view_id': ref('base.view_partner_tree')}),
         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_crm.crm_partner_view')}),
@@ -33,6 +34,14 @@
     <!-- Customer menu move to parent menu -->
     <menuitem
             id="res_partner_menu_customer"
+            name="Customers"
+            parent="crm.crm_menu_root"
+            active="False"
+            action="action_customer_custom"
+            sequence="5"/>
+    <!-- Customer menu move to parent menu -->
+    <menuitem
+            id="res_partner_menu_customer_custom"
             name="Customers"
             parent="crm.crm_menu_root"
             action="action_customer_custom"

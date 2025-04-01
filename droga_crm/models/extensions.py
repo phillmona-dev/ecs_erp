@@ -449,9 +449,20 @@ class crm_lead_extension(models.Model):
 
         if 'leads' in vals:
             lead = self.env['crm.lead'].search([('id', '=', vals['leads'])])
+            descr='-'
+            if 'is_from_plan' not in vals:
+                prods = ''
+                conts=''
+                for id, prod in enumerate(set(lead['core_products'])):
+                    prods = prods + prod.name if id == 0 else prods + ', ' + prod.name
+
+                for id, cont in enumerate(set(lead['contact_custom'])):
+                    conts += (' - '+cont['specialty']['specialty']+' '+cont['contact_name'] if cont else '')
+                descr = lead['partner_id'].name + ' - ' + conts if conts else lead['partner_id'].name
+                descr = descr + ' - ' + prods if prods else descr
             lead_vals = {
                 'name': lead.name.replace(" - Follow up", "").replace("opportunity's", "").replace("opportunity",
-                                                                                                   "") + ' - Follow up',
+                                                                                                   "") + ' - Follow up' if descr=='-' else descr,
                 'pr_sales': lead.pr_sales.id,
                 'pr_lead': lead.pr_sales.id,
                 'origin_user_id': lead.user_id.id,
@@ -469,8 +480,19 @@ class crm_lead_extension(models.Model):
 
             to_return= super(crm_lead_extension, self).create(lead_vals)
         else:
+            descr = ''
+            to_return = super(crm_lead_extension, self).create(vals)
+            if 'is_from_plan' not in vals:
+                prods = ''
+                conts = ''
+                for id, prod in enumerate(set(to_return['core_products'])):
+                    prods = prods + prod.name if id == 0 else prods + ', ' + prod.name
 
-            to_return= super(crm_lead_extension, self).create(vals)
+                for id, cont in enumerate(set(to_return['contact_custom'])):
+                    conts += (cont['specialty']['specialty'] + ' ' + cont['contact_name']+'-' if cont else '')
+                descr = to_return['partner_id'].name + ' - ' + conts[:-1] if conts else to_return['partner_id'].name
+                descr = descr + ' - ' + prods if prods else descr
+                to_return.name=descr
 
         self.env['droga.crm.done.activity'].create(
             {'name': to_return.name, 'activity_date': to_return.date_planned,
