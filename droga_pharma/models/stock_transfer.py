@@ -16,8 +16,8 @@ class picking_inherit(models.Model):
 
     def _show_set_to_draft(self):
         for rec in self:
-            if not rec.name.startswith('MT') and not self.env.user.has_group('droga_pharma.pharma_director'):
-                #This hides it
+            if not rec.name.startswith('PME/MT') and not rec.name.startswith('MT') and not self.env.user.has_group('droga_pharma.pharma_director'):
+                #This hides it, i know it's opposite
                 rec.show_set_to_draft = True
             else:
                 rec.show_set_to_draft = False
