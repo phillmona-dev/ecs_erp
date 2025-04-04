@@ -74,9 +74,9 @@ class DrogaHealthScreening(models.Model):
         self.ensure_one()
         sale_order = self.sale_order_id
 
-        if sale_order and sale_order.state != 'draft':
-            sale_order = sale_order.copy({'state': 'draft'})
-            self.write({'sale_order_id': sale_order.id})
+        # if sale_order and sale_order.state != 'draft':
+        #     sale_order = sale_order.copy({'state': 'draft'})
+        #     self.write({'sale_order_id': sale_order.id})
 
 
         if sale_order:
@@ -95,21 +95,30 @@ class DrogaHealthScreening(models.Model):
 
         customer = self.client_id.partner
 
-        default_product = self.env['product.product'].search([('id', '=', 40960)], limit=1)
-        if not default_product:
-            raise UserError("No products available in the catalog. Please add at least one saleable product.")
+        default_service = self.env['product.product'].search([('id', '=', 40960)], limit=1)
+        default_product = self.env['product.product'].search([('id', '=', 32509)], limit=1)
+        if not default_service or not default_product:
+            raise UserError("No services available in the catalog. Please add at least one saleable product.")
 
         sale_order_vals = {
             'partner_id': customer.id,
             'partner_custom': self.client_id.id,
             'client_order_ref': self.client_id.name,
             'order_line': [(0, 0, {
-                'product_id': default_product.id,
-                'name': default_product.name,
-                'product_uom': default_product.uom_id.id,
+                'product_id': default_service.id,
+                'name': default_service.name,
+                'product_uom': default_service.uom_id.id,
+                'product_uom_pharma_qty':1,
                 'product_uom_qty': 1,
-                'price_unit': 120.0,
-            })],
+            }),
+                           (0, 0, {
+                               'product_id': default_product.id,
+                               'name': default_product.name,
+                               'product_uom': default_product.uom_id.id,
+                               'product_uom_pharma_qty':0.02,
+                               'product_uom_qty': 0.02,
+                           })
+                           ],
             'state': 'draft',
             'payment_term_id': 11,
             'date_order': fields.Datetime.now(),
