@@ -377,7 +377,7 @@ export class PosFormController extends FormController {
             framework.blockUI();
 
             const settings = {
-                "url": "http://localhost:4949/get-pos?trans_id="+this.model.root.data.id,
+                "url": "http://"+ this.model.root.data.pos_device_ip_address+"/get-pos?trans_id="+this.model.root.data.id,
                 "method": "GET",
                 "timeout": 0,
             };
