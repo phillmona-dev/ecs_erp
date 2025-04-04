@@ -134,6 +134,7 @@
                         <tree editable="bottom">
                             <field name="withholding_tax_types" width="20" options="{'no_create':True,'no_open':True}" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
                             <field name="ref" width="10" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
+                            <field name="tin_no" width="10" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
                             <field name="withholding_date" width="10" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
                             <field name="amount_before_vat" width="20" attrs="{'readonly': [('entry_id', '!=', False)]}"/>
                             <field name="withholding_amount" width="20" readonly="1"/>

@@ -486,6 +486,8 @@ class AccountWithholding(models.Model):
     withholding_amount_word = fields.Char("Amount Word", compute="_compute_amount_word")
     withholding_percent = fields.Float("Withholding Percent", store=True)
 
+    tin_no=fields.Char("TIN")
+
     def _compute_amount_word(self):
         for record in self:
             record.withholding_amount_word = self.env['account.move'].convert_to_word(record.withholding_amount)
