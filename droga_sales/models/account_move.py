@@ -3,7 +3,7 @@ import os.path
 import xml.dom.minidom
 import xml.etree.cElementTree as ET
 from datetime import datetime
-import datetime
+import datetime as dt
 import requests
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
@@ -465,7 +465,7 @@ class account_move_line(models.Model):
     sales_cost = fields.Float('Sales Cost', store=True)
 
     def upd_cost(self):
-        date_limit = datetime.date(2024, 7, 7)
+        date_limit = dt.date(2024, 7, 7)
         moves = self.env['account.move.line'].search(
             [('date', '>', date_limit), ('move_id.invoice_origin','like','SO%'),('company_id', '=', 1), ('journal_id', '!=', 2),('sales_cost','=',-1)], limit=1300)
 
