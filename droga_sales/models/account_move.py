@@ -3,6 +3,7 @@ import os.path
 import xml.dom.minidom
 import xml.etree.cElementTree as ET
 from datetime import datetime
+import datetime
 import requests
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
@@ -463,6 +464,18 @@ class account_move_line(models.Model):
     profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True,default='-')
     sales_cost = fields.Float('Sales Cost', store=True)
 
+    def upd_cost(self):
+        date_limit = datetime.date(2024, 7, 7)
+        moves = self.env['account.move.line'].search(
+            [('date', '>', date_limit), ('move_id.invoice_origin','like','SO%'),('company_id', '=', 1), ('journal_id', '!=', 2),('sales_cost','=',-1)], limit=1300)
+
+        for rec in moves:
+
+            if rec.move_id.invoice_origin:
+                moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
+                rec.sales_cost = rec.quantity* abs(sum(moves.mapped('value')))/abs(sum(moves.mapped('quantity'))) if abs(sum(moves.mapped('quantity')))>0 else 0
+
+
     @api.model
     def create(self, vals):
         ret= super(account_move_line, self).create(vals)
@@ -470,7 +483,7 @@ class account_move_line(models.Model):
 
             if rec.move_id.invoice_origin:
                 if rec.move_id.invoice_origin.startswith('SO'):
-                    moves=self.env['stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
+                    moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
                     rec.sales_cost = rec.quantity* abs(sum(moves.mapped('value')))/abs(sum(moves.mapped('quantity'))) if abs(sum(moves.mapped('quantity')))>0 else 0
 
             if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
