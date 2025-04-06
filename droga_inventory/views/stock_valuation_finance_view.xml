@@ -40,6 +40,7 @@
                 <field name="quantity" sum="Total"/>
                 <field name="unit_cost"/>
                 <field name="value" sum="Total"/>
+                <field name="to_value"/>
                 <field name='remaining_qty'/>
                 <field name='remaining_value'/>
             </tree>

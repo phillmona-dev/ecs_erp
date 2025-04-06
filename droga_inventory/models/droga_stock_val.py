@@ -35,6 +35,7 @@ class DrogaStockValuation(models.Model):
     quantity = fields.Float('Quantity')
     unit_cost = fields.Float('Unit Value')
     value = fields.Float('Total Value')
+    to_value = fields.Float('To Value')
     remaining_qty = fields.Float('Remaining Quantity')
     remaining_value = fields.Float('Remaining Value')
 class DrogaStockValuationLayer(models.Model):
@@ -88,13 +89,14 @@ class DrogaStockValuationLayer(models.Model):
                 ([('dsvl_id', '=', self.id)])
         }
 
-    def InsertHistory(self):
+    def InsertHistory(self,to_value):
         for rec in self:
             dsval  = {
                         'dsvl_id': rec.id,
                         'quantity':rec.quantity,
                         'unit_cost': rec.unit_cost,
                         'value': rec.value,
+                        'to_value': to_value,
                         'remaining_qty': rec.remaining_qty,
                         'remaining_value': rec.remaining_value,
                     }
@@ -209,7 +211,9 @@ class DrogaStockValuationLayer(models.Model):
             if cur_trans.unit_cost!=((abs(prev_trans.remaining_value) / abs(
                 prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
                     abs(prev_trans.value) / abs(prev_trans.quantity))):
-                cur_trans.InsertHistory()
+                cur_trans.InsertHistory(cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(
+                    prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
+                    abs(prev_trans.value) / abs(prev_trans.quantity))))
 
             cur_trans.unit_cost = (abs(prev_trans.remaining_value) / abs(
                 prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
@@ -309,13 +313,14 @@ class DrogaLandedCost(models.Model):
                         #Get valuation layers
                         for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id','in',move_ids)]):
                             if res.lc_rate!=1:
-                                val.InsertHistory()
                                 orig_unit_cost = val.unit_cost / (val.po_rate * val.grn_rate)
-                                val.po_rate+=(res.lc_rate-1)
+                                val.po_rate += (res.lc_rate - 1)
+                                val.InsertHistory(val.quantity * (orig_unit_cost * (val.po_rate + val.grn_rate - 1)))
+
                                 val.unit_cost= orig_unit_cost*(val.po_rate+val.grn_rate-1)
                                 val.remaining_value=val.remaining_value + ((val.quantity * val.unit_cost)- val.value)
                                 val.value=val.quantity * val.unit_cost
-                                val.revaluate_after_date(val)
+                                val.revaluate_after_date_button()
                     res.state='done'
                 else:
                     for grn in res.picking_ids:
@@ -324,13 +329,14 @@ class DrogaLandedCost(models.Model):
                         # Get valuation layers
                         for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', move_ids)]):
                             if res.lc_rate!=1:
-                                val.InsertHistory()
                                 orig_unit_cost=val.unit_cost/(val.po_rate*val.grn_rate)
-                                val.grn_rate += (res.lc_rate-1)
+                                val.grn_rate += (res.lc_rate - 1)
+                                val.InsertHistory(val.quantity * (orig_unit_cost*(val.po_rate+val.grn_rate-1)))
+
                                 val.unit_cost= orig_unit_cost*(val.po_rate+val.grn_rate-1)
                                 val.remaining_value = val.remaining_value + ((val.quantity * val.unit_cost) - val.value)
                                 val.value = val.quantity * val.unit_cost
-                                val.revaluate_after_date(val)
+                                val.revaluate_after_date_button()
                     res.state = 'done'
             return True
 
