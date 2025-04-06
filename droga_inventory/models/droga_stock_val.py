@@ -19,6 +19,7 @@ class StockValuationLayerInherit(models.Model):
             'unit_cost': ret.unit_cost if not ret.stock_move_id.purchase_line_id else ret.unit_cost*ret.stock_move_id.purchase_line_id.order_id.cost_rate,
             'value': ret.value if not ret.stock_move_id.purchase_line_id else ret.value * ret.stock_move_id.purchase_line_id.order_id.cost_rate,
             'description': ret.description,
+            'po_rate':1 if not ret.stock_move_id.purchase_line_id else ret.stock_move_id.purchase_line_id.order_id.cost_rate,
             'stock_move_id': ret.stock_move_id.id,
             'account_move_line_id': ret.account_move_line_id.id,
             # Check below field
@@ -28,7 +29,14 @@ class StockValuationLayerInherit(models.Model):
         self.env['droga.stock.valuation.layer'].sudo().create(dsvl)
         return ret
 
-
+class DrogaStockValuation(models.Model):
+    _name='droga.stock.valuation.history'
+    dsvl_id=fields.Many2one('droga.stock.valuation.layer')
+    quantity = fields.Float('Quantity')
+    unit_cost = fields.Float('Unit Value')
+    value = fields.Float('Total Value')
+    remaining_qty = fields.Float('Remaining Quantity')
+    remaining_value = fields.Float('Remaining Value')
 class DrogaStockValuationLayer(models.Model):
     _name = 'droga.stock.valuation.layer'
     _description = 'Droga Stock Valuation Layer'
@@ -36,6 +44,7 @@ class DrogaStockValuationLayer(models.Model):
 
     _rec_name = 'product_id'
 
+    history_vals=fields.One2many('droga.stock.valuation.history','dsvl_id')
     company_id = fields.Many2one('res.company', 'Company', readonly=True, required=True)
     product_id = fields.Many2one('product.product', 'Product', readonly=True, required=True)
     categ_id = fields.Many2one('product.category', related='product_id.categ_id')
@@ -58,12 +67,39 @@ class DrogaStockValuationLayer(models.Model):
     svl_id = fields.Integer('SVL ID')
     move_date = fields.Date('Move date', required=True)
     origin = fields.Char(related='stock_move_id.origin', store=True)
+    po_rate=fields.Float('PO Rate',default=1,store=True)
+    grn_rate = fields.Float('GRN Rate', default=1, store=True)
     move_type = fields.Selection([
         ('Static', 'Static'),
         ('Weighted', 'Weighted'),
     ], string='Move type',
         help='Static types are transactions that we receive from suppliers and they change our weighted average price. Weighted types are '
              'types of transactions where we have to calculate weighted average value.')
+    def show_history(self):
+        return {
+            'name': 'Valuation history',
+            'view_type': 'tree',
+            'view_mode': 'tree',
+            'res_model': 'droga.stock.valuation.history',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'domain':
+                ([('dsvl_id', '=', self.id)])
+        }
+
+    def InsertHistory(self):
+        for rec in self:
+            dsval  = {
+                        'dsvl_id': rec.id,
+                        'quantity':rec.quantity,
+                        'unit_cost': rec.unit_cost,
+                        'value': rec.value,
+                        'remaining_qty': rec.remaining_qty,
+                        'remaining_value': rec.remaining_value,
+                    }
+
+            rec.env['droga.stock.valuation.history'].create(dsval)
 
     @api.model
     def create(self, vals):
@@ -129,6 +165,32 @@ class DrogaStockValuationLayer(models.Model):
             account_moves._post()
             self.account_move_id=account_moves.id
 
+    def revaluate_after_date_button(self):
+        ret=self
+
+        query1 = """
+                                update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
+                                case non_core_amt when 0 then 0 else %s end where id=%s
+                            """
+        self.env.cr.execute(query1, (
+        abs(ret.value), abs(ret.value), abs(ret.value), abs(ret.value), abs(ret.value),
+        ret.account_move_id.id))
+
+        query2 = """
+                                                    update account_move_line set debit= case when debit=0 then 0 else %s end,credit=case when credit=0 then 0 else %s end,
+                                                    balance=case when balance=0 then 0 else (balance/abs(balance))*%s end,amount_currency=case when amount_currency=0 then 0 else (amount_currency/abs(amount_currency))*%s end
+                                                    where move_id=%s
+                                                """
+        self.env.cr.execute(query2, (
+            abs(ret.value), abs(ret.value), abs(ret.value),
+            abs(ret.value), ret.account_move_id.id))
+
+        trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
+        init_trans = ret
+        for trans in trans_after:
+            self.update_trans(init_trans, trans,post_diff=True)
+            init_trans = trans
+
     def revaluate_after_date(self,ret):
         trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
         init_trans = ret
@@ -143,6 +205,12 @@ class DrogaStockValuationLayer(models.Model):
             cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
         else:
             old_value=cur_trans.value
+
+            if cur_trans.unit_cost!=((abs(prev_trans.remaining_value) / abs(
+                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
+                    abs(prev_trans.value) / abs(prev_trans.quantity))):
+                cur_trans.InsertHistory()
+
             cur_trans.unit_cost = (abs(prev_trans.remaining_value) / abs(
                 prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
                     abs(prev_trans.value) / abs(prev_trans.quantity))
@@ -151,6 +219,7 @@ class DrogaStockValuationLayer(models.Model):
             cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
 
             if float_compare(old_value,cur_trans.value,precision_digits=2) !=0:
+
                 if cur_trans.account_move_id:
 
                     #write a query to update
@@ -207,10 +276,10 @@ class DrogaLandedCost(models.Model):
         'purchase.order', string='Purchase orders',
         copy=False, states={'done': [('readonly', True)]})
     purchase_total=fields.Float('Purchase total',compute='get_purch_grn_total',store=True)
-    grn_total = fields.Float('Purchase total', compute='get_purch_grn_total', store=True)
+    grn_total = fields.Float('GRN total', compute='get_purch_grn_total', store=True)
     lc_rate=fields.Float('Landed Cost Rate',digits=(16, 8))
 
-    @api.depends('purchase_orders','picking_ids','target_model')
+    @api.depends('purchase_orders','picking_ids','target_model','amount_total')
     def get_purch_grn_total(self):
         for rec in self:
             rec.purchase_total=0
@@ -223,35 +292,46 @@ class DrogaLandedCost(models.Model):
                 for mv in rec.picking_ids.move_ids:
                     vals=self.env['droga.stock.valuation.layer'].search([('stock_move_id','=',mv.id)])
                     for val in vals:
-                        rec.grn_total=rec.grn_total+val.value
+                        #Divide by grn_rate to get GRN amount before PO and GRN update
+                        rec.grn_total=rec.grn_total+(val.value/(val.po_rate+val.grn_rate-1))
                 rec.lc_rate=((rec.amount_total+rec.grn_total)/rec.grn_total) if rec.grn_total!=0 else 1
 
     def button_validate(self):
-        if any(cost.target_model != 'pos' for cost in self):
+        if any(cost.target_model not in ('pos','picking') for cost in self):
             return super(DrogaLandedCost, self).button_validate()
         else:
             #For all receipts, update cost here
             for res in self:
-
-                for po in res.purchase_orders:
-                    po_rate = 1
-
-                    for rate in self.env['stock.landed.cost'].search(
-                            [('purchase_orders', 'in', po.id), ('state', '=', 'done')]):
-                        po_rate = po_rate + (rate['lc_rate'] - 1)
-                    po_rate=po_rate + (res.lc_rate-1)
-                    #Get stock move ids
-                    move_ids=self.env['stock.move'].search([('purchase_line_id','in',po.order_line.ids)]).ids
-                    #Get valuation layers
-                    for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id','in',move_ids)]):
-
-                        #Check if existing unit cost is different from purchase unit cost *
-                        if float_compare(val.unit_cost, val.stock_move_id.purchase_line_id.price_unit*po_rate, precision_digits=3) != 0:
-                            val.unit_cost=val.stock_move_id.purchase_line_id.price_unit*po_rate
-                            val.remaining_value=val.remaining_value + ((val.quantity * val.unit_cost)- val.value)
-                            val.value=val.quantity * val.unit_cost
-                            val.revaluate_after_date(val)
-                res.state='done'
+                if res.target_model=='pos':
+                    for po in res.purchase_orders:
+                        # Get stock move ids
+                        move_ids=self.env['stock.move'].search([('purchase_line_id','in',po.order_line.ids)]).ids
+                        #Get valuation layers
+                        for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id','in',move_ids)]):
+                            if res.lc_rate!=1:
+                                val.InsertHistory()
+                                orig_unit_cost = val.unit_cost / (val.po_rate * val.grn_rate)
+                                val.po_rate+=(res.lc_rate-1)
+                                val.unit_cost= orig_unit_cost*(val.po_rate+val.grn_rate-1)
+                                val.remaining_value=val.remaining_value + ((val.quantity * val.unit_cost)- val.value)
+                                val.value=val.quantity * val.unit_cost
+                                val.revaluate_after_date(val)
+                    res.state='done'
+                else:
+                    for grn in res.picking_ids:
+                        # Get stock move ids
+                        move_ids = grn.move_ids.ids
+                        # Get valuation layers
+                        for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', move_ids)]):
+                            if res.lc_rate!=1:
+                                val.InsertHistory()
+                                orig_unit_cost=val.unit_cost/(val.po_rate*val.grn_rate)
+                                val.grn_rate += (res.lc_rate-1)
+                                val.unit_cost= orig_unit_cost*(val.po_rate+val.grn_rate-1)
+                                val.remaining_value = val.remaining_value + ((val.quantity * val.unit_cost) - val.value)
+                                val.value = val.quantity * val.unit_cost
+                                val.revaluate_after_date(val)
+                    res.state = 'done'
             return True
 
 class PurchaseOrder(models.Model):

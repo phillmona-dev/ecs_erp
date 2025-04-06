@@ -19,6 +19,7 @@
             </xpath>
 
             <xpath expr="//field[@name='vendor_bill_id']" position="after">
+                <field name="grn_total" readonly="True"></field>
                 <field name="purchase_total" readonly="True"></field>
                 <field name="lc_rate" readonly="True"></field>
             </xpath>

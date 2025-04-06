@@ -294,7 +294,7 @@ class droga_cons_inherit(models.Model):
                     else:
                         unit_cost = (it.items_header[0].raw_item.standard_price*waste_increase_rate) + (det.proc_cost*waste_increase_rate) +(total_cost_build_byproduct/total_qty_byproduct)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
 
-                    uom_rate=det.product_id.product_tmpl_id.uom_id.factor/det.product_uom.factor
+                    uom_rate=it['item'].uom_id.factor/det.product_id.product_tmpl_id.uom_id.factor
 
                     items.append({
                         'product_id': self.env['product.product'].search([('product_tmpl_id', '=', it['item'].id)])[

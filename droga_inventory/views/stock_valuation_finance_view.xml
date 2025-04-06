@@ -17,12 +17,31 @@
                 <field name='categ_id'/>
                 <field name='uom_id'/>
                 <field name='quantity' sum="Total"/>
-                <field name='unit_cost' sum="Total"/>
+                <field name='unit_cost'/>
                 <field name='value' sum="Total"/>
-                <field name='remaining_qty' sum="Total"/>
-                <field name='remaining_value' sum="Total"/>
+                <field name='remaining_qty'/>
+                <field name='remaining_value'/>
                 <field name='create_date'/>
                 <field name='move_date'/>
+<!--                <button name="revaluate_after_date_button" string="UPD" type="object" class="btn-primary"/>-->
+                <field name='history_vals' invisible="1"/>
+                <button name="show_history" attrs="{'invisible': [('history_vals', '=', [])]}" string="Show History" type="object" class="btn-primary"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="droga_stock_valuation_transactions_history" model="ir.ui.view">
+        <field name="name">droga.stock.valuation.tree.history.tree</field>
+        <field name="model">droga.stock.valuation.history</field>
+        <field name="arch" type="xml">
+            <tree string="Stock transactions - All" delete="false" create="false">
+                <field name="dsvl_id"/>
+                <field name="create_date" string="Update date"/>
+                <field name="quantity" sum="Total"/>
+                <field name="unit_cost"/>
+                <field name="value" sum="Total"/>
+                <field name='remaining_qty'/>
+                <field name='remaining_value'/>
             </tree>
         </field>
     </record>
