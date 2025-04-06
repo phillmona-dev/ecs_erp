@@ -37,6 +37,7 @@
             <tree string="Stock transactions - All" delete="false" create="false">
                 <field name="dsvl_id"/>
                 <field name="create_date" string="Update date"/>
+                <field name="reference"/>
                 <field name="quantity" sum="Total"/>
                 <field name="unit_cost"/>
                 <field name="value" sum="Total"/>

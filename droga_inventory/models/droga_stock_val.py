@@ -34,6 +34,7 @@ class DrogaStockValuation(models.Model):
     dsvl_id=fields.Many2one('droga.stock.valuation.layer')
     quantity = fields.Float('Quantity')
     unit_cost = fields.Float('Unit Value')
+    reference=fields.Char('Reference')
     value = fields.Float('Total Value')
     to_value = fields.Float('To Value')
     remaining_qty = fields.Float('Remaining Quantity')
@@ -89,10 +90,11 @@ class DrogaStockValuationLayer(models.Model):
                 ([('dsvl_id', '=', self.id)])
         }
 
-    def InsertHistory(self,to_value):
+    def InsertHistory(self,ref,to_value):
         for rec in self:
             dsval  = {
                         'dsvl_id': rec.id,
+                        'reference':ref,
                         'quantity':rec.quantity,
                         'unit_cost': rec.unit_cost,
                         'value': rec.value,
@@ -167,7 +169,7 @@ class DrogaStockValuationLayer(models.Model):
             account_moves._post()
             self.account_move_id=account_moves.id
 
-    def revaluate_after_date_button(self):
+    def revaluate_after_date_button(self,reference=''):
         ret=self
 
         query1 = """
@@ -190,7 +192,7 @@ class DrogaStockValuationLayer(models.Model):
         trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
         init_trans = ret
         for trans in trans_after:
-            self.update_trans(init_trans, trans,post_diff=True)
+            self.update_trans(init_trans, trans,post_diff=True,reference=reference)
             init_trans = trans
 
     def revaluate_after_date(self,ret):
@@ -201,7 +203,7 @@ class DrogaStockValuationLayer(models.Model):
             init_trans = trans
 
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
-    def update_trans(self, prev_trans, cur_trans,post_diff=False):
+    def update_trans(self, prev_trans, cur_trans,post_diff=False,reference=''):
         if cur_trans.move_type == 'Static':
             cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
             cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
@@ -211,7 +213,7 @@ class DrogaStockValuationLayer(models.Model):
             if cur_trans.unit_cost!=((abs(prev_trans.remaining_value) / abs(
                 prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
                     abs(prev_trans.value) / abs(prev_trans.quantity))):
-                cur_trans.InsertHistory(cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(
+                cur_trans.InsertHistory('',cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(
                     prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
                     abs(prev_trans.value) / abs(prev_trans.quantity))))
 
@@ -315,12 +317,12 @@ class DrogaLandedCost(models.Model):
                             if res.lc_rate!=1:
                                 orig_unit_cost = val.unit_cost / (val.po_rate * val.grn_rate)
                                 val.po_rate += (res.lc_rate - 1)
-                                val.InsertHistory(val.quantity * (orig_unit_cost * (val.po_rate + val.grn_rate - 1)))
+                                val.InsertHistory(res.name,val.quantity * (orig_unit_cost * (val.po_rate + val.grn_rate - 1)))
 
                                 val.unit_cost= orig_unit_cost*(val.po_rate+val.grn_rate-1)
                                 val.remaining_value=val.remaining_value + ((val.quantity * val.unit_cost)- val.value)
                                 val.value=val.quantity * val.unit_cost
-                                val.revaluate_after_date_button()
+                                val.revaluate_after_date_button(reference=res.name)
                     res.state='done'
                 else:
                     for grn in res.picking_ids:
@@ -331,12 +333,12 @@ class DrogaLandedCost(models.Model):
                             if res.lc_rate!=1:
                                 orig_unit_cost=val.unit_cost/(val.po_rate*val.grn_rate)
                                 val.grn_rate += (res.lc_rate - 1)
-                                val.InsertHistory(val.quantity * (orig_unit_cost*(val.po_rate+val.grn_rate-1)))
+                                val.InsertHistory(res.name, val.quantity * (orig_unit_cost*(val.po_rate+val.grn_rate-1)))
 
                                 val.unit_cost= orig_unit_cost*(val.po_rate+val.grn_rate-1)
                                 val.remaining_value = val.remaining_value + ((val.quantity * val.unit_cost) - val.value)
                                 val.value = val.quantity * val.unit_cost
-                                val.revaluate_after_date_button()
+                                val.revaluate_after_date_button(reference=res.name)
                     res.state = 'done'
             return True
 
