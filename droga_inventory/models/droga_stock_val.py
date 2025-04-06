@@ -209,11 +209,10 @@ class DrogaStockValuationLayer(models.Model):
             cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
         else:
             old_value=cur_trans.value
-
-            if cur_trans.unit_cost!=((abs(prev_trans.remaining_value) / abs(
+            if float_compare(cur_trans.unit_cost, ((abs(prev_trans.remaining_value) / abs(
                 prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
-                    abs(prev_trans.value) / abs(prev_trans.quantity))):
-                cur_trans.InsertHistory('',cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(
+                    abs(prev_trans.value) / abs(prev_trans.quantity))), precision_digits=2) != 0:
+                cur_trans.InsertHistory(reference,cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(
                     prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
                     abs(prev_trans.value) / abs(prev_trans.quantity))))
 
