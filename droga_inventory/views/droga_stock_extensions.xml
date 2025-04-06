@@ -8,6 +8,13 @@
             <xpath expr="//form/sheet/group/group/field[@name='usage']" position="after">
                 <field name="con_type"/>
             </xpath>
+            <xpath expr="//form/sheet" position="after">
+                <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+            </xpath>
         </field>
     </record>
 
@@ -217,6 +224,13 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='code']" position="after">
                 <field name="wh_type"></field>
+            </xpath>
+            <xpath expr="//form/sheet" position="after">
+                <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
             </xpath>
         </field>
     </record>

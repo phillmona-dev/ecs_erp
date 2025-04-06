@@ -83,7 +83,7 @@ class droga_pharma_dispensary_type(models.Model):
 
 class droga_pharma_wh_has_dispensary(models.Model):
     _inherit = 'stock.warehouse'
-    linked_analytic = fields.Many2one('account.analytic.account')
+    linked_analytic = fields.Many2one('account.analytic.account',tracking=True)
 
 class droga_pharma_lot_extension(models.Model):
     _inherit = 'stock.lot'

@@ -206,16 +206,25 @@ class DrogaLandedCost(models.Model):
     purchase_orders=fields.Many2many(
         'purchase.order', string='Purchase orders',
         copy=False, states={'done': [('readonly', True)]})
-    purchase_total=fields.Float('Purchase total',compute='get_purch_total')
+    purchase_total=fields.Float('Purchase total',compute='get_purch_grn_total',store=True)
+    grn_total = fields.Float('Purchase total', compute='get_purch_grn_total', store=True)
     lc_rate=fields.Float('Landed Cost Rate',digits=(16, 8))
 
-    @api.depends('purchase_orders')
-    def get_purch_total(self):
+    @api.depends('purchase_orders','picking_ids','target_model')
+    def get_purch_grn_total(self):
         for rec in self:
             rec.purchase_total=0
-            for po in rec.purchase_orders:
-                rec.purchase_total=rec.purchase_total+po.amount_total
-            rec.lc_rate=((rec.amount_total+rec.purchase_total)/rec.purchase_total) if rec.purchase_total else 1
+            rec.grn_total=0
+            if rec.target_model=='pos':
+                for po in rec.purchase_orders:
+                    rec.purchase_total=rec.purchase_total+po.amount_total
+                rec.lc_rate=((rec.amount_total+rec.purchase_total)/rec.purchase_total) if rec.purchase_total!=0 else 1
+            elif rec.target_model=='picking':
+                for mv in rec.picking_ids.move_ids:
+                    vals=self.env['droga.stock.valuation.layer'].search([('stock_move_id','=',mv.id)])
+                    for val in vals:
+                        rec.grn_total=rec.grn_total+val.value
+                rec.lc_rate=((rec.amount_total+rec.grn_total)/rec.grn_total) if rec.grn_total!=0 else 1
 
     def button_validate(self):
         if any(cost.target_model != 'pos' for cost in self):

@@ -110,29 +110,22 @@ class transfer_request_inherit(models.Model):
             self._get_pharma_approvers()
             self.state = 'phmg'
         else:
-            if self.location_dest_id.complete_name[0:3] != self.location_id.code[0:3]:
-                # Post on message board here
-                channels = self.env['mail.channel'].search([('name', '=', 'Pharmacy inter-store')])
+            channels = self.env['mail.channel'].search([('name', '=', 'Pharmacy inter-store')])
 
-                message = "Inter-store transaction request has been initiated by " + str.upper(
-                    self.location_dest_id.complete_name) + '. The requested store is ' + str.upper(
-                    self.location_id.name) + "."
-                message = message + '   Inter-store request number - ' + self.name
-                for c in channels:
-                    c.message_post(
-                        subject="Inter-store pharmacy transfer.",
-                        body=message,
-                        message_type='comment',
-                        subtype_xmlid='mail.mt_comment',
-                        author_id=2,
-                    )
+            message = "Inter-store transaction request has been initiated by " + str.upper(
+                self.location_dest_id.complete_name) + '. The requested store is ' + str.upper(
+                self.location_id.name) + "."
+            message = message + '   Inter-store request number - ' + self.name
+            for c in channels:
+                c.message_post(
+                    subject="Inter-store pharmacy transfer.",
+                    body=message,
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=2,
+                )
+
             self.confirm_im()
-        # if self.location_dest_id.complete_name[0:3]==self.location_id.code[0:3]:
-        #    self.confirm_ph()
-        # self._get_pharma_approvers()
-        # if not self.pharmacy_manager:
-        #    raise UserError("Pharmacy operations manager not configured, please contact IT.")
-        # self.state = 'phmg'
 
     def confirm_ph(self):
         self.set_activity_done()

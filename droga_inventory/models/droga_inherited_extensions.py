@@ -153,13 +153,17 @@ class droga_warehouse_extension(models.Model):
     _inherit = 'stock.warehouse'
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
+
     has_no_access=fields.Boolean('is_loc_not_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_no_access')
-    has_dispensary_location = fields.Boolean("Has dispensary location")
+    has_dispensary_location = fields.Boolean("Has dispensary location",tracking=True)
     wh_type=fields.Selection([
         ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
-    ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.')
+    ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.',tracking=True)
+
+    name = fields.Char(tracking=True)
+    code = fields.Char(tracking=True)
 
     def _search_has_no_access(self, operator, value):
 
@@ -207,6 +211,13 @@ class droga_warehouse_extension(models.Model):
                 raise UserError("You can not edit warehouse.")
         return super(droga_warehouse_extension, self).write(vals)
 
+class droga_stock_location(models.Model):
+    _name = "stock.warehouse"
+    _inherit = ['stock.warehouse','mail.thread', 'mail.activity.mixin', 'image.mixin']
+class droga_stock_location(models.Model):
+    _name = "stock.location"
+    _inherit = ['stock.location','mail.thread', 'mail.activity.mixin', 'image.mixin']
+
 class droga_location_extension(models.Model):
     _inherit = 'stock.location'
     con_type = fields.Selection([
@@ -222,7 +233,10 @@ class droga_location_extension(models.Model):
         ('SRL', 'Inter-store receive transit location'),
         ('INC', 'Internal consumption'),
         ('SUBL', 'Cleaning unit location')
-        ], string='Cons/sample Type')
+        ], string='Cons/sample Type',tracking=True)
+    usage = fields.Selection(tracking=True)
+    name=fields.Char(tracking=True)
+    location_id = fields.Many2one(tracking=True)
     wcode=fields.Char(related='warehouse_id.code')
     has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
