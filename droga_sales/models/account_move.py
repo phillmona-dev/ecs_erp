@@ -248,7 +248,7 @@ class account_move(models.Model):
         if res.invoice_origin:
             if res.invoice_origin.startswith('SO'):
                 res.sales_cost = abs(
-                        sum(self.env['stock.valuation.layer'].search([('origin', '=', res.invoice_origin)]).mapped('value')))
+                        sum(self.env['droga.stock.valuation.layer'].search([('origin', '=', res.invoice_origin)]).mapped('value'))) * (-1 if res.move_type=='out_refund' else 1)
         return res
 
     def print_to_pos_peds(self):
@@ -465,17 +465,6 @@ class account_move_line(models.Model):
     sales_cost = fields.Float('Sales Cost', store=True)
     inv_origin=fields.Char('Inovice origin',store=True,related='move_id.invoice_origin')
 
-    def upd_cost(self):
-        date_limit = dt.date(2024, 7, 7)
-        moves = self.env['account.move.line'].search(
-            [('date', '>', date_limit), ('move_id.invoice_origin','like','SO%'),('company_id', '=', 1), ('journal_id', '!=', 2),('sales_cost','=',-1)], limit=1000)
-
-        for rec in moves:
-
-            moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
-            rec.sales_cost =  abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0
-
-
     @api.model
     def create(self, vals):
         ret= super(account_move_line, self).create(vals)
@@ -484,7 +473,7 @@ class account_move_line(models.Model):
             if rec.move_id.invoice_origin:
                 if rec.move_id.invoice_origin.startswith('SO'):
                     moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
-                    rec.sales_cost = abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0
+                    rec.sales_cost = (abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0) * (-1 if rec.move_id.move_type=='out_refund' else 1)
 
             if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
                 if rec.account.startswith('5'):

@@ -137,12 +137,12 @@ class DrogaStockValuationLayer(models.Model):
                 acc_move = self.env['account.move'].search([('invoice_origin', '=', ret.origin)])
                 for mv in acc_move:
                     mv.sales_cost = abs(
-                        sum(self.env['droga.stock.valuation.layer'].search([('origin', '=', ret.origin)]).mapped('value')))
+                        sum(self.env['droga.stock.valuation.layer'].search([('origin', '=', ret.origin)]).mapped('value'))) * (-1 if mv.move_type=='out_refund' else 1)
                     mvl=self.env['account.move.line'].search([('move_id', '=', mv.id)])
                     for mvld in mvl:
                         moves = self.env['droga.stock.valuation.layer'].search(
                             [('product_id', '=', mvld.product_id.id), ('origin', '=', mvld.move_id.invoice_origin)])
-                        mvld.sales_cost = abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0
+                        mvld.sales_cost = (abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0) * (-1 if mvld.move_id.move_type=='out_refund' else 1)
 
         return ret
 
