@@ -467,7 +467,7 @@ class account_move_line(models.Model):
     def upd_cost(self):
         date_limit = dt.date(2024, 7, 7)
         moves = self.env['account.move.line'].search(
-            [('date', '>', date_limit), ('move_id.invoice_origin','like','SO%'),('company_id', '=', 1), ('journal_id', '!=', 2),('sales_cost','=',-1)], limit=1300)
+            [('date', '>', date_limit), ('move_id.invoice_origin','like','SO%'),('company_id', '=', 1), ('journal_id', '!=', 2),('sales_cost','=',-1)], limit=1000)
 
         for rec in moves:
 
