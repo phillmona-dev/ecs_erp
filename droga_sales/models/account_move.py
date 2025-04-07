@@ -471,9 +471,8 @@ class account_move_line(models.Model):
 
         for rec in moves:
 
-            if rec.move_id.invoice_origin:
-                moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
-                rec.sales_cost =  abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0
+            moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
+            rec.sales_cost =  abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0
 
 
     @api.model
