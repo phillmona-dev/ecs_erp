@@ -142,8 +142,7 @@ class DrogaStockValuationLayer(models.Model):
                     for mvld in mvl:
                         moves = self.env['droga.stock.valuation.layer'].search(
                             [('product_id', '=', mvld.product_id.id), ('origin', '=', mvld.move_id.invoice_origin)])
-                        mvld.sales_cost = mvld.quantity * abs(sum(moves.mapped('value'))) / abs(
-                        sum(moves.mapped('quantity'))) if abs(sum(moves.mapped('quantity')))>0 else 0
+                        mvld.sales_cost = abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0
 
         return ret
 

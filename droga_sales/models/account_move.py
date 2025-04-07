@@ -473,7 +473,7 @@ class account_move_line(models.Model):
 
             if rec.move_id.invoice_origin:
                 moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
-                rec.sales_cost = rec.quantity* abs(sum(moves.mapped('value')))/abs(sum(moves.mapped('quantity'))) if abs(sum(moves.mapped('quantity')))>0 else 0
+                rec.sales_cost =  abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0
 
 
     @api.model
@@ -484,7 +484,7 @@ class account_move_line(models.Model):
             if rec.move_id.invoice_origin:
                 if rec.move_id.invoice_origin.startswith('SO'):
                     moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
-                    rec.sales_cost = rec.quantity* abs(sum(moves.mapped('value')))/abs(sum(moves.mapped('quantity'))) if abs(sum(moves.mapped('quantity')))>0 else 0
+                    rec.sales_cost = abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0
 
             if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
                 if rec.account.startswith('5'):
