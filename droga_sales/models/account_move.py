@@ -463,7 +463,7 @@ class account_move_line(models.Model):
     origin_ref = fields.Char(compute="get_origin_ref", string="Origin reference", store=True)
     profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True,default='-')
     sales_cost = fields.Float('Sales Cost', store=True)
-    inv_origin=fields.Char('Inovice origin',store=True,related='move_id.invoice_origin')
+    inv_origin=fields.Char('Inovice origin',store=True)
 
     def upd_cost(self):
         date_limit = dt.date(2024, 7, 7)
