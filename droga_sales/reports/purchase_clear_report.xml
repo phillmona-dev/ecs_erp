@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_account_move_line_purchase" model="ir.ui.view">
+        <field name="name">account.move.line.purchase.tree</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="account_id"/>
+                <field name="move_id" widget="many2one" options='{"no_open": False}'/>/>
+                <field name="date"/>
+                <field name="amount_currency" string="Amount"/>
+                <field name="inv_origin"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_account_move_line_purchase_search" model="ir.ui.view">
+        <field name="name">account.move.line.purchase.search</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="account_id"/>
+                <field name="move_id"/>
+                <field name="date"/>
+                <field name="amount_currency" sum="Total"/>
+                <field name="inv_origin"/>
+
+                <group expand="1" string="Group By">
+                    <filter string="Purchase order" name='group_inv_origin' context="{'group_by':'inv_origin'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="view_account_move_line_purchase_action">
+        <field name="name">Local / Foreign purchase clearing report</field>
+        <field name="res_model">account.move.line</field>
+        <field name="context">{'group_by_no_leaf':1,'group_by':['inv_origin']}</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_account_move_line_purchase"/>
+        <field name="search_view_id" ref="view_account_move_line_purchase_search"/>
+        <field name="domain">[('account_id','in',(2468,990))]</field>
+    </record>
+
+    <menuitem id="droga_purchase_clearing" name="Local purchase clearing"
+                  action="view_account_move_line_purchase_action"
+                parent="droga_finance.droga_payables_report"
+                  groups="account.group_account_manager" sequence="2"/>
+</odoo>
