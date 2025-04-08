@@ -4,11 +4,11 @@
         <field name="name">account.move.line.purchase.tree</field>
         <field name="model">account.move.line</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree create="0" default_order="date desc">
                 <field name="account_id"/>
-                <field name="move_id" widget="many2one" options='{"no_open": False}'/>/>
+                <field name="move_id" widget="many2one" options='{"no_open": False}'/>
                 <field name="date"/>
-                <field name="amount_currency" string="Amount"/>
+                <field name="amount_currency" sum="Amount"/>
                 <field name="inv_origin"/>
             </tree>
         </field>
@@ -35,11 +35,11 @@
     <record model="ir.actions.act_window" id="view_account_move_line_purchase_action">
         <field name="name">Local / Foreign purchase clearing report</field>
         <field name="res_model">account.move.line</field>
-        <field name="context">{'group_by_no_leaf':1,'group_by':['inv_origin']}</field>
+        <field name="context">{'search_default_group_inv_origin':1}</field>
         <field name="view_mode">tree</field>
         <field name="view_id" ref="view_account_move_line_purchase"/>
         <field name="search_view_id" ref="view_account_move_line_purchase_search"/>
-        <field name="domain">[('account_id','in',(2468,990))]</field>
+        <field name="domain">[('account_id','=',2468)]</field>
     </record>
 
     <menuitem id="droga_purchase_clearing" name="Local purchase clearing"
