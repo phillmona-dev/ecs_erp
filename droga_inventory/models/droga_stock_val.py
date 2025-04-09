@@ -167,10 +167,11 @@ class DrogaStockValuationLayer(models.Model):
             account_moves['invoice_origin']=self.origin
             account_moves._post()
 
-            acc_moves = self.env['account.move.line'].search([('inv_origin', '=', account_moves.invoice_origin)])
-            if sum(acc_moves.mapped('balance')) == 0:
-                for acc_move in acc_moves:
-                    acc_move.stat = 'Matched'
+            if account_moves.invoice_origin:
+                acc_moves = self.env['account.move.line'].search([('inv_origin', '=', account_moves.invoice_origin)])
+                if sum(acc_moves.mapped('balance')) == 0:
+                    for acc_move in acc_moves:
+                        acc_move.stat = 'Matched'
 
             self.account_move_id=account_moves.id
 
