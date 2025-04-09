@@ -474,7 +474,7 @@ class account_move_line(models.Model):
     profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True,default='-')
     sales_cost = fields.Float('Sales Cost', store=True)
     inv_origin=fields.Char('Inovice origin',store=True,related='move_id.invoice_origin')
-    stat=fields.Char(string='Match Status',store=True)
+    stat=fields.Char(string='Match Status',store=True,default='Unmatched')
     @api.model
     def create(self, vals):
         ret= super(account_move_line, self).create(vals)
