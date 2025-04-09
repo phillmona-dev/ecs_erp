@@ -4,7 +4,7 @@
         <field name="name">account.move.line.purchase.tree</field>
         <field name="model">account.move.line</field>
         <field name="arch" type="xml">
-            <tree create="0" default_order="date desc">
+            <tree create="0" default_order="inv_origin desc">
                 <field name="account_id"/>
                 <field name="move_id" widget="many2one" options='{"no_open": False}'/>
                 <field name="date"/>
