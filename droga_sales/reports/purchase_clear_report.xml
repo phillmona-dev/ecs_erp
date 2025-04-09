@@ -10,6 +10,7 @@
                 <field name="date"/>
                 <field name="amount_currency" sum="Amount"/>
                 <field name="inv_origin"/>
+                <field name="stat" widget="badge" decoration-success="stat=='Matched'" decoration-warning="stat=='Unmatched'"></field>
             </tree>
         </field>
     </record>
@@ -24,6 +25,10 @@
                 <field name="date"/>
                 <field name="amount_currency" sum="Total"/>
                 <field name="inv_origin"/>
+                <field name="stat"/>
+
+                <filter name="unmatched" string="Unmatched" domain="[('stat', '=', 'Unmatched')]"/>
+                <filter name="matched" string="Matched" domain="[('stat', '=', 'Matched')]"/>
 
                 <group expand="1" string="Group By">
                     <filter string="Purchase order" name='group_inv_origin' context="{'group_by':'inv_origin'}"/>
@@ -35,7 +40,7 @@
     <record model="ir.actions.act_window" id="view_account_move_line_purchase_action">
         <field name="name">Local / Foreign purchase clearing report</field>
         <field name="res_model">account.move.line</field>
-        <field name="context">{'search_default_group_inv_origin':1}</field>
+        <field name="context">{'search_default_unmatched':1,'search_default_group_inv_origin':1}</field>
         <field name="view_mode">tree</field>
         <field name="view_id" ref="view_account_move_line_purchase"/>
         <field name="search_view_id" ref="view_account_move_line_purchase_search"/>
@@ -45,5 +50,5 @@
     <menuitem id="droga_purchase_clearing" name="Local purchase clearing"
                   action="view_account_move_line_purchase_action"
                 parent="droga_finance.droga_payables_report"
-                  groups="account.group_account_manager" sequence="2"/>
+                  groups="account.group_account_manager,droga_inventory.inv_prod_fin" sequence="2"/>
 </odoo>

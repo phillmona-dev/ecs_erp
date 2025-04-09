@@ -242,6 +242,16 @@ class account_move(models.Model):
                     self.id) + '&field=fileout&download=true&filename=' + name_of_file + ".xml",
             }
 
+    def action_post(self):
+        res = super(account_move, self).action_post()
+        for res in self:
+            if res.state=='posted':
+                acc_moves=self.env['account.move.line'].search([('inv_origin','=',res.invoice_origin)])
+                if sum(acc_moves.mapped('balance'))==0:
+                    for acc_move in acc_moves:
+                        acc_move.stat='Matched'
+        return res
+
     @api.model
     def create(self, vals):
         res = super(account_move, self).create(vals)
@@ -464,7 +474,7 @@ class account_move_line(models.Model):
     profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True,default='-')
     sales_cost = fields.Float('Sales Cost', store=True)
     inv_origin=fields.Char('Inovice origin',store=True,related='move_id.invoice_origin')
-
+    stat=fields.Char(string='Match Status',store=True)
     @api.model
     def create(self, vals):
         ret= super(account_move_line, self).create(vals)
