@@ -7,7 +7,7 @@
             <tree default_order='date_order_det,order_partner_id,order_id' string="" create="false" delete="false">
                 <field name="sales_initiator_det" string="WaiterName" optional="show"/>
                 <field name="sales_dept" string="SalesMemo" optional="show"/>
-                <field name="order_id" string="InvoiceNumber" optional="hide"/>
+                <field name="order_id" string="InvoiceNumber" optional="show"/>
                 <field name="invoice_no" optional="hide"/>
                 <field name="fs_number" optional="hide"/>
                 <field name="itemcode" string="ItemCode" optional="show"/>

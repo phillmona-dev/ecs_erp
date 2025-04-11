@@ -9,40 +9,8 @@ class droga_crm_settings_prod_groups(models.Model):
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')],required=True,default='Active')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     parent_group=fields.Many2one('droga.crm.settings.prod_group')
-    has_group_access = fields.Boolean('Has CRM product group access', search='_has_group_access',compute='_compute_group')
-    def _has_group_access(self, operator, value):
-        if not self.env.user.name.upper().startswith('CRM MEDICAL'):
-            return [('id', 'in', [x.id for x in self.env['res.partner'].search([(1, '=', 1)])])]
-        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
-        if not request or len(ses) == 0:
-            return [('id', 'in', [])]
-        is_prod_avail = self.env['droga.crm.settings.prod_group'].sudo().search(
-            [('id', 'in', ses[0].pro_id[0].p_groups.ids)])
-        return [('id', 'in', [x.id for x in is_prod_avail] if is_prod_avail else False)]
-
-    def _compute_group(self):
-        if not self.env.user.name.upper().startswith('CRM MEDIC'):
-            for rec in self:
-                rec.has_group_access = True
-        else:
-            ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
-            if not request or len(ses) == 0:
-                for rec in self:
-                    rec.has_group_access = False
-            is_prod_avail = self.env['droga.crm.settings.prod_group'].sudo().search(
-                [('id', 'in', ses[0].pro_id[0].p_groups.ids)])
-            for rec in self:
-                if rec.id in is_prod_avail:
-                    rec.has_group_access=True
-                else:
-                    rec.has_group_access = False
 
 
-            for rec in self:
-                if rec.city_name in rec.pr_avail_areas:
-                    rec.is_cust_available = True
-                else:
-                    rec.is_cust_available = False
 class product_link_group(models.Model):
     _inherit = 'product.category'
     crm_group=fields.Many2one('droga.crm.settings.prod_group')

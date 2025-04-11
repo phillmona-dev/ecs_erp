@@ -511,3 +511,15 @@ class crm_lead_extension(models.Model):
 class crm_prod_template_extension(models.Model):
     _inherit = 'product.template'
     crm_group = fields.Many2one('droga.crm.settings.prod_group', string='CRM Group')
+    has_group_access = fields.Boolean('Has CRM product group access', search='_has_group_access',
+                                      compute='_compute_group')
+
+    def _has_group_access(self, operator, value):
+        if not self.env.user.name.upper().startswith('CRM MEDICAL'):
+            return [('id', 'in', [x.id for x in self.env['product.template'].search([])])]
+        ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
+        if not request or len(ses) == 0:
+            return [('id', 'in', [])]
+        is_prod_avail = self.env['droga.crm.settings.prod_group'].sudo().search(
+            [('id', 'in', ses[0].pro_id[0].p_groups.ids)])
+        return [('crm_group', 'in', [x.id for x in is_prod_avail] if is_prod_avail else False)]
