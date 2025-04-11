@@ -246,7 +246,7 @@ class account_move(models.Model):
         res = super(account_move, self).action_post()
         for res in self:
             if res.state=='posted' and res.invoice_origin:
-                acc_moves=self.env['account.move.line'].search([('inv_origin','=',res.invoice_origin)])
+                acc_moves=self.env['account.move.line'].search([('inv_origin','=',res.invoice_origin),('account_id','=',2468)])
                 if sum(acc_moves.mapped('balance'))==0:
                     for acc_move in acc_moves:
                         acc_move.stat='Matched'
