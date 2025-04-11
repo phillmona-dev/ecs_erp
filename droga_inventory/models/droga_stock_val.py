@@ -118,7 +118,7 @@ class DrogaStockValuationLayer(models.Model):
         prior_trans = self.get_parent_id(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
 
         if prior_trans:
-            self.update_trans(prior_trans, ret)
+            self.update_trans(prior_trans, ret,reference='-')
         else:
             # There are no prior transactions
             ret.remaining_value = ret.value
@@ -210,7 +210,7 @@ class DrogaStockValuationLayer(models.Model):
             cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
         else:
             old_value=cur_trans.value
-            if float_compare(cur_trans.unit_cost, ((abs(prev_trans.remaining_value) / abs(
+            if reference!='-' and float_compare(cur_trans.unit_cost, ((abs(prev_trans.remaining_value) / abs(
                 prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
                     abs(prev_trans.value) / abs(prev_trans.quantity))), precision_digits=2) != 0:
                 cur_trans.InsertHistory(reference,cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(

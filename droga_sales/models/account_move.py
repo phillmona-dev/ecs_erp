@@ -477,7 +477,7 @@ class account_move_line(models.Model):
                     if len(analytics) > 0:
                         rec.inv_origin= analytics[0].name
 
-            if rec.inv_origin:
+            if rec.inv_origin and rec.account_id.id in (990,4221,2468):
                 acc_moves = self.env['account.move.line'].search([('account_id','=',rec.account_id.id),('inv_origin', '=', rec.inv_origin)])
                 bal= sum(acc_moves.filtered(lambda mv: mv.parent_state=='posted').mapped('balance'))
                 for acc_move in acc_moves:

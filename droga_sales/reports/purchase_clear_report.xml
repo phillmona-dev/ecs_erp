@@ -30,6 +30,12 @@
                 <filter name="unmatched" string="Unmatched" domain="[('stat', '=', 'Unmatched')]"/>
                 <filter name="matched" string="Matched" domain="[('stat', '=', 'Matched')]"/>
 
+                <separator/>
+
+                <filter name="local" string="Local" domain="[('account_id', '=', 2468)]"/>
+                <filter name="foreign" string="Foreign" domain="[('account_id', '=', 990)]"/>
+                <filter name="export" string="Export" domain="[('account_id', '=', 4221)]"/>
+
                 <group expand="1" string="Group By">
                     <filter string="Purchase order" name='group_inv_origin' context="{'group_by':'inv_origin'}"/>
                 </group>
@@ -38,16 +44,16 @@
     </record>
 
     <record model="ir.actions.act_window" id="view_account_move_line_purchase_action">
-        <field name="name">Local / Foreign purchase clearing report</field>
+        <field name="name">Local/Foreign/Export purchase clearing report</field>
         <field name="res_model">account.move.line</field>
         <field name="context">{'search_default_unmatched':1,'search_default_group_inv_origin':1}</field>
         <field name="view_mode">tree,pivot</field>
         <field name="view_id" ref="view_account_move_line_purchase"/>
         <field name="search_view_id" ref="view_account_move_line_purchase_search"/>
-        <field name="domain">[('account_id','=',2468)]</field>
+        <field name="domain">[('account_id','in',(990,4221,2468))]</field>
     </record>
 
-    <menuitem id="droga_purchase_clearing" name="Local purchase clearing"
+    <menuitem id="droga_purchase_clearing" name="Local/Foreign/Export purchase clearing report"
                   action="view_account_move_line_purchase_action"
                 parent="droga_finance.droga_payables_report"
                   groups="account.group_account_manager,droga_inventory.inv_prod_fin" sequence="2"/>

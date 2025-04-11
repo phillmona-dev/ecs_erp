@@ -281,8 +281,12 @@ class purchase_order(models.Model):
             sup_id=4
 
             if res.company_id.id==1 and (res.request_type=='Local' or res.request_type=='Pharmacy'):
-                #Droga local
-                sup_id=4
+                if 'Export' in res.picking_type_id.display_name:
+                    #Droga local export
+                    sup_id = 879
+                else:
+                    #Droga local
+                    sup_id=4
             elif res.company_id.id==1 and res.request_type=='Foregin':
                 # Droga Foregin
                 sup_id = 263
