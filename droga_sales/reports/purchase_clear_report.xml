@@ -41,7 +41,7 @@
         <field name="name">Local / Foreign purchase clearing report</field>
         <field name="res_model">account.move.line</field>
         <field name="context">{'search_default_unmatched':1,'search_default_group_inv_origin':1}</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">tree,pivot</field>
         <field name="view_id" ref="view_account_move_line_purchase"/>
         <field name="search_view_id" ref="view_account_move_line_purchase_search"/>
         <field name="domain">[('account_id','=',2468)]</field>

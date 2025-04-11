@@ -242,16 +242,6 @@ class account_move(models.Model):
                     self.id) + '&field=fileout&download=true&filename=' + name_of_file + ".xml",
             }
 
-    def action_post(self):
-        res = super(account_move, self).action_post()
-        for res in self:
-            if res.state=='posted' and res.invoice_origin:
-                acc_moves=self.env['account.move.line'].search([('inv_origin','=',res.invoice_origin),('account_id','=',2468)])
-                if sum(acc_moves.mapped('balance'))==0:
-                    for acc_move in acc_moves:
-                        acc_move.stat='Matched'
-        return res
-
     @api.model
     def create(self, vals):
         res = super(account_move, self).create(vals)
@@ -473,13 +463,34 @@ class account_move_line(models.Model):
     origin_ref = fields.Char(compute="get_origin_ref", string="Origin reference", store=True)
     profit_cost_center=fields.Char('Profit / Cost Center',compute='get_acc_move',store=True,default='-')
     sales_cost = fields.Float('Sales Cost', store=True)
-    inv_origin=fields.Char('Inovice origin',store=True,related='move_id.invoice_origin')
+    inv_origin=fields.Char('Inovice origin',store=True,compute='_get_origin')
     stat=fields.Char(string='Match Status',store=True,default='Unmatched')
+
+    @api.depends('move_id.state')
+    def _get_origin(self):
+        for rec in self:
+            rec.inv_origin = rec.move_id.invoice_origin
+            if rec.account_id.id == 990 and rec.analytic_distribution:
+                for key, value in rec.analytic_distribution.items():
+                    analytics = self.env['account.analytic.account'].search(
+                        [('id', '=', key), ('plan_id', '=', 3)])
+                    if len(analytics) > 0:
+                        rec.inv_origin= analytics[0].name
+
+            if rec.inv_origin:
+                acc_moves = self.env['account.move.line'].search([('account_id','=',rec.account_id.id),('inv_origin', '=', rec.inv_origin)])
+                bal= sum(acc_moves.filtered(lambda mv: mv.parent_state=='posted').mapped('balance'))
+                for acc_move in acc_moves:
+                    if bal == 0:
+                        acc_move.stat = 'Matched'
+                    else:
+                        acc_move.stat = 'Unmatched'
+
+
     @api.model
     def create(self, vals):
         ret= super(account_move_line, self).create(vals)
         for rec in ret:
-
             if rec.move_id.invoice_origin:
                 if rec.move_id.invoice_origin.startswith('SO'):
                     moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
