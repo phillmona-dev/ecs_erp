@@ -10,23 +10,24 @@ class StockValuationLayerInherit(models.Model):
     @api.model
     def create(self, vals):
         ret = super(StockValuationLayerInherit, self).create(vals)
+        if ret.quantity!=0:
+            dsvl = {
+                'svl_id': ret.id,
+                'company_id': ret.company_id.id,
+                'product_id': ret.product_id.id,
+                'quantity': ret.quantity,
+                'unit_cost': ret.unit_cost if not ret.stock_move_id.purchase_line_id else ret.unit_cost*ret.stock_move_id.purchase_line_id.order_id.cost_rate,
+                'value': ret.value if not ret.stock_move_id.purchase_line_id else ret.value * ret.stock_move_id.purchase_line_id.order_id.cost_rate,
+                'description': ret.description,
+                'po_rate':1 if not ret.stock_move_id.purchase_line_id else ret.stock_move_id.purchase_line_id.order_id.cost_rate,
+                'stock_move_id': ret.stock_move_id.id,
+                'account_move_line_id': ret.account_move_line_id.id,
+                # Check below field
+                'move_date': ret.create_date,
+                'move_type':'Weighted'
+            }
 
-        dsvl = {
-            'svl_id': ret.id,
-            'company_id': ret.company_id.id,
-            'product_id': ret.product_id.id,
-            'quantity': ret.quantity,
-            'unit_cost': ret.unit_cost if not ret.stock_move_id.purchase_line_id else ret.unit_cost*ret.stock_move_id.purchase_line_id.order_id.cost_rate,
-            'value': ret.value if not ret.stock_move_id.purchase_line_id else ret.value * ret.stock_move_id.purchase_line_id.order_id.cost_rate,
-            'description': ret.description,
-            'po_rate':1 if not ret.stock_move_id.purchase_line_id else ret.stock_move_id.purchase_line_id.order_id.cost_rate,
-            'stock_move_id': ret.stock_move_id.id,
-            'account_move_line_id': ret.account_move_line_id.id,
-            # Check below field
-            'move_date': ret.create_date
-        }
-
-        self.env['droga.stock.valuation.layer'].sudo().create(dsvl)
+            self.env['droga.stock.valuation.layer'].sudo().create(dsvl)
         return ret
 
 class DrogaStockValuation(models.Model):
@@ -166,12 +167,6 @@ class DrogaStockValuationLayer(models.Model):
             account_moves = self.env['account.move'].sudo().create(am_vals)
             account_moves['invoice_origin']=self.origin
             account_moves._post()
-
-            if account_moves.invoice_origin:
-                acc_moves = self.env['account.move.line'].search([('inv_origin', '=', account_moves.invoice_origin)])
-                if sum(acc_moves.mapped('balance')) == 0:
-                    for acc_move in acc_moves:
-                        acc_move.stat = 'Matched'
 
             self.account_move_id=account_moves.id
 
