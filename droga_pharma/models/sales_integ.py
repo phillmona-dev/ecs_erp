@@ -163,7 +163,7 @@ class sales_integ(models.Model):
             self.disp_products()
             return
         inv = self.env['account.move'].search(
-            [('invoice_origin', '=', self.name)])
+            [('invoice_origin', '=', self.name),('move_type','=','out_invoice')])
         if len(inv)==0:
             raise ValidationError(
                 "Invoice have to be created before dispensing.")

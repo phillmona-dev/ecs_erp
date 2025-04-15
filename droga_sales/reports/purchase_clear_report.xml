@@ -10,6 +10,9 @@
                 <field name="date"/>
                 <field name="amount_currency" sum="Amount"/>
                 <field name="inv_origin"/>
+                <field name="create_date" optional="hide"></field>
+                <field name="create_uid" optional="hide"></field>
+                <field name="journal_id" optional="hide"></field>
                 <field name="stat" widget="badge" decoration-success="stat=='Matched'" decoration-warning="stat=='Unmatched'"></field>
             </tree>
         </field>
