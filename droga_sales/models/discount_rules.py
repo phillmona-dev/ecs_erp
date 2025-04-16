@@ -1147,7 +1147,7 @@ class account_move_inherit(models.Model):
     @api.model
     def create(self, vals):
         analytic=0
-        if 'invoice_origin' in vals:
+        if 'invoice_origin' in vals and self.env.company.id==1:
             if type(vals['invoice_origin']) is str:
                 if vals['invoice_origin'].startswith('SO'):
                     sale_order=self.env['sale.order'].search([('name','=',str(vals['invoice_origin'])),('company_id','=',1)])
