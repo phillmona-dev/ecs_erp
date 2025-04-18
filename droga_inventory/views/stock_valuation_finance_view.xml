@@ -34,7 +34,7 @@
         <field name="name">droga.stock.valuation.tree.history.tree</field>
         <field name="model">droga.stock.valuation.history</field>
         <field name="arch" type="xml">
-            <tree string="Stock transactions - All" delete="false" create="false">
+            <tree string="Stock Update history" delete="false" create="false">
                 <field name="dsvl_id"/>
                 <field name="create_date" string="Update date"/>
                 <field name="reference"/>
@@ -44,6 +44,7 @@
                 <field name="to_value"/>
                 <field name='remaining_qty'/>
                 <field name='remaining_value'/>
+                <field name='upd_date'/>
             </tree>
         </field>
     </record>

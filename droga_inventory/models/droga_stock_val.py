@@ -30,7 +30,7 @@ class StockValuationLayerInherit(models.Model):
             self.env['droga.stock.valuation.layer'].sudo().create(dsvl)
         return ret
 
-class DrogaStockValuation(models.Model):
+class DrogaStockValuationHistory(models.Model):
     _name='droga.stock.valuation.history'
     dsvl_id=fields.Many2one('droga.stock.valuation.layer')
     quantity = fields.Float('Quantity')
@@ -40,6 +40,7 @@ class DrogaStockValuation(models.Model):
     to_value = fields.Float('To Value')
     remaining_qty = fields.Float('Remaining Quantity')
     remaining_value = fields.Float('Remaining Value')
+    upd_date=fields.Datetime('Update date')
 class DrogaStockValuationLayer(models.Model):
     _name = 'droga.stock.valuation.layer'
     _description = 'Droga Stock Valuation Layer'
@@ -80,7 +81,7 @@ class DrogaStockValuationLayer(models.Model):
              'types of transactions where we have to calculate weighted average value.')
     def show_history(self):
         return {
-            'name': 'Valuation history',
+            'name': 'Valuation update history',
             'view_type': 'tree',
             'view_mode': 'tree',
             'res_model': 'droga.stock.valuation.history',
@@ -102,27 +103,40 @@ class DrogaStockValuationLayer(models.Model):
                         'to_value': to_value,
                         'remaining_qty': rec.remaining_qty,
                         'remaining_value': rec.remaining_value,
+                        'upd_date':fields.datetime.now()
                     }
 
             rec.env['droga.stock.valuation.history'].create(dsval)
+
+    def fetch_and_update(self,ret,reference='-'):
+        prior_trans = self.get_parent_id(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
+
+        if prior_trans:
+            self.update_trans(prior_trans, ret, reference=reference)
+        else:
+            # There are no prior transactions
+            ret.remaining_value = ret.value
+            ret.remaining_qty = ret.quantity
 
     @api.model
     def create(self, vals):
         ret = super(DrogaStockValuationLayer, self).create(vals)
 
-        if ret.stock_move_id.location_id.usage == 'supplier' and ret.stock_move_id.location_dest_id.usage!='customer':
+        if (ret.stock_move_id.location_id.usage == 'supplier' and ret.stock_move_id.location_dest_id.usage!='customer') or (ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.location_id.usage!='customer'):
             ret.move_type = 'Static'
+            if ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.origin_returned_move_id:
+                unit_cost=self.env['droga.stock.valuation.layer'].search([('move_type','=','Static'),('stock_move_id','=',ret.stock_move_id.origin_returned_move_id.id)],limit=1)
+                if unit_cost:                                                   #If there's no static valuation, we'll treat it as weighted transaction as well
+                    if unit_cost['move_date']>ret.company_id.tax_lock_date:     #Make sure period is not closed for the date, if closed we'll treat it as weighted transaction
+                        ret.unit_cost=unit_cost['unit_cost']
+                        ret.value=ret.unit_cost*ret.quantity
+                        #ret.move_date=unit_cost['move_date']
+                else:
+                    ret.move_type='Weighted'
         else:
             ret.move_type = 'Weighted'
 
-        prior_trans = self.get_parent_id(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
-
-        if prior_trans:
-            self.update_trans(prior_trans, ret,reference='-')
-        else:
-            # There are no prior transactions
-            ret.remaining_value = ret.value
-            ret.remaining_qty = ret.quantity
+        self.fetch_and_update(ret)
 
         accounts = ret.product_id.product_tmpl_id.get_product_accounts()
         ret.inv_acc = accounts['stock_valuation']
@@ -133,6 +147,7 @@ class DrogaStockValuationLayer(models.Model):
 
         self.revaluate_after_date(ret)
 
+        #This updates sales cost value for sales transactions
         if ret.origin:
             if ret.origin.startswith('SO'):
                 acc_move = self.env['account.move'].search([('invoice_origin', '=', ret.origin)])
@@ -170,7 +185,7 @@ class DrogaStockValuationLayer(models.Model):
 
             self.account_move_id=account_moves.id
 
-    def revaluate_after_date_button(self,reference=''):
+    def revaluate_after_date_upd_ledger(self,reference=''):
         ret=self
 
         query1 = """
@@ -193,33 +208,38 @@ class DrogaStockValuationLayer(models.Model):
         trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
         init_trans = ret
         for trans in trans_after:
-            self.update_trans(init_trans, trans,post_diff=True,reference=reference)
+            self.update_trans(init_trans, trans,reference=reference)
             init_trans = trans
 
-    def revaluate_after_date(self,ret):
+    def revaluate_after_date(self,ret,reference='-'):
         trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
         init_trans = ret
         for trans in trans_after:
-            self.update_trans(init_trans, trans,post_diff=True)
+            self.update_trans(init_trans, trans,reference=reference)
             init_trans = trans
 
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
-    def update_trans(self, prev_trans, cur_trans,post_diff=False,reference=''):
+    def update_trans(self, prev_trans, cur_trans,reference='-'):
         if cur_trans.move_type == 'Static':
+            #In case it's a purchase return and the remaining quantity becomes 0, we use the remaining value to balance it
+            if cur_trans.quantity<0 and (prev_trans.remaining_qty+cur_trans.quantity)==0:
+                cur_trans.value=prev_trans.remaining_value*-1
+                cur_trans.unit_cost=cur_trans.value/cur_trans.quantity
+
             cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
             cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
         else:
             old_value=cur_trans.value
             if reference!='-' and float_compare(cur_trans.unit_cost, ((abs(prev_trans.remaining_value) / abs(
-                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
-                    abs(prev_trans.value) / abs(prev_trans.quantity))), precision_digits=2) != 0:
+                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
+                    prev_trans.remaining_value / cur_trans.quantity)), precision_digits=2) != 0:
                 cur_trans.InsertHistory(reference,cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(
-                    prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
-                    abs(prev_trans.value) / abs(prev_trans.quantity))))
+                    prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
+                    prev_trans.remaining_value / cur_trans.quantity)))
 
             cur_trans.unit_cost = (abs(prev_trans.remaining_value) / abs(
-                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else (
-                    abs(prev_trans.value) / abs(prev_trans.quantity))
+                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
+                    prev_trans.remaining_value / cur_trans.quantity)
             cur_trans.value = cur_trans.quantity * cur_trans.unit_cost
             cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
             cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
@@ -249,7 +269,7 @@ class DrogaStockValuationLayer(models.Model):
         if trans_type == 'Static':
             to_ret = self.env['droga.stock.valuation.layer'].search(
                 ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", "<", trans_date), "&", ("move_date", "=", trans_date), "&",
-                 ("svl_id", "!=", cur_id), ("move_type", "=", "Static")],
+                 ("svl_id", "<", cur_id), ("move_type", "=", "Static")],
                 order="move_date desc, move_type desc, svl_id desc", limit=1)
             return to_ret if to_ret else False
         else:
@@ -322,7 +342,7 @@ class DrogaLandedCost(models.Model):
                                 val.unit_cost= orig_unit_cost*(val.po_rate+val.grn_rate-1)
                                 val.remaining_value=val.remaining_value + ((val.quantity * val.unit_cost)- val.value)
                                 val.value=val.quantity * val.unit_cost
-                                val.revaluate_after_date_button(reference=res.name)
+                                val.revaluate_after_date_upd_ledger(reference=res.name)
                     res.state='done'
                 else:
                     for grn in res.picking_ids:
@@ -338,7 +358,7 @@ class DrogaLandedCost(models.Model):
                                 val.unit_cost= orig_unit_cost*(val.po_rate+val.grn_rate-1)
                                 val.remaining_value = val.remaining_value + ((val.quantity * val.unit_cost) - val.value)
                                 val.value = val.quantity * val.unit_cost
-                                val.revaluate_after_date_button(reference=res.name)
+                                val.revaluate_after_date_upd_ledger(reference=res.name)
                     res.state = 'done'
             return True
 
@@ -353,6 +373,29 @@ class PurchaseOrder(models.Model):
                     [('purchase_orders', 'in', rec.id), ('state', '=', 'done')]):
                 po_rate = po_rate + (rate['lc_rate'] - 1)
             rec.cost_rate=po_rate
+
+class PurchaseOrderLine(models.Model):
+    _inherit='purchase.order.line'
+
+    def write(self, vals):
+        ret=super(PurchaseOrderLine, self).write(vals)
+        if 'price_unit' in vals:
+            for rec in self:
+                if rec.state in ('purchase', 'done'):
+                    moves = self.env['stock.move'].search([('purchase_line_id', '=', rec.id)])
+                    for move in moves:
+                        dsvals = self.env['droga.stock.valuation.layer'].search([('stock_move_id', '=', move.id)])
+                        for dsval in dsvals:
+                            new_up=(rec.price_unit * rec.product_qty) / (
+                                rec.product_uom_qty if rec.product_uom_qty != 0 else 1)
+                            dsval.InsertHistory(dsval.origin,
+                                              dsval.quantity * new_up)
+                            dsval.unit_cost = new_up
+                            dsval.value=dsval.unit_cost*dsval.quantity
+                            dsval.fetch_and_update(dsval,reference=dsval.origin)
+                            dsval.revaluate_after_date_upd_ledger(reference=dsval.origin)
+        return ret
+
 
 class ProductCategory(models.Model):
     _inherit = 'product.category'
