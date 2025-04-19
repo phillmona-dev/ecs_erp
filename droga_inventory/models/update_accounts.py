@@ -7,6 +7,14 @@ from odoo.tools import float_compare
 class update_acc(models.Model):
     _inherit='droga.stock.valuation.layer'
 
+    #update droga_stock_valuation_layer set po_rate=1.01,move_type='Static',description =(select (m.price_unit*m.product_qty)/case m.product_uom_qty when 0 then 1 else m.product_uom_qty end
+    #from purchase_order_line m where m.id=
+    #(select u.purchase_line_id from stock_move u where u.id=droga_stock_valuation_layer.stock_move_id)) where (unit_cost-(select (m.price_unit*m.product_qty)/case m.product_uom_qty when 0 then 1 else m.product_uom_qty end
+    #from purchase_order_line m where m.id=
+    #(select u.purchase_line_id from stock_move u where u.id=droga_stock_valuation_layer.stock_move_id)))>0.2 and origin like 'PO%' and origin not like 'PO-DF%'
+    #and move_date>'2024-07-07 00:00:00.000';
+
+    #Run this after running above query, for updating price discrepancy values
     def update_po_entries(self):
         dsvals=self.env['droga.stock.valuation.layer'].search([('po_rate','=',1.01)],limit=1)
         for dsval in dsvals:
@@ -19,6 +27,18 @@ class update_acc(models.Model):
                 dsval.value = dsval.unit_cost * dsval.quantity
                 dsval.fetch_and_update(dsval, reference=dsval.origin)
                 dsval.revaluate_after_date_upd_ledger(reference=dsval.origin)
+
+
+    #update droga_stock_valuation_layer set grn_rate=1.01,quantity=(select i.quantity_done from stock_move i where i.id=stock_move_id) where ...
+    #Run this method after running above query, for updating quantity discrepancy values
+    def update_grn_entries(self):
+        dsvals=self.env['droga.stock.valuation.layer'].search([('grn_rate','=',1.01)],limit=1)
+        for dsval in dsvals:
+            dsval.grn_rate=1
+
+            dsval.value = dsval.unit_cost * dsval.quantity
+            dsval.fetch_and_update(dsval, reference=dsval.origin)
+            dsval.revaluate_after_date_upd_ledger(reference=dsval.origin)
 
     # def update_acc(self):
     #     #date_limit = datetime.date(2023, 7, 7)

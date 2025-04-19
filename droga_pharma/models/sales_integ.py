@@ -354,7 +354,7 @@ class sales_integ(models.Model):
         }
     def action_minor_aliments(self):
         if self.partner_id.id==15488:
-            raise UserError("Pharma one time customer can not be used to register minor aliments. Please register customer to use the feature..")
+            raise UserError("Pharma one time customer can not be used to register minor aliments. Please register customer to use the feature.")
         return {
             'name': 'Minor ailments',
             'view_type': 'form',

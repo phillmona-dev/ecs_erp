@@ -36,6 +36,7 @@
         'views/droga_landed_cost.xml',
         'views/lock_period_views.xml',
         'views/stock_out_history.xml',
+        'views/droga_scrap_inherit.xml',
         'views/stock_valuation_finance_view.xml',
         'report/report_tree_extension.xml',
         'report/stock_adjustment_request_report.xml',
