@@ -41,6 +41,7 @@ class DrogaStockValuationHistory(models.Model):
     remaining_qty = fields.Float('Remaining Quantity')
     remaining_value = fields.Float('Remaining Value')
     upd_date=fields.Datetime('Update date')
+
 class DrogaStockValuationLayer(models.Model):
     _name = 'droga.stock.valuation.layer'
     _description = 'Droga Stock Valuation Layer'
@@ -79,6 +80,7 @@ class DrogaStockValuationLayer(models.Model):
     ], string='Move type',
         help='Static types are transactions that we receive from suppliers and they change our weighted average price. Weighted types are '
              'types of transactions where we have to calculate weighted average value.')
+    remark=fields.Char('Remark')
     def show_history(self):
         return {
             'name': 'Valuation update history',
@@ -117,6 +119,7 @@ class DrogaStockValuationLayer(models.Model):
             # There are no prior transactions
             ret.remaining_value = ret.value
             ret.remaining_qty = ret.quantity
+            ret.remark=''
 
     @api.model
     def create(self, vals):
@@ -197,13 +200,18 @@ class DrogaStockValuationLayer(models.Model):
         ret.account_move_id.id))
 
         query2 = """
-                                                    update account_move_line set debit= case when debit=0 then 0 else %s end,credit=case when credit=0 then 0 else %s end,
-                                                    balance=case when balance=0 then 0 else (balance/abs(balance))*%s end,amount_currency=case when amount_currency=0 then 0 else (amount_currency/abs(amount_currency))*%s end
-                                                    where move_id=%s
-                                                """
-        self.env.cr.execute(query2, (
-            abs(ret.value), abs(ret.value), abs(ret.value),
-            abs(ret.value), ret.account_move_id.id))
+                                            update account_move_line set 
+                                            debit= case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else 0 end,
+                                            credit= case when ((account_id=%s and %s < 0) or (account_id!=%s and %s > 0)) then %s else 0 end,
+                                            balance=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end,
+                                            amount_currency=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end
+                                            where move_id=%s
+                                        """
+        self.env.cr.execute(query2, (ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),
+                                     ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),
+                                     ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),abs(ret.value),
+                                     ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),abs(ret.value),
+                                     ret.account_move_id.id))
 
         trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
         init_trans = ret
@@ -238,11 +246,14 @@ class DrogaStockValuationLayer(models.Model):
                     prev_trans.remaining_value / cur_trans.quantity)))
 
             cur_trans.unit_cost = (abs(prev_trans.remaining_value) / abs(
-                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
-                    prev_trans.remaining_value / cur_trans.quantity)
+                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(prev_trans.unit_cost)
             cur_trans.value = cur_trans.quantity * cur_trans.unit_cost
-            cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
-            cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+            if cur_trans.value + prev_trans.remaining_value>=0:
+                cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
+                cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+                cur_trans.remark=''
+            else:
+                cur_trans.remark='Entry has been discarded from weighted average calculation because remaining value would become negative. Taking prior unit cost.d'
 
             if float_compare(old_value,cur_trans.value,precision_digits=2) !=0:
 
@@ -256,13 +267,21 @@ class DrogaStockValuationLayer(models.Model):
                     self.env.cr.execute(query1, (abs(cur_trans.value),abs(cur_trans.value),abs(cur_trans.value),abs(cur_trans.value),abs(cur_trans.value),cur_trans.account_move_id.id))
 
                     query2 = """
-                                            update account_move_line set debit= case when debit=0 then 0 else %s end,credit=case when credit=0 then 0 else %s end,
-                                            balance=case when balance=0 then 0 else (balance/abs(balance))*%s end,amount_currency=case when amount_currency=0 then 0 else (amount_currency/abs(amount_currency))*%s end
-                                            where move_id=%s
-                                        """
-                    self.env.cr.execute(query2, (
-                    abs(cur_trans.value), abs(cur_trans.value), abs(cur_trans.value),
-                    abs(cur_trans.value), cur_trans.account_move_id.id))
+                                                                update account_move_line set 
+                                                                debit= case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else 0 end,
+                                                                credit= case when ((account_id=%s and %s < 0) or (account_id!=%s and %s > 0)) then %s else 0 end,
+                                                                balance=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end,
+                                                                amount_currency=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end
+                                                                where move_id=%s
+                                                            """
+                    self.env.cr.execute(query2,
+                                        (cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value, abs(cur_trans.value),
+                                         cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value, abs(cur_trans.value),
+                                         cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value, abs(cur_trans.value),
+                                         abs(cur_trans.value),
+                                         cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value, abs(cur_trans.value),
+                                         abs(cur_trans.value),
+                                         cur_trans.account_move_id.id))
 
     # Gets initial row value for processing start
     def get_parent_id(self, prod_id, trans_date, trans_type, cur_id):
@@ -379,23 +398,28 @@ class PurchaseOrderLine(models.Model):
 
     def write(self, vals):
         ret=super(PurchaseOrderLine, self).write(vals)
-        if 'price_unit' in vals:
+        if 'price_unit' in vals or 'product_qty' in vals:
             for rec in self:
                 if rec.state in ('purchase', 'done'):
                     moves = self.env['stock.move'].search([('purchase_line_id', '=', rec.id)])
                     for move in moves:
                         dsvals = self.env['droga.stock.valuation.layer'].search([('stock_move_id', '=', move.id)])
                         for dsval in dsvals:
-                            new_up=(rec.price_unit * rec.product_qty) / (
-                                rec.product_uom_qty if rec.product_uom_qty != 0 else 1)
+                            new_up=rec.price_unit* (rec.product_uom.factor/rec.product_id.uom_id.factor)
                             dsval.InsertHistory(dsval.origin,
                                               dsval.quantity * new_up)
                             dsval.unit_cost = new_up
                             dsval.value=dsval.unit_cost*dsval.quantity
                             dsval.fetch_and_update(dsval,reference=dsval.origin)
                             dsval.revaluate_after_date_upd_ledger(reference=dsval.origin)
-        return ret
 
+                            query2 = """
+                                            update account_move_line g set stat=case when (select sum(i.balance) from account_move_line i where i.inv_origin=g.inv_origin and i.account_id=g.account_id)=0 then 'Matched' else 
+                                            'Unmatched' end where g.account_id in (2468,990,4221) and g.inv_origin=%s
+                                                                                        """
+                            self.env.cr.execute(query2,
+                                                (dsval.origin,))
+        return ret
 
 class ProductCategory(models.Model):
     _inherit = 'product.category'
@@ -483,7 +507,6 @@ class StockMovesVal(models.Model):
             'move_type': 'entry',
             'is_storno': self.env.context.get('is_returned') and self.env.company.account_storno,
         }
-
 
 class DrogaAccountMove(models.Model):
     _inherit = 'account.move'

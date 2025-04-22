@@ -198,9 +198,7 @@
                                                 '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True),
                                                 '&amp;', ('state', '=', 'done'), ('id', '!=', False)]}"/>
                 <field name="import_uom" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom"
-                        attrs="{'column_invisible':[('pharmacy_unit', '=', True)],'readonly': ['|', '|', ('reserved_uom_qty', '!=', 0.0),
-                                                '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True),
-                                                '&amp;', ('state', '=', 'done'), ('id', '!=', False)]}"/>
+                        attrs="{'column_invisible':[('pharmacy_unit', '=', True)],'readonly': False}"/>
             </xpath>
         </field>
     </record>

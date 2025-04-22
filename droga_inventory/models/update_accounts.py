@@ -16,7 +16,7 @@ class update_acc(models.Model):
 
     #Run this after running above query, for updating price discrepancy values
     def update_po_entries(self):
-        dsvals=self.env['droga.stock.valuation.layer'].search([('po_rate','=',1.01)],limit=1)
+        dsvals=self.env['droga.stock.valuation.layer'].search([('id','=',572563),('po_rate','=',1.01)],limit=1)
         for dsval in dsvals:
             dsval.po_rate=1
             if float_compare(dsval.unit_cost, float(dsval.description), precision_digits=2) != 0:
