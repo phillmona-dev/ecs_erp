@@ -190,28 +190,28 @@ class DrogaStockValuationLayer(models.Model):
 
     def revaluate_after_date_upd_ledger(self,reference=''):
         ret=self
+        if ret.account_move_id:
+            query1 = """
+                                    update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
+                                    case non_core_amt when 0 then 0 else %s end where id=%s
+                                """
+            self.env.cr.execute(query1, (
+            abs(ret.value), abs(ret.value), abs(ret.value), abs(ret.value), abs(ret.value),
+            ret.account_move_id.id))
 
-        query1 = """
-                                update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
-                                case non_core_amt when 0 then 0 else %s end where id=%s
-                            """
-        self.env.cr.execute(query1, (
-        abs(ret.value), abs(ret.value), abs(ret.value), abs(ret.value), abs(ret.value),
-        ret.account_move_id.id))
-
-        query2 = """
-                                            update account_move_line set 
-                                            debit= case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else 0 end,
-                                            credit= case when ((account_id=%s and %s < 0) or (account_id!=%s and %s > 0)) then %s else 0 end,
-                                            balance=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end,
-                                            amount_currency=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end
-                                            where move_id=%s
-                                        """
-        self.env.cr.execute(query2, (ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),
-                                     ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),
-                                     ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),abs(ret.value),
-                                     ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),abs(ret.value),
-                                     ret.account_move_id.id))
+            query2 = """
+                                                update account_move_line set 
+                                                debit= case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else 0 end,
+                                                credit= case when ((account_id=%s and %s < 0) or (account_id!=%s and %s > 0)) then %s else 0 end,
+                                                balance=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end,
+                                                amount_currency=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end
+                                                where move_id=%s
+                                            """
+            self.env.cr.execute(query2, (ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),
+                                         ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),
+                                         ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),abs(ret.value),
+                                         ret.inv_acc.id, ret.value,ret.inv_acc.id, ret.value, abs(ret.value),abs(ret.value),
+                                         ret.account_move_id.id))
 
         trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
         init_trans = ret
