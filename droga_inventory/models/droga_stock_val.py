@@ -125,7 +125,7 @@ class DrogaStockValuationLayer(models.Model):
     def create(self, vals):
         ret = super(DrogaStockValuationLayer, self).create(vals)
 
-        if (ret.stock_move_id.location_id.usage == 'supplier' and ret.stock_move_id.location_dest_id.usage!='customer') or (ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.location_id.usage!='customer'):
+        if ret.stock_move_id.location_id.con_type=='SUBL' or ret.stock_move_id.location_id.con_type=='CONR' or (ret.stock_move_id.location_id.usage == 'supplier' and ret.stock_move_id.location_dest_id.usage!='customer') or (ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.location_id.usage!='customer'):
             ret.move_type = 'Static'
             if ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.origin_returned_move_id:
                 unit_cost=self.env['droga.stock.valuation.layer'].search([('move_type','=','Static'),('stock_move_id','=',ret.stock_move_id.origin_returned_move_id.id)],limit=1)

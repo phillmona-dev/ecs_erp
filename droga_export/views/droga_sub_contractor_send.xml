@@ -181,7 +181,7 @@
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_sales_subcontractor_issue_view_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('droga_sales_subcontractor_issue_view_form')})]"/>
         <field name="context">{'default_issue_type': 'SUBL','default_warehouse_id':9}</field>
-        <field name="domain">[('create_uid','=',uid)]</field>
+        <field name="domain">[('create_uid','=',uid),('issue_type','in',('BAGI','SUBL'))]</field>
     </record>
 
 

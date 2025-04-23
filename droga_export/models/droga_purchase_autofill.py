@@ -176,27 +176,3 @@ class drogapochildinherit(models.Model):
     def fill_po(self, line):
         self.create(line)
 
-
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
-
-    def button_validate_dont_run(self):
-        #res=super(StockPicking, self).button_validate()
-        for rec in self:
-
-            if len(self.env['purchase.order'].search([('name','=',rec.origin)]))>0:
-                if self.env['purchase.order'].search([('name','=',rec.origin)])[0]['sub_cont_sent']:
-                    if len(self.env['stock.picking'].search([('origin','=',rec.origin),('state','=','done'),('picking_type_id.sequence_code','=','SUBL')]))==0 and rec.picking_type_id.sequence_code!='SUBL':
-                        raise UserError("Items are not sent to contractor, please issue them before receiving items.")
-                    else:
-                        ref=self.env['stock.picking'].search([('origin','=',rec.origin),('state','=','done'),('picking_type_id.sequence_code','=','SUBL')])[0].name if len(self.env['stock.picking'].search([('origin','=',rec.origin),('state','=','done'),('picking_type_id.sequence_code','=','SUBL')]))>0 else False
-                        for item in rec.move_ids:
-                            if len(self.env['purchase.order.line'].search([('id','=',item.purchase_line_id.id)]))==0:
-                                continue
-                            raw_item=self.env['purchase.order.line'].search([('id','=',item.purchase_line_id.id)])[0]
-                            val_up=self.env['droga.stock.valuation.layer'].search([('reference','=',ref),('product_id','=',self.env['product.product'].search([('product_tmpl_id','=',raw_item.raw_item.id)])[0].id)])[0]['unit_cost']
-                            raw_item.price_unit=raw_item.price_unit+(val_up) if raw_item.price_unit!=raw_item.sub_cont_price else raw_item.price_unit
-
-        self.env.cr.commit()
-        return super(StockPicking, self).button_validate()
-

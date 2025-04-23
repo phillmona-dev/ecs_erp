@@ -7,6 +7,7 @@ from lxml import etree
 #from pkg_resources import _
 
 from odoo import models, fields, api
+from odoo.addons.base.models.ir_module import assert_log_admin_access
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_is_zero, OrderedSet, float_compare
 
@@ -1217,3 +1218,10 @@ class prod(models.Model):
 class scrap(models.Model):
     _inherit='stock.scrap'
     origin = fields.Char(string='Source Document',tracking=True)
+
+class uninstalldisable(models.Model):
+    _inherit='ir.module.module'
+
+    @assert_log_admin_access
+    def module_uninstall(self):
+        raise UserError("Modules can not be uninstalled in production environment. Jezba.")
