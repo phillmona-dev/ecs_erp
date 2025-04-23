@@ -159,6 +159,7 @@ class PayrollMasterReports(models.Model):
         sheet.set_column('X:X', 15)
         sheet.set_column('Y:Y', 15)
         sheet.set_column('Z:Z', 15)
+        sheet.set_column('AA:AA', 15)
 
         row_start = 2
         date_format = workbook.add_format(
@@ -236,16 +237,17 @@ class PayrollMasterReports(models.Model):
 
         sheet.write(row_start, 12, 'Commission', title_format)
         sheet.write(row_start, 13, 'Parking & Lunch', title_format)
+        sheet.write(row_start, 14, 'Bonus/Incentive', title_format)
 
-        sheet.write(row_start, 14, 'Other*', title_format)
-        sheet.write(row_start, 15, 'Gross Earning', title_format)
-        sheet.write(row_start, 16, 'Taxable Earning', title_format)
-        sheet.write(row_start, 17, 'Income Tax', title_format)
-        sheet.write(row_start, 18, 'Pension Employee', title_format)
-        sheet.write(row_start, 19, 'Deductions', title_format)
-        sheet.write(row_start, 20, 'Total Deduction', title_format)
-        sheet.write(row_start, 21, 'Net Pay', title_format)
-        sheet.write(row_start, 22, 'Pension Employer', title_format)
+        sheet.write(row_start, 15, 'Other*', title_format)
+        sheet.write(row_start, 16, 'Gross Earning', title_format)
+        sheet.write(row_start, 17, 'Taxable Earning', title_format)
+        sheet.write(row_start, 18, 'Income Tax', title_format)
+        sheet.write(row_start, 19, 'Pension Employee', title_format)
+        sheet.write(row_start, 20, 'Deductions', title_format)
+        sheet.write(row_start, 21, 'Total Deduction', title_format)
+        sheet.write(row_start, 22, 'Net Pay', title_format)
+        sheet.write(row_start, 23, 'Pension Employer', title_format)
         row_start += 1
 
         # subtotal variable subtotal
@@ -258,6 +260,7 @@ class PayrollMasterReports(models.Model):
         acting_sub_total = 0
         commission_sub_total = 0
         parking_lunch_total = 0
+        bonus_incentive_total = 0
         other_sub_total = 0
         gross_sub_total = 0
         taxable_sub_total = 0
@@ -303,6 +306,7 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 20, num, num_format)
             sheet.write(row_start, 21, num, num_format)
             sheet.write(row_start, 22, num, num_format)
+            sheet.write(row_start, 23, num, num_format)
 
             # get payroll detail
             for payslip_detail in record.line_ids:
@@ -337,34 +341,38 @@ class PayrollMasterReports(models.Model):
                     sheet.write(row_start, 13, payslip_detail.total, num_format)
                     parking_lunch_total += payslip_detail.total
 
+                elif payslip_detail.code == 'BONINC':  # Bonus/Incentive
+                    sheet.write(row_start, 14, payslip_detail.total, num_format)
+                    bonus_incentive_total += payslip_detail.total
+
 
                 elif payslip_detail.code == 'OTHALL':  # Othe Allowances
-                    sheet.write(row_start, 14, payslip_detail.total, num_format)
+                    sheet.write(row_start, 15, payslip_detail.total, num_format)
                     other_sub_total += payslip_detail.total
                 elif payslip_detail.code == 'GROSS':  # Gross Earning
-                    sheet.write(row_start, 15, payslip_detail.total, num_format)
+                    sheet.write(row_start, 16, payslip_detail.total, num_format)
                     gross_sub_total += payslip_detail.total
 
                 elif payslip_detail.code == 'TTI':  # Taxable Earning
-                    sheet.write(row_start, 16, payslip_detail.total, num_format)
+                    sheet.write(row_start, 17, payslip_detail.total, num_format)
                     taxable_sub_total += payslip_detail.total
                 elif payslip_detail.code == 'INCTAX':  # Income Tax
-                    sheet.write(row_start, 17, payslip_detail.total, num_format)
+                    sheet.write(row_start, 18, payslip_detail.total, num_format)
                     income_tax_sub_total += payslip_detail.total
                 elif payslip_detail.code == 'PEN1':  # Pension Employee
-                    sheet.write(row_start, 18, payslip_detail.total, num_format)
+                    sheet.write(row_start, 19, payslip_detail.total, num_format)
                     pen1_sub_total += payslip_detail.total
                 elif payslip_detail.code == 'NFALL':  # Deductions
-                    sheet.write(row_start, 19, payslip_detail.total, num_format)
+                    sheet.write(row_start, 20, payslip_detail.total, num_format)
                     ded_sub_total += payslip_detail.total
                 elif payslip_detail.code == 'DED':  # Total Deductions
-                    sheet.write(row_start, 20, payslip_detail.total, num_format)
+                    sheet.write(row_start, 21, payslip_detail.total, num_format)
                     total_ded_sub_total += payslip_detail.total
                 elif payslip_detail.code == 'NET':  # Net Pay
-                    sheet.write(row_start, 21, payslip_detail.total, num_format)
+                    sheet.write(row_start, 22, payslip_detail.total, num_format)
                     net_pay_sub_total += payslip_detail.total
                 elif payslip_detail.code == 'PEN2':  # Pension Employer
-                    sheet.write(row_start, 22, payslip_detail.total, num_format)
+                    sheet.write(row_start, 23, payslip_detail.total, num_format)
                     pen2_sub_total += payslip_detail.total
             row_start += 1
 
@@ -380,18 +388,19 @@ class PayrollMasterReports(models.Model):
 
         sheet.write(row_start, 12, other_sub_total, num_format_sub_total)
         sheet.write(row_start, 13, parking_lunch_total, num_format_sub_total)
+        sheet.write(row_start, 14, bonus_incentive_total, num_format_sub_total)
 
-        sheet.write(row_start, 14, commission_sub_total, num_format_sub_total)
-        sheet.write(row_start, 15, gross_sub_total, num_format_sub_total)
+        sheet.write(row_start, 15, commission_sub_total, num_format_sub_total)
+        sheet.write(row_start, 16, gross_sub_total, num_format_sub_total)
 
-        sheet.write(row_start, 16, taxable_sub_total, num_format_sub_total)
+        sheet.write(row_start, 17, taxable_sub_total, num_format_sub_total)
 
-        sheet.write(row_start, 17, income_tax_sub_total, num_format_sub_total)
-        sheet.write(row_start, 18, pen1_sub_total, num_format_sub_total)
-        sheet.write(row_start, 19, ded_sub_total, num_format_sub_total)
-        sheet.write(row_start, 20, total_ded_sub_total, num_format_sub_total)
-        sheet.write(row_start, 21, net_pay_sub_total, num_format_sub_total)
-        sheet.write(row_start, 22, pen2_sub_total, num_format_sub_total)
+        sheet.write(row_start, 18, income_tax_sub_total, num_format_sub_total)
+        sheet.write(row_start, 19, pen1_sub_total, num_format_sub_total)
+        sheet.write(row_start, 20, ded_sub_total, num_format_sub_total)
+        sheet.write(row_start, 21, total_ded_sub_total, num_format_sub_total)
+        sheet.write(row_start, 22, net_pay_sub_total, num_format_sub_total)
+        sheet.write(row_start, 23, pen2_sub_total, num_format_sub_total)
 
     def payroll_net_report(self, workbook):
 
