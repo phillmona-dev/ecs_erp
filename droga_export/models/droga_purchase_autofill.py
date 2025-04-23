@@ -194,7 +194,7 @@ class StockPicking(models.Model):
                             if len(self.env['purchase.order.line'].search([('id','=',item.purchase_line_id.id)]))==0:
                                 continue
                             raw_item=self.env['purchase.order.line'].search([('id','=',item.purchase_line_id.id)])[0]
-                            val_up=self.env['stock.valuation.layer'].search([('reference','=',ref),('product_id','=',self.env['product.product'].search([('product_tmpl_id','=',raw_item.raw_item.id)])[0].id)])[0]['unit_cost']
+                            val_up=self.env['droga.stock.valuation.layer'].search([('reference','=',ref),('product_id','=',self.env['product.product'].search([('product_tmpl_id','=',raw_item.raw_item.id)])[0].id)])[0]['unit_cost']
                             raw_item.price_unit=raw_item.price_unit+(val_up) if raw_item.price_unit!=raw_item.sub_cont_price else raw_item.price_unit
 
         self.env.cr.commit()

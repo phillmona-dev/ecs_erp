@@ -201,7 +201,7 @@ class droga_stock_move_line(models.Model):
     @api.depends('state')
     def _get_up(self):
         for rec in self:
-            layer=self.env['stock.valuation.layer'].search([('stock_move_id','=',rec.id)])
+            layer=self.env['droga.stock.valuation.layer'].search([('stock_move_id','=',rec.id)])
             rec.unit_price=layer[0].unit_cost if layer else 0
             rec.tot_price=rec.unit_price*rec.quantity_done
 

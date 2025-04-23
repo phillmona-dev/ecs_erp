@@ -1213,3 +1213,7 @@ class prod(models.Model):
         services.outgoing_qty = 0.0
         services.virtual_available = 0.0
         services.free_qty = 0.0
+
+class scrap(models.Model):
+    _inherit='stock.scrap'
+    origin = fields.Char(string='Source Document',tracking=True)
