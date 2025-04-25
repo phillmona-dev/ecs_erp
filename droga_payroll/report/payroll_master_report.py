@@ -15,7 +15,7 @@ class PayrollMasterReports(models.Model):
     _name = 'hr.payslip.run.report'
 
     #
-    batch = fields.Many2one('hr.payslip.run', required=True)
+    batch = fields.Many2one('hr.payslip.run')
     fileout = fields.Binary('File', readonly=True)
     cost_center = fields.Many2many("hr.department")
     # cost_center_analytic = fields.Many2many("account.analytic.account", domain=[('plan_id.name', '=', 'Cost Center')])
@@ -27,6 +27,19 @@ class PayrollMasterReports(models.Model):
             ('company_id', 'in', self.env.context.get('allowed_company_ids', []))
         ]
     )
+
+    # add year and period
+    fiscal_year = fields.Many2one("account.fiscal.year", "Fiscal Year",
+                                  domain=lambda self: [
+                                      ('company_id', '=', self.env.context.get('allowed_company_ids', []))])
+    period = fields.Many2one("account.fiscal.year.period", domain="[('fiscal_year_id', '=', fiscal_year)]")
+
+    date_from = fields.Date("Date From")
+    date_to = fields.Date("Date To")
+
+    report_type = fields.Selection([('Income Tax', 'Income Tax'), ('Pension', 'Pension')])
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                                 index=True, default=lambda self: self.env.company.id)
 
     def convert_to_word(self, num):
         num_strings = str(num)
