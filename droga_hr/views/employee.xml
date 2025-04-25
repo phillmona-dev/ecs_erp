@@ -61,6 +61,16 @@
 
             </xpath>
 
+
+            <xpath expr="//form/sheet/notebook/page[@name='personal_information']//field[@name='passport_id']"
+                   position="after">
+
+                <field name="tin_no"/>
+                <field name="pension_no"/>
+
+
+            </xpath>
+
             <xpath expr="//form/sheet/notebook/page[@name='hr_settings']//field[@name='barcode']" position="attributes">
                 <attribute name="readonly">1</attribute>
             </xpath>

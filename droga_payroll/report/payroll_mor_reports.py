@@ -297,9 +297,9 @@ class PayrollMorReports(models.Model):
                     payments['basic_salary'] = payslip_detail.total
 
             if payments['basic_salary'] != 0 and payslip.contract_id.pension_contribution:
-                sheet.write(row_start, 0, '', border)
+                sheet.write(row_start, 0, payslip.employee_id.tin_no, border)
                 sheet.write(row_start, 1, payslip.employee_id.name, border)
-                sheet.write(row_start, 2, '', border)
+                sheet.write(row_start, 2, payslip.employee_id.pension_no, border)
                 sheet.write(row_start, 3, payslip.employee_id.first_contract_date, date_format)
                 sheet.write(row_start, 4, '', border)
                 sheet.write(row_start, 5, payments['basic_salary'], num_format)
