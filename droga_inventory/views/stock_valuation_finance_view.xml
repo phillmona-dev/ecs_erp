@@ -4,7 +4,7 @@
         <field name="name">droga.stock.valuation.tree.transaction.tree</field>
         <field name="model">droga.stock.valuation.layer</field>
         <field name="arch" type="xml">
-            <tree string="Stock transactions - All" delete="false" create="false">
+            <tree string="Stock transactions - All" default_order='move_date asc, move_type asc, svl_id asc' delete="false" create="false">
                 <field name="id"/>
                 <field name="move_date"/>
                 <field name="move_type"/>

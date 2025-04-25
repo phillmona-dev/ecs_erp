@@ -238,6 +238,15 @@ class DrogaStockValuationLayer(models.Model):
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
     def update_trans(self, prev_trans, cur_trans,reference='-'):
         if cur_trans.move_type == 'Static':
+            if cur_trans.quantity < 0 and cur_trans.origin.startswith('P'):
+                unit_cost = self.env['droga.stock.valuation.layer'].search([('move_type', '=', 'Static'),
+                                                                            ('stock_move_id', '=',
+                                                                             cur_trans.stock_move_id.origin_returned_move_id.id)],
+                                                                           limit=1)
+                if unit_cost:
+                    cur_trans.unit_cost=unit_cost['unit_cost']
+                    cur_trans.value=cur_trans.unit_cost*cur_trans.quantity
+
             #In case it's a purchase return and the remaining quantity becomes 0, we use the remaining value to balance it
             if cur_trans.quantity<0 and (prev_trans.remaining_qty+cur_trans.quantity)==0:
                 cur_trans.value=prev_trans.remaining_value*-1
