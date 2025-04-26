@@ -27,5 +27,11 @@
             parent="hr_payroll.menu_hr_payroll_report"
             sequence="100"/>
 
+    <menuitem
+            id="hr_payslip_run_report_tax_menu" name="MOR Reports"
+            action="hr_payslip_run_report_tax_action"
+            parent="hr_payroll.menu_hr_payroll_report"
+            sequence="101"/>
+
 
 </odoo>

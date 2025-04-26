@@ -35,6 +35,7 @@
         'views/hr_payslip.xml',
         'views/hr_payslip_employees.xml',
         'report/hr_payslip_run.xml',
+        'report/hr_payroll_mor_reports.xml',
         'views/Menu.xml',
 
     ],
