@@ -110,32 +110,42 @@ class DrogaStockValuationLayer(models.Model):
 
             rec.env['droga.stock.valuation.history'].create(dsval)
 
-    def fetch_and_update(self,ret,reference='-'):
+    def fetch_and_update(self,ret,reference='-',date_change=False):
         prior_trans = self.get_parent_id(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
 
         if prior_trans:
-            self.update_trans(prior_trans, ret, reference=reference)
+            self.update_trans(prior_trans, ret, reference=reference,date_change=date_change)
         else:
             # There are no prior transactions
-            ret.remaining_value = ret.value
-            ret.remaining_qty = ret.quantity
+            ret.remaining_value = ret.value if ret.value>0 else 0
+            ret.remaining_qty = ret.quantity if ret.quantity>0 else 0
             ret.remark=''
 
     @api.model
     def create(self, vals):
         ret = super(DrogaStockValuationLayer, self).create(vals)
 
-        if ret.stock_move_id.location_id.con_type=='SUBL' or ret.stock_move_id.location_id.con_type=='CONR' or (ret.stock_move_id.location_id.usage == 'supplier' and ret.stock_move_id.location_dest_id.usage!='customer') or (ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.location_id.usage!='customer'):
+        self.update_wa_after_date(ret)
+
+        return ret
+
+    def update_wa_after_date(self,ret):
+        if ret.stock_move_id.location_id.con_type == 'SUBL' or ret.stock_move_id.location_id.con_type == 'CONR' or (
+                ret.stock_move_id.location_id.usage == 'supplier' and ret.stock_move_id.location_dest_id.usage != 'customer') or (
+                ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.location_id.usage != 'customer'):
             ret.move_type = 'Static'
             if ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.origin_returned_move_id:
-                unit_cost=self.env['droga.stock.valuation.layer'].search([('move_type','=','Static'),('stock_move_id','=',ret.stock_move_id.origin_returned_move_id.id)],limit=1)
-                if unit_cost:                                                   #If there's no static valuation, we'll treat it as weighted transaction as well
-                    if unit_cost['move_date']>ret.company_id.tax_lock_date:     #Make sure period is not closed for the date, if closed we'll treat it as weighted transaction
-                        ret.unit_cost=unit_cost['unit_cost']
-                        ret.value=ret.unit_cost*ret.quantity
-                        #ret.move_date=unit_cost['move_date']
+                unit_cost = self.env['droga.stock.valuation.layer'].search(
+                    [('move_type', '=', 'Static'), ('stock_move_id', '=', ret.stock_move_id.origin_returned_move_id.id)],
+                    limit=1)
+                if unit_cost:  # If there's no static valuation, we'll treat it as weighted transaction as well
+                    if unit_cost[
+                        'move_date'] > ret.company_id.tax_lock_date:  # Make sure period is not closed for the date, if closed we'll treat it as weighted transaction
+                        ret.unit_cost = unit_cost['unit_cost']
+                        ret.value = ret.unit_cost * ret.quantity
+                        # ret.move_date=unit_cost['move_date']
                 else:
-                    ret.move_type='Weighted'
+                    ret.move_type = 'Weighted'
         else:
             ret.move_type = 'Weighted'
 
@@ -151,8 +161,6 @@ class DrogaStockValuationLayer(models.Model):
         self.revaluate_after_date(ret)
 
         self.updatesalescost(ret)
-
-        return ret
 
     def updatesalescost(self,ret):
         # This updates sales cost value for sales transactions
@@ -236,16 +244,17 @@ class DrogaStockValuationLayer(models.Model):
             init_trans = trans
 
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
-    def update_trans(self, prev_trans, cur_trans,reference='-'):
+    def update_trans(self, prev_trans, cur_trans,reference='-',date_change=False):
         if cur_trans.move_type == 'Static':
-            if cur_trans.quantity < 0 and cur_trans.origin.startswith('P'):
-                unit_cost = self.env['droga.stock.valuation.layer'].search([('move_type', '=', 'Static'),
-                                                                            ('stock_move_id', '=',
-                                                                             cur_trans.stock_move_id.origin_returned_move_id.id)],
-                                                                           limit=1)
-                if unit_cost:
-                    cur_trans.unit_cost=unit_cost['unit_cost']
-                    cur_trans.value=cur_trans.unit_cost*cur_trans.quantity
+            if cur_trans.origin:
+                if cur_trans.quantity < 0 and cur_trans.origin.startswith('P'):
+                    unit_cost = self.env['droga.stock.valuation.layer'].search([('move_type', '=', 'Static'),
+                                                                                ('stock_move_id', '=',
+                                                                                 cur_trans.stock_move_id.origin_returned_move_id.id)],
+                                                                               limit=1)
+                    if unit_cost:
+                        cur_trans.unit_cost=unit_cost['unit_cost']
+                        cur_trans.value=cur_trans.unit_cost*cur_trans.quantity
 
             #In case it's a purchase return and the remaining quantity becomes 0, we use the remaining value to balance it
             if cur_trans.quantity<0 and (prev_trans.remaining_qty+cur_trans.quantity)==0:

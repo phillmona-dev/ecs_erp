@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_droga_date_change_tree" model="ir.ui.view">
+        <field name="name">droga.date.change.tree</field>
+        <field name="model">droga.date.change</field>
+        <field name="arch" type="xml">
+            <tree editable="top" delete="0" string="Date Change Requests">
+                <field name="id"></field>
+                <field name="status" invisible="1"/>
+                <field name="reference" attrs="{'invisible': [('status', '=', 'Processed')]}" options="{'no_create':True,'no_open':True}" domain="[('state', '=', 'done')]"/>
+                <field name="transaction_date"/>
+                <field name="new_transaction_date" attrs="{'invisible': [('status', '=', 'Processed')]}"/>
+                <field name="status" readonly="1"/>
+                <button name="update_date" attrs="{'invisible': [('status', '=', 'Processed')]}" string="Change date" type="object" class="oe_highlight"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_droga_date_change" model="ir.actions.act_window">
+        <field name="name">Change Transaction Date</field>
+        <field name="res_model">droga.date.change</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem id="menu_droga_date_change"
+              name="Inventory Date Changes"
+              action="action_droga_date_change"
+              parent="droga_finance.droga_reciveables_report"
+              groups="droga_inventory.fin_inv_date_update"
+              sequence="26"/>
+</odoo>
