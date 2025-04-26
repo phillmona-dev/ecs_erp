@@ -280,7 +280,11 @@ class DrogaStockValuationLayer(models.Model):
                 cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
                 cur_trans.remark=''
             else:
-                cur_trans.remark='Entry has been discarded from weighted average calculation because remaining value would become negative. Taking prior unit cost.d'
+                cur_trans.remark='Entry is negative stock. Please update date accordingly.'
+                cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
+                cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+                #Get future date, update current with future date, call wa updater for previous transaction and return false
+
 
             if float_compare(old_value,cur_trans.value,precision_digits=2) !=0:
 
@@ -332,13 +336,13 @@ class DrogaStockValuationLayer(models.Model):
             to_ret = self.env['droga.stock.valuation.layer'].search(
                 ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", ">", trans_date), "|", "&", ("move_date", "=", trans_date),
                  ("move_type", "=", "Weighted"), "&", ("move_date", "=", trans_date), "&", ("move_type", "=", "Static"), ("svl_id", ">", cur_id)],
-                order="move_date asc, move_type asc, svl_id asc")
+                order="move_date asc, move_type asc, quantity desc,svl_id asc")
             return to_ret if to_ret else []
         else:
             to_ret = self.env['droga.stock.valuation.layer'].search(
                 ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", ">", trans_date), "&", ("move_date", "=", trans_date), "&",
                  ("move_type", "=", "Weighted"), ("svl_id", ">", cur_id)],
-                order="move_date asc, move_type asc, svl_id asc")
+                order="move_date asc, move_type asc, quantity desc,svl_id asc")
             return to_ret if to_ret else []
 
 class DrogaLandedCost(models.Model):
