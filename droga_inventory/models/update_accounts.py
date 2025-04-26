@@ -7,8 +7,12 @@ from odoo.tools import float_compare
 class update_acc(models.Model):
     _inherit='droga.stock.valuation.layer'
 
-    def recalculateWA(self,count=10):
-        dsvals=self.env['droga.stock.valuation.layer'].search([('company_id','=',1),('account_move_line_id','=',7928888)],limit=count)
+    def recalculateWA(self,count=10,product=0):
+        if product!=0:
+            dsvals = self.env['droga.stock.valuation.layer'].search(
+                [('company_id', '=', 1), ('account_move_line_id', '=', 7928888),('product_id','=',product)], limit=count)
+        else:
+            dsvals=self.env['droga.stock.valuation.layer'].search([('company_id','=',1),('account_move_line_id','=',7928888)],limit=count)
         for dsval in dsvals:
 
             if dsval.account_move_line_id:
