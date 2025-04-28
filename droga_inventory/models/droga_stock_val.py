@@ -53,7 +53,7 @@ class DrogaStockValuationLayer(models.Model):
     history_vals=fields.One2many('droga.stock.valuation.history','dsvl_id')
     company_id = fields.Many2one('res.company', 'Company', readonly=True, required=True)
     product_id = fields.Many2one('product.product', 'Product', readonly=True, required=True)
-    categ_id = fields.Many2one('product.category', related='product_id.categ_id')
+    categ_id = fields.Many2one('product.category', string='Product category',related='product_id.categ_id',store=True)
     product_tmpl_id = fields.Many2one('product.template', related='product_id.product_tmpl_id')
     quantity = fields.Float('Quantity', readonly=True, digits='Product Unit of Measure')
     uom_id = fields.Many2one(related='product_id.uom_id', readonly=True, required=True)
