@@ -16,7 +16,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'resource', 'stock', 'sale','sales_team', 'sale_stock', 'droga_crm', 'droga_inventory', 'uom',
+    'depends': ['base', 'account', 'resource', 'stock', 'sale','sales_team', 'sale_stock', 'droga_crm', 'droga_pharma','droga_inventory', 'uom',
                 'hr'],
 
     # always loaded

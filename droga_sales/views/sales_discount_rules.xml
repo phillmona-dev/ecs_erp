@@ -264,6 +264,7 @@
             id="droga_sales_discount_per_cust_prod_menu"
             name="Sales discount per customer and product"
             action="droga_sales_discount_per_prod_cust_action"
+            groups="droga_pharma.physio_admin"
             parent="account.account_invoicing_menu"
             sequence="20"/>
 

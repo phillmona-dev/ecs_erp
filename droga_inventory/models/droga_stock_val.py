@@ -72,7 +72,7 @@ class DrogaStockValuationLayer(models.Model):
     con_acc = fields.Many2one('account.account', string='Contra account')
     svl_id = fields.Integer('SVL ID')
     move_date = fields.Date('Move date', required=True)
-    move_date_initial = fields.Date('Move date', required=True)
+    move_date_initial = fields.Date('Move date origin', required=True)
     origin = fields.Char(related='stock_move_id.origin', store=True)
     po_rate=fields.Float('PO Rate',default=1,store=True)
     grn_rate = fields.Float('GRN Rate', default=1, store=True)
