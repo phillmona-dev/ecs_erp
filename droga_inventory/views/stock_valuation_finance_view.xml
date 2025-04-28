@@ -64,6 +64,9 @@
                 <field name='quantity'/>
                 <field name='unit_cost'/>
                 <field name='value'/>
+
+                <filter string="Product category" name="categ_id" domain="[]" context="{'group_by': 'categ_id'}"/>
+
                 <filter string="Today"
                         domain="[('move_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('move_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
                         name="today_trans"></filter>
