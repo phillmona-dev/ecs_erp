@@ -345,10 +345,8 @@ class DrogaStockValuationLayer(models.Model):
 
     def get_parent_negative_date_id(self, prod_id, trans_date, cur_id):
         to_ret = self.env['droga.stock.valuation.layer'].search(
-            ["&", ("svl_id", "!=", cur_id),"&", ("remaining_qty", "<", 0), "&", ("product_id", "=", prod_id), "|", ("move_date", "<", trans_date), "&",
-             ("move_date", "=", trans_date), "&",
-             ("svl_id", "<", cur_id), ("move_type", "=", "Static")],
-            order="move_date desc, move_type desc, quantity desc,svl_id desc", limit=1)
+            [("svl_id", "!=", cur_id), ("remaining_qty", "<", 0),  ("product_id", "=", prod_id), ("move_date", "<", trans_date)],
+            order="move_date asc, move_type asc, quantity asc,svl_id asc", limit=1)
         return to_ret if to_ret else False
 
     def get_trans_after(self, prod_id, trans_date, trans_type, cur_id):
