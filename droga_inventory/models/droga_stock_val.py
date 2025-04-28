@@ -53,7 +53,7 @@ class DrogaStockValuationLayer(models.Model):
     history_vals=fields.One2many('droga.stock.valuation.history','dsvl_id')
     company_id = fields.Many2one('res.company', 'Company', readonly=True, required=True)
     product_id = fields.Many2one('product.product', 'Product', readonly=True, required=True)
-    categ_id = fields.Many2one('product.category', string='Product category',related='product_id.categ_id',store=True)
+    categ_id = fields.Many2one('product.category',string='Product category',related='product_id.categ_id',store=True)
     product_tmpl_id = fields.Many2one('product.template', related='product_id.product_tmpl_id')
     quantity = fields.Float('Quantity', readonly=True, digits='Product Unit of Measure')
     uom_id = fields.Many2one(related='product_id.uom_id', readonly=True, required=True)
@@ -249,6 +249,7 @@ class DrogaStockValuationLayer(models.Model):
 
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
     def update_trans(self, prev_trans, cur_trans,reference='-',date_change=False):
+        
         if cur_trans.move_type == 'Static':
             if cur_trans.origin and cur_trans.quantity < 0:
                 if cur_trans.origin.startswith('P'):
