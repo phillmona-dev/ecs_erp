@@ -266,9 +266,15 @@ class DrogaStockValuationLayer(models.Model):
                 cur_trans.unit_cost=cur_trans.value/cur_trans.quantity
             if prev_trans.remaining_qty<0:
                 trans_before = self.get_parent_negative_date_id(cur_trans.product_id.id, cur_trans.move_date, cur_trans.svl_id)
-                cur_trans.move_date=trans_before.move_date
-                self.fetch_and_update(cur_trans)
-                return False
+                if trans_before:
+                    cur_trans.move_date=trans_before.move_date
+                    self.fetch_and_update(cur_trans)
+                    return False
+                else:
+                    cur_trans.remark='Negative stock, prior transaction not found'
+                    cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
+                    cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+                    return True
             else:
                 cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
                 cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
