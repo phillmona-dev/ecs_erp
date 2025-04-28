@@ -24,6 +24,7 @@ class StockValuationLayerInherit(models.Model):
                 'account_move_line_id': ret.account_move_line_id.id,
                 # Check below field
                 'move_date': ret.create_date,
+                'move_date_initial': ret.create_date,
                 'move_type':'Weighted'
             }
 
@@ -71,6 +72,7 @@ class DrogaStockValuationLayer(models.Model):
     con_acc = fields.Many2one('account.account', string='Contra account')
     svl_id = fields.Integer('SVL ID')
     move_date = fields.Date('Move date', required=True)
+    move_date_initial = fields.Date('Move date', required=True)
     origin = fields.Char(related='stock_move_id.origin', store=True)
     po_rate=fields.Float('PO Rate',default=1,store=True)
     grn_rate = fields.Float('GRN Rate', default=1, store=True)
@@ -240,14 +242,16 @@ class DrogaStockValuationLayer(models.Model):
         trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
         init_trans = ret
         for trans in trans_after:
-            self.update_trans(init_trans, trans,reference=reference)
+            ret_val=self.update_trans(init_trans, trans,reference=reference)
+            if not ret_val:
+                break
             init_trans = trans
 
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
     def update_trans(self, prev_trans, cur_trans,reference='-',date_change=False):
         if cur_trans.move_type == 'Static':
-            if cur_trans.origin:
-                if cur_trans.quantity < 0 and cur_trans.origin.startswith('P'):
+            if cur_trans.origin and cur_trans.quantity < 0:
+                if cur_trans.origin.startswith('P'):
                     unit_cost = self.env['droga.stock.valuation.layer'].search([('move_type', '=', 'Static'),
                                                                                 ('stock_move_id', '=',
                                                                                  cur_trans.stock_move_id.origin_returned_move_id.id)],
@@ -260,9 +264,15 @@ class DrogaStockValuationLayer(models.Model):
             if cur_trans.quantity<0 and (prev_trans.remaining_qty+cur_trans.quantity)==0:
                 cur_trans.value=prev_trans.remaining_value*-1
                 cur_trans.unit_cost=cur_trans.value/cur_trans.quantity
-
-            cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
-            cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+            if prev_trans.remaining_qty<0:
+                trans_before = self.get_parent_negative_date_id(cur_trans.product_id.id, cur_trans.move_date, cur_trans.svl_id)
+                cur_trans.move_date=trans_before.move_date
+                self.fetch_and_update(cur_trans)
+                return False
+            else:
+                cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
+                cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+                return True
         else:
             old_value=cur_trans.value
             if reference!='-' and float_compare(cur_trans.unit_cost, ((abs(prev_trans.remaining_value) / abs(
@@ -315,6 +325,7 @@ class DrogaStockValuationLayer(models.Model):
                                          cur_trans.account_move_id.id))
 
                 self.updatesalescost(cur_trans)
+            return True
 
     # Gets initial row value for processing start
     def get_parent_id(self, prod_id, trans_date, trans_type, cur_id):
@@ -330,6 +341,15 @@ class DrogaStockValuationLayer(models.Model):
                                                                      "&", ("move_date", "=", trans_date), ("move_type", "=", "Static")],
                                                                     order="move_date desc, move_type desc, svl_id desc",limit=1)
             return to_ret if to_ret else False
+
+
+    def get_parent_negative_date_id(self, prod_id, trans_date, cur_id):
+        to_ret = self.env['droga.stock.valuation.layer'].search(
+            ["&", ("svl_id", "!=", cur_id),"&", ("remaining_qty", "<", 0), "&", ("product_id", "=", prod_id), "|", ("move_date", "<", trans_date), "&",
+             ("move_date", "=", trans_date), "&",
+             ("svl_id", "<", cur_id), ("move_type", "=", "Static")],
+            order="move_date desc, move_type desc, quantity desc,svl_id desc", limit=1)
+        return to_ret if to_ret else False
 
     def get_trans_after(self, prod_id, trans_date, trans_type, cur_id):
         if trans_type == 'Static':
