@@ -243,13 +243,12 @@ class DrogaStockValuationLayer(models.Model):
         init_trans = ret
         for trans in trans_after:
             ret_val=self.update_trans(init_trans, trans,reference=reference)
+            init_trans = trans
             if not ret_val:
                 break
-            init_trans = trans
 
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
     def update_trans(self, prev_trans, cur_trans,reference='-',date_change=False):
-        
         if cur_trans.move_type == 'Static':
             if cur_trans.origin and cur_trans.quantity < 0:
                 if cur_trans.origin.startswith('P'):
@@ -269,7 +268,8 @@ class DrogaStockValuationLayer(models.Model):
                 trans_before = self.get_parent_negative_date_id(cur_trans.product_id.id, cur_trans.move_date, cur_trans.svl_id)
                 if trans_before:
                     cur_trans.move_date=trans_before.move_date
-                    self.fetch_and_update(cur_trans)
+                    cur_trans.fetch_and_update(cur_trans)
+                    cur_trans.revaluate_after_date(cur_trans)
                     return False
                 else:
                     cur_trans.remark='Negative stock, prior transaction not found'
