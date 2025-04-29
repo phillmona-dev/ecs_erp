@@ -59,7 +59,7 @@ class DrogaStockValuationLayer(models.Model):
     uom_id = fields.Many2one(related='product_id.uom_id', readonly=True, required=True)
     currency_id = fields.Many2one('res.currency', 'Currency', related='company_id.currency_id', readonly=True,
                                   required=True)
-    unit_cost = fields.Monetary('Unit Value', readonly=True)
+    unit_cost = fields.Float('Unit Value', readonly=True)
     value = fields.Monetary('Total Value', readonly=True)
     remaining_qty = fields.Float(readonly=True, digits='Product Unit of Measure')
     remaining_value = fields.Monetary('Remaining Value', readonly=True)
