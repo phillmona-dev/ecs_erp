@@ -41,7 +41,6 @@
         'reports/sales_detail_waiter.xml',
         'reports/sales_summary.xml',
         'wizard/sales_report_view.xml',
-        'views/profit_margin.xml',
         'views/account_move_origin.xml',
 
     ],
