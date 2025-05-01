@@ -68,20 +68,20 @@ class sales_report_det_fields(models.Model):
     #margin_pct = fields.Float('Profit Margin %', compute='_get_cost')
     fs_num = fields.Char(compute='_get_fs_num')
 
-    def _get_cost(self):
-        for rec in self:
-            uc = self.env['droga.sales.cost.of.sales'].search(
-                [('sale_line_id', '=', rec.id)])
-            if not uc:
-                rec.unit_cost = 0
-                rec.total_cost = 0
-                rec.margin = 0
-                rec.margin_pct = 0
-            else:
-                rec.unit_cost = sum(uc.mapped('unit_cost'))/len(uc)
-                rec.total_cost = rec.qty_invoiced * rec.unit_cost
-                rec.margin = rec.invoiced_amt - rec.total_cost
-                rec.margin_pct = (rec.margin / rec.invoiced_amt) * 100 if rec.invoiced_amt != 0 else 0
+    # def _get_cost(self):
+    #     for rec in self:
+    #         uc = self.env['droga.sales.cost.of.sales'].search(
+    #             [('sale_line_id', '=', rec.id)])
+    #         if not uc:
+    #             rec.unit_cost = 0
+    #             rec.total_cost = 0
+    #             rec.margin = 0
+    #             rec.margin_pct = 0
+    #         else:
+    #             rec.unit_cost = sum(uc.mapped('unit_cost'))/len(uc)
+    #             rec.total_cost = rec.qty_invoiced * rec.unit_cost
+    #             rec.margin = rec.invoiced_amt - rec.total_cost
+    #             rec.margin_pct = (rec.margin / rec.invoiced_amt) * 100 if rec.invoiced_amt != 0 else 0
 
     @api.depends('qty_invoiced', 'price_unit')
     def _get_invoiced_amount(self):
@@ -103,46 +103,46 @@ class sales_report_det_fields(models.Model):
                 rec.sales_dept = 'Employee'
 
     invoice_date = fields.Date('Invoice date',store=True)
-class droga_sales_cost_of_sales_view(models.Model):
-    _name = 'droga.sales.cost.of.sales'
-
-    _auto = False
-    product_id=fields.Integer('product_id')
-    product_code = fields.Char('Product Code')
-    product_descr = fields.Char('Product Description')
-    product_categ = fields.Char('Product Category')
-    sales_ref = fields.Char('Sales Ref')
-    order_from = fields.Char('Profit / Cost Center')
-    sales_date=fields.Date('Sales Date')
-    sale_line_id = fields.Integer('sale_order_line')
-    invoiced_amt=fields.Float('Invoiced amount')
-    qty_invoiced=fields.Float('Quantity Invoiced')
-    price_unit = fields.Float('Unit Price')
-    profit = fields.Float('Profit')
-    company_id = fields.Integer('Company ID')
-    profit_margin = fields.Float('Profit Margin')
-    profit_margin_progress_bar = fields.Float('Profit Margin')
-    amount = fields.Float("Total cost")
-    quantity = fields.Float("Quantity")
-    unit_cost = fields.Float("Unit Cost")
-
-    def init(self):
-        drop_view_if_exists(self.env.cr, 'droga_sales_cost_of_sales')
-        self.env.cr.execute("""
-                   create or replace view droga_sales_cost_of_sales as (
-                        select row_number() over () as id,g.* from (
-select m.company_id,m.product_id,m.product_descr,m.product_code,m.sales_ref,m.order_from,m.product_categ,m.sales_date,m.sale_line_id,avg(m.invoiced_amt) as invoiced_amt,avg(m.qty_invoiced) as qty_invoiced,avg(m.price_unit) as price_unit,round((avg(m.invoiced_amt)-sum(m.amount))::decimal,2) as profit,
-case when sum(m.invoiced_amt)!=0 then round((((avg(m.invoiced_amt)-sum(m.amount))/avg(m.invoiced_amt))*100)::decimal,2) else 0 end as profit_margin_progress_bar,case when sum(m.invoiced_amt)!=0 then round((((avg(m.invoiced_amt)-sum(m.amount))/avg(m.invoiced_amt))*100)::decimal,2) else 0 end as profit_margin,sum(m.quantity) as quantity,avg(m.unit_cost) as unit_cost,sum(m.amount) as amount from (											
-select c.id as product_id,(select y.name->>'en_US' from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id)) as product_descr,b.value,
-(select m.default_code from product_product m where m.id=a.product_id) as product_code,(select m.name from sale_order m where m.id=c.order_id) as sales_ref,(select m.order_from from sale_order m where m.id=c.order_id) as order_from,c.company_id,
-(select i.name from product_category i where i.id=(select y.categ_id from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id))) as product_categ,
-(c.date_order_det) as sales_date,invoiced_amt,qty_invoiced,c.price_unit,round((invoiced_amt+b.value)::decimal,2) as profit,case when invoiced_amt!=0 then round((((invoiced_amt+b.value)/invoiced_amt)*100)::decimal,2) else 0 end as profit_margin,
-a.sale_line_id,b.quantity*-1 as quantity,round(b.unit_cost::decimal,2) as unit_cost,round(b.value*-1::decimal,2) as amount from stock_move a,stock_valuation_layer b,sale_order_line c where a.id=b.stock_move_id 
-                        and a.sale_line_id is not null and c.id=a.sale_line_id) m where m.company_id=1 group by m.company_id,m.product_id,m.product_descr,m.product_code,m.sales_ref,m.order_from,m.product_categ,m.sales_date,m.sale_line_id) g 
-                   )""")
-
-
-
-                        #update account_move_line set product_id=4823 where product_id=2222
-						#update sale_order_line set product_id=4823 where product_id=2222
-						#delete from product_product where id=2222
+# class droga_sales_cost_of_sales_view(models.Model):
+#     _name = 'droga.sales.cost.of.sales'
+#
+#     _auto = False
+#     product_id=fields.Integer('product_id')
+#     product_code = fields.Char('Product Code')
+#     product_descr = fields.Char('Product Description')
+#     product_categ = fields.Char('Product Category')
+#     sales_ref = fields.Char('Sales Ref')
+#     order_from = fields.Char('Profit / Cost Center')
+#     sales_date=fields.Date('Sales Date')
+#     sale_line_id = fields.Integer('sale_order_line')
+#     invoiced_amt=fields.Float('Invoiced amount')
+#     qty_invoiced=fields.Float('Quantity Invoiced')
+#     price_unit = fields.Float('Unit Price')
+#     profit = fields.Float('Profit')
+#     company_id = fields.Integer('Company ID')
+#     profit_margin = fields.Float('Profit Margin')
+#     profit_margin_progress_bar = fields.Float('Profit Margin')
+#     amount = fields.Float("Total cost")
+#     quantity = fields.Float("Quantity")
+#     unit_cost = fields.Float("Unit Cost")
+#
+#     def init(self):
+#         drop_view_if_exists(self.env.cr, 'droga_sales_cost_of_sales')
+#         self.env.cr.execute("""
+#                    create or replace view droga_sales_cost_of_sales as (
+#                         select row_number() over () as id,g.* from (
+# select m.company_id,m.product_id,m.product_descr,m.product_code,m.sales_ref,m.order_from,m.product_categ,m.sales_date,m.sale_line_id,avg(m.invoiced_amt) as invoiced_amt,avg(m.qty_invoiced) as qty_invoiced,avg(m.price_unit) as price_unit,round((avg(m.invoiced_amt)-sum(m.amount))::decimal,2) as profit,
+# case when sum(m.invoiced_amt)!=0 then round((((avg(m.invoiced_amt)-sum(m.amount))/avg(m.invoiced_amt))*100)::decimal,2) else 0 end as profit_margin_progress_bar,case when sum(m.invoiced_amt)!=0 then round((((avg(m.invoiced_amt)-sum(m.amount))/avg(m.invoiced_amt))*100)::decimal,2) else 0 end as profit_margin,sum(m.quantity) as quantity,avg(m.unit_cost) as unit_cost,sum(m.amount) as amount from (
+# select c.id as product_id,(select y.name->>'en_US' from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id)) as product_descr,b.value,
+# (select m.default_code from product_product m where m.id=a.product_id) as product_code,(select m.name from sale_order m where m.id=c.order_id) as sales_ref,(select m.order_from from sale_order m where m.id=c.order_id) as order_from,c.company_id,
+# (select i.name from product_category i where i.id=(select y.categ_id from product_template y where y.id=(select m.product_tmpl_id from product_product m where m.id=a.product_id))) as product_categ,
+# (c.date_order_det) as sales_date,invoiced_amt,qty_invoiced,c.price_unit,round((invoiced_amt+b.value)::decimal,2) as profit,case when invoiced_amt!=0 then round((((invoiced_amt+b.value)/invoiced_amt)*100)::decimal,2) else 0 end as profit_margin,
+# a.sale_line_id,b.quantity*-1 as quantity,round(b.unit_cost::decimal,2) as unit_cost,round(b.value*-1::decimal,2) as amount from stock_move a,stock_valuation_layer b,sale_order_line c where a.id=b.stock_move_id
+#                         and a.sale_line_id is not null and c.id=a.sale_line_id) m where m.company_id=1 group by m.company_id,m.product_id,m.product_descr,m.product_code,m.sales_ref,m.order_from,m.product_categ,m.sales_date,m.sale_line_id) g
+#                    )""")
+#
+#
+#
+#                         #update account_move_line set product_id=4823 where product_id=2222
+# 						#update sale_order_line set product_id=4823 where product_id=2222
+# 						#delete from product_product where id=2222

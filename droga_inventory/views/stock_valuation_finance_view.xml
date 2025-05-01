@@ -6,7 +6,8 @@
         <field name="arch" type="xml">
             <tree string="Stock transactions - All" default_order='move_date asc, move_type asc, svl_id asc' delete="false" create="false">
                 <field name="id"/>
-                <field name="move_date"/>
+                <field name="move_date" string="Weighted Avg date"/>
+                <field name="move_date_initial"/>
                 <field name="move_type"/>
                 <field name="reference"/>
                 <field name="account_move_id" widget="many2one" options='{"no_open": False}'/>
@@ -21,7 +22,6 @@
                 <field name='value' sum="Total"/>
                 <field name='remaining_qty'/>
                 <field name='remaining_value'/>
-                <field name='create_date'/>
                 <field name='move_date'/>
 <!--                <button name="revaluate_after_date_button" string="UPD" type="object" class="btn-primary"/>-->
                 <field name='history_vals' invisible="1"/>

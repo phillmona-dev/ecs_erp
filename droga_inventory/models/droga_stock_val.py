@@ -165,7 +165,7 @@ class DrogaStockValuationLayer(models.Model):
         self.updatesalescost(ret)
 
     def updatesalescost(self,ret):
-        # This updates sales cost value for sales transactions
+        # This updates sales cost value for sales transactions. Out refund is sales return
         if ret.origin:
             if ret.origin.startswith('SO'):
                 acc_move = self.env['account.move'].search([('invoice_origin', '=', ret.origin)])
@@ -175,11 +175,9 @@ class DrogaStockValuationLayer(models.Model):
                             'value'))) * (-1 if mv.move_type == 'out_refund' else 1)
                     mvl = self.env['account.move.line'].search([('move_id', '=', mv.id)])
                     for mvld in mvl:
-                        moves = self.env['droga.stock.valuation.layer'].search(
-                            [('product_id', '=', mvld.product_id.id), ('origin', '=', mvld.move_id.invoice_origin)])
-                        mvld.sales_cost = (abs(sum(moves.mapped('value'))) if abs(
-                            sum(moves.mapped('value'))) > 0 else 0) * (
-                                              -1 if mvld.move_id.move_type == 'out_refund' else 1)
+                        mvld.sales_cost = abs(
+                        sum(self.env['droga.stock.valuation.layer'].search([('product_id','=',mvld.product_id.id),('origin', '=', ret.origin)]).mapped(
+                            'value'))) * (-1 if mv.move_type == 'out_refund' else 1)
 
     def _validate_accounting_entries_custom(self):
         accounts = self.product_id.product_tmpl_id.get_product_accounts()
@@ -249,6 +247,7 @@ class DrogaStockValuationLayer(models.Model):
 
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
     def update_trans(self, prev_trans, cur_trans,reference='-',date_change=False):
+        old_value = cur_trans.value
         if cur_trans.move_type == 'Static':
             if cur_trans.origin and cur_trans.quantity < 0:
                 if cur_trans.origin.startswith('P'):
@@ -259,6 +258,9 @@ class DrogaStockValuationLayer(models.Model):
                     if unit_cost:
                         cur_trans.unit_cost=unit_cost['unit_cost']
                         cur_trans.value=cur_trans.unit_cost*cur_trans.quantity
+
+                        if float_compare(old_value, cur_trans.value, precision_digits=2) != 0:
+                            self.update_gl(cur_trans)
 
             #In case it's a purchase return and the remaining quantity becomes 0, we use the remaining value to balance it
             if cur_trans.quantity<0 and (prev_trans.remaining_qty+cur_trans.quantity)==0:
@@ -279,9 +281,10 @@ class DrogaStockValuationLayer(models.Model):
             else:
                 cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
                 cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+
                 return True
         else:
-            old_value=cur_trans.value
+
             if reference!='-' and float_compare(cur_trans.unit_cost, ((abs(prev_trans.remaining_value) / abs(
                 prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
                     prev_trans.remaining_value / cur_trans.quantity)), precision_digits=2) != 0:
@@ -305,35 +308,42 @@ class DrogaStockValuationLayer(models.Model):
 
             if float_compare(old_value,cur_trans.value,precision_digits=2) !=0:
 
-                if cur_trans.account_move_id:
-
-                    #write a query to update
-                    query1="""
-                        update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
-                        case non_core_amt when 0 then 0 else %s end where id=%s
-                    """
-                    self.env.cr.execute(query1, (abs(cur_trans.value),abs(cur_trans.value),abs(cur_trans.value),abs(cur_trans.value),abs(cur_trans.value),cur_trans.account_move_id.id))
-
-                    query2 = """
-                                update account_move_line set 
-                                debit= case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else 0 end,
-                                credit= case when ((account_id=%s and %s < 0) or (account_id!=%s and %s > 0)) then %s else 0 end,
-                                balance=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end,
-                                amount_currency=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end
-                                where move_id=%s
-                            """
-                    self.env.cr.execute(query2,
-                                        (cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value, abs(cur_trans.value),
-                                         cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value, abs(cur_trans.value),
-                                         cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value, abs(cur_trans.value),
-                                         abs(cur_trans.value),
-                                         cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value, abs(cur_trans.value),
-                                         abs(cur_trans.value),
-                                         cur_trans.account_move_id.id))
+                self.update_gl(cur_trans)
 
                 self.updatesalescost(cur_trans)
             return True
 
+    def update_gl(self,cur_trans):
+        if cur_trans.account_move_id:
+            # write a query to update
+            query1 = """
+                update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
+                case non_core_amt when 0 then 0 else %s end where id=%s
+            """
+            self.env.cr.execute(query1,
+                                (abs(cur_trans.value), abs(cur_trans.value), abs(cur_trans.value), abs(cur_trans.value),
+                                 abs(cur_trans.value), cur_trans.account_move_id.id))
+
+            query2 = """
+                        update account_move_line set 
+                        debit= case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else 0 end,
+                        credit= case when ((account_id=%s and %s < 0) or (account_id!=%s and %s > 0)) then %s else 0 end,
+                        balance=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end,
+                        amount_currency=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end
+                        where move_id=%s
+                    """
+            self.env.cr.execute(query2,
+                                (cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 abs(cur_trans.value),
+                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 abs(cur_trans.value),
+                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 abs(cur_trans.value),
+                                 abs(cur_trans.value),
+                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 abs(cur_trans.value),
+                                 abs(cur_trans.value),
+                                 cur_trans.account_move_id.id))
     # Gets initial row value for processing start
     def get_parent_id(self, prod_id, trans_date, trans_type, cur_id):
         if trans_type == 'Static':

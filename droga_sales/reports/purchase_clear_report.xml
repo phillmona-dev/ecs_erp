@@ -10,6 +10,7 @@
                 <field name="date"/>
                 <field name="amount_currency" sum="Amount"/>
                 <field name="inv_origin"/>
+                <field name="parent_state"/>
                 <field name="create_date" optional="hide"></field>
                 <field name="create_uid" optional="hide"></field>
                 <field name="journal_id" optional="hide"></field>

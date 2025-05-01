@@ -34,7 +34,48 @@ class StockQuant(models.Model):
                                 res.product_id.uom_id.factor / res.product_id.import_uom_new.factor)
                 else:
                     res.inventory_quantity = vals["import_counted"]
-        return super(StockQuant, self).write(vals)
+        quant=super(StockQuant, self).write(vals)
+
+        # Pharmacy stock out tracker
+        if quant.location_id.usage == "internal":
+            stock_hist = self.env['product.availability.pharmacy'].search(
+                [('prod', '=', quant.product_id.id), ('batch_id', '=', quant.lot_id.id),
+                 ('warehouse', '=', quant.location_id.warehouse_id.id)])
+            if len(stock_hist) == 0:
+                stock_tracker_vals = {
+                    'prod': quant.product_id.id,
+                    'warehouse': quant.location_id.warehouse_id.id,
+                    'stock_quantity_total': quant.quantity,
+                    'batch_id': quant.lot_id.id
+                }
+                self.env['product.availability.pharmacy'].create(stock_tracker_vals)
+            else:
+                prod_sum_phar = sum(self.env['stock.quant'].search(
+                    [('product_id', '=', quant.product_id.id),
+                     ('location_id.warehouse_id', '=', quant.warehouse_id.id)]).mapped(
+                    'quantity'))
+                stock_hist[0].write({'stock_quantity_total': prod_sum_phar})
+
+        prod_sum = sum(self.env['stock.quant'].search(
+            [('product_id', '=', quant.product_id.id), ('location_id.usage', '=', 'internal')]).mapped('quantity'))
+        self.env['product.template'].search(
+            [('id', '=', quant.product_id.product_tmpl_id.id), '|', ('active', '=', True), ('active', '=', False)])[
+            0].write({
+            'most_recent_trans_date': datetime.now().date(),
+            'stock_quantity_total': prod_sum
+        })
+        if prod_sum == 0:
+            vals = {
+                'product': quant.product_id.product_tmpl_id.id,
+                'date_from': datetime.now().date(),
+            }
+            self.env['stock.out.history'].create(vals)
+        else:
+            recs = self.env['stock.out.history'].search([('date_to', '=', False)])
+            for rc in recs:
+                rc.write({'date_to': datetime.now().date()})
+
+        return quant
 
     @api.onchange('import_counted')
     def _import_count_update(self):
@@ -95,39 +136,6 @@ class StockQuant(models.Model):
                         "complete_name": quant.location_id.complete_name,
                     }
                 )
-            #Pharmacy stock out tracker
-            if quant.location_id.usage=="internal":
-                stock_hist=self.env['product.availability.pharmacy'].search([('prod','=',quant.product_id.id),('batch_id','=',quant.lot_id.id),('warehouse','=',quant.location_id.warehouse_id.id)])
-                if len(stock_hist)==0:
-                    stock_tracker_vals = {
-                        'prod': quant.product_id.id,
-                        'warehouse': quant.location_id.warehouse_id.id,
-                        'stock_quantity_total': quant.quantity,
-                        'batch_id':quant.lot_id.id
-                    }
-                    self.env['product.availability.pharmacy'].create(stock_tracker_vals)
-                else:
-                    prod_sum_phar = sum(self.env['stock.quant'].search(
-                        [('product_id', '=', quant.product_id.id), ('location_id.warehouse_id', '=', quant.warehouse_id.id)]).mapped(
-                        'quantity'))
-                    stock_hist[0].write({'stock_quantity_total': prod_sum_phar})
-
-            prod_sum =  sum(self.env['stock.quant'].search(
-                [('product_id', '=', quant.product_id.id), ('location_id.usage', '=', 'internal')]).mapped('quantity'))
-            self.env['product.template'].search([('id','=',quant.product_id.product_tmpl_id.id),'|', ('active', '=', True), ('active', '=', False)])[0].write({
-                'most_recent_trans_date': datetime.now().date(),
-                'stock_quantity_total':prod_sum
-            })
-            if prod_sum==0:
-                vals = {
-                    'product': quant.product_id.product_tmpl_id.id,
-                    'date_from': datetime.now().date(),
-                }
-                self.env['stock.out.history'].create(vals)
-            else:
-                recs=self.env['stock.out.history'].search([('date_to','=',False)])
-                for rc in recs:
-                    rc.write({'date_to':datetime.now().date()})
 
 
     @api.model

@@ -94,7 +94,8 @@ class droga_pharma_lot_extension(models.Model):
     def _get_lot_descr(self):
         for rec in self:
             if rec.expiration_date:
-                rec.lot_descr=rec.name+' - '+str(rec.expiration_date.strftime("%b %d, %Y"))+' - '+str((rec.expiration_date - datetime.today()).days) +' days left'
+                rec.lot_descr=(rec.name+' - '+str(rec.expiration_date.strftime("%b %d, %Y"))+' - '+str((rec.expiration_date - datetime.today()).days)
+                               +(' days left' if (rec.expiration_date - datetime.today()).days>0 else ' days passed'))
             else:
                 rec.lot_descr = rec.name
 

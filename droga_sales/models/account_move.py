@@ -247,6 +247,7 @@ class account_move(models.Model):
         res = super(account_move, self).create(vals)
         if res.invoice_origin:
             if res.invoice_origin.startswith('SO'):
+                # This updates sales cost value for sales transactions. Out refund is sales return
                 res.sales_cost = abs(
                         sum(self.env['droga.stock.valuation.layer'].search([('origin', '=', res.invoice_origin)]).mapped('value'))) * (-1 if res.move_type=='out_refund' else 1)
         return res
@@ -492,9 +493,11 @@ class account_move_line(models.Model):
         ret= super(account_move_line, self).create(vals)
         for rec in ret:
             if rec.move_id.invoice_origin:
+                # This updates sales cost value for sales transactions. Out refund is sales return
                 if rec.move_id.invoice_origin.startswith('SO'):
                     moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
-                    rec.sales_cost = (abs(sum(moves.mapped('value'))) if abs(sum(moves.mapped('value')))>0 else 0) * (-1 if rec.move_id.move_type=='out_refund' else 1)
+                    rec.sales_cost = abs(
+                        sum(self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)]).mapped('value'))) * (-1 if rec.move_id.move_type=='out_refund' else 1)
 
             if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
                 if rec.account.startswith('5'):
