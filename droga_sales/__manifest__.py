@@ -24,7 +24,6 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'security/record_rules.xml',
-        'reports/sales_costing_excel_report.xml',
         'views/account_move.xml',
         'views/sale_order_extend.xml',
         'views/credit_limit.xml',
