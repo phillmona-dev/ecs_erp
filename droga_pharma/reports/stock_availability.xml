@@ -9,6 +9,7 @@
                 <field name="warehouse"/>
                 <field name='stock_quantity_total'/>
                 <field name='categ_id'/>
+                <field name="unit_of_measure"></field>
                 <field name="availability" invisible="1"></field>
                 <field name="availability" decoration-success="availability =='Available'" decoration-warning="availability =='Needs reordering'"
                        decoration-danger="availability == 'Stock out'" widget="badge"></field>

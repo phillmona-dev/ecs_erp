@@ -7,6 +7,7 @@ from odoo import fields, models, api
 class prod_availability(models.Model):
     _name='product.availability.pharmacy'
     prod=fields.Many2one('product.product',readonly=True)
+    unit_of_measure=fields.Many2one('uom.uom',related='prod.product_tmpl_id.uom_id',string='UOM')
     warehouse=fields.Many2one('stock.warehouse',readonly=True)
     stock_quantity_total = fields.Float('Stock quantity',readonly=True)
     availability = fields.Char('Availability', compute='_compute_availability', store=True)

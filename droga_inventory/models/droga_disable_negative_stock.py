@@ -15,6 +15,19 @@ class StockQuant(models.Model):
     difference_custom=fields.Float('Difference_Custom')
     diff_date=fields.Date('Diff_Date')
 
+    @api.model
+    def create(self, vals):
+        ret = super(StockQuant, self).create(vals)
+        stock_tracker_vals = {
+            'prod': ret.product_id.id,
+            'warehouse': ret.location_id.warehouse_id.id,
+            'stock_quantity_total': ret.quantity,
+            'batch_id': ret.lot_id.id
+        }
+        self.env['product.availability.pharmacy'].create(stock_tracker_vals)
+
+        return ret
+
     def write(self, vals):
         if 'diff_date' in vals or 'difference_custom' in vals:
             for res in self:
