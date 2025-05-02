@@ -37,6 +37,8 @@
                 <filter name="needs_reordering" string="Needs reordering" domain="[('availability', '=', 'Needs reordering')]" />
                 <filter name="stock_out" string="Stock out" domain="[('availability', '=', 'Stock out')]" />
 
+                <separator></separator>
+
                 <filter name="Up_to_Date" string="Up-to-Date" domain="[('expiry_status', '=', 'Up-to-Date')]" />
                 <filter name="near_expiry" string="Near Expiry" domain="[('expiry_status', '=', 'Near Expiry')]" />
                 <filter name="expired" string="Expired" domain="[('expiry_status', '=', 'Expired')]" />

@@ -12,6 +12,7 @@
                 <button name="po_open" type="object" class="oe_stat_button"  groups="droga_export.export_user"
                         attrs="{'invisible': [('state', 'not in', ('sale','done'))]}" string="Purchase order"/>
             </xpath>
+
             <xpath expr="//form/sheet/div/button[@name='action_preview_sale_order']" position="before">
                 <button name="subcontract_issue_open"
                         type="object"
@@ -22,17 +23,6 @@
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_text">Send to</span>
                             <span class="o_stat_text">Cleaning unit</span>
-                        </div>
-                    </button>
-                <button name="po_open"
-                        type="object"
-                        class="oe_stat_button"
-                        attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"
-                        groups="droga_export.export_user"
-                        icon="fa-car icon">
-                        <div class="o_field_widget o_stat_info">
-                            <span class="o_stat_text">Purchase</span>
-                            <span class="o_stat_text">Order</span>
                         </div>
                     </button>
                 <button name="items_issue_order"
@@ -57,6 +47,10 @@
                             <span class="o_stat_text">Status</span>
                         </div>
                     </button>
+            </xpath>
+
+            <xpath expr="//form/sheet/div/button[@name='action_preview_sale_order']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
         </field>
     </record>
