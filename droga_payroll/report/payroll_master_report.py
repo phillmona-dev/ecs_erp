@@ -704,6 +704,9 @@ class PayrollMasterReports(models.Model):
                 elif payslip_detail.code == 'SPOCONT':  # sport contribution
                     deductions['sport_contribution'] = payslip_detail.total
                     totals['sport_contribution'] += payslip_detail.total
+                elif payslip_detail.code == 'OTHDED':  # other deductions
+                    deductions['others'] = payslip_detail.total
+                    totals['others'] += payslip_detail.total
 
             # Write deduction values to the sheet
             sheet.write(row_start, 2, deductions['canteen'], num_format)
