@@ -25,6 +25,7 @@
                 <field name="qty_delivered" sum="Total" optional="hide"/>
                 <field name="invoice_date" string="Invoice Date" optional="show"/>
                 <field name="due_date"/>
+                <field name="due_date_in_days" optional="show"/>
 
                 <field name="product_uom" string="UOM" optional="hide"/>
                 <field name="is_core" optional="hide"/>
