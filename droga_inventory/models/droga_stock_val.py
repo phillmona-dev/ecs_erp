@@ -175,9 +175,12 @@ class DrogaStockValuationLayer(models.Model):
                             'value'))) * (-1 if mv.move_type == 'out_refund' else 1)
                     mvl = self.env['account.move.line'].search([('move_id', '=', mv.id)])
                     for mvld in mvl:
-                        mvld.sales_cost = abs(
-                        sum(self.env['droga.stock.valuation.layer'].search([('product_id','=',mvld.product_id.id),('origin', '=', ret.origin)]).mapped(
-                            'value'))) * (-1 if mv.move_type == 'out_refund' else 1)
+                        val_layers=self.env['droga.stock.valuation.layer'].search([('product_id','=',mvld.product_id.id),('origin', '=', ret.origin)])
+                        if len(val_layers)==0:
+                            mvld.sales_cost=0
+                        else:
+                            mvld.sales_cost = abs(
+                            sum(val_layers.mapped('value'))/len(val_layers.mapped('value'))) * (-1 if mv.move_type == 'out_refund' else 1)
 
     def _validate_accounting_entries_custom(self):
         accounts = self.product_id.product_tmpl_id.get_product_accounts()

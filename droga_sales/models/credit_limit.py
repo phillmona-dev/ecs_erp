@@ -284,7 +284,7 @@ class cust_sales_no_create_after_invoice(models.Model):
 
     due_date=fields.Date('Due Date',compute='compute_due_date',store=True)
     due_date_in_days = fields.Integer("Due Days", store=True, compute='compute_due_date')
-    @api.depends('order_id.invoice_ids.invoice_date_due')
+    @api.depends('order_id.invoice_ids.invoice_date_due','order_id.invoice_ids.due_date_in_days')
     def compute_due_date(self):
         for rec in self:
             rec.due_date=max(rec.order_id.mapped('invoice_ids.invoice_date_due') or [False])

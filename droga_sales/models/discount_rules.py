@@ -24,6 +24,10 @@ class droga_price_discount_per_type(models.Model):
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active',
                               tracking=True)
 
+    def unlink(self):
+        raise UserError('You are not allowed to delete this record.')
+        return super(droga_price_discount_per_type, self).unlink()
+
 
 class droga_price_discount_per_amount(models.Model):
     _name = 'droga.price.discount.per.amount'
@@ -40,6 +44,10 @@ class droga_price_discount_per_amount(models.Model):
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active',
                               tracking=True)
 
+    def unlink(self):
+        raise UserError('You are not allowed to delete this record.')
+        return super(droga_price_discount_per_amount, self).unlink()
+
 
 class droga_price_discount_per_product_qty(models.Model):
     _name = 'droga.price.discount.per.product.qty'
@@ -54,6 +62,10 @@ class droga_price_discount_per_product_qty(models.Model):
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active',
                               tracking=True)
 
+    def unlink(self):
+        raise UserError('You are not allowed to delete this record.')
+        return super(droga_price_discount_per_product_qty, self).unlink()
+
 
 class droga_price_discount_per_product_customer(models.Model):
     _name = 'droga.price.discount.per.product.customer'
@@ -66,6 +78,10 @@ class droga_price_discount_per_product_customer(models.Model):
                                   string='Used under', required=True, tracking=True)
     status = fields.Selection([('Active', 'Active'), ('Closed', 'Closed')], required=True, default='Active',
                               tracking=True)
+
+    def unlink(self):
+        raise UserError('You are not allowed to delete this record.')
+        return super(droga_price_discount_per_product_customer, self).unlink()
 
 class sale_order_line(models.Model):
     _inherit = 'sale.order.line'
