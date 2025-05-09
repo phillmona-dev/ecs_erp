@@ -24,6 +24,7 @@
                 <field name="invoiced_amt" string="Grand Total" sum="Total" optional="show"/>
                 <field name="qty_delivered" sum="Total" optional="hide"/>
                 <field name="invoice_date" string="Invoice Date" optional="show"/>
+                <field name="due_date"/>
 
                 <field name="product_uom" string="UOM" optional="hide"/>
                 <field name="is_core" optional="hide"/>

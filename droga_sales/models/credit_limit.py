@@ -282,6 +282,12 @@ class cust_sales_no_create_after_invoice(models.Model):
     expiry_date_html = fields.Html('Expiration date', compute='_get_expiry', default='')
     batch_html = fields.Html('Batch No', compute='_get_expiry', default='')
 
+    due_date=fields.Date('Due Date',compute='compute_due_date',store=True)
+    @api.depends('order_id.invoice_ids.invoice_date_due')
+    def compute_due_date(self):
+        for rec in self:
+            rec.due_date=max(rec.order_id.mapped('invoice_ids.invoice_date_due') or [False])
+
     order_type = fields.Selection([
         ('IM', 'Import'),('EX','Export'),
         ('WS', 'Wholesale')], string='Order type', related='order_id.order_type')
