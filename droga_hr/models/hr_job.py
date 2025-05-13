@@ -40,6 +40,12 @@ class HrJobSalaryDetail(models.Model):
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
 
+    def update_status_from_parent(self):
+        details = self.env["hr.job.salary.detail"].search([])
+        for record in details:
+            if record.job_detail_id.state == 'Closed':
+                record.write({'state': 'Closed'})
+
 
 class HrJobSalaryPayment(models.Model):
     _name = 'hr.job.salary.payment'
