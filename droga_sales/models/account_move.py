@@ -546,6 +546,7 @@ class AccountInvoiceReportSalesCost(models.Model):
     _inherit = 'account.invoice.report'
 
     sales_cost = fields.Float(string="Sales Cost")
+    inv_origin = fields.Char(string="Origin")
 
     def _select(self):
-        return super()._select() + ", line.sales_cost as sales_cost"
+        return super()._select() + ", line.sales_cost as sales_cost,line.inv_origin as inv_origin"
