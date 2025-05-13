@@ -45,10 +45,10 @@ class droga_stock_cons_issue(models.Model):
     marketting_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
     store_manager = fields.Many2one('res.users', compute='_get_approvers',store=True)
 
-    def write(self, vals):
-        if self.state in ('sc','done','processed','reject'):
-            raise UserError("Record can not be modified now.")
-        return super(droga_stock_cons_issue, self).write(vals)
+    # def write(self, vals):
+    #     if self.state in ('sc','done','processed','reject'):
+    #         raise UserError("Record can not be modified now.")
+    #     return super(droga_stock_cons_issue, self).write(vals)
 
     def _get_approvers(self):
         for rec in self:
