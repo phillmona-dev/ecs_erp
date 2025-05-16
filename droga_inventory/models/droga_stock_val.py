@@ -170,17 +170,18 @@ class DrogaStockValuationLayer(models.Model):
             if ret.origin.startswith('SO'):
                 acc_move = self.env['account.move'].search([('invoice_origin', '=', ret.origin)])
                 for mv in acc_move:
-                    mv.sales_cost = abs(
-                        sum(self.env['droga.stock.valuation.layer'].search([('origin', '=', ret.origin)]).mapped(
-                            'value'))) * (-1 if mv.move_type == 'out_refund' else 1)
-                    mvl = self.env['account.move.line'].search([('move_id', '=', mv.id)])
+                    mvl = mv.line_ids
                     for mvld in mvl:
-                        val_layers=self.env['droga.stock.valuation.layer'].search([('product_id','=',mvld.product_id.id),('origin', '=', ret.origin)])
+
+                        stock_move_ids=self.env['stock.move'].search([('sale_line_id','in',mvld.sale_line_ids.ids)])
+
+                        val_layers=self.env['droga.stock.valuation.layer'].search([('stock_move_id','in',stock_move_ids.ids)])
                         if len(val_layers)==0:
                             mvld.sales_cost=0
                         else:
-                            mvld.sales_cost = abs(
-                            sum(val_layers.mapped('value'))/len(val_layers.mapped('value'))) * (-1 if mv.move_type == 'out_refund' else 1)
+                            mvld.sales_cost = sum(val_layers.mapped('value'))
+
+                    mv.sales_cost = sum(mv.line_ids.mapeed('sales_cost'))
 
     def _validate_accounting_entries_custom(self):
         accounts = self.product_id.product_tmpl_id.get_product_accounts()

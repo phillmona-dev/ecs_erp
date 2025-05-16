@@ -486,7 +486,7 @@ class droga_stock_move_extension(models.Model):
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
     cons_price=fields.Float('Consignment payable')
 
-    
+
 
     @api.depends('picking_id.pharmacy_unit')
     def _get_pharma_unit(self):

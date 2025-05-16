@@ -248,8 +248,9 @@ class account_move(models.Model):
         if res.invoice_origin:
             if res.invoice_origin.startswith('SO'):
                 # This updates sales cost value for sales transactions. Out refund is sales return
+                stock_move_ids = self.env['stock.move'].search([('sale_line_id', 'in', res.line_ids.sale_line_ids.ids)])
                 res.sales_cost = abs(
-                        sum(self.env['droga.stock.valuation.layer'].search([('origin', '=', res.invoice_origin)]).mapped('value'))) * (-1 if res.move_type=='out_refund' else 1)
+                        sum(self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', stock_move_ids.ids)]).mapped('value')))
         return res
 
     def print_to_pos_peds(self):
@@ -495,12 +496,12 @@ class account_move_line(models.Model):
             if rec.move_id.invoice_origin:
                 # This updates sales cost value for sales transactions. Out refund is sales return
                 if rec.move_id.invoice_origin.startswith('SO'):
-                    moves=self.env['droga.stock.valuation.layer'].search([('product_id','=',rec.product_id.id),('origin', '=', rec.move_id.invoice_origin)])
+                    stock_moves=self.env['stock.move'].search([('sale_line_id','in',rec.sale_line_ids.ids)])
+                    moves=self.env['droga.stock.valuation.layer'].search([('stock_move_id','in',stock_moves.ids)])
                     if len(moves)==0:
                         rec.sales_cost=0
                     else:
-                        rec.sales_cost = abs(
-                            sum(moves.mapped('value'))/len(moves.mapped('value'))) * (-1 if rec.move_id.move_type=='out_refund' else 1)
+                        rec.sales_cost = sum(moves.mapped('value'))
 
             if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
                 if rec.account.startswith('5'):

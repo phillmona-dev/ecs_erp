@@ -169,6 +169,7 @@
         <field name="domain">['&amp;',('is_record_owner','=',True),'|', ('type','=','lead'), ('type','=',False)]</field>
         <field name="context">{'search_default_activities_today_custom': 1}</field>
     </record>
+
     <!-- Pipeline menu domain -->
     <record model="ir.actions.act_window" id="crm.crm_lead_action_pipeline">
         <field name="domain">[('is_record_owner','=',True)]</field>
