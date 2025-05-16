@@ -510,6 +510,15 @@ class account_move_line(models.Model):
                         rec.profit_cost_center=analytic[0].trans_warehouse.linked_analytic.name if analytic[0].trans_warehouse.linked_analytic else rec.profit_cost_center
         return ret
 
+    def update_cost(self):
+        for rec in self:
+            stock_moves = self.env['stock.move'].search([('sale_line_id', 'in', rec.sale_line_ids.ids)])
+            moves = self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', stock_moves.ids)])
+            if len(moves) == 0:
+                rec.sales_cost = 0
+            else:
+                rec.sales_cost = sum(moves.mapped('value'))
+                
     @api.depends('analytic_distribution')
     def get_acc_move(self):
         for rec in self:
