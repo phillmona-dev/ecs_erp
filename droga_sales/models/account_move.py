@@ -249,8 +249,7 @@ class account_move(models.Model):
             if res.invoice_origin.startswith('SO'):
                 # This updates sales cost value for sales transactions. Out refund is sales return
                 stock_move_ids = self.env['stock.move'].search([('sale_line_id', 'in', res.line_ids.sale_line_ids.ids)])
-                res.sales_cost = abs(
-                        sum(self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', stock_move_ids.ids)]).mapped('value')))
+                res.sales_cost = sum(self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', stock_move_ids.ids)]).mapped('value'))*-1
         return res
 
     def print_to_pos_peds(self):
@@ -501,7 +500,7 @@ class account_move_line(models.Model):
                     if len(moves)==0:
                         rec.sales_cost=0
                     else:
-                        rec.sales_cost = sum(moves.mapped('value'))
+                        rec.sales_cost = sum(moves.mapped('value'))*-1
 
             if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
                 if rec.account.startswith('5'):
@@ -517,8 +516,8 @@ class account_move_line(models.Model):
             if len(moves) == 0:
                 rec.sales_cost = 0
             else:
-                rec.sales_cost = sum(moves.mapped('value'))
-                
+                rec.sales_cost = sum(moves.mapped('value'))*-1
+
     @api.depends('analytic_distribution')
     def get_acc_move(self):
         for rec in self:
