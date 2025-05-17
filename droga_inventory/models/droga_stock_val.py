@@ -181,7 +181,7 @@ class DrogaStockValuationLayer(models.Model):
                         else:
                             mvld.sales_cost = sum(val_layers.mapped('value'))*-1
 
-                    mv.sales_cost = sum(mv.line_ids.mapeed('sales_cost'))*-1
+                    mv.sales_cost = sum(mv.line_ids.mapped('sales_cost'))*-1
 
     def _validate_accounting_entries_custom(self):
         accounts = self.product_id.product_tmpl_id.get_product_accounts()
