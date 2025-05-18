@@ -8,6 +8,9 @@
     <menuitem id="droga_hr_job_salary_payment_menu" name="Payment Types" action="droga_hr_job_salary_payment_action"
               groups="hr.group_hr_user" parent="hr.menu_config_recruitment" sequence="10"/>
 
+    <menuitem id="droga_hr_job_salary_menu" name="Salary Structure" action="hr_job_salary_action" groups="hr.group_hr_user"
+              parent="hr.menu_config_recruitment" sequence="11"/>
+
 
     <menuitem id="droga_hr_letter_config_menu" name="Letter"
               groups="hr.group_hr_user" parent="hr.menu_human_resources_configuration" sequence="100">
@@ -27,9 +30,6 @@
                   sequence="2"/>
 
 
-
-
-
     </menuitem>
 
     <menuitem id="hr_attendance_reports" name="Reports" sequence="3"
@@ -47,7 +47,6 @@
 
     <menuitem id="hr_division_job_menu" name="Divisions" action="view_hr_division_job_action"
               groups="hr.group_hr_user" parent="hr.menu_config_employee" sequence="100"/>
-
 
 
 </odoo>

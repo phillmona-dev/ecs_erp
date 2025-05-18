@@ -35,6 +35,7 @@
         'views/hr_attendance_absence.xml',
         'views/hr_attendance_over_time_report.xml',
         'views/hr_division.xml',
+        'views/hr_job_salary.xml',
         'report/letter.xml',
         'views/menu.xml',
     ],

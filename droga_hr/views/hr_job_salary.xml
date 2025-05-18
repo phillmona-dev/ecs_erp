@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- tree view -->
+    <record id="hr_job_salary_view" model="ir.ui.view">
+        <field name="name">Salary Structure</field>
+        <field name="model">hr.job.salary</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="job_id"/>
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="currency"/>
+                <field name="state"/>
+                <field name="company_id"/>
+
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="hr_job_salary_search_view" model="ir.ui.view">
+        <field name="name">Salary Structure Search</field>
+        <field name="model">hr.job.salary</field>
+        <field name="arch" type="xml">
+            <search string="Salary Structure">
+                <!-- Search Fields -->
+                <field name="job_id" string="Job Position"/>
+                <field name="name" string="Salary Name"/>
+                <field name="date_from" string="Start Date"/>
+                <field name="date_to" string="End Date"/>
+                <field name="currency" string="Currency"/>
+                <field name="state" string="Status"/>
+                <!-- Filters -->
+                <filter name="active_jobs" string="Active" domain="[('state', '=', 'Active')]"/>
+                <filter name="closed_jobs" string="Closed" domain="[('state', '=', 'Closed')]"/>
+
+                <!-- Group By -->
+                <group expand="0" string="Group By">
+                    <filter name="group_by_job" string="Job Position" context="{'group_by': 'job_id'}"/>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_company" string="Company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <!-- action -->
+    <record id="hr_job_salary_action" model="ir.actions.act_window">
+        <field name="name">Salary Structure</field>
+        <field name="res_model">hr.job.salary</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[('job_id', '!=', False)]</field>
+        <field name="context">{'search_default_active_jobs': 1}</field>
+    </record>
+
+    <!-- rule -->
+    <record model="ir.rule" id="hr_job_salary_rule">
+        <field name="name">Salary Structure multi-company</field>
+        <field name="model_id" ref="model_hr_job_salary"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+</odoo>
