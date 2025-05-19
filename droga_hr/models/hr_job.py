@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from datetime import timedelta
 
 
 class HrJob(models.Model):
@@ -9,6 +10,26 @@ class HrJob(models.Model):
     currency = fields.Many2one("res.currency", string="Currency")
 
     # _sql_constraints = [('name_unique', 'unique(name)', 'Job position must be unique')]
+
+    def close_old_salary_structures(self):
+        jobs = self.env['hr.job'].search([])
+
+        for job in jobs:
+            active_structures = job.salary_structure.filtered(lambda s: s.state == 'Active')
+            if len(active_structures) == 2:
+                # get minium date_from active_structures
+                # Sort by date_from (ascending, None last)
+                sorted_structures = active_structures.sorted(
+                    key=lambda s: s.date_from or fields.Date.today()
+                )
+                earliest_structure = sorted_structures[0]
+                active_structure = sorted_structures[1]
+
+                # calculate closing date
+                closing_date = active_structure.date_from - timedelta(days=1)
+
+                # close the earliest active salary structure
+                earliest_structure.write({'state': 'Closed', 'date_to': closing_date})
 
 
 class HrJobSalary(models.Model):

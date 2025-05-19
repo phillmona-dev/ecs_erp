@@ -30,47 +30,42 @@ class EmployeePayrollRate(models.Model):
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW hr_employee_payroll_rate_report AS 
             SELECT 
-    row_number() OVER () AS id,
-    x.company_id, x.employee_id, x.badge_id, x.department_id,
-    x.first_contract_date, x.contract_id, x.job_id, x.payment_type, x.amount, x.date_from
-FROM (
-    SELECT 
-        company_id, employee_id, badge_id, department_id, first_contract_date, 
-        contract_id, job_id, payment_type, amount, date_from,
-        ROW_NUMBER() OVER (PARTITION BY employee_id, contract_id ORDER BY date_from DESC) AS rn
-    FROM (
-        SELECT 
-            h.company_id, c.employee_id, h.barcode AS badge_id,
-            c.department_id, h.first_contract_date, c.id AS contract_id,
-            c.job_id, jsd.payment_type, jsd.amount, js.date_from
-        FROM hr_employee h
-        INNER JOIN hr_contract c ON h.id = c.employee_id
-        INNER JOIN hr_job_salary js ON c.job_id = js.job_id
-        INNER JOIN hr_job_salary_detail jsd ON js.id = jsd.job_detail_id
-        WHERE 
-            h.active = TRUE 
-            AND c.state = 'open' 
-            AND js.state = 'Active' 
-            AND (c.custom_salary_structure = FALSE OR c.custom_salary_structure IS NULL) 
-            AND jsd.amount != 0
-        UNION
-        SELECT 
-            h.company_id, c.employee_id, h.barcode AS badge_id,
-            c.department_id, h.first_contract_date, c.id AS contract_id,
-            c.job_id, jsd.payment_type, jsd.amount, js.date_from
-        FROM hr_employee h
-        INNER JOIN hr_contract c ON h.id = c.employee_id
-        INNER JOIN hr_job_salary js ON c.id = js.contract_id 
-        INNER JOIN hr_job_salary_detail jsd ON js.id = jsd.job_detail_id
-        WHERE 
-            h.active = TRUE 
-            AND c.state = 'open' 
-            AND js.state = 'Active' 
-            AND (c.custom_salary_structure = TRUE OR c.custom_salary_structure IS NULL) 
-            AND jsd.amount != 0
-    ) inner_x
-) x
-WHERE x.rn = 1;
+                row_number() over () as id,
+                x.company_id, x.employee_id, x.badge_id, x.department_id,
+                x.first_contract_date, x.contract_id, x.job_id, x.payment_type, x.amount  
+            FROM (
+                SELECT 
+                    h.company_id, c.employee_id, h.barcode AS badge_id,
+                    c.department_id, h.first_contract_date, c.id AS contract_id,
+                    c.job_id, jsd.payment_type, jsd.amount  
+                FROM hr_employee h
+                INNER JOIN hr_contract c ON h.id = c.employee_id
+                INNER JOIN hr_job_salary js ON c.job_id = js.job_id
+                INNER JOIN hr_job_salary_detail jsd ON js.id = jsd.job_detail_id
+                WHERE 
+                    h.active = TRUE 
+                    AND c.state = 'open' 
+                    AND js.state = 'Active' 
+                    AND (c.custom_salary_structure =false or c.custom_salary_structure is null) 
+                    AND jsd.amount != 0
+                    
+                UNION
+                
+                SELECT 
+                    h.company_id, c.employee_id, h.barcode AS badge_id,
+                    c.department_id, h.first_contract_date, c.id AS contract_id,
+                    c.job_id, jsd.payment_type, jsd.amount  
+                FROM hr_employee h
+                INNER JOIN hr_contract c ON h.id = c.employee_id
+                INNER JOIN hr_job_salary js ON c.id=js.contract_id 
+                INNER JOIN hr_job_salary_detail jsd ON js.id = jsd.job_detail_id
+                WHERE 
+                    h.active = TRUE 
+                    AND c.state = 'open' 
+                    AND js.state = 'Active' 
+                    AND (c.custom_salary_structure =true or custom_salary_structure is null) 
+                    AND jsd.amount != 0
+            ) x;
         """)
 
 
