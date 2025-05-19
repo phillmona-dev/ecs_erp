@@ -46,6 +46,7 @@ class EmployeePayrollRate(models.Model):
                     h.active = TRUE 
                     AND c.state = 'open' 
                     AND js.state = 'Active' 
+                    AND js.date_from >= CURRENT_DATE
                     AND (c.custom_salary_structure =false or c.custom_salary_structure is null) 
                     AND jsd.amount != 0
                     
@@ -63,6 +64,7 @@ class EmployeePayrollRate(models.Model):
                     h.active = TRUE 
                     AND c.state = 'open' 
                     AND js.state = 'Active' 
+                    AND js.date_from >= CURRENT_DATE
                     AND (c.custom_salary_structure =true or custom_salary_structure is null) 
                     AND jsd.amount != 0
             ) x;
