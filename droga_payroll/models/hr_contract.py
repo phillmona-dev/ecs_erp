@@ -43,7 +43,7 @@ class HrContract(models.Model):
                     salary_structures = record.salary_structure_custom
 
                     for salary_structure in salary_structures:
-                        if salary_structure.date_to >= date.today():
+                        if not salary_structure.date_to or salary_structure.date_to >= date.today():
                             rates = salary_structure.salary_detail
                             for rate in rates:
                                 if rate.payment_type.code == payment_code:
@@ -53,7 +53,7 @@ class HrContract(models.Model):
 
                     for salary_structure in salary_structures:
 
-                        if salary_structure.date_to >= date.today():
+                        if not salary_structure.date_to or salary_structure.date_to >= date.today():
                             rates = salary_structure.salary_detail
                             for rate in rates:
                                 if rate.payment_type.code == payment_code:
