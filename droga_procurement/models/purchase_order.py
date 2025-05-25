@@ -283,7 +283,7 @@ class purchase_order(models.Model):
             if res.company_id.id==1 and (res.request_type=='Local' or res.request_type=='Pharmacy'):
                 if 'Export' in res.picking_type_id.display_name:
                     #Droga local export
-                    sup_id = 879
+                    sup_id = 891
                 else:
                     #Droga local
                     sup_id=4

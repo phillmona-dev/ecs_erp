@@ -365,6 +365,7 @@
 <!--                    <field name="specialty" optional="hide"/>-->
                     <field name="phone" optional="hide" class="o_force_ltr"/>
                     <field name="date_planned" readonly="1" string="Lead date" optional="show"/>
+                    <field name="pr_team_custom"></field>
                     <field name="check_in_descr" optional="show"/>
                     <field name="check_out_descr" optional="show"/>
                     <field name="visit_status"></field>
@@ -457,6 +458,12 @@
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
             <field name="arch" type="xml">
+                <xpath expr="//search/field[@name='user_id']" position="replace">
+                    <field name="pr_sales"/>
+                </xpath>
+                <xpath expr="//filter[@name='saleschannel']" position="replace">
+                    <filter string="Sales Team" name="sales_team_custom" context="{'group_by':'pr_team_custom'}"/>
+                </xpath>
                 <xpath expr="//filter[@name='activities_overdue']" position="replace">
                     <filter string="Past Visits" name="activities_overdue"
                         domain="[('date_planned', '&lt;', context_today().strftime('%Y-%m-%d'))]"

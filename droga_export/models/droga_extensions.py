@@ -153,6 +153,7 @@ class droga_cons_inherit(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_issue_export_origin_form': self.id,
+                'default_export_origin_form': self.subcontract_issue_origin_form.id,
             },
             'domain':
                 ([('issue_export_origin_form', '=', self.id)])
