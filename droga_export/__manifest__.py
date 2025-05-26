@@ -29,13 +29,14 @@
         'views/items_composition.xml',
         'views/droga_sub_contractor_send.xml',
         'views/droga_sales_extension.xml',
+        'views/droga_export_origin_update.xml',
         'views/droga_sub_contractor_receipt.xml'
     ],
 
     # any module necessary for this one to work correctly
 
     'depends': ['base', 'hr',
-                'mail', 'stock', 'http_routing', 'sale',
+                'mail', 'stock', 'http_routing', 'sale','droga_finance',
                 'resource', 'stock', 'droga_inventory',
                 'web', 'crm'],
     "license": "AGPL-3",

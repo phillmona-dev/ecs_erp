@@ -30,7 +30,7 @@ class done_activity(models.Model):
     check_out = fields.Char('Check out',compute='_getcheckout',store=True)
     check_in_dt = fields.Datetime('Check in datetime',compute='_getcheckin',store=True)
     check_out_dt = fields.Datetime('Check out datetime',compute='_getcheckout',store=True)
-
+    pr_team_custom = fields.Many2one('crm.team', related='sales_rep.team', string='CRM Team', store=True)
     has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
 
@@ -65,7 +65,8 @@ class done_activity(models.Model):
         for rec in self:
             rec.check_out = rec.lead_id.check_out_descr
             rec.check_out_dt=rec.lead_id.check_out_time_and_date
-            rec.state = 'Done'
+            if rec.check_in and rec.checkout:
+                rec.state = 'Done'
 
 class mail_activity_extension(models.Model):
     _inherit = "mail.activity"

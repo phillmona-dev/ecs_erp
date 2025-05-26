@@ -7,6 +7,7 @@
             <tree string="" expand="1" create="0" delete="0">
                 <field name="source_name"/>
                 <field name="sales_rep"/>
+                <field name="pr_team_custom"/>
                 <field name="activity_date" string="Plan date"/>
                 <field name="check_in" string="Check in"/>
                 <field name="check_out" string="Check out"/>
@@ -37,6 +38,7 @@
                 <filter name="cancel" string="Cancelled activities" domain="[('state', '=', 'Cancelled')]" />
                 <filter name="Done" string="Done activities" domain="[('state', '=', 'Done')]" />
                 <filter name="group_user" string="User" context="{'group_by':'sales_rep'}"/>
+                <filter name="group_team" string="Sales Team" context="{'group_by':'pr_team_custom'}"/>
 
                 <filter string="Today activities"
                         domain="[('activity_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('activity_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
