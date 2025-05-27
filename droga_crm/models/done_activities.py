@@ -65,7 +65,7 @@ class done_activity(models.Model):
         for rec in self:
             rec.check_out = rec.lead_id.check_out_descr
             rec.check_out_dt=rec.lead_id.check_out_time_and_date
-            if rec.check_in and rec.checkout:
+            if rec.check_in and rec.check_out:
                 rec.state = 'Done'
 
 class mail_activity_extension(models.Model):
