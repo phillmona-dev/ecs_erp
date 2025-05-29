@@ -332,6 +332,11 @@ class PayrollMasterReports(models.Model):
             sheet.write(row_start, 21, num, num_format)
             sheet.write(row_start, 22, num, num_format)
             sheet.write(row_start, 23, num, num_format)
+            sheet.write(row_start, 24, num, num_format)
+            sheet.write(row_start, 25, num, num_format)
+            sheet.write(row_start, 26, num, num_format)
+            sheet.write(row_start, 27, num, num_format)
+            sheet.write(row_start, 28, num, num_format)
 
             # get payroll detail
             for payslip_detail in record.line_ids:
@@ -433,11 +438,11 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 13, parking_lunch_total, num_format_sub_total)
         sheet.write(row_start, 14, bonus_incentive_total, num_format_sub_total)
 
-        sheet.write(row_start, 15, bonus_incentive_total, num_format_sub_total)
-        sheet.write(row_start, 16, bonus_incentive_total, num_format_sub_total)
-        sheet.write(row_start, 17, bonus_incentive_total, num_format_sub_total)
-        sheet.write(row_start, 18, bonus_incentive_total, num_format_sub_total)
-        sheet.write(row_start, 19, bonus_incentive_total, num_format_sub_total)
+        sheet.write(row_start, 15, bp_basic_sub_total, num_format_sub_total)
+        sheet.write(row_start, 16, bp_transport_sub_total, num_format_sub_total)
+        sheet.write(row_start, 17, bp_housing_sub_total, num_format_sub_total)
+        sheet.write(row_start, 18, bp_rep_sub_total, num_format_sub_total)
+        sheet.write(row_start, 19, bp_acting_sub_total, num_format_sub_total)
 
         sheet.write(row_start, 20, commission_sub_total, num_format_sub_total)
         sheet.write(row_start, 21, gross_sub_total, num_format_sub_total)
