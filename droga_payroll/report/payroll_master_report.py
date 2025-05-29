@@ -434,7 +434,7 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 10, fuel_sub_total, num_format_sub_total)
         sheet.write(row_start, 11, acting_sub_total, num_format_sub_total)
 
-        sheet.write(row_start, 12, other_sub_total, num_format_sub_total)
+        sheet.write(row_start, 12, commission_sub_total, num_format_sub_total)
         sheet.write(row_start, 13, parking_lunch_total, num_format_sub_total)
         sheet.write(row_start, 14, bonus_incentive_total, num_format_sub_total)
 
@@ -444,7 +444,7 @@ class PayrollMasterReports(models.Model):
         sheet.write(row_start, 18, bp_rep_sub_total, num_format_sub_total)
         sheet.write(row_start, 19, bp_acting_sub_total, num_format_sub_total)
 
-        sheet.write(row_start, 20, commission_sub_total, num_format_sub_total)
+        sheet.write(row_start, 20, other_sub_total, num_format_sub_total)
         sheet.write(row_start, 21, gross_sub_total, num_format_sub_total)
 
         sheet.write(row_start, 22, taxable_sub_total, num_format_sub_total)
