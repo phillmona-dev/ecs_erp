@@ -36,6 +36,7 @@ class GeneralLedgerReport(models.AbstractModel):
                        account_move_line.date_maturity,
                        account_move_line.name,
                        account_move_line.ref,
+                       account_move_line.inv_origin,
                        account_move_line.company_id,
                        account_move_line.account_id,
                        account_move_line.payment_id,
