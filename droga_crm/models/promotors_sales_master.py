@@ -20,6 +20,7 @@ class droga_promotors_sales_master(models.Model):
     res_user_name=fields.Char(related=employee_access_users.name)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
     team=fields.Many2one('crm.team',string='Team',required=True)
+    employee=fields.Many2one('hr.employee')
     def change_id(self):
         self.ensure_one()
         self.write({'p_id': '12345'})
