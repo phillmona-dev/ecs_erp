@@ -43,12 +43,14 @@ class HrPayrollPaymentDeductions(models.Model):
                 SELECT SUM(amount)
                 FROM hr_payslip_line
                 WHERE code = %s AND employee_id = %s
-            """, [pd.input_types,pd.employee_id])
+            """, [pd.input_types.code,pd.employee_id.id])
             result = self.env.cr.fetchone()
             total_amount = float(result[0]) or 0.0  # If result is None, fallback to 0.0
 
+            rem_amount=pd.total_amount-total_amount
+
             # update remaining amount
-            pd.write({'rem_amount': total_amount})
+            pd.write({'rem_amount': rem_amount})
 
 
 class HrPayrollVariablePayments(models.Model):
