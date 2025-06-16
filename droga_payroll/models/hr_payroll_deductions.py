@@ -31,8 +31,12 @@ class HrPayrollPaymentDeductions(models.Model):
 
     # update remaining amount
     def update_rem_amount(self):
-        pds = self.env["hr.payroll.payment.deduction"].search(
-            [('input_type', '=', 'Deduction'), ('rem_amount', '<', 'total_amount')])
+        pds = self.env["hr.payroll.payment.deduction"].search([
+            ('input_type', '=', 'Deduction')
+        ])
+
+        # Filter in Python: compare rem_amount < total_amount
+        pds = pds.filtered(lambda r: r.rem_amount < r.total_amount)
 
         for pd in pds:
             self.env.cr.execute("""
