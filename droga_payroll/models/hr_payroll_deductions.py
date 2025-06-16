@@ -39,18 +39,19 @@ class HrPayrollPaymentDeductions(models.Model):
         pds = pds.filtered(lambda r: r.rem_amount < r.total_amount)
 
         for pd in pds:
-            self.env.cr.execute("""
-                SELECT SUM(amount)
-                FROM hr_payslip_line
-                WHERE code = %s AND employee_id = %s
-            """, [pd.input_types.code,pd.employee_id])
-            result = self.env.cr.fetchone()
-            total_amount = float(result[0]) or 0.0  # If result is None, fallback to 0.0
+            if pd.employee_id:
+                self.env.cr.execute("""
+                    SELECT COALESCE(SUM(amount), 0)
+                    FROM hr_payslip_line
+                    WHERE code = %s AND employee_id = %s
+                """, [pd.input_types.code,pd.employee_id.id])
+                result = self.env.cr.fetchone()
+                total_amount = float(result[0]) or 0.0  # If result is None, fallback to 0.0
 
-            rem_amount=pd.total_amount-total_amount
+                rem_amount=pd.total_amount-total_amount
 
-            # update remaining amount
-            pd.write({'rem_amount': rem_amount})
+                # update remaining amount
+                pd.write({'rem_amount': rem_amount})
 
 
 class HrPayrollVariablePayments(models.Model):

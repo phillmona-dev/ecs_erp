@@ -72,6 +72,17 @@ class HrContract(models.Model):
 
         return amount
 
+    def get_unpaid_amount(self,pd_code):
+        rem_amount = 0
+        for record in self:
+            if record.state == 'open':
+                payment_deductions = record.payment_deductions.search(
+                    [('input_types.code', '=', pd_code), ('contract_id', '=', record.id)])
+                for payment_deduction in payment_deductions:
+                    rem_amount = payment_deduction.rem_amount
+
+        return rem_amount
+
     def get_fixed_rate(self, pd_code):
 
         # get fuel rate
