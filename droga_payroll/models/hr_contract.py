@@ -105,6 +105,8 @@ class HrContract(models.Model):
 
         return False
 
+
+
     # @api.onchange('analytic_account_id')
     # def _on_analytic_id_changed(self):
     # for record in self:
