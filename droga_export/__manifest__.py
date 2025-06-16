@@ -30,6 +30,7 @@
         'views/droga_sub_contractor_send.xml',
         'views/droga_sales_extension.xml',
         'views/droga_export_origin_update.xml',
+        'views/droga_export_po_origin_update.xml',
         'views/droga_sub_contractor_receipt.xml'
     ],
 

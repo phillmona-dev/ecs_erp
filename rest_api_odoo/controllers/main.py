@@ -19,11 +19,12 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-
+import ast
 import json
 import logging
 from odoo import http
 from odoo.http import request
+from datetime import datetime, date
 
 _logger = logging.getLogger(__name__)
 
@@ -47,6 +48,12 @@ class RestApi(http.Controller):
                         "!</h2></body></html>")
 
         return response
+
+    class DateTimeEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, (datetime, date)):
+                return obj.isoformat()
+            return super().default(obj)
 
     def generate_response(self, method, model, rec_id,dom):
         """This function is used to generate the response based on the type
@@ -91,14 +98,16 @@ class RestApi(http.Controller):
                         datas.append(data)
                         return request.make_response(data=datas)
                     else:
+                        desired_odoo_domain = [ast.literal_eval(dom[0])]
+
                         partner_records = request.env[
                             str(model_name)].search_read(
-                            domain=dom,
+                            domain=desired_odoo_domain,
                             fields=fields
                         )
                         data = json.dumps({
                             'records': partner_records
-                        })
+                        },cls=self.DateTimeEncoder, indent=4)
                         datas.append(data)
                         return request.make_response(data=datas)
         except:
@@ -217,7 +226,9 @@ class RestApi(http.Controller):
 
             dom=[]
             for key,value in kw.items():
-                if key!='model':
+                if key=="domain":
+                    dom.append(value.replace("'", ""))
+                elif key!='model':
                     if value.isdigit():
                         dom.append((key, '=', int(value)))
                     else:

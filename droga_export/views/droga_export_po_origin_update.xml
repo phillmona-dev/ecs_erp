@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="droga_export_po_origin_update_tree_view" model="ir.ui.view">
+            <field name="name">droga.export.origin.update.tree</field>
+            <field name="model">droga.export.po.origin.update</field>
+            <field name="arch" type="xml">
+                <tree string="Export Origin Updates" editable="bottom">
+                    <field name="company_id" invisible="1"></field>
+                    <field name="po_to_update" domain="[('company_id', '=', company_id)]" attrs="{'readonly': [('status', '=', 'Done')]}" options="{'no_create':True,'no_open':True}"/>
+                    <field name="sales_from" readonly="1" domain="[('company_id', '=', company_id)]" options="{'no_create':True,'no_open':True}" force_save="1"/>
+                    <field name="sales_to" domain="[('company_id', '=', company_id)]" attrs="{'readonly': [('status', '=', 'Done')]}" options="{'no_create':True,'no_open':True}"/>
+                    <field name="status" readonly="1"/>
+                    <button name="update_pay" type="object" string="Update"
+                            help="Click to execute the update pay function"
+                            class="oe_highlight"/>
+                    <field name="create_uid" readonly="1" options="{'no_create':True,'no_open':True}"/>
+                    <field name="write_uid" readonly="1" options="{'no_create':True,'no_open':True}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="droga_export_po_origin_update_action" model="ir.actions.act_window">
+            <field name="name">Export PO Origin Updates</field>
+            <field name="res_model">droga.export.po.origin.update</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new export origin update
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="droga_export_po_origin_update_menu_child"
+                  name="Export PO Reference Updates"
+                  parent="sale.menu_sales_config"
+                  action="droga_export_po_origin_update_action"
+                  sequence="42"/>
+
+    </data>
+</odoo>

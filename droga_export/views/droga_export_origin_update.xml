@@ -6,9 +6,10 @@
             <field name="model">droga.export.origin.update</field>
             <field name="arch" type="xml">
                 <tree string="Export Origin Updates" editable="bottom">
-                    <field name="pay_req_to_update" attrs="{'readonly': [('status', '=', 'Done')]}" options="{'no_create':True,'no_open':True}"/>
-                    <field name="sales_from" readonly="1" options="{'no_create':True,'no_open':True}" force_save="1"/>
-                    <field name="sales_to" attrs="{'readonly': [('status', '=', 'Done')]}" options="{'no_create':True,'no_open':True}"/>
+                    <field name="company_id" invisible="1"></field>
+                    <field name="pay_req_to_update" domain="[('company_id', '=', company_id)]" attrs="{'readonly': [('status', '=', 'Done')]}" options="{'no_create':True,'no_open':True}"/>
+                    <field name="sales_from" domain="[('company_id', '=', company_id)]" readonly="1" options="{'no_create':True,'no_open':True}" force_save="1"/>
+                    <field name="sales_to" domain="[('company_id', '=', company_id)]" attrs="{'readonly': [('status', '=', 'Done')]}" options="{'no_create':True,'no_open':True}"/>
                     <field name="cleaning_unit_from" readonly="1" options="{'no_create':True,'no_open':True}" force_save="1"/>
                     <field name="cleaning_unit_to" attrs="{'readonly': [('status', '=', 'Done')]}" domain="[('subcontract_issue_origin_form', '=', sales_to)]" options="{'no_create':True,'no_open':True}"/>
                     <field name="status" readonly="1"/>
@@ -33,11 +34,10 @@
         </record>
 
         <menuitem id="droga_export_origin_update_menu_child"
-                  name="Export Reference Updates"
+                  name="Export PMR Reference Updates"
                   parent="sale.menu_sales_config"
                   action="droga_export_origin_update_action"
                   sequence="42"/>
-
 
 <!--        <record id="inherit_for_purchase_order_form" model="ir.ui.view">-->
 <!--            <field name="name">Purchase Order</field>-->

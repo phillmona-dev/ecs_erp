@@ -6,3 +6,4 @@ access_export_status,droga.export.status,model_droga_export_status,droga_export.
 access_droga_export_cost_buildup,droga.export.cost.buildup,model_droga_export_cost_buildup,droga_export.export_user,1,1,1,1
 access_droga_export_cost_type,droga.export.cost.type,model_droga_export_cost_type,droga_export.export_user,1,1,1,1
 access_droga_export_origin_update,droga.export.origin.update,model_droga_export_origin_update,droga_export.export_manager,1,1,1,1
+access_droga_export_po_origin_update,droga.export.po.origin.update,model_droga_export_po_origin_update,droga_export.export_manager,1,1,1,1
