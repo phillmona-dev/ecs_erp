@@ -41,7 +41,7 @@ class HrPayrollPaymentDeductions(models.Model):
                 WHERE code = %s AND employee_id = %s
             """, [pd.input_types,pd.employee_id])
             result = self.env.cr.fetchone()
-            total_amount = result[0] or 0.0  # If result is None, fallback to 0.0
+            total_amount = float(result[0]) or 0.0  # If result is None, fallback to 0.0
 
             # update remaining amount
             pd.write({'rem_amount': total_amount})
