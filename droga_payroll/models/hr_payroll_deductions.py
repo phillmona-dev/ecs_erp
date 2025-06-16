@@ -43,7 +43,7 @@ class HrPayrollPaymentDeductions(models.Model):
                 SELECT SUM(amount)
                 FROM hr_payslip_line
                 WHERE code = %s AND employee_id = %s
-            """, [pd.input_types.code,pd.employee_id.id])
+            """, [pd.input_types.code,pd.employee_id])
             result = self.env.cr.fetchone()
             total_amount = float(result[0]) or 0.0  # If result is None, fallback to 0.0
 
