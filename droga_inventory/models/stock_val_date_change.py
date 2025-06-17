@@ -36,18 +36,19 @@ class droga_date_change(models.Model):
             for layer in stock_layers:
                 layer.move_date=self.new_transaction_date
 
-                query1 = """
-                            update account_move set company_id=6 where id=%s
-                        """
-                self.env.cr.execute(query1, (
-                    layer.account_move_id.id,))
+                if layer.account_move_id:
+                    query1 = """
+                                update account_move set company_id=6 where id=%s
+                            """
+                    self.env.cr.execute(query1, (
+                        layer.account_move_id.id,))
 
-                query2 = """
-                            update account_move_line set company_id=6 where move_id=%s
-                        """
+                    query2 = """
+                                update account_move_line set company_id=6 where move_id=%s
+                            """
 
-                self.env.cr.execute(query2, (
-                    layer.account_move_id.id,))
+                    self.env.cr.execute(query2, (
+                        layer.account_move_id.id,))
 
                 layer.account_move_id = False
 
