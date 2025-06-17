@@ -29,6 +29,30 @@ class HrPayrollPaymentDeductions(models.Model):
                 # update the contract id
                 pd.contract_id = active_contract.id
 
+    # update remaining amount
+    def update_rem_amount(self):
+        pds = self.env["hr.payroll.payment.deduction"].search([
+            ('input_type', '=', 'Deduction')
+        ])
+
+        # Filter in Python: compare rem_amount < total_amount
+        pds = pds.filtered(lambda r: r.rem_amount < r.total_amount)
+
+        for pd in pds:
+            if pd.employee_id:
+                self.env.cr.execute("""
+                    SELECT COALESCE(SUM(amount), 0)
+                    FROM hr_payslip_line
+                    WHERE code = %s AND employee_id = %s
+                """, [pd.input_types.code,pd.employee_id.id])
+                result = self.env.cr.fetchone()
+                total_amount = float(result[0]) or 0.0  # If result is None, fallback to 0.0
+
+                rem_amount=pd.total_amount-total_amount
+
+                # update remaining amount
+                pd.write({'rem_amount': rem_amount})
+
 
 class HrPayrollVariablePayments(models.Model):
     _name = 'hr.payroll.variable.payment'
