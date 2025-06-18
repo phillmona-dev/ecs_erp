@@ -170,7 +170,7 @@ class cust_contact_extension(models.Model):
 
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log", store=True,
                                       default=_get_pr_sales_logged)
-    pr_sales_logged_empid = fields.Many2one('hr.employee', related='pr_sales_logged.employee')
+    pr_sales_logged_empid = fields.Many2one('hr.employee', related='pr_sales_logged.employee',store=True)
     def _get_areas(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
             return self.env['droga.crm.settings.city'].search([(1, '=', 1)]).ids
