@@ -99,7 +99,9 @@ class RestApi(http.Controller):
                         return request.make_response(data=datas)
                     else:
                         desired_odoo_domain = [ast.literal_eval(dom[0])]
-
+                        if len(dom)>1:
+                            for entry in dom[1:]:
+                                desired_odoo_domain.append(entry)
                         partner_records = request.env[
                             str(model_name)].search_read(
                             domain=desired_odoo_domain,
