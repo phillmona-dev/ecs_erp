@@ -278,6 +278,7 @@ class crm_lead_extension(models.Model):
     co_travel_crm = fields.Many2many('droga.pro.sales.master', string='Co-travelers')
     date_planned = fields.Date('Lead date', default=fields.Date.today())
     origin_user_id = fields.Many2one('res.users')
+    products_list=fields.Char('Products')
     is_from_plan=fields.Boolean(Default=False,string='From plan')
     type = fields.Selection([
         ('lead', 'Lead'), ('opportunity', 'Opportunity')], required=True, tracking=15, index=True,
@@ -375,7 +376,10 @@ class crm_lead_extension(models.Model):
             return False if len(ses) == 0 else ses[0].pro_id[0].p_regions.ids
 
     pr_avail_areas = fields.Many2many('droga.crm.settings.city', default=_get_areas)
-    contact_custom = fields.Many2many('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]")
+    contact_custom = fields.Many2many('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]",string="Contact")
+    contact_custom2 = fields.Many2one('droga.crm.contacts', domain="[('parent_customer','=',partner_id)]",string="Contact")
+    specialty = fields.Many2one('droga.cust.specialty', string='Specialty', related='contact_custom2.specialty')
+    cont_grade = fields.Many2one('droga.cust.grade', string='Contact grade',related='contact_custom2.cont_grade')
     partner_id = fields.Many2one(
         'res.partner', string='Customer', check_company=True, index=True, tracking=10,
         domain="['&',('city_name', 'in',pr_avail_areas),'|', ('company_id', '=', False), ('company_id', '=', company_id)]",
@@ -428,16 +432,6 @@ class crm_lead_extension(models.Model):
             upd_values['stage_id'] = stage.id
         return upd_values
 
-    # @api.depends('contact_custom.mobile')
-    # def _compute_phone(self):
-    #     for lead in self:
-    #         if lead.contact_custom.mobile and not lead.phone:
-    #             lead.phone = lead.contact_custom.mobile
-
-    # def _inverse_phone(self):
-    #     for lead in self:
-    #         lead.contact_custom.mobile = lead.phone
-
     def unlink(self):
         raise UserError("You can not delete the record. Please mark it as lost instead.")
 
@@ -462,8 +456,8 @@ class crm_lead_extension(models.Model):
                 for id, prod in enumerate(set(lead['core_products'])):
                     prods = prods + prod.name if id == 0 else prods + ', ' + prod.name
 
-                for id, cont in enumerate(set(lead['contact_custom'])):
-                    conts += (' - '+cont['specialty']['specialty']+' '+cont['contact_name'] if cont else '')
+                conts+=('-'+lead['contact_custom2']['specialty']['specialty'] + ' ' + lead['contact_custom2']['contact_name']) if lead['contact_custom2'] else ''
+
                 descr = lead['partner_id'].name + ' - ' + conts if conts else lead['partner_id'].name
                 descr = descr + ' - ' + prods if prods else descr
             lead_vals = {
@@ -494,8 +488,7 @@ class crm_lead_extension(models.Model):
                 for id, prod in enumerate(set(to_return['core_products'])):
                     prods = prods + prod.name if id == 0 else prods + ', ' + prod.name
 
-                for id, cont in enumerate(set(to_return['contact_custom'])):
-                    conts += (cont['specialty']['specialty'] + ' ' + cont['contact_name']+'-' if cont else '')
+                conts+=to_return['contact_custom2']['specialty']['specialty'] + ' ' + to_return['contact_custom2']['contact_name']+'-' if to_return['contact_custom2'] else ''
                 descr = to_return['partner_id'].name + ' - ' + conts[:-1] if conts else to_return['partner_id'].name
                 descr = descr + ' - ' + prods if prods else descr
                 to_return.name=descr

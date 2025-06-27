@@ -165,8 +165,8 @@
                                         <field name="contacts_schedule" mode="tree,kanban">
                                 <tree editable="bottom" delete="0">
                                     <field name="is_readonly" invisible="1"></field>
-                                    <field name="cust" attrs="{'readonly': [('is_readonly','=',True)]}"/>
-                                    <field name="contact_custom" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags" domain="([('parent_customer','=',cust),('has_access','=',True)])"
+                                    <field name="cust" attrs="{'readonly': True}" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="contact_custom2" attrs="{'readonly': [('is_readonly','=',True)]}" domain="([('parent_customer','=',cust),('has_access','=',True)])"
                                            options="{'no_create':True,'no_open':True}"></field>
                                     <field name="co_travel_crm" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
@@ -177,8 +177,8 @@
                                 <form>
                                     <group>
                                         <field name="is_readonly" invisible="1"></field>
-                                        <field name="cust" attrs="{'readonly': [('is_readonly','=',True)]}"/>
-                                        <field name="contact_custom" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags" domain="([('parent_customer','=',cust),('has_access','=',True)])"
+                                        <field name="cust" attrs="{'readonly': True}" options="{'no_create':True,'no_open':True}"/>
+                                        <field name="contact_custom2" attrs="{'readonly': [('is_readonly','=',True)]}" domain="([('parent_customer','=',cust),('has_access','=',True)])"
                                                options="{'no_create':True,'no_open':True}"></field>
                                         <field name="co_travel_crm" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags"
                                                options="{'no_create':True,'no_open':True}"/>
@@ -191,7 +191,7 @@
                                     <field name="is_readonly" invisible="1"></field>
                                     <field name="cust" attrs="{'readonly': [('is_readonly','=',True)]}"/>
                                     <field name="cont_plan_des" attrs="{'readonly': [('is_readonly','=',True)]}"></field>
-                                    <field name="contact_custom" widget="many2many_tags" domain="([('parent_customer','=',cust),('has_access','=',True)])"
+                                    <field name="contact_custom2" domain="([('parent_customer','=',cust),('has_access','=',True)])"
                                            attrs="{'readonly': [('is_readonly','=',True)]}" options="{'no_create':True,'no_open':True}"></field>
                                     <field name="co_travel_crm" widget="many2many_tags"
                                            attrs="{'readonly': [('is_readonly','=',True)]}" options="{'no_create':True,'no_open':True}"/>
@@ -206,7 +206,7 @@
                                                         <field name="is_readonly" invisible="1"></field>
                                                         <li>
                                                             <strong class="o_kanban_record_title">Contact:
-                                                                <field name="contact_custom" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags"></field>
+                                                                <field name="contact_custom2" attrs="{'readonly': [('is_readonly','=',True)]}"></field>
                                                             </strong>
                                                             <field name="cont_plan_des" attrs="{'readonly': [('is_readonly','=',True)]}"></field>
                                                         </li>
@@ -287,8 +287,8 @@
                             <field name="contacts_schedule" mode="tree,kanban">
                                 <tree editable="bottom" delete="0">
                                     <field name="is_readonly" invisible="1"></field>
-                                    <field name="cust" attrs="{'readonly': [('is_readonly','=',True)]}" required="True"/>
-                                    <field name="contact_custom" attrs="{'readonly': [('is_readonly','=',True)]}" required="True" widget="many2many_tags" domain="([('parent_customer','=',cust),('has_access','=',True)])"
+                                    <field name="cust" attrs="{'readonly': True}" required="True" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="contact_custom2" attrs="{'readonly': [('is_readonly','=',True)]}" required="True" domain="([('parent_customer','=',cust),('has_access','=',True)])"
                                            options="{'no_create':True,'no_open':True}"></field>
                                     <field name="co_travel_crm" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
@@ -299,8 +299,8 @@
                                 <form>
                                     <group>
                                         <field name="is_readonly" invisible="1"></field>
-                                        <field name="cust" attrs="{'readonly': [('is_readonly','=',True)]}"/>
-                                        <field name="contact_custom" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags" domain="([('parent_customer','=',cust),('has_access','=',True)])"
+                                        <field name="cust" attrs="{'readonly': True}" options="{'no_create':True,'no_open':True}"/>
+                                        <field name="contact_custom2" attrs="{'readonly': [('is_readonly','=',True)]}" domain="([('parent_customer','=',cust),('has_access','=',True)])"
                                                options="{'no_create':True,'no_open':True}"></field>
                                         <field name="co_travel_crm" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags"
                                                options="{'no_create':True,'no_open':True}"/>
@@ -311,9 +311,9 @@
                                 </form>
                                 <kanban  on_create="quick_create">
                                     <field name="is_readonly" invisible="1"></field>
-                                    <field name="cust" attrs="{'readonly': [('is_readonly','=',True)]}"/>
+                                    <field name="cust" attrs="{'readonly': True}" options="{'no_create':True,'no_open':True}"/>
                                     <field name="cont_plan_des" attrs="{'readonly': [('is_readonly','=',True)]}"></field>
-                                    <field name="contact_custom" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags" domain="([('parent_customer','=',cust),('has_access','=',True)])"
+                                    <field name="contact_custom2" attrs="{'readonly': [('is_readonly','=',True)]}" domain="([('parent_customer','=',cust),('has_access','=',True)])"
                                            options="{'no_create':True,'no_open':True}"></field>
                                     <field name="co_travel_crm" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags"
                                            options="{'no_create':True,'no_open':True}"/>
@@ -328,7 +328,7 @@
                                                         <field name="is_readonly" invisible="1"></field>
                                                         <li>
                                                             <strong class="o_kanban_record_title">Contact:
-                                                                <field name="contact_custom" attrs="{'readonly': [('is_readonly','=',True)]}" widget="many2many_tags"></field>
+                                                                <field name="contact_custom2" attrs="{'readonly': [('is_readonly','=',True)]}"></field>
                                                             </strong>
                                                             <field name="cont_plan_des" attrs="{'readonly': [('is_readonly','=',True)]}"></field>
                                                         </li>

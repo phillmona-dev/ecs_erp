@@ -162,80 +162,8 @@ class customer_visit_header(models.Model):
             'res_model': 'droga.customer.visit.header',
             'view_id': self.env.ref('droga_crm.droga_crm_customer_visit_header_view_form_popup').id,
             'type': 'ir.actions.act_window',
-            #'context': {'search_default_group_week_no':1,'default_visit_header':self.id},
-            #'domain': [('pr_sales', '=', self.pr_sales)],
-            #'target': 'new',
             'res_id': self.id,
         }
-
-    # def plan_analysis(self):
-    #
-    #     views=self.env['droga.crm.grade.vs.schedule.trans'].search([('visit_header_id', '=', self.id)])
-    #     views.unlink()
-    #
-    #     regions=self.pr_sales.p_regions.ids
-    #     partners_list=self.env['res.partner'].search([('city_name','in',regions),('company_id','=',self.env.company.id)])
-    #     contacts_list=self.env['droga.crm.contacts'].search([('contact_area','in',regions),('company_id','=',self.env.company.id)])
-    #
-    #     for partner in partners_list:
-    #         planned_vis=len(self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)])) if self.env['droga.customer.visit.detail'].search([('visit_header','=',self.id),('visit_client','=',partner.id)]) else 0
-    #         planned_vis_all = len(self.env['droga.customer.visit.detail'].search(
-    #             [('visit_header.month', '=', self.month),('visit_header.year', '=', self.year), ('visit_client', '=', partner.id)])) if self.env[
-    #             'droga.customer.visit.detail'].search(
-    #             [('visit_header.month', '=', self.month),('visit_header.year', '=', self.year), ('visit_client', '=', partner.id)]) else 0
-    #         vals = {
-    #             'month': self.month,
-    #             'month_des': calendar.month_name[int(self.month)],
-    #             'year': self.year,
-    #             'state': self.state,
-    #             'cust_name': partner.name,
-    #             'visit_header_id': self.id,
-    #             'required_visits': partner.cust_grade.visit_times_per_month if partner.cust_grade else 4,
-    #             'planned_visits': planned_vis,
-    #             'planned_visits_all': planned_vis_all,
-    #             'diff':planned_vis_all-partner.cust_grade.visit_times_per_month if partner.cust_grade else planned_vis_all-4,
-    #             'customer_type': partner.cust_type_ext.full_name,
-    #             'cust_type': 'Customer',
-    #             'cust_id': partner.id
-    #         }
-    #
-    #         self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
-    #     for cont in contacts_list:
-    #         planned_vis=len(self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)])) if self.env['droga.crm.contacts.schedule'].search([('visits_header','=',self.id),('contact_custom','=',cont.id)]) else 0
-    #         planned_vis_all = len(self.env['droga.crm.contacts.schedule'].search(
-    #             [('visits_header.month', '=', self.month), ('visits_header.year', '=', self.year),
-    #              ('contact_custom','=',cont.id)])) if self.env[
-    #             'droga.crm.contacts.schedule'].search(
-    #             [('visits_header.month', '=', self.month), ('visits_header.year', '=', self.year),
-    #              ('contact_custom','=',cont.id)]) else 0
-    #         vals = {
-    #             'month': self.month,
-    #             'month_des': calendar.month_name[int(self.month)],
-    #             'year': self.year,
-    #             'state': self.state,
-    #             'cust_name': cont.descr+' ('+cont.parent_customer.name+')',
-    #             'visit_header_id': self.id,
-    #             'required_visits': cont.cont_grade.visit_times_per_month if cont.cont_grade else 4,
-    #             'planned_visits': planned_vis,
-    #             'planned_visits_all': planned_vis_all,
-    #             'diff':planned_vis_all-cont.cont_grade.visit_times_per_month if cont.cont_grade else planned_vis_all-4,
-    #             'customer_type': cont.parent_customer.cust_type_ext.full_name,
-    #             'cust_type': 'Contact',
-    #             'cust_id': partner.id
-    #         }
-    #
-    #         self.env['droga.crm.grade.vs.schedule.trans'].sudo().create(vals)
-    #     return {
-    #         'name': 'Plan analysis for '+self.userid+' - '+calendar.month_name[int(self.month)]+', '+self.year,
-    #         'view_mode': 'tree',
-    #         'view_type': 'form',
-    #         'res_model': 'droga.crm.grade.vs.schedule.trans',
-    #         'views': [[self.env.ref('droga_crm.droga_crm_required_vs_planned_tree').id, 'tree'],
-    #                   [self.env.ref('droga_crm.droga_crm_grade_vs_schedule_view_view_kanban').id, 'kanban']],
-    #         'type': 'ir.actions.act_window',
-    #         'domain': [('visit_header_id', '=', self.id)],
-    #         'context': {'search_default_group_cust_type':1},
-    #     }
 
     def request_approval(self):
         self._get_approver()
@@ -262,8 +190,9 @@ class customer_visit_header(models.Model):
                     'pr_sales':self.pr_sales.id,
                     'pr_lead':self.pr_sales.id,
                     'origin_user_id': self.user_id,
+                    'products_list':prods,
                     'user_id': self.user_id,
-                    'team_id': 0,  # Fix me
+                    'team_id': self.pr_sales.team.id,
                     'company_id': self.env.company.id,
                     'type': 'lead',
                     'stage_id': 1,
@@ -288,10 +217,11 @@ class customer_visit_header(models.Model):
                     lead = {
                         'name': descr,
                         'origin_user_id': self.user_id,
+                        'products_list': prods,
                         'user_id': self.user_id,
                         'pr_sales': self.pr_sales.id,
                         'pr_lead': self.pr_sales.id,
-                        'team_id': 0,  # Fix me
+                        'team_id': self.pr_sales.team.id,
                         'company_id': self.env.company.id,
                         'type': 'lead',
                         'stage_id': 1,
@@ -299,7 +229,7 @@ class customer_visit_header(models.Model):
                         'is_from_plan': True,
                         'core_products': contdet['core_products'],
                         'co_travel_crm': contdet['co_travel_crm'],
-                        'contact_custom':contdet['contact_custom'].ids,
+                        'contact_custom2':contdet['contact_custom2'].id,
                         'expected_revenue': 0,
                         'date_planned': det['visit_date'],
                         'partner_id': det['visit_client'].id,
@@ -374,7 +304,7 @@ class customer_visit_detail(models.Model):
             rec.visit_client = rec.partner_custom.partner if rec.partner_custom else False
 
     visit_client=fields.Many2one('res.partner','Customer')
-    #visit_contact_custom = fields.Many2many('droga.crm.contacts',string='Contact')
+
     visit_location=fields.Char('Visit location')
     city_name=fields.Many2one('droga.crm.settings.city',related='visit_header.city_name')
 

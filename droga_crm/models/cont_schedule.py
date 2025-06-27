@@ -6,6 +6,7 @@ from odoo.http import request
 class contacts_schedule(models.Model):
     _name='droga.crm.contacts.schedule'
     contact_custom=fields.Many2many('droga.crm.contacts',string='Contact')
+    contact_custom2 = fields.Many2one('droga.crm.contacts', string='Contact')
 
     sales_close_descr=fields.Char(string='Sales closed?')
     sales_avail=fields.Boolean('Sales available?',default=False)

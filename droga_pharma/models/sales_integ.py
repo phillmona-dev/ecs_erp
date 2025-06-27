@@ -340,6 +340,17 @@ class sales_integ(models.Model):
         }
 
     def action_supp_rewards(self):
+        det_entries = []
+        disc = self.env['droga.pharma.reward.issue'].search(
+            [('type', '=', ('Speciality service reward'))])[0]
+        det_entries.append({
+            'product_id': self.env['product.product'].search([('product_tmpl_id', '=', disc.prod_template.id)])[0].id,
+            'product_uom_pharma': disc.uom.id,
+            'product_uom_qty': disc.quantity,
+            'warehouse_id': [self.env.user.warehouse_ids_ph_disp + self.env.user.warehouse_ids_im_ws][0].ids[0]
+
+        })
+
         return {
             'name': 'Reward - Supplements',
             'view_type': 'form',
@@ -350,6 +361,8 @@ class sales_integ(models.Model):
             'context': {
                 'default_issue_type': 'RWDS',
                 'default_customer': self.partner_id.id,
+                'default_detail_entries': det_entries,
+                'default_points_to_deduct': disc.reward_req_points
             },
         }
     def action_minor_aliments(self):

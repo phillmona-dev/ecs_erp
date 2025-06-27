@@ -170,7 +170,7 @@
                            required="True" string="Customer"
                            invisible="True"/>
 
-                    <field name="contact_custom" widget="many2many_tags" domain="([('parent_customer','=',partner_id),('has_access','=',True)])" options="{'no_create':True,'no_open':True}"></field>
+                    <field name="contact_custom2" domain="([('parent_customer','=',partner_id),('has_access','=',True)])" options="{'no_create':True,'no_open':True}"></field>
 
 <!--                    <field name="specialty" options="{'no_create':True,'no_open':True}"></field>-->
                     <field name="check_in_descr" readonly="1"/>
@@ -208,7 +208,7 @@
                     <field name="partner_id" options="{'no_create':True,'no_open':True}" widget="res_partner_many2one"
                            required="True" string="Customer"
                            invisible="True"/>
-                    <field name="contact_custom" widget="many2many_tags" domain="([('parent_customer','=',partner_id),('has_access','=',True)])" options="{'no_create':True,'no_open':True}"></field>
+                    <field name="contact_custom2" domain="([('parent_customer','=',partner_id),('has_access','=',True)])" options="{'no_create':True,'no_open':True}"></field>
                     <field name="date_planned" readonly="1" required="True" string="Opportunity date"/>
 <!--                    <field name="specialty" options="{'no_create':True,'no_open':True}"></field>-->
 
@@ -361,7 +361,9 @@
                     <field name="company_id" groups="base.group_multi_company" optional="hide"/>
                     <field name="city" optional="hide"/>
                     <field name="state_id" optional="hide"/>
-                    <field name="contact_custom" widget="many2many_tags" optional="show"/>
+                    <field name="contact_custom2" optional="show"/>
+                    <field name="specialty" optional="show"/>
+                    <field name="cont_grade" optional="show"/>
 <!--                    <field name="specialty" optional="hide"/>-->
                     <field name="phone" optional="hide" class="o_force_ltr"/>
                     <field name="date_planned" readonly="1" string="Lead date" optional="show"/>
@@ -409,7 +411,7 @@
                     <field name="name" string="Opportunity" readonly="1"/>
                     <field name="partner_id" optional="show"/>
                     <field name="contact_name" optional="hide"/>
-                    <field name="contact_custom" widget="many2many_tags" string="Contact" optional="show"/>
+                    <field name="contact_custom2" string="Contact" optional="show"/>
 <!--                    <field name="specialty" optional="show"/>-->
                     <field name="phone" optional="show" class="o_force_ltr"/>
                     <field name="date_planned" readonly="1" string="Opportunity date" optional="show"/>
