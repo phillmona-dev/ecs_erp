@@ -354,9 +354,10 @@ class sales_integ(models.Model):
         return {
             'name': 'Reward - Supplements',
             'view_type': 'form',
-            'view_mode': 'form',
+            'view_mode': 'form,tree',
             'res_model': 'droga.inventory.consignment.issue',
-            'views': [[self.env.ref('droga_pharma.droga_inventory_reward_issue_view_form').id, 'form']],
+            'views': [[self.env.ref('droga_inventory.droga_inventory_consignment_issue_view_tree_sales').id, 'tree'],
+                      [self.env.ref('droga_pharma.droga_inventory_reward_issue_view_form').id, 'form']],
             'type': 'ir.actions.act_window',
             'context': {
                 'default_issue_type': 'RWDS',
@@ -364,6 +365,8 @@ class sales_integ(models.Model):
                 'default_detail_entries': det_entries,
                 'default_points_to_deduct': disc.reward_req_points
             },
+            'domain':
+                ([('customer', '=', self.partner_id.id), ('issue_type', '=', 'RWDS')])
         }
     def action_minor_aliments(self):
         if self.partner_id.id==15488:

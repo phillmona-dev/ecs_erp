@@ -261,7 +261,7 @@ class free_sample_issue_ext(models.Model):
                 [('sequence_code', '=', 'RWD')]).id
             cust_locat = self.env['stock.location'].search([('con_type', '=', 'RWD')]).id
             if not pick_type_id:
-                raise UserError("Picking type is not configured for one of the warehouses.")
+                raise UserError("Picking type RWD is not configured for one of the warehouses.")
             if not cust_locat:
                 raise UserError(
                     "Customer location for type RWD not set. Please configure accordingly.")

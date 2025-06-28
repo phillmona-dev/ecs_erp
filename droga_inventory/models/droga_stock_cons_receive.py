@@ -103,7 +103,7 @@ class droga_stock_cons_receive(models.Model):
             pick_type_id = self.env['stock.picking.type'].sudo().search(
                 [('sequence_code', '=','CONR'), ('warehouse_id', '=', wh.id)]).id
             if not pick_type_id :
-                raise UserError("Picking type is not configured for one of the warehouses.")
+                raise UserError("Picking type CONR is not configured for one of the warehouses.")
 
         cons_vendor=self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
 
