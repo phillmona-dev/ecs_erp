@@ -324,28 +324,28 @@ class free_sample_issue_ext(models.Model):
 
         self.state = 'processed'
 
-        if self.issue_type=='RWDB':
-            points = {
-                'type': 'Referral reward',
-                'customer': self.customer.id,
-                'earned_date': self.issue_date,
-                'points_earned': self.points_to_deduct * -1,
-            }
+        #if self.issue_type=='RWDB' or self.issue_type:
+        points = {
+            'type': 'Referral reward',
+            'customer': self.customer.id,
+            'earned_date': self.issue_date,
+            'points_earned': self.points_to_deduct * -1,
+        }
 
-            self.env['droga.pharma.points.earned'].create(points)
-        else:
-            points = {
-                'type': 'Discount for referral',
-                'customer': self.customer.id,
-                'earned_date': self.issue_date,
-                'points_earned': self.points_to_deduct * -1,
-            }
+        self.env['droga.pharma.points.earned'].create(points)
+        #else:
+        #    points = {
+        #        'type': 'Discount for referral',
+        #        'customer': self.customer.id,
+        #        'earned_date': self.issue_date,
+        #        'points_earned': self.points_to_deduct * -1,
+        #    }
 
-            self.env['droga.pharma.points.earned'].create(points)
+        #    self.env['droga.pharma.points.earned'].create(points)
 
 class droga_stock_cons_issue_detail_inherit(models.Model):
     _inherit = 'droga.inventory.cons.issue.detail'
-    is_prod_available = fields.Char(compute='is_prod_available_method',precompute=True)
+    is_prod_available = fields.Char(compute='is_prod_available_method')
     avail_char=fields.Char('Available')
 
     def _get_outgoing_qty_per_warehouse(self, product_id, warehouse_id):
@@ -374,13 +374,17 @@ class droga_stock_cons_issue_detail_inherit(models.Model):
 
             wh = rec.warehouse_id
 
-
             rate = round(rec.product_uom.factor / (
                 rec.product_id.uom_id.factor if rec.product_id.uom_id.factor != 0 else (
                     rec.product_uom.factor if rec.product_uom.factor != 0 else 1)),6)
-            available_qty = available_qty + ((selfsud._get_avail_qty_per_warehouse(rec.product_id,
-                                                                                           wh) - selfsud._get_outgoing_qty_per_warehouse(
-                rec.product_id, wh)) * (rate))
+            if wh.wh_type!='PH':
+                available_qty = available_qty + ((selfsud._get_avail_qty_per_warehouse(rec.product_id,
+                                                                                               wh) - selfsud._get_outgoing_qty_per_warehouse(
+                    rec.product_id, wh)) * (rate))
+            else:
+                available_qty = available_qty + ((selfsud._get_avail_qty_per_warehouse(rec.product_id,
+                                                                                       wh) - selfsud._get_outgoing_qty_per_warehouse(
+                    rec.product_id, wh)) )
 
             rec.avail_char = str(available_qty)
 
