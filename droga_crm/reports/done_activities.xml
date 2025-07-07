@@ -12,10 +12,10 @@
                 <field name="check_in" string="Check in"/>
                 <field name="check_out" string="Check out"/>
                 <field name="res_model_descr" string="Type"/>
-                <field name="sales_area" string="Area"/>
-                <field name="type" optional="hide"/>
-                <field name="state" decoration-success="state == 'Done'" decoration-warning="state=='Pending'" decoration-info="state == 'Open'" decoration-danger="state == 'Cancelled'" widget="badge"/>
+                <field name="from_visit_plan" invisible="1"/>
+                <field name="sales_area" string="Area (Planned is green)" widget="badge" decoration-danger="not from_visit_plan" decoration-success="from_visit_plan"/>
                 <field name="from_visit_plan"/>
+                <field name="state" decoration-success="state == 'Done'" decoration-warning="state=='Pending'" decoration-info="state == 'Open'" decoration-danger="state == 'Cancelled'" widget="badge"/>
                 <field name="act_note" widget="html" optional="hide"/>
             </tree>
         </field>
