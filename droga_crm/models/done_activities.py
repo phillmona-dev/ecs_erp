@@ -25,6 +25,7 @@ class done_activity(models.Model):
     act_note = fields.Text('Act. note')
     act_id=fields.Integer('Activity ID')
     from_visit_plan=fields.Boolean('Visit planned?')
+    from_visit_plan_str=fields.Char("Visit planned?",compute='_get_visit_planned')
     company_id = fields.Many2one('res.company', string='Company', related='lead_id.company_id',store=True)
     check_in = fields.Char('Check in',compute='_getcheckin',store=True)
     check_out = fields.Char('Check out',compute='_getcheckout',store=True)
@@ -33,7 +34,9 @@ class done_activity(models.Model):
     pr_team_custom = fields.Many2one('crm.team', related='sales_rep.team', string='CRM Team', store=True)
     has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
-
+    def _get_visit_planned(self):
+        for rec in self:
+            rec.from_visit_plan_str="Yes" if rec.from_visit_plan else "No"
     def _search_has_access(self, operator, value):
         if operator == '=':
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
