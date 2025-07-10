@@ -1,0 +1,59 @@
+<odoo>
+    <template id="health_screening_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="today" t-value="(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
+                <t t-call="droga_pharma.droga_pharma_header_layout"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 style="text-align:center;">Health Screening Report</h2>
+                        <p>Report Date: <t t-esc="today"/></p>
+                        <p>Patient ID: <t t-esc="doc.id"/></p>
+                        <p>Name: <t t-esc="doc.client_id"/></p>
+                        <p>Age: <t t-esc="doc.age"/></p>
+                        <p>Mobile: <t t-esc="doc.mobile"/></p>
+                        <p>Sex: <t t-esc="doc.sex"/></p>
+                        <p>Patient Condition: <t t-esc="doc.patient_condition"/></p>
+                        <p>Weight (KG): <t t-esc="doc.weight"/></p>
+
+                        <br/>
+                        <h4>Blood Pressure</h4>
+                        <table style="width:100%; border:1px solid black;">
+                            <thead>
+                                <tr>
+                                    <th>Systolic</th>
+                                    <th>Diastolic</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><t t-esc="doc.bp_systolic"/></td>
+                                    <td><t t-esc="doc.bp_diastolic"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br/>
+                        <h4>Glucose</h4>
+                        <table style="width:100%; border:1px solid black;">
+                            <thead>
+                                <tr>
+                                    <th>Fasting Glucose</th>
+                                    <th>Postprandial Glucose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><t t-esc="doc.fasting_glucose"/></td>
+                                    <td><t t-esc="doc.rbs_glucose"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <t t-call="droga_pharma.droga_pharma_footer_layout"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
