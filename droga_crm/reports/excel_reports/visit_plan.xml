@@ -42,13 +42,14 @@
             id="menu_excel_vist_reports"
             name="Excel reports"
             parent="menu_visit_reports"
+            groups="crm_mr"
             sequence="25"/>
 
-    <menuitem
-            id="droga_crm_reports_visit_plan_excel_menu"
-            name="Visit plan - Excel"
-            action="droga_crm_reports_visit_plan_excel_action"
-            parent="menu_excel_vist_reports"
-            groups="crm_mr"
-            sequence="11"/>
+<!--    <menuitem-->
+<!--            id="droga_crm_reports_visit_plan_excel_menu"-->
+<!--            name="Visit plan - Excel"-->
+<!--            action="droga_crm_reports_visit_plan_excel_action"-->
+<!--            parent="menu_excel_vist_reports"-->
+<!--            groups="crm_mr"-->
+<!--            sequence="11"/>-->
 </odoo>

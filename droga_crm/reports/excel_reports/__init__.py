@@ -1,1 +1,1 @@
-from . import visit_plan
+from . import visit_plan,visit_end_of_day

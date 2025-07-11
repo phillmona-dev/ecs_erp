@@ -26,6 +26,7 @@
         'views/module_menus.xml',
         'security/ir.model.access.csv',
         'reports/excel_reports/visit_plan.xml',
+        'reports/excel_reports/visit_end_of_day.xml',
         'reports/core_products.xml',
         'views/cust_extension.xml',
         'views/customer_visits.xml',
