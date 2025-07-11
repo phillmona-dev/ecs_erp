@@ -34,6 +34,7 @@ class done_activity(models.Model):
     pr_team_custom = fields.Many2one('crm.team', related='sales_rep.team', string='CRM Team', store=True)
     has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
+    pr_sales_logged_empid_code = fields.Char('hr.employee', related='sales_rep.employee.barcode', store=True)
     def _get_visit_planned(self):
         for rec in self:
             rec.from_visit_plan_str="Yes" if rec.from_visit_plan else "No"

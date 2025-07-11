@@ -197,8 +197,7 @@ class crm_end_of_day(models.TransientModel):
                 sheet.write(row_start, 3, lead.check_in if lead.check_in else ' ')
                 sheet.write(row_start, 4, lead.check_out if lead.check_out else ' ')
                 # TODO
-                sheet.write(row_start, 6, lead.from_visit_plan_str + (
-                    ('-' + lead.lead_id.planned_visit_selection) if lead.lead_id.planned_visit_selection else ' '))
+                sheet.write(row_start, 6, lead.from_visit_plan_str)
                 sheet.write(row_start, 7, lead.state)
                 row_start = row_start + 1
 

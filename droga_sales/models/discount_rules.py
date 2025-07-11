@@ -117,7 +117,7 @@ class sale_order_line(models.Model):
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.name',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
     disc_applied=fields.Float('Discount applied',default=0)
-
+    pr_sales_logged_empid_code = fields.Char('hr.employee', related='order_id.pr_sales_logged_empid_code', store=True)
     def write(self, vals):
         res = super(sale_order_line, self).write(vals)
         if self.order_id.state in ('sale', 'done','dispense') and ('product_uom_pharma_qty' in vals or 'price_unit' in vals):
@@ -860,6 +860,7 @@ class sale_order_ext(models.Model):
 
     pr_sales = fields.Many2one('droga.pro.sales.master', readonly=True, store=True, string="Promotor ID",
                                default=_get_pr_sales_logged)
+    pr_sales_logged_empid_code = fields.Char('hr.employee', related='pr_sales.employee.barcode', store=True)
     pr_sales_logged = fields.Many2one('droga.pro.sales.master', string="Promotor ID log", store=False,
                                       default=_get_pr_sales_logged)
     pr_avail_areas = fields.Many2many(related='pr_sales.p_regions')
