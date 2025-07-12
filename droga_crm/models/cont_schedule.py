@@ -1,5 +1,5 @@
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 from odoo.http import request
 
 
@@ -15,14 +15,38 @@ class contacts_schedule(models.Model):
     #leads=fields.Many2one('crm.lead','contacts_schedule')
     visits=fields.Many2one('droga.customer.visit.detail','contacts_schedule')
     is_readonly=fields.Boolean(related='visits.is_readonly')
+    visit_date = fields.Date('Visit date', related='visits.visit_date', store=True)
     visits_header = fields.Many2one(related='visits.visit_header',store=True)
-    cust=fields.Many2one('res.partner',related='visits.visit_client')
+    cust=fields.Many2one('res.partner',related='visits.visit_client',store=True)
     #custlead = fields.Many2one('res.partner', related='leads.partner_id')
     core_products = fields.Many2many('product.template')
 
     cont_plan_des = fields.Text('Plan', compute='_compute_contact_plan')
 
-    @api.depends('co_travel_crm','core_products')
+    @api.constrains('contact_custom2', 'visit_date')
+    def _check_unique_contact_date(self):
+        for record in self:
+            if not record.contact_custom2 or not record.visit_date:
+                continue
+
+            domain = [
+                ('contact_custom2', '=', record.contact_custom2.id),
+                ('visit_date', '=', record.visit_date),
+                ('id', '!=', record.id)  # Exclude the current record from the search
+            ]
+
+            existing_visits = self.env['droga.crm.contacts.schedule'].search(domain)
+
+            if existing_visits:
+                sales_rep_name = 'an unknown sales representative'
+                if existing_visits[0].visits_header and existing_visits[0].visits_header.pr_sales:
+                    sales_rep_name = existing_visits[0].visits_header.pr_sales.p_name
+
+                raise ValidationError(
+                    f'A visit is already scheduled by {sales_rep_name} with the same institution and date.'
+                )
+
+    @api.depends('co_travel_crm','core_products','contact_custom2')
     def _compute_contact_plan(self):
         for rec in self:
             descr = ''

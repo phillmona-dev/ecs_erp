@@ -341,12 +341,14 @@ class customer_visit_detail(models.Model):
     day_and_date=fields.Char('Visit Date',compute='_get_visit_date_and_day')
 
     cont_plan_des=fields.Text('Plan',compute='_compute_contact_plan')
+
+    @api.depends('contacts_schedule.contact_custom2')
     def _compute_contact_plan(self):
         for rec in self:
             descr=''
             try:
                 for sched in rec.contacts_schedule:
-                    for cont in sched['contact_custom']:
+                    for cont in sched['contact_custom2']:
                         descr=descr+'\n'+(cont['job_position']['job_position'] +' - ' if cont['job_position'] else '')+(cont['specialty']['specialty']+' - ' if cont['specialty']['specialty'] else '')+cont['contact_name']+' : ' if cont['contact_name'] else ' '
 
                     for id, prod in enumerate(sched['core_products']):
