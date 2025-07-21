@@ -8,6 +8,7 @@
             <tree string="Weight Records" create="1" delete="1">
                 <field name="client_id"/>
                 <field name="mobile"/>
+                <field name="create_date" string="Date"/>
                 <field name="age"/>
                 <field name="sex"/>
                 <field name="patient_condition"/>

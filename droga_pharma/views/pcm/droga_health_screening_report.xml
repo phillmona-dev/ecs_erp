@@ -11,6 +11,7 @@
                 <field name="age"/>
                 <field name="sex"/>
                 <field name="mobile"/>
+                <field name="create_date" string="Date"/>
                 <field name="patient_condition"/>
                 <field name="weight"/>
                 <field name="bp_systolic"/>
@@ -31,6 +32,7 @@
                 <field name="age"/>
                 <field name="sex"/>
                 <field name="mobile"/>
+                <field name="create_date" string="Date"/>
                 <field name="patient_condition"/>
                 <field name="weight"/>
                 <field name="bp_systolic"/>
@@ -38,6 +40,15 @@
                 <field name="fasting_glucose"/>
                 <field name="rbs_glucose"/>
                 <field name="screening_type"/>
+                
+                <filter name="today" string="Today"
+                        domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="yesterday" string="Yesterday"
+                        domain="[('create_date', '&gt;', (context_today() + relativedelta(days=-2)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today().strftime('%Y-%m-%d')))]"/>
+                <filter name="this_week" string="This Week"
+                        domain="[('create_date', '&gt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(weeks=0, weekday=5)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_week" string="Last Week"
+                        domain="[('create_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=5)).strftime('%Y-%m-%d'))]"/>
             </search>
         </field>
     </record>

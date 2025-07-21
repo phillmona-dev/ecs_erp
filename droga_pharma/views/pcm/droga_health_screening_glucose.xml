@@ -9,6 +9,7 @@
                 <field name="client_id"/>
                 <field name="age"/>
                 <field name="sex"/>
+                <field name="create_date" string="Date"/>
                 <field name="mobile"/>
                 <field name="patient_condition"/>
                 <field name="weight"/>

@@ -22,6 +22,7 @@
                 <field name="coun_code"></field>
                 <field name="counselling_cat"></field>
                 <field name="status"></field>
+                <field name="create_date" string="Date"/>
                 <field name="pharmacist_lev_understanding"></field>
                 <field name="ses_acceptance"></field>
             </tree>

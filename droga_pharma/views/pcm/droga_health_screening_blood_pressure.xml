@@ -10,6 +10,7 @@
                 <field name="mobile"/>
                 <field name="age"/>
                 <field name="sex"/>
+                <field name="create_date" string="Date"/>
                 <field name="patient_condition"/>
                 <field name="weight"/>
                 <field name="bp_systolic"/>
