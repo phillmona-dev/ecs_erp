@@ -41,9 +41,9 @@ class contacts_schedule(models.Model):
                 sales_rep_name = 'an unknown sales representative'
                 if existing_visits[0].visits_header and existing_visits[0].visits_header.pr_sales:
                     sales_rep_name = existing_visits[0].visits_header.pr_sales.p_name
-
+                cont=record.contact_custom2.parent_name+' '+record.contact_custom2.descr
                 raise ValidationError(
-                    f'A visit is already scheduled by {sales_rep_name} with the same institution and date.'
+                    f'A visit is already scheduled by {sales_rep_name} with the same institution {cont} and date.'
                 )
 
     @api.depends('co_travel_crm','core_products','contact_custom2')
