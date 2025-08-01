@@ -30,7 +30,7 @@
                                 <t t-foreach="object.line_ids" t-as="pd">
                                     <tr>
 
-                                        <t t-if="pd.appears_on_payslip">
+                                        <t t-if="pd.salary_rule_id.appears_on_payslip">
                                             <td>
                                                 <strong>
                                                     <t t-out="pd.name"/>
