@@ -28,7 +28,10 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="object.line_ids" t-as="pd">
+                                <tr t-foreach="object.line_ids.filtered(lambda line: line.appears_on_payslip)"
+                                    t-as="pd">
+
+                                    <t t-if="pd.appears_on_payslip">
                                         <tr>
 
 
@@ -45,6 +48,7 @@
 
                                         </tr>
                                     </t>
+                                </tr>
                             </tbody>
                         </table>
                         <p>Regards,</p>
