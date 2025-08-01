@@ -28,27 +28,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr t-foreach="object.line_ids.filtered(lambda line: line.appears_on_payslip)"
-                                    t-as="pd">
+                                <t t-foreach="object.line_ids.filtered(lambda line: line.appears_on_payslip)"
+                                   t-as="pd">
 
-                                    <t t-if="pd.appears_on_payslip">
-                                        <tr>
+                                    <tr>
 
+                                        <td>
+                                            <strong>
+                                                <t t-out="pd.name"/>
+                                            </strong>
+                                        </td>
+                                        <td align="right">
+                                            <strong>
+                                                <t t-esc="'{:,.2f}'.format(pd.total)"/>
+                                            </strong>
+                                        </td>
 
-                                            <td>
-                                                <strong>
-                                                    <t t-out="pd.name"/>
-                                                </strong>
-                                            </td>
-                                            <td align="right">
-                                                <strong>
-                                                    <t t-esc="'{:,.2f}'.format(pd.total)"/>
-                                                </strong>
-                                            </td>
-
-                                        </tr>
-                                    </t>
-                                </tr>
+                                    </tr>
+                                </t>
                             </tbody>
                         </table>
                         <p>Regards,</p>
