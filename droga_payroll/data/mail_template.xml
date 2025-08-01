@@ -10,7 +10,7 @@
             <field name="body_html" type="html">
 
                 <div class="container">
-                    <p>Dear<t t-out="object.employee_id.name"/>,
+                    <p>Dear <t t-out="object.employee_id.name"/>,
                     </p>
                     <p>Please find below the details of your payslip for the month
                         <t t-out="object.period.description"/>
@@ -30,7 +30,7 @@
                                 <t t-foreach="object.line_ids" t-as="pd">
                                     <tr>
 
-                                        <t t-if="pd.code in ['GROSS', 'DED', 'NET']">
+                                        <t t-if="pd.appears_on_payslip">
                                             <td>
                                                 <strong>
                                                     <t t-out="pd.name"/>
