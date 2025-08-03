@@ -16,6 +16,9 @@ class Lc(models.Model):
     supplier_id = fields.Many2one(
         related='purchase_order_id.partner_id', store=True)
 
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                                 index=True, default=lambda self: self.env.company.id)
+
     name = fields.Char("LC/TT Number", required=True)
     bank_name = fields.Char("Bank")
     bank = fields.Many2one("res.bank", required=True)
@@ -134,6 +137,16 @@ class Lc(models.Model):
         lcs = self.env['droga.purchase.lc'].search([])
         for record in lcs:
             record.total_amount_etb = record.exchange_rate * record.total_amount_usd
+
+    def update_company(self):
+        lcs = self.env['droga.purchase.lc'].search([])
+
+        try:
+            for record in lcs:
+                if record.purchase_order_id.company_id.id:
+                    record.company_id = record.purchase_order_id.company_id.id;
+        except Exception:
+            pass
 
 
 class LcDetail(models.Model):
