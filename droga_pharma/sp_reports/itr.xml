@@ -24,8 +24,8 @@
                                    attrs="{'readonly':1}">
                                 <tree editable="false">
                                     <field name="product"/>
-                                    <field name="cogs"/>
-                                    <field name="av_inv"/>
+                                    <field name="cogs" string="QOGS"/>
+                                    <field name="av_inv" string="Avg.Inv.Qty"/>
                                     <field name="inv_tur"/>
                                     <field name="dsi"/>
                                 </tree>
