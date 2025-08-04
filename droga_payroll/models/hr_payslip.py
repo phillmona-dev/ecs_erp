@@ -49,9 +49,12 @@ class HrPayslip(models.Model):
     def send_email_with_attachment(self, record_id, attachment):
         template_id = self.env.ref('droga_payroll.email_template_payslip').id
         email_template = self.env['mail.template'].browse(template_id)
+
+        # Sanitize attachment name (no newlines)
+        safe_name = attachment.name.replace('\n', '').replace('\r', '')
         # Attach the file
         attachment_id = self.env['ir.attachment'].create({
-            'name': attachment.name,
+            'name': safe_name,
             'type': 'binary',
             'datas': attachment.datas,
             'store_fname': attachment.store_fname,
