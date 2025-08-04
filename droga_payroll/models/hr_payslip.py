@@ -113,7 +113,7 @@ class HrPayslip(models.Model):
                 sanitized_period_description = payslip.period.description.replace('\n', ' ').replace('\r',
                                                                                                      ' ') if payslip.period else ''
                 sanitized_subject = f"Payslip of {sanitized_employee_name} for month {sanitized_period_description}"
-                sanitized_email_from = self.env.user.email or 'no_replay@Drogapharma.com'
+                sanitized_email_from = self.mail_server.replace('\n', ' ').replace('\r', ' ') or 'no_replay@Drogapharma.com'
 
                 # Compose email_values for overriding headers
                 email_values = {
