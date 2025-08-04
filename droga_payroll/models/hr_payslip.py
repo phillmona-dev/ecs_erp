@@ -51,13 +51,14 @@ class HrPayslip(models.Model):
         email_template = self.env['mail.template'].browse(template_id)
 
         # Sanitize attachment name (no newlines)
-        safe_name = attachment.name.replace('\n', '').replace('\r', '')
+        safe_name = attachment.name.replace('\n', '').replace('\r', '') if attachment.name else 'payslip.pdf'
+        safe_store_fname = (attachment.store_fname or '').replace('\n', '').replace('\r', '')
         # Attach the file
         attachment_id = self.env['ir.attachment'].create({
             'name': safe_name,
             'type': 'binary',
             'datas': attachment.datas,
-            'store_fname': attachment.store_fname,
+            'store_fname': safe_store_fname,
             'mimetype': attachment.mimetype,
             'res_model': 'your.model',
             'res_id': record_id,
