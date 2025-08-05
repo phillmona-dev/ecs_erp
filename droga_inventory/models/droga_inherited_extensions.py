@@ -485,8 +485,17 @@ class droga_stock_move_extension(models.Model):
     ('PH', 'Pharmacy'),('PR','Project')],compute='_get_source_type',store=True)
     pharmacy_unit = fields.Boolean('Pharmacy unit', default=False,compute='_get_pharma_unit',store=True)
     cons_price=fields.Float('Consignment payable')
+    barcode_product=fields.Char(related='product_tmpl_id.barcode',string='Barcode')
+    barcode_scanned = fields.Char(string='Barcode scanned')
+    barcode_status=fields.Char(compute='get_barcode',default="Mismatch")
 
-
+    @api.depends('barcode_scanned')
+    def get_barcode(self):
+        for rec in self:
+            if rec.barcode_scanned==rec.barcode_product:
+                rec.barcode_status="Match"
+            else:
+                rec.barcode_status = "Mismatch"
 
     @api.depends('picking_id.pharmacy_unit')
     def _get_pharma_unit(self):
