@@ -492,7 +492,7 @@ class droga_stock_move_extension(models.Model):
     @api.depends('barcode_scanned')
     def get_barcode(self):
         for rec in self:
-            if rec.barcode_scanned==rec.barcode_product:
+            if rec.barcode_scanned==rec.barcode_product and rec.barcode_scanned:
                 rec.barcode_status="Match"
             else:
                 rec.barcode_status = "Mismatch"
