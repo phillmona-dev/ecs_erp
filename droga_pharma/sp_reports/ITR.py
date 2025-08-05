@@ -39,7 +39,7 @@ class droga_pharma_stock_card(models.TransientModel):
                     'cogs': qogs,
                     'av_inv': avg,
                     'inv_tur': itr,
-                    'dsi': dsl/itr
+                    'dsi': dsl/itr if itr!=0 else 0
                     # TODO - Add DSI, check with GET and add it
                 }
                 self.results.create(val)
@@ -71,7 +71,7 @@ class droga_pharma_stock_card(models.TransientModel):
                         'cogs': qogs,
                         'av_inv': avg,
                         'inv_tur': itr,
-                        'dsi': dsl/itr
+                        'dsi': dsl/itr if itr!=0 else 0
                         # TODO - Add DSI, check with GET and add it
                     }
                     self.results.create(val)
