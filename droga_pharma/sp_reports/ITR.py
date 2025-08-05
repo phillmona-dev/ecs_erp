@@ -7,7 +7,7 @@ class droga_pharma_stock_card(models.TransientModel):
     _descr = 'Inventory turn over rate'
 
     branch = fields.Many2one('stock.warehouse', 'Warehouse')
-    product = fields.Many2one('product.product', 'Product')
+    product = fields.Many2one('product.template', 'Product')
     date_from = fields.Date('Date from', default=fields.Date.today()-timedelta(days=365))
     date_to = fields.Date('Date to', default=fields.Date.today())
 
