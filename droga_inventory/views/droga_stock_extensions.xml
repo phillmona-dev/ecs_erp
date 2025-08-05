@@ -85,7 +85,7 @@
                        attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
                 <field name="barcode_product" readonly="1"></field>
                 <field name="barcode_scanned"></field>
-                <field name="barcode_status" decoration-danger="state == 'Mismatch'" decoration-success="state == 'Match'" widget="badge" readonly="1"></field>
+                <field name="barcode_status" decoration-danger="barcode_status == 'Mismatch'" decoration-success="barcode_status == 'Match'" widget="badge" readonly="1"></field>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page/field/tree" position="attributes">
