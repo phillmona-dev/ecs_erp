@@ -42,7 +42,7 @@ class droga_pharma_stock_card(models.TransientModel):
                 }
                 self.results.create(val)
         else:
-            products=self.env['stock.quant'].search([('location_id.warehouse_id','=',self.branch.id)]).mapped('product_id')
+            products=self.env['stock.quant'].search([('location_id.warehouse_id','=',self.branch.id)],limit=100).mapped('product_id')
             for prod_id in products:
 
                 if not prod_id:
