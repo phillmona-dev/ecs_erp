@@ -49,12 +49,16 @@ class HrPayslip(models.Model):
     def send_email_with_attachment(self, record_id, attachment):
         template_id = self.env.ref('droga_payroll.email_template_payslip').id
         email_template = self.env['mail.template'].browse(template_id)
+
+        # Sanitize attachment name (no newlines)
+        safe_name = attachment.name.replace('\n', '').replace('\r', '') if attachment.name else 'payslip.pdf'
+        safe_store_fname = (attachment.store_fname or '').replace('\n', '').replace('\r', '')
         # Attach the file
         attachment_id = self.env['ir.attachment'].create({
-            'name': attachment.name,
+            'name': safe_name,
             'type': 'binary',
             'datas': attachment.datas,
-            'store_fname': attachment.store_fname,
+            'store_fname': safe_store_fname,
             'mimetype': attachment.mimetype,
             'res_model': 'your.model',
             'res_id': record_id,
@@ -63,7 +67,7 @@ class HrPayslip(models.Model):
         email_template.send_mail(record_id, force_send=True,
                                  email_values={'attachment_ids': [(6, 0, [attachment_id.id])]})
 
-    def action_send_email(self):
+    def action_send_email1(self):
 
         for payslip in self:
             try:
@@ -89,6 +93,41 @@ class HrPayslip(models.Model):
                     _logger.info(f'Payslip email sent successfully for {payslip.employee_id.name}')
                 else:
                     _logger.warning('Email template not found: droga_payroll.email_template_payslip')
+            except Exception as e:
+                _logger.error(f'Error sending payslip email for {payslip.employee_id.name}: {str(e)}')
+
+    def action_send_email(self):
+        for payslip in self:
+            try:
+                mail_template = self.env.ref('droga_payroll.email_template_payslip')
+
+                if not mail_template:
+                    _logger.warning('Email template not found: droga_payroll.email_template_payslip')
+                    continue
+
+                if not payslip.employee_id.work_email:
+                    _logger.warning(f'No work email for employee: {payslip.employee_id.name}')
+                    continue
+
+                # Sanitize header-sensitive values
+                sanitized_employee_name = payslip.employee_id.name.replace('\n', ' ').replace('\r', ' ')
+                sanitized_period_description = payslip.period.description.replace('\n', ' ').replace('\r',
+                                                                                                     ' ') if payslip.period else ''
+                sanitized_subject = f"Payslip of {sanitized_employee_name} for month {sanitized_period_description}"
+                sanitized_email_from = self.mail_server.replace('\n', ' ').replace('\r', ' ') or 'no_replay@Drogapharma.com'
+
+                # Compose email_values for overriding headers
+                email_values = {
+                    'subject': sanitized_subject,
+                    'email_from': sanitized_email_from,
+                    'email_to': payslip.employee_id.work_email,
+                }
+
+                # Send mail with sanitized headers
+                mail_template.send_mail(payslip.id, force_send=True, email_values=email_values)
+
+                _logger.info(f'Payslip email sent successfully for {sanitized_employee_name}')
+
             except Exception as e:
                 _logger.error(f'Error sending payslip email for {payslip.employee_id.name}: {str(e)}')
 
