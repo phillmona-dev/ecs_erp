@@ -15,7 +15,7 @@ class droga_pharma_stock_card(models.TransientModel):
 
     def load_results(self):
         self.results.unlink()
-
+        dsl=(self.date_to-self.date_from).days
         if self.product:
             prod_id=self.product.product_variant_id
             avg=self.get_avg(prod_id.id)
@@ -27,6 +27,7 @@ class droga_pharma_stock_card(models.TransientModel):
                     'cogs': qogs,
                     'av_inv': avg,
                     'inv_tur': 0,
+                    'dsl':0
                     #TODO - Add DSI, check with GET and add it
                 }
                 self.results.create(val)
@@ -38,6 +39,7 @@ class droga_pharma_stock_card(models.TransientModel):
                     'cogs': qogs,
                     'av_inv': avg,
                     'inv_tur': itr,
+                    'dsl': dsl/itr
                     # TODO - Add DSI, check with GET and add it
                 }
                 self.results.create(val)
@@ -57,6 +59,7 @@ class droga_pharma_stock_card(models.TransientModel):
                         'cogs': qogs,
                         'av_inv': avg,
                         'inv_tur': 0,
+                        'dsl': 0
                         # TODO - Add DSI, check with GET and add it
                     }
                     self.results.create(val)
@@ -68,6 +71,7 @@ class droga_pharma_stock_card(models.TransientModel):
                         'cogs': qogs,
                         'av_inv': avg,
                         'inv_tur': itr,
+                        'dsl': dsl/itr
                         # TODO - Add DSI, check with GET and add it
                     }
                     self.results.create(val)
