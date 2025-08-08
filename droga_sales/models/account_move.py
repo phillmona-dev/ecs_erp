@@ -524,16 +524,21 @@ class account_move_line(models.Model):
             if rec.profit_cost_center=='-' and rec.analytic_distribution:
                 if rec.company_id.id==2:
                     for key, value in rec.analytic_distribution.items():
-                        analytics=self.env['account.analytic.account'].search([('id','=',key),('plan_id','in',(16,19))])
-                        if len(analytics)>0:
-                            rec.profit_cost_center=analytics[0].name
+                        if key!='False':
+                            analytics=self.env['account.analytic.account'].search([('id','=',key),('plan_id','in',(16,19))])
+                            if len(analytics)>0:
+                                rec.profit_cost_center=analytics[0].name
                 else:
                     for key, value in rec.analytic_distribution.items():
-                        analytics = self.env['account.analytic.account'].search(
-                            [('id', '=', key), ('plan_id', 'in', (1, 2))])
-                        if len(analytics) > 0:
-                            rec.profit_cost_center = analytics[0].profit_center.name if analytics[0].plan_id.id == 2 and analytics[
-                                0].profit_center else analytics[0].name
+                        if key != 'False':
+                            analytics = self.env['account.analytic.account'].search(
+                                [('id', '=', key), ('plan_id', 'in', (1, 2))])
+                            if len(analytics) > 0:
+                                rec.profit_cost_center = analytics[0].profit_center.name if analytics[
+                                                                                                0].plan_id.id == 2 and \
+                                                                                            analytics[
+                                                                                                0].profit_center else \
+                                analytics[0].name
 
 
     def get_origin_ref(self):

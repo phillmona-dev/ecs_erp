@@ -134,13 +134,14 @@ class AccountMove(models.Model):
                         analytic_distributions = o.analytic_distribution
                         for analytic_distribution_id in analytic_distributions:
                             # search analytic definition table
-                            analytic_plans = self.env['account.analytic.account'].search(
-                                [('id', '=', analytic_distribution_id)])
-                            for analytic_plan in analytic_plans:
-                                if analytic_plan.plan_id.complete_name == 'Profit / Cost Center':
-                                    record.cost_center = analytic_plan.display_name
-                                elif analytic_plan.plan_id.complete_name == 'Sales Channel':
-                                    record.sales_channel = analytic_plan.display_name
+                            if analytic_distribution_id != 'False':
+                                analytic_plans = self.env['account.analytic.account'].search(
+                                    [('id', '=', analytic_distribution_id)])
+                                for analytic_plan in analytic_plans:
+                                    if analytic_plan.plan_id.complete_name == 'Profit / Cost Center':
+                                        record.cost_center = analytic_plan.display_name
+                                    elif analytic_plan.plan_id.complete_name == 'Sales Channel':
+                                        record.sales_channel = analytic_plan.display_name
                         break
 
                 if record.cost_center == "Others" and record.stock_move_id:
@@ -486,7 +487,7 @@ class AccountWithholding(models.Model):
     withholding_amount_word = fields.Char("Amount Word", compute="_compute_amount_word")
     withholding_percent = fields.Float("Withholding Percent", store=True)
 
-    tin_no=fields.Char("TIN")
+    tin_no = fields.Char("TIN")
 
     def _compute_amount_word(self):
         for record in self:
