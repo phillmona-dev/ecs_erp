@@ -43,7 +43,6 @@
         'report/account_payment_check_printout.xml',
         'report/customer_outstanding_balance_report.xml',
         'report/payment_report.xml',
-        'report/trial_balance.xml',
 
         'views/menu.xml',
     ],

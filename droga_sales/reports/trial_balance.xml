@@ -9,6 +9,7 @@
                 <field name="account_id"/>
                 <field name="date"/>
                 <field name="move_name"/>
+                <field name="inv_origin"/>
                 <field name="debit" optional="show"/>
                 <field name="credit" optional="show"/>
                 <field name="balance"/>
@@ -35,7 +36,32 @@
                 -->
 
                 <filter name="group_account" string="Account" context="{'group_by':'account_id'}"/>
+                
+                <filter string="Today transactions"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
+                        name="today_transactions"></filter>
 
+                <filter string="Current week transactions"
+                    domain="[
+                        ('date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
+                    name="current_week_transactions"></filter>
+
+                <filter string="Previous week transactions"
+                       domain="[('date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),
+                       ('date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]"
+                        name="previous_week_transactions"></filter>
+
+                <filter string="Current month transactions"
+                        domain="[('date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
+                        ('date','&gt;=',time.strftime('%%Y-%%m-01'))]"
+                        name="current_month_transactions"></filter>
+
+                <filter string="Previous month transactions"
+                        domain="[('date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
+                        ('date','&lt;',time.strftime('%%Y-%%m-01'))]"
+                name="previous_month_transactions"></filter>
+                
             </search>
         </field>
     </record>

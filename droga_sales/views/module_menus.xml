@@ -19,7 +19,12 @@
               active="False"
             sequence="40"/>
 
-
+    <menuitem id="account_reports.account_reports_audit_reports_menu" name="Audit Reports" parent="account.menu_finance_reports" sequence="2">
+        <menuitem id="droga_sales_trial_balance_report_tree_menu" name="Ledger detail by Cost Center"
+                      action="view_move_line_trial_balance_action"
+                      groups="account.group_account_manager"
+                      sequence="5"/>
+    </menuitem>
     <record id="droga_sales_matured_customers_action" model="ir.actions.act_window">
         <field name="name">Matured customers</field>
         <field name="res_model">account.move</field>

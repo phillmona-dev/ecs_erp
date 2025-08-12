@@ -16,7 +16,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'resource', 'stock', 'sale','sales_team', 'sale_stock', 'droga_crm','droga_inventory', 'uom',
+    'depends': ['base', 'account', 'resource', 'stock', 'sale','sales_team', 'sale_stock', 'droga_crm','droga_inventory','account_reports', 'uom',
                 'hr'],
 
     # always loaded
@@ -36,8 +36,10 @@
         'reports/request_report.xml',
         'reports/account_form_readonly.xml',
         'reports/purchase_clear_report.xml',
+        'reports/trial_balance.xml',
         'views/module_menus.xml',
         'reports/sales_detail.xml',
+
         'reports/sales_detail_waiter.xml',
         'reports/sales_summary.xml',
         'wizard/sales_report_view.xml',
