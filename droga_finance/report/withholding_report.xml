@@ -166,8 +166,8 @@
 
                         <div id="informations" class="row">
                             <div class="col-12 bm-2">
-                                <h6>ተቀናሽ የተደረገ 2% ግብር ብር</h6>
-                                <h6>2% withhold birr:-
+                                <h6>ተቀናሽ የተደረገ 3% ግብር ብር</h6>
+                                <h6>3% withhold birr:-
                                     <b>
                                         <t t-if="o.withholding_two_percent!=0">
                                             <t t-esc="o.tax_amount_word"/>
@@ -212,7 +212,7 @@
                     <div id="informations" class="row">
                         <div class="col-12 bm-2">
                             <h6>በገቢ አዋጅ ቁጥር 979/2008 አንቀጽ 92/1 መሰረት ከላይ ስማቸው ለትጠቀሰው ግብር ከፋይ ከፈጸምነው ክፍያ ለግብር ሰብሳቢው መ/ቤት
-                                የሚከፈል 2% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን
+                                የሚከፈል 3% ብር _____ቀንሰን ማስቀረታችን እናረጋግጣለን
                             </h6>
                         </div>
                     </div>
@@ -229,7 +229,7 @@
                                     </t>
 
                                 </b>
-                                representing 2% tax payable to the Tax Authority as per the article 92/1 of the income
+                                representing 3% tax payable to the Tax Authority as per the article 92/1 of the income
                                 tax proclamtion No.979/2008
                             </h6>
                         </div>

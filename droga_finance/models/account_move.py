@@ -97,7 +97,7 @@ class AccountMove(models.Model):
 
         for record in self.invoice_line_ids:
             for tax_id in record.tax_ids:
-                if tax_id.amount == -2:
+                if tax_id.amount == -2 or tax_id.amount == -3:
                     tax_amount1 += abs(record.balance * tax_id.amount / 100)
                 elif tax_id.amount == -30:
                     tax_amount2 += abs(record.balance * tax_id.amount / 100)
