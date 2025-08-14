@@ -95,15 +95,22 @@ class AccountMove(models.Model):
         self.withholding_thirty_percent = 0
         self.vat_percent = 0
 
-        for record in self.invoice_line_ids:
+        withholding_tax_percent = 0
+        for record in self.line_ids:
             for tax_id in record.tax_ids:
-                #if tax_id.amount == -2 or tax_id.amount == -3:
-                if tax_id.tax_group_id.name=="Withholding":
-                    tax_amount1 += abs(record.credit)
-                elif tax_id.tax_group_id.name=="Withholding 30":
-                    tax_amount2 += abs(record.credit)
+                if tax_id.amount == -2 or tax_id.amount == -3:
+                    # tax_amount1 += abs(record.balance * tax_id.amount / 100)
+                    withholding_tax_percent = tax_id.amount
+                elif tax_id.amount == -30:
+                    # tax_amount2 += abs(record.balance * tax_id.amount / 100)
+                    withholding_tax_percent = tax_id.amount
                 elif tax_id.amount == 15:
                     vat_amount += abs(record.balance * tax_id.amount / 100)
+
+            if (withholding_tax_percent == -2 or withholding_tax_percent == -3) and record.account_id.code == "214003":
+                tax_amount1 += abs(record.balance)
+            elif withholding_tax_percent == -30 and record.account_id.code == "214003":
+                tax_amount2 += abs(record.balance)
 
         self.withholding_two_percent = round(tax_amount1, 2)
         self.withholding_thirty_percent = round(tax_amount2, 2)
