@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
-droga.inventory.consignment.issue.sequence.li
+    <data noupdate="1">
         <record id="seq_transfer_request_md" model="ir.sequence">
             <field name="name">Transfer request MD store</field>
             <field name="code">droga.inventory.transfer.custom.sequence.md</field>
@@ -14,8 +13,8 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_transfer_request_ms" model="ir.sequence">
-            <field name="name">Transfer request MSE store</field>
-            <field name="code">droga.inventory.transfer.custom.sequence1.mse</field>
+            <field name="name">Transfer request MS store</field>
+            <field name="code">droga.inventory.transfer.custom.sequence.ms</field>
             <field name="prefix">MTIV/MS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
@@ -25,9 +24,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_transfer_request_li" model="ir.sequence">
-    <field name="name">Transfer request ML store</field>
-    <field name="code">droga.inventory.transfer.custom.sequence01.ml</field>
-    <field name="prefix">MTIV/ML/%(y)s/</field>
+            <field name="name">Transfer request LI store</field>
+            <field name="code">droga.inventory.transfer.custom.sequence.li</field>
+            <field name="prefix">MTIV/LI/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -69,9 +68,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_transfer_request_wsos" model="ir.sequence">
-            <field name="name">Transfer request MSE store</field>
-            <field name="code">droga.inventory.transfer.custom.sequence2.mse</field>
-            <field name="prefix">MTOV/MSE/%(y)s/</field>
+            <field name="name">Transfer request WSOS store</field>
+            <field name="code">droga.inventory.transfer.custom.sequence.wsos</field>
+            <field name="prefix">MTIV/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="number_increment">1</field>
             <field name="implementation">no_gap</field>
@@ -180,9 +179,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_transfer_issue_li" model="ir.sequence">
- <field name="name">Transfer issue ML store</field>
-<field name="code">droga.inventory.transfer.issue.sequence02.ml</field>
-<field name="prefix">MTOV/ML/%(y)s/</field>
+            <field name="name">Transfer issue LI store</field>
+            <field name="code">droga.inventory.transfer.issue.sequence.li</field>
+            <field name="prefix">MTOV/LI/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -213,9 +212,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_transfer_issue_ws" model="ir.sequence">
-            <field name="name">Transfer issue MSE store</field>
-            <field name="code">droga.inventory.transfer.issue.sequence3.mse</field>
-            <field name="prefix">MTOV/MSE/%(y)s/</field>
+            <field name="name">Transfer issue WS store</field>
+            <field name="code">droga.inventory.transfer.issue.sequence.ws</field>
+            <field name="prefix">MTOV/WS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -224,9 +223,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_transfer_issue_wsos" model="ir.sequence">
-            <field name="name">Transfer issue MSE store</field>
-            <field name="code">droga.inventory.transfer.issue.sequence4.mse</field>
-            <field name="prefix">MTOV/MSE/%(y)s/</field>
+            <field name="name">Transfer issue WSOS store</field>
+            <field name="code">droga.inventory.transfer.issue.sequence.wsos</field>
+            <field name="prefix">MTOV/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -255,7 +254,7 @@ droga.inventory.consignment.issue.sequence.li
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
-            seq_transfer_issue_ws
+
         <record id="seq_transfer_issue_ec" model="ir.sequence">
             <field name="name">Transfer issue EC store</field>
             <field name="code">droga.inventory.transfer.issue.sequence.ec</field>
@@ -323,10 +322,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_goods_return_li" model="ir.sequence">
-<field name="name">Goods return ML store</field>
-<field name="code">droga.inventory.goods.return.sequence03.ml</field>
-<field name="prefix">WGR/ML/%(y)s/</field>
-
+            <field name="name">Goods return LI store</field>
+            <field name="code">droga.inventory.goods.return.sequence.li</field>
+            <field name="prefix">WGR/LI/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -357,9 +355,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_goods_return_ws" model="ir.sequence">
-            <field name="name">Goods return MSE store</field>
-            <field name="code">droga.inventory.goods.return.sequence5.mse</field>
-            <field name="prefix">WGR/MSE/%(y)s/</field>
+            <field name="name">Goods return WS store</field>
+            <field name="code">droga.inventory.goods.return.sequence.ws</field>
+            <field name="prefix">WGR/WS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -368,9 +366,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_goods_return_wsos" model="ir.sequence">
-            <field name="name">Goods return MSE store</field>
-            <field name="code">droga.inventory.goods.return.sequence6.mse</field>
-            <field name="prefix">WGR/MSE/%(y)s/</field>
+            <field name="name">Goods return WSOS store</field>
+            <field name="code">droga.inventory.goods.return.sequence.wsos</field>
+            <field name="prefix">WGR/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -454,6 +452,7 @@ droga.inventory.consignment.issue.sequence.li
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
         <record id="seq_stock_adjustement_ms" model="ir.sequence">
             <field name="name">Stock adjustement MS store</field>
             <field name="code">droga.inventory.stock.adjustement.sequence.ms</field>
@@ -466,10 +465,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_stock_adjustement_li" model="ir.sequence">
-<field name="name">Stock adjustment ML store</field>
-<field name="code">droga.inventory.stock.adjustment.sequence09.ml</field>
-<field name="prefix">ADJ/ML/%(y)s/</field>
-
+            <field name="name">Stock adjustement LI store</field>
+            <field name="code">droga.inventory.stock.adjustement.sequence.li</field>
+            <field name="prefix">ADJ/LI/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -487,7 +485,7 @@ droga.inventory.consignment.issue.sequence.li
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
-droga.inventory.consignment.issue.sequence.li
+
         <record id="seq_stock_adjustement_os" model="ir.sequence">
             <field name="name">Stock adjustement OS store</field>
             <field name="code">droga.inventory.stock.adjustement.sequence.os</field>
@@ -500,9 +498,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_stock_adjustement_ws" model="ir.sequence">
-            <field name="name">Stock adjustement MSE store</field>
-            <field name="code">droga.inventory.stock.adjustement.sequence7.mse</field>
-            <field name="prefix">ADJ/MSE/%(y)s/</field>
+            <field name="name">Stock adjustement WS store</field>
+            <field name="code">droga.inventory.stock.adjustement.sequence.ws</field>
+            <field name="prefix">ADJ/WS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -511,15 +509,16 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_stock_adjustement_wsos" model="ir.sequence">
-            <field name="name">Stock adjustement MSE store</field>
-            <field name="code">droga.inventory.stock.adjustement.sequence8.mse</field>
-            <field name="prefix">ADJ/MSE/%(y)s/</field>
+            <field name="name">Stock adjustement WSOS store</field>
+            <field name="code">droga.inventory.stock.adjustement.sequence.wsos</field>
+            <field name="prefix">ADJ/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
         <record id="seq_stock_adjustement_of" model="ir.sequence">
             <field name="name">Stock adjustement OF store</field>
             <field name="code">droga.inventory.stock.adjustement.sequence.of</field>
@@ -609,10 +608,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_local_purchase_li" model="ir.sequence">
-<field name="name">Local purchase ML store</field>
-<field name="code">droga.inventory.local.purchase.sequence06.ml</field>
-<field name="prefix">GRN/ML/LP/%(y)s/</field>
-
+            <field name="name">Local purchase LI store</field>
+            <field name="code">droga.inventory.local.purchase.sequence.li</field>
+            <field name="prefix">GRN/LI/LP/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -630,6 +628,7 @@ droga.inventory.consignment.issue.sequence.li
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
         <record id="seq_local_purchase_os" model="ir.sequence">
             <field name="name">Local purchase OS store</field>
             <field name="code">droga.inventory.local.purchase.sequence.os</field>
@@ -642,9 +641,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_local_purchase_ws" model="ir.sequence">
-            <field name="name">Local purchase MSE store</field>
-            <field name="code">droga.inventory.local.purchase.sequence9.mse</field>
-            <field name="prefix">GRN/MSE/LP/%(y)s/</field>
+            <field name="name">Local purchase WS store</field>
+            <field name="code">droga.inventory.local.purchase.sequence.ws</field>
+            <field name="prefix">GRN/WS/LP/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -653,9 +652,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_local_purchase_wsos" model="ir.sequence">
-            <field name="name">Local purchase MSE store</field>
-            <field name="code">droga.inventory.local.purchase.sequence10.mse</field>
-            <field name="prefix">GRN/MSE/LP/%(y)s/</field>
+            <field name="name">Local purchase WSOS store</field>
+            <field name="code">droga.inventory.local.purchase.sequence.wsos</field>
+            <field name="prefix">GRN/WSOS/LP/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -752,10 +751,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_foreign_purchase_li" model="ir.sequence">
-<field name="name">Foreign purchase ML store</field>
-<field name="code">droga.inventory.foreign.purchase.sequence011.ml</field>
-<field name="prefix">GRN/ML/FP/%(y)s/</field>
-
+            <field name="name">Foreign purchase LI store</field>
+            <field name="code">droga.inventory.foreign.purchase.sequence.li</field>
+            <field name="prefix">GRN/LI/FP/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -784,10 +782,11 @@ droga.inventory.consignment.issue.sequence.li
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
         <record id="seq_foreign_purchase_ws" model="ir.sequence">
-            <field name="name">Foreign purchase MSE store</field>
-            <field name="code">droga.inventory.foreign.purchase.sequence11.mse</field>
-            <field name="prefix">GRN/MSE/FP/%(y)s/</field>
+            <field name="name">Foreign purchase WS store</field>
+            <field name="code">droga.inventory.foreign.purchase.sequence.ws</field>
+            <field name="prefix">GRN/WS/FP/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -796,10 +795,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_foreign_purchase_wsos" model="ir.sequence">
-           <field name="name">Foreign purchase MSE store</field>
-            <field name="code">droga.inventory.foreign.purchase.sequence12.mse</field>
-            <field name="prefix">GRN/MSE/FP/%(y)s/</field>
-
+            <field name="name">Foreign purchase WSOS store</field>
+            <field name="code">droga.inventory.foreign.purchase.sequence.wsos</field>
+            <field name="prefix">GRN/WSOS/FP/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -883,6 +881,18 @@ droga.inventory.consignment.issue.sequence.li
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <record id="seq_consignment_return_order" model="ir.sequence">
+            <field name="name">Consignment return order</field>
+            <field name="code">droga.inventory.consignment.return.sequence</field>
+            <field name="prefix">CON/RETURN/%(y)s/</field>
+            <field name="suffix"></field>
+            <field name="implementation">no_gap</field>
+            <field name="number_increment">1</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
         <record id="seq_consignment_issue_order" model="ir.sequence">
             <field name="name">Consignment issue order</field>
             <field name="code">droga.inventory.consignment.issue.sequence</field>
@@ -918,10 +928,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_consignment_receipt_li" model="ir.sequence">
-<field name="name">Consignment receipt ML store</field>
-<field name="code">droga.inventory.consignment.receipt.sequence0022.ml</field>
-<field name="prefix">COR/ML/%(y)s/</field>
-
+            <field name="name">Consignment receipt LI store</field>
+            <field name="code">droga.inventory.consignment.receipt.sequence.li</field>
+            <field name="prefix">COR/LI/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -955,18 +964,17 @@ droga.inventory.consignment.issue.sequence.li
             <field name="name">Consignment receipt WS store</field>
             <field name="code">droga.inventory.consignment.receipt.sequence.ws</field>
             <field name="prefix">COR/WS/%(y)s/</field>
-
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
-        <record id="seq_consignment_receipt_wsos" model="ir.sequence">
-            <field name="name">Consignment receipt MSE store</field>
-            <field name="code">droga.inventory.consignment.receipt.sequence13.mse</field>
-            <field name="prefix">COR/MSE/%(y)s/</field>
 
+        <record id="seq_consignment_receipt_wsos" model="ir.sequence">
+            <field name="name">Consignment receipt WSOS store</field>
+            <field name="code">droga.inventory.consignment.receipt.sequence.wsos</field>
+            <field name="prefix">COR/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -1063,10 +1071,9 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_consignment_issue_li" model="ir.sequence">
-<field name="name">Consignment issue ML store</field>
-<field name="code">droga.inventory.consignment.issue.sequence0012.ml</field>
-<field name="prefix">COI/ML/%(y)s/</field>
-
+            <field name="name">Consignment issue LI store</field>
+            <field name="code">droga.inventory.consignment.issue.sequence.li</field>
+            <field name="prefix">COI/LI/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -1084,6 +1091,7 @@ droga.inventory.consignment.issue.sequence.li
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
         <record id="seq_consignment_issue_os" model="ir.sequence">
             <field name="name">Consignment issue OS store</field>
             <field name="code">droga.inventory.consignment.issue.sequence.os</field>
@@ -1096,19 +1104,20 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
         <record id="seq_consignment_issue_ws" model="ir.sequence">
-            <field name="name">Consignment issue MSE store</field>
-            <field name="code">droga.inventory.consignment.issue.sequence.mse14</field>
-            <field name="prefix">COI/MSE/%(y)s/</field>
+            <field name="name">Consignment issue WS store</field>
+            <field name="code">droga.inventory.consignment.issue.sequence.ws</field>
+            <field name="prefix">COI/WS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
         <record id="seq_consignment_issue_wsos" model="ir.sequence">
-            <field name="name">Consignment issue MSE store</field>
-            <field name="code">droga.inventory.consignment.issue.sequence.mse15</field>
-            <field name="prefix">COI/MSE/%(y)s/</field>
+            <field name="name">Consignment issue WSOS store</field>
+            <field name="code">droga.inventory.consignment.issue.sequence.wsos</field>
+            <field name="prefix">COI/WSOS/%(y)s/</field>
             <field name="suffix"></field>
             <field name="implementation">no_gap</field>
             <field name="number_increment">1</field>
@@ -1316,5 +1325,5 @@ droga.inventory.consignment.issue.sequence.li
         </record>
 
     </data>
-    
 </odoo>
+
