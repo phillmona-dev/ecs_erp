@@ -33,7 +33,7 @@ class cust_contact_extension(models.Model):
     cust_type_ext = fields.Many2one('droga.cust.type', string='Customer type', tracking=True)
     contact_tobe_accessed_by = fields.Selection(
         [('Promotors', 'Promotors'), ('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
-    max_allowed_distance=fields.Integer('Check in/out max diff',default=100)
+    # max_allowed_distance=fields.Integer('Check in/out max diff',default=100)
     type = fields.Selection(
         [('contact', 'Contact'),
          ('invoice', 'Invoice Address'),
