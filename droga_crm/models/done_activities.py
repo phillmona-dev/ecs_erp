@@ -2,7 +2,7 @@ from datetime import date
 from string import capwords
 from odoo.http import request
 from odoo import models,fields,api
-
+from datetime import datetime, timedelta
 
 class done_activity(models.Model):
     _name = "droga.crm.done.activity"
@@ -31,11 +31,34 @@ class done_activity(models.Model):
     check_out = fields.Char('Check out',compute='_getcheckout',store=True)
     check_in_dt = fields.Datetime('Check in datetime',compute='_getcheckin',store=True)
     check_out_dt = fields.Datetime('Check out datetime',compute='_getcheckout',store=True)
-    duration=fields.Integer('Duration in minutes',compute='_getcheckout',store=True,default=0)
+    durationdescr=fields.Char('Duration in minutes',compute='_getcheckout',store=True,default="-")
     pr_team_custom = fields.Many2one('crm.team', related='sales_rep.team', string='CRM Team', store=True)
     has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     pr_sales_logged_empid_code = fields.Char('hr.employee', related='sales_rep.employee.barcode', store=True)
+
+    def human_diff_full(self,a, b) :
+        if not a or not b:
+            return "-"
+        delta = abs(a - b)
+        total_seconds = int(delta.total_seconds())
+
+        days = total_seconds // (24 * 3600)
+        remainder = total_seconds % (24 * 3600)
+        hours = remainder // 3600
+        remainder %= 3600
+        minutes = remainder // 60
+
+        parts = []
+        if days > 0:
+            parts.append(f"{days} day{'s' if days != 1 else ''}")
+        if hours > 0:
+            parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
+        if minutes > 0:
+            parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
+
+        return ', '.join(parts) if parts else "-"
+
     def _get_visit_planned(self):
         for rec in self:
             rec.from_visit_plan_str="Yes" if rec.from_visit_plan else "No"
@@ -70,10 +93,10 @@ class done_activity(models.Model):
         for rec in self:
             rec.check_out = rec.lead_id.check_out_descr
             rec.check_out_dt=rec.lead_id.check_out_time_and_date
-            rec.duration=0
+            rec.durationdescr="-"
             if rec.check_in and rec.check_out:
                 rec.state = 'Done'
-                rec.duration=(rec.check_out_dt-rec.check_in_dt).total_seconds()/60
+                rec.durationdescr=self.human_diff_full(rec.check_out_dt,rec.check_in_dt)
 
 class mail_activity_extension(models.Model):
     _inherit = "mail.activity"

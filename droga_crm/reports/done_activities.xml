@@ -11,6 +11,7 @@
                 <field name="activity_date" string="Plan date"/>
                 <field name="check_in" string="Check in"/>
                 <field name="check_out" string="Check out"/>
+                <field name="durationdescr" string="Duration"/>
                 <field name="res_model_descr" string="Type"/>
                 <field name="from_visit_plan" invisible="1"/>
                 <field name="from_visit_plan" invisible="1"/>

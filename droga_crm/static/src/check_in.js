@@ -51,8 +51,8 @@ export class CheckinController extends FormController {
                         });
                         alert(_t(`${method === 'update_check_in_locations' ? 'Check-in' : 'Check-out'} successful.`));
                     } catch (rpcError) {
-                        console.error("RPC Error:", rpcError);
-                        alert(_t('Failed to update location. Please try again.'));
+                        console.error("RPC Error:", rpcError.message || '');
+                        alert(_t('Failed to update location.'+(rpcError.message.data.arguments[0]) || ''));
                     } finally {
                         this.uiService.unblock();
                         window.location.reload();

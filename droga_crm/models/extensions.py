@@ -4,6 +4,7 @@ from math import radians, sin, cos, atan2, sqrt
 from odoo import models, fields, api,_
 from odoo.exceptions import ValidationError, UserError
 from odoo.http import request
+from odoo.tools.translate import _
 
 class pharma_res_partner(models.Model):
     _name='res.partner.crm2'
@@ -32,6 +33,7 @@ class cust_contact_extension(models.Model):
     cust_type_ext = fields.Many2one('droga.cust.type', string='Customer type', tracking=True)
     contact_tobe_accessed_by = fields.Selection(
         [('Promotors', 'Promotors'), ('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
+    max_allowed_distance=fields.Integer('Check in/out max diff',default=100)
     type = fields.Selection(
         [('contact', 'Contact'),
          ('invoice', 'Invoice Address'),
@@ -108,7 +110,7 @@ class cust_contact_extension(models.Model):
 
     def write(self, vals):
         for rec in self:
-            if 'vat' in vals and rec.vat and not self.env.user.has_group('droga_crm.tin_admin'):
+            if ('max_allowed_distance' in vals or 'vat' in vals) and rec.vat and not self.env.user.has_group('droga_crm.tin_admin'):
                 raise UserError("You can not edit Tin no.")
             if 'name' in vals and rec.vat and not self.env.user.has_group('droga_crm.tin_admin'):
                 raise UserError("You can not edit name.")
@@ -308,6 +310,9 @@ class crm_lead_extension(models.Model):
     referral_distri = fields.Many2many('res.partner', string='Referral to distributor')
 
     def update_check_in_locations(self, res_id, lati, long):
+        if res_id is None:
+            raise ValidationError(_("Please save before checking in."))
+
         for res in self.env['crm.lead'].search([('id', '=', res_id)]):
             if res.partner_id.partner_latitude==0:
                 res.partner_id.update_current_locations(res.partner_id.id,lati,long,True)
@@ -317,6 +322,9 @@ class crm_lead_extension(models.Model):
                 res.check_in_long = float(long)
                 dist = self.calculate_distance(float(lati), float(long), res.partner_id.partner_latitude,
                                                res.partner_id.partner_longitude)
+                if dist>res.partner_id.max_allowed_distance:
+                    raise ValidationError(_("Check in distance should not be greater than "+str(res.partner_id.max_allowed_distance)+" meters. It's currently "+str(round(dist,2))+"."))
+
                 res.check_in_distance_meters = int(dist)
                 res.check_in_time_and_date = datetime.now()
                 res.check_in_descr = (res.check_in_time_and_date + timedelta(hours=3)).strftime(
@@ -324,6 +332,9 @@ class crm_lead_extension(models.Model):
 
 
     def update_check_out_locations(self, res_id, lati, long):
+        if res_id is None:
+            raise ValidationError(_("Please save before checking out."))
+
         for res in self.env['crm.lead'].search([('id', '=', res_id)]):
             if not res.check_in_time_and_date:
                 res.update_check_in_locations(res_id,lati,long)
@@ -332,8 +343,13 @@ class crm_lead_extension(models.Model):
                 res.check_out_long = float(long)
                 dist = self.calculate_distance(float(lati), float(long), res.partner_id.partner_latitude,
                                                res.partner_id.partner_longitude)
+
+                if dist>res.partner_id.max_allowed_distance:
+                    raise ValidationError(_("Check out distance should not be greater than "+str(res.partner_id.max_allowed_distance)+" meters. It's currently "+str(round(dist,2))+"."))
+
                 res.check_out_distance_meters = int(dist)
                 res.check_out_time_and_date = datetime.now()
+                res.duration=self.human_diff_full(res.check_in_time_and_date,res.check_out_time_and_date)
                 res.check_out_descr = (res.check_out_time_and_date + timedelta(hours=3)).strftime(
                     "%d %b, %H:%M") + ' (' + f"{int(dist):,}" + ' m)'
 

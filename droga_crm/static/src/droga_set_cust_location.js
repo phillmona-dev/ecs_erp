@@ -52,8 +52,8 @@ export class cusLocController extends FormController {
                         alert(_t('Location updated successfully.'));
 
                     } catch (rpcError) {
-                        console.error("RPC Error:", rpcError);
-                        alert(_t('Failed to update location. Please try again.'));
+                        console.error("RPC Error:", rpcError.message || '');
+                        alert(_t('Failed to update location. '+(rpcError.message.data.arguments[0]) || ''));
                     } finally {
                         this.uiService.unblock();
                         window.location.reload();
