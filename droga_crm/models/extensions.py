@@ -349,7 +349,7 @@ class crm_lead_extension(models.Model):
 
                 res.check_out_distance_meters = int(dist)
                 res.check_out_time_and_date = datetime.now()
-                res.duration=self.human_diff_full(res.check_in_time_and_date,res.check_out_time_and_date)
+                # res.duration=self.human_diff_full(res.check_in_time_and_date,res.check_out_time_and_date)
                 res.check_out_descr = (res.check_out_time_and_date + timedelta(hours=3)).strftime(
                     "%d %b, %H:%M") + ' (' + f"{int(dist):,}" + ' m)'
 
