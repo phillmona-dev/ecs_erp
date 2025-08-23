@@ -36,7 +36,7 @@ class customer_visit_header(models.Model):
     @api.depends('weeks')
     def _get_deadline(self):
         for rec in self:
-            tleft=25200+(datetime.datetime.combine(rec.weeks.date_from,datetime.datetime.min.time()) -fields.Datetime.now()).total_seconds()
+            tleft=-32400+(datetime.datetime.combine(rec.weeks.date_from,datetime.datetime.min.time()) -fields.Datetime.now()).total_seconds()
             rec.deadline_in_secs=tleft
             if tleft<=0 or rec.state=='approved':
                 rec.is_readonly=True
