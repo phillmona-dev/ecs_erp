@@ -1,5 +1,5 @@
 from odoo import fields, models, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class droga_stock_adjustment_request(models.Model):
@@ -99,44 +99,74 @@ class droga_stock_adjustment_request(models.Model):
         for act in activity:
             act.sudo().action_done()
 
+    def create_transfer(self):
+        pick_type_id = self.env['stock.picking.type'].sudo().search(
+            [('sequence_code', '=', 'ADJ')]).id
+
+        if not self.source_location_id:
+            raise ValidationError("Please fill source location.")
+        if not self.dest_location_id:
+            raise ValidationError("Please fill destination location.")
+
+        from_locat = self.source_location_id.id
+        to_locat=self.dest_location_id.id
+
+        picking_vals = {
+            'partner_id': 1,
+            'company_id': self.env.company.id,
+            'picking_type_id': pick_type_id,
+            'location_id': from_locat,
+            'location_dest_id': to_locat,
+            'origin': self.name,
+            'request_no': self.name,
+            'from_reconcile_menu':True,
+            'state': 'draft',
+            'scheduled_date': self.request_date_time,
+            'to_correct_pick':self.to_correct_ref.id
+        }
+        picking_id = self.env['stock.picking'].sudo().create(picking_vals)
+
+        for rec in self.stock_adjustment_detail_entries:
+
+            move_vals = {
+                'picking_id': picking_id.id,
+                'picking_type_id': pick_type_id,
+                'name': picking_id.name,
+                'product_id': rec['product_id'].id,
+                'product_uom': rec["product_id"].uom_id.id,
+                'product_uom_qty': rec['qty'] * (
+                            rec["product_id"].uom_id.factor / rec["product_uom"].factor),
+                'location_id': from_locat,
+                'location_dest_id': to_locat,
+                'state': 'draft',
+                'company_id': self.env.company.id
+            }
+
+            self.env['stock.move'].sudo().create(move_vals)
+
     def action_open_adj(self):
         self.set_activity_done()
 
-        mv_id=self.env['stock.picking'].search([('request_no','=',self.name)])
-        if len(mv_id)==0:
+        self.create_transfer()
 
-            return {
-                'name': 'Stock adjustement',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'stock.picking',
-                'view_id': self.env.ref('stock.view_picking_form').id,
-                'type': 'ir.actions.act_window',
-                'context': {
-                    'default_origin': self.name,
-                    'default_request_no': self.name,
-                    'default_from_reconcile_menu':True,
-                    'default_state':'draft',
-                    'default_to_correct_pick':self.to_correct_ref.id
-                }
+        mv_id=self.env['stock.picking'].search([('request_no','=',self.name)])
+
+        return {
+            'name': 'Stock adjustement',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'stock.picking',
+            'view_id': self.env.ref('stock.view_picking_form').id,
+            'type': 'ir.actions.act_window',
+            'res_id':mv_id[0].id,
+            'context': {
+                'default_origin': self.name,
+                'default_request_no': self.name,
+                'default_from_reconcile_menu': True,
+                'default_state': 'draft',
+                'default_to_correct_pick': self.to_correct_ref.id
             }
-        else:
-            return {
-                'name': 'Stock adjustement',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'stock.picking',
-                'view_id': self.env.ref('stock.view_picking_form').id,
-                'type': 'ir.actions.act_window',
-                'res_id':mv_id[0].id,
-                'context': {
-                    'default_origin': self.name,
-                    'default_request_no': self.name,
-                    'default_from_reconcile_menu': True,
-                    'default_state': 'draft',
-                    'default_to_correct_pick': self.to_correct_ref.id
-                }
-            }
+        }
 
 class droga_stock_adjustment_request_detail(models.Model):
     _name = 'droga.stock.adjustment.request.detail'

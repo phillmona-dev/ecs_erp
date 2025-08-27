@@ -32,13 +32,13 @@
                 <sheet>
                     <group string="Stock Adjustment Request Form">
                         <group>
-                            <field name="to_correct_ref" options="{'no_create':True,'no_open':True}"/>
-                            <field name="request_date_time" readonly="1"/>
+                            <field name="to_correct_ref" required="1" options="{'no_create':True,'no_open':True}"/>
+                            <field name="request_date_time" required="1" readonly="1"/>
                             <field name="remark"/>
                         </group>
                         <group>
-                            <field name="source_location_id" domain="['|',('complete_name','like','Partners/'),'|',('has_access','=',True),('con_type','=','DIL')]" options="{'no_create':True,'no_open':True}"/>
-                            <field name="dest_location_id" domain="['|',('complete_name','like','Partners/'),'|',('has_access','=',True),('con_type','=','DIL')]" options="{'no_create':True,'no_open':True}"/>
+                            <field name="source_location_id" required="1" domain="['|',('complete_name','like','Partners/'),'|',('has_access','=',True),('con_type','=','DIL')]" options="{'no_create':True,'no_open':True}"/>
+                            <field name="dest_location_id" required="1" domain="['|',('complete_name','like','Partners/'),'|',('has_access','=',True),('con_type','=','DIL')]" options="{'no_create':True,'no_open':True}"/>
                         </group>
                     </group>
                     <notebook>
