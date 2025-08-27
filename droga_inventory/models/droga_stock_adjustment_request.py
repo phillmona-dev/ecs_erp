@@ -121,7 +121,6 @@ class droga_stock_adjustment_request(models.Model):
             'request_no': self.name,
             'from_reconcile_menu':True,
             'state': 'draft',
-            'remark':self.remark,
             'scheduled_date': self.request_date_time,
             'to_correct_pick':self.to_correct_ref.id
         }
@@ -144,6 +143,7 @@ class droga_stock_adjustment_request(models.Model):
             }
 
             self.env['stock.move'].sudo().create(move_vals)
+        picking_id.remark=self.remark
 
     def action_open_adj(self):
         self.set_activity_done()
