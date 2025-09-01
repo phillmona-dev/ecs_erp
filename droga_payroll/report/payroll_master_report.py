@@ -988,7 +988,7 @@ class PayrollMasterReports(models.Model):
         emp_list = self.get_unique_employee_id()
 
         # search employees from hr.employee
-        employees = self.env['hr.employee'].search([('id', 'in', emp_list)])
+        employees = self.env['hr.employee'].search([('id', 'in', emp_list),('division','=',self.batch.slip_ids.employee_id[0].division.id)])
         # search based on cost center
         if self.cost_center_analytic.ids:
             slips = self.batch.slip_ids.search(
@@ -997,16 +997,17 @@ class PayrollMasterReports(models.Model):
         else:
             slips = self.batch.slip_ids
 
+
         current_period = self.batch.period
         previous_period = self.get_period()
 
-        for record in slips:
+        for record in employees:
             sheet.write(row_start, 0, row_start - 2, border)
-            sheet.write(row_start, 1, record.employee_id.barcode, border)
-            sheet.write(row_start, 2, record.employee_id.name, border)
+            sheet.write(row_start, 1, record.barcode, border)
+            sheet.write(row_start, 2, record.name, border)
 
-            previous_net_wage = self.get_net_pay_amount(previous_period, record.employee_id.id)
-            current_net_wage = self.get_net_pay_amount(current_period, record.employee_id.id)
+            previous_net_wage = self.get_net_pay_amount(previous_period, record.id)
+            current_net_wage = self.get_net_pay_amount(current_period, record.id)
             difference = previous_net_wage - current_net_wage
 
             sheet.write(row_start, 3, previous_net_wage, num_format)
