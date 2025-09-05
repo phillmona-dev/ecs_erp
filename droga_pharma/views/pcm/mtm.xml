@@ -24,6 +24,7 @@
         <field name="arch" type="xml">
             <tree string="" delete="0" create="0">
                 <field name="client"/>
+                <field name="wareh"/>
 <!--                <field name="sales_origin"/>-->
                 <field name="mobile"/>
             </tree>

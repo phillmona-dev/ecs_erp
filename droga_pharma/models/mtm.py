@@ -47,6 +47,11 @@ class droga_pharma_mtm_header(models.Model):
     medication_history = fields.Html("Medication History and adherence", store=True,compute='get_cust_hist',inverse='update_medication_history',tracking=True)
     immunization = fields.Html("Immunization", store=True,compute='get_cust_hist',inverse='update_immunization',tracking=True)
     adr = fields.Html("ADRS and/or Allergies", store=True,compute='get_cust_hist',inverse='update_adr',tracking=True)
+    wareh = fields.Many2one('stock.warehouse', string='Pharmacy Branch', compute='_get_pharma_wh',
+                            store=True)
+    def _get_pharma_wh(self):
+        for rec in self:
+            rec.wareh = self.env.user.warehouse_ids_ph_disp[0].id
 
     @api.depends('client.medical_history','client.medication_history','client.immunization','client.adr_allergy','client.dob','client.gender','client.weight','client.height')
     def get_cust_hist(self):

@@ -33,7 +33,7 @@ class cust_contact_extension(models.Model):
     cust_type_ext = fields.Many2one('droga.cust.type', string='Customer type', tracking=True)
     contact_tobe_accessed_by = fields.Selection(
         [('Promotors', 'Promotors'), ('Sales reps', 'Sales reps'), ('Both', 'Both')], string='Contact used by')
-    max_allowed_distance=fields.Integer('Check in/out max diff',default=100,tracking=True)
+    max_allowed_distance=fields.Integer('Check in/out max diff',default=300,tracking=True)
     type = fields.Selection(
         [('contact', 'Contact'),
          ('invoice', 'Invoice Address'),
@@ -316,6 +316,10 @@ class crm_lead_extension(models.Model):
         for res in self.env['crm.lead'].search([('id', '=', res_id)]):
             if res.partner_id.partner_latitude==0:
                 res.partner_id.update_current_locations(res.partner_id.id,lati,long,True)
+            activities=self.env['droga.crm.done.activity'].search([('sales_rep', '=', res.pr_sales.id),('state','=','Pending')])
+            if len(activities)>0:
+                raise ValidationError(_("Please checkout pending activities with "+activities[0].lead_id.partner_id.name+" on "+activities[0].check_in_dt.strftime("%d-%b-%Y")))
+
             # res.lati_custom=float(latitude)
             if res.check_in_lati == 0:
                 res.check_in_lati = float(lati)
