@@ -344,17 +344,28 @@
 
                                         </td>
                                         <td>
-                                            <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
+                                            <strong t-esc="'{0:,.2f}'.format(o.amount_untaxed)"
                                                     class="small"/>
                                         </td>
                                     </tr>
-                                    <tr class="is-subtotal text-end">
+                                   <!-- <tr class="is-subtotal text-end">
                                         <td colspan="7">
                                             <strong class="mr16">Non Tax (%)</strong>
 
                                         </td>
                                         <td>
                                             <strong class="small">0.00</strong>
+                                        </td>
+                                    </tr>-->
+                                    <tr class="is-subtotal text-end">
+                                        <td colspan="7">
+                                            <strong class="mr16">Vat 15%</strong>
+
+                                        </td>
+                                        <td>
+
+                                            <strong t-esc="'{0:,.2f}'.format(o.vat_percent)"
+                                                    class="small"/>
                                         </td>
                                     </tr>
                                     <tr class="is-subtotal text-end">
@@ -364,7 +375,7 @@
 
                                         </td>
                                         <td>
-                                            <strong t-esc="'{0:,.2f}'.format(o.amount_untaxed)"
+                                            <strong t-esc="'{0:,.2f}'.format(o.amount_total)"
                                                     class="small"/>
                                         </td>
                                     </tr>
@@ -376,7 +387,7 @@
 
                                             </td>
                                             <td>
-                                                <strong t-esc="'{0:,.2f}'.format(withholding_amt)"
+                                                <strong t-esc="'{0:,.2f}'.format(o.withholding_two_percent)"
                                                         class="small"/>
                                             </td>
                                         </tr>
