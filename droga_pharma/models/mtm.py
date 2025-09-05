@@ -51,7 +51,7 @@ class droga_pharma_mtm_header(models.Model):
                             store=True)
     def _get_pharma_wh(self):
         for rec in self:
-            rec.wareh = self.env.user.warehouse_ids_ph_disp[0].id
+            rec.wareh = self.env.user.warehouse_ids_ph_disp[0].id if self.env.user.warehouse_ids_ph_disp else False
 
     @api.depends('client.medical_history','client.medication_history','client.immunization','client.adr_allergy','client.dob','client.gender','client.weight','client.height')
     def get_cust_hist(self):
