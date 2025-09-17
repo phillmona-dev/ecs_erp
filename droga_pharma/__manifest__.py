@@ -29,6 +29,7 @@
         'reports/stock_availability.xml',
         'reports/mtm_report_view.xml',
         'views/droga_physio_sales.xml',
+        'views/customers.xml',
         'views/droga_pharmacy_sales.xml',
         'reports/daily_sales.xml',
         'views/droga_physio_list.xml',
@@ -85,7 +86,6 @@
         'reports/counselling_printout.xml',
         'views/prescription.xml',
         'views/update_stock.xml',
-        'views/customers.xml',
         'views/cust_approval_kanban.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
         'views/inventory/location_extension.xml',
@@ -107,6 +107,7 @@
                 'web', 'crm'],
     "license": "AGPL-3",
     # only loaded in demonstration mode
+
     'installable': True,
     'application': True,
 }

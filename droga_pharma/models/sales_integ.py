@@ -16,8 +16,18 @@ class sales_integ(models.Model):
     available_amount_pharma = fields.Float(string='Credit balance', related='partner_id.available_amount_pharma')
     manual_price_pharma=fields.Boolean('Manual price',default=False,tracking=True)
     referred_by=fields.Many2one('res.partner',string='Referred by')
-    phone_no=fields.Char(string='Mobile',related='partner_id.mobile')
+    phone_no=fields.Char(string='Mobile',compute='_get_phone',store=True,inverse="_set_phone" )
     partner_custom=fields.Many2one('res.partner.pharma2')
+
+    @api.depends('customer_emp','partner_id')
+    def _get_phone(self):
+        for rec in self:
+            rec.phone_no = rec.customer_emp.phone_no if rec.customer_emp and rec.customer_emp.phone_no else rec.partner_id.mobile
+
+    def _set_phone(self):
+        for rec in self:
+            if rec.customer_emp:
+                rec.customer_emp.phone_no = rec.phone_no
 
     @api.onchange('partner_custom')
     def _partner_custom_change(self):
@@ -130,6 +140,16 @@ class sales_integ(models.Model):
             'type': 'ir.actions.act_window',
 
             'res_id': self.id,
+        }
+
+    def open_partner_form(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'form',
+            'view_id': self.env.ref('droga_pharma.pharma_partner_view').id,
+            'target': 'new',
+            'flags': {'form': {'action_buttons': True, 'options': {'mode': 'edit'}}},
         }
 
     @api.onchange('dob','sex')

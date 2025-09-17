@@ -225,6 +225,27 @@
         </field>
     </record>
 
+    <record id="res_partner_individual_customer_form" model="ir.actions.act_window">
+        <field name="name">Individual customers</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="pharma_partner_view"/>
+        <field name="domain">[('is_company','=',False)]</field>
+        <field name="context">{'search_default_customer': 1,'res_partner_search_mode': 'customer', 'default_is_company':
+            False,'default_company_type':'person', 'default_customer_rank': 1}
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new customer in your address book
+            </p>
+            <p>
+                Odoo helps you easily track all activities related to a customer.
+            </p>
+        </field>
+    </record>
+
     <menuitem
             id="droga_pharma_customers_comp_list_menu"
             name="Clients"
