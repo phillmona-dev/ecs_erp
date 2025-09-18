@@ -77,7 +77,6 @@ class DrogaStockValuationLayer(models.Model):
     move_date = fields.Date('Move date', required=True)
     move_date_initial = fields.Date('Move date origin', required=True)
     origin = fields.Char(related='stock_move_id.origin', store=True)
-    warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse',related='stock_move_id.warehouse_id')
     po_rate = fields.Float('PO Rate', default=1, store=True)
     grn_rate = fields.Float('GRN Rate', default=1, store=True)
     move_type = fields.Selection([
@@ -87,6 +86,32 @@ class DrogaStockValuationLayer(models.Model):
         help='Static types are transactions that we receive from suppliers and they change our weighted average price. Weighted types are '
              'types of transactions where we have to calculate weighted average value.')
     remark = fields.Char('Remark')
+
+    first_move_line_id = fields.Many2one(
+        'stock.move.line',
+        string='First Move Line',
+        compute='_compute_first_move_line',
+        store=True
+    )
+
+    warehouse_id = fields.Many2one(
+        'stock.warehouse',
+        string='Warehouse',
+        compute='_compute_first_move_line',
+        store=True
+    )
+
+    @api.depends('stock_move_id.move_line_ids')
+    def _compute_first_move_line(self):
+        for rec in self:
+            if rec.stock_move_id and rec.stock_move_id.move_line_ids:
+                # Get first move line by ID (or use sorted if needed by date/sequence)
+                first_line = rec.stock_move_id.move_line_ids.sorted('id')[0]
+                rec.first_move_line_id = first_line
+                rec.warehouse_id = first_line.warehouse_id
+            else:
+                rec.first_move_line_id = False
+                rec.warehouse_id = False
 
     def show_history(self):
         return {
