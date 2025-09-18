@@ -16,6 +16,7 @@
                 <field name="origin"/>
                 <field name='product_id'/>
                 <field name='categ_id'/>
+                <field name='warehouse_id'/>
                 <field name='uom_id'/>
                 <field name='quantity' sum="Total"/>
                 <field name='unit_cost'/>
@@ -59,6 +60,7 @@
                 <field name="origin"/>
                 <field name='product_id'/>
                 <field name='categ_id'/>
+                <field name='warehouse_id'/>
                 <field name='id'/>
                 <field name='uom_id'/>
                 <field name='quantity'/>
