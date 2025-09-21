@@ -77,7 +77,7 @@ class DrogaStockValuationLayer(models.Model):
     move_date = fields.Date('Move date', required=True)
     move_date_initial = fields.Date('Move date origin', required=True)
     origin = fields.Char(related='stock_move_id.origin', store=True)
-    warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse',related='stock_move_id.trans_warehouse')
+    warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse',related='stock_move_id.trans_warehouse',store=True)
     po_rate = fields.Float('PO Rate', default=1, store=True)
     grn_rate = fields.Float('GRN Rate', default=1, store=True)
     move_type = fields.Selection([
