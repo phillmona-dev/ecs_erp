@@ -26,6 +26,8 @@ class pharma_res_partner(models.Model):
                 'name': vals['name_reg'],
                 'mobile': vals['mobile_reg'] if 'mobile_reg' in vals else ''
             })
+        else:
+            return super(pharma_res_partner, self).create(vals)
 
     @api.depends('partner.name','partner.mobile')
     def _get_name(self):
