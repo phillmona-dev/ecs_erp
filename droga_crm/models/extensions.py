@@ -317,8 +317,8 @@ class crm_lead_extension(models.Model):
             if res.partner_id.partner_latitude==0:
                 res.partner_id.update_current_locations(res.partner_id.id,lati,long,True)
             activities=self.env['droga.crm.done.activity'].search([('sales_rep', '=', res.pr_sales.id),('check_in_dt','!=',False),('state','=','Pending')])
-            if len(activities)>0:
-                raise ValidationError(_("Please checkout pending activities with "+(activities[0].lead_id.partner_id.name if activities[0].lead_id else '')+" on "+(activities[0].check_in_dt.strftime("%d-%b-%Y")) if activities[0].check_in_dt else ''))
+            # if len(activities)>0:
+            #     raise ValidationError(_("Please checkout pending activities with "+(activities[0].lead_id.partner_id.name if activities[0].lead_id else '')+" on "+(activities[0].check_in_dt.strftime("%d-%b-%Y")) if activities[0].check_in_dt else ''))
 
             # res.lati_custom=float(latitude)
             if res.check_in_lati == 0:
