@@ -270,7 +270,8 @@
                                style="font-size:11pt">>
                             <label for="partner_custom" string="Customer"/>
                             <div class="o_row">
-                                <field name="partner_custom" string="Customer" domain="[('active', '=', True)]" options='{"no_open":True,"no_create": True}'></field>
+                                <field name="partner_custom" string="Customer" domain="[('active', '=', True)]" options='{"no_open":True,"no_create": False}'
+                                context="{'form_view_ref': 'droga_pharma_res_partner2'}"> </field>
 
                             </div>
 
@@ -290,7 +291,7 @@
 
                             <field name="customer_emp" attrs="{'invisible': [('pay_type', '=', True)]}"
                                    context="{'default_parent_customer':partner_id,'default_customer_emp': customer_emp}"
-                                   options="{'no_open': True,'no_edit':True, 'no_create': False}"
+                                   options="{'no_open': True,'no_edit':True, 'no_create': True}"
                                    widget="many2one"></field>
                             <field name="cust_id_linked" attrs="{'invisible': [('pay_type', '=', True)]}"></field>
 

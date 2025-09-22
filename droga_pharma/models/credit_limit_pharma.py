@@ -15,7 +15,17 @@ class pharma_res_partner(models.Model):
     _rec_name = 'name'
     partner=fields.Many2one('res.partner',required=True)
     name=fields.Char(string='Name',compute='_get_name',store=True)
+    name_reg=fields.Char('Name reg')
+    phone_reg = fields.Char('Phone reg')
     active = fields.Boolean(default=True,related='partner.active')
+
+    @api.model
+    def create(self, vals):
+        if 'name_reg' in vals:
+            self.env['res.partner'].create({
+                'name': vals['name_reg'],
+                'mobile': vals['mobile_reg'] if 'mobile_reg' in vals else ''
+            })
 
     @api.depends('partner.name','partner.mobile')
     def _get_name(self):

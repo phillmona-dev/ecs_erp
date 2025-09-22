@@ -33,6 +33,25 @@
 
     </record>
 
+    <record id="droga_pharma_res_partner2" model="ir.ui.view">
+        <field name="name">form.res.partner.pharma2</field>
+        <field name="model">res.partner.pharma2</field>
+        <field name="priority">400</field>
+        <field name="arch" type="xml">
+
+            <form delete="0" editable="bottom">
+
+                <sheet>
+                    <group>
+                        <field name="name_reg" required="True"/>
+                        <field name="phone_reg"/>
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+
+    </record>
 
     <record id="droga_pharma_customers_create_popup" model="ir.ui.view">
         <field name="name">droga.pharma.cust.employees.view.form.popup</field>
