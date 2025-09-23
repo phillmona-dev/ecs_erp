@@ -271,8 +271,7 @@
                             <label for="partner_custom" string="Customer"/>
                             <div class="o_row">
                                 <field name="partner_custom" string="Customer" domain="[('active', '=', True)]" options='{"no_open":True,"no_create": False}'
-                                context="{'form_view_ref': 'droga_pharma_res_partner2'}"> </field>
-
+                                context="{'form_view_ref': 'droga_pharma_res_partner2', 'default_name_reg': name}" eval="True"> </field>
                             </div>
 
 

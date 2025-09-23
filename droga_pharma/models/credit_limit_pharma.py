@@ -15,17 +15,30 @@ class pharma_res_partner(models.Model):
     _rec_name = 'name'
     partner=fields.Many2one('res.partner',required=True)
     name=fields.Char(string='Name',compute='_get_name',store=True)
-    name_reg=fields.Char('Name reg')
-    phone_reg = fields.Char('Phone reg')
+    name_reg=fields.Char('Name')
+    phone_reg = fields.Char('Phone')
     active = fields.Boolean(default=True,related='partner.active')
+
+    @api.model
+    def name_create(self, name):
+        record = self.create({
+            'name': name,
+            'name_reg': name,
+        })
+        return record.name_get()[0]
 
     @api.model
     def create(self, vals):
         if 'name_reg' in vals:
-            self.env['res.partner'].create({
+            partner=self.env['res.partner'].create({
                 'name': vals['name_reg'],
-                'mobile': vals['mobile_reg'] if 'mobile_reg' in vals else ''
+                'mobile': vals['mobile_reg'] if 'mobile_reg' in vals else '',
+                'cust_credit_limit_pharma':0,
+                'is_company':False
             })
+            vals['partner']=partner.id
+            partner.write({'is_company': False})
+            return super(pharma_res_partner, self).create(vals)
         else:
             return super(pharma_res_partner, self).create(vals)
 
@@ -50,9 +63,10 @@ class pharma_credit(models.Model):
     @api.model
     def create(self, vals):
         result = super(pharma_credit, self).create(vals)
-        self.env['res.partner.pharma2'].create({
-            'partner':result.id
-        })
+        if 'cust_credit_limit_pharma' not in vals:
+            self.env['res.partner.pharma2'].create({
+                'partner':result.id
+            })
         return result
 
     def visit_detail_open(self):

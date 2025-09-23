@@ -28,6 +28,8 @@ class sales_integ(models.Model):
         for rec in self:
             if rec.customer_emp:
                 rec.customer_emp.phone_no = rec.phone_no
+            if rec.partner_id:
+                rec.partner_id.mobile=rec.phone_no
 
     @api.onchange('partner_custom')
     def _partner_custom_change(self):
