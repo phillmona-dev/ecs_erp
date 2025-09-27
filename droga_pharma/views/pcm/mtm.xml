@@ -12,10 +12,26 @@
            <field name="numbercall">-1</field>
        </record>
     </data>
+
+    <record id="droga_pharma_mtm_search" model="ir.ui.view">
+        <field name="name">droga.pharma.mtm.search</field>
+        <field name="model">droga.pharma.mtm.header</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="client"/>
+                <field name="wareh"/>
+                <field name="mobile"/>
+
+                <filter name="group_branch" string="By Branch" context="{'group_by':'wareh'}"/>
+            </search>
+        </field>
+    </record>
+
     <record id="droga_pharma_mtm_action" model="ir.actions.act_window">
         <field name="name">MTM registration</field>
         <field name="res_model">droga.pharma.mtm.header</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="droga_pharma_mtm_search"></field>
     </record>
 
     <record id="droga_pharma_mtm_tree_view" model="ir.ui.view">
@@ -44,7 +60,7 @@
                                 <h5>Patient's Personal Info</h5>
                                 <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"></div>
                                 <group>
-                                    <field name="client"></field>
+                                    <field name="client" readonly="1"></field>
                                     <field name="gender" readonly="0"/>
                                     <field name="weight" string="Weight (KG)" readonly="0"/>
                                     <field name="height" string="Height (CM)" readonly="0"/>

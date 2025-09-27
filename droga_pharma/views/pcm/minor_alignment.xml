@@ -13,10 +13,28 @@
        </record>
     </data>
 
+    <record id="droga_pharma_aliment_search" model="ir.ui.view">
+        <field name="name">droga.pharma.minor.aliment.search</field>
+        <field name="model">droga.pharma.minor.alignment</field>
+        <field name="arch" type="xml">
+            <search string="Minor Aliments">
+                <field name="client2"/>
+                <field name="mobile"/>
+                <field name="wareh"/>
+                <field name="minor_align"></field>
+                <field name="decision"></field>
+                <field name="referral"></field>
+                <field name="create_date" string="Date"></field>
+                <field name="treatment" widget="many2many_tags"></field>
+            </search>
+        </field>
+    </record>
+
     <record id="droga_pharma_aliment_action" model="ir.actions.act_window">
         <field name="name">Minor ailment session</field>
         <field name="res_model">droga.pharma.minor.alignment</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="droga_pharma_aliment_search"></field>
 <!--        <field name="view_id" ref="droga_pharma_aliment_tree"/>-->
     </record>
 
@@ -27,6 +45,7 @@
             <tree string="Minor Aliments" create="1" delete="0">
                 <field name="client2"/>
                 <field name="mobile"/>
+                <field name="wareh"/>
                 <field name="minor_align"></field>
                 <field name="decision"></field>
                 <field name="referral"></field>
@@ -44,6 +63,7 @@
                 <field name="sales_origin"/>
                 <field name="client2"/>
                 <field name="mobile"/>
+                <field name="wareh"/>
                 <field name="minor_align"></field>
                 <field name="decision"></field>
                 <field name="referral"></field>

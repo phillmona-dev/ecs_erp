@@ -245,6 +245,7 @@ class sales_integ(models.Model):
         if len(id)==0:
             mtm = {
                 'client': self.partner_id.id,
+                'wareh':self.wareh.id
             }
 
             id=self.env['droga.pharma.mtm.header'].create(mtm)

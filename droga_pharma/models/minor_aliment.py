@@ -24,6 +24,13 @@ class droga_pharma_minor_alignment(models.Model):
     client_descr = fields.Char(related='sales_origin.emp_descr')
     sales_origin = fields.Many2one('sale.order')
     mobile = fields.Char("Mobile", compute='get_mobile',reverse='_update_mob')
+    wareh = fields.Many2one('stock.warehouse', string='Pharmacy Branch', compute='_get_pharma_wh',
+                            store=True)
+    @api.depends('client2')
+    def _get_pharma_wh(self):
+        for rec in self:
+            rec.wareh = self.env.user.warehouse_ids_ph_disp[0].id if self.env.user.warehouse_ids_ph_disp else False
+
     def _update_mob(self):
         for rec in self:
             rec.client2.partner.mobile = rec.mobile
