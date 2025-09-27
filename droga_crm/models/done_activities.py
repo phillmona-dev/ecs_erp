@@ -13,6 +13,9 @@ class done_activity(models.Model):
     source_id = fields.Integer('Record ID')
     state = fields.Char('State')
     sales_area = fields.Char('Act. area')
+    visit_remark = fields.Selection(
+        [('-', '-')],
+        string='Feedback')
     sales_rep=fields.Many2one('droga.pro.sales.master','User')
     type = fields.Char('Act. type')
     user = fields.Char('User')
@@ -24,6 +27,7 @@ class done_activity(models.Model):
     res_model_id=fields.Integer('Model ID')
     act_note = fields.Text('Act. note')
     act_id=fields.Integer('Activity ID')
+    contact_name=fields.Char('Contact Name')
     from_visit_plan=fields.Boolean('Visit planned?')
     from_visit_plan_str=fields.Char("Visit planned?",compute='_get_visit_planned')
     company_id = fields.Many2one('res.company', string='Company', related='lead_id.company_id',store=True)
@@ -84,15 +88,20 @@ class done_activity(models.Model):
     @api.depends('lead_id.check_in_descr')
     def _getcheckin(self):
         for rec in self:
-            rec.check_in=rec.lead_id.check_in_descr
-            rec.check_in_dt=rec.lead_id.check_in_time_and_date
-            rec.state='Pending'
+            if rec.contact_name==False and rec.lead_id.contact_custom2:
+                rec.contact_name=rec.lead_id.contact_custom2.descr
+            if rec.check_in_descr:
+                rec.check_in=rec.lead_id.check_in_descr
+                rec.check_in_dt=rec.lead_id.check_in_time_and_date
+                rec.state='Pending'
 
     @api.depends('lead_id.check_out_descr')
     def _getcheckout(self):
         for rec in self:
             rec.check_out = rec.lead_id.check_out_descr
             rec.check_out_dt=rec.lead_id.check_out_time_and_date
+            if rec.contact_name==False and rec.lead_id.contact_custom2:
+                rec.contact_name=rec.lead_id.contact_custom2.descr
             rec.durationdescr="-"
             if rec.check_in and rec.check_out:
                 rec.state = 'Done'

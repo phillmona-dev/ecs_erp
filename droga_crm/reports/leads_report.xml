@@ -13,7 +13,7 @@
                 <field name="name" string="Lead/visit" readonly="1"/>
                 <field name="check_in_descr" optional="show"/>
                 <field name="check_out_descr" optional="show"/>
-                <field name="visit_status"></field>
+                <field name="visit_remark"></field>
                 <field name="city_name" optional="show"/>
                 <field name="contact_name" optional="hide"/>
                 <field name="partner_name" optional="hide"/>
@@ -42,7 +42,7 @@
                 <field name="name" string="Lead/visit" readonly="1"/>
                 <field name="check_in_descr"/>
                 <field name="check_out_descr"/>
-                <field name="visit_status"></field>
+                <field name="visit_remark"></field>
                 <field name="city_name"/>
                 <field name="pr_sales"/>
 

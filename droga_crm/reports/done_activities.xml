@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <tree string="" expand="1" create="0" delete="0">
                 <field name="source_name"/>
+                <field name="contact_name"/>
                 <field name="sales_rep"/>
                 <field name="pr_team_custom"/>
                 <field name="activity_date" string="Plan date"/>
@@ -16,6 +17,7 @@
                 <field name="from_visit_plan" invisible="1"/>
                 <field name="from_visit_plan" invisible="1"/>
                 <field name="sales_area" string="Area"/>
+                <field name="visit_remark"></field>
                 <field name="from_visit_plan_str" string="Visit planned?" widget="badge" decoration-danger="not from_visit_plan" decoration-success="from_visit_plan"/>
                 <field name="state" decoration-success="state == 'Done'" decoration-warning="state=='Pending'" decoration-info="state == 'Open'" decoration-danger="state == 'Cancelled'" widget="badge"/>
                 <field name="act_note" widget="html" optional="hide"/>

@@ -306,6 +306,9 @@ class crm_lead_extension(models.Model):
     check_out_descr = fields.Char('Check out')
 
     visit_status = fields.Char('Visit status')
+    visit_remark = fields.Selection(
+        [('-', '-')],
+        string='Feedback')
 
     referral_distri = fields.Many2many('res.partner', string='Referral to distributor')
 
@@ -316,11 +319,10 @@ class crm_lead_extension(models.Model):
         for res in self.env['crm.lead'].search([('id', '=', res_id)]):
             if res.partner_id.partner_latitude==0:
                 res.partner_id.update_current_locations(res.partner_id.id,lati,long,True)
-            activities=self.env['droga.crm.done.activity'].search([('sales_rep', '=', res.pr_sales.id),('check_in_dt','!=',False),('state','=','Pending')])
-            # if len(activities)>0:
-            #     raise ValidationError(_("Please checkout pending activities with "+(activities[0].lead_id.partner_id.name if activities[0].lead_id else '')+" on "+(activities[0].check_in_dt.strftime("%d-%b-%Y")) if activities[0].check_in_dt else ''))
+            activities=self.env['droga.crm.done.activity'].search([('sales_rep', '=', res.pr_sales.id),('check_in_dt','!=',False),('check_out_dt','=',False),('state','=','Pending')])
+            if len(activities)>0:
+                raise ValidationError(_("Please checkout pending activities with "+(activities[0].lead_id.partner_id.name if activities[0].lead_id else '')+" on "+(activities[0].check_in_dt.strftime("%d-%b-%Y")) if activities[0].check_in_dt else ''))
 
-            # res.lati_custom=float(latitude)
             if res.check_in_lati == 0:
                 res.check_in_lati = float(lati)
                 res.check_in_long = float(long)
@@ -517,12 +519,13 @@ class crm_lead_extension(models.Model):
             {'name': to_return.name, 'activity_date': to_return.date_planned,
              'type': to_return.type, 'from_visit_plan': to_return.is_from_plan,
              'lead_id': to_return.id,
+             'visit_remark': to_return.visit_remark,
              'sales_rep':to_return.pr_sales.id,
              'state': 'Open', 'source_name': to_return.name, 'act_id': 0,
              'source_id': to_return.id,
              'sales_area': to_return.partner_id.city_name.city_descr,
              'res_model_id': 530, 'res_model_descr': 'Lead visit',
-             'act_note': to_return.name, 'res_model': 'crm.lead',
+             'act_note': to_return.name, 'res_model': 'crm.lead','contact_name':to_return.contact_custom2.descr,
              'user': to_return.pr_sales.p_name})
         return to_return
 

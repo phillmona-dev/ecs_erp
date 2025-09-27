@@ -176,7 +176,7 @@
                     <field name="check_in_descr" readonly="1"/>
                     <field name="check_out_descr" readonly="1"/>
                     <field name="date_planned" readonly="1" required="True"/>
-                    <field name="visit_status"></field>
+                    <field name="visit_remark"></field>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'opportunity')]}">>
                     <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
@@ -214,7 +214,7 @@
 
                     <field name="check_in_descr" readonly="1"/>
                     <field name="check_out_descr" readonly="1"/>
-                    <field name="visit_status"></field>
+                    <field name="visit_remark"></field>
                 </group>
                 <group attrs="{'invisible': [('type', '=', 'lead')]}">
                     <field name="core_products" widget="many2many_tags" domain="([('is_prod_available','=',True)])"
@@ -370,7 +370,7 @@
                     <field name="pr_team_custom"></field>
                     <field name="check_in_descr" optional="show"/>
                     <field name="check_out_descr" optional="show"/>
-                    <field name="visit_status"></field>
+                    <field name="visit_remark"></field>
                     <field name="city_name" string="City/sub-city" optional="show"/>
                     <field name="country_id" optional="hide" options="{'no_open': True, 'no_create': True}"/>
                     <field name="partner_id" invisible="1"/>
