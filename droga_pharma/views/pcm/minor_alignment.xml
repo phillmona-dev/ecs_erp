@@ -28,7 +28,7 @@
                 <field name="treatment" widget="many2many_tags"></field>
 
                 <filter name="group_branch" string="By Branch" context="{'group_by':'wareh'}"/>
-                <filter name="group_aliment" string="By ailment" context="{'group_by':'minor_align'}"/>
+                <filter name="group_aliment" string="By Ailment" context="{'group_by':'minor_align'}"/>
             </search>
         </field>
     </record>
