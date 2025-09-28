@@ -90,7 +90,7 @@ class done_activity(models.Model):
         for rec in self:
             if rec.contact_name==False and rec.lead_id.contact_custom2:
                 rec.contact_name=rec.lead_id.contact_custom2.descr
-            if rec.check_in_descr:
+            if rec.lead_id.check_in_descr:
                 rec.check_in=rec.lead_id.check_in_descr
                 rec.check_in_dt=rec.lead_id.check_in_time_and_date
                 rec.state='Pending'

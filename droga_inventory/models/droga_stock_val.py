@@ -413,7 +413,7 @@ class DrogaLandedCost(models.Model):
     purchase_total = fields.Float('Purchase total', compute='get_purch_grn_total', store=True)
     grn_total = fields.Float('GRN total', compute='get_purch_grn_total', store=True)
     lc_rate = fields.Float('Landed Cost Rate', digits=(16, 8))
-    validate_with_cron=fields.Boolean('Validate with cron',default=False)
+    validate_with_cron=fields.Boolean('Validate with cron',default=False,tracking=True)
 
     def button_validate_cron(self):
         for rec in self:
