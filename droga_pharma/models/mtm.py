@@ -211,7 +211,7 @@ class droga_pharma_mtm_schedule(models.Model):
                 res.origin_sales = sd.origin_sales.id
                 return res
 
-        raise UserError("There're no active MTM orders to create a follow up.")
+        raise UserError("There're no active MTM sales orders to create a follow up.")
 
 
 class droga_pharma_mtm_schedule_detail(models.Model):

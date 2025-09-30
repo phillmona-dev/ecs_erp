@@ -131,7 +131,7 @@
                                 <tree editable="bottom" create="1">
                                     <field name="date_follow_up"></field>
                                     <field name="time"></field>
-                                    <field name="origin_sales"></field>
+                                    <field name="origin_sales" readonly="1"></field>
                                     <field name="current_status"></field>
                                     <button icon="fa-credit-card-alt"
                                             type="object" string=" Detail"
@@ -139,7 +139,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="MTM History">
+                        <page string="MTM Status">
                             <field name="mtm_history">
                                 <tree editable="0" create="0" delete="0">
                                     <field name="origin_sales" readonly="1" options="{'no_create':True,'no_open':True}"/>
