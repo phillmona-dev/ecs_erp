@@ -307,8 +307,14 @@ class crm_lead_extension(models.Model):
 
     visit_status = fields.Char('Visit status')
     visit_remark = fields.Selection(
-        [('-', '-')],
-        string='Feedback')
+        [('Physician Not Available', 'Physician Not Available'),
+         ('Engagement Successfully Completed', 'Engagement Successfully Completed'),
+         ('Partial / Interrupted Engagement', 'Partial / Interrupted Engagement'),
+         ('Physician Declined / Refused', 'Physician Declined / Refused')],
+        string='Feedback',help='Physician not available - What to Do Next:Record the visit attempt, then arrange a follow-up—either another visit or a call to reschedule.\n'
+             'Engagement Successfully Completed - What to Do Next: Document the conversation highlights, outcomes, agreed next steps, and any feedback received.\n'
+           'Partial / Interrupted Engagement - What to Do Next: Log what was covered, and plan a return visit or follow-up call to complete the exchange.\n'
+             'Physician Declined / Refused - What to Do Next: Respectfully note the refusal and, if necessary, flag the case to limit or pause further outreach.')
 
     referral_distri = fields.Many2many('res.partner', string='Referral to distributor')
 
@@ -352,6 +358,9 @@ class crm_lead_extension(models.Model):
 
                 if dist>res.partner_id.max_allowed_distance:
                     raise ValidationError(_("Check out distance should not be greater than "+str(res.partner_id.max_allowed_distance)+" meters. It's currently "+str(round(dist,2))+"."))
+
+                if not res.visit_remark:
+                    raise ValidationError(_("Please fill select feedback field."))
 
                 res.check_out_distance_meters = int(dist)
                 res.check_out_time_and_date = datetime.now()

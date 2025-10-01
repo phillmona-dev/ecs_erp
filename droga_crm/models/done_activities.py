@@ -14,8 +14,15 @@ class done_activity(models.Model):
     state = fields.Char('State')
     sales_area = fields.Char('Act. area')
     visit_remark = fields.Selection(
-        [('-', '-')],
-        string='Feedback')
+        [('Physician Not Available', 'Physician Not Available'),
+         ('Engagement Successfully Completed', 'Engagement Successfully Completed'),
+         ('Partial / Interrupted Engagement', 'Partial / Interrupted Engagement'),
+         ('Physician Declined / Refused', 'Physician Declined / Refused')],
+        string='Feedback',
+        help='Physician not available - What to Do Next:Record the visit attempt, then arrange a follow-up—either another visit or a call to reschedule.\n'
+             'Engagement Successfully Completed - What to Do Next: Document the conversation highlights, outcomes, agreed next steps, and any feedback received.\n'
+             'Partial / Interrupted Engagement - What to Do Next: Log what was covered, and plan a return visit or follow-up call to complete the exchange.\n'
+             'Physician Declined / Refused - What to Do Next: Respectfully note the refusal and, if necessary, flag the case to limit or pause further outreach.')
     sales_rep=fields.Many2one('droga.pro.sales.master','User')
     type = fields.Char('Act. type')
     user = fields.Char('User')

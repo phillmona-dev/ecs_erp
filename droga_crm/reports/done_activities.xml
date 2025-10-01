@@ -38,11 +38,13 @@
                 <field name="action_date"/>
                 <field name="res_model_descr"/>
                 <field name="act_note"/>
+                <field name="visit_remark"></field>
                 <filter name="open" string="Open activities" domain="[('state', '=', 'Open')]" />
                 <filter name="cancel" string="Cancelled activities" domain="[('state', '=', 'Cancelled')]" />
                 <filter name="Done" string="Done activities" domain="[('state', '=', 'Done')]" />
                 <filter name="group_user" string="User" context="{'group_by':'sales_rep'}"/>
                 <filter name="group_team" string="Sales Team" context="{'group_by':'pr_team_custom'}"/>
+                <filter name="visit_remark" string="Feedback" context="{'group_by':'visit_remark'}"/>
 
                 <filter string="Today activities"
                         domain="[('activity_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('activity_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
