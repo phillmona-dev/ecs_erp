@@ -98,12 +98,25 @@ class RestApi(http.Controller):
                         datas.append(data)
                         return request.make_response(data=datas)
                     else:
-                        desired_odoo_domain = []
-                        if len(dom) > 0:
-                            desired_odoo_domain = [ast.literal_eval(dom[0])]
-                        if len(dom)>1:
-                            for entry in dom[1:]:
-                                desired_odoo_domain.append(entry)
+                        # desired_odoo_domain = []
+                        # if len(dom) > 0:
+                        #     desired_odoo_domain = [ast.literal_eval(dom[0])]
+                        # if len(dom)>1:
+                        #     for entry in dom[1:]:
+                        #         desired_odoo_domain.append(entry)
+
+                        if isinstance(dom, list):
+                            if all(isinstance(i, list) for i in dom):
+                                desired_odoo_domain = dom
+
+                            elif len(dom) == 1 and isinstance(dom[0], (list, tuple)) and len(dom[0]) == 3:
+                                raw = dom[0][2]
+                                if isinstance(raw, str):
+                                    try:
+                                        desired_odoo_domain = json.loads(raw)
+                                    except json.JSONDecodeError:
+                                        desired_odoo_domain = ast.literal_eval(raw)
+
                         partner_records = request.env[
                             str(model_name)].search_read(
                             domain=desired_odoo_domain,
