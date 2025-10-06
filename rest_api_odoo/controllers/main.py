@@ -98,7 +98,9 @@ class RestApi(http.Controller):
                         datas.append(data)
                         return request.make_response(data=datas)
                     else:
-                        desired_odoo_domain = [ast.literal_eval(dom[0])]
+                        desired_odoo_domain = []
+                        if len(dom) > 0:
+                            desired_odoo_domain = [ast.literal_eval(dom[0])]
                         if len(dom)>1:
                             for entry in dom[1:]:
                                 desired_odoo_domain.append(entry)
