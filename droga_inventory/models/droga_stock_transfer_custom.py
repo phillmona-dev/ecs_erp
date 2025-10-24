@@ -143,7 +143,7 @@ class droga_stock_transfer_custom(models.Model):
         warehouse_list=self.detail_entries['warehouse_id']
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'MTOV'),('warehouse_id', 'like', wh.id)]).id
+                [('sequence_code', '=', 'MTOV'),('warehouse_id', 'like', wh.id)],limit=1).id
             if not pick_type_id :
                 raise UserError("Picking type 'MTOV' is not configured for one of the warehouses.")
 
