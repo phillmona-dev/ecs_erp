@@ -184,7 +184,7 @@ class droga_cons_inherit(models.Model):
             if self.issue_type == 'BAGI':
                 cust_locat = 5  # 5 is customers location
             else:
-                cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
+                cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type)], order='id asc', limit=1).id
 
             if not cust_locat:
                 raise UserError(
