@@ -39,7 +39,7 @@ class HrPayrollPaymentDeductions(models.Model):
         pds = pds.filtered(lambda r: r.rem_amount < r.total_amount)
 
         for pd in pds:
-            if pd.employee_id:
+            if pd.employee_id and pd.input_types:
                 self.env.cr.execute("""
                     SELECT COALESCE(SUM(amount), 0)
                     FROM hr_payslip_line
