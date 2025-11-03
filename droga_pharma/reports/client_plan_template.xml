@@ -1,10 +1,12 @@
 <odoo>
+    <!-- English Version -->
     <template id="report_mtm_plan">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="droga_pharma.droga_pharma_header_layout">
-                </t>
+                <!-- Use external_layout with proper structure -->
                 <t t-call="web.external_layout">
+                    <t t-call="droga_pharma.droga_pharma_header_layout"/>
+                    <t t-set="doc" t-value="doc"/>
                     <div class="page">
                         <div class="oe_structure"/>
                         <div class="row mt32">
@@ -13,35 +15,59 @@
                                 <h5>Date: <span t-field="doc.date_follow_up"/></h5>
                                 <br/>
                                 <h5>Based on what I've discussed with the pharmacist, I will complete these things.</h5>
-<!--                                <div t-raw="doc.plan"/>-->
                                 <br/>
-                                <table style="border-collapse: separate; border-spacing: 10%; width: 100%;">
+
+                                <table style="border-collapse: separate; border-spacing: 0 5px; width: 100%;">
                                     <tbody>
+                                        <!-- Section 1 -->
+                                        <tr>
+                                            <th style="text-align:left; text-decoration: underline; font-weight: bold; padding-top:5px;">
+                                                Plans and goals for next followup
+                                            </th>
+                                        </tr>
                                         <t t-foreach="doc.plan.split('\n')" t-as="line">
-                                            <tr>
-                                                <td>
-                                                    <t t-raw="line"/>
-                                                </td>
-                                            </tr>
+                                            <tr><td><t t-raw="line"/></td></tr>
+                                        </t>
+
+                                        <!-- Section 2 -->
+                                        <tr>
+                                            <th style="text-align:left; text-decoration: underline; font-weight: bold; padding-top:10px;">
+                                                Assessment and care plan
+                                            </th>
+                                        </tr>
+                                        <t t-foreach="doc.asses_care_plan.split('\n')" t-as="line">
+                                            <tr><td><t t-raw="line"/></td></tr>
+                                        </t>
+
+                                        <!-- Section 3 -->
+                                        <tr>
+                                            <th style="text-align:left; text-decoration: underline; font-weight: bold; padding-top:10px;">
+                                                Recommendations / Interventions
+                                            </th>
+                                        </tr>
+                                        <t t-foreach="doc.recs_inter.split('\n')" t-as="line">
+                                            <tr><td><t t-raw="line"/></td></tr>
                                         </t>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                    <t t-call="droga_pharma.droga_pharma_footer_layout">
-                    </t>
                 </t>
+                <!-- Custom footer called separately -->
+                <t t-call="droga_pharma.droga_pharma_footer_layout"/>
             </t>
         </t>
     </template>
 
+    <!-- Amharic Version -->
     <template id="report_mtm_plan_amharic">
         <t t-call="web.html_container">
+            <t t-call="droga_pharma.droga_pharma_header_layout"/>
             <t t-foreach="docs" t-as="doc">
-                <t t-call="droga_pharma.droga_pharma_header_layout">
-                </t>
+                <!-- Use external_layout with proper structure -->
                 <t t-call="web.external_layout">
+                    <t t-set="doc" t-value="doc"/>
                     <head>
                         <style>
                             @font-face {
@@ -55,28 +81,54 @@
                         <div class="row mt32">
                             <div class="col-12">
                                 <h2 style="font-family: amharic_font, Arial, sans-serif;">የታካሚ መከታተያ</h2>
-                                <h5 style="font-family: amharic_font, Arial, sans-serif;">ቀን: <span t-field="doc.date_follow_up"/></h5>
+                                <h5 style="font-family: amharic_font, Arial, sans-serif;">
+                                    ቀን: <span t-field="doc.date_follow_up"/>
+                                </h5>
                                 <br/>
-                                <h5 style="font-family: amharic_font, Arial, sans-serif;">በተሰጠኝ የመድኃኒት ክትትል አገልግሎት መሰረት ከታች የተዘረዘሩትን  ምክር እተገብራለሁ</h5>
-<!--                                <div t-raw="doc.plan"/>-->
+                                <h5 style="font-family: amharic_font, Arial, sans-serif;">
+                                    በተሰጠኝ የመድኃኒት ክትትል አገልግሎት መሰረት ከታች የተዘረዘሩትን ምክር እተገብራለሁ
+                                </h5>
                                 <br/>
-                                <table style="border-collapse: separate; border-spacing: 10%; width: 100%;">
+
+                                <table style="border-collapse: separate; border-spacing: 0 5px; width: 100%;">
                                     <tbody>
+                                        <!-- Section 1 -->
+                                        <tr>
+                                            <th style="text-align:left; text-decoration: underline; font-weight: bold; padding-top:5px;">
+                                                ለቀጣይ ክትትል ዕቅዶች እና ግቦች
+                                            </th>
+                                        </tr>
                                         <t t-foreach="doc.plan.split('\n')" t-as="line">
-                                            <tr>
-                                                <td>
-                                                    <t t-raw="line"/>
-                                                </td>
-                                            </tr>
+                                            <tr><td><t t-raw="line"/></td></tr>
+                                        </t>
+
+                                        <!-- Section 2 -->
+                                        <tr>
+                                            <th style="text-align:left; text-decoration: underline; font-weight: bold; padding-top:10px;">
+                                                ግምገማ እና እንክብካቤ እቅድ
+                                            </th>
+                                        </tr>
+                                        <t t-foreach="doc.asses_care_plan.split('\n')" t-as="line">
+                                            <tr><td><t t-raw="line"/></td></tr>
+                                        </t>
+
+                                        <!-- Section 3 -->
+                                        <tr>
+                                            <th style="text-align:left; text-decoration: underline; font-weight: bold; padding-top:10px;">
+                                                ምክሮች / ጣልቃገብነቶች
+                                            </th>
+                                        </tr>
+                                        <t t-foreach="doc.recs_inter.split('\n')" t-as="line">
+                                            <tr><td><t t-raw="line"/></td></tr>
                                         </t>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                    <t t-call="droga_pharma.droga_pharma_footer_layout">
-                    </t>
                 </t>
+                <!-- Custom footer called separately -->
+                <t t-call="droga_pharma.droga_pharma_footer_layout"/>
             </t>
         </t>
     </template>
