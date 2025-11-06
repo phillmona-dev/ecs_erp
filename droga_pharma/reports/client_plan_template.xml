@@ -14,7 +14,7 @@
                                 <h2>Patient's Program of Action</h2>
                                 <h5>Date: <span t-field="doc.date_follow_up"/></h5>
                                 <br/>
-                                <h5>In light of the discussion I had with the patient, I would appreciate it if you could take our MTM Pharmacist’s recommendations into consideration.</h5>
+                                <h5>Based on what I've discussed with the pharmacist, I will complete these things.</h5>
                                 <br/>
 
                                 <table style="border-collapse: separate; border-spacing: 0 5px; width: 100%;">
@@ -147,7 +147,7 @@
                                 <h2>Patient's Program of Action</h2>
                                 <h5>Date: <span t-field="doc.date_follow_up"/></h5>
                                 <br/>
-                                <h5>Based on what I've discussed with the pharmacist, I will complete these things.</h5>
+                                <h5>In light of the discussion I had with the patient, I would appreciate it if you could take our MTM Pharmacist’s recommendations into consideration.</h5>
                                 <br/>
 
                                 <table style="border-collapse: separate; border-spacing: 0 5px; width: 100%;">
