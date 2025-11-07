@@ -13,9 +13,10 @@ class DrogaUpdateWaAfterDate(models.Model):
     def recalculate_item_after_date(self, product_id, dateafter):
         to_update = self.env["droga.stock.valuation.layer"].search(
             [('product_id', '=', product_id), ('move_date', '>=', dateafter)],
-            order='move_date asc, move_type asc, quantity asc, svl_id asc',
+            order='move_date asc, move_type asc, quantity asc, svl_id asc',limit =1
         )
         for row in to_update:
+            print("Processing rowid " + str(row.id))
             row.update_wa_after_date(row)
 
     def recalculate_item_after_date_per_warehouse(self, warehouseid, dateafter):
@@ -26,4 +27,5 @@ class DrogaUpdateWaAfterDate(models.Model):
         )
         product_ids = [item['product_id'][0] for item in product_data]
         for prod_id in product_ids:
+            print("Processing "+str(prod_id))
             self.recalculate_item_after_date(prod_id, dateafter)
