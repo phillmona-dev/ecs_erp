@@ -716,15 +716,15 @@ class droga_stock_move_extension(models.Model):
                 rec.has_read_access = False
 
     def write(self,vals_list):
-        if 'date' in vals_list:
-            for res in self:
-                if res.location_id.name == 'Inventory adjustment' or res.location_dest_id.name == 'Inventory adjustment' and res.product_id.product_tmpl_id.adj_date:
-                    try:
-                        vals_list['date'] = datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())
-                        for mv_line in res.move_line_ids:
-                            mv_line.date = datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())
-                    except:
-                        raise ValidationError("Please use excel file template with FINANCE for posting shortage and overage transactions.")
+        # if 'date' in vals_list:
+        #     for res in self:
+        #         if (res.location_id.name == 'Inventory adjustment' or res.location_dest_id.name == 'Inventory adjustment') and res.product_id.product_tmpl_id.adj_date:
+        #             try:
+        #                 vals_list['date'] = datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())
+        #                 for mv_line in res.move_line_ids:
+        #                     mv_line.date = datetime.combine(res.product_id.product_tmpl_id.adj_date, datetime.min.time())
+        #             except:
+        #                 raise ValidationError("Please use excel file template with FINANCE for posting shortage and overage transactions.")
         return super(droga_stock_move_extension, self).write(vals_list)
 
     @api.model
