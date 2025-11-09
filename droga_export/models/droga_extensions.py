@@ -286,7 +286,7 @@ class droga_cons_inherit(models.Model):
             if len(raw_details) > 0:
                 for it in raw_details[0].items_detail:
                     prod_id=self.env['product.product'].search([('product_tmpl_id','=',it.items_header[0].raw_item.id)])
-                    std_price=self.env['droga.wa.utility'].get_cost_at_date(self.env,prod_id.id,self.issue_date)
+                    std_price=self.env['droga.wa.utility'].get_cost_at_date(self.env,prod_id.id,self.create_date)
                     if it['type'] == 'waste':
                         continue
                     if it['type'] == 'finish':
@@ -336,6 +336,8 @@ class droga_cons_inherit(models.Model):
                     vals_receipts = self.env['droga.stock.valuation.layer'].search(
                         [('stock_move_id', 'in', moves_receipts.ids), ('product_id', '=', product.id)])
                     for val in vals_receipts:
+                        if val.id==381438:
+                            x=9
                         val.write({'unit_cost': price})
                         val.write({'value': price * val.quantity})
                         # val.unit_cost = price

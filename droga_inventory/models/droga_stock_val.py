@@ -658,4 +658,10 @@ class DrogaUtility(models.AbstractModel):
         if price:
             return price.unit_cost
         else:
-            return 0
+            price = env['droga.stock.valuation.layer'].search(
+                [('product_id', '=', product_id), ('move_date', '>', date)],
+                order="move_date asc, move_type asc, quantity desc,svl_id asc", limit=1)
+            if price:
+                return price.unit_cost
+            else:
+                return 0
