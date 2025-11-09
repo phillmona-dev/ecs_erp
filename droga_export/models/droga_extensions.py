@@ -1,3 +1,5 @@
+from datetime import date
+
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
@@ -251,6 +253,112 @@ class droga_cons_inherit(models.Model):
 
         self.state = 'waiting'
 
+    def recalculate(self):
+        for det in self.detail_entries:
+            raw_details = self.env['droga.export.items.composition'].search(
+                [('raw_item', 'in', det.product_id.product_tmpl_id.ids)])
+            if len(raw_details)==0:
+                continue
+            else:
+                #Total number of finished goods
+                total_qty_finished=det.product_uom_qty*sum(self.env['droga.export.items.composition.fin.goods'].search(
+                    [('id', 'in', raw_details[0].items_detail.ids),('type','=','finish')]).mapped('rate_in_pct'))/100
+                # Total number of byproduct goods
+                total_qty_byproduct = det.product_uom_qty * sum(self.env['droga.export.items.composition.fin.goods'].search(
+                    [('id', 'in', raw_details[0].items_detail.ids), ('type', '=', 'byproduct')]).mapped('rate_in_pct')) / 100
+                #Total number sent to cleaning unit
+            total_qty = det.product_uom_qty
+
+            # Total cost for finished goods
+            total_cost_build_finish=sum(self.env['droga.export.cost.buildup'].search([('issue_export_origin_form','=',self.id),('type_apply','=','Finished')]).mapped('amount_for_order'))
+            # Total cost for byproduct goods
+            total_cost_build_byproduct = sum(self.env['droga.export.cost.buildup'].search(
+                [('issue_export_origin_form', '=', self.id), ('type_apply', '=', 'By-product')]).mapped('amount_for_order'))
+            # Total cost for common costs
+            total_cost_common = sum(self.env['droga.export.cost.buildup'].search(
+                [('issue_export_origin_form', '=', self.id), ('type_apply', '=', 'All')]).mapped(
+                'amount_for_order'))
+
+            if total_qty_finished+total_qty_byproduct!=0:
+                #This variable is used to add markup and accomodate waste material cost and priorate them to finished and by-products
+                waste_increase_rate=total_qty/(total_qty_finished+total_qty_byproduct)
+
+            if len(raw_details) > 0:
+                for it in raw_details[0].items_detail:
+                    prod_id=self.env['product.product'].search([('product_tmpl_id','=',it.items_header[0].raw_item.id)])
+                    std_price=self.env['droga.wa.utility'].get_cost_at_date(self.env,prod_id.id,self.issue_date)
+                    if it['type'] == 'waste':
+                        continue
+                    if it['type'] == 'finish':
+                        unit_cost=(std_price*waste_increase_rate) +(det.proc_cost*waste_increase_rate)+(total_cost_build_finish/total_qty_finished)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
+                    else:
+                        unit_cost = (std_price*waste_increase_rate) + (det.proc_cost*waste_increase_rate) +(total_cost_build_byproduct/total_qty_byproduct)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
+
+                    uom_rate=it['item'].uom_id.factor/det.product_id.product_tmpl_id.uom_id.factor
+
+                    price=unit_cost/uom_rate
+                    product=self.env['product.product'].search([('product_tmpl_id','=',it.item.id)])
+                    items=self.env['droga.inventory.cons.receive.detail'].search([('cons_header.subcontractor_return_origin_form','=',self.id),('product_id','=',product.id)])
+
+                    for item in items:
+                        item.price_unit_cons=price
+
+                    picking_issues=self.env['stock.picking'].search([('cons_sample_issue_request','=',self.id)])
+                    moves_issues=self.env['stock.move'].search([('picking_id','in',picking_issues.ids),('product_id','=',prod_id.id)])
+                    vals_issues=self.env['droga.stock.valuation.layer'].search([('stock_move_id','in',moves_issues.ids),('product_id','=',prod_id.id)])
+                    for val in vals_issues:
+                        val.write({'unit_cost': price})
+                        val.write({'value': price*val.quantity})
+                        # val.unit_cost=price
+                        # val.value=price*val.quantity
+                        if val.account_move_id:
+                            query1 = """
+                                        update account_move set company_id=6 where id=%s
+                                    """
+                            self.env.cr.execute(query1, (
+                                val.account_move_id.id,))
+
+                            query2 = """
+                                        update account_move_line set company_id=6 where move_id=%s
+                                    """
+
+                            self.env.cr.execute(query2, (
+                                val.account_move_id.id,))
+
+                        val.account_move_id = False
+
+                        val.update_wa_after_date(val)
+
+                    receipts=self.env['droga.inventory.consignment.receive'].search([('subcontractor_return_origin_form','=',self.id)])
+                    picking_receipts = self.env['stock.picking'].search([('cons_receive_request', 'in', receipts.ids)])
+                    moves_receipts = self.env['stock.move'].search(
+                        [('picking_id', 'in', picking_receipts.ids), ('product_id', '=', product.id)])
+                    vals_receipts = self.env['droga.stock.valuation.layer'].search(
+                        [('stock_move_id', 'in', moves_receipts.ids), ('product_id', '=', product.id)])
+                    for val in vals_receipts:
+                        val.write({'unit_cost': price})
+                        val.write({'value': price * val.quantity})
+                        # val.unit_cost = price
+                        # val.value = price * val.quantity
+                        if val.account_move_id:
+                            query1 = """
+                                                            update account_move set company_id=6 where id=%s
+                                                        """
+                            self.env.cr.execute(query1, (
+                                val.account_move_id.id,))
+
+                            query2 = """
+                                                            update account_move_line set company_id=6 where move_id=%s
+                                                        """
+
+                            self.env.cr.execute(query2, (
+                                val.account_move_id.id,))
+
+                        val.account_move_id = False
+
+                        val.update_wa_after_date(val)
+
+
     def sub_cont_return(self):
         if len(self.cons_ref.filtered(lambda x: (x.state=='done')))==0:
             raise UserError("Please send items to cleaning unit first before receving them.")
@@ -288,12 +396,17 @@ class droga_cons_inherit(models.Model):
 
             if len(raw_details) > 0:
                 for it in raw_details[0].items_detail:
+
+                    prod_id = self.env['product.product'].search(
+                        [('product_tmpl_id', '=', it.items_header[0].raw_item.id)])
+                    std_price = self.env['droga.wa.utility'].get_cost_at_date(self.env, prod_id.id, date(2099, 1, 1))
+
                     if it['type'] == 'waste':
                         continue
                     if it['type'] == 'finish':
-                        unit_cost=(it.items_header[0].raw_item.standard_price*waste_increase_rate) +(det.proc_cost*waste_increase_rate)+(total_cost_build_finish/total_qty_finished)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
+                        unit_cost=(std_price*waste_increase_rate) +(det.proc_cost*waste_increase_rate)+(total_cost_build_finish/total_qty_finished)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
                     else:
-                        unit_cost = (it.items_header[0].raw_item.standard_price*waste_increase_rate) + (det.proc_cost*waste_increase_rate) +(total_cost_build_byproduct/total_qty_byproduct)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
+                        unit_cost = (std_price*waste_increase_rate) + (det.proc_cost*waste_increase_rate) +(total_cost_build_byproduct/total_qty_byproduct)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
 
                     uom_rate=it['item'].uom_id.factor/det.product_id.product_tmpl_id.uom_id.factor
 

@@ -168,6 +168,11 @@ class droga_stock_cons_receive(models.Model):
         for act in activity:
             act.sudo().action_done()
 
+    def recalculate_wa(self):
+        # Search for subcontractor_return_origin_form field for each item and get it's parent
+        issue_origin=self.env['droga.inventory.consignment.issue'].search([('id','=',self.subcontractor_return_origin_form)])
+        issue_origin.recalculate()
+
 
 class droga_stock_cons_receive_detail(models.Model):
     _name = 'droga.inventory.cons.receive.detail'

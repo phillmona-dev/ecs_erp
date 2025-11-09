@@ -213,7 +213,7 @@ class DrogaStockValuationLayer(models.Model):
             account_moves = self.env['account.move'].sudo().create(am_vals)
             account_moves['invoice_origin'] = self.origin
             account_moves._post()
-
+            print('Linked '+str(self.id)+' with '+str(account_moves.id))
             self.account_move_id = account_moves.id
 
     def revaluate_after_date_upd_ledger(self, reference=''):
@@ -648,3 +648,14 @@ class DrogaAccountMove(models.Model):
 
     droga_stock_valuation_layer_ids = fields.One2many('stock.valuation.layer', 'account_move_id',
                                                       string='Stock Valuation Layer')
+
+class DrogaUtility(models.AbstractModel):
+    _name='droga.wa.utility'
+
+    @classmethod
+    def get_cost_at_date(cls,env,product_id,date):
+        price=env['droga.stock.valuation.layer'].search([('product_id','=',product_id),('move_date','<=',date)],order="move_date desc, move_type desc, quantity asc,svl_id desc",limit=1)
+        if price:
+            return price.unit_cost
+        else:
+            return 0
