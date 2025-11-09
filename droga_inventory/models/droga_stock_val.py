@@ -125,7 +125,8 @@ class DrogaStockValuationLayer(models.Model):
         else:
             # There are no prior transactions
             ret.remaining_value = ret.value if ret.value > 0 else 0
-            ret.remaining_qty = ret.quantity if ret.quantity > 0 else 0
+            #ret.remaining_qty = ret.quantity if ret.quantity > 0 else 0
+            ret.remaining_qty = ret.quantity
             ret.remark = ''
 
     @api.model
