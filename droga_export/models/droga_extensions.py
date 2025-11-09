@@ -295,7 +295,8 @@ class droga_cons_inherit(models.Model):
                         unit_cost = (std_price*waste_increase_rate) + (det.proc_cost*waste_increase_rate) +(total_cost_build_byproduct/total_qty_byproduct)+(total_cost_common/(total_qty_finished+total_qty_byproduct))
 
                     uom_rate=it['item'].uom_id.factor/det.product_id.product_tmpl_id.uom_id.factor
-
+                    if uom_rate==0.001:
+                        uom_rate=1
                     price=unit_cost/uom_rate
                     product=self.env['product.product'].search([('product_tmpl_id','=',it.item.id)])
                     items=self.env['droga.inventory.cons.receive.detail'].search([('cons_header.subcontractor_return_origin_form','=',self.id),('product_id','=',product.id)])
