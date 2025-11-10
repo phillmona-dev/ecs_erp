@@ -286,7 +286,8 @@ class droga_cons_inherit(models.Model):
             if len(raw_details) > 0:
                 for it in raw_details[0].items_detail:
                     prod_id=self.env['product.product'].search([('product_tmpl_id','=',it.items_header[0].raw_item.id)])
-                    std_price=self.env['droga.wa.utility'].get_cost_at_date(self.env,prod_id.id,self.create_date)
+                    date_issue=self.env['stock.picking'].search([('name','=',self.consignment_reference.replace("\n", "").replace("\r", ""))],limit=1).write_date or self.create_date
+                    std_price=self.env['droga.wa.utility'].get_cost_at_date(self.env,prod_id.id,date_issue)
                     if it['type'] == 'waste':
                         continue
                     if it['type'] == 'finish':
