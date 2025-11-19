@@ -488,6 +488,17 @@ class account_move_line(models.Model):
                         acc_move.stat = 'Unmatched'
 
 
+    def update_cost_ref(self):
+        for rec in self:
+            analytic = self.env['stock.move.line'].search([('move_id', '=', rec.move_id.stock_move_id.id)])
+            if not rec.inv_origin and len(analytic)>0:
+                rec.inv_origin=analytic[0].move_id.origin
+            if rec.profit_cost_center == '-' and rec.account and rec.journal_id.id == 2 and len(analytic)>0:
+                if rec.account.startswith('5'):
+                    if len(analytic) > 0:
+                        rec.profit_cost_center = analytic[0].trans_warehouse.linked_analytic.name if analytic[
+                            0].trans_warehouse.linked_analytic else rec.profit_cost_center
+
     @api.model
     def create(self, vals):
         ret= super(account_move_line, self).create(vals)
