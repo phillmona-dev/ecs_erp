@@ -490,9 +490,9 @@ class account_move_line(models.Model):
 
     def update_cost_ref(self):
         for rec in self:
-            analytic = self.env['stock.move.line'].search([('move_id', '=', rec.move_id.stock_move_id.id)])
+            analytic = self.env['stock.move'].search([('id', '=', rec.move_id.stock_move_id.id)])
             if not rec.inv_origin and len(analytic)>0:
-                rec.inv_origin=analytic[0].move_id.origin
+                rec.inv_origin=analytic[0].origin
             if rec.profit_cost_center == '-' and rec.account and rec.journal_id.id == 2 and len(analytic)>0:
                 if rec.account.startswith('5'):
                     if len(analytic) > 0:
