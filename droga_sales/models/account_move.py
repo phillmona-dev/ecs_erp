@@ -487,7 +487,6 @@ class account_move_line(models.Model):
                     else:
                         acc_move.stat = 'Unmatched'
 
-
     def update_cost_ref(self):
         for rec in self:
             analytic = self.env['stock.move'].search([('id', '=', rec.move_id.stock_move_id.id)])

@@ -178,10 +178,14 @@ class droga_cons_inherit(models.Model):
                 if not pick_type_id:
                     raise UserError("Picking type delivery order is not configured for one of the warehouses.")
             else:
-                pick_type_id = self.env['stock.picking.type'].sudo().search(
-                    [('sequence_code', '=', 'SUBI'), ('warehouse_id', '=', wh.id)]).id
-                if not pick_type_id:
+                pick_type_ids = self.env['stock.picking.type'].sudo().search(
+                    [('sequence_code', '=', 'SUBI'), ('warehouse_id', '=', wh.id)]).ids
+                if len(pick_type_ids)>1:
+                    raise UserError("There are multiple picking types of type SUBI is configured for the warehouse, please make sure there's only one.")
+
+                if not pick_type_ids:
                     raise UserError("Picking type SUBI is not configured for one of the warehouses.")
+                pick_type_id = pick_type_ids[0]
 
             if self.issue_type == 'BAGI':
                 cust_locat = 5  # 5 is customers location
