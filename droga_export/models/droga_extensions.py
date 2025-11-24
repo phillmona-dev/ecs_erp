@@ -506,6 +506,11 @@ class droga_sale_inherit(models.Model):
         itemsdetail=[]
         for ord in self.order_line:
             if len(self.env['droga.export.items.composition.fin.goods'].search([('item','=',ord.product_template_id.id),('type','=','finish')]))>0:
+                prod_templates = self.env['droga.export.items.composition.fin.goods'].search(
+                    [('item', '=', ord.product_template_id.id), ('type', '=', 'finish')])[0].items_header.raw_item.ids
+                if len(prod_templates)>0:
+                    raise UserError("The item is registered twice under composition, please archive the duplicate ones..")
+
                 prod_template=self.env['droga.export.items.composition.fin.goods'].search(
                     [('item', '=', ord.product_template_id.id), ('type', '=', 'finish')])[0].items_header.raw_item.id
                 itemsdetail.append({
