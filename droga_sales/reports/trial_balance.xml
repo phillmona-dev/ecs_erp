@@ -15,9 +15,10 @@
                 <field name="balance"/>
                 <field name="journal_id"/>
                 <field name="name"/>
-                <!--
+                <field name="parent_state"/>
+
                 <field name="profit_cost_center"/>
-                -->
+
             </tree>
         </field>
     </record>
