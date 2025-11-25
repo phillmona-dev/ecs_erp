@@ -507,7 +507,7 @@ class droga_sale_inherit(models.Model):
         for ord in self.order_line:
             if len(self.env['droga.export.items.composition.fin.goods'].search([('item','=',ord.product_template_id.id),('type','=','finish')]))>0:
                 prod_templates = self.env['droga.export.items.composition.fin.goods'].search(
-                    [('item', '=', ord.product_template_id.id), ('type', '=', 'finish')])[0].items_header.raw_item
+                    [('item', '=', ord.product_template_id.id), ('type', '=', 'finish'),('company_id', '=', self.env.company.id)])[0].items_header.raw_item
                 if len(prod_templates)>1:
                     items=''
                     for raw in prod_templates:
@@ -517,8 +517,7 @@ class droga_sale_inherit(models.Model):
                 if len(prod_templates) ==0:
                     raise UserError(
                         "Please register the item under items composition so that it can be sent to cleaning unit.")
-                prod_template=self.env['droga.export.items.composition.fin.goods'].search(
-                    [('item', '=', ord.product_template_id.id), ('type', '=', 'finish')])[0].items_header.raw_item.id
+                prod_template=prod_templates[0].id
                 itemsdetail.append({
                     'company_id':self.company_id.id,
                     'product_id':self.env['product.product'].search(
@@ -527,6 +526,9 @@ class droga_sale_inherit(models.Model):
                                                                                                    ('type','=','finish')])[0]['rate_in_pct']
 
                 })
+            else:
+                raise UserError(
+                    "The item is registered more than once under composition, please archive the duplicate ones.")
         return {
             'name': 'Cleaning unit issue',
             'view_type': 'form',
