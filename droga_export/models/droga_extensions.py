@@ -39,6 +39,14 @@ class inventory_return_extension(models.Model):
                 [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id)]).id
             if not pick_type_id:
                 raise UserError("Picking type SUBL is not configured for one of the warehouses.")
+        pick_type_ids = self.env['stock.location'].sudo().search(
+            [('con_type', '=', self.issue_type)])
+        if len(pick_type_ids) > 1:
+            loc=""
+            for pick in pick_type_ids:
+                loc=loc+pick.name
+            raise UserError(
+                "There are multiple locations of type "+self.issue_type+loc+" configured for the warehouse, please make sure there's only one.")
 
         cons_vendor = self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
 
