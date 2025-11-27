@@ -40,24 +40,24 @@ class inventory_return_extension(models.Model):
             if not pick_type_id:
                 raise UserError("Picking type SUBL is not configured for one of the warehouses.")
         pick_type_ids = self.env['stock.location'].sudo().search(
-            [('con_type', '=', self.issue_type)])
+            [('con_type', '=', self.issue_type),('active','=',True),('company_id','=', self.env.company.id)])
         if len(pick_type_ids) > 1:
             loc=""
             for pick in pick_type_ids:
-                loc=loc+pick.name
+                loc=loc+str(pick.id)
             raise UserError(
                 "There are multiple locations of type "+self.issue_type+loc+" configured for the warehouse, please make sure there's only one.")
 
-        cons_vendor = self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
+        cons_vendor = self.env['stock.location'].search([('con_type', '=', self.issue_type),('active','=',True),('company_id','=', self.env.company.id)]).id
 
         if not cons_vendor:
             raise UserError("SUBL location not set. Please configure accordingly.")
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id),('company_id','=', self.env.company.id)]).id
             def_loc_id = self.env['stock.location'].search(
-                [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False), ('usage', '=', 'internal')])[
+                [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False),('company_id','=', self.env.company.id), ('usage', '=', 'internal')])[
                 0].id
             if not def_loc_id:
                 raise UserError("Store location not set for receiver warehouse. Please configure accordingly.")
@@ -182,12 +182,12 @@ class droga_cons_inherit(models.Model):
 
             if self.issue_type == 'BAGI':
                 pick_type_id = self.env['stock.picking.type'].sudo().search(
-                    [('sequence_code', '=', 'OUT'), ('warehouse_id', '=', wh.id)]).id
+                    [('sequence_code', '=', 'OUT'), ('company_id','=', self.env.company.id),('warehouse_id', '=', wh.id)]).id
                 if not pick_type_id:
                     raise UserError("Picking type delivery order is not configured for one of the warehouses.")
             else:
                 pick_type_ids = self.env['stock.picking.type'].sudo().search(
-                    [('sequence_code', '=', 'SUBI'), ('warehouse_id', '=', wh.id)]).ids
+                    [('sequence_code', '=', 'SUBI'),('company_id','=', self.env.company.id), ('warehouse_id', '=', wh.id)]).ids
                 if len(pick_type_ids)>1:
                     raise UserError("There are multiple picking types of type SUBI is configured for the warehouse, please make sure there's only one.")
 
@@ -198,7 +198,7 @@ class droga_cons_inherit(models.Model):
             if self.issue_type == 'BAGI':
                 cust_locat = 5  # 5 is customers location
             else:
-                cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type)], order='id asc', limit=1).id
+                cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type),('company_id','=', self.env.company.id)], order='id asc', limit=1).id
 
             if not cust_locat:
                 raise UserError(
@@ -213,9 +213,9 @@ class droga_cons_inherit(models.Model):
                 def_loc_id = 5
             else:
                 pick_type_id = self.env['stock.picking.type'].sudo().search(
-                    [('sequence_code', '=', 'SUBI'), ('warehouse_id', '=', wh.id)]).id
+                    [('sequence_code', '=', 'SUBI'),('company_id','=', self.env.company.id), ('warehouse_id', '=', wh.id)]).id
                 def_loc_id = self.env['stock.location'].search(
-                    [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False), ('usage', '=', 'internal')])[
+                    [('complete_name', 'like', wh.code + '/%'),('company_id','=', self.env.company.id), ('con_type', '=', False), ('usage', '=', 'internal')])[
                     0].id
 
             # Get default location for the warehouse
