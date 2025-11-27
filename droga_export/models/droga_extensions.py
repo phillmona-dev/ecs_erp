@@ -512,7 +512,6 @@ class droga_sale_inherit(models.Model):
                     items=''
                     for raw in prod_templates:
                         items=items+raw.default_code
-
                     raise UserError("The item is registered more than once under composition, please archive the duplicate ones.")
                 if len(prod_templates) ==0:
                     raise UserError(
@@ -520,11 +519,9 @@ class droga_sale_inherit(models.Model):
                 prod_template=prod_templates[0].id
                 itemsdetail.append({
                     'company_id':self.company_id.id,
-                    'product_id':self.env['product.product'].search(
-                    [('product_tmpl_id', '=', prod_template)])[0].id,
+                    'product_id':self.env['product.product'].search([('product_tmpl_id', '=', prod_template)])[0].id,
                     'product_uom_qty':(ord.product_uom_qty*100)/self.env['droga.export.items.composition.fin.goods'].search([('item','=',ord.product_template_id.id),
                                                                                                    ('type','=','finish')])[0]['rate_in_pct']
-
                 })
             else:
                 raise UserError(
