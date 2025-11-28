@@ -132,10 +132,10 @@
                   groups="account.group_account_manager"
                   sequence="4"/>
 
-        <menuitem id="droga_trial_balance_report_by_analytics_tree_menu" name="Trial Balance by Analytics"
+        <!--<menuitem id="droga_trial_balance_report_by_analytics_tree_menu" name="Trial Balance by Analytics"
                   action="view_trial_balance_by_analytics_action"
                   groups="account.group_account_manager"
-                  sequence="6"/>
+                  sequence="6"/>-->
 
 
     </menuitem>

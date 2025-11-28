@@ -39,17 +39,25 @@ class inventory_return_extension(models.Model):
                 [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id)]).id
             if not pick_type_id:
                 raise UserError("Picking type SUBL is not configured for one of the warehouses.")
+        pick_type_ids = self.env['stock.location'].sudo().search(
+            [('con_type', '=', self.issue_type),('active','=',True),('company_id','=', self.env.company.id)])
+        if len(pick_type_ids) > 1:
+            loc=""
+            for pick in pick_type_ids:
+                loc=loc+str(pick.id)
+            raise UserError(
+                "There are multiple locations of type "+self.issue_type+loc+" configured for the warehouse, please make sure there's only one.")
 
-        cons_vendor = self.env['stock.location'].search([('con_type', '=', self.issue_type)]).id
+        cons_vendor = self.env['stock.location'].search([('con_type', '=', self.issue_type),('active','=',True),('company_id','=', self.env.company.id)]).id
 
         if not cons_vendor:
             raise UserError("SUBL location not set. Please configure accordingly.")
 
         for wh in warehouse_list:
             pick_type_id = self.env['stock.picking.type'].sudo().search(
-                [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id)]).id
+                [('sequence_code', '=', 'SUBL'), ('warehouse_id', '=', wh.id),('company_id','=', self.env.company.id)]).id
             def_loc_id = self.env['stock.location'].search(
-                [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False), ('usage', '=', 'internal')])[
+                [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False),('company_id','=', self.env.company.id), ('usage', '=', 'internal')])[
                 0].id
             if not def_loc_id:
                 raise UserError("Store location not set for receiver warehouse. Please configure accordingly.")
@@ -174,19 +182,23 @@ class droga_cons_inherit(models.Model):
 
             if self.issue_type == 'BAGI':
                 pick_type_id = self.env['stock.picking.type'].sudo().search(
-                    [('sequence_code', '=', 'OUT'), ('warehouse_id', '=', wh.id)]).id
+                    [('sequence_code', '=', 'OUT'), ('company_id','=', self.env.company.id),('warehouse_id', '=', wh.id)]).id
                 if not pick_type_id:
                     raise UserError("Picking type delivery order is not configured for one of the warehouses.")
             else:
-                pick_type_id = self.env['stock.picking.type'].sudo().search(
-                    [('sequence_code', '=', 'SUBI'), ('warehouse_id', '=', wh.id)]).id
-                if not pick_type_id:
+                pick_type_ids = self.env['stock.picking.type'].sudo().search(
+                    [('sequence_code', '=', 'SUBI'),('company_id','=', self.env.company.id), ('warehouse_id', '=', wh.id)]).ids
+                if len(pick_type_ids)>1:
+                    raise UserError("There are multiple picking types of type SUBI is configured for the warehouse, please make sure there's only one.")
+
+                if not pick_type_ids:
                     raise UserError("Picking type SUBI is not configured for one of the warehouses.")
+                pick_type_id = pick_type_ids[0]
 
             if self.issue_type == 'BAGI':
                 cust_locat = 5  # 5 is customers location
             else:
-                cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type)], order='id asc', limit=1).id
+                cust_locat = self.env['stock.location'].search([('con_type', '=', self.issue_type),('company_id','=', self.env.company.id)], order='id asc', limit=1).id
 
             if not cust_locat:
                 raise UserError(
@@ -201,9 +213,9 @@ class droga_cons_inherit(models.Model):
                 def_loc_id = 5
             else:
                 pick_type_id = self.env['stock.picking.type'].sudo().search(
-                    [('sequence_code', '=', 'SUBI'), ('warehouse_id', '=', wh.id)]).id
+                    [('sequence_code', '=', 'SUBI'),('company_id','=', self.env.company.id), ('warehouse_id', '=', wh.id)]).id
                 def_loc_id = self.env['stock.location'].search(
-                    [('complete_name', 'like', wh.code + '/%'), ('con_type', '=', False), ('usage', '=', 'internal')])[
+                    [('complete_name', 'like', wh.code + '/%'),('company_id','=', self.env.company.id), ('con_type', '=', False), ('usage', '=', 'internal')])[
                     0].id
 
             # Get default location for the warehouse
@@ -502,16 +514,26 @@ class droga_sale_inherit(models.Model):
         itemsdetail=[]
         for ord in self.order_line:
             if len(self.env['droga.export.items.composition.fin.goods'].search([('item','=',ord.product_template_id.id),('type','=','finish')]))>0:
-                prod_template=self.env['droga.export.items.composition.fin.goods'].search(
-                    [('item', '=', ord.product_template_id.id), ('type', '=', 'finish')])[0].items_header.raw_item.id
+                prod_templates = self.env['droga.export.items.composition.fin.goods'].search(
+                    [('item', '=', ord.product_template_id.id), ('type', '=', 'finish'),('company_id', '=', self.env.company.id)])
+                if len(prod_templates)>1:
+                    items=''
+                    for raw in prod_templates:
+                        items=items+raw.items_header.raw_item.default_code+" ,"
+                    raise UserError("The item "+ord.product_template_id.name+" is registered more than once under composition with "+items+", please archive the duplicate ones.")
+                if len(prod_templates) ==0:
+                    raise UserError(
+                        "Please register the item under items composition so that it can be sent to cleaning unit.")
+                prod_template=prod_templates[0].items_header.raw_item.id
                 itemsdetail.append({
                     'company_id':self.company_id.id,
-                    'product_id':self.env['product.product'].search(
-                    [('product_tmpl_id', '=', prod_template)])[0].id,
+                    'product_id':self.env['product.product'].search([('product_tmpl_id', '=', prod_template)])[0].id,
                     'product_uom_qty':(ord.product_uom_qty*100)/self.env['droga.export.items.composition.fin.goods'].search([('item','=',ord.product_template_id.id),
                                                                                                    ('type','=','finish')])[0]['rate_in_pct']
-
                 })
+            else:
+                raise UserError(
+                    "The item is not registered under composition, please register raw material for it.")
         return {
             'name': 'Cleaning unit issue',
             'view_type': 'form',
