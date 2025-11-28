@@ -79,6 +79,7 @@
                 <field name="sales_order_type"></field>
                 <field name="company_id" invisible="1"></field>
                 <field name="manual_price"></field>
+                <field name="discount"></field>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='partner_id']" position="replace">
@@ -95,7 +96,7 @@
                        readonly="1"/>
                 <field name="total_discount"
                        attrs="{'invisible': ['|',('total_discount', '&lt;', 0),('total_discount', '=', 0)]}"
-                       string="Total discount" invisible="" readonly="1"/>
+                       string="Total discount" readonly="1"/>
                 <field name="total_added"
                        attrs="{'invisible': ['|',('total_added', '&lt;', 0),('total_added', '=', 0)]}"
                        string="Total increase" invisible="" readonly="1"/>
