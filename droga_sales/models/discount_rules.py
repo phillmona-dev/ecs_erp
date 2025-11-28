@@ -313,8 +313,10 @@ class sale_order_line(models.Model):
     @api.onchange('product_id')
     def _prod_changed(self):
         for rec in self:
+            rec.discount = rec.order_id.discount
             if rec.order_from:
                 if rec.order_from.startswith('PH'):
+                    rec.discount=rec.order_id.discount
                     rec.price_unit=self._get_pharma_price(rec)
 
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
@@ -537,14 +539,14 @@ class sale_order_ext(models.Model):
     inv_number=fields.Char('Invoice Number')
     discount=fields.Integer('Discount %',default=0)
 
-    @api.depends('discount')
+    @api.onchange('discount')
     def disc_change(self):
         for rec in self:
             if rec.discount <0 or rec.discount>100:
                 rec.discount=0
                 raise ValidationError("Price discount should be between 0 and 100.")
             rec.manual_price=False
-            for line in rec.order_ids:
+            for line in rec.order_line:
                 line.discount=rec.discount
 
     @api.depends('total_disc_pharma','deduct_type')
