@@ -36,6 +36,7 @@
         'views/account_journal.xml',
         'views/branch_address.xml',
         'views/account_move_crv.xml',
+        'views/maturity_extension.xml',
         'report/payment_request.xml',
         'report/account_move.xml',
 

@@ -19,4 +19,4 @@ access_droga_account_move_withholidng,account.move.withholding,model_account_mov
 access_droga_account_payment_link,droga.account.payment.link,model_droga_account_payment_link,droga_finance.finance_self_service_group,1,1,1,1
 access_droga_account_payment_link_data,droga.account.payment.link.data,model_droga_account_payment_link_data,droga_finance.finance_self_service_group,1,1,1,1
 
-
+access_invoice_extension_user,access_invoice_extension_user,model_invoice_extension,droga_finance.account_receivable_team_leader_group,1,1,1,1,,,1,,,,,1,,,,,,0,,,,,,,0
