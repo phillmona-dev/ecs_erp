@@ -505,7 +505,7 @@ class PurchaseOrderLine(models.Model):
             for rec in self:
                 # for order in rec:
                 for move in rec.mapped('move_ids'):
-                    if move.state == 'done' and self.env.user.id != 17: #Tewodros Ababu
+                    if move.state == 'done' and self.env.user.id != 178: #Tewodros Ababu
                         raise UserError(
                             _('Unable to update purchase order %s as some receptions have already been done.') % (
                                 rec.order_id.name))
