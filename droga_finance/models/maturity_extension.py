@@ -11,27 +11,17 @@ class InvoiceExtension(models.Model):
         "account.move",
         string="Invoice",
         required=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
     )
 
     extension_days = fields.Integer(
         string="Extension Days",
         required=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
     )
 
     new_due_date = fields.Date(
         string="New Due Date",
         compute="_compute_new_due_date",
         store=True,
-        readonly=True,
-    )
-
-    state = fields.Selection(
-        [("draft", "Draft"), ("done", "Done")],
-        default="draft",
         readonly=True,
     )
 
@@ -56,14 +46,6 @@ class InvoiceExtension(models.Model):
         rec._apply_extension_sql()
         return rec
 
-    def write(self, vals):
-        if any(r.state == "done" for r in self):
-            raise exceptions.UserError("You cannot modify a record that is already processed.")
-        res = super().write(vals)
-        self._apply_extension_sql()
-        self.state = "done"
-        return res
-
     def _apply_extension_sql(self):
         """Update invoice due date using direct SQL for performance and control."""
         for rec in self:
@@ -75,4 +57,4 @@ class InvoiceExtension(models.Model):
                         WHERE id = %s;
                     """
                     self.env.cr.execute(query, (rec.new_due_date, rec.invoice_id.id))
-                    rec.state = "done"
+
