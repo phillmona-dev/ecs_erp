@@ -54,7 +54,6 @@ class InvoiceExtension(models.Model):
     def create(self, vals):
         rec = super().create(vals)
         rec._apply_extension_sql()
-        rec.state = "done"
         return rec
 
     def write(self, vals):
@@ -76,3 +75,4 @@ class InvoiceExtension(models.Model):
                         WHERE id = %s;
                     """
                     self.env.cr.execute(query, (rec.new_due_date, rec.invoice_id.id))
+                    rec.state = "done"
