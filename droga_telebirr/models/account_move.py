@@ -214,6 +214,9 @@ class AccountMove(models.Model):
             partner_phone = self.partner_id.phone
         else:
             raise UserError(_("Customer has no phone number on partner record."))
+
+        partner_phone=self.normalize_phone(partner_phone)
+
         API_Caller = "DROGAUSSDPUSH"
         API_Caller_pass = "juCbniUsZOijv72yo5ZB3LSMujrUCjFTE71w7xVraOw="
         amount = "%.2f" % (self.amount_total)
