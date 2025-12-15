@@ -114,6 +114,15 @@ class AccountMove(models.Model):
             self.write({'telebirr_status': 'failed', 'telebirr_message': str(e)})
             raise UserError(_("Error when sending to relay: %s") % e)
 
+    def normalize_phone(partner_phone):
+        if partner_phone.startswith('+'):
+            return partner_phone[1:]
+
+        elif partner_phone.startswith('0'):
+            return '251' + partner_phone[1:]
+
+        return partner_phone
+
     def _prepare_telebirr_payload_log(self,conv_id):
         """Builds the SOAP XML payload using the invoice fields.
 
@@ -129,6 +138,9 @@ class AccountMove(models.Model):
             partner_phone = self.partner_id.phone
         else:
             raise UserError(_("Customer has no phone number on partner record."))
+
+        partner_phone=self.normalize_phone(partner_phone)
+
         API_Caller="DROGAUSSDPUSH"
         API_Caller_pass="juCbniUsZOijv72yo5ZB3LSMujrUCjFTE71w7xVraOw="
         amount = "%.2f" % (self.amount_total)
