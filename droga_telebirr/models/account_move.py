@@ -115,13 +115,14 @@ class AccountMove(models.Model):
             raise UserError(_("Error when sending to relay: %s") % e)
 
     def normalize_phone(partner_phone):
-        if partner_phone.startswith('+'):
-            return partner_phone[1:]
+        clean_phone = partner_phone.replace(" ", "")
+        if clean_phone.startswith('+'):
+            return clean_phone[1:]
 
-        elif partner_phone.startswith('0'):
-            return '251' + partner_phone[1:]
+        elif clean_phone.startswith('0'):
+            return '251' + clean_phone[1:]
 
-        return partner_phone
+        return clean_phone
 
     def _prepare_telebirr_payload_log(self,conv_id):
         """Builds the SOAP XML payload using the invoice fields.
