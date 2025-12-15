@@ -114,7 +114,7 @@ class AccountMove(models.Model):
             self.write({'telebirr_status': 'failed', 'telebirr_message': str(e)})
             raise UserError(_("Error when sending to relay: %s") % e)
 
-    def normalize_phone(partner_phone):
+    def normalize_phone(self,partner_phone):
         clean_phone = partner_phone.replace(" ", "")
         if clean_phone.startswith('+'):
             return clean_phone[1:]
