@@ -12,6 +12,16 @@
         <field name="context">{'create': "0",'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
     </record>
 
+    <record id="product.product_category_action_form" model="ir.actions.act_window">
+        <field name="name">Product Categories</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.category</field>
+        <field name="context">{'default_company_id': allowed_company_ids[0]}</field>
+        <field name="search_view_id" ref="product.product_category_search_view"/>
+        <field name="view_id" ref="product.product_category_list_view"/>
+    </record>
+
+
     <!-- Stock transfers default filter per warehouse access -->
     <record id="stock.action_picking_tree_ready" model="ir.actions.act_window">
         <field name="domain">[('has_access','=',True)]</field>
