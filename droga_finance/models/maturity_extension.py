@@ -34,12 +34,6 @@ class InvoiceExtension(models.Model):
             else:
                 rec.new_due_date = False
 
-    @api.constrains("extension_days")
-    def _check_extension_days(self):
-        for rec in self:
-            if rec.extension_days <= 0:
-                raise exceptions.ValidationError("Extension days must be greater than zero.")
-
     @api.model
     def create(self, vals):
         rec = super().create(vals)
