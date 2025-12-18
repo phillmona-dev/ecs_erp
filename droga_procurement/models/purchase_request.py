@@ -263,6 +263,10 @@ class purhcase_request(models.Model):
     # budget checked
     def budget_checked_request(self):
         # check for budgetary position and expense account
+
+        if self.company_id in [10, 22]:
+            return True
+
         for record in self.purhcase_request_lines:
             if not record.budgetary_position.ids or not record.expense_account.ids:
                 return {
@@ -571,7 +575,8 @@ class purhcase_request_line(models.Model):
     @api.depends("unit_price", "selling_price_after_arrival")
     def calculate_margin(self):
         for record in self:
-            record.expected_margin = ((record.unit_price - record.selling_price_after_arrival) / record.selling_price_after_arrival) * 100
+            record.expected_margin = ((
+                                              record.unit_price - record.selling_price_after_arrival) / record.selling_price_after_arrival) * 100
 
     def compute_sequence_no(self):
         seq_no = 1
@@ -621,9 +626,9 @@ class purhcase_request_line(models.Model):
         for record in self:
             record.four_month_order_qty = record.expected_average_mon_cons * 4
             # record.six_month_order_qty = record.expected_average_mon_cons * 6
-            if record.expected_average_mon_cons!=0:
+            if record.expected_average_mon_cons != 0:
                 record.six_month_order_qty = (
-                                             record.product_qty + record.current_stock_balance) / record.expected_average_mon_cons
+                                                     record.product_qty + record.current_stock_balance) / record.expected_average_mon_cons
             record.order_qty_and_current_stcok = record.product_qty + \
                                                  record.current_stock_balance
         return True
