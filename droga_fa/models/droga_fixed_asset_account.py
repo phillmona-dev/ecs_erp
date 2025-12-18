@@ -52,13 +52,10 @@ class AccountAsset(models.Model):
 
     @api.constrains('asset_number')
     def _check_asset_no_unique(self):
-        if self.asset_number == '':
-            return True
-
         counts = self.search_count(
             [('asset_number', '=', self.asset_number)])
 
-        if counts > 1 and self.asset_type not in ('sale', 'expense'):
+        if counts > 1 and self.asset_type not in ('sale', 'expense','purchase'):
             raise ValidationError("Asset code must be unique")
 
 
