@@ -47,11 +47,14 @@ class AccountAsset(models.Model):
         draft_lines = self.depreciation_move_ids
         for line in draft_lines:
             for move_line in line.line_ids:
-                if move_line.account_id != self.account_depreciation_id: #check if account is  expense account
+                if move_line.account_id != self.account_depreciation_id:  # check if account is  expense account
                     move_line.write({'analytic_distribution': new_analytic_id})
 
     @api.constrains('asset_number')
     def _check_asset_no_unique(self):
+        if self.asset_number == '':
+            return True
+
         counts = self.search_count(
             [('asset_number', '=', self.asset_number)])
 
