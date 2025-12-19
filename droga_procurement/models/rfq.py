@@ -421,7 +421,7 @@ class Rfq(models.Model):
                     bank_branch = record11.bank_branch
                     approved_date = record11.request_approved_date
 
-        suppliers = record.supplier_id
+        suppliers = self.supplier_id
 
         # get unique suppliers from the rfq
         # for line in self.rfq_lines:
