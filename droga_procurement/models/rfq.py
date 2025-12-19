@@ -378,28 +378,29 @@ class Rfq(models.Model):
                 [('rfq_id', '=', self.id)])
 
             # check if foregin currency is approved
-            if self.currency_requests.ids:
-                for record in self.currency_requests:
-                    if record.state != 'Approved':
-                        return {
-                            'type': 'ir.actions.client',
-                            'tag': 'display_notification',
-                            'params': {
-                                'message': 'Requested foreign currency is not approved ',
-                                'type': 'danger',
-                                'sticky': False
+            if self.company_id not in [22,10]:
+                if self.currency_requests.ids:
+                    for record in self.currency_requests:
+                        if record.state != 'Approved':
+                            return {
+                                'type': 'ir.actions.client',
+                                'tag': 'display_notification',
+                                'params': {
+                                    'message': 'Requested foreign currency is not approved ',
+                                    'type': 'danger',
+                                    'sticky': False
+                                }
                             }
+                else:
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
+                            'message': 'Foreign currency is not requested, please request the form before issuing the purchase order ',
+                            'type': 'danger',
+                            'sticky': False
                         }
-            else:
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'message': 'Foreign currency is not requested, please request the form before issuing the purchase order ',
-                        'type': 'danger',
-                        'sticky': False
                     }
-                }
 
             if puchase_orders.ids:
                 return {
