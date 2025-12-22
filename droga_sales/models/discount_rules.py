@@ -600,6 +600,7 @@ class sale_order_ext(models.Model):
             list) > 0 else False
 
     wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh',store=True)
+    telebirr_id = fields.Char('Telebirr ID',related='wareh.telebirr_id')
 
     def unlink(self):
         raise ValidationError(

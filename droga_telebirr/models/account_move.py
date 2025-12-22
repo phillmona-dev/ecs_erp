@@ -143,7 +143,7 @@ class AccountMove(models.Model):
         partner_phone=self.normalize_phone(partner_phone)
 
         API_Caller="DROGAUSSDPUSH"
-        API_Caller_pass="juCbniUsZOijv72yo5ZB3LSMujrUCjFTE71w7xVraOw="
+        API_Caller_pass="-"
         amount = "%.2f" % (self.amount_total)
         amount=1
         currency = (self.currency_id.name or "ETB")
@@ -154,7 +154,7 @@ class AccountMove(models.Model):
         short_code = "515190"
         ORG_OPERATOR_ID="51519001"
         timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-        SecurityCredential='GPAhd70eFCbwhfQ8WRYDRTvc5yUwVZruVEtNj+pFy5Y='
+        SecurityCredential='-'
 
         # Minimal SOAP request body (XML string)
         soap_template = f"""<?xml version="1.0" encoding="utf-8"?>   
@@ -218,7 +218,7 @@ class AccountMove(models.Model):
         partner_phone=self.normalize_phone(partner_phone)
 
         API_Caller = "DROGAUSSDPUSH"
-        API_Caller_pass = "juCbniUsZOijv72yo5ZB3LSMujrUCjFTE71w7xVraOw="
+        API_Caller_pass = self.env['ir.config_parameter'].sudo().get_param('telebirr.api.pass')
         amount = "%.2f" % (self.amount_total)
         amount = 1
         currency = (self.currency_id.name or "ETB")
@@ -227,9 +227,14 @@ class AccountMove(models.Model):
 
         initiator_id = self.env.user.login or 'odoo_user'
         short_code = "515190"
+        short_code=self.line_ids.sale_line_ids.order_id.wareh.telebirr_id
+        if not short_code:
+            raise UserError(_("Short code not filled for branch, please contact system administrator."))
+
         ORG_OPERATOR_ID = "51519001"
+        ORG_OPERATOR_ID=short_code+"01"
         timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-        SecurityCredential = 'GPAhd70eFCbwhfQ8WRYDRTvc5yUwVZruVEtNj+pFy5Y='
+        SecurityCredential = self.env['ir.config_parameter'].sudo().get_param('telebirr.api.credential')
 
         # Minimal SOAP request body (XML string)
         soap_template = f"""<?xml version="1.0" encoding="utf-8"?>   
@@ -282,9 +287,6 @@ class AccountMove(models.Model):
 
     def _telebirr_callback_url(self):
         return 'https://drogaerp-staging-25932983.dev.odoo.com/web/callback/result'
-        base = self.env['ir.config_parameter'].sudo().get_param('telebirr.callback.base') or ''
-        # build result callback URL (should point to a controller that handles results)
-        return (base.rstrip('/') + '/telebirr/callback') if base else 'https://your.odoo/telebirr/callback'
 
     def _send_bus_notification(self, status, message=None):
         try:

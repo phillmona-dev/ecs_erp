@@ -15,7 +15,7 @@
     'category': 'Droga telebirr integration',
     'version': '0.1',
 
-    'depends': ['base','account','droga_finance','droga_sales'],
+    'depends': ['base','account','droga_finance','droga_sales','droga_inventory'],
 
     'data': [
         "security/ir.model.access.csv",
