@@ -137,9 +137,11 @@ class WitholdingReport(models.TransientModel):
         sheet.write(row_start, 2, 'Withholdee''s Name', title_format)
         sheet.write(row_start, 3, 'Receipt No', title_format)
         sheet.write(row_start, 4, 'Receipt Date', title_format)
-        sheet.write(row_start, 5, 'Taxable Amount', title_format)
-        sheet.write(row_start, 6, 'Tax Withheld', title_format)
-        sheet.write(row_start, 7, 'Receipt No Internal', title_format)
+        sheet.write(row_start, 5, 'Folder type (G or E)', title_format)
+        sheet.write(row_start, 6, 'Taxable Amount', title_format)
+        sheet.write(row_start, 7, 'Tax Withheld', title_format)
+        sheet.write(row_start, 8, 'Receipt No Internal', title_format)
+        sheet.write(row_start, 9, 'MRC No', title_format)
         row_start += 1
 
         for record in withholdings:
@@ -156,9 +158,11 @@ class WitholdingReport(models.TransientModel):
                     sheet.write(row_start, 2, witholdee_name, border)
                     sheet.write(row_start, 3, reciept_no, border)
                     sheet.write(row_start, 4, record.withholding_date, date_format)
-                    sheet.write(row_start, 5, record.amount_before_vat, num_format)
-                    sheet.write(row_start, 6, abs(record.withholding_amount), num_format)
-                    sheet.write(row_start, 7, internal_ref, border)
+                    sheet.write(row_start, 5, 'G', border)
+                    sheet.write(row_start, 6, record.amount_before_vat, num_format)
+                    sheet.write(row_start, 7, abs(record.withholding_amount), num_format)
+                    sheet.write(row_start, 8, internal_ref, border)
+                    sheet.write(row_start, 9,'',border)
                     row_start += 1
 
     def generate_receivable_xlsx_report(self, workbook):
@@ -242,9 +246,11 @@ class WitholdingReport(models.TransientModel):
         sheet.write(row_start, 2, 'Withholdee''s Name', title_format)
         sheet.write(row_start, 3, 'Receipt No', title_format)
         sheet.write(row_start, 4, 'Receipt Date', title_format)
-        sheet.write(row_start, 5, 'Taxable Amount', title_format)
-        sheet.write(row_start, 6, 'Tax Withheld', title_format)
-        sheet.write(row_start, 7, 'Receipt No Internal', title_format)
+        sheet.write(row_start, 5,'Folder type (G or E)',title_format)
+        sheet.write(row_start, 6, 'Taxable Amount', title_format)
+        sheet.write(row_start, 7, 'Tax Withheld', title_format)
+        sheet.write(row_start, 8, 'Receipt No Internal', title_format)
+        sheet.write(row_start, 8, 'MRC No', title_format)
         row_start += 1
 
         for record in withholdings:
@@ -261,9 +267,11 @@ class WitholdingReport(models.TransientModel):
                     sheet.write(row_start, 2, witholdee_name, border)
                     sheet.write(row_start, 3, reciept_no, border)
                     sheet.write(row_start, 4, record.withholding_date, date_format)
-                    sheet.write(row_start, 5, record.amount_before_vat, num_format)
-                    sheet.write(row_start, 6, abs(record.withholding_amount), num_format)
-                    sheet.write(row_start, 7, internal_ref, border)
+                    sheet.write(row_start, 5, 'G', border)
+                    sheet.write(row_start, 6, record.amount_before_vat, num_format)
+                    sheet.write(row_start, 7, abs(record.withholding_amount), num_format)
+                    sheet.write(row_start, 8, internal_ref, border)
+                    sheet.write(row_start, 9, '', border)
                     row_start += 1
 
     def generate_vat_xlsx_report(self, workbook, move_type, tax_type):
