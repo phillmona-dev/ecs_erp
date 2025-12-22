@@ -73,7 +73,7 @@ class AccountMove(models.Model):
 
     mobile_no = fields.Char(
         string='Mobile',
-
+        #TODO - While installing on prod, remove below 4 params first, install, then add them again
         compute='_compute_mobile_no',
         inverse='_inverse_mobile_no',
         store=True,
@@ -254,7 +254,7 @@ class AccountMove(models.Model):
             raise UserError(_("Short code not filled for branch, please contact system administrator."))
 
         ORG_OPERATOR_ID = "51519001"
-        ORG_OPERATOR_ID=short_code+"01"
+        
         timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
         SecurityCredential = self.env['ir.config_parameter'].sudo().get_param('telebirr.api.credential')
 
