@@ -148,7 +148,7 @@ class WitholdingReport(models.TransientModel):
                     # get witholde name and tin no
                     witholdee_name = move_id_wh.partner_id.name if move_id_wh.partner_id.name else ''
                     witholdee_tin = move_id_wh.partner_id.vat if move_id_wh.partner_id.vat else ''
-                    reciept_no = move_id_wh.ref if move_id_wh.ref else ''
+                    reciept_no = record.ref if record.ref else ''
                     internal_ref = move_id_wh.withholding_internal_ref if move_id_wh.withholding_internal_ref else ''
 
                     sheet.write(row_start, 0, "9063340002", border)
@@ -253,7 +253,7 @@ class WitholdingReport(models.TransientModel):
                     # get witholde name and tin no
                     witholdee_name = move_id_wh.partner_id.name if move_id_wh.partner_id.name else ''
                     witholdee_tin = move_id_wh.partner_id.vat if move_id_wh.partner_id.vat else ''
-                    reciept_no = move_id_wh.ref if move_id_wh.ref else ''
+                    reciept_no = record.ref if record.ref else ''
                     internal_ref = move_id_wh.withholding_internal_ref if move_id_wh.withholding_internal_ref else ''
 
                     sheet.write(row_start, 0, "9063340002", border)
