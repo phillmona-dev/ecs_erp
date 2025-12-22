@@ -378,28 +378,29 @@ class Rfq(models.Model):
                 [('rfq_id', '=', self.id)])
 
             # check if foregin currency is approved
-            if self.currency_requests.ids:
-                for record in self.currency_requests:
-                    if record.state != 'Approved':
-                        return {
-                            'type': 'ir.actions.client',
-                            'tag': 'display_notification',
-                            'params': {
-                                'message': 'Requested foreign currency is not approved ',
-                                'type': 'danger',
-                                'sticky': False
+            if self.company_id  in ('22','10'):
+                if self.currency_requests.ids:
+                    for record in self.currency_requests:
+                        if record.state != 'Approved':
+                            return {
+                                'type': 'ir.actions.client',
+                                'tag': 'display_notification',
+                                'params': {
+                                    'message': 'Requested foreign currency is not approved ',
+                                    'type': 'danger',
+                                    'sticky': False
+                                }
                             }
+                else:
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
+                            'message': 'Foreign currency is not requested, please request the form before issuing the purchase order ',
+                            'type': 'danger',
+                            'sticky': False
                         }
-            else:
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'message': 'Foreign currency is not requested, please request the form before issuing the purchase order ',
-                        'type': 'danger',
-                        'sticky': False
                     }
-                }
 
             if puchase_orders.ids:
                 return {
@@ -420,7 +421,7 @@ class Rfq(models.Model):
                     bank_branch = record11.bank_branch
                     approved_date = record11.request_approved_date
 
-        suppliers = record.supplier_id
+        suppliers = self.supplier_id
 
         # get unique suppliers from the rfq
         # for line in self.rfq_lines:
