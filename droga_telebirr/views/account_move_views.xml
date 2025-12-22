@@ -18,12 +18,13 @@
 
                 <!-- Add Telebirr fields after invoice date -->
                 <xpath expr="//field[@name='invoice_date']" position="after">
-                    <group string="Telebirr Information" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}">
-                        <field name="telebirr_conversation_id" readonly="1"/>
-                        <field name="telebirr_status"/>
-                        <field name="telebirr_transaction_id" readonly="1"/>
-                        <field name="telebirr_response_date" readonly="1"/>
-                    </group>
+<!--                    <group string="Telebirr Information" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}">-->
+                    <field name="mobile_no"></field>
+                    <field name="telebirr_conversation_id" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}" string="Telebirr ID" readonly="1"/>
+                    <field name="telebirr_status" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
+                    <field name="telebirr_transaction_id" readonly="1" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
+                    <field name="telebirr_response_date" readonly="1" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
+
                 </xpath>
             </field>
         </record>

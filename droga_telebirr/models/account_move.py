@@ -71,6 +71,24 @@ class AccountMove(models.Model):
         readonly=True,
     )
 
+    mobile_no = fields.Char(
+        string='Mobile',
+        
+    )
+
+    @api.depends('partner_id')
+    def _compute_mobile_no(self):
+        for move in self:
+            if not move.mobile_no and move.partner_id:
+                move.mobile_no = move.partner_id.mobile or move.partner_id.phone
+
+    def _inverse_mobile_no(self):
+        for move in self:
+            if move.mobile_no and move.partner_id:
+                move.partner_id.write({
+                    'mobile': move.mobile_no
+                })
+
     def action_send_to_telebirr(self):
         """Public method that constructs a SOAP request and posts it to the relay."""
         self.ensure_one()
