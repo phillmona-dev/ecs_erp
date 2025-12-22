@@ -32,11 +32,8 @@ export const telebirrBusService = {
                     }
 
                     // --- NOTIFICATION ---
-       //             action.doAction("reload");
+                    action.doAction("reload");
 
-                    controller.component.model.root.update({
-                        payment_state: status === "success" ? 'paid' : 'not_paid'
-                    });
                     notification.add(
                         message || `Payment update for ${invoice_name}`,
                         {
