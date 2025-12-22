@@ -73,7 +73,11 @@ class AccountMove(models.Model):
 
     mobile_no = fields.Char(
         string='Mobile',
-        
+
+        compute='_compute_mobile_no',
+        inverse='_inverse_mobile_no',
+        store=True,
+        readonly=False
     )
 
     @api.depends('partner_id')
