@@ -254,7 +254,7 @@ class droga_stock_picking_extension_pharma(models.Model):
     cons_receive_request_pharma = fields.Many2one('droga.inventory.consignment.receive.pharma','Consignment receive request')
 
     def button_validate(self):
-        if self.cons_receive_request_pharma:
+        if self.cons_receive_request_pharma and self.company_id==1:
             self.cons_receive_request_pharma.write({'state': 'done'})
 
         return super(droga_stock_picking_extension_pharma, self).button_validate()

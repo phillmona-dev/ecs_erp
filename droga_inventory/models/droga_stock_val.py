@@ -147,7 +147,7 @@ class DrogaStockValuationLayer(models.Model):
                     [('move_type', '=', 'Static'),
                      ('stock_move_id', '=', ret.stock_move_id.origin_returned_move_id.id)],
                     limit=1)
-                if unit_cost:  # If there's no static valuation, we'll treat it as weighted transaction as well
+                if unit_cost and ret.company_id.tax_lock_date:  # If there's no static valuation, we'll treat it as weighted transaction as well
                     if unit_cost[
                         'move_date'] > ret.company_id.tax_lock_date:  # Make sure period is not closed for the date, if closed we'll treat it as weighted transaction
                         ret.unit_cost = unit_cost['unit_cost']
