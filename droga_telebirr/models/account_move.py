@@ -97,6 +97,9 @@ class AccountMove(models.Model):
         """Public method that constructs a SOAP request and posts it to the relay."""
         self.ensure_one()
         conv_id= str(uuid.uuid4())
+        if self.state!="posted":
+            self.action_post()
+
         params = self._prepare_telebirr_payload(conv_id)
 
         print (params)

@@ -32,7 +32,7 @@ export const telebirrBusService = {
                     }
 
                     // --- NOTIFICATION ---
-
+                    action.doAction("reload");
                     notification.add(
                         message || `Payment update for ${invoice_name}`,
                         {
@@ -41,24 +41,6 @@ export const telebirrBusService = {
                             sticky: true,
                         }
                     );
-
-                    // --- VIEW RELOAD (FIXED) ---
-
-//                    if (status === "success") {
-//                        setTimeout(() => {
-//                            const currentController = action.currentController;
-//
-//                            if (currentController && currentController.component && typeof currentController.component.reload === 'function') {
-//
-//                                currentController.component.reload();
-//
-//                                console.log(`Telebirr: Successfully reloaded view data for Invoice ${invoice_name}`);
-//                            } else {
-//                                console.warn("Telebirr: Could not find view component reload method. Forcing page refresh.");
-//                                browser.location.reload();
-//                            }
-//                        }, 500);
-//                    }
                 }
             }
         }
