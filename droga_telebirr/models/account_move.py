@@ -230,7 +230,9 @@ class AccountMove(models.Model):
     def _prepare_telebirr_payload(self,conv_id):
         self.ensure_one()
         partner_phone = False
-        if self.partner_id.mobile:
+        if self.mobile_no:
+            partner_phone = self.mobile_no
+        elif self.partner_id.mobile:
             partner_phone = self.partner_id.mobile
         elif self.partner_id.phone:
             partner_phone = self.partner_id.phone
@@ -254,7 +256,7 @@ class AccountMove(models.Model):
             raise UserError(_("Short code not filled for branch, please contact system administrator."))
 
         ORG_OPERATOR_ID = "51519001"
-        
+
         timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
         SecurityCredential = self.env['ir.config_parameter'].sudo().get_param('telebirr.api.credential')
 

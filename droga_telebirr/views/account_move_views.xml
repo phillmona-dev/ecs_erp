@@ -13,7 +13,8 @@
                             type="object"
                             string="Send to Telebirr"
                             class="btn-primary"
-                            attrs="{'invisible': [('state', '!=', 'posted'), ('telebirr_status', '=', 'success')]}"/>
+                            icon="fa-phone"
+                            attrs="{'invisible': ['|',('state', '!=', 'posted'), ('telebirr_status', '=', 'success')]}"/>
                 </xpath>
 
                 <!-- Add Telebirr fields after invoice date -->
