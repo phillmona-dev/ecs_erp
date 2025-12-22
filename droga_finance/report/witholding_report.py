@@ -15,7 +15,7 @@ class WitholdingReport(models.TransientModel):
 
     report = fields.Selection(
         [('Withholding Payable', 'Withholding Payable'), ('Withholding Receivable', 'Withholding Receivable'),
-         ('VAT Receivable', 'VAT Receivable'),('VAT Payable', 'VAT Payable')])
+         ('VAT Receivable', 'VAT Receivable'), ('VAT Payable', 'VAT Payable')])
     date_from = fields.Date("Date From", required=True)
     date_to = fields.Date("Date To")
     company_id = fields.Many2one('res.company', 'Company', required=True,
@@ -120,14 +120,17 @@ class WitholdingReport(models.TransientModel):
 
         # search RFQ
 
-        account_moves = self.env['account.move'].search(
-            [('date', '>=', self.date_from), ('date', '<=', self.date_to), ('company_id', '=', self.company_id.id)])
+        #account_moves = self.env['account.move'].search(
+            #[('date', '>=', self.date_from), ('date', '<=', self.date_to), ('company_id', '=', self.company_id.id)])
 
-        accounts = self.env['account.account'].search(
-            [('code', 'in', ('214003', '214004'))])
+        #accounts = self.env['account.account'].search(
+            #[('code', 'in', ('214003', '214004'))])
 
-        withholdings = self.env['account.move.line'].search(
-            [('move_id', 'in', account_moves.ids), ('account_id', 'in', accounts.ids)])
+        # withholdings = self.env['account.move.line'].search(
+        # [('move_id', 'in', account_moves.ids), ('account_id', 'in', accounts.ids)])
+
+        withholdings = self.env['account.move.withholding'].search(
+            [('withholding_date', '>=', self.date_from), ('withholding_date', '<=', self.date_to),('company_id', '=', self.company_id.id)])
 
         sheet.write(row_start, 0, 'Withholder''s Tax Account', title_format)
         sheet.write(row_start, 1, 'Withholdee''s TIN', title_format)
@@ -140,21 +143,23 @@ class WitholdingReport(models.TransientModel):
         row_start += 1
 
         for record in withholdings:
-            # get witholde name and tin no
-            witholdee_name = record.move_id.partner_id.name if record.move_id.partner_id.name else ''
-            witholdee_tin = record.move_id.partner_id.vat if record.move_id.partner_id.vat else ''
-            reciept_no = record.move_id.withholding_no if record.move_id.withholding_no else ''
-            internal_ref = record.move_id.withholding_internal_ref if record.move_id.withholding_internal_ref else ''
+            for move_id_wh in record.move_id_wh:
+                if move_id_wh.move_type=='in_invoice' and move_id_wh.company_id==self.company_id:
+                    # get witholde name and tin no
+                    witholdee_name = move_id_wh.partner_id.name if move_id_wh.partner_id.name else ''
+                    witholdee_tin = move_id_wh.partner_id.vat if move_id_wh.partner_id.vat else ''
+                    reciept_no = move_id_wh.ref if move_id_wh.ref else ''
+                    internal_ref = move_id_wh.withholding_internal_ref if move_id_wh.withholding_internal_ref else ''
 
-            sheet.write(row_start, 0, "9063340002", border)
-            sheet.write(row_start, 1, witholdee_tin, border)
-            sheet.write(row_start, 2, witholdee_name, border)
-            sheet.write(row_start, 3, reciept_no, border)
-            sheet.write(row_start, 4, record.date, date_format)
-            sheet.write(row_start, 5, record.tax_base_amount, num_format)
-            sheet.write(row_start, 6, abs(record.balance), num_format)
-            sheet.write(row_start, 7, internal_ref, border)
-            row_start += 1
+                    sheet.write(row_start, 0, "9063340002", border)
+                    sheet.write(row_start, 1, witholdee_tin, border)
+                    sheet.write(row_start, 2, witholdee_name, border)
+                    sheet.write(row_start, 3, reciept_no, border)
+                    sheet.write(row_start, 4, record.withholding_date, date_format)
+                    sheet.write(row_start, 5, record.amount_before_vat, num_format)
+                    sheet.write(row_start, 6, abs(record.withholding_amount), num_format)
+                    sheet.write(row_start, 7, internal_ref, border)
+                    row_start += 1
 
     def generate_receivable_xlsx_report(self, workbook):
         sheet = workbook.add_worksheet('Witholding Report Receivable')
@@ -222,14 +227,15 @@ class WitholdingReport(models.TransientModel):
 
         # search RFQ
 
-        account_moves = self.env['account.move'].search(
-            [('date', '>=', self.date_from), ('date', '<=', self.date_to), ('company_id', '=', self.company_id.id)])
+        #account_moves = self.env['account.move'].search(
+            #[('date', '>=', self.date_from), ('date', '<=', self.date_to), ('company_id', '=', self.company_id.id)])
 
-        accounts = self.env['account.account'].search(
-            [('code', 'in', ('116001', '116002'))])
+        #accounts = self.env['account.account'].search(
+            #[('code', 'in', ('116001', '116002'))])
 
-        withholdings = self.env['account.move.line'].search(
-            [('move_id', 'in', account_moves.ids), ('account_id', 'in', accounts.ids)])
+        withholdings = self.env['account.move.withholding'].search(
+            [('withholding_date', '>=', self.date_from), ('withholding_date', '<=', self.date_to),
+             ('company_id', '=', self.company_id.id)])
 
         sheet.write(row_start, 0, 'Withholder''s Tax Account', title_format)
         sheet.write(row_start, 1, 'Withholdee''s TIN', title_format)
@@ -242,21 +248,23 @@ class WitholdingReport(models.TransientModel):
         row_start += 1
 
         for record in withholdings:
-            # get witholde name and tin no
-            witholdee_name = record.move_id.partner_id.name if record.move_id.partner_id.name else ''
-            witholdee_tin = record.move_id.partner_id.vat if record.move_id.partner_id.vat else ''
-            reciept_no = record.move_id.withholding_no if record.move_id.withholding_no else ''
-            internal_ref = record.move_id.withholding_internal_ref if record.move_id.withholding_internal_ref else ''
+            for move_id_wh in record.move_id_wh:
+                if move_id_wh.move_type == 'out_invoice' and move_id_wh.company_id == self.company_id:
+                    # get witholde name and tin no
+                    witholdee_name = move_id_wh.partner_id.name if move_id_wh.partner_id.name else ''
+                    witholdee_tin = move_id_wh.partner_id.vat if move_id_wh.partner_id.vat else ''
+                    reciept_no = move_id_wh.ref if move_id_wh.ref else ''
+                    internal_ref = move_id_wh.withholding_internal_ref if move_id_wh.withholding_internal_ref else ''
 
-            sheet.write(row_start, 0, "9063340002", border)
-            sheet.write(row_start, 1, witholdee_tin, border)
-            sheet.write(row_start, 2, witholdee_name, border)
-            sheet.write(row_start, 3, reciept_no, border)
-            sheet.write(row_start, 4, record.date, date_format)
-            sheet.write(row_start, 5, record.tax_base_amount, num_format)
-            sheet.write(row_start, 6, abs(record.balance), num_format)
-            sheet.write(row_start, 7, internal_ref, border)
-            row_start += 1
+                    sheet.write(row_start, 0, "9063340002", border)
+                    sheet.write(row_start, 1, witholdee_tin, border)
+                    sheet.write(row_start, 2, witholdee_name, border)
+                    sheet.write(row_start, 3, reciept_no, border)
+                    sheet.write(row_start, 4, record.withholding_date, date_format)
+                    sheet.write(row_start, 5, record.amount_before_vat, num_format)
+                    sheet.write(row_start, 6, abs(record.withholding_amount), num_format)
+                    sheet.write(row_start, 7, internal_ref, border)
+                    row_start += 1
 
     def generate_vat_xlsx_report(self, workbook, move_type, tax_type):
         sheet = workbook.add_worksheet('VAT Receivable')

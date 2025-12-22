@@ -497,6 +497,9 @@ class AccountWithholding(models.Model):
 
     tin_no = fields.Char("TIN")
 
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                                 index=True, default=lambda self: self.env.company.id)
+
     def _compute_amount_word(self):
         for record in self:
             record.withholding_amount_word = self.env['account.move'].convert_to_word(record.withholding_amount)
