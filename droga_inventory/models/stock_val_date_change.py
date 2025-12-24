@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 class droga_date_change(models.Model):
     _name='droga.date.change'
     reference=fields.Many2one('stock.picking',required=False)
-    wa_id = fields.Float('Valuation ID', required=False)
+    wa_id = fields.Integer('Valuation ID', required=False)
     transaction_date=fields.Datetime(string='From date',compute='get_date',store=True)
     new_transaction_date=fields.Date('Transaction date correct')
     status=fields.Selection([('Draft','Draft'),('Processed','Processed')],default='Draft')
@@ -19,7 +19,7 @@ class droga_date_change(models.Model):
                 if rec.reference:
                     rec.transaction_date=rec.reference.date_done
                 else:
-                    valuation = self.env['droga.stock.valuation.layer'].search([('stock_move_id', '=', rec.wa_id)])
+                    valuation = self.env['droga.stock.valuation.layer'].search([('id', '=', rec.wa_id)])
                     if valuation:
                         rec.transaction_date=valuation.move_date
 
@@ -34,7 +34,7 @@ class droga_date_change(models.Model):
         if self.reference:
             done_moves = self.env['stock.move'].search([('picking_id', '=', self.reference.id)])
         elif self.wa_id:
-            valuation=self.env['droga.stock.valuation.layer'].search([('stock_move_id','=',self.wa_id)])
+            valuation=self.env['droga.stock.valuation.layer'].search([('id','=', self.wa_id)])
             if valuation:
                 done_moves=valuation.stock_move_id
             else:
