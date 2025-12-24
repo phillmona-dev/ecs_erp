@@ -32,8 +32,9 @@ export const telebirrBusService = {
                     }
 
                     // --- NOTIFICATION ---
-                    action.doAction("reload");
-
+                    if (status === "success") {
+                        action.doAction("reload");
+                    }
                     notification.add(
                         message || `Payment update for ${invoice_name}`,
                         {
