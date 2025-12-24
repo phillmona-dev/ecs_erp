@@ -4,18 +4,24 @@ from odoo.exceptions import UserError
 
 class droga_date_change(models.Model):
     _name='droga.date.change'
-    reference=fields.Many2one('stock.picking',required=True)
+    reference=fields.Many2one('stock.picking',required=False)
+    wa_id = fields.Float('Valuation ID', required=False)
     transaction_date=fields.Datetime(string='From date',compute='get_date',store=True)
     new_transaction_date=fields.Date('Transaction date correct')
     status=fields.Selection([('Draft','Draft'),('Processed','Processed')],default='Draft')
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  index=True, default=lambda self: self.env.company.id)
 
-    @api.depends('reference')
+    @api.depends('reference','wa_id')
     def get_date(self):
         for rec in self:
             if rec.status=='Draft':
-                rec.transaction_date=rec.reference.date_done
+                if rec.reference:
+                    rec.transaction_date=rec.reference.date_done
+                else:
+                    valuation = self.env['droga.stock.valuation.layer'].search([('stock_move_id', '=', rec.wa_id)])
+                    if valuation:
+                        rec.transaction_date=valuation.move_date
 
     def update_date(self):
         if not self.new_transaction_date:
@@ -24,7 +30,18 @@ class droga_date_change(models.Model):
         if self.new_transaction_date <= self.company_id.tax_lock_date:
             raise UserError("Tax period is closed for the stated period. Latest period transaction can be adjusted is "+str(self.company_id.tax_lock_date))
 
-        done_moves=self.env['stock.move'].search([('picking_id','=',self.reference.id)])
+        done_moves=False
+        if self.reference:
+            done_moves = self.env['stock.move'].search([('picking_id', '=', self.reference.id)])
+        elif self.wa_id:
+            valuation=self.env['droga.stock.valuation.layer'].search([('stock_move_id','=',self.wa_id)])
+            if valuation:
+                done_moves=valuation.stock_move_id
+            else:
+                raise UserError("No moves found with stated valuation ID.")
+        else:
+            raise UserError("Please enter either reference number or valuation ID.")
+
         self.status='Processed'
         self.reference.date_done = self.new_transaction_date
         #self.reference.date = self.new_transaction_date
