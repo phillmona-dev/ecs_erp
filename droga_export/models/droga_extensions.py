@@ -516,11 +516,11 @@ class droga_sale_inherit(models.Model):
             if len(self.env['droga.export.items.composition.fin.goods'].search([('item','=',ord.product_template_id.id),('type','=','finish')]))>0:
                 prod_templates = self.env['droga.export.items.composition.fin.goods'].search(
                     [('item', '=', ord.product_template_id.id), ('type', '=', 'finish'),('company_id', '=', self.env.company.id)])
-                if len(prod_templates)>1:
-                    items=''
-                    for raw in prod_templates:
-                        items=items+raw.items_header.raw_item.default_code+" ,"
-                    raise UserError("The item "+ord.product_template_id.name+" is registered more than once under composition with "+items+", please archive the duplicate ones.")
+                # if len(prod_templates)>1:
+                #     items=''
+                #     for raw in prod_templates:
+                #         items=items+raw.items_header.raw_item.default_code+" ,"
+                #     raise UserError("The item "+ord.product_template_id.name+" is registered more than once under composition with "+items+", please archive the duplicate ones.")
                 if len(prod_templates) ==0:
                     raise UserError(
                         "Please register the item under items composition so that it can be sent to cleaning unit.")
