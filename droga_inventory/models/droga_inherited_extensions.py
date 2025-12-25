@@ -162,7 +162,10 @@ class droga_warehouse_extension(models.Model):
         ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.',tracking=True)
-    telebirr_id=fields.Char('Telebirr ID')
+    telebirr_id=fields.Char('Telebirr short code')
+    telebirr_cred = fields.Char('Telebirr credential')
+    telebirr_pass = fields.Char('Telebirr passkey')
+    telebirr_operid = fields.Char('Telebirr operator ID')
     name = fields.Char(tracking=True)
     code = fields.Char(tracking=True)
 

@@ -245,7 +245,7 @@ class AccountMove(models.Model):
         partner_phone=self.normalize_phone(partner_phone)
 
         API_Caller = "DROGAUSSDPUSH"
-        API_Caller_pass = self.env['ir.config_parameter'].sudo().get_param('telebirr.api.pass')
+        API_Caller_pass = self.line_ids.sale_line_ids.order_id.wareh.telebirr_pass
         amount = "%.2f" % (self.amount_total)
         amount = 1
         currency = (self.currency_id.name or "ETB")
@@ -253,15 +253,14 @@ class AccountMove(models.Model):
         originator_id = conv_id
 
         initiator_id = self.env.user.login or 'odoo_user'
-        short_code = "515190"
         short_code=self.line_ids.sale_line_ids.order_id.wareh.telebirr_id
         if not short_code:
             raise UserError(_("Short code not filled for branch, please contact system administrator."))
 
-        ORG_OPERATOR_ID = "51519001"
+        ORG_OPERATOR_ID = self.line_ids.sale_line_ids.order_id.wareh.telebirr_operid
 
         timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-        SecurityCredential = self.env['ir.config_parameter'].sudo().get_param('telebirr.api.credential')
+        SecurityCredential = self.line_ids.sale_line_ids.order_id.wareh.telebirr_cred
 
         # Minimal SOAP request body (XML string)
         soap_template = f"""<?xml version="1.0" encoding="utf-8"?>   
