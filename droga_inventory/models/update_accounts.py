@@ -10,11 +10,11 @@ class update_acc(models.Model):
     def recalculateWA(self,count=10,product=0):
         if product!=0:
             dsvals = self.env['droga.stock.valuation.layer'].search(
-                [('company_id', '=', 1), ('account_move_line_id', '=', 7928888),('product_id','=',product)], limit=count)
+                [ ('account_move_line_id', '=', 7928888),('product_id','=',product)], limit=count)
         else:
-            dsvals=self.env['droga.stock.valuation.layer'].search([('company_id','=',1),('account_move_line_id','=',7928888)],limit=count)
+            dsvals=self.env['droga.stock.valuation.layer'].search([('account_move_line_id','=',7928888)],limit=count)
         for dsval in dsvals:
-
+            #update droga_stock_valuation_layer set account_move_line_id =7928888 where company_id =2; ot jump start
             if dsval.account_move_line_id:
                 dsval.account_move_line_id = False
 
