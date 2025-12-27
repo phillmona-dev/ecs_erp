@@ -231,8 +231,8 @@
             <xpath expr="//form/sheet/group/group/field[@name='code']" position="after">
                 <field name="wh_type"></field>
                 <field name="telebirr_id"></field>
-                <field name="telebirr_cred"></field>
-                <field name="telebirr_pass"></field>
+                <field name="telebirr_cred" password="True"></field>
+                <field name="telebirr_pass" password="True"></field>
                 <field name="telebirr_operid"></field>
             </xpath>
             <xpath expr="//form/sheet" position="after">
