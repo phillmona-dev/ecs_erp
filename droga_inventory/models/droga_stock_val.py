@@ -167,6 +167,14 @@ class DrogaStockValuationLayer(models.Model):
         for svl in ret:
             svl.stock_move_id._account_analytic_entry_move()
 
+        cons_ref = self.env['droga.inventory.consignment.issue'].search(
+            [('company_id', '=', 2), ('cons_ref', '=', ret.stock_move_id.picking_id.id), ('issue_type', '=', 'CONI')],
+            order="create_date asc"
+        )
+        if cons_ref:
+            for cons in cons_ref:
+                cons.recalculate()
+                
         self.revaluate_after_date(ret)
 
         self.updatesalescost(ret)
