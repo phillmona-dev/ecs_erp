@@ -7,15 +7,15 @@
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
-                <!-- Add button to button box -->
-                <xpath expr="//div[@name='button_box']" position="inside">
-                    <button name="action_send_to_telebirr"
-                            type="object"
-                            string="Send to Telebirr"
-                            class="btn-primary"
-                            icon="fa-phone"
-                            attrs="{'invisible': [ ('telebirr_status', '=', 'success')]}"/>
-                </xpath>
+
+<!--                <xpath expr="//div[@name='button_box']" position="inside">-->
+<!--                    <button name="action_send_to_telebirr"-->
+<!--                            type="object"-->
+<!--                            string="Send to Telebirr"-->
+<!--                            class="btn-primary"-->
+<!--                            icon="fa-phone"-->
+<!--                            attrs="{'invisible': [ ('telebirr_status', '=', 'success')]}"/>-->
+<!--                </xpath>-->
 
                 <!-- Add Telebirr fields after invoice date -->
                 <xpath expr="//field[@name='invoice_date']" position="after">
