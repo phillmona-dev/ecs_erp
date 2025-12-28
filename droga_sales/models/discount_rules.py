@@ -213,11 +213,11 @@ class sale_order_line(models.Model):
                 lambda x: not x.display_type and not x.product_id.is_core_product and x.id != None)
 
         for cs in order_lines_core:
-            core_sum = core_sum + (cs.product_uom_qty * cs.price_unit)
+            core_sum = core_sum + (cs.product_uom_qty * cs.price_reduce)
             total_before_discount = total_before_discount + (cs.product_uom_qty * cs.price_unit_before_discount)
 
         for ncs in order_lines_non_core:
-            non_core_sum = non_core_sum + (ncs.product_uom_qty * ncs.price_unit)
+            non_core_sum = non_core_sum + (ncs.product_uom_qty * ncs.price_reduce)
             total_before_discount = total_before_discount + (ncs.product_uom_qty * ncs.price_unit_before_discount)
 
         self.order_id.core_sum = core_sum
@@ -313,8 +313,10 @@ class sale_order_line(models.Model):
     @api.onchange('product_id')
     def _prod_changed(self):
         for rec in self:
+            rec.discount = rec.order_id.discount
             if rec.order_from:
                 if rec.order_from.startswith('PH'):
+                    rec.discount=rec.order_id.discount
                     rec.price_unit=self._get_pharma_price(rec)
 
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
@@ -535,7 +537,17 @@ class sale_order_ext(models.Model):
     deduct_type=fields.Char('Type')
     deduct_descr=fields.Char(compute='_compute_desc')
     inv_number=fields.Char('Invoice Number')
+    discount=fields.Integer('Discount %',default=0)
 
+    @api.onchange('discount')
+    def disc_change(self):
+        for rec in self:
+            if rec.discount <0 or rec.discount>100:
+                rec.discount=0
+                raise ValidationError("Price discount should be between 0 and 100.")
+            rec.manual_price=False
+            for line in rec.order_line:
+                line.discount=rec.discount
 
     @api.depends('total_disc_pharma','deduct_type')
     def _compute_desc(self):
@@ -588,6 +600,10 @@ class sale_order_ext(models.Model):
             list) > 0 else False
 
     wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh',store=True)
+    telebirr_id = fields.Char('Telebirr short code',related='wareh.telebirr_id')
+    telebirr_cred = fields.Char('Telebirr credential', related='wareh.telebirr_cred')
+    telebirr_pass = fields.Char('Telebirr passkey', related='wareh.telebirr_pass')
+    telebirr_operid = fields.Char('Telebirr operator ID', related='wareh.telebirr_operid')
 
     def unlink(self):
         raise ValidationError(

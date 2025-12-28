@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_res_config_settings_telebirr_form" model="ir.ui.view">
+            <field name="name">res.config.settings.telebirr.form.inherit</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Telebirr USSD Integration" string="Telebirr USSD Integration" data-key="telebirr_ussd">
+                        <h2>Telebirr USSD Integration</h2>
+                        <div class="row mt16">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <i class="fa fa-globe fa-2x"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="telebirr_relay_url" string="Relay Service URL"/>
+                                    <div class="text-muted">
+                                        URL of the Flask relay service that connects to Telebirr via VPN
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="telebirr_relay_url" class="oe_inline" placeholder="http://localhost:5000"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <i class="fa fa-link fa-2x"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="telebirr_callback_base" string="Callback Base URL"/>
+                                    <div class="text-muted">
+                                        Base URL for callback endpoints (used in result_url)
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="telebirr_callback_base" class="oe_inline" placeholder="http://localhost:5000"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <i class="fa fa-user fa-2x"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="telebirr_relay_user" string="Relay Auth User"/>
+                                    <div class="text-muted">
+                                        Basic authentication username for relay service (if required)
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="telebirr_relay_user" class="oe_inline" placeholder="username"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <i class="fa fa-key fa-2x"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="telebirr_relay_password" string="Relay Auth Password"/>
+                                    <div class="text-muted">
+                                        Basic authentication password for relay service (if required)
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="telebirr_relay_password" class="oe_inline" password="true" placeholder="password"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12">
+                                <div class="alert alert-info" role="alert">
+                                    <h4 class="alert-heading">Configuration Notes</h4>
+                                    <ul class="mb-0">
+                                        <li>The relay service must be running and accessible from your Odoo instance</li>
+                                        <li>Ensure the relay service has VPN access to the Telebirr API</li>
+                                        <li>Callback URL will be: {callback_base}/ussd/result</li>
+                                        <li>Test the connection after configuring these settings</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
