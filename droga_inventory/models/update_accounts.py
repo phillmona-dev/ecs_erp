@@ -14,7 +14,7 @@ class update_acc(models.Model):
         else:
             dsvals=self.env['droga.stock.valuation.layer'].search([('account_move_line_id','=',7928888)],limit=count)
         for dsval in dsvals:
-            #update droga_stock_valuation_layer set account_move_line_id =7928888 where company_id =2; ot jump start
+            #update droga_stock_valuation_layer set account_move_line_id =7928888 where company_id =2 and id in (); ot jump start
             if dsval.account_move_line_id:
                 dsval.account_move_line_id = False
 
