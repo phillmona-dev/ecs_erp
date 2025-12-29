@@ -599,7 +599,7 @@ class sale_order_ext(models.Model):
             0].id if len(
             list) > 0 else False
 
-    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse', compute='_get_pharma_wh',store=True)
+    wareh = fields.Many2one('stock.warehouse', string='User linked pharmacy warehouse',store=True)
     telebirr_id = fields.Char('Telebirr short code',related='wareh.telebirr_id')
     telebirr_cred = fields.Char('Telebirr credential', related='wareh.telebirr_cred')
     telebirr_pass = fields.Char('Telebirr passkey', related='wareh.telebirr_pass')
