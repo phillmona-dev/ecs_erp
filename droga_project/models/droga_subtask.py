@@ -306,7 +306,7 @@ class droga_task_stage_progress(models.Model):
     @api.model
     def create(self, vals):
         res = super(droga_task_stage_progress, self).create(vals)
-        if not res.from_project_auto:
+        if not res.from_project_auto and False:
             raise UserError("You can not create a stage manually.")
         return res
 
