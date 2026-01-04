@@ -95,8 +95,8 @@ class update_acc(models.Model):
     #                 rec.con_acc = acc_dest
     #
     def post_trans(self):
-        date_limit = datetime.date(2024, 7, 7)
-        moves = self.env['droga.stock.valuation.layer'].search([('move_date', '>', date_limit),(), ('company_id','=',2),('value','!=',0),('account_move_id', '=', False)], limit=1000)
+        date_limit = datetime.date(2023, 7, 7)
+        moves = self.env['droga.stock.valuation.layer'].search([('move_date', '>', date_limit), ('company_id','=',2),('value','!=',0),('account_move_id', '=', False)], limit=1000)
         for ret in moves:
             ret._validate_accounting_entries_custom()
             for svl in ret:
