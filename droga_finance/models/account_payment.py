@@ -192,7 +192,8 @@ class AccountPayment(models.Model):
 
                 # search account move
                 account_move = self.env["account.move"].sudo().search([('name', '=', record.invoice_no)])
-                for o in account_move.invoice_line_ids:
+                if account_move.invoice_line_ids:
+                    o = account_move.invoice_line_ids[0]
                     if o.analytic_distribution:
                         analytic_distributions = o.analytic_distribution
                         for analytic_distribution_id in analytic_distributions:
@@ -205,6 +206,92 @@ class AccountPayment(models.Model):
                                 elif analytic_plan.plan_id.complete_name == 'Sales Channel':
                                     record.sales_channel = analytic_plan.display_name
                         break
+
+    def update_sale_info_perf(self):
+        # Search for payments without division and inbound customer payments
+        payments = self.env['account.payment'].search([
+            ('division', 'in', [False, '']),
+            ('payment_type', '=', 'inbound'),
+            ('partner_type', '=', 'customer'),  # Explicitly filter for customer payments to avoid unnecessary checks
+        ])
+
+        if not payments:
+            return
+
+        # Collect unique invoice numbers
+        invoice_nos = {payment.invoice_no for payment in payments if payment.invoice_no}
+
+        # Batch search for account moves (invoices) by name
+        moves = self.env['account.move'].sudo().search([('name', 'in', list(invoice_nos))]) if invoice_nos else \
+        self.env['account.move']
+
+        # Create a dict: invoice_name -> first invoice_line's analytic_distribution (or empty)
+        move_to_distribution = {}
+        for move in moves:
+            if move.invoice_line_ids:
+                first_line = move.invoice_line_ids[0]
+                move_to_distribution[move.name] = first_line.analytic_distribution or {}
+            else:
+                move_to_distribution[move.name] = {}
+
+        # Collect all analytic account IDs from distributions
+        analytic_ids = set()
+        for dist in move_to_distribution.values():
+            analytic_ids.update(dist.keys())  # keys are str(ID)
+
+        analytic_ids = {int(aid) for aid in analytic_ids if aid.isdigit()}  # Convert to int safely
+
+        # Batch search analytic accounts with their plans
+        analytics = self.env['account.analytic.account'].search([('id', 'in', list(analytic_ids))]) if analytic_ids else \
+        self.env['account.analytic.account']
+
+        # Precompute display_name by plan complete_name
+        division_by_analytic = {}
+        channel_by_analytic = {}
+        for analytic in analytics:
+            plan_name = analytic.plan_id.complete_name
+            if plan_name == 'Profit / Cost Center':
+                division_by_analytic[analytic.id] = analytic.display_name
+            elif plan_name == 'Sales Channel':
+                channel_by_analytic[analytic.id] = analytic.display_name
+
+        # Now process each payment
+        for record in payments:
+            # Reset fields
+            record.sales_channel = ""
+            record.division = ""
+
+            # Set category from customer (overwrites default if exists)
+            if record.partner_id.cust_type_ext and record.partner_id.cust_type_ext.cust_org_type:
+                record.category = record.partner_id.cust_type_ext.cust_org_type
+            else:
+                record.category = 'Others'  # Fallback if no cust_org_type
+
+            # If no invoice_no, skip analytic part (or leave as "")
+            if not record.invoice_no:
+                continue
+
+            distribution = move_to_distribution.get(record.invoice_no, {})
+
+            # Extract division and channel from distribution
+            found_division = False
+            for analytic_id_str, percentage in distribution.items():
+                if percentage == 0:
+                    continue  # Skip zero allocations
+                try:
+                    analytic_id = int(analytic_id_str)
+                except ValueError:
+                    continue
+
+                if analytic_id in division_by_analytic:
+                    record.division = division_by_analytic[analytic_id]
+                    found_division = True  # Optional: if multiple, could take first or handle differently
+                if analytic_id in channel_by_analytic:
+                    record.sales_channel = channel_by_analytic[analytic_id]
+
+            # If no division found from Profit/Cost Center, fallback (optional)
+            if not record.division:
+                record.division = "Others"
 
 
 class AccountPaymentRegister(models.TransientModel):
