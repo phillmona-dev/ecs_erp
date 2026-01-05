@@ -247,7 +247,6 @@ class AccountMove(models.Model):
         API_Caller = "DROGAUSSDPUSH"
         API_Caller_pass = self.line_ids.sale_line_ids.order_id.wareh.telebirr_pass
         amount = "%.2f" % (self.amount_total)
-        amount = 1
         currency = (self.currency_id.name or "ETB")
 
         originator_id = conv_id
