@@ -172,7 +172,12 @@ class AccountPayment(models.Model):
 
     def update_sale_info(self):
 
-        payments = self.env['account.payment'].search([('division', '=', False), ('payment_type', '=', 'inbound')])
+        #payments = self.env['account.payment'].search([('division', '=', False), ('payment_type', '=', 'inbound')])
+
+        payments = self.env['account.payment'].search([
+            ('division', 'in', [False, '']),
+            ('payment_type', '=', 'inbound')
+        ])
 
         for record in payments:
             record.category = ""
