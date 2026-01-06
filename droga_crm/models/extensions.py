@@ -84,7 +84,7 @@ class cust_contact_extension(models.Model):
         return [('state', 'in', ('done','sale','dispense'))]
 
     company_id = fields.Many2one(
-        'res.company', 'Company',  index=True)
+        'res.company', 'Company', default=lambda self: self.env.company, index=True)
 
     def _def_rec(self):
         cid = self.env.company.id
