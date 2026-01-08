@@ -59,34 +59,61 @@ class PaymentReport(models.Model):
     def init(self):
         drop_view_if_exists(self.env.cr, 'droga_finance_payment_report')
         self.env.cr.execute("""
-                           create or replace view droga_finance_payment_report as (
+            CREATE OR REPLACE VIEW droga_finance_payment_report AS (
 
-                                select row_number()over() as id,x.partner_id,x.payment_type,x.category,x.division,x.sales_channel,x.invoice_no,x.sales_type,
-x.sales_initiator,x.invoice_date_due,x.paid_date,x.total_amount,x.paid_amount,x.settled_amount,x.due_days,x.paid_passed_days,x.company_id  from(
-select ap.partner_id,'Customer' as payment_type,ap.category,ap.division,ap.sales_channel,am."name" as invoice_no,am.sales_type,am.sales_initiator,
-am.invoice_date_due,apr.max_date as paid_date,
-am.amount_total_signed as total_amount,ap.amount  as paid_amount,apr.amount as settled_amount,
-(apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days,ap.id as payment_id,am.id as move_id,am.company_id 
-from account_move am inner join account_move_line aml on  am.id=aml.move_id 
-inner join account_partial_reconcile apr on aml.id=apr.debit_move_id 
-inner join account_payment ap on ap.id=(select distinct payment_id  from account_move_line   where id=apr.credit_move_id)
-where aml.display_type ='payment_term' and ap.payment_type='inbound' and am.state ='posted'
+                SELECT
+                    row_number() OVER () AS id,
+                    ap.partner_id,
+                    CASE 
+                        WHEN ap.payment_type = 'inbound' THEN 'Customer'
+                        ELSE 'Vendor'
+                    END AS payment_type,
+                    ap.category,
+                    ap.division,
+                    ap.sales_channel,
+                    am.name AS invoice_no,
+                    am.sales_type,
+                    am.sales_initiator,
+                    am.invoice_date_due,
+                    apr.max_date AS paid_date,
+                    CASE 
+                        WHEN ap.payment_type = 'inbound'
+                            THEN am.amount_total_signed
+                        ELSE abs(am.amount_total_signed)
+                    END AS total_amount,
+                    ap.amount AS paid_amount,
+                    apr.amount AS settled_amount,
+                    (apr.max_date - am.invoice_date_due) AS due_days,
+                    (CURRENT_DATE - apr.max_date) AS paid_passed_days,
+                    am.company_id
 
+                FROM account_move am
 
-union 
+                JOIN account_move_line aml
+                    ON am.id = aml.move_id
+                    AND aml.display_type = 'payment_term'
 
-select ap.partner_id,'Vendor' as payment_type,ap.category,ap.division,ap.sales_channel,am."name" as invoice_no,am.sales_type,am.sales_initiator,
-am.invoice_date_due,apr.max_date as paid_date,
-abs(am.amount_total_signed) as total_amount,ap.amount  as paid_amount,apr.amount as settled_amount,
-(apr.max_date-am.invoice_date_due) as due_days,(CURRENT_DATE-apr.max_date) as paid_passed_days,ap.id as payment_id,am.id as move_id,am.company_id 
-from account_move am inner join account_move_line aml on  am.id=aml.move_id 
-inner join account_partial_reconcile apr on aml.id=apr.credit_move_id  
-inner join account_payment ap on ap.id=(select distinct payment_id  from account_move_line   where id=apr.debit_move_id)
-where aml.display_type ='payment_term' and ap.payment_type='outbound' and am.state ='posted')x order by x.payment_type,x.paid_date,x.invoice_no
+                JOIN account_partial_reconcile apr
+                    ON apr.debit_move_id = aml.id
+                    OR apr.credit_move_id = aml.id
 
+                JOIN account_move_line pml
+                    ON (
+                        pml.id = apr.debit_move_id
+                        OR pml.id = apr.credit_move_id
+                    )
+                    AND pml.payment_id IS NOT NULL
 
- 
-                           )""")
+                JOIN account_payment ap
+                    ON ap.id = pml.payment_id
+
+                WHERE am.state = 'posted'
+                  AND (
+                        (ap.payment_type = 'inbound' AND apr.debit_move_id = aml.id)
+                     OR (ap.payment_type = 'outbound' AND apr.credit_move_id = aml.id)
+                  )
+            )
+        """)
 
 
 class AccountPaymentLinK(models.Model):
