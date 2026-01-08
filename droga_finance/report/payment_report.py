@@ -61,13 +61,11 @@ class PaymentReport(models.Model):
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW droga_finance_payment_report AS (
 
+                /* ================= CUSTOMER PAYMENTS ================= */
                 SELECT
                     row_number() OVER () AS id,
                     ap.partner_id,
-                    CASE 
-                        WHEN ap.payment_type = 'inbound' THEN 'Customer'
-                        ELSE 'Vendor'
-                    END AS payment_type,
+                    'Customer' AS payment_type,
                     ap.category,
                     ap.division,
                     ap.sales_channel,
@@ -76,11 +74,7 @@ class PaymentReport(models.Model):
                     am.sales_initiator,
                     am.invoice_date_due,
                     apr.max_date AS paid_date,
-                    CASE 
-                        WHEN ap.payment_type = 'inbound'
-                            THEN am.amount_total_signed
-                        ELSE abs(am.amount_total_signed)
-                    END AS total_amount,
+                    am.amount_total_signed AS total_amount,
                     ap.amount AS paid_amount,
                     apr.amount AS settled_amount,
                     (apr.max_date - am.invoice_date_due) AS due_days,
@@ -88,30 +82,62 @@ class PaymentReport(models.Model):
                     am.company_id
 
                 FROM account_move am
-
                 JOIN account_move_line aml
-                    ON am.id = aml.move_id
-                    AND aml.display_type = 'payment_term'
+                    ON aml.move_id = am.id
+                   AND aml.display_type = 'payment_term'
 
                 JOIN account_partial_reconcile apr
                     ON apr.debit_move_id = aml.id
-                    OR apr.credit_move_id = aml.id
 
                 JOIN account_move_line pml
-                    ON (
-                        pml.id = apr.debit_move_id
-                        OR pml.id = apr.credit_move_id
-                    )
-                    AND pml.payment_id IS NOT NULL
+                    ON pml.id = apr.credit_move_id
+                   AND pml.payment_id IS NOT NULL
 
                 JOIN account_payment ap
                     ON ap.id = pml.payment_id
+                   AND ap.payment_type = 'inbound'
 
                 WHERE am.state = 'posted'
-                  AND (
-                        (ap.payment_type = 'inbound' AND apr.debit_move_id = aml.id)
-                     OR (ap.payment_type = 'outbound' AND apr.credit_move_id = aml.id)
-                  )
+
+                UNION ALL
+
+                /* ================= VENDOR PAYMENTS ================= */
+                SELECT
+                    row_number() OVER () AS id,
+                    ap.partner_id,
+                    'Vendor' AS payment_type,
+                    ap.category,
+                    ap.division,
+                    ap.sales_channel,
+                    am.name AS invoice_no,
+                    am.sales_type,
+                    am.sales_initiator,
+                    am.invoice_date_due,
+                    apr.max_date AS paid_date,
+                    abs(am.amount_total_signed) AS total_amount,
+                    ap.amount AS paid_amount,
+                    apr.amount AS settled_amount,
+                    (apr.max_date - am.invoice_date_due) AS due_days,
+                    (CURRENT_DATE - apr.max_date) AS paid_passed_days,
+                    am.company_id
+
+                FROM account_move am
+                JOIN account_move_line aml
+                    ON aml.move_id = am.id
+                   AND aml.display_type = 'payment_term'
+
+                JOIN account_partial_reconcile apr
+                    ON apr.credit_move_id = aml.id
+
+                JOIN account_move_line pml
+                    ON pml.id = apr.debit_move_id
+                   AND pml.payment_id IS NOT NULL
+
+                JOIN account_payment ap
+                    ON ap.id = pml.payment_id
+                   AND ap.payment_type = 'outbound'
+
+                WHERE am.state = 'posted'
             )
         """)
 
