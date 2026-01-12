@@ -29,9 +29,9 @@ class WitholdingReport(models.TransientModel):
         file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
         if self.report == 'Withholding Payable':
-            self.generate_payable_xlsx_report(workbook)
-        elif self.report == 'Withholding Receivable':
             self.generate_receivable_xlsx_report(workbook)
+        elif self.report == 'Withholding Receivable':
+            self.generate_payable_xlsx_report(workbook)
         elif self.report == 'VAT Receivable':
             self.generate_vat_xlsx_report(workbook, 'in_invoice', 'Purchase VAT 15%')
         elif self.report == 'VAT Payable':
