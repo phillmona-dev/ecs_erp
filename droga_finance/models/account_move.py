@@ -585,3 +585,49 @@ class AccountWithholding(models.Model):
             journal_id = journal.id
 
         return journal_id
+
+    def update_with_holding(self):
+        company = self.env.company
+
+        # 1️⃣ Exclude moves already used in withholding
+        excluded_move_ids = self.env['account.move.withholding'].search([
+            ('company_id', '=', company.id),
+            ('move_id_wh', '!=', False),
+        ]).mapped('move_id_wh').ids
+
+        # 2️⃣ Fetch move lines
+        move_lines = self.env['account.move.line'].search([
+            ('account_id.code', 'in', ['214003', '214004']),
+            ('move_id.state', '=', 'posted'),
+            ('company_id', '=', company.id),
+            ('move_id', 'not in', excluded_move_ids),
+            ('tax_line_id','!=',False)
+        ])
+
+        if not move_lines:
+            return
+
+        # 3️⃣ Prepare batch values
+        vals_list = []
+        for line in move_lines:
+            amount_before_vat = line.tax_base_amount / 1.15 if line.tax_base_amount else 0.0
+
+            vals_list.append({
+                'move_id_wh': line.move_id.id,
+                'withholding_date': line.date,
+                'withholding_tax_types': line.tax_line_id.id,
+                'ref': line.move_id.withholding_no or '',
+                'company_id': company.id,
+                'tin_no':line.move_id.partner_id.vat,
+                'amount_before_vat': amount_before_vat,
+            })
+
+        # 4️⃣ Single create() call (FAST)
+        self.env['account.move.withholding'].with_context(
+            tracking_disable=True,
+            mail_create_nolog=True,
+            mail_notrack=True,
+        ).create(vals_list)
+
+
+
