@@ -310,6 +310,7 @@ class AccountMove(models.Model):
         """
         return soap_template
 
+
     def _telebirr_callback_url(self):
         return 'https://drogaerp-staging-26944149.dev.odoo.com/telebirr/callback'
 
