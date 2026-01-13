@@ -29,9 +29,9 @@ class WitholdingReport(models.TransientModel):
         file_io = BytesIO()
         workbook = xlsxwriter.Workbook(file_io)
         if self.report == 'Withholding Payable':
-            self.generate_receivable_xlsx_report(workbook)
-        elif self.report == 'Withholding Receivable':
             self.generate_payable_xlsx_report(workbook)
+        elif self.report == 'Withholding Receivable':
+            self.generate_receivable_xlsx_report(workbook)
         elif self.report == 'VAT Receivable':
             self.generate_vat_xlsx_report(workbook, 'in_invoice', 'Purchase VAT 15%')
         elif self.report == 'VAT Payable':
@@ -146,7 +146,7 @@ class WitholdingReport(models.TransientModel):
 
         for record in withholdings:
             for move_id_wh in record.move_id_wh:
-                if move_id_wh.move_type=='in_invoice' and move_id_wh.company_id==self.company_id:
+                if move_id_wh.move_type=='out_invoice' and move_id_wh.company_id==self.company_id:
                     # get witholde name and tin no
                     witholdee_name = move_id_wh.partner_id.name if move_id_wh.partner_id.name else ''
                     witholdee_tin = move_id_wh.partner_id.vat if move_id_wh.partner_id.vat else ''
@@ -255,7 +255,7 @@ class WitholdingReport(models.TransientModel):
 
         for record in withholdings:
             for move_id_wh in record.move_id_wh:
-                if move_id_wh.move_type == 'out_invoice' and move_id_wh.company_id == self.company_id:
+                if move_id_wh.move_type == 'in_invoice' and move_id_wh.company_id == self.company_id:
                     # get witholde name and tin no
                     witholdee_name = move_id_wh.partner_id.name if move_id_wh.partner_id.name else ''
                     witholdee_tin = move_id_wh.partner_id.vat if move_id_wh.partner_id.vat else ''
