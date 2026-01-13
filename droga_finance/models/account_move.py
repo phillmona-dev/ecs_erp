@@ -597,7 +597,7 @@ class AccountWithholding(models.Model):
 
         # 2️⃣ Fetch move lines
         move_lines = self.env['account.move.line'].search([
-            ('account_id.code', 'in', ['214003', '214004']),
+            ('account_id.code', 'in', ['214003', '214004','114012','116001','116002']),
             ('move_id.state', '=', 'posted'),
             ('company_id', '=', company.id),
             ('move_id', 'not in', excluded_move_ids),
