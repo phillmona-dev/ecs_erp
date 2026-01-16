@@ -247,7 +247,6 @@ class AccountMove(models.Model):
         API_Caller = "DROGAUSSDPUSH"
         API_Caller_pass = self.line_ids.sale_line_ids.order_id.wareh.telebirr_pass
         amount = "%.2f" % (self.amount_total)
-        amount = 1
         currency = (self.currency_id.name or "ETB")
 
         originator_id = conv_id
@@ -312,7 +311,7 @@ class AccountMove(models.Model):
         return soap_template
 
     def _telebirr_callback_url(self):
-        return 'https://drogaerp-staging-25932983.dev.odoo.com/web/callback/result'
+        return 'https://drogaerp.odoo.com/telebirr/callback'
 
     def _send_bus_notification(self, status, message=None):
         try:
