@@ -35,14 +35,20 @@ export const telebirrBusService = {
                     if (status === "success") {
                         action.doAction("reload");
                     }
-                    notification.add(
+                    const closeNotification = notification.add(
                         message || `Payment update for ${invoice_name}`,
                         {
                             title: status === "success" ? "Payment Success" : "Payment Update",
                             type: status === "success" ? "success" : "warning",
-                            sticky: true,
+                            sticky: true, // Keep it open initially
                         }
                     );
+
+                    setTimeout(() => {
+                        if (typeof closeNotification === 'function') {
+                            closeNotification(); // Odoo v15+ returns a close function
+                        }
+                    }, 10000);
                 }
             }
         }

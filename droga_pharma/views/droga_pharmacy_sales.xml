@@ -331,7 +331,7 @@
 
                             </div>
                             <field name="date_order" nolabel="1"/>
-                            <field name="wareh" readonly="1" string="Pharmacy branch"
+                            <field name="wareh" readonly="0" string="Pharmacy branch"
                                    options="{'no_open':True,'no_create': True}"/>
                             <field name="mature_amount_pharma" style="color:red"
                                    attrs="{'invisible': [('show_invoice_button_pharma', '=', False)]}"></field>
