@@ -311,7 +311,7 @@ class AccountMove(models.Model):
         return soap_template
 
     def _telebirr_callback_url(self):
-        return 'https://drogaerp-staging-25932983.dev.odoo.com/web/callback/result'
+        return 'https://drogaerp-staging-26944149.dev.odoo.com/web/callback/result'
 
     def _send_bus_notification(self, status, message=None):
         try:
