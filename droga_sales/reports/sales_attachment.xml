@@ -422,8 +422,15 @@
                                 <div class="col-2 text-end">
                                     <img t-att-src="'/report/barcode/QR/%s' % ('https://helpdesk.mypathatdroga.com/sign-up')"
                                          style="width:150px; height:150px;"/>
+
                                 </div>
 
+
+                            </div>
+                            <div id="informations" class="row mt25 mb25">
+                                 <div class="col-12 text-end">
+                                    <span>Scan me for any of your complaint or call us on 6637</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -436,7 +443,6 @@
                                     <span t-esc="o.company_id.email"/>
                                     website:-
                                     <span t-esc="o.company_id.website"/>
-                                    short code:- <span>6637</span>
                                 </h6>
                             </div>
                         </div>
