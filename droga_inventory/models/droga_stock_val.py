@@ -476,7 +476,7 @@ class DrogaLandedCost(models.Model):
                         move_ids = grn.move_ids.ids
                         # Get valuation layers
                         for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', move_ids)]):
-                            if res.lc_rate != 1:
+                            if res.grn_rate != 1:
                                 orig_unit_cost = val.unit_cost / (val.po_rate * val.grn_rate)
                                 val.grn_rate += (res.lc_rate - 1)
                                 val.InsertHistory(res.name,
