@@ -689,8 +689,15 @@ class AccountWithholding(models.Model):
             if not withholding_tax:
                 continue
 
-            before_tax_amount = (withholding.withholding_amount * 100) / withholding_tax
-            withholding.amount_before_vat = before_tax_amount
+            withholding_amount=abs(lines[0].amount_currency)
+
+            if withholding.create_uid.id==2:
+                withholding.withholding_amount=withholding_amount
+                withholding.amount_before_vat = (withholding_amount * 100) / withholding_tax
+            else:
+                withholding.amount_before_vat = (withholding.withholding_amount * 100) / withholding_tax
+
+
 
 
 
