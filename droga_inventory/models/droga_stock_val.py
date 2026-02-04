@@ -5,6 +5,19 @@ from odoo.tools import float_compare, float_is_zero
 from odoo.exceptions import UserError
 
 
+WA_ORDER_ASC = "move_date asc, move_type asc, quantity desc, svl_id asc"
+WA_ORDER_DESC = "move_date desc, move_type desc, quantity asc, svl_id desc"
+
+
+def wa_sort_key(move_date, move_type, quantity, svl_id):
+    """Pure helper for ordering transactions like WA_ORDER_ASC.
+
+    Keep in sync with WA_ORDER_ASC / WA_ORDER_DESC.
+    """
+    move_type_rank = 0 if move_type == 'Static' else 1
+    return (move_date, move_type_rank, -quantity, svl_id)
+
+
 class StockValuationLayerInherit(models.Model):
     _inherit = 'stock.valuation.layer'
 
@@ -118,16 +131,16 @@ class DrogaStockValuationLayer(models.Model):
             rec.env['droga.stock.valuation.history'].create(dsval)
 
     def fetch_and_update(self, ret, reference='-', date_change=False):
-        prior_trans = self.get_parent_id(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
+        prior_trans = self.get_parent_id(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id, ret.quantity)
 
         if prior_trans:
             self.update_trans(prior_trans, ret, reference=reference, date_change=date_change)
         else:
             # There are no prior transactions
-            ret.remaining_value = ret.value if ret.value > 0 else 0
+            ret.remaining_value = ret.value
             #ret.remaining_qty = ret.quantity if ret.quantity > 0 else 0
             ret.remaining_qty = ret.quantity
-            ret.remark = ''
+            ret.remark = 'Negative stock, prior transaction not found' if ret.remaining_qty < 0 else ''
 
     @api.model
     def create(self, vals):
@@ -262,7 +275,7 @@ class DrogaStockValuationLayer(models.Model):
         #     init_trans = trans
 
     def revaluate_after_date(self, ret, reference='-'):
-        trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
+        trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id, ret.quantity)
         init_trans = ret
         for trans in trans_after:
             ret_val = self.update_trans(init_trans, trans, reference=reference)
@@ -270,10 +283,29 @@ class DrogaStockValuationLayer(models.Model):
             if not ret_val:
                 break
 
+    def _get_prev_weighted_unit_cost(self, prev_trans):
+        if float_is_zero(prev_trans.remaining_qty, precision_rounding=prev_trans.uom_id.rounding):
+            return abs(prev_trans.unit_cost)
+        return abs(prev_trans.remaining_value) / abs(prev_trans.remaining_qty)
+
+    def _get_negative_segment_start(self, negative_trans):
+        """Return the first transaction of the current negative-stock segment."""
+        current = negative_trans
+        parent = self.get_parent_id(
+            current.product_id.id, current.move_date, current.move_type, current.svl_id, current.quantity
+        )
+        while parent and parent.remaining_qty < 0:
+            current = parent
+            parent = self.get_parent_id(
+                current.product_id.id, current.move_date, current.move_type, current.svl_id, current.quantity
+            )
+        return current
+
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
     def update_trans(self, prev_trans, cur_trans, reference='-', date_change=False):
         old_value = cur_trans.value
         if cur_trans.move_type == 'Static':
+            cur_trans.remark = ''
             if cur_trans.origin and cur_trans.quantity < 0:
                 if cur_trans.origin.startswith('P'):
                     unit_cost = self.env['droga.stock.valuation.layer'].search([('move_type', '=', 'Static'),
@@ -291,35 +323,36 @@ class DrogaStockValuationLayer(models.Model):
             if cur_trans.quantity < 0 and (prev_trans.remaining_qty + cur_trans.quantity) == 0:
                 cur_trans.value = prev_trans.remaining_value * -1
                 cur_trans.unit_cost = cur_trans.value / cur_trans.quantity
-            if prev_trans.remaining_qty < 0:
-                trans_before = self.get_parent_negative_date_id(cur_trans.product_id.id, cur_trans.move_date,
-                                                                cur_trans.svl_id)
-                if trans_before:
-                    cur_trans.move_date = trans_before.move_date
-                    cur_trans.fetch_and_update(cur_trans)
-                    cur_trans.revaluate_after_date(cur_trans)
-                    return False
-                else:
-                    cur_trans.remark = 'Negative stock, prior transaction not found'
-                    cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
-                    cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
-                    return True
-            else:
-                cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
-                cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
 
-                return True
+            if prev_trans.remaining_qty < 0:
+                if cur_trans.quantity > 0:
+                    negative_start = self._get_negative_segment_start(prev_trans)
+                    if negative_start and negative_start.move_date:
+                        if cur_trans.company_id.tax_lock_date and negative_start.move_date <= cur_trans.company_id.tax_lock_date:
+                            cur_trans.remark = (
+                                'Negative stock: cannot auto-backdate into closed period '
+                                f'({cur_trans.company_id.tax_lock_date})'
+                            )
+                        elif negative_start.move_date != cur_trans.move_date:
+                            cur_trans.move_date = negative_start.move_date
+                            cur_trans.fetch_and_update(cur_trans)
+                            cur_trans.revaluate_after_date(cur_trans)
+                            return False
+                    else:
+                        cur_trans.remark = 'Negative stock, prior transaction not found'
+                else:
+                    cur_trans.remark = 'Negative stock: transaction occurs while stock is negative'
+
+            cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
+            cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+            return True
         else:
 
-            if reference != '-' and float_compare(cur_trans.unit_cost, ((abs(prev_trans.remaining_value) / abs(
-                    prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
-                prev_trans.remaining_value / cur_trans.quantity)), precision_digits=2) != 0:
-                cur_trans.InsertHistory(reference, cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(
-                    prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
-                    prev_trans.remaining_value / cur_trans.quantity)))
+            prev_unit_cost = self._get_prev_weighted_unit_cost(prev_trans)
+            if reference != '-' and float_compare(cur_trans.unit_cost, prev_unit_cost, precision_digits=2) != 0:
+                cur_trans.InsertHistory(reference, cur_trans.quantity * prev_unit_cost)
 
-            cur_trans.unit_cost = (abs(prev_trans.remaining_value) / abs(
-                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(prev_trans.unit_cost)
+            cur_trans.unit_cost = prev_unit_cost
             cur_trans.value = cur_trans.quantity * cur_trans.unit_cost
             if cur_trans.value + prev_trans.remaining_value >= 0:
                 cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
@@ -370,45 +403,70 @@ class DrogaStockValuationLayer(models.Model):
                                  cur_trans.account_move_id.id))
 
     # Gets initial row value for processing start
-    def get_parent_id(self, prod_id, trans_date, trans_type, cur_id):
-        if trans_type == 'Static':
-            to_ret = self.env['droga.stock.valuation.layer'].search(
-                ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", "<", trans_date),
-                 "&", ("move_date", "=", trans_date), "&",
-                 ("svl_id", "<", cur_id), ("move_type", "=", "Static")],
-                order="move_date desc, move_type desc, svl_id desc", limit=1)
-            return to_ret if to_ret else False
-        else:
-            to_ret = self.env['droga.stock.valuation.layer'].search(
-                ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", "<", trans_date),
-                 "|", "&", ("move_date", "=", trans_date), "&", ("svl_id", "<", cur_id), ("move_type", "=", "Weighted"),
-                 "&", ("move_date", "=", trans_date), ("move_type", "=", "Static")],
-                order="move_date desc, move_type desc, svl_id desc", limit=1)
-            return to_ret if to_ret else False
-
-    def get_parent_negative_date_id(self, prod_id, trans_date, cur_id):
+    def get_parent_id(self, prod_id, trans_date, trans_type, cur_id, cur_qty):
         to_ret = self.env['droga.stock.valuation.layer'].search(
-            [("svl_id", "!=", cur_id), ("remaining_qty", "<", 0), ("product_id", "=", prod_id),
-             ("move_date", "<", trans_date)],
-            order="move_date asc, move_type asc, quantity asc,svl_id asc", limit=1)
+            [
+                ("svl_id", "!=", cur_id),
+                ("product_id", "=", prod_id),
+                "|",
+                ("move_date", "<", trans_date),
+                "|",
+                "&",
+                ("move_date", "=", trans_date),
+                ("move_type", "<", trans_type),
+                "&",
+                ("move_date", "=", trans_date),
+                "&",
+                ("move_type", "=", trans_type),
+                "|",
+                ("quantity", ">", cur_qty),
+                "&",
+                ("quantity", "=", cur_qty),
+                ("svl_id", "<", cur_id),
+            ],
+            order=WA_ORDER_DESC,
+            limit=1,
+        )
         return to_ret if to_ret else False
 
-    def get_trans_after(self, prod_id, trans_date, trans_type, cur_id):
-        if trans_type == 'Static':
-            to_ret = self.env['droga.stock.valuation.layer'].search(
-                ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", ">", trans_date),
-                 "|", "&", ("move_date", "=", trans_date),
-                 ("move_type", "=", "Weighted"), "&", ("move_date", "=", trans_date), "&", ("move_type", "=", "Static"),
-                 ("svl_id", ">", cur_id)],
-                order="move_date asc, move_type asc, quantity desc,svl_id asc")
-            return to_ret if to_ret else []
-        else:
-            to_ret = self.env['droga.stock.valuation.layer'].search(
-                ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", ">", trans_date),
-                 "&", ("move_date", "=", trans_date), "&",
-                 ("move_type", "=", "Weighted"), ("svl_id", ">", cur_id)],
-                order="move_date asc, move_type asc, quantity desc,svl_id asc")
-            return to_ret if to_ret else []
+    def get_parent_negative_date_id(self, prod_id, trans_date, cur_id):
+        # Kept for backward compatibility; prefer `_get_negative_segment_start`.
+        to_ret = self.env['droga.stock.valuation.layer'].search(
+            [
+                ("svl_id", "!=", cur_id),
+                ("remaining_qty", "<", 0),
+                ("product_id", "=", prod_id),
+                ("move_date", "<", trans_date),
+            ],
+            order=WA_ORDER_DESC,
+            limit=1,
+        )
+        return to_ret if to_ret else False
+
+    def get_trans_after(self, prod_id, trans_date, trans_type, cur_id, cur_qty):
+        to_ret = self.env['droga.stock.valuation.layer'].search(
+            [
+                ("svl_id", "!=", cur_id),
+                ("product_id", "=", prod_id),
+                "|",
+                ("move_date", ">", trans_date),
+                "|",
+                "&",
+                ("move_date", "=", trans_date),
+                ("move_type", ">", trans_type),
+                "&",
+                ("move_date", "=", trans_date),
+                "&",
+                ("move_type", "=", trans_type),
+                "|",
+                ("quantity", "<", cur_qty),
+                "&",
+                ("quantity", "=", cur_qty),
+                ("svl_id", ">", cur_id),
+            ],
+            order=WA_ORDER_ASC,
+        )
+        return to_ret if to_ret else []
 
 
 class DrogaLandedCost(models.Model):
@@ -663,13 +721,13 @@ class DrogaUtility(models.AbstractModel):
 
     @classmethod
     def get_cost_at_date(cls,env,product_id,date):
-        price=env['droga.stock.valuation.layer'].search([('product_id','=',product_id),('move_date','<=',date)],order="move_date desc, move_type desc, quantity asc,svl_id desc",limit=1)
+        price=env['droga.stock.valuation.layer'].search([('product_id','=',product_id),('move_date','<=',date)],order=WA_ORDER_DESC,limit=1)
         if price:
             return price.unit_cost
         else:
             price = env['droga.stock.valuation.layer'].search(
                 [('product_id', '=', product_id), ('move_date', '>', date)],
-                order="move_date asc, move_type asc, quantity desc,svl_id asc", limit=1)
+                order=WA_ORDER_ASC, limit=1)
             if price:
                 return price.unit_cost
             else:
