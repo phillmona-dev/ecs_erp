@@ -9,17 +9,17 @@
             <field name="arch" type="xml">
                 <!-- Add button to button box -->
             <xpath expr="//div[@name='button_box']" position="inside">
-<!--                <button name="action_send_to_telebirr"-->
-<!--                        type="object"-->
-<!--                        class="oe_stat_button"-->
-<!--                        icon="fa-phone"-->
-<!--                        attrs="{'invisible': [('telebirr_status', '=', 'success')]}">-->
-<!--                    <div class="o_field_widget o_stat_info">-->
-<!--                        &lt;!&ndash; Added style to override text-transform: uppercase &ndash;&gt;-->
-<!--                        <span class="o_stat_text" style="text-transform: none !important;">Send</span>-->
-<!--                        <span class="o_stat_text" style="text-transform: none !important;">To telebirr</span>-->
-<!--                    </div>-->
-<!--                </button>-->
+                <button name="action_send_to_telebirr"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-phone"
+                        attrs="{'invisible': [('telebirr_status', '=', 'success')]}">
+                    <div class="o_field_widget o_stat_info">
+                        <!-- Added style to override text-transform: uppercase -->
+                        <span class="o_stat_text" style="text-transform: none !important;">Send</span>
+                        <span class="o_stat_text" style="text-transform: none !important;">To telebirr</span>
+                    </div>
+                </button>
             </xpath>
                 <!-- Add Telebirr fields after invoice date -->
                 <xpath expr="//field[@name='invoice_date']" position="after">
