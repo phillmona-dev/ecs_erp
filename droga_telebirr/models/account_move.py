@@ -89,9 +89,10 @@ class AccountMove(models.Model):
     def _inverse_mobile_no(self):
         for move in self:
             if move.mobile_no and move.partner_id:
-                move.partner_id.write({
-                    'mobile': move.mobile_no
-                })
+                if move.partner_id.company_type == 'person':
+                    move.partner_id.write({
+                        'mobile': move.mobile_no
+                    })
 
     def action_send_to_telebirr(self):
         """Public method that constructs a SOAP request and posts it to the relay."""
