@@ -246,21 +246,30 @@ class AccountMove(models.Model):
         partner_phone=self.normalize_phone(partner_phone)
 
         API_Caller = "DROGAUSSDPUSH"
-        API_Caller_pass = self.line_ids.sale_line_ids.order_id.wareh.telebirr_pass
         amount = "%.2f" % (self.amount_total)
         currency = (self.currency_id.name or "ETB")
 
         originator_id = conv_id
 
         initiator_id = self.env.user.login or 'odoo_user'
-        short_code=self.line_ids.sale_line_ids.order_id.wareh.telebirr_id
+        wareh = False
+
+        # TODO if self.line_ids.sale_line_ids.order_id.wareh.order_type.wareh is null or false or empty, self.line_ids.sale_line_ids[0].wareh
+        if self.line_ids.sale_line_ids.order_id.wareh:
+            wareh = self.line_ids.sale_line_ids.order_id.wareh
+        else:
+            if self.line_ids.sale_line_ids:
+                wareh = self.line_ids.sale_line_ids[0].wareh
+
+        API_Caller_pass = wareh.telebirr_pass
+        short_code=wareh.telebirr_id
         if not short_code:
             raise UserError(_("Short code not filled for branch, please contact system administrator."))
 
-        ORG_OPERATOR_ID = self.line_ids.sale_line_ids.order_id.wareh.telebirr_operid
+        ORG_OPERATOR_ID = wareh.telebirr_operid
 
         timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-        SecurityCredential = self.line_ids.sale_line_ids.order_id.wareh.telebirr_cred
+        SecurityCredential = wareh.telebirr_cred
 
         # Minimal SOAP request body (XML string)
         soap_template = f"""<?xml version="1.0" encoding="utf-8"?>   
