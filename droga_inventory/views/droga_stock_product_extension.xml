@@ -147,7 +147,7 @@
                     </group>
 
                     <group string="Categories">
-                        <field name="categ_id" invisible="1" string="Product Category"
+                        <field name="categ_id" invisible="0" string="Product Category"
                                options="{'no_create':True,'no_open':True}"
                                domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
                         <field name="pharmacy_group_id" required="True" options="{'no_create':True,'no_open':True}" domain="[('id_counter','&lt;',1000)]"
