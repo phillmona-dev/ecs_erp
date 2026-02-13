@@ -911,6 +911,10 @@ class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
     name = fields.Char('Name', index='trigram', required=True, translate=True,tracking=True)
     company_id = fields.Many2one('res.company', string='Company',index=True, default=lambda self: self.env.company, required=False)
+    show_company_1_product_groups = fields.Boolean(
+        compute='_compute_show_company_1_product_groups',
+        store=False
+    )
     order_type = fields.Selection([
         ('IM', 'Import and pharmacy'),
         ('WS', 'Wholesale and pharmacy'),
@@ -963,6 +967,12 @@ class droga_stock_product_extension(models.Model):
     origin = fields.Many2one('res.country',string='Origin')
     reg_status=fields.Selection([('draft', 'draft'), ('waiting', 'waiting'),('rejected', 'rejected'),('approved', 'approved')],
                             default='draft')
+
+    @api.depends_context('allowed_company_ids', 'company')
+    def _compute_show_company_1_product_groups(self):
+        show_groups = self.env.company.id == 1
+        for rec in self:
+            rec.show_company_1_product_groups = show_groups
 
     def _get_prod_id(self):
         for rec in self:

@@ -176,6 +176,52 @@ class sales_integ(models.Model):
                 if pro_type == "counselling":
                     rec.has_counsell_products = True
 
+    def _create_membership_records(self):
+        membership_model = self.env['droga.pharma.membership'].sudo()
+        for rec in self:
+            if not rec.order_from or not rec.order_from.startswith('PH'):
+                continue
+
+            membership_lines = rec.order_line.filtered(
+                lambda ln: ln.product_id
+                and ln.product_id.product_tmpl_id.pharma_detailed_type == 'membershipcard'
+                and not ln.display_type
+            )
+            for line in membership_lines:
+                owner_domain = [('parent_employee', '=', rec.customer_emp.id)] if rec.customer_emp else [
+                    ('parent_customer', '=', rec.partner_id.id),
+                    ('parent_employee', '=', False)
+                ]
+                existing_membership = membership_model.search([
+                    ('sales_ref', '=', rec.name),
+                    ('membership_product_id', '=', line.product_id.id),
+                ] + owner_domain, limit=1)
+                if existing_membership:
+                    continue
+
+                start_date = fields.Datetime.to_datetime(rec.date_order or fields.Datetime.now())
+                qty = int(line.product_uom_pharma_qty or line.product_uom_qty or 1)
+                qty = max(qty, 1)
+                months_duration = (line.product_id.product_tmpl_id.duration or 0) * qty
+
+                membership_vals = {
+                    'parent_customer': rec.partner_id.id if not rec.customer_emp else False,
+                    'parent_employee': rec.customer_emp.id,
+                    'membership_product_id': line.product_id.id,
+                    'prod': line.product_id.default_code,
+                    'prod_descr': line.product_id.name,
+                    'sales_ref': rec.name,
+                    'paid_amount': line.price_subtotal,
+                    'left_amount': 0,
+                    'date_from': start_date,
+                    'date_to': start_date + relativedelta(months=months_duration)
+                }
+                membership_model.create(membership_vals)
+
+    def action_confirm(self):
+        res = super().action_confirm()
+        self.filtered(lambda so: so.state in ('sale', 'done', 'dispense'))._create_membership_records()
+        return res
 
     def action_done(self):
         self.state='done'

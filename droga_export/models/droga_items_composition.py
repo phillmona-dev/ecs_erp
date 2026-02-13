@@ -14,22 +14,39 @@ class droga_items_composition(models.Model):
     item_desc = fields.Char('Description', related='raw_item.name')
     items_detail=fields.One2many('droga.export.items.composition.fin.goods', 'items_header')
 
+    def _validate_items_detail(self, items_detail_vals):
+        if not items_detail_vals:
+            raise UserError("At least one product must be registered to save record.")
+
+        pct_sum = 0.0
+        has_finish = False
+        finish_products_to_update = []
+
+        for item in items_detail_vals:
+            if not isinstance(item, (list, tuple)) or len(item) < 3:
+                continue
+            values = item[2] if isinstance(item[2], dict) else {}
+            rate_in_pct = values.get('rate_in_pct', 0.0)
+            line_type = values.get('type')
+            product_tmpl_id = values.get('item')
+            if rate_in_pct < 0:
+                raise UserError("Percentage can not be negative.")
+            pct_sum += rate_in_pct
+            if line_type == 'finish':
+                has_finish = True
+                if product_tmpl_id:
+                    finish_products_to_update.append(product_tmpl_id)
+
+        if abs(pct_sum - 100.0) > 1e-6:
+            raise UserError("The summation of percentage should equal 100%.")
+        if not has_finish:
+            raise UserError("At least one finished good must be configured.")
+        return finish_products_to_update
+
     @api.model
     def create(self, vals_list):
         if vals_list.get('name', 'New') == 'New':
-            if len(vals_list['items_detail']) == 0:
-                raise UserError("At least one product must be registered to save record.")
-
-            prod_to_update=[]
-
-            pct_sum=0
-            for item in vals_list['items_detail']:
-                pct_sum+=item[2]['rate_in_pct']
-                if item[2]['type']=='finish':
-                    prod_to_update.append(item[2]['item'])
-
-            if pct_sum != 100:
-                raise UserError("The summation of percentage should equal 100%.")
+            prod_to_update = self._validate_items_detail(vals_list.get('items_detail', []))
 
             _name = self.env['ir.sequence'].next_by_code('droga.export.items.composition.sequence')
             if not _name:
@@ -37,23 +54,26 @@ class droga_items_composition(models.Model):
             vals_list['name'] = _name
 
             for item in prod_to_update:
-                self.env['product.template'].search([('id', '=', item)])[0].bought_locally=True
+                product = self.env['product.template'].browse(item)
+                if product.exists():
+                    product.bought_locally = True
 
         return super(droga_items_composition, self).create(vals_list)
 
     def write(self, vals):
-        for val in vals:
-            res = super(droga_items_composition, self).write(vals)
+        res = super(droga_items_composition, self).write(vals)
 
-        detail_items = self.env['droga.export.items.composition.fin.goods'].search(
-            [('items_header', '=', self.id)])
+        for rec in self:
+            detail_items = self.env['droga.export.items.composition.fin.goods'].search(
+                [('items_header', '=', rec.id)])
 
-        pct_sum = 0
-        for item in detail_items:
-            pct_sum += item['rate_in_pct']
+            pct_sum = sum(detail_items.mapped('rate_in_pct'))
+            has_finish = any(detail_items.mapped(lambda x: x.type == 'finish'))
 
-        if pct_sum != 100:
-            raise UserError("The summation of percentage should equal 100%.")
+            if abs(pct_sum - 100.0) > 1e-6:
+                raise UserError("The summation of percentage should equal 100%.")
+            if not has_finish:
+                raise UserError("At least one finished good must be configured.")
 
         return res
 
