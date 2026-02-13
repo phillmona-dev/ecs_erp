@@ -138,11 +138,11 @@
                         <field name="from_pharma" invisible="1"></field>
                         <field name="import_uom_new" required="1" string="Import UOM" options="{'no_create': True}" attrs="{'required': [('from_pharma', '=', True)]}"/>/>
                         <field name="uom_id" string="Pharmacy UOM" options="{'no_create': True}" />
-                        <field name="categ" readonly="1" invisible="1"></field>
                     </group>
 
                     <group string="Categories">
                         <field name="show_company_1_product_groups" invisible="1"/>
+                        <field name="categ" readonly="0" attrs="{'invisible': [('show_company_1_product_groups', '=', True)]}"></field>
                         <field name="categ_id" invisible="1" string="Product Category"
                                options="{'no_create':True,'no_open':True}"
                                domain="[('complete_name','not like','All%'),('parent_id','=',False)]"/>
