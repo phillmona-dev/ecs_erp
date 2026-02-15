@@ -587,9 +587,15 @@ class DrogaLandedCost(models.Model):
                         # Get stock move ids
                         move_ids = self.env['stock.move'].search([('purchase_line_id', 'in', po.order_line.ids)]).ids
                         # Get valuation layers
-                        for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', move_ids)]):
+                        for val in self.env['droga.stock.valuation.layer'].search([
+                            ('stock_move_id', 'in', move_ids),
+                            ('move_type', '=', 'Static'),
+                        ]):
                             if res.lc_rate != 1:
-                                orig_unit_cost = val.unit_cost / (val.po_rate * val.grn_rate)
+                                combined_rate = (val.po_rate or 1.0) + (val.grn_rate or 1.0) - 1.0
+                                if float_is_zero(combined_rate, precision_digits=8):
+                                    combined_rate = 1.0
+                                orig_unit_cost = val.unit_cost / combined_rate
                                 val.po_rate += (res.lc_rate - 1)
                                 val.InsertHistory(res.name,
                                                   val.quantity * (orig_unit_cost * (val.po_rate + val.grn_rate - 1)))
@@ -605,9 +611,15 @@ class DrogaLandedCost(models.Model):
                         # Get stock move ids
                         move_ids = grn.move_ids.ids
                         # Get valuation layers
-                        for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', move_ids)]):
+                        for val in self.env['droga.stock.valuation.layer'].search([
+                            ('stock_move_id', 'in', move_ids),
+                            ('move_type', '=', 'Static'),
+                        ]):
                             if res.lc_rate != 1:
-                                orig_unit_cost = val.unit_cost / (val.po_rate * val.grn_rate)
+                                combined_rate = (val.po_rate or 1.0) + (val.grn_rate or 1.0) - 1.0
+                                if float_is_zero(combined_rate, precision_digits=8):
+                                    combined_rate = 1.0
+                                orig_unit_cost = val.unit_cost / combined_rate
                                 val.grn_rate += (res.lc_rate - 1)
                                 val.InsertHistory(res.name,
                                                   val.quantity * (orig_unit_cost * (val.po_rate + val.grn_rate - 1)))
@@ -652,7 +664,11 @@ class PurchaseOrderLine(models.Model):
                     for move in moves:
                         dsvals = self.env['droga.stock.valuation.layer'].search([('stock_move_id', '=', move.id)])
                         for dsval in dsvals:
-                            new_up = rec.price_unit * (rec.product_uom.factor / rec.product_id.uom_id.factor)
+                            base_unit_cost = rec.price_unit * (rec.product_uom.factor / rec.product_id.uom_id.factor)
+                            combined_rate = (dsval.po_rate or 1.0) + (dsval.grn_rate or 1.0) - 1.0
+                            if float_is_zero(combined_rate, precision_digits=8):
+                                combined_rate = 1.0
+                            new_up = base_unit_cost * combined_rate
                             dsval.InsertHistory(dsval.origin,
                                                 dsval.quantity * new_up)
                             dsval.unit_cost = new_up

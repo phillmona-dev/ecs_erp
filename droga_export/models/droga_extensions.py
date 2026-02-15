@@ -328,14 +328,31 @@ class droga_cons_inherit(models.Model):
         total_cost_build_byproduct = sum(cost_lines.filtered(lambda x: x.type_apply == 'By-product').mapped('amount_for_order'))
         total_cost_common = sum(cost_lines.filtered(lambda x: x.type_apply == 'All').mapped('amount_for_order'))
 
+        issue_pickings = self.env['stock.picking'].search([
+            ('cons_sample_issue_request', '=', self.id),
+        ])
+        issue_vals_by_product = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+        if issue_pickings:
+            issue_moves = self.env['stock.move'].search([('picking_id', 'in', issue_pickings.ids)])
+            if issue_moves:
+                issue_vals = self.env['droga.stock.valuation.layer'].search([
+                    ('stock_move_id', 'in', issue_moves.ids),
+                    ('move_type', '=', 'Static'),
+                ])
+                for val in issue_vals:
+                    issue_vals_by_product[val.product_id.id]['qty'] += abs(val.quantity)
+                    issue_vals_by_product[val.product_id.id]['value'] += abs(val.value)
+
         detail_metrics = []
         issue_total_qty = {
             'finish': 0.0,
             'byproduct': 0.0,
             'waste': 0.0,
         }
+        detail_qty_by_product = defaultdict(float)
 
         for det in self.detail_entries:
+            detail_qty_by_product[det.product_id.id] += det.product_uom_qty
             composition = self._get_composition_for_raw_item(det.product_id.product_tmpl_id)
             if not composition:
                 raise UserError(
@@ -370,12 +387,18 @@ class droga_cons_inherit(models.Model):
         product_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
 
         for det, composition, _qty_by_type, distributed_qty in detail_metrics:
-            waste_increase_rate = det.product_uom_qty / distributed_qty
-            std_price = self.env['droga.wa.utility'].get_cost_at_date(self.env, det.product_id.id, valuation_date)
-            base_unit_cost = (
-                (std_price * waste_increase_rate)
-                + (det.proc_cost * waste_increase_rate)
-            )
+            issue_totals = issue_vals_by_product.get(det.product_id.id) or {}
+            issued_raw_cost_total = issue_totals.get('value', 0.0) or 0.0
+            if float_is_zero(issued_raw_cost_total, precision_digits=6):
+                # Fallback for legacy/partial cases where issue valuation rows are missing.
+                std_price = self.env['droga.wa.utility'].get_cost_at_date(self.env, det.product_id.id, valuation_date)
+                issued_raw_cost_total = abs(std_price * detail_qty_by_product.get(det.product_id.id, det.product_uom_qty))
+            detail_product_qty = detail_qty_by_product.get(det.product_id.id, det.product_uom_qty)
+            if float_is_zero(detail_product_qty, precision_digits=6):
+                detail_product_qty = det.product_uom_qty or 1.0
+            issued_raw_cost_share = issued_raw_cost_total * (det.product_uom_qty / detail_product_qty)
+            processing_cost_total = det.proc_cost * det.product_uom_qty
+            base_unit_cost = (issued_raw_cost_share + processing_cost_total) / distributed_qty
             common_unit_cost = total_cost_common / issue_total_distributed_qty
 
             for comp_item in composition.items_detail:
@@ -456,7 +479,9 @@ class droga_cons_inherit(models.Model):
         subl_receive_headers = receive_headers.filtered(
             lambda r: 'issue_type' in r._fields and r.issue_type == 'SUBL'
         )
-        if subl_receive_headers and price_by_product:
+        if not subl_receive_headers:
+            return
+        if price_by_product:
             receive_items = self.env['droga.inventory.cons.receive.detail'].search([
                 ('cons_header', 'in', subl_receive_headers.ids),
                 ('product_id', 'in', list(price_by_product.keys())),
@@ -464,7 +489,7 @@ class droga_cons_inherit(models.Model):
             for line in receive_items:
                 line.write({'price_unit_cons': price_by_product.get(line.product_id.id, line.price_unit_cons)})
 
-        receive_pickings = self.env['stock.picking'].search([('cons_receive_request', 'in', receive_headers.ids)])
+        receive_pickings = self.env['stock.picking'].search([('cons_receive_request', 'in', subl_receive_headers.ids)])
         moves_receipts = self.env['stock.move'].search([
             ('picking_id', 'in', receive_pickings.ids),
         ])

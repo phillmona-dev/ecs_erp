@@ -891,7 +891,9 @@ class droga_stock_picking_extension(models.Model):
         if self.office_request:
             self.office_request.write({'state': 'processed'})
         if self.cons_sample_issue_request:
-            self.cons_sample_issue_request.write({'state': ('done' if 'issue_type'=='SAP' else 'processed')})
+            self.cons_sample_issue_request.write({
+                'state': ('done' if self.cons_sample_issue_request.issue_type == 'SAP' else 'processed')
+            })
         if self.cons_receive_request:
             self.cons_receive_request.write({'state': 'done'})
 

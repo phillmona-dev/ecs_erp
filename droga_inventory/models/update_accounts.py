@@ -20,12 +20,15 @@ class update_acc(models.Model):
             return False
 
     def _resolve_product_by_code(self, item_code, company_id=False):
-        domain = [
-            ('id', '=', item_code),
+        if str(item_code).isdigit():
+            domain = [('id', '=', int(item_code))]
+        else:
+            domain = [('default_code', '=', item_code)]
+        domain.extend([
             '|',
             ('active', '=', True),
             ('active', '=', False),
-        ]
+        ])
         if company_id:
             domain.extend(['|', ('company_id', '=', False), ('company_id', '=', company_id)])
         products = self.env['product.product'].search(domain)
@@ -285,7 +288,7 @@ class update_acc(models.Model):
             product_ids = [product.id]
         else:
             groups = self.env['droga.stock.valuation.layer'].read_group(
-                [('company_id', '=', company_id)],
+                self._get_cleaning_layer_domain(company_id=company_id),
                 ['product_id'],
                 ['product_id'],
             )
@@ -333,9 +336,8 @@ class update_acc(models.Model):
                 ('company_id', '=', company_id),
                 ('value', '!=', 0),
                 ('account_move_id', '=', False),
+                ('product_id', 'in', list(all_product_ids)),
             ]
-            if item_code:
-                post_domain.append(('product_id', 'in', list(all_product_ids)))
             self._post_or_update_entries(
                 post_domain,
                 order_asc=WA_ORDER_ASC,
@@ -347,9 +349,8 @@ class update_acc(models.Model):
                     ('company_id', '=', company_id),
                     ('value', '!=', 0),
                     ('account_move_id', '!=', False),
+                    ('product_id', 'in', list(all_product_ids)),
                 ]
-                if item_code:
-                    repost_domain.append(('product_id', 'in', list(all_product_ids)))
                 self._post_or_update_entries(
                     repost_domain,
                     order_asc=WA_ORDER_ASC,
