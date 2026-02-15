@@ -145,6 +145,19 @@ class DrogaStockValuationLayer(models.Model):
             ret.remaining_qty = ret.quantity
             ret.remark = 'Negative stock, prior transaction not found' if ret.remaining_qty < 0 else ''
 
+    def _is_cleaning_unit_return_transaction(self, trans):
+        """True when the valuation layer comes from a SUBL cleaning return picking."""
+        move = trans.stock_move_id
+        if not move or not move.picking_id:
+            return False
+        picking = move.picking_id
+        if 'cons_receive_request' not in picking._fields:
+            return False
+        receive = picking.cons_receive_request
+        if not receive:
+            return False
+        return bool('issue_type' in receive._fields and receive.issue_type == 'SUBL')
+
     @api.model
     def create(self, vals):
         ret = super(DrogaStockValuationLayer, self).create(vals)
@@ -338,7 +351,8 @@ class DrogaStockValuationLayer(models.Model):
         old_value = cur_trans.value
         if cur_trans.move_type == 'Static':
             cur_trans.remark = ''
-            if cur_trans.origin and cur_trans.quantity < 0:
+            allow_static_reprice = self._is_cleaning_unit_return_transaction(cur_trans)
+            if allow_static_reprice and cur_trans.origin and cur_trans.quantity < 0:
                 if cur_trans.origin.startswith('P'):
                     unit_cost = self.env['droga.stock.valuation.layer'].search([('move_type', '=', 'Static'),
                                                                                 ('stock_move_id', '=',
@@ -352,9 +366,27 @@ class DrogaStockValuationLayer(models.Model):
                             self.update_gl(cur_trans)
 
             # In case it's a purchase return and the remaining quantity becomes 0, we use the remaining value to balance it
-            if cur_trans.quantity < 0 and (prev_trans.remaining_qty + cur_trans.quantity) == 0:
-                cur_trans.value = prev_trans.remaining_value * -1
-                cur_trans.unit_cost = cur_trans.value / cur_trans.quantity
+            if allow_static_reprice and cur_trans.quantity < 0 and (prev_trans.remaining_qty + cur_trans.quantity) == 0:
+                balanced_value = prev_trans.remaining_value * -1
+                # Guardrail: keep existing non-zero static cost if balancing value collapses to zero unexpectedly.
+                if (
+                    cur_trans.currency_id.is_zero(balanced_value)
+                    and (
+                        not cur_trans.currency_id.is_zero(cur_trans.value)
+                        or not float_is_zero(cur_trans.unit_cost, precision_digits=6)
+                    )
+                ):
+                    _logger.warning(
+                        "Skipping zero-balance overwrite for static dsvl id=%s product=%s "
+                        "(current unit_cost=%s value=%s).",
+                        cur_trans.id,
+                        cur_trans.product_id.id,
+                        cur_trans.unit_cost,
+                        cur_trans.value,
+                    )
+                else:
+                    cur_trans.value = balanced_value
+                    cur_trans.unit_cost = cur_trans.value / cur_trans.quantity
 
             if prev_trans.remaining_qty < 0:
                 if cur_trans.quantity > 0:

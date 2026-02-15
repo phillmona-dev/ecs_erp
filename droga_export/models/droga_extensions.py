@@ -1,7 +1,12 @@
 from collections import defaultdict
+import logging
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from odoo.tools import float_is_zero
+
+
+_logger = logging.getLogger(__name__)
 
 class droga_export_detail_ext(models.Model):
     _inherit = 'droga.inventory.cons.receive.detail'
@@ -441,47 +446,77 @@ class droga_cons_inherit(models.Model):
         valuation_date = self._get_cleaning_valuation_date()
         pricing_payload = self._build_cleaning_pricing_payload(valuation_date)
         price_by_product = pricing_payload['price_by_product']
-        if not price_by_product:
-            return
 
         receive_headers = self.env['droga.inventory.consignment.receive'].search([
-            ('subcontractor_return_origin_form', '=', self.id)
+            ('subcontractor_return_origin_form', '=', self.id),
         ])
         if not receive_headers:
             return
 
-        receive_items = self.env['droga.inventory.cons.receive.detail'].search([
-            ('cons_header', 'in', receive_headers.ids),
-            ('product_id', 'in', list(price_by_product.keys())),
-        ])
-        for line in receive_items:
-            line.write({'price_unit_cons': price_by_product.get(line.product_id.id, line.price_unit_cons)})
+        subl_receive_headers = receive_headers.filtered(
+            lambda r: 'issue_type' in r._fields and r.issue_type == 'SUBL'
+        )
+        if subl_receive_headers and price_by_product:
+            receive_items = self.env['droga.inventory.cons.receive.detail'].search([
+                ('cons_header', 'in', subl_receive_headers.ids),
+                ('product_id', 'in', list(price_by_product.keys())),
+            ])
+            for line in receive_items:
+                line.write({'price_unit_cons': price_by_product.get(line.product_id.id, line.price_unit_cons)})
 
         receive_pickings = self.env['stock.picking'].search([('cons_receive_request', 'in', receive_headers.ids)])
         moves_receipts = self.env['stock.move'].search([
             ('picking_id', 'in', receive_pickings.ids),
-            ('product_id', 'in', list(price_by_product.keys())),
         ])
         vals_receipts = self.env['droga.stock.valuation.layer'].search([
             ('stock_move_id', 'in', moves_receipts.ids),
-            ('product_id', 'in', list(price_by_product.keys())),
+            ('move_type', '=', 'Static'),
         ])
         for val in vals_receipts:
-            price = price_by_product.get(val.product_id.id)
-            if price is None:
-                continue
-            val.write({'unit_cost': price, 'value': price * val.quantity})
-            if val.account_move_id:
-                self.env.cr.execute(
-                    "update account_move set company_id=%s where id=%s",
-                    (val.company_id.id, val.account_move_id.id)
-                )
-                self.env.cr.execute(
-                    "update account_move_line set company_id=%s where move_id=%s",
-                    (val.company_id.id, val.account_move_id.id)
-                )
-            val.account_move_id = False
-            val.update_wa_after_date(val)
+            receive = val.stock_move_id.picking_id.cons_receive_request
+            allow_price_update = bool(
+                receive and 'issue_type' in receive._fields and receive.issue_type == 'SUBL'
+            )
+            price = price_by_product.get(val.product_id.id) if allow_price_update else None
+            price_updated = False
+
+            if price is not None:
+                # Guardrail: avoid wiping a static valuation row to zero due transient/missing pricing payload.
+                if (
+                    val.currency_id.is_zero(price)
+                    and (
+                        not val.currency_id.is_zero(val.value)
+                        or not float_is_zero(val.unit_cost, precision_digits=6)
+                    )
+                ):
+                    _logger.warning(
+                        "Skipping zero-price overwrite for static dsvl id=%s product=%s "
+                        "(current unit_cost=%s value=%s).",
+                        val.id,
+                        val.product_id.id,
+                        val.unit_cost,
+                        val.value,
+                    )
+                else:
+                    val.write({'unit_cost': price, 'value': price * val.quantity})
+                    price_updated = True
+
+            if price_updated:
+                if val.account_move_id:
+                    self.env.cr.execute(
+                        "update account_move set company_id=%s where id=%s",
+                        (val.company_id.id, val.account_move_id.id)
+                    )
+                    self.env.cr.execute(
+                        "update account_move_line set company_id=%s where move_id=%s",
+                        (val.company_id.id, val.account_move_id.id)
+                    )
+                val.account_move_id = False
+                val.update_wa_after_date(val)
+            else:
+                # Keep price unchanged, but still propagate weighted-average recomputation.
+                val.fetch_and_update(val, reference='Cleaning Unit WA Recalc')
+                val.revaluate_after_date(val, reference='Cleaning Unit WA Recalc')
 
     def sub_cont_return(self):
         self.ensure_one()
