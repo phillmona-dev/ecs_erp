@@ -14,6 +14,26 @@ class droga_items_composition(models.Model):
     item_desc = fields.Char('Description', related='raw_item.name')
     items_detail=fields.One2many('droga.export.items.composition.fin.goods', 'items_header')
 
+    def _check_edit_restricted_by_return_operations(self):
+        receive_model = self.env['droga.inventory.consignment.receive']
+        if 'subcontractor_return_origin_form' not in receive_model._fields:
+            return
+
+        for rec in self:
+            receive = receive_model.search([
+                ('subcontractor_return_origin_form', '!=', False),
+                ('subcontractor_return_origin_form.issue_type', '=', 'SUBL'),
+                ('subcontractor_return_origin_form.company_id', '=', rec.company_id.id),
+                ('subcontractor_return_origin_form.detail_entries.product_id.product_tmpl_id', '=', rec.raw_item.id),
+            ], order='id desc', limit=1)
+            if receive:
+                issue_name = receive.subcontractor_return_origin_form.name or '/'
+                raise UserError(
+                    "You cannot edit cleaning unit composition for raw material %s because "
+                    "return operation %s already exists from issue %s."
+                    % (rec.raw_item.display_name, receive.name or '/', issue_name)
+                )
+
     def _validate_items_detail(self, items_detail_vals):
         if not items_detail_vals:
             raise UserError("At least one product must be registered to save record.")
@@ -61,6 +81,8 @@ class droga_items_composition(models.Model):
         return super(droga_items_composition, self).create(vals_list)
 
     def write(self, vals):
+        if any(field in vals for field in ('raw_item', 'items_detail')):
+            self._check_edit_restricted_by_return_operations()
         res = super(droga_items_composition, self).write(vals)
 
         for rec in self:
@@ -77,6 +99,10 @@ class droga_items_composition(models.Model):
 
         return res
 
+    def unlink(self):
+        self._check_edit_restricted_by_return_operations()
+        return super(droga_items_composition, self).unlink()
+
 class droga_items_composition_finished_goods(models.Model):
     _name = 'droga.export.items.composition.fin.goods'
     company_id=fields.Many2one('res.company',related='items_header.company_id')
@@ -85,4 +111,21 @@ class droga_items_composition_finished_goods(models.Model):
         [('finish', 'Finished good'), ('byproduct', 'By-Product'), ('waste', 'Wastage')],required=True)
     rate_in_pct=fields.Float(string='Percentage (out of 100)',required=True)
     items_header = fields.Many2one('droga.export.items.composition', required=True)
-    
+
+    @api.model
+    def create(self, vals):
+        header_id = vals.get('items_header')
+        if header_id:
+            self.env['droga.export.items.composition'].browse(header_id)._check_edit_restricted_by_return_operations()
+        return super(droga_items_composition_finished_goods, self).create(vals)
+
+    def write(self, vals):
+        headers = self.mapped('items_header')
+        if vals.get('items_header'):
+            headers |= self.env['droga.export.items.composition'].browse(vals.get('items_header'))
+        headers._check_edit_restricted_by_return_operations()
+        return super(droga_items_composition_finished_goods, self).write(vals)
+
+    def unlink(self):
+        self.mapped('items_header')._check_edit_restricted_by_return_operations()
+        return super(droga_items_composition_finished_goods, self).unlink()

@@ -298,6 +298,11 @@ class droga_cons_inherit(models.Model):
         self.ensure_one()
         return fields.Date.to_date(self.issue_date or self.create_date or fields.Date.context_today(self))
 
+    def _can_build_cleaning_pricing_payload(self):
+        self.ensure_one()
+        return self.state in ('waiting', 'processed','done','sc')
+        #return self.state in ('processed', 'done', 'sc')
+
     def _get_composition_for_raw_item(self, raw_template):
         self.ensure_one()
         compositions = self.env['droga.export.items.composition'].search([
@@ -311,7 +316,7 @@ class droga_cons_inherit(models.Model):
             )
         return compositions[:1]
 
-    def _build_cleaning_pricing_payload(self, valuation_date):
+    def _build_cleaning_pricing_payload(self, valuation_date,tolerate_composition_error=False):
         self.ensure_one()
         cost_lines = self.env['droga.export.cost.buildup'].search([('issue_export_origin_form', '=', self.id)])
         total_cost_build_finish = sum(cost_lines.filtered(lambda x: x.type_apply == 'Finished').mapped('amount_for_order'))
@@ -324,12 +329,13 @@ class droga_cons_inherit(models.Model):
             'byproduct': 0.0,
             'waste': 0.0,
         }
+
         for det in self.detail_entries:
             composition = self._get_composition_for_raw_item(det.product_id.product_tmpl_id)
             if not composition:
                 raise UserError(
-                    "Composition is not configured for raw material %s."
-                    % det.product_id.display_name
+                    "Composition is not configured for raw material %s in %s."
+                    % (det.product_id.display_name,self.name+(('-'+self.subcontract_issue_origin_form.name) if self.subcontract_issue_origin_form else ''))
                 )
 
             qty_by_type = {
@@ -430,6 +436,8 @@ class droga_cons_inherit(models.Model):
 
     def recalculate(self):
         self.ensure_one()
+        if not self._can_build_cleaning_pricing_payload():
+            return
         valuation_date = self._get_cleaning_valuation_date()
         pricing_payload = self._build_cleaning_pricing_payload(valuation_date)
         price_by_product = pricing_payload['price_by_product']
@@ -479,6 +487,8 @@ class droga_cons_inherit(models.Model):
         self.ensure_one()
         if len(self.cons_ref.filtered(lambda x: (x.state=='done')))==0:
             raise UserError("Please send items to cleaning unit first before receving them.")
+        if not self._can_build_cleaning_pricing_payload():
+            raise UserError("Cleaning unit pricing can be generated only when order state is Waiting or Processed.")
 
         valuation_date = self._get_cleaning_valuation_date()
         pricing_payload = self._build_cleaning_pricing_payload(valuation_date)
@@ -558,11 +568,11 @@ class droga_sale_inherit(models.Model):
             )
             if not finish_lines:
                 continue
-            if len(finish_lines.mapped('items_header.raw_item')) > 1:
-                raise UserError(
-                    "The item %s is linked to multiple raw materials in composition setup. Please keep only one."
-                    % ord.product_template_id.display_name
-                )
+            # if len(finish_lines.mapped('items_header.raw_item')) > 1:
+            #     raise UserError(
+            #         "The item %s is linked to multiple raw materials in composition setup. Please keep only one."
+            #         % ord.product_template_id.display_name
+            #     )
             finish_line = finish_lines[0]
             if finish_line.rate_in_pct <= 0:
                 raise UserError("Finished good percentage can not be zero for %s." % ord.product_template_id.display_name)

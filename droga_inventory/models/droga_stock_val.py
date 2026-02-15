@@ -1,8 +1,11 @@
 from email.policy import default
 from collections import defaultdict
+import logging
 from odoo import api, fields, models, tools, _
 from odoo.tools import float_compare, float_is_zero
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 WA_ORDER_ASC = "move_date asc, move_type asc, quantity desc, svl_id asc"
@@ -193,6 +196,8 @@ class DrogaStockValuationLayer(models.Model):
         self.updatesalescost(ret)
 
     def updatesalescost(self, ret):
+        if self.env.context.get('skip_sales_cost_sync'):
+            return
         # This updates sales cost value for sales transactions. Out refund is sales return
         if ret.origin:
             if ret.origin.startswith('SO'):
@@ -235,12 +240,39 @@ class DrogaStockValuationLayer(models.Model):
             account_moves = self.env['account.move'].sudo().create(am_vals)
             account_moves['invoice_origin'] = self.origin
             account_moves._post()
-            print('Linked '+str(self.id)+' with '+str(account_moves.id))
+            _logger.debug("Linked droga.stock.valuation.layer id=%s with account.move id=%s", self.id, account_moves.id)
             self.account_move_id = account_moves.id
+
+    def _resolve_inventory_account_id(self, trans):
+        """Return an inventory account id suitable for GL line updates."""
+        inv_acc = trans.inv_acc
+        if not inv_acc:
+            accounts = trans.product_id.product_tmpl_id.get_product_accounts()
+            inv_acc = accounts.get('stock_valuation')
+        if not inv_acc and trans.account_move_id:
+            move_lines = trans.account_move_id.line_ids.filtered(lambda l: l.account_id)
+            if trans.con_acc:
+                preferred = move_lines.filtered(lambda l: l.account_id.id != trans.con_acc.id)
+                inv_acc = preferred[:1].account_id if preferred else False
+            if not inv_acc and move_lines:
+                inv_acc = move_lines[0].account_id
+        if inv_acc and trans.inv_acc != inv_acc:
+            trans.inv_acc = inv_acc.id
+        return inv_acc.id if inv_acc else False
 
     def revaluate_after_date_upd_ledger(self, reference=''):
         ret = self
         if ret.account_move_id:
+            inv_acc_id = self._resolve_inventory_account_id(ret)
+            if not inv_acc_id:
+                _logger.warning(
+                    "Skipping GL update for dsvl id=%s (move id=%s): inventory account is missing",
+                    ret.id,
+                    ret.account_move_id.id,
+                )
+                self.updatesalescost(ret)
+                self.revaluate_after_date(ret, reference=reference)
+                return
             query1 = """
                                     update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
                                     case non_core_amt when 0 then 0 else %s end where id=%s
@@ -257,11 +289,11 @@ class DrogaStockValuationLayer(models.Model):
                                                 amount_currency=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end
                                                 where move_id=%s
                                             """
-            self.env.cr.execute(query2, (ret.inv_acc.id, ret.value, ret.inv_acc.id, ret.value, abs(ret.value),
-                                         ret.inv_acc.id, ret.value, ret.inv_acc.id, ret.value, abs(ret.value),
-                                         ret.inv_acc.id, ret.value, ret.inv_acc.id, ret.value, abs(ret.value),
+            self.env.cr.execute(query2, (inv_acc_id, ret.value, inv_acc_id, ret.value, abs(ret.value),
+                                         inv_acc_id, ret.value, inv_acc_id, ret.value, abs(ret.value),
+                                         inv_acc_id, ret.value, inv_acc_id, ret.value, abs(ret.value),
                                          abs(ret.value),
-                                         ret.inv_acc.id, ret.value, ret.inv_acc.id, ret.value, abs(ret.value),
+                                         inv_acc_id, ret.value, inv_acc_id, ret.value, abs(ret.value),
                                          abs(ret.value),
                                          ret.account_move_id.id))
 
@@ -372,6 +404,14 @@ class DrogaStockValuationLayer(models.Model):
 
     def update_gl(self, cur_trans):
         if cur_trans.account_move_id:
+            inv_acc_id = self._resolve_inventory_account_id(cur_trans)
+            if not inv_acc_id:
+                _logger.warning(
+                    "Skipping GL update for dsvl id=%s (move id=%s): inventory account is missing",
+                    cur_trans.id,
+                    cur_trans.account_move_id.id,
+                )
+                return
             # write a query to update
             query1 = """
                 update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
@@ -390,14 +430,14 @@ class DrogaStockValuationLayer(models.Model):
                         where move_id=%s
                     """
             self.env.cr.execute(query2,
-                                (cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                (inv_acc_id, cur_trans.value, inv_acc_id, cur_trans.value,
                                  abs(cur_trans.value),
-                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 inv_acc_id, cur_trans.value, inv_acc_id, cur_trans.value,
                                  abs(cur_trans.value),
-                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 inv_acc_id, cur_trans.value, inv_acc_id, cur_trans.value,
                                  abs(cur_trans.value),
                                  abs(cur_trans.value),
-                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 inv_acc_id, cur_trans.value, inv_acc_id, cur_trans.value,
                                  abs(cur_trans.value),
                                  abs(cur_trans.value),
                                  cur_trans.account_move_id.id))

@@ -1,22 +1,37 @@
 from odoo import models
 import datetime
+import logging
 
 from odoo.exceptions import UserError
 
 
 WA_ORDER_ASC = "move_date asc, move_type asc, quantity desc, svl_id asc"
+_logger = logging.getLogger(__name__)
 
 
 class update_acc(models.Model):
     _inherit='droga.stock.valuation.layer'
 
+    def _is_http_request_context(self):
+        try:
+            from odoo.http import request
+            return bool(request and getattr(request, 'httprequest', None))
+        except Exception:
+            return False
+
     def _resolve_product_by_code(self, item_code, company_id=False):
-        domain = [('default_code', '=', item_code)]
+        domain = [
+            ('id', '=', item_code),
+            '|',
+            ('active', '=', True),
+            ('active', '=', False),
+        ]
         if company_id:
             domain.extend(['|', ('company_id', '=', False), ('company_id', '=', company_id)])
         products = self.env['product.product'].search(domain)
         if not products:
-            raise UserError("No product is found with item code %s." % item_code)
+            #_logger.info("No product found with ID "+str(item_code))
+            raise UserError("No product is found with product id %s." % item_code)
         if len(products) > 1:
             raise UserError(
                 "Multiple products are found with item code %s. Please use product_id instead."
@@ -42,6 +57,118 @@ class update_acc(models.Model):
             layer._validate_accounting_entries_custom()
             layer.stock_move_id._account_analytic_entry_move()
         return len(to_post)
+
+    def _post_or_update_entries(
+        self,
+        domain,
+        order_asc=WA_ORDER_ASC,
+        repost_existing=False,
+        commit_every=1,
+        deadline=None,
+    ):
+        """Post missing accounting entries, and optionally refresh existing ones via update_gl."""
+        layers = self.env['droga.stock.valuation.layer'].search(domain, order=order_asc)
+        posted = 0
+        updated = 0
+        skipped = 0
+        failed = 0
+        cron_mode = bool(self.env.context.get('cron_id'))
+        request_mode = self._is_http_request_context()
+        stopped_by_deadline = False
+        for idx, layer in enumerate(layers, 1):
+            if deadline and datetime.datetime.now() >= deadline:
+                stopped_by_deadline = True
+                break
+            try:
+                with self.env.cr.savepoint():
+                    if layer.currency_id.is_zero(layer.value):
+                        skipped += 1
+                        continue
+                    if not layer.stock_move_id:
+                        skipped += 1
+                        continue
+
+                    accounts = layer.product_id.product_tmpl_id.get_product_accounts()
+                    layer.inv_acc = accounts['stock_valuation']
+
+                    if layer.account_move_id:
+                        if repost_existing:
+                            layer.update_gl(layer)
+                            updated += 1
+                        else:
+                            skipped += 1
+                        continue
+
+                    layer._validate_accounting_entries_custom()
+                    if layer.account_move_id:
+                        layer.stock_move_id._account_analytic_entry_move()
+                        posted += 1
+                    else:
+                        skipped += 1
+            except Exception as exc:
+                failed += 1
+                _logger.exception(
+                    "Posting failed for droga.stock.valuation.layer id=%s company=%s product=%s: %s",
+                    layer.id,
+                    layer.company_id.id,
+                    layer.product_id.id,
+                    exc,
+                )
+            if (cron_mode or request_mode) and commit_every and idx % commit_every == 0:
+                self.env.cr.commit()
+        _logger.info(
+            "Post/update summary: posted=%s updated=%s skipped=%s failed=%s domain=%s",
+            posted,
+            updated,
+            skipped,
+            failed,
+            domain,
+        )
+        if stopped_by_deadline:
+            _logger.info(
+                "Post/update stopped early due request time budget; rerun cron to continue. domain=%s",
+                domain,
+            )
+        if cron_mode or request_mode:
+            self.env.cr.commit()
+        return posted, updated
+
+    def _recalculate_linked_cleaning_returns_for_raw_products(self, product_ids, company_id):
+        """Collect return-product ids linked to SUBL raw-material issues.
+
+        WA recalculation should work from already-posted valuation/receipt data.
+        This method intentionally does not call issue-side pricing recomputation
+        (which depends on composition setup and can change over time).
+        """
+        if not product_ids:
+            return set()
+
+        issue_detail_model = self.env['droga.inventory.cons.issue.detail']
+        issue_details = issue_detail_model.search([
+            ('company_id', '=', company_id),
+            ('product_id', 'in', list(product_ids)),
+            ('cons_header.issue_type', '=', 'SUBL'),
+        ])
+        issue_headers = issue_details.mapped('cons_header')
+        if not issue_headers:
+            return set()
+
+        receive_model = self.env['droga.inventory.consignment.receive']
+        if 'subcontractor_return_origin_form' not in receive_model._fields:
+            return set()
+
+        receive_headers = receive_model.search([
+            ('company_id', '=', company_id),
+            ('issue_type', '=', 'SUBL'),
+            ('subcontractor_return_origin_form', 'in', issue_headers.ids),
+        ])
+        if not receive_headers:
+            return set()
+
+        receive_details = self.env['droga.inventory.cons.receive.detail'].search([
+            ('cons_header', 'in', receive_headers.ids),
+        ])
+        return set(receive_details.mapped('product_id').ids)
 
     def recalculate_weighted_average_for_product(
         self,
@@ -116,8 +243,9 @@ class update_acc(models.Model):
             return 0
 
         # Ensure the starting node has consistent remaining_* then propagate forward.
-        first.fetch_and_update(first, reference=reference)
-        first.revaluate_after_date(first, reference=reference)
+        wa_runner = first.with_context(skip_sales_cost_sync=True)
+        wa_runner.fetch_and_update(wa_runner, reference=reference)
+        wa_runner.revaluate_after_date(wa_runner, reference=reference)
 
         if post_transactions:
             post_domain = [
@@ -135,15 +263,16 @@ class update_acc(models.Model):
         self,
         company_id=False,
         item_code=False,
-        post_transactions=False,
+        post_transactions=True,
+        repost_existing=False,
         reference='Cleaning Unit WA Recalc',
     ):
-        """Recalculate WA for cleaning-unit items by company or by item code.
+        """Recalculate WA for stock items by company or by item code.
 
         Usage examples:
-          - all cleaning-unit items in company:
+          - all stock items in company:
               env['droga.stock.valuation.layer'].recalculate_cleaning_unit_weighted_average(
-                  company_id=2, post_transactions=False
+                  company_id=2, post_transactions=True
               )
           - one item by code:
               env['droga.stock.valuation.layer'].recalculate_cleaning_unit_weighted_average(
@@ -151,40 +280,92 @@ class update_acc(models.Model):
               )
         """
         company_id = int(company_id) if company_id else self.env.company.id
-        cleaning_domain = self._get_cleaning_layer_domain(company_id=company_id)
-
         if item_code:
             product = self._resolve_product_by_code(item_code, company_id=company_id)
-            has_cleaning_layer = self.env['droga.stock.valuation.layer'].search(
-                cleaning_domain + [('product_id', '=', product.id)],
-                limit=1,
+            product_ids = [product.id]
+        else:
+            groups = self.env['droga.stock.valuation.layer'].read_group(
+                [('company_id', '=', company_id)],
+                ['product_id'],
+                ['product_id'],
             )
-            if not has_cleaning_layer:
-                return 0
-            return self.recalculate_weighted_average_for_product(
-                product_id=product.id,
-                reference=reference,
-                post_transactions=post_transactions,
-                company_id=company_id,
-                all_products_per_company=False,
-            )
+            product_ids = [g['product_id'][0] for g in groups if g.get('product_id')]
 
-        groups = self.env['droga.stock.valuation.layer'].read_group(
-            cleaning_domain,
-            ['product_id'],
-            ['product_id'],
+        if not product_ids:
+            return 0
+
+        all_product_ids = set(product_ids)
+        linked_return_product_ids = self._recalculate_linked_cleaning_returns_for_raw_products(
+            all_product_ids, company_id
         )
-        product_ids = [g['product_id'][0] for g in groups if g.get('product_id')]
+        all_product_ids.update(linked_return_product_ids)
 
         processed = 0
-        for product_id in product_ids:
-            processed += self.recalculate_weighted_average_for_product(
-                product_id=product_id,
-                reference=reference,
-                post_transactions=post_transactions,
-                company_id=company_id,
-                all_products_per_company=False,
+        cron_mode = bool(self.env.context.get('cron_id'))
+        request_mode = self._is_http_request_context()
+        deadline = datetime.datetime.now() + datetime.timedelta(seconds=95) if request_mode else None
+        stopped_by_deadline = False
+        for idx, product_id in enumerate(sorted(all_product_ids), 1):
+            if deadline and datetime.datetime.now() >= deadline:
+                stopped_by_deadline = True
+                break
+            try:
+                with self.env.cr.savepoint():
+                    processed += self.recalculate_weighted_average_for_product(
+                        product_id=product_id,
+                        reference=reference,
+                        post_transactions=False,
+                        company_id=company_id,
+                        all_products_per_company=False,
+                    )
+            except Exception as exc:
+                _logger.exception(
+                    "WA recalculation failed for company=%s product=%s: %s",
+                    company_id,
+                    product_id,
+                    exc,
+                )
+            if (cron_mode or request_mode) and idx % 50 == 0:
+                self.env.cr.commit()
+
+        if post_transactions and not (deadline and datetime.datetime.now() >= deadline):
+            post_domain = [
+                ('company_id', '=', company_id),
+                ('value', '!=', 0),
+                ('account_move_id', '=', False),
+            ]
+            if item_code:
+                post_domain.append(('product_id', 'in', list(all_product_ids)))
+            self._post_or_update_entries(
+                post_domain,
+                order_asc=WA_ORDER_ASC,
+                repost_existing=False,
+                deadline=deadline,
             )
+            if repost_existing:
+                repost_domain = [
+                    ('company_id', '=', company_id),
+                    ('value', '!=', 0),
+                    ('account_move_id', '!=', False),
+                ]
+                if item_code:
+                    repost_domain.append(('product_id', 'in', list(all_product_ids)))
+                self._post_or_update_entries(
+                    repost_domain,
+                    order_asc=WA_ORDER_ASC,
+                    repost_existing=True,
+                    deadline=deadline,
+                )
+        elif post_transactions and deadline:
+            stopped_by_deadline = True
+
+        if stopped_by_deadline:
+            _logger.info(
+                "WA recalculation stopped early due request time budget for company=%s; rerun to continue.",
+                company_id,
+            )
+        if request_mode:
+            self.env.cr.commit()
         return processed
 
     def recalculateWA(self,count=10,product=0):
