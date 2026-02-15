@@ -1,15 +1,52 @@
-from odoo import models,fields
+from odoo import models
 import datetime
 
-from odoo.tools import float_compare
+from odoo.exceptions import UserError
+
+
+WA_ORDER_ASC = "move_date asc, move_type asc, quantity desc, svl_id asc"
 
 
 class update_acc(models.Model):
     _inherit='droga.stock.valuation.layer'
 
+    def _resolve_product_by_code(self, item_code, company_id=False):
+        domain = [('default_code', '=', item_code)]
+        if company_id:
+            domain.extend(['|', ('company_id', '=', False), ('company_id', '=', company_id)])
+        products = self.env['product.product'].search(domain)
+        if not products:
+            raise UserError("No product is found with item code %s." % item_code)
+        if len(products) > 1:
+            raise UserError(
+                "Multiple products are found with item code %s. Please use product_id instead."
+                % item_code
+            )
+        return products[0]
+
+    def _get_cleaning_layer_domain(self, company_id=False):
+        domain = [
+            '|', '|', '|',
+            ('stock_move_id.picking_id.cons_sample_issue_request.issue_type', '=', 'SUBL'),
+            ('stock_move_id.picking_id.cons_receive_request.issue_type', '=', 'SUBL'),
+            ('stock_move_id.location_id.con_type', '=', 'SUBL'),
+            ('stock_move_id.location_dest_id.con_type', '=', 'SUBL'),
+        ]
+        if company_id:
+            domain.append(('company_id', '=', company_id))
+        return domain
+
+    def _post_missing_entries(self, domain, order_asc=WA_ORDER_ASC):
+        to_post = self.env['droga.stock.valuation.layer'].search(domain, order=order_asc)
+        for layer in to_post:
+            layer._validate_accounting_entries_custom()
+            layer.stock_move_id._account_analytic_entry_move()
+        return len(to_post)
+
     def recalculate_weighted_average_for_product(
         self,
         product_id=False,
+        item_code=False,
         reference='Manual WA Recalc',
         post_transactions=False,
         company_id=False,
@@ -59,11 +96,14 @@ class update_acc(models.Model):
                 )
             return processed
 
+        if not product_id and item_code:
+            product_id = self._resolve_product_by_code(item_code, company_id=company_id).id
+
         product_id = int(product_id) if product_id else 0
         if not product_id:
             return 0
 
-        order_asc = "move_date asc, move_type asc, quantity desc, svl_id asc"
+        order_asc = WA_ORDER_ASC
         domain = [('product_id', '=', product_id)]
         if company_id:
             domain.append(('company_id', '=', company_id))
@@ -82,20 +122,70 @@ class update_acc(models.Model):
         if post_transactions:
             post_domain = [
                 ('product_id', '=', product_id),
-                ('value', '!=', 0),('move_date','>','07-07-2023'),
+                ('value', '!=', 0),
                 ('account_move_id', '=', False),
             ]
             if company_id:
                 post_domain.append(('company_id', '=', company_id))
-            to_post = self.env['droga.stock.valuation.layer'].search(
-                post_domain,
-                order=order_asc,
-            )
-            for layer in to_post:
-                layer._validate_accounting_entries_custom()
-                layer.stock_move_id._account_analytic_entry_move()
+            self._post_missing_entries(post_domain, order_asc=order_asc)
 
         return 1
+
+    def recalculate_cleaning_unit_weighted_average(
+        self,
+        company_id=False,
+        item_code=False,
+        post_transactions=False,
+        reference='Cleaning Unit WA Recalc',
+    ):
+        """Recalculate WA for cleaning-unit items by company or by item code.
+
+        Usage examples:
+          - all cleaning-unit items in company:
+              env['droga.stock.valuation.layer'].recalculate_cleaning_unit_weighted_average(
+                  company_id=2, post_transactions=False
+              )
+          - one item by code:
+              env['droga.stock.valuation.layer'].recalculate_cleaning_unit_weighted_average(
+                  company_id=2, item_code='RAW-COFFEE', post_transactions=True
+              )
+        """
+        company_id = int(company_id) if company_id else self.env.company.id
+        cleaning_domain = self._get_cleaning_layer_domain(company_id=company_id)
+
+        if item_code:
+            product = self._resolve_product_by_code(item_code, company_id=company_id)
+            has_cleaning_layer = self.env['droga.stock.valuation.layer'].search(
+                cleaning_domain + [('product_id', '=', product.id)],
+                limit=1,
+            )
+            if not has_cleaning_layer:
+                return 0
+            return self.recalculate_weighted_average_for_product(
+                product_id=product.id,
+                reference=reference,
+                post_transactions=post_transactions,
+                company_id=company_id,
+                all_products_per_company=False,
+            )
+
+        groups = self.env['droga.stock.valuation.layer'].read_group(
+            cleaning_domain,
+            ['product_id'],
+            ['product_id'],
+        )
+        product_ids = [g['product_id'][0] for g in groups if g.get('product_id')]
+
+        processed = 0
+        for product_id in product_ids:
+            processed += self.recalculate_weighted_average_for_product(
+                product_id=product_id,
+                reference=reference,
+                post_transactions=post_transactions,
+                company_id=company_id,
+                all_products_per_company=False,
+            )
+        return processed
 
     def recalculateWA(self,count=10,product=0):
         if product!=0:

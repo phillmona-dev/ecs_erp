@@ -1,4 +1,4 @@
-from datetime import date
+from collections import defaultdict
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -294,197 +294,197 @@ class droga_cons_inherit(models.Model):
 
         self.state = 'waiting'
 
-    def recalculate(self):
+    def _get_cleaning_valuation_date(self):
+        self.ensure_one()
+        return fields.Date.to_date(self.issue_date or self.create_date or fields.Date.context_today(self))
+
+    def _get_composition_for_raw_item(self, raw_template):
+        self.ensure_one()
+        compositions = self.env['droga.export.items.composition'].search([
+            ('raw_item', '=', raw_template.id),
+            ('company_id', '=', self.company_id.id),
+        ])
+        if len(compositions) > 1:
+            raise UserError(
+                "Multiple composition setups were found for raw material %s. Please keep only one."
+                % raw_template.display_name
+            )
+        return compositions[:1]
+
+    def _build_cleaning_pricing_payload(self, valuation_date):
         self.ensure_one()
         cost_lines = self.env['droga.export.cost.buildup'].search([('issue_export_origin_form', '=', self.id)])
         total_cost_build_finish = sum(cost_lines.filtered(lambda x: x.type_apply == 'Finished').mapped('amount_for_order'))
         total_cost_build_byproduct = sum(cost_lines.filtered(lambda x: x.type_apply == 'By-product').mapped('amount_for_order'))
         total_cost_common = sum(cost_lines.filtered(lambda x: x.type_apply == 'All').mapped('amount_for_order'))
-        issue_pickings = self.env['stock.picking'].search([('cons_sample_issue_request', '=', self.id)])
-        issue_date = max(issue_pickings.mapped('write_date')) if issue_pickings else self.create_date
-        receive_headers = self.env['droga.inventory.consignment.receive'].search([('subcontractor_return_origin_form', '=', self.id)])
-        receive_pickings = self.env['stock.picking'].search([('cons_receive_request', 'in', receive_headers.ids)])
+
         detail_metrics = []
-        issue_total_qty_finished = 0.0
-        issue_total_qty_byproduct = 0.0
+        issue_total_qty = {
+            'finish': 0.0,
+            'byproduct': 0.0,
+            'waste': 0.0,
+        }
         for det in self.detail_entries:
-            composition = self.env['droga.export.items.composition'].search([('raw_item', '=', det.product_id.product_tmpl_id.id)], limit=1)
+            composition = self._get_composition_for_raw_item(det.product_id.product_tmpl_id)
             if not composition:
-                continue
-            finish_pct = sum(composition.items_detail.filtered(lambda x: x.type == 'finish').mapped('rate_in_pct'))
-            byproduct_pct = sum(composition.items_detail.filtered(lambda x: x.type == 'byproduct').mapped('rate_in_pct'))
-            det_qty_finished = det.product_uom_qty * finish_pct / 100.0
-            det_qty_byproduct = det.product_uom_qty * byproduct_pct / 100.0
-            det_distributed_qty = det_qty_finished + det_qty_byproduct
+                raise UserError(
+                    "Composition is not configured for raw material %s."
+                    % det.product_id.display_name
+                )
+
+            qty_by_type = {
+                'finish': det.product_uom_qty * sum(
+                    composition.items_detail.filtered(lambda x: x.type == 'finish').mapped('rate_in_pct')
+                ) / 100.0,
+                'byproduct': det.product_uom_qty * sum(
+                    composition.items_detail.filtered(lambda x: x.type == 'byproduct').mapped('rate_in_pct')
+                ) / 100.0,
+                'waste': det.product_uom_qty * sum(
+                    composition.items_detail.filtered(lambda x: x.type == 'waste').mapped('rate_in_pct')
+                ) / 100.0,
+            }
+            det_distributed_qty = sum(qty_by_type.values())
             if det_distributed_qty <= 0:
                 continue
-            detail_metrics.append((det, composition, det_qty_finished, det_qty_byproduct, det_distributed_qty))
-            issue_total_qty_finished += det_qty_finished
-            issue_total_qty_byproduct += det_qty_byproduct
+            detail_metrics.append((det, composition, qty_by_type, det_distributed_qty))
+            issue_total_qty['finish'] += qty_by_type['finish']
+            issue_total_qty['byproduct'] += qty_by_type['byproduct']
+            issue_total_qty['waste'] += qty_by_type['waste']
 
-        issue_total_distributed_qty = issue_total_qty_finished + issue_total_qty_byproduct
+        issue_total_distributed_qty = sum(issue_total_qty.values())
         if issue_total_distributed_qty <= 0:
-            return
+            return {'items': [], 'price_by_product': {}}
 
-        for det, composition, total_qty_finished, total_qty_byproduct, distributed_qty in detail_metrics:
+        item_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+        product_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+
+        for det, composition, _qty_by_type, distributed_qty in detail_metrics:
             waste_increase_rate = det.product_uom_qty / distributed_qty
-            raw_product = det.product_id
-            std_price = self.env['droga.wa.utility'].get_cost_at_date(self.env, raw_product.id, issue_date)
+            std_price = self.env['droga.wa.utility'].get_cost_at_date(self.env, det.product_id.id, valuation_date)
+            base_unit_cost = (
+                (std_price * waste_increase_rate)
+                + (det.proc_cost * waste_increase_rate)
+            )
+            common_unit_cost = total_cost_common / issue_total_distributed_qty
 
             for comp_item in composition.items_detail:
-                if comp_item.type == 'waste':
+                if comp_item.type not in issue_total_qty:
                     continue
                 if comp_item.type == 'finish':
-                    if issue_total_qty_finished <= 0:
+                    if issue_total_qty['finish'] <= 0:
                         continue
-                    unit_cost = (
-                        (std_price * waste_increase_rate)
-                        + (det.proc_cost * waste_increase_rate)
-                        + (total_cost_build_finish / issue_total_qty_finished)
-                        + (total_cost_common / issue_total_distributed_qty)
-                    )
+                    type_cost = total_cost_build_finish / issue_total_qty['finish']
+                elif comp_item.type == 'byproduct':
+                    if issue_total_qty['byproduct'] <= 0:
+                        continue
+                    type_cost = total_cost_build_byproduct / issue_total_qty['byproduct']
                 else:
-                    if issue_total_qty_byproduct <= 0:
-                        continue
-                    unit_cost = (
-                        (std_price * waste_increase_rate)
-                        + (det.proc_cost * waste_increase_rate)
-                        + (total_cost_build_byproduct / issue_total_qty_byproduct)
-                        + (total_cost_common / issue_total_distributed_qty)
-                    )
+                    # Wastage participates in valuation using raw/process/common costs.
+                    type_cost = 0.0
 
-                uom_rate = comp_item.item.uom_id.factor / (det.product_id.product_tmpl_id.uom_id.factor or 1.0)
-                uom_rate = uom_rate or 1.0
-                price = unit_cost / uom_rate
+                unit_cost = base_unit_cost + type_cost + common_unit_cost
+
                 product = comp_item.item.product_variant_id
                 if not product:
                     continue
 
-                receive_items = self.env['droga.inventory.cons.receive.detail'].search([
-                    ('cons_header.subcontractor_return_origin_form', '=', self.id),
-                    ('product_id', '=', product.id)
-                ])
-                receive_items.write({'price_unit_cons': price})
+                raw_uom_factor = det.product_id.product_tmpl_id.uom_id.factor or 1.0
+                return_uom_factor = comp_item.item.uom_id.factor or 1.0
+                uom_rate = return_uom_factor / raw_uom_factor
+                uom_rate = uom_rate or 1.0
 
-                moves_issues = self.env['stock.move'].search([
-                    ('picking_id', 'in', issue_pickings.ids),
-                    ('product_id', '=', raw_product.id)
-                ])
-                vals_issues = self.env['droga.stock.valuation.layer'].search([
-                    ('stock_move_id', 'in', moves_issues.ids),
-                    ('product_id', '=', raw_product.id)
-                ])
-                for val in vals_issues:
-                    val.write({'unit_cost': price, 'value': price * val.quantity})
-                    if val.account_move_id:
-                        self.env.cr.execute(
-                            "update account_move set company_id=%s where id=%s",
-                            (val.company_id.id, val.account_move_id.id)
-                        )
-                        self.env.cr.execute(
-                            "update account_move_line set company_id=%s where move_id=%s",
-                            (val.company_id.id, val.account_move_id.id)
-                        )
-                    val.account_move_id = False
-                    val.update_wa_after_date(val)
+                qty = uom_rate * det.product_uom_qty * comp_item.rate_in_pct / 100.0
+                if qty <= 0:
+                    continue
+                unit_price = unit_cost / uom_rate
 
-                moves_receipts = self.env['stock.move'].search([
-                    ('picking_id', 'in', receive_pickings.ids),
-                    ('product_id', '=', product.id)
-                ])
-                vals_receipts = self.env['droga.stock.valuation.layer'].search([
-                    ('stock_move_id', 'in', moves_receipts.ids),
-                    ('product_id', '=', product.id)
-                ])
-                for val in vals_receipts:
-                    val.write({'unit_cost': price, 'value': price * val.quantity})
-                    if val.account_move_id:
-                        self.env.cr.execute(
-                            "update account_move set company_id=%s where id=%s",
-                            (val.company_id.id, val.account_move_id.id)
-                        )
-                        self.env.cr.execute(
-                            "update account_move_line set company_id=%s where move_id=%s",
-                            (val.company_id.id, val.account_move_id.id)
-                        )
-                    val.account_move_id = False
-                    val.update_wa_after_date(val)
+                key = (product.id, det.warehouse_id.id, comp_item.item.uom_id.id)
+                item_totals[key]['qty'] += qty
+                item_totals[key]['value'] += (unit_price * qty)
+                product_totals[product.id]['qty'] += qty
+                product_totals[product.id]['value'] += (unit_price * qty)
 
+        items = []
+        for key, item_data in item_totals.items():
+            product_id, warehouse_id, uom_id = key
+            if item_data['qty'] <= 0:
+                continue
+            items.append({
+                'product_id': product_id,
+                'prodct_id_esti': product_id,
+                'product_uom_qty': item_data['qty'],
+                'product_uom_qty_esti': item_data['qty'],
+                'product_uom': uom_id,
+                'price_unit_cons': item_data['value'] / item_data['qty'],
+                'company_id': self.company_id.id,
+                'warehouse_id': warehouse_id,
+            })
+
+        price_by_product = {}
+        for product_id, product_data in product_totals.items():
+            if product_data['qty'] <= 0:
+                continue
+            price_by_product[product_id] = product_data['value'] / product_data['qty']
+
+        return {'items': items, 'price_by_product': price_by_product}
+
+    def recalculate(self):
+        self.ensure_one()
+        valuation_date = self._get_cleaning_valuation_date()
+        pricing_payload = self._build_cleaning_pricing_payload(valuation_date)
+        price_by_product = pricing_payload['price_by_product']
+        if not price_by_product:
+            return
+
+        receive_headers = self.env['droga.inventory.consignment.receive'].search([
+            ('subcontractor_return_origin_form', '=', self.id)
+        ])
+        if not receive_headers:
+            return
+
+        receive_items = self.env['droga.inventory.cons.receive.detail'].search([
+            ('cons_header', 'in', receive_headers.ids),
+            ('product_id', 'in', list(price_by_product.keys())),
+        ])
+        for line in receive_items:
+            line.write({'price_unit_cons': price_by_product.get(line.product_id.id, line.price_unit_cons)})
+
+        receive_pickings = self.env['stock.picking'].search([('cons_receive_request', 'in', receive_headers.ids)])
+        moves_receipts = self.env['stock.move'].search([
+            ('picking_id', 'in', receive_pickings.ids),
+            ('product_id', 'in', list(price_by_product.keys())),
+        ])
+        vals_receipts = self.env['droga.stock.valuation.layer'].search([
+            ('stock_move_id', 'in', moves_receipts.ids),
+            ('product_id', 'in', list(price_by_product.keys())),
+        ])
+        for val in vals_receipts:
+            price = price_by_product.get(val.product_id.id)
+            if price is None:
+                continue
+            val.write({'unit_cost': price, 'value': price * val.quantity})
+            if val.account_move_id:
+                self.env.cr.execute(
+                    "update account_move set company_id=%s where id=%s",
+                    (val.company_id.id, val.account_move_id.id)
+                )
+                self.env.cr.execute(
+                    "update account_move_line set company_id=%s where move_id=%s",
+                    (val.company_id.id, val.account_move_id.id)
+                )
+            val.account_move_id = False
+            val.update_wa_after_date(val)
 
     def sub_cont_return(self):
         self.ensure_one()
         if len(self.cons_ref.filtered(lambda x: (x.state=='done')))==0:
             raise UserError("Please send items to cleaning unit first before receving them.")
 
-        items = []
-        cost_lines = self.env['droga.export.cost.buildup'].search([('issue_export_origin_form', '=', self.id)])
-        total_cost_build_finish = sum(cost_lines.filtered(lambda x: x.type_apply == 'Finished').mapped('amount_for_order'))
-        total_cost_build_byproduct = sum(cost_lines.filtered(lambda x: x.type_apply == 'By-product').mapped('amount_for_order'))
-        total_cost_common = sum(cost_lines.filtered(lambda x: x.type_apply == 'All').mapped('amount_for_order'))
-        detail_metrics = []
-        issue_total_qty_finished = 0.0
-        issue_total_qty_byproduct = 0.0
-        for det in self.detail_entries:
-            composition = self.env['droga.export.items.composition'].search([('raw_item', '=', det.product_id.product_tmpl_id.id)], limit=1)
-            if not composition:
-                continue
-            finish_pct = sum(composition.items_detail.filtered(lambda x: x.type == 'finish').mapped('rate_in_pct'))
-            byproduct_pct = sum(composition.items_detail.filtered(lambda x: x.type == 'byproduct').mapped('rate_in_pct'))
-            det_qty_finished = det.product_uom_qty * finish_pct / 100.0
-            det_qty_byproduct = det.product_uom_qty * byproduct_pct / 100.0
-            det_distributed_qty = det_qty_finished + det_qty_byproduct
-            if det_distributed_qty <= 0:
-                continue
-            detail_metrics.append((det, composition, det_qty_finished, det_qty_byproduct, det_distributed_qty))
-            issue_total_qty_finished += det_qty_finished
-            issue_total_qty_byproduct += det_qty_byproduct
-
-        issue_total_distributed_qty = issue_total_qty_finished + issue_total_qty_byproduct
-        if issue_total_distributed_qty <= 0:
-            raise UserError("No finished/by-product quantity can be derived from composition setup.")
-
-        for det, composition, total_qty_finished, total_qty_byproduct, distributed_qty in detail_metrics:
-            waste_increase_rate = det.product_uom_qty / distributed_qty
-            std_price = self.env['droga.wa.utility'].get_cost_at_date(self.env, det.product_id.id, date.today())
-
-            for comp_item in composition.items_detail:
-                if comp_item.type == 'waste':
-                    continue
-                if comp_item.type == 'finish':
-                    if issue_total_qty_finished <= 0:
-                        continue
-                    unit_cost = (
-                        (std_price * waste_increase_rate)
-                        + (det.proc_cost * waste_increase_rate)
-                        + (total_cost_build_finish / issue_total_qty_finished)
-                        + (total_cost_common / issue_total_distributed_qty)
-                    )
-                else:
-                    if issue_total_qty_byproduct <= 0:
-                        continue
-                    unit_cost = (
-                        (std_price * waste_increase_rate)
-                        + (det.proc_cost * waste_increase_rate)
-                        + (total_cost_build_byproduct / issue_total_qty_byproduct)
-                        + (total_cost_common / issue_total_distributed_qty)
-                    )
-
-                product = comp_item.item.product_variant_id
-                if not product:
-                    continue
-                uom_rate = comp_item.item.uom_id.factor / (det.product_id.product_tmpl_id.uom_id.factor or 1.0)
-                uom_rate = uom_rate or 1.0
-                qty = uom_rate * det.product_uom_qty * comp_item.rate_in_pct / 100.0
-                items.append({
-                    'product_id': product.id,
-                    'prodct_id_esti': product.id,
-                    'product_uom_qty': qty,
-                    'product_uom_qty_esti': qty,
-                    'product_uom': comp_item.item.uom_id.id,
-                    'price_unit_cons': unit_cost / uom_rate,
-                    'company_id': self.env.company.id,
-                    'warehouse_id': det.warehouse_id.id,
-                })
+        valuation_date = self._get_cleaning_valuation_date()
+        pricing_payload = self._build_cleaning_pricing_payload(valuation_date)
+        items = pricing_payload['items']
+        if not items:
+            raise UserError("No finished/by-product/wastage quantity can be derived from composition setup.")
 
         return {
             'name': 'cleaning unit items return',
