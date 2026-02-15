@@ -19,6 +19,8 @@ class HrPayslipRun(models.Model):
     date_start = fields.Date(string='Date From')
     date_end = fields.Date(string='Date To')
 
+    division = fields.Many2one('droga.hr.division')
+
     @api.depends('date_start', 'date_end')
     def get_outgoing_email(self):
         self.mail_server = ""
