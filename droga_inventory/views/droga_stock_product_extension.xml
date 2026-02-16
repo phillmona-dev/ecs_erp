@@ -141,7 +141,7 @@
                     </group>
 
                     <group string="Categories">
-                        <field name="show_company_1_product_groups" invisible="1"/>
+                        <field name="show_company_1_product_groups" invisible="0"/>
                         <field name="categ" readonly="0" attrs="{'invisible': [('show_company_1_product_groups', '=', True)]}"></field>
                         <field name="categ_id" invisible="1" string="Product Category"
                                options="{'no_create':True,'no_open':True}"
@@ -150,9 +150,9 @@
                                options="{'no_create':True,'no_open':True}"
                                domain="[('complete_name','not like','All%'),('parent_id','=',False)]"
                                attrs="{'invisible': [('show_company_1_product_groups', '=', True)]}"/>
-                        <field name="pharmacy_group_id" required="True" options="{'no_create':True,'no_open':True}" domain="[('id_counter','&lt;',1000)]"
+                        <field name="pharmacy_group_id" options="{'no_create':True,'no_open':True}" domain="[('id_counter','&lt;',1000)]"
                                groups="droga_inventory.inv_prod_mi_manager"
-                               attrs="{'invisible': [('show_company_1_product_groups', '=', False)]}"></field>
+                               attrs="{'invisible': [('show_company_1_product_groups', '=', False)], 'required': [('show_company_1_product_groups', '=', True)]}"></field>
                         <field name="categ_id" string="Product Category" options="{'no_create':True,'no_open':True}"
                                domain="[('complete_name','not like','All%'),('avail_in_product_master','=',True),('group_type','=','MI')]"
                                groups="droga_inventory.inv_prod_mi_manager"
@@ -228,4 +228,3 @@
             </field>
         </record>
 </odoo>
-

@@ -970,11 +970,12 @@ class droga_stock_product_extension(models.Model):
     reg_status=fields.Selection([('draft', 'draft'), ('waiting', 'waiting'),('rejected', 'rejected'),('approved', 'approved')],
                             default='draft')
 
+    @api.depends('company_id')
     @api.depends_context('allowed_company_ids', 'company')
     def _compute_show_company_1_product_groups(self):
-        show_groups = self.env.company.id == 1
         for rec in self:
-            rec.show_company_1_product_groups = show_groups
+            current_company = rec.company_id or self.env.company
+            rec.show_company_1_product_groups = (current_company.id == 1)
 
     def _get_prod_id(self):
         for rec in self:
