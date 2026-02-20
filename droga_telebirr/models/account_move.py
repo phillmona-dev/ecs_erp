@@ -443,7 +443,6 @@ class AccountMove(models.Model):
         return soap_template
 
     def _telebirr_callback_url(self):
-        return 'https://webhook.site/cf2c7798-224c-4050-9244-dc9911e93222'
         return 'https://drogaerp.odoo.com/telebirr/callback'
 
     def _send_bus_notification(self, status, message=None):
