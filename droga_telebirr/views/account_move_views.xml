@@ -29,6 +29,16 @@
                     <field name="telebirr_status" String="telebirr status" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
                     <field name="telebirr_transaction_id" String="telebirr Transaction ID" readonly="1" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
                     <field name="telebirr_response_date" String="telebirr Response Date" readonly="1" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
+                    <field name="telebirr_request_ids" readonly="1" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}">
+                        <tree create="0" edit="0" delete="0">
+                            <field name="sent_at"/>
+                            <field name="conversation_id"/>
+                            <field name="state"/>
+                            <field name="transaction_id"/>
+                            <field name="result_code"/>
+                            <field name="callback_at"/>
+                        </tree>
+                    </field>
 
                 </xpath>
             </field>

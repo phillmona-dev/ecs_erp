@@ -9,6 +9,90 @@ from xml.etree import ElementTree as ET
 
 _logger = logging.getLogger(__name__)
 
+
+class TelebirrRequest(models.Model):
+    _name = "telebirr.request"
+    _description = "Telebirr Request History"
+    _order = "id desc"
+    _rec_name = "conversation_id"
+
+    move_id = fields.Many2one(
+        "account.move",
+        string="Invoice",
+        required=True,
+        ondelete="cascade",
+        index=True,
+        copy=False,
+    )
+    conversation_id = fields.Char(
+        string="Originator Conversation ID",
+        required=True,
+        index=True,
+        copy=False,
+        readonly=True,
+    )
+    state = fields.Selection(
+        [
+            ("pending", "Pending"),
+            ("success", "Success"),
+            ("failed", "Failed"),
+            ("cancelled", "Cancelled"),
+        ],
+        default="pending",
+        required=True,
+        copy=False,
+        readonly=True,
+    )
+    relay_request_id = fields.Integer(
+        string="Relay Request ID",
+        copy=False,
+        readonly=True,
+        index=True,
+    )
+    transaction_id = fields.Char(
+        string="Telebirr Transaction ID",
+        copy=False,
+        readonly=True,
+        index=True,
+    )
+    result_code = fields.Char(
+        string="Result Code",
+        copy=False,
+        readonly=True,
+    )
+    result_desc = fields.Text(
+        string="Result Description",
+        copy=False,
+        readonly=True,
+    )
+    relay_response = fields.Text(
+        string="Relay Response",
+        copy=False,
+        readonly=True,
+    )
+    sent_by = fields.Many2one(
+        "res.users",
+        string="Sent By",
+        copy=False,
+        readonly=True,
+    )
+    sent_at = fields.Datetime(
+        string="Sent At",
+        default=fields.Datetime.now,
+        copy=False,
+        readonly=True,
+    )
+    callback_at = fields.Datetime(
+        string="Callback At",
+        copy=False,
+        readonly=True,
+    )
+
+    _sql_constraints = [
+        ("telebirr_conversation_unique", "unique(conversation_id)", "Telebirr conversation ID must be unique."),
+    ]
+
+
 class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
 
@@ -70,6 +154,13 @@ class AccountMove(models.Model):
         copy=False,
         readonly=True,
     )
+    telebirr_request_ids = fields.One2many(
+        'telebirr.request',
+        'move_id',
+        string='Telebirr Requests',
+        copy=False,
+        readonly=True,
+    )
 
     mobile_no = fields.Char(
         string='Mobile',
@@ -98,16 +189,22 @@ class AccountMove(models.Model):
         """Public method that constructs a SOAP request and posts it to the relay."""
         self.ensure_one()
         conv_id= str(uuid.uuid4())
+
         if self.state!="posted":
             self.action_post()
 
         params = self._prepare_telebirr_payload(conv_id)
 
-        print (params)
-
         relay_url = self.env['ir.config_parameter'].sudo().get_param('telebirr.relay.url')
         if not relay_url:
             raise UserError(_("Telebirr relay URL not configured. Go to Settings > Telebirr."))
+
+        telebirr_request = self.env["telebirr.request"].sudo().create({
+            "move_id": self.id,
+            "conversation_id": conv_id,
+            "state": "pending",
+            "sent_by": self.env.user.id,
+        })
 
         auth_user = self.env['ir.config_parameter'].sudo().get_param('telebirr.relay.user')
         auth_pass = self.env['ir.config_parameter'].sudo().get_param('telebirr.relay.password')
@@ -121,6 +218,11 @@ class AccountMove(models.Model):
                                      auth=(auth_user, auth_pass) if auth_user and auth_pass else None,
                                      timeout=30)
             _logger.info("Telebirr relay response: %s", response.text)
+            relay_request_id = self._extract_relay_request_id(response)
+            telebirr_request.sudo().write({
+                "relay_request_id": relay_request_id or False,
+                "relay_response": response.text,
+            })
             if response.status_code in (200,201,202):
                 self.write({
                     'telebirr_status': 'Sent',
@@ -129,16 +231,36 @@ class AccountMove(models.Model):
                     'telebirr_message': "Sent to relay at %s. Relay response: %s" % (datetime.utcnow().isoformat(), response.text)
                 })
             else:
+                failure_message = "Failed sending to relay. HTTP %s: %s" % (response.status_code, response.text)
                 self.write({
                     'telebirr_status': 'failed',
                     'telebirr_conversation_id': conv_id,
-                    'telebirr_message': "Failed sending to relay. HTTP %s: %s" % (response.status_code, response.text)
+                    'telebirr_message': failure_message
+                })
+                telebirr_request.sudo().write({
+                    "state": "failed",
+                    "result_desc": failure_message,
+                    "callback_at": fields.Datetime.now(),
                 })
                 raise UserError(_("Failed to send to relay: %s") % response.text)
         except Exception as e:
             _logger.exception("Error sending to relay")
+            telebirr_request.sudo().write({
+                "state": "failed",
+                "result_desc": str(e),
+                "callback_at": fields.Datetime.now(),
+            })
             self.write({'telebirr_status': 'failed', 'telebirr_message': str(e)})
             raise UserError(_("Error when sending to relay: %s") % e)
+
+    def _extract_relay_request_id(self, response):
+        try:
+            payload = response.json()
+            if isinstance(payload, dict):
+                return payload.get("request_id")
+        except ValueError:
+            return False
+        return False
 
     def normalize_phone(self,partner_phone):
         clean_phone = partner_phone.replace(" ", "")
@@ -321,6 +443,7 @@ class AccountMove(models.Model):
         return soap_template
 
     def _telebirr_callback_url(self):
+        return 'https://webhook.site/cf2c7798-224c-4050-9244-dc9911e93222'
         return 'https://drogaerp.odoo.com/telebirr/callback'
 
     def _send_bus_notification(self, status, message=None):

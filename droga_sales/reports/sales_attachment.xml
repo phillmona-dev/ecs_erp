@@ -67,6 +67,7 @@
                     <t t-set="sales_representative" t-value=""/>
                     <t t-set="order_type" t-value=""/>
                     <t t-set="partner_id" t-value=""/>
+                    <t t-set="customer_emp" t-value="''"/>
 
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
@@ -77,6 +78,7 @@
                         <t t-set="order_from" t-value="sale_order.order_from"/>
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
                         <t t-set="customer_name" t-value="sale_order.cust_name"/>
+                        <t t-set="customer_emp" t-value="sale_order.customer_emp.descr"/>
                         <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                         <t t-set="partner_id" t-value="sale_order.partner_id.id"/>
                     </t>
@@ -197,7 +199,11 @@
                                     <td>
                                         <strong>ID No.:</strong>
                                     </td>
-                                    <td colspan="2">
+                                    <td>
+                                        <strong>Customer Emp.:</strong>
+                                        <span class="small" t-esc="customer_emp"/>
+                                    </td>
+                                    <td>
                                         <strong>Payment Term.:</strong>
                                         <span class="small" t-esc="o.invoice_payment_term_id.name"/>
                                     </td>
@@ -517,6 +523,7 @@
                     <t t-set="store" t-value=""/>
                     <t t-set="sales_representative" t-value=""/>
                     <t t-set="order_type" t-value=""/>
+                    <t t-set="customer_emp" t-value="''"/>
 
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
@@ -527,6 +534,7 @@
                         <t t-set="order_from" t-value="sale_order.order_from"/>
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
                         <t t-set="customer_name" t-value="sale_order.cust_name"/>
+                        <t t-set="customer_emp" t-value="sale_order.customer_emp.descr"/>
                         <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                     </t>
 
@@ -640,7 +648,11 @@
                                     <td>
                                         <strong>ID No.:</strong>
                                     </td>
-                                    <td colspan="2">
+                                    <td>
+                                        <strong>Customer Emp.:</strong>
+                                        <span class="small" t-esc="customer_emp"/>
+                                    </td>
+                                    <td>
                                         <strong>Payment Term.:</strong>
                                         <span class="small" t-esc="o.invoice_payment_term_id.name"/>
                                     </td>
@@ -956,6 +968,7 @@
                     <t t-set="sales_representative" t-value=""/>
                     <t t-set="order_type" t-value=""/>
                     <t t-set="pharmacy_order_from" t-value="o.cost_center"/>
+                    <t t-set="customer_emp" t-value="''"/>
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
                        t-as="sale_order">
@@ -965,6 +978,7 @@
                         <t t-set="order_from" t-value="sale_order.order_from"/>
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
                         <t t-set="customer_name" t-value="sale_order.cust_name"/>
+                        <t t-set="customer_emp" t-value="sale_order.customer_emp.descr"/>
                         <t t-set="customer_id" t-value="sale_order.cust_id"/>
                         <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                     </t>
@@ -1191,7 +1205,7 @@
                             <tr>
                                 <td colspan="2">
                                     <strong class="small">Contact Person:</strong>
-                                    <t class="small" t-esc="customer_name"/>
+                                    <t class="small" t-esc="customer_emp or customer_name"/>
 
                                 </td>
 
