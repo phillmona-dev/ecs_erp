@@ -61,6 +61,50 @@ class update_acc(models.Model):
             layer.stock_move_id._account_analytic_entry_move()
         return len(to_post)
 
+    def _refresh_cleaning_issue_prices(
+        self,
+        issue_headers,
+        company_id,
+        deadline=None,
+        commit_every=20,
+        commit_mode=False,
+        log_label='Cleaning pricing refresh',
+    ):
+        """Refresh SUBL cleaning issue pricing in tolerant mode."""
+        if not issue_headers:
+            return 0, False
+
+        can_refresh_issue_prices = hasattr(self.env['droga.inventory.consignment.issue'], 'recalculate')
+        if not can_refresh_issue_prices:
+            _logger.info(
+                "Skipping %s for company=%s: issue.recalculate() is unavailable.",
+                log_label,
+                company_id,
+            )
+            return 0, False
+
+        refreshed = 0
+        stopped_by_deadline = False
+        for idx, issue in enumerate(issue_headers.sorted('id'), 1):
+            if deadline and datetime.datetime.now() >= deadline:
+                stopped_by_deadline = True
+                break
+            try:
+                with self.env.cr.savepoint():
+                    issue.with_context(tolerate_composition_error=True).recalculate()
+                    refreshed += 1
+            except Exception as exc:
+                _logger.exception(
+                    "%s failed for issue=%s company=%s: %s",
+                    log_label,
+                    issue.id,
+                    company_id,
+                    exc,
+                )
+            if commit_mode and commit_every and idx % commit_every == 0:
+                self.env.cr.commit()
+        return refreshed, stopped_by_deadline
+
     def _get_extreme_value_product_ids(self, company_id, abs_value_threshold):
         positive = self.env['droga.stock.valuation.layer'].search([
             ('company_id', '=', company_id),
@@ -331,29 +375,17 @@ class update_acc(models.Model):
         )
         all_product_ids.update(linked_return_product_ids)
 
-        can_refresh_issue_prices = hasattr(self.env['droga.inventory.consignment.issue'], 'recalculate')
-        if refresh_cleaning_pricing and issue_headers and can_refresh_issue_prices:
-            for idx, issue in enumerate(issue_headers.sorted('id'), 1):
-                if deadline and datetime.datetime.now() >= deadline:
-                    stopped_by_deadline = True
-                    break
-                try:
-                    with self.env.cr.savepoint():
-                        issue.with_context(tolerate_composition_error=True).recalculate()
-                except Exception as exc:
-                    _logger.exception(
-                        "Cleaning pricing refresh failed for issue=%s company=%s: %s",
-                        issue.id,
-                        company_id,
-                        exc,
-                    )
-                if (cron_mode or request_mode) and idx % 20 == 0:
-                    self.env.cr.commit()
-        elif refresh_cleaning_pricing and issue_headers:
-            _logger.info(
-                "Skipping cleaning pricing refresh for company=%s: issue.recalculate() is unavailable.",
+        if refresh_cleaning_pricing and issue_headers:
+            _refreshed_pre, stopped_pre = self._refresh_cleaning_issue_prices(
+                issue_headers,
                 company_id,
+                deadline=deadline,
+                commit_every=20,
+                commit_mode=(cron_mode or request_mode),
+                log_label='Cleaning pricing pre-refresh',
             )
+            if stopped_pre:
+                stopped_by_deadline = True
 
         processed = 0
         for idx, product_id in enumerate(sorted(all_product_ids), 1):
@@ -378,6 +410,43 @@ class update_acc(models.Model):
                 )
             if (cron_mode or request_mode) and idx % 50 == 0:
                 self.env.cr.commit()
+
+        # Second pass: refresh cleaning prices after WA chain update, then replay WA
+        # so static receive rows computed from fresh issue costs propagate correctly.
+        if refresh_cleaning_pricing and issue_headers and not (deadline and datetime.datetime.now() >= deadline):
+            _refreshed_post, stopped_post = self._refresh_cleaning_issue_prices(
+                issue_headers,
+                company_id,
+                deadline=deadline,
+                commit_every=20,
+                commit_mode=(cron_mode or request_mode),
+                log_label='Cleaning pricing post-refresh',
+            )
+            if stopped_post:
+                stopped_by_deadline = True
+            elif _refreshed_post:
+                for idx, product_id in enumerate(sorted(all_product_ids), 1):
+                    if deadline and datetime.datetime.now() >= deadline:
+                        stopped_by_deadline = True
+                        break
+                    try:
+                        with self.env.cr.savepoint():
+                            self.recalculate_weighted_average_for_product(
+                                product_id=product_id,
+                                reference=reference,
+                                post_transactions=False,
+                                company_id=company_id,
+                                all_products_per_company=False,
+                            )
+                    except Exception as exc:
+                        _logger.exception(
+                            "Second-pass WA recalculation failed for company=%s product=%s: %s",
+                            company_id,
+                            product_id,
+                            exc,
+                        )
+                    if (cron_mode or request_mode) and idx % 50 == 0:
+                        self.env.cr.commit()
 
         if post_transactions and not (deadline and datetime.datetime.now() >= deadline):
             post_domain = [
@@ -483,21 +552,15 @@ class update_acc(models.Model):
         )
         all_product_ids = set(batch_ids) | set(linked_return_product_ids)
 
-        can_refresh_issue_prices = hasattr(self.env['droga.inventory.consignment.issue'], 'recalculate')
-        if issue_headers and can_refresh_issue_prices:
-            for idx, issue in enumerate(issue_headers.sorted('id'), 1):
-                try:
-                    with self.env.cr.savepoint():
-                        issue.with_context(tolerate_composition_error=True).recalculate()
-                except Exception as exc:
-                    _logger.exception(
-                        "Cron cleaning pricing refresh failed for issue=%s company=%s: %s",
-                        issue.id,
-                        company_id,
-                        exc,
-                    )
-                if idx % 20 == 0:
-                    self.env.cr.commit()
+        if issue_headers:
+            self._refresh_cleaning_issue_prices(
+                issue_headers,
+                company_id,
+                deadline=None,
+                commit_every=20,
+                commit_mode=True,
+                log_label='Cron cleaning pricing pre-refresh',
+            )
 
         processed = 0
         for idx, product_id in enumerate(sorted(all_product_ids), 1):
@@ -519,6 +582,36 @@ class update_acc(models.Model):
                 )
             if idx % 50 == 0:
                 self.env.cr.commit()
+
+        if issue_headers:
+            refreshed_post, _stopped_unused = self._refresh_cleaning_issue_prices(
+                issue_headers,
+                company_id,
+                deadline=None,
+                commit_every=20,
+                commit_mode=True,
+                log_label='Cron cleaning pricing post-refresh',
+            )
+            if refreshed_post:
+                for idx, product_id in enumerate(sorted(all_product_ids), 1):
+                    try:
+                        with self.env.cr.savepoint():
+                            self.recalculate_weighted_average_for_product(
+                                product_id=product_id,
+                                reference=reference,
+                                post_transactions=False,
+                                company_id=company_id,
+                                all_products_per_company=False,
+                            )
+                    except Exception as exc:
+                        _logger.exception(
+                            "Cron second-pass WA recalculation failed for company=%s product=%s: %s",
+                            company_id,
+                            product_id,
+                            exc,
+                        )
+                    if idx % 50 == 0:
+                        self.env.cr.commit()
 
         if post_transactions:
             post_domain = [
