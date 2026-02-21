@@ -61,6 +61,17 @@ class update_acc(models.Model):
             layer.stock_move_id._account_analytic_entry_move()
         return len(to_post)
 
+    def _get_extreme_value_product_ids(self, company_id, abs_value_threshold):
+        positive = self.env['droga.stock.valuation.layer'].search([
+            ('company_id', '=', company_id),
+            ('value', '>=', abs_value_threshold),
+        ]).mapped('product_id').ids
+        negative = self.env['droga.stock.valuation.layer'].search([
+            ('company_id', '=', company_id),
+            ('value', '<=', -abs_value_threshold),
+        ]).mapped('product_id').ids
+        return sorted(set(positive + negative))
+
     def _post_or_update_entries(
         self,
         domain,
@@ -404,6 +415,158 @@ class update_acc(models.Model):
             )
         if request_mode:
             self.env.cr.commit()
+        return processed
+
+    def cron_recalculate_company_weighted_average_with_cleaning(
+        self,
+        company_id=2,
+        max_products_per_run=200,
+        abs_value_threshold=1000000000,
+        post_transactions=True,
+        repost_existing=False,
+        reference='Scheduled WA and Cleaning Recalc',
+    ):
+        """Cron-friendly WA+cleaning recalculation with batching and resume cursor.
+
+        Designed for Scheduled Actions:
+        - prioritizes extreme-value products first (abs(value) >= threshold)
+        - refreshes cleaning-unit pricing in tolerant mode
+        - processes remaining products in batches across runs using a cursor
+        """
+        company_id = int(company_id) if company_id else self.env.company.id
+        max_products_per_run = int(max_products_per_run or 0)
+        if max_products_per_run <= 0:
+            max_products_per_run = 200
+        abs_value_threshold = abs(float(abs_value_threshold or 0))
+        if abs_value_threshold <= 0:
+            abs_value_threshold = 1000000000
+
+        cursor_key = f'droga_inventory.wa_cleaning_cursor.company_{company_id}'
+        param_model = self.env['ir.config_parameter'].sudo()
+        try:
+            cursor = int(param_model.get_param(cursor_key, default='0') or 0)
+        except Exception:
+            cursor = 0
+
+        groups = self.env['droga.stock.valuation.layer'].read_group(
+            [('company_id', '=', company_id)],
+            ['product_id'],
+            ['product_id'],
+        )
+        all_company_product_ids = sorted([g['product_id'][0] for g in groups if g.get('product_id')])
+        if not all_company_product_ids:
+            param_model.set_param(cursor_key, '0')
+            return 0
+
+        anomaly_product_ids = self._get_extreme_value_product_ids(company_id, abs_value_threshold)
+
+        batch_ids = list(anomaly_product_ids)
+        remaining_non_anomaly = [pid for pid in all_company_product_ids if pid > cursor and pid not in anomaly_product_ids]
+        slots = max(max_products_per_run - len(batch_ids), 0)
+        if slots:
+            batch_ids.extend(remaining_non_anomaly[:slots])
+
+        # End of pass: reset cursor and continue from start on next run.
+        if not batch_ids and cursor:
+            param_model.set_param(cursor_key, '0')
+            remaining_non_anomaly = [pid for pid in all_company_product_ids if pid not in anomaly_product_ids]
+            slots = max(max_products_per_run - len(batch_ids), 0)
+            if slots:
+                batch_ids.extend(remaining_non_anomaly[:slots])
+
+        if not batch_ids:
+            return 0
+
+        batch_set = set(batch_ids)
+        issue_headers, linked_return_product_ids = self._collect_linked_cleaning_issues_and_return_products(
+            batch_set, company_id
+        )
+        all_product_ids = set(batch_ids) | set(linked_return_product_ids)
+
+        can_refresh_issue_prices = hasattr(self.env['droga.inventory.consignment.issue'], 'recalculate')
+        if issue_headers and can_refresh_issue_prices:
+            for idx, issue in enumerate(issue_headers.sorted('id'), 1):
+                try:
+                    with self.env.cr.savepoint():
+                        issue.with_context(tolerate_composition_error=True).recalculate()
+                except Exception as exc:
+                    _logger.exception(
+                        "Cron cleaning pricing refresh failed for issue=%s company=%s: %s",
+                        issue.id,
+                        company_id,
+                        exc,
+                    )
+                if idx % 20 == 0:
+                    self.env.cr.commit()
+
+        processed = 0
+        for idx, product_id in enumerate(sorted(all_product_ids), 1):
+            try:
+                with self.env.cr.savepoint():
+                    processed += self.recalculate_weighted_average_for_product(
+                        product_id=product_id,
+                        reference=reference,
+                        post_transactions=False,
+                        company_id=company_id,
+                        all_products_per_company=False,
+                    )
+            except Exception as exc:
+                _logger.exception(
+                    "Cron WA recalculation failed for company=%s product=%s: %s",
+                    company_id,
+                    product_id,
+                    exc,
+                )
+            if idx % 50 == 0:
+                self.env.cr.commit()
+
+        if post_transactions:
+            post_domain = [
+                ('company_id', '=', company_id),
+                ('value', '!=', 0),
+                ('account_move_id', '=', False),
+                ('product_id', 'in', list(all_product_ids)),
+            ]
+            self._post_or_update_entries(
+                post_domain,
+                order_asc=WA_ORDER_ASC,
+                repost_existing=False,
+                deadline=None,
+            )
+            if repost_existing:
+                repost_domain = [
+                    ('company_id', '=', company_id),
+                    ('value', '!=', 0),
+                    ('account_move_id', '!=', False),
+                    ('product_id', 'in', list(all_product_ids)),
+                ]
+                self._post_or_update_entries(
+                    repost_domain,
+                    order_asc=WA_ORDER_ASC,
+                    repost_existing=True,
+                    deadline=None,
+                )
+
+        non_anomaly_in_batch = [pid for pid in batch_ids if pid not in anomaly_product_ids]
+        if non_anomaly_in_batch:
+            new_cursor = max(non_anomaly_in_batch)
+            param_model.set_param(cursor_key, str(new_cursor))
+
+            max_non_anomaly = max([pid for pid in all_company_product_ids if pid not in anomaly_product_ids] or [0])
+            if new_cursor >= max_non_anomaly:
+                # Completed one full pass of non-anomaly products.
+                param_model.set_param(cursor_key, '0')
+
+        self.env.cr.commit()
+        _logger.info(
+            "Cron WA+cleaning summary: company=%s processed=%s batch_products=%s linked_return_products=%s anomalies=%s cursor=%s",
+            company_id,
+            processed,
+            len(batch_ids),
+            len(linked_return_product_ids),
+            len(anomaly_product_ids),
+            param_model.get_param(cursor_key, default='0'),
+        )
         return processed
 
     def recalculateWA(self,count=10,product=0):
