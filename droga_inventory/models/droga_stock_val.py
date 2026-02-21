@@ -158,6 +158,55 @@ class DrogaStockValuationLayer(models.Model):
             return False
         return bool('issue_type' in receive._fields and receive.issue_type == 'SUBL')
 
+    def _is_supplier_return_transaction(self, trans):
+        move = trans.stock_move_id
+        if not move:
+            return False
+        return bool(
+            move.origin_returned_move_id
+            and move.location_dest_id
+            and move.location_dest_id.usage == 'supplier'
+            and move.location_id
+            and move.location_id.usage != 'customer'
+        )
+
+    def _get_origin_return_layer(self, trans):
+        move = trans.stock_move_id
+        if not move or not move.origin_returned_move_id:
+            return False
+        domain = [
+            ('stock_move_id', '=', move.origin_returned_move_id.id),
+            ('product_id', '=', trans.product_id.id),
+            ('company_id', '=', trans.company_id.id),
+        ]
+        origin_layer = self.env['droga.stock.valuation.layer'].search(
+            domain + [('move_type', '=', 'Static')],
+            order='move_date desc, id desc',
+            limit=1,
+        )
+        if not origin_layer:
+            origin_layer = self.env['droga.stock.valuation.layer'].search(
+                domain,
+                order='move_date desc, id desc',
+                limit=1,
+            )
+        return origin_layer or False
+
+    def _get_origin_return_unit_cost(self, trans):
+        origin_layer = self._get_origin_return_layer(trans)
+        if not origin_layer:
+            return False
+        return abs(origin_layer.unit_cost)
+
+    def _get_origin_return_move_date(self, trans):
+        origin_layer = self._get_origin_return_layer(trans)
+        if origin_layer and origin_layer.move_date:
+            return origin_layer.move_date
+        move = trans.stock_move_id
+        if move and move.origin_returned_move_id and move.origin_returned_move_id.date:
+            return fields.Date.to_date(move.origin_returned_move_id.date)
+        return False
+
     @api.model
     def create(self, vals):
         ret = super(DrogaStockValuationLayer, self).create(vals)
@@ -171,18 +220,13 @@ class DrogaStockValuationLayer(models.Model):
                 ret.stock_move_id.location_id.usage == 'supplier' and ret.stock_move_id.location_dest_id.usage != 'customer') or (
                 ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.location_id.usage != 'customer'):
             ret.move_type = 'Static'
-            if ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.origin_returned_move_id:
-                unit_cost = self.env['droga.stock.valuation.layer'].search(
-                    [('move_type', '=', 'Static'),
-                     ('stock_move_id', '=', ret.stock_move_id.origin_returned_move_id.id)],
-                    limit=1)
-                if unit_cost and ret.company_id.tax_lock_date:  # If there's no static valuation, we'll treat it as weighted transaction as well
-                    if unit_cost[
-                        'move_date'] > ret.company_id.tax_lock_date:  # Make sure period is not closed for the date, if closed we'll treat it as weighted transaction
-                        ret.unit_cost = unit_cost['unit_cost']
-                        ret.value = ret.unit_cost * ret.quantity
-                        # ret.move_date=unit_cost['move_date']
-                else:
+            if self._is_supplier_return_transaction(ret):
+                origin_unit_cost = self._get_origin_return_unit_cost(ret)
+                if origin_unit_cost:
+                    ret.unit_cost = origin_unit_cost
+                    ret.value = ret.unit_cost * ret.quantity
+                elif not ret.company_id.tax_lock_date:
+                    # Keep previous behavior fallback when there is no source valuation and period is open.
                     ret.move_type = 'Weighted'
         else:
             ret.move_type = 'Weighted'
@@ -351,22 +395,37 @@ class DrogaStockValuationLayer(models.Model):
         old_value = cur_trans.value
         if cur_trans.move_type == 'Static':
             cur_trans.remark = ''
-            allow_static_reprice = self._is_cleaning_unit_return_transaction(cur_trans)
-            if allow_static_reprice and cur_trans.origin and cur_trans.quantity < 0:
-                if cur_trans.origin.startswith('P'):
-                    unit_cost = self.env['droga.stock.valuation.layer'].search([('move_type', '=', 'Static'),
-                                                                                ('stock_move_id', '=',
-                                                                                 cur_trans.stock_move_id.origin_returned_move_id.id)],
-                                                                               limit=1)
-                    if unit_cost:
-                        cur_trans.unit_cost = unit_cost['unit_cost']
-                        cur_trans.value = cur_trans.unit_cost * cur_trans.quantity
+            allow_static_reprice = (
+                self._is_cleaning_unit_return_transaction(cur_trans)
+                or self._is_supplier_return_transaction(cur_trans)
+            )
+            if allow_static_reprice and cur_trans.quantity < 0:
+                origin_unit_cost = self._get_origin_return_unit_cost(cur_trans)
+                if origin_unit_cost:
+                    cur_trans.unit_cost = origin_unit_cost
+                    cur_trans.value = cur_trans.unit_cost * cur_trans.quantity
 
-                        if float_compare(old_value, cur_trans.value, precision_digits=2) != 0:
-                            self.update_gl(cur_trans)
+                    if float_compare(old_value, cur_trans.value, precision_digits=2) != 0:
+                        self.update_gl(cur_trans)
 
             # In case it's a purchase return and the remaining quantity becomes 0, we use the remaining value to balance it
             if allow_static_reprice and cur_trans.quantity < 0 and (prev_trans.remaining_qty + cur_trans.quantity) == 0:
+                # For supplier returns, prefer anchoring valuation at the original receipt date
+                # when periods allow it. If not possible, fall back to balancing value.
+                if self._is_supplier_return_transaction(cur_trans):
+                    origin_move_date = self._get_origin_return_move_date(cur_trans)
+                    if origin_move_date and origin_move_date != cur_trans.move_date:
+                        if cur_trans.company_id.tax_lock_date and origin_move_date <= cur_trans.company_id.tax_lock_date:
+                            cur_trans.remark = (
+                                'Return date cannot move to source receipt date due closed period '
+                                f'({cur_trans.company_id.tax_lock_date})'
+                            )
+                        else:
+                            cur_trans.move_date = origin_move_date
+                            cur_trans.fetch_and_update(cur_trans, reference=reference)
+                            cur_trans.revaluate_after_date(cur_trans, reference=reference)
+                            return False
+
                 balanced_value = prev_trans.remaining_value * -1
                 # Guardrail: keep existing non-zero static cost if balancing value collapses to zero unexpectedly.
                 if (

@@ -337,7 +337,6 @@ class droga_cons_inherit(models.Model):
             if issue_moves:
                 issue_vals = self.env['droga.stock.valuation.layer'].search([
                     ('stock_move_id', 'in', issue_moves.ids),
-                    ('move_type', '=', 'Static'),
                 ])
                 for val in issue_vals:
                     issue_vals_by_product[val.product_id.id]['qty'] += abs(val.quantity)
@@ -349,10 +348,14 @@ class droga_cons_inherit(models.Model):
             'byproduct': 0.0,
             'waste': 0.0,
         }
+        # Store raw quantities in product stock UoM to avoid kg/ton mix-up.
         detail_qty_by_product = defaultdict(float)
 
         for det in self.detail_entries:
-            detail_qty_by_product[det.product_id.id] += det.product_uom_qty
+            raw_uom = det.product_id.uom_id
+            source_uom = det.product_uom or raw_uom
+            det_qty_raw_uom = source_uom._compute_quantity(det.product_uom_qty, raw_uom)
+            detail_qty_by_product[det.product_id.id] += det_qty_raw_uom
             composition = self._get_composition_for_raw_item(det.product_id.product_tmpl_id)
             if not composition:
                 raise UserError(
@@ -361,42 +364,43 @@ class droga_cons_inherit(models.Model):
                 )
 
             qty_by_type = {
-                'finish': det.product_uom_qty * sum(
+                'finish': det_qty_raw_uom * sum(
                     composition.items_detail.filtered(lambda x: x.type == 'finish').mapped('rate_in_pct')
                 ) / 100.0,
-                'byproduct': det.product_uom_qty * sum(
+                'byproduct': det_qty_raw_uom * sum(
                     composition.items_detail.filtered(lambda x: x.type == 'byproduct').mapped('rate_in_pct')
                 ) / 100.0,
-                'waste': det.product_uom_qty * sum(
+                'waste': det_qty_raw_uom * sum(
                     composition.items_detail.filtered(lambda x: x.type == 'waste').mapped('rate_in_pct')
                 ) / 100.0,
             }
             det_distributed_qty = sum(qty_by_type.values())
             if det_distributed_qty <= 0:
                 continue
-            detail_metrics.append((det, composition, qty_by_type, det_distributed_qty))
+            detail_metrics.append((det, composition, qty_by_type, det_distributed_qty, det_qty_raw_uom, raw_uom))
             issue_total_qty['finish'] += qty_by_type['finish']
             issue_total_qty['byproduct'] += qty_by_type['byproduct']
             issue_total_qty['waste'] += qty_by_type['waste']
 
         issue_total_distributed_qty = sum(issue_total_qty.values())
         if issue_total_distributed_qty <= 0:
-            return {'items': [], 'price_by_product': {}}
+            return {'items': [], 'price_by_product': {}, 'price_by_product_uom': {}}
 
         item_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
-        product_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+        product_totals_in_line_uom = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+        product_totals_in_stock_uom = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
 
-        for det, composition, _qty_by_type, distributed_qty in detail_metrics:
+        for det, composition, _qty_by_type, distributed_qty, det_qty_raw_uom, raw_uom in detail_metrics:
             issue_totals = issue_vals_by_product.get(det.product_id.id) or {}
             issued_raw_cost_total = issue_totals.get('value', 0.0) or 0.0
             if float_is_zero(issued_raw_cost_total, precision_digits=6):
                 # Fallback for legacy/partial cases where issue valuation rows are missing.
                 std_price = self.env['droga.wa.utility'].get_cost_at_date(self.env, det.product_id.id, valuation_date)
-                issued_raw_cost_total = abs(std_price * detail_qty_by_product.get(det.product_id.id, det.product_uom_qty))
-            detail_product_qty = detail_qty_by_product.get(det.product_id.id, det.product_uom_qty)
+                issued_raw_cost_total = abs(std_price * detail_qty_by_product.get(det.product_id.id, det_qty_raw_uom))
+            detail_product_qty = detail_qty_by_product.get(det.product_id.id, det_qty_raw_uom)
             if float_is_zero(detail_product_qty, precision_digits=6):
-                detail_product_qty = det.product_uom_qty or 1.0
-            issued_raw_cost_share = issued_raw_cost_total * (det.product_uom_qty / detail_product_qty)
+                detail_product_qty = det_qty_raw_uom or 1.0
+            issued_raw_cost_share = issued_raw_cost_total * (det_qty_raw_uom / detail_product_qty)
             processing_cost_total = det.proc_cost * det.product_uom_qty
             base_unit_cost = (issued_raw_cost_share + processing_cost_total) / distributed_qty
             common_unit_cost = total_cost_common / issue_total_distributed_qty
@@ -422,21 +426,21 @@ class droga_cons_inherit(models.Model):
                 if not product:
                     continue
 
-                raw_uom_factor = det.product_id.product_tmpl_id.uom_id.factor or 1.0
-                return_uom_factor = comp_item.item.uom_id.factor or 1.0
-                uom_rate = return_uom_factor / raw_uom_factor
-                uom_rate = uom_rate or 1.0
-
-                qty = uom_rate * det.product_uom_qty * comp_item.rate_in_pct / 100.0
+                return_uom = comp_item.item.uom_id
+                qty_in_raw_uom = det_qty_raw_uom * comp_item.rate_in_pct / 100.0
+                qty = raw_uom._compute_quantity(qty_in_raw_uom, return_uom)
                 if qty <= 0:
                     continue
-                unit_price = unit_cost / uom_rate
+                unit_price = raw_uom._compute_price(unit_cost, return_uom)
 
-                key = (product.id, det.warehouse_id.id, comp_item.item.uom_id.id)
+                key = (product.id, det.warehouse_id.id, return_uom.id)
                 item_totals[key]['qty'] += qty
                 item_totals[key]['value'] += (unit_price * qty)
-                product_totals[product.id]['qty'] += qty
-                product_totals[product.id]['value'] += (unit_price * qty)
+                product_totals_in_line_uom[(product.id, return_uom.id)]['qty'] += qty
+                product_totals_in_line_uom[(product.id, return_uom.id)]['value'] += (unit_price * qty)
+                qty_in_stock_uom = return_uom._compute_quantity(qty, product.uom_id)
+                product_totals_in_stock_uom[product.id]['qty'] += qty_in_stock_uom
+                product_totals_in_stock_uom[product.id]['value'] += (unit_price * qty)
 
         items = []
         for key, item_data in item_totals.items():
@@ -455,20 +459,147 @@ class droga_cons_inherit(models.Model):
             })
 
         price_by_product = {}
-        for product_id, product_data in product_totals.items():
+        for product_id, product_data in product_totals_in_stock_uom.items():
             if product_data['qty'] <= 0:
                 continue
             price_by_product[product_id] = product_data['value'] / product_data['qty']
 
-        return {'items': items, 'price_by_product': price_by_product}
+        price_by_product_uom = {}
+        for key, product_data in product_totals_in_line_uom.items():
+            if product_data['qty'] <= 0:
+                continue
+            price_by_product_uom[key] = product_data['value'] / product_data['qty']
+
+        return {
+            'items': items,
+            'price_by_product': price_by_product,
+            'price_by_product_uom': price_by_product_uom,
+        }
+
+    def _get_cleaning_issue_cost_totals(self):
+        """Return (issue_value, processing_cost, cost_build_total)."""
+        self.ensure_one()
+        cost_lines = self.env['droga.export.cost.buildup'].search([('issue_export_origin_form', '=', self.id)])
+        total_cost_build = sum(cost_lines.mapped('amount_for_order'))
+        total_processing_cost = sum(
+            (det.proc_cost or 0.0) * (det.product_uom_qty or 0.0)
+            for det in self.detail_entries
+        )
+        issue_pickings = self.env['stock.picking'].search([
+            ('cons_sample_issue_request', '=', self.id),
+        ])
+        issue_moves = self.env['stock.move'].search([('picking_id', 'in', issue_pickings.ids)]) if issue_pickings else []
+        issue_vals = self.env['droga.stock.valuation.layer'].search([
+            ('stock_move_id', 'in', issue_moves.ids),
+        ]) if issue_moves else []
+        total_issue_value = sum(abs(val.value) for val in issue_vals)
+        return total_issue_value, total_processing_cost, total_cost_build
+
+    def _build_cleaning_pricing_payload_fallback(self, valuation_date, error=None):
+        """Fallback pricing builder when composition setup is missing.
+
+        This scales existing return-line prices to match total issued cost so we
+        can still correct unit-of-measure inflation without composition data.
+        """
+        self.ensure_one()
+
+        total_issue_value, total_processing_cost, total_cost_build = self._get_cleaning_issue_cost_totals()
+        target_total_value = total_issue_value + total_processing_cost + total_cost_build
+
+        receive_headers = self.env['droga.inventory.consignment.receive'].search([
+            ('subcontractor_return_origin_form', '=', self.id),
+            ('issue_type', '=', 'SUBL'),
+        ])
+        if not receive_headers or float_is_zero(target_total_value, precision_digits=6):
+            return {'items': [], 'price_by_product': {}, 'price_by_product_uom': {}}
+
+        receive_details = self.env['droga.inventory.cons.receive.detail'].search([
+            ('cons_header', 'in', receive_headers.ids),
+        ])
+        if not receive_details:
+            return {'items': [], 'price_by_product': {}, 'price_by_product_uom': {}}
+
+        product_totals_in_stock_uom = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+        product_totals_in_line_uom = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+        current_total_value = 0.0
+
+        for line in receive_details:
+            line_uom = line.product_uom or line.product_id.uom_id
+            qty_stock = line_uom._compute_quantity(line.product_uom_qty, line.product_id.uom_id)
+            if float_is_zero(qty_stock, precision_digits=6):
+                continue
+            price_line = line.price_unit_cons or 0.0
+            price_stock = line_uom._compute_price(price_line, line.product_id.uom_id)
+            line_value_stock = price_stock * qty_stock
+            current_total_value += line_value_stock
+
+            product_totals_in_stock_uom[line.product_id.id]['qty'] += qty_stock
+            product_totals_in_stock_uom[line.product_id.id]['value'] += line_value_stock
+            product_totals_in_line_uom[(line.product_id.id, line_uom.id)]['qty'] += line.product_uom_qty
+            product_totals_in_line_uom[(line.product_id.id, line_uom.id)]['value'] += price_line * line.product_uom_qty
+
+        if float_is_zero(current_total_value, precision_digits=6):
+            total_qty_stock = sum(data['qty'] for data in product_totals_in_stock_uom.values())
+            if float_is_zero(total_qty_stock, precision_digits=6):
+                return {'items': [], 'price_by_product': {}, 'price_by_product_uom': {}}
+            uniform_price_stock = target_total_value / total_qty_stock
+            price_by_product = {
+                product_id: uniform_price_stock
+                for product_id, data in product_totals_in_stock_uom.items()
+                if data['qty'] > 0
+            }
+            price_by_product_uom = {}
+            for (product_id, uom_id), data in product_totals_in_line_uom.items():
+                if data['qty'] <= 0:
+                    continue
+                product = self.env['product.product'].browse(product_id)
+                uom = self.env['uom.uom'].browse(uom_id)
+                price_by_product_uom[(product_id, uom_id)] = product.uom_id._compute_price(
+                    uniform_price_stock, uom
+                )
+        else:
+            scale = target_total_value / current_total_value
+            price_by_product = {}
+            for product_id, data in product_totals_in_stock_uom.items():
+                if data['qty'] <= 0:
+                    continue
+                price_by_product[product_id] = (data['value'] * scale) / data['qty']
+
+            price_by_product_uom = {}
+            for key, data in product_totals_in_line_uom.items():
+                if data['qty'] <= 0:
+                    continue
+                price_by_product_uom[key] = (data['value'] * scale) / data['qty']
+
+        _logger.warning(
+            "Cleaning pricing fallback used for issue=%s company=%s: %s",
+            self.id,
+            self.company_id.id,
+            error or 'composition missing',
+        )
+
+        return {
+            'items': [],
+            'price_by_product': price_by_product,
+            'price_by_product_uom': price_by_product_uom,
+        }
 
     def recalculate(self):
         self.ensure_one()
         if not self._can_build_cleaning_pricing_payload():
             return
         valuation_date = self._get_cleaning_valuation_date()
-        pricing_payload = self._build_cleaning_pricing_payload(valuation_date)
-        price_by_product = pricing_payload['price_by_product']
+        try:
+            pricing_payload = self._build_cleaning_pricing_payload(valuation_date)
+        except UserError as exc:
+            if self.env.context.get('tolerate_composition_error'):
+                pricing_payload = self._build_cleaning_pricing_payload_fallback(
+                    valuation_date, error=exc
+                )
+            else:
+                raise
+        price_by_product = pricing_payload.get('price_by_product', {})
+        price_by_product_uom = pricing_payload.get('price_by_product_uom', {})
 
         receive_headers = self.env['droga.inventory.consignment.receive'].search([
             ('subcontractor_return_origin_form', '=', self.id),
@@ -481,13 +612,114 @@ class droga_cons_inherit(models.Model):
         )
         if not subl_receive_headers:
             return
-        if price_by_product:
-            receive_items = self.env['droga.inventory.cons.receive.detail'].search([
-                ('cons_header', 'in', subl_receive_headers.ids),
-                ('product_id', 'in', list(price_by_product.keys())),
-            ])
+
+        def _price_for_product_and_uom(product, uom):
+            key = (product.id, uom.id)
+            if key in price_by_product_uom:
+                return price_by_product_uom[key]
+            base_price = price_by_product.get(product.id)
+            if base_price is None:
+                return None
+            if uom and product.uom_id and uom.id != product.uom_id.id:
+                return product.uom_id._compute_price(base_price, uom)
+            return base_price
+
+        receive_items_all = self.env['droga.inventory.cons.receive.detail'].search([
+            ('cons_header', 'in', subl_receive_headers.ids),
+        ])
+
+        if self.env.context.get('tolerate_composition_error') and receive_items_all:
+            missing_line_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+            missing_stock_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
+            known_value = 0.0
+            missing_value = 0.0
+
+            for line in receive_items_all:
+                line_uom = line.product_uom or line.product_id.uom_id
+                qty_stock = line_uom._compute_quantity(line.product_uom_qty, line.product_id.uom_id)
+                if float_is_zero(qty_stock, precision_digits=6):
+                    continue
+                price = _price_for_product_and_uom(line.product_id, line_uom)
+                if price is None:
+                    price_line = line.price_unit_cons or 0.0
+                    price_stock = line_uom._compute_price(price_line, line.product_id.uom_id)
+                    line_value_stock = price_stock * qty_stock
+                    missing_value += line_value_stock
+                    missing_stock_totals[line.product_id.id]['qty'] += qty_stock
+                    missing_stock_totals[line.product_id.id]['value'] += line_value_stock
+                    missing_line_totals[(line.product_id.id, line_uom.id)]['qty'] += line.product_uom_qty
+                    missing_line_totals[(line.product_id.id, line_uom.id)]['value'] += price_line * line.product_uom_qty
+                else:
+                    price_stock = line_uom._compute_price(price, line.product_id.uom_id)
+                    known_value += price_stock * qty_stock
+
+            if missing_value and not float_is_zero(missing_value, precision_digits=6):
+                total_issue_value, total_processing_cost, total_cost_build = self._get_cleaning_issue_cost_totals()
+                target_total_value = total_issue_value + total_processing_cost + total_cost_build
+                remaining = target_total_value - known_value
+                if remaining > 0:
+                    scale_missing = remaining / missing_value
+                    for product_id, data in missing_stock_totals.items():
+                        if data['qty'] <= 0:
+                            continue
+                        price_by_product[product_id] = (data['value'] * scale_missing) / data['qty']
+                    for key, data in missing_line_totals.items():
+                        if data['qty'] <= 0:
+                            continue
+                        price_by_product_uom[key] = (data['value'] * scale_missing) / data['qty']
+                    _logger.warning(
+                        "Cleaning pricing fallback (missing outputs) applied for issue=%s company=%s.",
+                        self.id,
+                        self.company_id.id,
+                    )
+                else:
+                    pricing_payload = self._build_cleaning_pricing_payload_fallback(
+                        valuation_date, error='missing return products'
+                    )
+                    price_by_product = pricing_payload.get('price_by_product', {})
+                    price_by_product_uom = pricing_payload.get('price_by_product_uom', {})
+            elif missing_stock_totals:
+                # Missing outputs exist but their current pricing is zero; allocate by quantity.
+                total_issue_value, total_processing_cost, total_cost_build = self._get_cleaning_issue_cost_totals()
+                target_total_value = total_issue_value + total_processing_cost + total_cost_build
+                remaining = target_total_value - known_value
+                if remaining > 0:
+                    total_missing_qty = sum(data['qty'] for data in missing_stock_totals.values())
+                    if total_missing_qty > 0:
+                        uniform_price_stock = remaining / total_missing_qty
+                        for product_id, data in missing_stock_totals.items():
+                            if data['qty'] <= 0:
+                                continue
+                            price_by_product[product_id] = uniform_price_stock
+                        for key, data in missing_line_totals.items():
+                            if data['qty'] <= 0:
+                                continue
+                            product_id, uom_id = key
+                            product = self.env['product.product'].browse(product_id)
+                            uom = self.env['uom.uom'].browse(uom_id)
+                            price_by_product_uom[key] = product.uom_id._compute_price(
+                                uniform_price_stock, uom
+                            )
+                        _logger.warning(
+                            "Cleaning pricing fallback (missing outputs, zero prices) applied for issue=%s company=%s.",
+                            self.id,
+                            self.company_id.id,
+                        )
+                else:
+                    pricing_payload = self._build_cleaning_pricing_payload_fallback(
+                        valuation_date, error='missing return products'
+                    )
+                    price_by_product = pricing_payload.get('price_by_product', {})
+                    price_by_product_uom = pricing_payload.get('price_by_product_uom', {})
+
+        if price_by_product_uom or price_by_product:
+            target_product_ids = list({product_id for product_id, _uom_id in price_by_product_uom.keys()} or set(price_by_product.keys()))
+            receive_items = receive_items_all.filtered(lambda l: l.product_id.id in target_product_ids)
             for line in receive_items:
-                line.write({'price_unit_cons': price_by_product.get(line.product_id.id, line.price_unit_cons)})
+                line_uom = line.product_uom or line.product_id.uom_id
+                price = _price_for_product_and_uom(line.product_id, line_uom)
+                if price is not None:
+                    line.write({'price_unit_cons': price})
 
         receive_pickings = self.env['stock.picking'].search([('cons_receive_request', 'in', subl_receive_headers.ids)])
         moves_receipts = self.env['stock.move'].search([
@@ -502,13 +734,17 @@ class droga_cons_inherit(models.Model):
             allow_price_update = bool(
                 receive and 'issue_type' in receive._fields and receive.issue_type == 'SUBL'
             )
-            price = price_by_product.get(val.product_id.id) if allow_price_update else None
+            move_uom = val.stock_move_id.product_uom or val.product_id.uom_id
+            price = _price_for_product_and_uom(val.product_id, move_uom) if allow_price_update else None
             price_updated = False
 
             if price is not None:
+                price_in_stock_uom = price
+                if move_uom and val.product_id.uom_id and move_uom.id != val.product_id.uom_id.id:
+                    price_in_stock_uom = move_uom._compute_price(price, val.product_id.uom_id)
                 # Guardrail: avoid wiping a static valuation row to zero due transient/missing pricing payload.
                 if (
-                    val.currency_id.is_zero(price)
+                    val.currency_id.is_zero(price_in_stock_uom)
                     and (
                         not val.currency_id.is_zero(val.value)
                         or not float_is_zero(val.unit_cost, precision_digits=6)
@@ -523,7 +759,7 @@ class droga_cons_inherit(models.Model):
                         val.value,
                     )
                 else:
-                    val.write({'unit_cost': price, 'value': price * val.quantity})
+                    val.write({'unit_cost': price_in_stock_uom, 'value': price_in_stock_uom * val.quantity})
                     price_updated = True
 
             if price_updated:

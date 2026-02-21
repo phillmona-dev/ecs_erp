@@ -136,15 +136,10 @@ class update_acc(models.Model):
             self.env.cr.commit()
         return posted, updated
 
-    def _recalculate_linked_cleaning_returns_for_raw_products(self, product_ids, company_id):
-        """Collect return-product ids linked to SUBL raw-material issues.
-
-        WA recalculation should work from already-posted valuation/receipt data.
-        This method intentionally does not call issue-side pricing recomputation
-        (which depends on composition setup and can change over time).
-        """
+    def _collect_linked_cleaning_issues_and_return_products(self, product_ids, company_id):
+        """Collect SUBL issue headers and linked return products for given products."""
         if not product_ids:
-            return set()
+            return self.env['droga.inventory.consignment.issue'], set()
 
         issue_detail_model = self.env['droga.inventory.cons.issue.detail']
         issue_details = issue_detail_model.search([
@@ -153,25 +148,41 @@ class update_acc(models.Model):
             ('cons_header.issue_type', '=', 'SUBL'),
         ])
         issue_headers = issue_details.mapped('cons_header')
-        if not issue_headers:
-            return set()
 
         receive_model = self.env['droga.inventory.consignment.receive']
         if 'subcontractor_return_origin_form' not in receive_model._fields:
-            return set()
+            return issue_headers, set()
+
+        receive_details_by_product = self.env['droga.inventory.cons.receive.detail'].search([
+            ('cons_header.company_id', '=', company_id),
+            ('cons_header.issue_type', '=', 'SUBL'),
+            ('product_id', 'in', list(product_ids)),
+        ])
+        receive_headers_by_product = receive_details_by_product.mapped('cons_header')
+        issue_headers |= receive_headers_by_product.mapped('subcontractor_return_origin_form')
+        if not issue_headers:
+            return issue_headers, set()
 
         receive_headers = receive_model.search([
             ('company_id', '=', company_id),
             ('issue_type', '=', 'SUBL'),
             ('subcontractor_return_origin_form', 'in', issue_headers.ids),
         ])
+        receive_headers |= receive_headers_by_product
         if not receive_headers:
-            return set()
+            return issue_headers, set()
 
         receive_details = self.env['droga.inventory.cons.receive.detail'].search([
             ('cons_header', 'in', receive_headers.ids),
         ])
-        return set(receive_details.mapped('product_id').ids)
+        return issue_headers, set(receive_details.mapped('product_id').ids)
+
+    def _recalculate_linked_cleaning_returns_for_raw_products(self, product_ids, company_id):
+        """Backward-compatible wrapper for callers expecting only linked return products."""
+        _issue_headers, linked_return_product_ids = self._collect_linked_cleaning_issues_and_return_products(
+            product_ids, company_id
+        )
+        return linked_return_product_ids
 
     def recalculate_weighted_average_for_product(
         self,
@@ -269,6 +280,7 @@ class update_acc(models.Model):
         post_transactions=True,
         repost_existing=False,
         reference='Cleaning Unit WA Recalc',
+        refresh_cleaning_pricing=False,
     ):
         """Recalculate WA for stock items by company or by item code.
 
@@ -297,17 +309,42 @@ class update_acc(models.Model):
         if not product_ids:
             return 0
 
-        all_product_ids = set(product_ids)
-        linked_return_product_ids = self._recalculate_linked_cleaning_returns_for_raw_products(
-            all_product_ids, company_id
-        )
-        all_product_ids.update(linked_return_product_ids)
-
-        processed = 0
         cron_mode = bool(self.env.context.get('cron_id'))
         request_mode = self._is_http_request_context()
         deadline = datetime.datetime.now() + datetime.timedelta(seconds=95) if request_mode else None
         stopped_by_deadline = False
+
+        all_product_ids = set(product_ids)
+        issue_headers, linked_return_product_ids = self._collect_linked_cleaning_issues_and_return_products(
+            all_product_ids, company_id
+        )
+        all_product_ids.update(linked_return_product_ids)
+
+        can_refresh_issue_prices = hasattr(self.env['droga.inventory.consignment.issue'], 'recalculate')
+        if refresh_cleaning_pricing and issue_headers and can_refresh_issue_prices:
+            for idx, issue in enumerate(issue_headers.sorted('id'), 1):
+                if deadline and datetime.datetime.now() >= deadline:
+                    stopped_by_deadline = True
+                    break
+                try:
+                    with self.env.cr.savepoint():
+                        issue.with_context(tolerate_composition_error=True).recalculate()
+                except Exception as exc:
+                    _logger.exception(
+                        "Cleaning pricing refresh failed for issue=%s company=%s: %s",
+                        issue.id,
+                        company_id,
+                        exc,
+                    )
+                if (cron_mode or request_mode) and idx % 20 == 0:
+                    self.env.cr.commit()
+        elif refresh_cleaning_pricing and issue_headers:
+            _logger.info(
+                "Skipping cleaning pricing refresh for company=%s: issue.recalculate() is unavailable.",
+                company_id,
+            )
+
+        processed = 0
         for idx, product_id in enumerate(sorted(all_product_ids), 1):
             if deadline and datetime.datetime.now() >= deadline:
                 stopped_by_deadline = True
