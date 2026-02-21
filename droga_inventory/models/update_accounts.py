@@ -215,6 +215,25 @@ class update_acc(models.Model):
         ])
         receive_headers_by_product = receive_details_by_product.mapped('cons_header')
         issue_headers |= receive_headers_by_product.mapped('subcontractor_return_origin_form')
+
+        # Fallback for legacy rows: follow valuation layers -> stock moves -> SUBL pickings,
+        # even when issue/receive detail lines were edited later.
+        svls = self.env['droga.stock.valuation.layer'].search([
+            ('company_id', '=', company_id),
+            ('product_id', 'in', list(product_ids)),
+            ('stock_move_id', '!=', False),
+        ])
+        if svls:
+            svl_issue_headers = svls.mapped('stock_move_id.picking_id.cons_sample_issue_request').filtered(
+                lambda h: h and 'issue_type' in h._fields and h.issue_type == 'SUBL'
+            )
+            receive_headers_by_svl = svls.mapped('stock_move_id.picking_id.cons_receive_request').filtered(
+                lambda h: h and 'issue_type' in h._fields and h.issue_type == 'SUBL'
+            )
+            issue_headers |= svl_issue_headers
+            issue_headers |= receive_headers_by_svl.mapped('subcontractor_return_origin_form')
+            receive_headers_by_product |= receive_headers_by_svl
+
         if not issue_headers:
             return issue_headers, set()
 

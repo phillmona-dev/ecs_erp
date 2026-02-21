@@ -321,12 +321,79 @@ class droga_cons_inherit(models.Model):
             )
         return compositions[:1]
 
+    def _get_legacy_issue_qty_scale_by_product(self):
+        """Detect legacy SUBL rows where qty from sales UoM was saved as raw-product bigger UoM."""
+        self.ensure_one()
+        if not self.subcontract_issue_origin_form:
+            return {}
+
+        actual_qty_by_product = defaultdict(float)
+        for det in self.detail_entries:
+            raw_uom = det.product_id.uom_id
+            line_uom = det.product_uom or raw_uom
+            if not raw_uom or not line_uom or line_uom.category_id.id != raw_uom.category_id.id:
+                continue
+            actual_qty_by_product[det.product_id.id] += line_uom._compute_quantity(det.product_uom_qty, raw_uom)
+
+        if not actual_qty_by_product:
+            return {}
+
+        sale_lines = self.subcontract_issue_origin_form.order_line.filtered(
+            lambda x: not x.display_type and x.product_template_id
+        )
+        if not sale_lines:
+            return {}
+
+        finish_lines = self.env['droga.export.items.composition.fin.goods'].search([
+            ('item', 'in', sale_lines.mapped('product_template_id').ids),
+            ('type', '=', 'finish'),
+            ('company_id', '=', self.company_id.id),
+        ])
+        finish_by_item = defaultdict(list)
+        for line in finish_lines:
+            finish_by_item[line.item.id].append(line)
+
+        expected_qty_by_product = defaultdict(float)
+        for ord_line in sale_lines:
+            sale_uom = ord_line.product_uom or ord_line.product_id.uom_id
+            for finish_line in finish_by_item.get(ord_line.product_template_id.id, []):
+                if finish_line.rate_in_pct <= 0:
+                    continue
+                raw_product = finish_line.items_header.raw_item.product_variant_id
+                if not raw_product:
+                    continue
+                raw_uom = raw_product.uom_id
+                if not sale_uom or not raw_uom or sale_uom.category_id.id != raw_uom.category_id.id:
+                    continue
+                qty_in_sale_uom = (ord_line.product_uom_qty * 100.0) / finish_line.rate_in_pct
+                qty_in_raw_uom = sale_uom._compute_quantity(qty_in_sale_uom, raw_uom)
+                expected_qty_by_product[raw_product.id] += qty_in_raw_uom
+
+        scale_by_product = {}
+        for product_id, expected_qty in expected_qty_by_product.items():
+            actual_qty = actual_qty_by_product.get(product_id, 0.0)
+            if float_is_zero(expected_qty, precision_digits=6) or float_is_zero(actual_qty, precision_digits=6):
+                continue
+            ratio = actual_qty / expected_qty
+            if ratio > 50:
+                scale_by_product[product_id] = expected_qty / actual_qty
+
+        if scale_by_product:
+            _logger.warning(
+                "Legacy cleaning quantity scaling detected for issue=%s company=%s scale=%s",
+                self.id,
+                self.company_id.id,
+                scale_by_product,
+            )
+        return scale_by_product
+
     def _build_cleaning_pricing_payload(self, valuation_date,tolerate_composition_error=False):
         self.ensure_one()
         cost_lines = self.env['droga.export.cost.buildup'].search([('issue_export_origin_form', '=', self.id)])
         total_cost_build_finish = sum(cost_lines.filtered(lambda x: x.type_apply == 'Finished').mapped('amount_for_order'))
         total_cost_build_byproduct = sum(cost_lines.filtered(lambda x: x.type_apply == 'By-product').mapped('amount_for_order'))
         total_cost_common = sum(cost_lines.filtered(lambda x: x.type_apply == 'All').mapped('amount_for_order'))
+        legacy_scale_by_product = self._get_legacy_issue_qty_scale_by_product()
 
         issue_pickings = self.env['stock.picking'].search([
             ('cons_sample_issue_request', '=', self.id),
@@ -339,8 +406,9 @@ class droga_cons_inherit(models.Model):
                     ('stock_move_id', 'in', issue_moves.ids),
                 ])
                 for val in issue_vals:
+                    legacy_scale = legacy_scale_by_product.get(val.product_id.id, 1.0)
                     issue_vals_by_product[val.product_id.id]['qty'] += abs(val.quantity)
-                    issue_vals_by_product[val.product_id.id]['value'] += abs(val.value)
+                    issue_vals_by_product[val.product_id.id]['value'] += abs(val.value) * legacy_scale
 
         detail_metrics = []
         issue_total_qty = {
@@ -391,17 +459,20 @@ class droga_cons_inherit(models.Model):
         product_totals_in_stock_uom = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
 
         for det, composition, _qty_by_type, distributed_qty, det_qty_raw_uom, raw_uom in detail_metrics:
+            legacy_scale = legacy_scale_by_product.get(det.product_id.id, 1.0)
             issue_totals = issue_vals_by_product.get(det.product_id.id) or {}
             issued_raw_cost_total = issue_totals.get('value', 0.0) or 0.0
             if float_is_zero(issued_raw_cost_total, precision_digits=6):
                 # Fallback for legacy/partial cases where issue valuation rows are missing.
                 std_price = self.env['droga.wa.utility'].get_cost_at_date(self.env, det.product_id.id, valuation_date)
-                issued_raw_cost_total = abs(std_price * detail_qty_by_product.get(det.product_id.id, det_qty_raw_uom))
+                issued_raw_cost_total = abs(
+                    std_price * detail_qty_by_product.get(det.product_id.id, det_qty_raw_uom) * legacy_scale
+                )
             detail_product_qty = detail_qty_by_product.get(det.product_id.id, det_qty_raw_uom)
             if float_is_zero(detail_product_qty, precision_digits=6):
                 detail_product_qty = det_qty_raw_uom or 1.0
             issued_raw_cost_share = issued_raw_cost_total * (det_qty_raw_uom / detail_product_qty)
-            processing_cost_total = det.proc_cost * det.product_uom_qty
+            processing_cost_total = det.proc_cost * det.product_uom_qty * legacy_scale
             base_unit_cost = (issued_raw_cost_share + processing_cost_total) / distributed_qty
             common_unit_cost = total_cost_common / issue_total_distributed_qty
 
@@ -481,8 +552,9 @@ class droga_cons_inherit(models.Model):
         self.ensure_one()
         cost_lines = self.env['droga.export.cost.buildup'].search([('issue_export_origin_form', '=', self.id)])
         total_cost_build = sum(cost_lines.mapped('amount_for_order'))
+        legacy_scale_by_product = self._get_legacy_issue_qty_scale_by_product()
         total_processing_cost = sum(
-            (det.proc_cost or 0.0) * (det.product_uom_qty or 0.0)
+            (det.proc_cost or 0.0) * (det.product_uom_qty or 0.0) * legacy_scale_by_product.get(det.product_id.id, 1.0)
             for det in self.detail_entries
         )
         issue_pickings = self.env['stock.picking'].search([
@@ -492,7 +564,10 @@ class droga_cons_inherit(models.Model):
         issue_vals = self.env['droga.stock.valuation.layer'].search([
             ('stock_move_id', 'in', issue_moves.ids),
         ]) if issue_moves else []
-        total_issue_value = sum(abs(val.value) for val in issue_vals)
+        total_issue_value = sum(
+            abs(val.value) * legacy_scale_by_product.get(val.product_id.id, 1.0)
+            for val in issue_vals
+        )
         return total_issue_value, total_processing_cost, total_cost_build
 
     def _build_cleaning_pricing_payload_fallback(self, valuation_date, error=None):
@@ -900,10 +975,19 @@ class droga_sale_inherit(models.Model):
             raw_product = finish_line.items_header.raw_item.product_variant_id
             if not raw_product:
                 raise UserError("Raw material variant is missing for %s." % ord.product_template_id.display_name)
+            source_uom = ord.product_uom or ord.product_id.uom_id
+            target_uom = raw_product.import_uom_new or raw_product.uom_id
+            required_qty = (ord.product_uom_qty * 100) / finish_line.rate_in_pct
+            if (
+                source_uom and target_uom
+                and source_uom.category_id.id == target_uom.category_id.id
+            ):
+                required_qty = source_uom._compute_quantity(required_qty, target_uom)
             itemsdetail.append({
                 'company_id': self.company_id.id,
                 'product_id': raw_product.id,
-                'product_uom_qty': (ord.product_uom_qty * 100) / finish_line.rate_in_pct
+                'product_uom_qty': required_qty,
+                'product_uom': target_uom.id,
             })
 
         if not itemsdetail:
