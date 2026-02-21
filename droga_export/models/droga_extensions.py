@@ -624,6 +624,28 @@ class droga_cons_inherit(models.Model):
                 return product.uom_id._compute_price(base_price, uom)
             return base_price
 
+        def _layer_qty_is_in_move_uom(val, move_uom):
+            """Detect legacy rows where valuation quantity was stored in move UoM."""
+            if not move_uom or not val.product_id.uom_id or move_uom.id == val.product_id.uom_id.id:
+                return False
+            move = val.stock_move_id
+            if not move:
+                return False
+            layer_qty = abs(val.quantity or 0.0)
+            move_qty = abs(move.product_uom_qty or 0.0)
+            if float_is_zero(layer_qty, precision_digits=6) or float_is_zero(move_qty, precision_digits=6):
+                return False
+            move_qty_in_stock = abs(move_uom._compute_quantity(move_qty, val.product_id.uom_id))
+            if float_is_zero(move_qty_in_stock, precision_digits=6):
+                return False
+
+            # If layer qty matches move qty but is far from expected stock-uom qty,
+            # treat the row as move-uom-quantified and avoid re-converting price.
+            layer_matches_move = float_is_zero(layer_qty - move_qty, precision_digits=4)
+            layer_matches_stock = float_is_zero(layer_qty - move_qty_in_stock, precision_digits=4)
+            mismatch_ratio = layer_qty / move_qty_in_stock if move_qty_in_stock else 1.0
+            return bool(layer_matches_move and not layer_matches_stock and mismatch_ratio > 50)
+
         receive_items_all = self.env['droga.inventory.cons.receive.detail'].search([
             ('cons_header', 'in', subl_receive_headers.ids),
         ])
@@ -741,7 +763,10 @@ class droga_cons_inherit(models.Model):
             if price is not None:
                 price_in_stock_uom = price
                 if move_uom and val.product_id.uom_id and move_uom.id != val.product_id.uom_id.id:
-                    price_in_stock_uom = move_uom._compute_price(price, val.product_id.uom_id)
+                    if _layer_qty_is_in_move_uom(val, move_uom):
+                        price_in_stock_uom = price
+                    else:
+                        price_in_stock_uom = move_uom._compute_price(price, val.product_id.uom_id)
                 # Guardrail: avoid wiping a static valuation row to zero due transient/missing pricing payload.
                 if (
                     val.currency_id.is_zero(price_in_stock_uom)
