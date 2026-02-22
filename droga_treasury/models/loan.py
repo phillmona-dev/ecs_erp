@@ -15,7 +15,9 @@ class AccountLoan(models.Model):
 
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
 
-    name = fields.Many2one('res.bank', string="Bank", required=True)
+    # Keep `name` as Char for backward-compatible schema upgrades (existing DB column is varchar).
+    name = fields.Char(string="Bank", required=True)
+    bank_id = fields.Many2one('res.bank', string="Bank Record")
 
     loan_type = fields.Many2one(
         'account.loan.type', string="Loan Type", required=True)
@@ -225,6 +227,28 @@ class AccountLoan(models.Model):
      
 
     #loan_renews_ids = fields.One2many('account.loan.renews', 'acount_loan_id', string="Renews")
+
+    @api.onchange('bank_id')
+    def _onchange_bank_id(self):
+        for record in self:
+            if record.bank_id:
+                record.name = record.bank_id.name
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            bank_id = vals.get('bank_id')
+            if bank_id and not vals.get('name'):
+                bank = self.env['res.bank'].browse(bank_id)
+                vals['name'] = bank.name
+        return super().create(vals_list)
+
+    def write(self, vals):
+        bank_id = vals.get('bank_id')
+        if bank_id and not vals.get('name'):
+            bank = self.env['res.bank'].browse(bank_id)
+            vals = dict(vals, name=bank.name)
+        return super().write(vals)
 
     @api.depends('loan_renew_ids')
     def compute_renew(self):

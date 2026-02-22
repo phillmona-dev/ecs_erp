@@ -18,6 +18,7 @@ model-->
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="bank_id"/>
                 <field name="loan_amount"/>
                 <field name="contract_date"/>
                 <field name="payment_start_date"/>
@@ -84,6 +85,7 @@ model-->
 
                     <group>
                         <group>
+                            <field name="bank_id"/>
                             <field name="name"/>
                             <field name="loan_amount"/>
                             <field name="loan_statement_number"/>
