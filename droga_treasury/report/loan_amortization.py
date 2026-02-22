@@ -37,7 +37,8 @@ class droga_account_loan_reports_xls(models.TransientModel):
 
         #The file name is stored under filename
         datetime_string = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = '%s_%s_%s' % ('Loan Amortization ',self.loan_id['name'].id, datetime_string)
+        bank_name = self.loan_id.bank_id.name or self.loan_id.name or 'bank'
+        filename = '%s_%s_%s' % ('Loan Amortization ', bank_name, datetime_string)
         filename += '%2Exlsx'
 
         #This downloads file. The file is fileout and the name if filename
@@ -123,13 +124,14 @@ class droga_account_loan_reports_xls(models.TransientModel):
         sheet.merge_range('A' + str(row_start + 1) + ':O' + str(row_start + 1), self.loan_id.company_id.name, header_format)
         sheet.merge_range('A' + str(row_start + 2) + ':O' + str(row_start + 2), "LOAN AMORTIZATION", header_format)
         sheet.merge_range('K' + str(row_start + 3) + ':L' + str(row_start + 3), "BANK",title_format_num )
-        sheet.merge_range('M' + str(row_start + 3) + ':M' + str(row_start + 3), self.loan_id['name'].name, title_format_num)
+        bank_name = self.loan_id.bank_id.name or self.loan_id.name or ''
+        sheet.merge_range('M' + str(row_start + 3) + ':M' + str(row_start + 3), bank_name, title_format_num)
         contractdate= self.loan_id['contract_date'].strftime("%Y/%m/%d")
         sheet.merge_range('K' + str(row_start + 4) + ':L' + str(row_start + 4), "Loan Type", title_format_num)
         sheet.merge_range('M' + str(row_start + 4) + ':M' + str(row_start + 4), self.loan_id['loan_type'].name,title_format_num )
         sheet.merge_range('K' + str(row_start + 5) + ':L' + str(row_start + 5), "Statment Number",title_format_num )
         sheet.merge_range('M' + str(row_start + 5) + ':M' + str(row_start + 5), self.loan_id['loan_statement_number'], title_format_num)
-        sheet.write(row_start+2, 12, self.loan_id['name'].name,title_format_num)
+        sheet.write(row_start+2, 12, bank_name,title_format_num)
         sheet.write(row_start + 3, 12, self.loan_id['loan_type'].name,title_format_num)
         sheet.write(row_start + 4, 12, self.loan_id['loan_statement_number'],title_format_num)
         #sheet.write(row_start + 5, 13, contractdate)#

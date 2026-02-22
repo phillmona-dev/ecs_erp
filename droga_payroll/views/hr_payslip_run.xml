@@ -32,6 +32,7 @@
             <xpath expr="//field[@name='company_id']" position="before">
                 <field name="fiscal_year" options="{'no_create':True,'no_open':True}"/>
                 <field name="period" options="{'no_create':True,'no_open':True}"/>
+                <field name="division" options="{'no_create':True,'no_open':True}"/>
             </xpath>
             <xpath expr="//field[@name='date_start']" position="attributes">
                 <attribute name="readonly">0</attribute>

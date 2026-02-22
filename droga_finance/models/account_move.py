@@ -610,7 +610,21 @@ class AccountWithholding(models.Model):
         # 3️⃣ Prepare batch values
         vals_list = []
         for line in move_lines:
-            amount_before_vat = line.tax_base_amount / 1.15 if line.tax_base_amount else 0.0
+            # Extract withholding tax safely
+            withholding_tax = next(
+                (
+                    abs(tax.amount)
+                    for line in move_lines
+                    for tax in line.tax_line_id
+                    if tax.tax_group_id and tax.tax_group_id.name == 'Withholding'
+                ),
+                0
+            )
+
+            if not withholding_tax:
+                continue
+
+            amount_before_vat = (line.balance * 100) / withholding_tax
 
             vals_list.append({
                 'move_id_wh': line.move_id.id,
@@ -628,6 +642,63 @@ class AccountWithholding(models.Model):
             mail_create_nolog=True,
             mail_notrack=True,
         ).create(vals_list)
+
+    def update_before_tax_amount(self):
+        company = self.env.company
+
+        withholdings = self.env['account.move.withholding'].search([
+            ('company_id', '=', company.id),
+        ])
+
+        if not withholdings:
+            return
+
+        # Prefetch all move IDs at once
+        move_ids = withholdings.mapped('move_id_wh').ids
+
+        # Fetch all relevant move lines in ONE query
+        move_lines = self.env['account.move.line'].search([
+            ('move_id', 'in', move_ids),
+            ('move_id.state', '=', 'posted'),
+            ('company_id', '=', company.id),
+            ('tax_line_id', '!=', False),
+            ('account_id.code', 'in', ['214003', '214004', '114012', '116001', '116002']),
+        ])
+
+        # Group move lines by move_id
+        move_line_map = {}
+        for line in move_lines:
+            move_line_map.setdefault(line.move_id.id, []).append(line)
+
+        for withholding in withholdings:
+            lines = move_line_map.get(withholding.move_id_wh.id)
+            if not lines:
+                continue
+
+            # Extract withholding tax safely
+            withholding_tax = next(
+                (
+                    abs(tax.amount)
+                    for line in lines
+                    for tax in line.tax_line_id
+                    if tax.tax_group_id and tax.tax_group_id.name == 'Withholding'
+                ),
+                0
+            )
+
+            if not withholding_tax:
+                continue
+
+            withholding_amount=abs(lines[0].amount_currency)
+
+            if withholding.create_uid.id==2:
+                withholding.withholding_amount=withholding_amount
+                withholding.amount_before_vat = (withholding_amount * 100) / withholding_tax
+            else:
+                withholding.amount_before_vat = (withholding.withholding_amount * 100) / withholding_tax
+
+
+
 
 
 

@@ -43,6 +43,7 @@
         'report/stock_adjustment_request_report.xml',
         'report/xls_stock_card.xml',
         'report/stock_take.xml',
+        'report/product_flow_report.xml',
         'report/cons_report.xml',
         'report/store_request.xml',
         'views/droga_stock_adjustment_request_view.xml',

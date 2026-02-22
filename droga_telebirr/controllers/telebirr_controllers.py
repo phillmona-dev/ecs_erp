@@ -1,7 +1,6 @@
-from odoo import http, _
+from odoo import http, _, fields
 from odoo.http import request, Response
 import logging
-import json
 from lxml import etree
 from datetime import datetime
 import traceback
@@ -15,6 +14,12 @@ class TelebirrCallbackController(http.Controller):
         """Create payment record and reconcile it with the invoice"""
         try:
             Payment = request.env['account.payment'].sudo()
+            transaction_id = callback_data.get('transaction_id')
+            if transaction_id:
+                existing_payment = Payment.search([('ref', '=', f"Telebirr-{transaction_id}")], limit=1)
+                if existing_payment:
+                    _logger.info("Payment already exists for transaction %s, skipping create.", transaction_id)
+                    return existing_payment
 
             # 1. Determine Amount (Use residual amount - what is still owed)
             payment_amount = move.amount_residual
@@ -166,7 +171,6 @@ class TelebirrCallbackController(http.Controller):
 
         xml_data = request.httprequest.data.decode('utf-8')
         try:
-            # ... (XML parsing and data extraction logic remains the same) ...
             root = etree.fromstring(xml_data.encode('utf-8'))
             namespaces = {
                 'soapenv': 'http://schemas.xmlsoap.org/soap/envelope/',
@@ -189,23 +193,49 @@ class TelebirrCallbackController(http.Controller):
             }
 
             move = self._find_invoice(callback_data['originator_conversation_id'], callback_data['transaction_id'])
+            request_log = self._find_request_log(callback_data['originator_conversation_id'], callback_data['transaction_id'])
 
             if not move:
-                return Response("ERROR: Invoice not found", status=404)
+                if request_log and request_log.move_id:
+                    move = request_log.move_id
+                else:
+                    _logger.error(
+                        "Telebirr callback ignored: no invoice found for originator=%s transaction=%s",
+                        callback_data['originator_conversation_id'],
+                        callback_data['transaction_id'],
+                    )
+                    return Response("ERROR: Invoice not found", status=404)
+
+            if not request_log and callback_data['originator_conversation_id']:
+                request_log = request.env['telebirr.request'].sudo().create({
+                    'move_id': move.id,
+                    'conversation_id': callback_data['originator_conversation_id'],
+                    'state': 'pending',
+                    'sent_by': move.tele_user.id or move.create_uid.id,
+                })
 
             # Ensure the invoice is posted before processing payment
             if move.state != 'posted':
                 _logger.warning("Invoice %s is not posted, cannot apply payment.", move.name)
 
             if callback_data['result_code'] == '0':
-                move.sudo().write({
+                move_vals = {
                     'telebirr_status': 'success',
                     'telebirr_result_code': callback_data['result_code'],
-                    'telebirr_transaction_id': callback_data['transaction_id'],
+                    'telebirr_result_desc': callback_data['result_desc'],
                     'telebirr_response_date': datetime.now(),
-                })
+                    'telebirr_response_raw': xml_data,
+                }
+                if callback_data['conversation_id']:
+                    move_vals['telebirr_conversation_id_response'] = callback_data['conversation_id']
+                if callback_data['originator_conversation_id']:
+                    move_vals['telebirr_conversation_id'] = callback_data['originator_conversation_id']
+                if callback_data['transaction_id'] and not move.telebirr_transaction_id:
+                    move_vals['telebirr_transaction_id'] = callback_data['transaction_id']
+                move.sudo().write(move_vals)
 
-                # 2. CREATE PAYMENT & RECONCILE (Fixed logic)
+                self._update_request_log(request_log, callback_data, 'success')
+
                 payment = self._create_payment(move, callback_data)
 
                 if payment:
@@ -215,7 +245,6 @@ class TelebirrCallbackController(http.Controller):
                              f"Result: {callback_data['result_desc']}"
                     )
 
-                # 3. Notify User (use the invoice's final state)
                 self._send_bus_notification(
                     move,
                     'success',
@@ -224,19 +253,73 @@ class TelebirrCallbackController(http.Controller):
 
                 return Response("SUCCESS", status=200)
 
-            else:  # Failure
-                move.sudo().write({
-                    'telebirr_status': 'failed',
-                    'telebirr_result_code': callback_data['result_code'],
-                })
+            self._update_request_log(request_log, callback_data, 'failed')
+            self._apply_failure_status(move, callback_data, xml_data)
 
-                self._send_bus_notification(move, 'failed', f"Failed: {callback_data['result_desc']}")
-
-                return Response("ERROR_RECEIVED", status=200)
+            return Response("ERROR_RECEIVED", status=200)
 
         except Exception as e:
             _logger.exception("Error: %s", str(e))
             return "ERROR", 500
+
+    def _find_request_log(self, originator_conversation_id, transaction_id):
+        RequestLog = request.env['telebirr.request'].sudo()
+        if originator_conversation_id:
+            req = RequestLog.search([('conversation_id', '=', originator_conversation_id)], limit=1)
+            if req:
+                return req
+        if transaction_id:
+            req = RequestLog.search([('transaction_id', '=', transaction_id)], limit=1)
+            if req:
+                return req
+        return RequestLog.browse()
+
+    def _update_request_log(self, request_log, callback_data, state):
+        if not request_log:
+            return
+
+        vals = {
+            'state': state,
+            'result_code': callback_data.get('result_code'),
+            'result_desc': callback_data.get('result_desc'),
+            'callback_at': fields.Datetime.now(),
+        }
+        if callback_data.get('transaction_id'):
+            vals['transaction_id'] = callback_data.get('transaction_id')
+        request_log.sudo().write(vals)
+
+    def _apply_failure_status(self, move, callback_data, xml_data):
+        # Ignore stale failure callbacks once the invoice is already paid successfully.
+        if move.telebirr_status == 'success' or move.payment_state in ('paid', 'in_payment'):
+            _logger.info(
+                "Ignoring failure callback for paid invoice %s (originator=%s).",
+                move.name,
+                callback_data.get('originator_conversation_id'),
+            )
+            return
+
+        originator_conversation_id = callback_data.get('originator_conversation_id')
+        is_latest_request = not originator_conversation_id or move.telebirr_conversation_id == originator_conversation_id
+        if not is_latest_request:
+            _logger.info(
+                "Ignoring stale failure callback for invoice %s (callback=%s, latest=%s).",
+                move.name,
+                originator_conversation_id,
+                move.telebirr_conversation_id,
+            )
+            return
+
+        move_vals = {
+            'telebirr_status': 'failed',
+            'telebirr_result_code': callback_data.get('result_code'),
+            'telebirr_result_desc': callback_data.get('result_desc'),
+            'telebirr_response_date': datetime.now(),
+            'telebirr_response_raw': xml_data,
+        }
+        if callback_data.get('conversation_id'):
+            move_vals['telebirr_conversation_id_response'] = callback_data.get('conversation_id')
+        move.sudo().write(move_vals)
+        self._send_bus_notification(move, 'failed', f"Failed: {callback_data.get('result_desc')}")
 
     # ... (Keep helper methods _extract_xml_text, _find_invoice, _extract_balances, check_status) ...
     def _extract_xml_text(self, element, xpath, namespaces):
@@ -245,12 +328,21 @@ class TelebirrCallbackController(http.Controller):
 
     def _find_invoice(self, originator_conversation_id, transaction_id):
         Move = request.env['account.move']
+        RequestLog = request.env['telebirr.request']
         if originator_conversation_id:
+            req = RequestLog.sudo().search([('conversation_id', '=', originator_conversation_id)], limit=1)
+            if req and req.move_id:
+                return req.move_id
             move = Move.sudo().search([('telebirr_conversation_id', '=', originator_conversation_id)], limit=1)
-            if move: return move
+            if move:
+                return move
         if transaction_id:
+            req = RequestLog.sudo().search([('transaction_id', '=', transaction_id)], limit=1)
+            if req and req.move_id:
+                return req.move_id
             move = Move.sudo().search([('telebirr_transaction_id', '=', transaction_id)], limit=1)
-            if move: return move
+            if move:
+                return move
         return None
 
     @http.route('/telebirr/check-status/<int:invoice_id>', type='json', auth='user')

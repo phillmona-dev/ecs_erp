@@ -67,6 +67,7 @@
                     <t t-set="sales_representative" t-value=""/>
                     <t t-set="order_type" t-value=""/>
                     <t t-set="partner_id" t-value=""/>
+                    <t t-set="customer_emp" t-value="''"/>
 
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
@@ -77,6 +78,7 @@
                         <t t-set="order_from" t-value="sale_order.order_from"/>
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
                         <t t-set="customer_name" t-value="sale_order.cust_name"/>
+                        <t t-set="customer_emp" t-value="sale_order.customer_emp.descr"/>
                         <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                         <t t-set="partner_id" t-value="sale_order.partner_id.id"/>
                     </t>
@@ -197,7 +199,11 @@
                                     <td>
                                         <strong>ID No.:</strong>
                                     </td>
-                                    <td colspan="2">
+                                    <td>
+                                        <strong>Customer Emp.:</strong>
+                                        <span class="small" t-esc="customer_emp"/>
+                                    </td>
+                                    <td>
                                         <strong>Payment Term.:</strong>
                                         <span class="small" t-esc="o.invoice_payment_term_id.name"/>
                                     </td>
@@ -422,8 +428,15 @@
                                 <div class="col-2 text-end">
                                     <img t-att-src="'/report/barcode/QR/%s' % ('https://helpdesk.mypathatdroga.com/sign-up')"
                                          style="width:150px; height:150px;"/>
+
                                 </div>
 
+
+                            </div>
+                            <div id="informations" class="row mt25 mb25">
+                                 <div class="col-12 text-end">
+                                    <span>Scan me for any of your complaint or call us on 6637</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -436,7 +449,6 @@
                                     <span t-esc="o.company_id.email"/>
                                     website:-
                                     <span t-esc="o.company_id.website"/>
-                                    short code:- <span>6637</span>
                                 </h6>
                             </div>
                         </div>
@@ -511,6 +523,7 @@
                     <t t-set="store" t-value=""/>
                     <t t-set="sales_representative" t-value=""/>
                     <t t-set="order_type" t-value=""/>
+                    <t t-set="customer_emp" t-value="''"/>
 
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
@@ -521,6 +534,7 @@
                         <t t-set="order_from" t-value="sale_order.order_from"/>
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
                         <t t-set="customer_name" t-value="sale_order.cust_name"/>
+                        <t t-set="customer_emp" t-value="sale_order.customer_emp.descr"/>
                         <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                     </t>
 
@@ -634,7 +648,11 @@
                                     <td>
                                         <strong>ID No.:</strong>
                                     </td>
-                                    <td colspan="2">
+                                    <td>
+                                        <strong>Customer Emp.:</strong>
+                                        <span class="small" t-esc="customer_emp"/>
+                                    </td>
+                                    <td>
                                         <strong>Payment Term.:</strong>
                                         <span class="small" t-esc="o.invoice_payment_term_id.name"/>
                                     </td>
@@ -950,6 +968,7 @@
                     <t t-set="sales_representative" t-value=""/>
                     <t t-set="order_type" t-value=""/>
                     <t t-set="pharmacy_order_from" t-value="o.cost_center"/>
+                    <t t-set="customer_emp" t-value="''"/>
 
                     <t t-foreach="request.env['sale.order'].search([('name', '=', o.invoice_origin)])"
                        t-as="sale_order">
@@ -959,6 +978,7 @@
                         <t t-set="order_from" t-value="sale_order.order_from"/>
                         <t t-set="order_type" t-value="sale_order.sales_type"/>
                         <t t-set="customer_name" t-value="sale_order.cust_name"/>
+                        <t t-set="customer_emp" t-value="sale_order.customer_emp.descr"/>
                         <t t-set="customer_id" t-value="sale_order.cust_id"/>
                         <t t-set="withholding_amt" t-value="abs(o.amount_tax)"/>
                     </t>
@@ -1185,7 +1205,7 @@
                             <tr>
                                 <td colspan="2">
                                     <strong class="small">Contact Person:</strong>
-                                    <t class="small" t-esc="customer_name"/>
+                                    <t class="small" t-esc="customer_emp or customer_name"/>
 
                                 </td>
 

@@ -162,10 +162,10 @@ class droga_warehouse_extension(models.Model):
         ('IM','Import'),('EX','Export'),
         ('WS', 'Wholesale'),('PT','Physiotherapy'),
     ('PH', 'Pharmacy'),('PR','Project')], string='Warehouse type.',tracking=True)
-    telebirr_id=fields.Char('Telebirr short code')
+    telebirr_id=fields.Char('Telebirr short code',tracking=True)
     telebirr_cred = fields.Char('Telebirr credential')
     telebirr_pass = fields.Char('Telebirr passkey')
-    telebirr_operid = fields.Char('Telebirr operator ID')
+    telebirr_operid = fields.Char('Telebirr operator ID',tracking=True)
     name = fields.Char(tracking=True)
     code = fields.Char(tracking=True)
 
@@ -891,7 +891,9 @@ class droga_stock_picking_extension(models.Model):
         if self.office_request:
             self.office_request.write({'state': 'processed'})
         if self.cons_sample_issue_request:
-            self.cons_sample_issue_request.write({'state': ('done' if 'issue_type'=='SAP' else 'processed')})
+            self.cons_sample_issue_request.write({
+                'state': ('done' if self.cons_sample_issue_request.issue_type == 'SAP' else 'processed')
+            })
         if self.cons_receive_request:
             self.cons_receive_request.write({'state': 'done'})
 
@@ -911,6 +913,10 @@ class droga_stock_product_extension(models.Model):
     _inherit = 'product.template'
     name = fields.Char('Name', index='trigram', required=True, translate=True,tracking=True)
     company_id = fields.Many2one('res.company', string='Company',index=True, default=lambda self: self.env.company, required=False)
+    show_company_1_product_groups = fields.Boolean(
+        compute='_compute_show_company_1_product_groups',
+        store=False
+    )
     order_type = fields.Selection([
         ('IM', 'Import and pharmacy'),
         ('WS', 'Wholesale and pharmacy'),
@@ -963,6 +969,13 @@ class droga_stock_product_extension(models.Model):
     origin = fields.Many2one('res.country',string='Origin')
     reg_status=fields.Selection([('draft', 'draft'), ('waiting', 'waiting'),('rejected', 'rejected'),('approved', 'approved')],
                             default='draft')
+
+    @api.depends('company_id')
+    @api.depends_context('allowed_company_ids', 'company')
+    def _compute_show_company_1_product_groups(self):
+        for rec in self:
+            current_company = rec.company_id or self.env.company
+            rec.show_company_1_product_groups = (current_company.id == 1)
 
     def _get_prod_id(self):
         for rec in self:

@@ -1,11 +1,11 @@
-from odoo import fields, models, api
-from odoo.exceptions import UserError
-import datetime
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 class droga_pharma_membership_status(models.Model):
     _name='droga.pharma.membership'
     parent_customer=fields.Many2one('res.partner', string='Customer Name')
     parent_employee = fields.Many2one('droga.pharma.cust.employees', string='Employee Name')
+    membership_product_id = fields.Many2one('product.product', string='Membership Product')
 
     prod=fields.Char('Product code')
     prod_descr = fields.Char('Product description')
@@ -19,13 +19,56 @@ class droga_pharma_membership_status(models.Model):
     date_to = fields.Datetime('Date To')
     status=fields.Char(compute='get_status')
     def get_status(self):
+        now_dt = fields.Datetime.to_datetime(fields.Datetime.now())
         for rec in self:
-            if rec.date_to>datetime.datetime.today():
+            date_to = fields.Datetime.to_datetime(rec.date_to) if rec.date_to else False
+            if date_to and date_to > now_dt:
                 rec.status='Active'
             else:
                 rec.status = 'Closed'
 
     usages=fields.One2many('droga.pharma.membership.usage','membership')
+
+    @api.constrains('date_from', 'date_to')
+    def _check_dates(self):
+        for rec in self:
+            if rec.date_from and rec.date_to and rec.date_to < rec.date_from:
+                raise ValidationError("Date To can not be earlier than Date From.")
+
+    def _get_membership_product(self):
+        self.ensure_one()
+        if self.membership_product_id:
+            return self.membership_product_id
+        if not self.prod:
+            return self.env['product.product']
+        return self.env['product.product'].search([
+            ('default_code', '=', self.prod),
+            ('product_tmpl_id.pharma_detailed_type', '=', 'membershipcard')
+        ], limit=1)
+
+    @api.model
+    def get_active_membership_discount(self, partner, employee=False):
+        if not partner and not employee:
+            return 0.0
+
+        now_dt = fields.Datetime.now()
+        domain = [
+            ('date_from', '<=', now_dt),
+            ('date_to', '>=', now_dt),
+        ]
+        if employee:
+            domain.append(('parent_employee', '=', employee.id))
+        else:
+            domain.append(('parent_customer', '=', partner.id))
+
+        membership = self.search(domain, order='date_to desc, id desc', limit=1)
+        if not membership:
+            return 0.0
+
+        membership_product = membership._get_membership_product()
+        if not membership_product:
+            return 0.0
+        return membership_product.product_tmpl_id.mtm_discount or 0.0
 
     def sales_req(self):
         return {

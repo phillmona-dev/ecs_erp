@@ -6,6 +6,7 @@ from odoo import models, fields, api,_
 from dateutil.relativedelta import relativedelta
 
 from odoo.exceptions import ValidationError, UserError
+from odoo.tools.float_utils import float_compare, float_is_zero
 
 
 class sales_integ(models.Model):
@@ -176,6 +177,52 @@ class sales_integ(models.Model):
                 if pro_type == "counselling":
                     rec.has_counsell_products = True
 
+    def _create_membership_records(self):
+        membership_model = self.env['droga.pharma.membership'].sudo()
+        for rec in self:
+            if not rec.order_from or not rec.order_from.startswith('PH'):
+                continue
+
+            membership_lines = rec.order_line.filtered(
+                lambda ln: ln.product_id
+                and ln.product_id.product_tmpl_id.pharma_detailed_type == 'membershipcard'
+                and not ln.display_type
+            )
+            for line in membership_lines:
+                owner_domain = [('parent_employee', '=', rec.customer_emp.id)] if rec.customer_emp else [
+                    ('parent_customer', '=', rec.partner_id.id),
+                    ('parent_employee', '=', False)
+                ]
+                existing_membership = membership_model.search([
+                    ('sales_ref', '=', rec.name),
+                    ('membership_product_id', '=', line.product_id.id),
+                ] + owner_domain, limit=1)
+                if existing_membership:
+                    continue
+
+                start_date = fields.Datetime.to_datetime(rec.date_order or fields.Datetime.now())
+                qty = int(line.product_uom_pharma_qty or line.product_uom_qty or 1)
+                qty = max(qty, 1)
+                months_duration = (line.product_id.product_tmpl_id.duration or 0) * qty
+
+                membership_vals = {
+                    'parent_customer': rec.partner_id.id if not rec.customer_emp else False,
+                    'parent_employee': rec.customer_emp.id,
+                    'membership_product_id': line.product_id.id,
+                    'prod': line.product_id.default_code,
+                    'prod_descr': line.product_id.name,
+                    'sales_ref': rec.name,
+                    'paid_amount': line.price_subtotal,
+                    'left_amount': 0,
+                    'date_from': start_date,
+                    'date_to': start_date + relativedelta(months=months_duration)
+                }
+                membership_model.create(membership_vals)
+
+    def action_confirm(self):
+        res = super().action_confirm()
+        self.filtered(lambda so: so.state in ('sale', 'done', 'dispense'))._create_membership_records()
+        return res
 
     def action_done(self):
         self.state='done'
@@ -194,17 +241,93 @@ class sales_integ(models.Model):
                 "Please fill out FS number under invoice.")
         else:
             self.disp_products()
+
+    def _get_sale_line_target_qty_for_issue(self, line):
+        target_qty = line.product_uom_qty
+        if (
+            self.order_from
+            and self.order_from.startswith('PH')
+            and 'product_uom_pharma_qty' in line._fields
+        ):
+            pharma_qty = line.product_uom_pharma_qty
+            pharma_uom = line.product_uom
+            if 'product_uom_pharma_measure' in line._fields and line.product_uom_pharma_measure:
+                pharma_uom = line.product_uom_pharma_measure
+            if line.product_uom and pharma_uom:
+                target_qty = pharma_uom._compute_quantity(pharma_qty, line.product_uom, round=False)
+            else:
+                target_qty = pharma_qty
+        return target_qty
+
+    def _sync_open_issue_moves_with_latest_qty(self):
+        for rec in self:
+            sale_lines = rec.order_line.filtered(
+                lambda ln: not ln.display_type
+                and ln.product_id
+                and ln.product_id.detailed_type in ('product', 'consu')
+            )
+            open_issue_moves = self.env['stock.move'].search([
+                ('state', 'not in', ('done', 'cancel')),
+                ('picking_id.origin', '=', rec.name),
+                ('picking_id.state', 'not in', ('done', 'cancel')),
+                ('picking_id.name', 'not like', '%/RET/%'),
+            ])
+            orphan_moves = open_issue_moves.filtered(
+                lambda mv: not mv.sale_line_id or mv.sale_line_id not in sale_lines
+            )
+            if orphan_moves:
+                orphan_moves._action_cancel()
+            for line in sale_lines:
+                target_line_qty = rec._get_sale_line_target_qty_for_issue(line)
+                if float_compare(
+                    line.product_uom_qty,
+                    target_line_qty,
+                    precision_rounding=line.product_uom.rounding
+                ) != 0:
+                    line.write({'product_uom_qty': target_line_qty})
+
+                open_moves = line.move_ids.filtered(
+                    lambda mv: mv.state not in ('done', 'cancel')
+                    and mv.picking_id
+                    and mv.picking_id.origin == rec.name
+                    and '/RET/' not in mv.picking_id.name
+                ).sorted('id')
+                if not open_moves:
+                    continue
+
+                remaining_qty = max(line.product_uom_qty - line.qty_delivered, 0.0)
+                first_move = open_moves[0]
+                remaining_move_qty = remaining_qty
+                if line.product_uom and first_move.product_uom:
+                    remaining_move_qty = line.product_uom._compute_quantity(
+                        remaining_qty, first_move.product_uom, round=False
+                    )
+                if float_is_zero(remaining_move_qty, precision_rounding=first_move.product_uom.rounding):
+                    open_moves._action_cancel()
+                    continue
+
+                if float_compare(
+                    first_move.product_uom_qty,
+                    remaining_move_qty,
+                    precision_rounding=first_move.product_uom.rounding
+                ) != 0:
+                    first_move.write({'product_uom_qty': remaining_move_qty})
+
+                if len(open_moves) > 1:
+                    open_moves[1:]._action_cancel()
+
     def disp_products(self):
         #temp = self.invoice_status
         #self.invoice_status = temp
 
         for rec in self:
+            rec._sync_open_issue_moves_with_latest_qty()
             moves=self.env['stock.move'].search([('state','in',('assigned','partially_available')),('location_id.warehouse_id','=',rec.wareh.id),('reference','like','MTOV%'),('product_id','in',rec.order_line.product_id.ids)])
             for mv in moves:
                 mv.picking_id.do_unreserve()
             pickings=self.env['stock.picking'].search([('origin','=',rec.name),('state','!=','cancel'),('state','!=','done'),('name','not like','%/RET/%')],order="name asc")
             for pick in pickings:
-                for move in pick.move_ids:
+                for move in pick.move_ids.filtered(lambda mv: mv.state not in ('done', 'cancel')):
                     move.move_line_ids.unlink()
                     move.quantity_done=move.product_uom_qty
                 pick.button_validate()
@@ -215,7 +338,7 @@ class sales_integ(models.Model):
             for pick in pickings2:
                 pick.action_confirm()
                 pick.action_assign()
-                for move in pick.move_ids:
+                for move in pick.move_ids.filtered(lambda mv: mv.state not in ('done', 'cancel')):
                     move.quantity_done = move.product_uom_qty
                     for mv in move.move_line_ids:
                         mv.lot_id=self.env['stock.move.line'].search([('picking_id','in',pickings.ids),('product_id','=',mv.product_id.id)],limit=1).lot_id

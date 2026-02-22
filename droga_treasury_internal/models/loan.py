@@ -159,7 +159,8 @@ class AccountLoanModifaied(models.Model):
 
                 name=record.loan_type.name
                 short_name=name[0:3].upper()
-                name=short_name+"/"+ record.name.name+ "/"+string_num
+                bank_name = record.bank_id.name or record.name or ''
+                name=short_name+"/"+ bank_name+ "/"+string_num
             record.descrip=name             
 
 

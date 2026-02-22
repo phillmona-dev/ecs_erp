@@ -1,8 +1,24 @@
 from email.policy import default
 from collections import defaultdict
+import logging
 from odoo import api, fields, models, tools, _
 from odoo.tools import float_compare, float_is_zero
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
+
+
+WA_ORDER_ASC = "move_date asc, move_type asc, quantity desc, svl_id asc"
+WA_ORDER_DESC = "move_date desc, move_type desc, quantity asc, svl_id desc"
+
+
+def wa_sort_key(move_date, move_type, quantity, svl_id):
+    """Pure helper for ordering transactions like WA_ORDER_ASC.
+
+    Keep in sync with WA_ORDER_ASC / WA_ORDER_DESC.
+    """
+    move_type_rank = 0 if move_type == 'Static' else 1
+    return (move_date, move_type_rank, -quantity, svl_id)
 
 
 class StockValuationLayerInherit(models.Model):
@@ -118,16 +134,78 @@ class DrogaStockValuationLayer(models.Model):
             rec.env['droga.stock.valuation.history'].create(dsval)
 
     def fetch_and_update(self, ret, reference='-', date_change=False):
-        prior_trans = self.get_parent_id(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
+        prior_trans = self.get_parent_id(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id, ret.quantity)
 
         if prior_trans:
             self.update_trans(prior_trans, ret, reference=reference, date_change=date_change)
         else:
             # There are no prior transactions
-            ret.remaining_value = ret.value if ret.value > 0 else 0
+            ret.remaining_value = ret.value
             #ret.remaining_qty = ret.quantity if ret.quantity > 0 else 0
             ret.remaining_qty = ret.quantity
-            ret.remark = ''
+            ret.remark = 'Negative stock, prior transaction not found' if ret.remaining_qty < 0 else ''
+
+    def _is_cleaning_unit_return_transaction(self, trans):
+        """True when the valuation layer comes from a SUBL cleaning return picking."""
+        move = trans.stock_move_id
+        if not move or not move.picking_id:
+            return False
+        picking = move.picking_id
+        if 'cons_receive_request' not in picking._fields:
+            return False
+        receive = picking.cons_receive_request
+        if not receive:
+            return False
+        return bool('issue_type' in receive._fields and receive.issue_type == 'SUBL')
+
+    def _is_supplier_return_transaction(self, trans):
+        move = trans.stock_move_id
+        if not move:
+            return False
+        return bool(
+            move.origin_returned_move_id
+            and move.location_dest_id
+            and move.location_dest_id.usage == 'supplier'
+            and move.location_id
+            and move.location_id.usage != 'customer'
+        )
+
+    def _get_origin_return_layer(self, trans):
+        move = trans.stock_move_id
+        if not move or not move.origin_returned_move_id:
+            return False
+        domain = [
+            ('stock_move_id', '=', move.origin_returned_move_id.id),
+            ('product_id', '=', trans.product_id.id),
+            ('company_id', '=', trans.company_id.id),
+        ]
+        origin_layer = self.env['droga.stock.valuation.layer'].search(
+            domain + [('move_type', '=', 'Static')],
+            order='move_date desc, id desc',
+            limit=1,
+        )
+        if not origin_layer:
+            origin_layer = self.env['droga.stock.valuation.layer'].search(
+                domain,
+                order='move_date desc, id desc',
+                limit=1,
+            )
+        return origin_layer or False
+
+    def _get_origin_return_unit_cost(self, trans):
+        origin_layer = self._get_origin_return_layer(trans)
+        if not origin_layer:
+            return False
+        return abs(origin_layer.unit_cost)
+
+    def _get_origin_return_move_date(self, trans):
+        origin_layer = self._get_origin_return_layer(trans)
+        if origin_layer and origin_layer.move_date:
+            return origin_layer.move_date
+        move = trans.stock_move_id
+        if move and move.origin_returned_move_id and move.origin_returned_move_id.date:
+            return fields.Date.to_date(move.origin_returned_move_id.date)
+        return False
 
     @api.model
     def create(self, vals):
@@ -142,18 +220,13 @@ class DrogaStockValuationLayer(models.Model):
                 ret.stock_move_id.location_id.usage == 'supplier' and ret.stock_move_id.location_dest_id.usage != 'customer') or (
                 ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.location_id.usage != 'customer'):
             ret.move_type = 'Static'
-            if ret.stock_move_id.location_dest_id.usage == 'supplier' and ret.stock_move_id.origin_returned_move_id:
-                unit_cost = self.env['droga.stock.valuation.layer'].search(
-                    [('move_type', '=', 'Static'),
-                     ('stock_move_id', '=', ret.stock_move_id.origin_returned_move_id.id)],
-                    limit=1)
-                if unit_cost and ret.company_id.tax_lock_date:  # If there's no static valuation, we'll treat it as weighted transaction as well
-                    if unit_cost[
-                        'move_date'] > ret.company_id.tax_lock_date:  # Make sure period is not closed for the date, if closed we'll treat it as weighted transaction
-                        ret.unit_cost = unit_cost['unit_cost']
-                        ret.value = ret.unit_cost * ret.quantity
-                        # ret.move_date=unit_cost['move_date']
-                else:
+            if self._is_supplier_return_transaction(ret):
+                origin_unit_cost = self._get_origin_return_unit_cost(ret)
+                if origin_unit_cost:
+                    ret.unit_cost = origin_unit_cost
+                    ret.value = ret.unit_cost * ret.quantity
+                elif not ret.company_id.tax_lock_date:
+                    # Keep previous behavior fallback when there is no source valuation and period is open.
                     ret.move_type = 'Weighted'
         else:
             ret.move_type = 'Weighted'
@@ -180,6 +253,8 @@ class DrogaStockValuationLayer(models.Model):
         self.updatesalescost(ret)
 
     def updatesalescost(self, ret):
+        if self.env.context.get('skip_sales_cost_sync'):
+            return
         # This updates sales cost value for sales transactions. Out refund is sales return
         if ret.origin:
             if ret.origin.startswith('SO'):
@@ -222,12 +297,39 @@ class DrogaStockValuationLayer(models.Model):
             account_moves = self.env['account.move'].sudo().create(am_vals)
             account_moves['invoice_origin'] = self.origin
             account_moves._post()
-            print('Linked '+str(self.id)+' with '+str(account_moves.id))
+            _logger.debug("Linked droga.stock.valuation.layer id=%s with account.move id=%s", self.id, account_moves.id)
             self.account_move_id = account_moves.id
+
+    def _resolve_inventory_account_id(self, trans):
+        """Return an inventory account id suitable for GL line updates."""
+        inv_acc = trans.inv_acc
+        if not inv_acc:
+            accounts = trans.product_id.product_tmpl_id.get_product_accounts()
+            inv_acc = accounts.get('stock_valuation')
+        if not inv_acc and trans.account_move_id:
+            move_lines = trans.account_move_id.line_ids.filtered(lambda l: l.account_id)
+            if trans.con_acc:
+                preferred = move_lines.filtered(lambda l: l.account_id.id != trans.con_acc.id)
+                inv_acc = preferred[:1].account_id if preferred else False
+            if not inv_acc and move_lines:
+                inv_acc = move_lines[0].account_id
+        if inv_acc and trans.inv_acc != inv_acc:
+            trans.inv_acc = inv_acc.id
+        return inv_acc.id if inv_acc else False
 
     def revaluate_after_date_upd_ledger(self, reference=''):
         ret = self
         if ret.account_move_id:
+            inv_acc_id = self._resolve_inventory_account_id(ret)
+            if not inv_acc_id:
+                _logger.warning(
+                    "Skipping GL update for dsvl id=%s (move id=%s): inventory account is missing",
+                    ret.id,
+                    ret.account_move_id.id,
+                )
+                self.updatesalescost(ret)
+                self.revaluate_after_date(ret, reference=reference)
+                return
             query1 = """
                                     update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
                                     case non_core_amt when 0 then 0 else %s end where id=%s
@@ -244,11 +346,11 @@ class DrogaStockValuationLayer(models.Model):
                                                 amount_currency=case when ((account_id=%s and %s > 0) or (account_id!=%s and %s < 0)) then %s else -1 * %s end
                                                 where move_id=%s
                                             """
-            self.env.cr.execute(query2, (ret.inv_acc.id, ret.value, ret.inv_acc.id, ret.value, abs(ret.value),
-                                         ret.inv_acc.id, ret.value, ret.inv_acc.id, ret.value, abs(ret.value),
-                                         ret.inv_acc.id, ret.value, ret.inv_acc.id, ret.value, abs(ret.value),
+            self.env.cr.execute(query2, (inv_acc_id, ret.value, inv_acc_id, ret.value, abs(ret.value),
+                                         inv_acc_id, ret.value, inv_acc_id, ret.value, abs(ret.value),
+                                         inv_acc_id, ret.value, inv_acc_id, ret.value, abs(ret.value),
                                          abs(ret.value),
-                                         ret.inv_acc.id, ret.value, ret.inv_acc.id, ret.value, abs(ret.value),
+                                         inv_acc_id, ret.value, inv_acc_id, ret.value, abs(ret.value),
                                          abs(ret.value),
                                          ret.account_move_id.id))
 
@@ -262,7 +364,7 @@ class DrogaStockValuationLayer(models.Model):
         #     init_trans = trans
 
     def revaluate_after_date(self, ret, reference='-'):
-        trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id)
+        trans_after = self.get_trans_after(ret.product_id.id, ret.move_date, ret.move_type, ret.svl_id, ret.quantity)
         init_trans = ret
         for trans in trans_after:
             ret_val = self.update_trans(init_trans, trans, reference=reference)
@@ -270,56 +372,110 @@ class DrogaStockValuationLayer(models.Model):
             if not ret_val:
                 break
 
+    def _get_prev_weighted_unit_cost(self, prev_trans):
+        if float_is_zero(prev_trans.remaining_qty, precision_rounding=prev_trans.uom_id.rounding):
+            return abs(prev_trans.unit_cost)
+        return abs(prev_trans.remaining_value) / abs(prev_trans.remaining_qty)
+
+    def _get_negative_segment_start(self, negative_trans):
+        """Return the first transaction of the current negative-stock segment."""
+        current = negative_trans
+        parent = self.get_parent_id(
+            current.product_id.id, current.move_date, current.move_type, current.svl_id, current.quantity
+        )
+        while parent and parent.remaining_qty < 0:
+            current = parent
+            parent = self.get_parent_id(
+                current.product_id.id, current.move_date, current.move_type, current.svl_id, current.quantity
+            )
+        return current
+
     # This function takes 2 objects of valuation layer and updates the current row based on the previous row values.
     def update_trans(self, prev_trans, cur_trans, reference='-', date_change=False):
         old_value = cur_trans.value
         if cur_trans.move_type == 'Static':
-            if cur_trans.origin and cur_trans.quantity < 0:
-                if cur_trans.origin.startswith('P'):
-                    unit_cost = self.env['droga.stock.valuation.layer'].search([('move_type', '=', 'Static'),
-                                                                                ('stock_move_id', '=',
-                                                                                 cur_trans.stock_move_id.origin_returned_move_id.id)],
-                                                                               limit=1)
-                    if unit_cost:
-                        cur_trans.unit_cost = unit_cost['unit_cost']
-                        cur_trans.value = cur_trans.unit_cost * cur_trans.quantity
+            cur_trans.remark = ''
+            allow_static_reprice = (
+                self._is_cleaning_unit_return_transaction(cur_trans)
+                or self._is_supplier_return_transaction(cur_trans)
+            )
+            if allow_static_reprice and cur_trans.quantity < 0:
+                origin_unit_cost = self._get_origin_return_unit_cost(cur_trans)
+                if origin_unit_cost:
+                    cur_trans.unit_cost = origin_unit_cost
+                    cur_trans.value = cur_trans.unit_cost * cur_trans.quantity
 
-                        if float_compare(old_value, cur_trans.value, precision_digits=2) != 0:
-                            self.update_gl(cur_trans)
+                    if float_compare(old_value, cur_trans.value, precision_digits=2) != 0:
+                        self.update_gl(cur_trans)
 
             # In case it's a purchase return and the remaining quantity becomes 0, we use the remaining value to balance it
-            if cur_trans.quantity < 0 and (prev_trans.remaining_qty + cur_trans.quantity) == 0:
-                cur_trans.value = prev_trans.remaining_value * -1
-                cur_trans.unit_cost = cur_trans.value / cur_trans.quantity
-            if prev_trans.remaining_qty < 0:
-                trans_before = self.get_parent_negative_date_id(cur_trans.product_id.id, cur_trans.move_date,
-                                                                cur_trans.svl_id)
-                if trans_before:
-                    cur_trans.move_date = trans_before.move_date
-                    cur_trans.fetch_and_update(cur_trans)
-                    cur_trans.revaluate_after_date(cur_trans)
-                    return False
-                else:
-                    cur_trans.remark = 'Negative stock, prior transaction not found'
-                    cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
-                    cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
-                    return True
-            else:
-                cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
-                cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+            if allow_static_reprice and cur_trans.quantity < 0 and (prev_trans.remaining_qty + cur_trans.quantity) == 0:
+                # For supplier returns, prefer anchoring valuation at the original receipt date
+                # when periods allow it. If not possible, fall back to balancing value.
+                if self._is_supplier_return_transaction(cur_trans):
+                    origin_move_date = self._get_origin_return_move_date(cur_trans)
+                    if origin_move_date and origin_move_date != cur_trans.move_date:
+                        if cur_trans.company_id.tax_lock_date and origin_move_date <= cur_trans.company_id.tax_lock_date:
+                            cur_trans.remark = (
+                                'Return date cannot move to source receipt date due closed period '
+                                f'({cur_trans.company_id.tax_lock_date})'
+                            )
+                        else:
+                            cur_trans.move_date = origin_move_date
+                            cur_trans.fetch_and_update(cur_trans, reference=reference)
+                            cur_trans.revaluate_after_date(cur_trans, reference=reference)
+                            return False
 
-                return True
+                balanced_value = prev_trans.remaining_value * -1
+                # Guardrail: keep existing non-zero static cost if balancing value collapses to zero unexpectedly.
+                if (
+                    cur_trans.currency_id.is_zero(balanced_value)
+                    and (
+                        not cur_trans.currency_id.is_zero(cur_trans.value)
+                        or not float_is_zero(cur_trans.unit_cost, precision_digits=6)
+                    )
+                ):
+                    _logger.warning(
+                        "Skipping zero-balance overwrite for static dsvl id=%s product=%s "
+                        "(current unit_cost=%s value=%s).",
+                        cur_trans.id,
+                        cur_trans.product_id.id,
+                        cur_trans.unit_cost,
+                        cur_trans.value,
+                    )
+                else:
+                    cur_trans.value = balanced_value
+                    cur_trans.unit_cost = cur_trans.value / cur_trans.quantity
+
+            if prev_trans.remaining_qty < 0:
+                if cur_trans.quantity > 0:
+                    negative_start = self._get_negative_segment_start(prev_trans)
+                    if negative_start and negative_start.move_date:
+                        if cur_trans.company_id.tax_lock_date and negative_start.move_date <= cur_trans.company_id.tax_lock_date:
+                            cur_trans.remark = (
+                                'Negative stock: cannot auto-backdate into closed period '
+                                f'({cur_trans.company_id.tax_lock_date})'
+                            )
+                        elif negative_start.move_date != cur_trans.move_date:
+                            cur_trans.move_date = negative_start.move_date
+                            cur_trans.fetch_and_update(cur_trans)
+                            cur_trans.revaluate_after_date(cur_trans)
+                            return False
+                    else:
+                        cur_trans.remark = 'Negative stock, prior transaction not found'
+                else:
+                    cur_trans.remark = 'Negative stock: transaction occurs while stock is negative'
+
+            cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
+            cur_trans.remaining_qty = cur_trans.quantity + prev_trans.remaining_qty
+            return True
         else:
 
-            if reference != '-' and float_compare(cur_trans.unit_cost, ((abs(prev_trans.remaining_value) / abs(
-                    prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
-                prev_trans.remaining_value / cur_trans.quantity)), precision_digits=2) != 0:
-                cur_trans.InsertHistory(reference, cur_trans.quantity * ((abs(prev_trans.remaining_value) / abs(
-                    prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(
-                    prev_trans.remaining_value / cur_trans.quantity)))
+            prev_unit_cost = self._get_prev_weighted_unit_cost(prev_trans)
+            if reference != '-' and float_compare(cur_trans.unit_cost, prev_unit_cost, precision_digits=2) != 0:
+                cur_trans.InsertHistory(reference, cur_trans.quantity * prev_unit_cost)
 
-            cur_trans.unit_cost = (abs(prev_trans.remaining_value) / abs(
-                prev_trans.remaining_qty)) if prev_trans.remaining_qty != 0 else abs(prev_trans.unit_cost)
+            cur_trans.unit_cost = prev_unit_cost
             cur_trans.value = cur_trans.quantity * cur_trans.unit_cost
             if cur_trans.value + prev_trans.remaining_value >= 0:
                 cur_trans.remaining_value = cur_trans.value + prev_trans.remaining_value
@@ -339,6 +495,14 @@ class DrogaStockValuationLayer(models.Model):
 
     def update_gl(self, cur_trans):
         if cur_trans.account_move_id:
+            inv_acc_id = self._resolve_inventory_account_id(cur_trans)
+            if not inv_acc_id:
+                _logger.warning(
+                    "Skipping GL update for dsvl id=%s (move id=%s): inventory account is missing",
+                    cur_trans.id,
+                    cur_trans.account_move_id.id,
+                )
+                return
             # write a query to update
             query1 = """
                 update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
@@ -357,58 +521,83 @@ class DrogaStockValuationLayer(models.Model):
                         where move_id=%s
                     """
             self.env.cr.execute(query2,
-                                (cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                (inv_acc_id, cur_trans.value, inv_acc_id, cur_trans.value,
                                  abs(cur_trans.value),
-                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 inv_acc_id, cur_trans.value, inv_acc_id, cur_trans.value,
                                  abs(cur_trans.value),
-                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 inv_acc_id, cur_trans.value, inv_acc_id, cur_trans.value,
                                  abs(cur_trans.value),
                                  abs(cur_trans.value),
-                                 cur_trans.inv_acc.id, cur_trans.value, cur_trans.inv_acc.id, cur_trans.value,
+                                 inv_acc_id, cur_trans.value, inv_acc_id, cur_trans.value,
                                  abs(cur_trans.value),
                                  abs(cur_trans.value),
                                  cur_trans.account_move_id.id))
 
     # Gets initial row value for processing start
-    def get_parent_id(self, prod_id, trans_date, trans_type, cur_id):
-        if trans_type == 'Static':
-            to_ret = self.env['droga.stock.valuation.layer'].search(
-                ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", "<", trans_date),
-                 "&", ("move_date", "=", trans_date), "&",
-                 ("svl_id", "<", cur_id), ("move_type", "=", "Static")],
-                order="move_date desc, move_type desc, svl_id desc", limit=1)
-            return to_ret if to_ret else False
-        else:
-            to_ret = self.env['droga.stock.valuation.layer'].search(
-                ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", "<", trans_date),
-                 "|", "&", ("move_date", "=", trans_date), "&", ("svl_id", "<", cur_id), ("move_type", "=", "Weighted"),
-                 "&", ("move_date", "=", trans_date), ("move_type", "=", "Static")],
-                order="move_date desc, move_type desc, svl_id desc", limit=1)
-            return to_ret if to_ret else False
-
-    def get_parent_negative_date_id(self, prod_id, trans_date, cur_id):
+    def get_parent_id(self, prod_id, trans_date, trans_type, cur_id, cur_qty):
         to_ret = self.env['droga.stock.valuation.layer'].search(
-            [("svl_id", "!=", cur_id), ("remaining_qty", "<", 0), ("product_id", "=", prod_id),
-             ("move_date", "<", trans_date)],
-            order="move_date asc, move_type asc, quantity asc,svl_id asc", limit=1)
+            [
+                ("svl_id", "!=", cur_id),
+                ("product_id", "=", prod_id),
+                "|",
+                ("move_date", "<", trans_date),
+                "|",
+                "&",
+                ("move_date", "=", trans_date),
+                ("move_type", "<", trans_type),
+                "&",
+                ("move_date", "=", trans_date),
+                "&",
+                ("move_type", "=", trans_type),
+                "|",
+                ("quantity", ">", cur_qty),
+                "&",
+                ("quantity", "=", cur_qty),
+                ("svl_id", "<", cur_id),
+            ],
+            order=WA_ORDER_DESC,
+            limit=1,
+        )
         return to_ret if to_ret else False
 
-    def get_trans_after(self, prod_id, trans_date, trans_type, cur_id):
-        if trans_type == 'Static':
-            to_ret = self.env['droga.stock.valuation.layer'].search(
-                ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", ">", trans_date),
-                 "|", "&", ("move_date", "=", trans_date),
-                 ("move_type", "=", "Weighted"), "&", ("move_date", "=", trans_date), "&", ("move_type", "=", "Static"),
-                 ("svl_id", ">", cur_id)],
-                order="move_date asc, move_type asc, quantity desc,svl_id asc")
-            return to_ret if to_ret else []
-        else:
-            to_ret = self.env['droga.stock.valuation.layer'].search(
-                ["&", ("svl_id", "!=", cur_id), "&", ("product_id", "=", prod_id), "|", ("move_date", ">", trans_date),
-                 "&", ("move_date", "=", trans_date), "&",
-                 ("move_type", "=", "Weighted"), ("svl_id", ">", cur_id)],
-                order="move_date asc, move_type asc, quantity desc,svl_id asc")
-            return to_ret if to_ret else []
+    def get_parent_negative_date_id(self, prod_id, trans_date, cur_id):
+        # Kept for backward compatibility; prefer `_get_negative_segment_start`.
+        to_ret = self.env['droga.stock.valuation.layer'].search(
+            [
+                ("svl_id", "!=", cur_id),
+                ("remaining_qty", "<", 0),
+                ("product_id", "=", prod_id),
+                ("move_date", "<", trans_date),
+            ],
+            order=WA_ORDER_DESC,
+            limit=1,
+        )
+        return to_ret if to_ret else False
+
+    def get_trans_after(self, prod_id, trans_date, trans_type, cur_id, cur_qty):
+        to_ret = self.env['droga.stock.valuation.layer'].search(
+            [
+                ("svl_id", "!=", cur_id),
+                ("product_id", "=", prod_id),
+                "|",
+                ("move_date", ">", trans_date),
+                "|",
+                "&",
+                ("move_date", "=", trans_date),
+                ("move_type", ">", trans_type),
+                "&",
+                ("move_date", "=", trans_date),
+                "&",
+                ("move_type", "=", trans_type),
+                "|",
+                ("quantity", "<", cur_qty),
+                "&",
+                ("quantity", "=", cur_qty),
+                ("svl_id", ">", cur_id),
+            ],
+            order=WA_ORDER_ASC,
+        )
+        return to_ret if to_ret else []
 
 
 class DrogaLandedCost(models.Model):
@@ -457,9 +646,15 @@ class DrogaLandedCost(models.Model):
                         # Get stock move ids
                         move_ids = self.env['stock.move'].search([('purchase_line_id', 'in', po.order_line.ids)]).ids
                         # Get valuation layers
-                        for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', move_ids)]):
+                        for val in self.env['droga.stock.valuation.layer'].search([
+                            ('stock_move_id', 'in', move_ids),
+                            ('move_type', '=', 'Static'),
+                        ]):
                             if res.lc_rate != 1:
-                                orig_unit_cost = val.unit_cost / (val.po_rate * val.grn_rate)
+                                combined_rate = (val.po_rate or 1.0) + (val.grn_rate or 1.0) - 1.0
+                                if float_is_zero(combined_rate, precision_digits=8):
+                                    combined_rate = 1.0
+                                orig_unit_cost = val.unit_cost / combined_rate
                                 val.po_rate += (res.lc_rate - 1)
                                 val.InsertHistory(res.name,
                                                   val.quantity * (orig_unit_cost * (val.po_rate + val.grn_rate - 1)))
@@ -475,9 +670,15 @@ class DrogaLandedCost(models.Model):
                         # Get stock move ids
                         move_ids = grn.move_ids.ids
                         # Get valuation layers
-                        for val in self.env['droga.stock.valuation.layer'].search([('stock_move_id', 'in', move_ids)]):
-                            if res.grn_rate != 1:
-                                orig_unit_cost = val.unit_cost / (val.po_rate * val.grn_rate)
+                        for val in self.env['droga.stock.valuation.layer'].search([
+                            ('stock_move_id', 'in', move_ids),
+                            ('move_type', '=', 'Static'),
+                        ]):
+                            if res.lc_rate != 1:
+                                combined_rate = (val.po_rate or 1.0) + (val.grn_rate or 1.0) - 1.0
+                                if float_is_zero(combined_rate, precision_digits=8):
+                                    combined_rate = 1.0
+                                orig_unit_cost = val.unit_cost / combined_rate
                                 val.grn_rate += (res.lc_rate - 1)
                                 val.InsertHistory(res.name,
                                                   val.quantity * (orig_unit_cost * (val.po_rate + val.grn_rate - 1)))
@@ -522,7 +723,11 @@ class PurchaseOrderLine(models.Model):
                     for move in moves:
                         dsvals = self.env['droga.stock.valuation.layer'].search([('stock_move_id', '=', move.id)])
                         for dsval in dsvals:
-                            new_up = rec.price_unit * (rec.product_uom.factor / rec.product_id.uom_id.factor)
+                            base_unit_cost = rec.price_unit * (rec.product_uom.factor / rec.product_id.uom_id.factor)
+                            combined_rate = (dsval.po_rate or 1.0) + (dsval.grn_rate or 1.0) - 1.0
+                            if float_is_zero(combined_rate, precision_digits=8):
+                                combined_rate = 1.0
+                            new_up = base_unit_cost * combined_rate
                             dsval.InsertHistory(dsval.origin,
                                                 dsval.quantity * new_up)
                             dsval.unit_cost = new_up
@@ -663,13 +868,13 @@ class DrogaUtility(models.AbstractModel):
 
     @classmethod
     def get_cost_at_date(cls,env,product_id,date):
-        price=env['droga.stock.valuation.layer'].search([('product_id','=',product_id),('move_date','<=',date)],order="move_date desc, move_type desc, quantity asc,svl_id desc",limit=1)
+        price=env['droga.stock.valuation.layer'].search([('product_id','=',product_id),('move_date','<=',date)],order=WA_ORDER_DESC,limit=1)
         if price:
             return price.unit_cost
         else:
             price = env['droga.stock.valuation.layer'].search(
                 [('product_id', '=', product_id), ('move_date', '>', date)],
-                order="move_date asc, move_type asc, quantity desc,svl_id asc", limit=1)
+                order=WA_ORDER_ASC, limit=1)
             if price:
                 return price.unit_cost
             else:

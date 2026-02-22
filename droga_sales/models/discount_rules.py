@@ -246,6 +246,25 @@ class sale_order_line(models.Model):
             line.order_id.points_to_deduct = 0
             return line.product_id.list_price_phar*rate
         else:
+            # Active membership card discount (configured on membership-card product template)
+            membership_discount = 0.0
+            if (
+                'droga.pharma.membership' in self.env
+                and 'customer_emp' in line.order_id._fields
+                and 'pharma_detailed_type' in line.product_id._fields
+                and line.product_id.product_tmpl_id.detailed_type == 'product'
+            ):
+                membership_discount = self.env['droga.pharma.membership'].sudo().get_active_membership_discount(
+                    line.order_id.partner_id,
+                    line.order_id.customer_emp if line.order_id.customer_emp else False
+                )
+            if membership_discount:
+                rate = 1 + (membership_discount / 100)
+                line.disc_applied = membership_discount
+                line.order_id.points_to_deduct = 0
+                line.order_id.deduct_type = 'Membership discount'
+                return line.product_id.list_price_phar * rate
+
             #Accumulated points discount
             discount_per_acc = self.env['droga.pharma.reward.issue'].search([('type','in',('Purchase reward','Discount for loyal customer')),('status','=','Active')])
             for disc in discount_per_acc:
