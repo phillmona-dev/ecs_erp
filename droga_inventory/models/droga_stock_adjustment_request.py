@@ -14,7 +14,14 @@ class droga_stock_adjustment_request(models.Model):
         'stock.location', "Source location")
     dest_location_id = fields.Many2one(
         'stock.location', "Destination location")
-    operation_type = fields.Many2one('stock.picking.type')
+    operation_type = fields.Many2one(
+        'stock.picking.type',
+        string='Operation Type',
+        required=True,
+        default=lambda self: self.env['stock.picking.type'].sudo().search(
+            [('sequence_code', '=', 'ADJ')], limit=1
+        )
+    )
     request_date_time = fields.Datetime('Request Date', default=fields.Datetime.now)
     stock_adjustment_detail_entries = fields.One2many('droga.stock.adjustment.request.detail',
                                                       'stock_adjustment_header')
@@ -100,8 +107,10 @@ class droga_stock_adjustment_request(models.Model):
             act.sudo().action_done()
 
     def create_transfer(self):
-        pick_type_id = self.env['stock.picking.type'].sudo().search(
-            [('sequence_code', '=', 'ADJ')]).id
+        self.ensure_one()
+        pick_type = self.operation_type
+        if not pick_type:
+            raise ValidationError("Please select operation type.")
 
         if not self.source_location_id:
             raise ValidationError("Please fill source location.")
@@ -114,7 +123,7 @@ class droga_stock_adjustment_request(models.Model):
         picking_vals = {
             'partner_id': 1,
             'company_id': self.env.company.id,
-            'picking_type_id': pick_type_id,
+            'picking_type_id': pick_type.id,
             'location_id': from_locat,
             'location_dest_id': to_locat,
             'origin': self.name,
@@ -130,7 +139,7 @@ class droga_stock_adjustment_request(models.Model):
 
             move_vals = {
                 'picking_id': picking_id.id,
-                'picking_type_id': pick_type_id,
+                'picking_type_id': pick_type.id,
                 'name': picking_id.name,
                 'product_id': rec['product_id'].id,
                 'product_uom': rec["product_id"].uom_id.id,
@@ -165,7 +174,8 @@ class droga_stock_adjustment_request(models.Model):
                 'default_request_no': self.name,
                 'default_from_reconcile_menu': True,
                 'default_state': 'draft',
-                'default_to_correct_pick': self.to_correct_ref.id
+                'default_to_correct_pick': self.to_correct_ref.id,
+                'default_picking_type_id': self.operation_type.id,
             }
         }
 
