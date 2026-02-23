@@ -452,7 +452,12 @@ class droga_cons_inherit(models.Model):
 
         issue_total_distributed_qty = sum(issue_total_qty.values())
         if issue_total_distributed_qty <= 0:
-            return {'items': [], 'price_by_product': {}, 'price_by_product_uom': {}}
+            return {
+                'items': [],
+                'price_by_product': {},
+                'price_by_product_uom': {},
+                'expected_qty_by_product_uom': {},
+            }
 
         item_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
         product_totals_in_line_uom = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
@@ -540,11 +545,17 @@ class droga_cons_inherit(models.Model):
             if product_data['qty'] <= 0:
                 continue
             price_by_product_uom[key] = product_data['value'] / product_data['qty']
+        expected_qty_by_product_uom = {
+            key: data['qty']
+            for key, data in product_totals_in_line_uom.items()
+            if data['qty'] > 0
+        }
 
         return {
             'items': items,
             'price_by_product': price_by_product,
             'price_by_product_uom': price_by_product_uom,
+            'expected_qty_by_product_uom': expected_qty_by_product_uom,
         }
 
     def _get_cleaning_issue_cost_totals(self):
@@ -586,13 +597,23 @@ class droga_cons_inherit(models.Model):
             ('issue_type', '=', 'SUBL'),
         ])
         if not receive_headers or float_is_zero(target_total_value, precision_digits=6):
-            return {'items': [], 'price_by_product': {}, 'price_by_product_uom': {}}
+            return {
+                'items': [],
+                'price_by_product': {},
+                'price_by_product_uom': {},
+                'expected_qty_by_product_uom': {},
+            }
 
         receive_details = self.env['droga.inventory.cons.receive.detail'].search([
             ('cons_header', 'in', receive_headers.ids),
         ])
         if not receive_details:
-            return {'items': [], 'price_by_product': {}, 'price_by_product_uom': {}}
+            return {
+                'items': [],
+                'price_by_product': {},
+                'price_by_product_uom': {},
+                'expected_qty_by_product_uom': {},
+            }
 
         product_totals_in_stock_uom = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
         product_totals_in_line_uom = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
@@ -616,7 +637,12 @@ class droga_cons_inherit(models.Model):
         if float_is_zero(current_total_value, precision_digits=6):
             total_qty_stock = sum(data['qty'] for data in product_totals_in_stock_uom.values())
             if float_is_zero(total_qty_stock, precision_digits=6):
-                return {'items': [], 'price_by_product': {}, 'price_by_product_uom': {}}
+                return {
+                    'items': [],
+                    'price_by_product': {},
+                    'price_by_product_uom': {},
+                    'expected_qty_by_product_uom': {},
+                }
             uniform_price_stock = target_total_value / total_qty_stock
             price_by_product = {
                 product_id: uniform_price_stock
@@ -657,6 +683,7 @@ class droga_cons_inherit(models.Model):
             'items': [],
             'price_by_product': price_by_product,
             'price_by_product_uom': price_by_product_uom,
+            'expected_qty_by_product_uom': {},
         }
 
     def recalculate(self):
@@ -675,6 +702,8 @@ class droga_cons_inherit(models.Model):
                 raise
         price_by_product = pricing_payload.get('price_by_product', {})
         price_by_product_uom = pricing_payload.get('price_by_product_uom', {})
+        expected_qty_by_product_uom = pricing_payload.get('expected_qty_by_product_uom', {})
+        legacy_receive_qty_scale_by_key = {}
 
         receive_headers = self.env['droga.inventory.consignment.receive'].search([
             ('subcontractor_return_origin_form', '=', self.id),
@@ -698,6 +727,15 @@ class droga_cons_inherit(models.Model):
             if uom and product.uom_id and uom.id != product.uom_id.id:
                 return product.uom_id._compute_price(base_price, uom)
             return base_price
+
+        def _scaled_price_for_legacy_receive_qty(product, uom, price):
+            if price is None:
+                return None
+            target_uom = uom or product.uom_id
+            if not target_uom:
+                return price
+            scale = legacy_receive_qty_scale_by_key.get((product.id, target_uom.id))
+            return price * scale if scale else price
 
         def _layer_qty_is_in_move_uom(val, move_uom):
             """Detect legacy rows where valuation quantity was stored in move UoM."""
@@ -724,6 +762,29 @@ class droga_cons_inherit(models.Model):
         receive_items_all = self.env['droga.inventory.cons.receive.detail'].search([
             ('cons_header', 'in', subl_receive_headers.ids),
         ])
+        if expected_qty_by_product_uom and receive_items_all:
+            actual_receive_qty_by_key = defaultdict(float)
+            for line in receive_items_all:
+                line_uom = line.product_uom or line.product_id.uom_id
+                if not line_uom:
+                    continue
+                actual_receive_qty_by_key[(line.product_id.id, line_uom.id)] += abs(line.product_uom_qty or 0.0)
+
+            for key, actual_qty in actual_receive_qty_by_key.items():
+                expected_qty = abs(expected_qty_by_product_uom.get(key, 0.0) or 0.0)
+                if float_is_zero(expected_qty, precision_digits=6) or float_is_zero(actual_qty, precision_digits=6):
+                    continue
+                ratio = actual_qty / expected_qty
+                if ratio > 50:
+                    legacy_receive_qty_scale_by_key[key] = expected_qty / actual_qty
+
+            if legacy_receive_qty_scale_by_key:
+                _logger.warning(
+                    "Legacy cleaning receive quantity scaling detected for issue=%s company=%s scale=%s",
+                    self.id,
+                    self.company_id.id,
+                    legacy_receive_qty_scale_by_key,
+                )
 
         if self.env.context.get('tolerate_composition_error') and receive_items_all:
             missing_line_totals = defaultdict(lambda: {'qty': 0.0, 'value': 0.0})
@@ -816,6 +877,7 @@ class droga_cons_inherit(models.Model):
                 line_uom = line.product_uom or line.product_id.uom_id
                 price = _price_for_product_and_uom(line.product_id, line_uom)
                 if price is not None:
+                    price = _scaled_price_for_legacy_receive_qty(line.product_id, line_uom, price)
                     line.write({'price_unit_cons': price})
 
         receive_pickings = self.env['stock.picking'].search([('cons_receive_request', 'in', subl_receive_headers.ids)])
@@ -836,6 +898,7 @@ class droga_cons_inherit(models.Model):
             price_updated = False
 
             if price is not None:
+                price = _scaled_price_for_legacy_receive_qty(val.product_id, move_uom, price)
                 price_in_stock_uom = price
                 if move_uom and val.product_id.uom_id and move_uom.id != val.product_id.uom_id.id:
                     if _layer_qty_is_in_move_uom(val, move_uom):
