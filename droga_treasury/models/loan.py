@@ -16,7 +16,7 @@ class AccountLoan(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
 
     # Keep `name` as Char for backward-compatible schema upgrades (existing DB column is varchar).
-    name = fields.Char(string="Bank", required=True)
+    name_old = fields.Char(string="Bank", required=True)
     bank_id = fields.Many2one('res.bank', string="Bank Record")
 
     loan_type = fields.Many2one(

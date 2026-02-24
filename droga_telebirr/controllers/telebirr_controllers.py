@@ -4,104 +4,179 @@ import logging
 from lxml import etree
 from datetime import datetime
 import traceback
+import time
+
+from psycopg2 import Error as PsycopgError, errorcodes
 
 _logger = logging.getLogger(__name__)
+RETRYABLE_PG_CODES = {
+    errorcodes.SERIALIZATION_FAILURE,
+    errorcodes.DEADLOCK_DETECTED,
+    errorcodes.LOCK_NOT_AVAILABLE,
+}
 
 
 class TelebirrCallbackController(http.Controller):
 
     def _create_payment(self, move, callback_data):
         """Create payment record and reconcile it with the invoice"""
-        try:
-            Payment = request.env['account.payment'].sudo()
-            transaction_id = callback_data.get('transaction_id')
-            if transaction_id:
-                existing_payment = Payment.search([('ref', '=', f"Telebirr-{transaction_id}")], limit=1)
-                if existing_payment:
-                    _logger.info("Payment already exists for transaction %s, skipping create.", transaction_id)
-                    return existing_payment
+        Payment = request.env['account.payment'].sudo()
+        transaction_id = callback_data.get('transaction_id')
+        payment_ref = self._build_payment_reference(callback_data, move)
 
-            # 1. Determine Amount (Use residual amount - what is still owed)
-            payment_amount = move.amount_residual
+        # Serialize processing for the same invoice to avoid duplicate payments on concurrent callbacks.
+        self._lock_invoice_for_update(move)
 
-            # We assume a full payment for simplicity, if partial is needed, adjust payment_amount here.
+        if payment_ref:
+            existing_payment = Payment.search([('ref', '=', payment_ref)], limit=1)
+            if existing_payment:
+                _logger.info("Payment already exists for ref %s, skipping create.", payment_ref)
+                return existing_payment
 
-            # Check if invoice is already paid or draft
-            if move.payment_state in ('paid', 'in_payment') or move.state != 'posted':
-                _logger.info("Invoice %s is already paid or not posted, skipping payment creation.", move.name)
-                return None
+        # 1. Determine Amount (Use residual amount - what is still owed)
+        payment_amount = move.amount_residual
 
-            # 2. Prepare Payment Values
-            journal_id = self._get_telebirr_journal()
+        # We assume a full payment for simplicity, if partial is needed, adjust payment_amount here.
 
-            payment_vals = {
-                'date': datetime.now().date(),
-                'amount': payment_amount,
-                'payment_type': 'inbound',
-                'partner_type': 'customer',
-                'ref': f"Telebirr-{callback_data.get('transaction_id', '')}",
-                'journal_id': journal_id,
-                'currency_id': move.currency_id.id,
-                'partner_id': move.partner_id.id,
-                'payment_method_line_id': self._get_payment_method_line_id(journal_id),
-                # Link to the invoice's move ID for context
-                'purpose': move.name,
-            }
-
-            # 3. Create and Post Payment
-            payment = Payment.create(payment_vals)
-            payment.action_post()
-
-            # CRITICAL CHECK: Stop if the payment's journal entry failed to post
-            if payment.move_id.state != 'posted':
-                _logger.error(
-                    "Payment Move (ID: %s) failed to post for invoice %s. Please check Telebirr Journal setup (accounts and currency).",
-                    payment.move_id.id, move.name)
-                return None
-
-            # 4. Reconcile Payment with Invoice (THE LINKING STEP)
-
-            # Find the outstanding receivable line of the original invoice
-            invoice_lines = move.line_ids.filtered(
-                lambda line: line.account_type == 'asset_receivable'
-                             and not line.reconciled
-                             and line.balance > 0  # Debit line (outstanding balance)
-                             and abs(line.amount_residual_currency) >= payment_amount
-            )
-
-            # Find the corresponding receivable line of the payment move
-            payment_lines = payment.move_id.line_ids.filtered(
-                lambda line: line.account_type == 'asset_receivable'
-                             and not line.reconciled
-                             and line.balance < 0  # Credit line (payment made)
-            )
-
-            # Reconcile if we found the necessary outstanding lines
-            if invoice_lines and payment_lines:
-                # Ensure the lines use the same account (sanity check)
-                if invoice_lines[0].account_id.id != payment_lines[0].account_id.id:
-                    _logger.error(
-                        "Reconciliation failed: Receivable accounts do not match between invoice (%s) and payment (%s).",
-                        invoice_lines[0].account_id.name, payment_lines[0].account_id.name)
-                    return payment
-
-                # Perform the reconciliation
-                (invoice_lines | payment_lines).reconcile()
-
-                # Verify status change
-                move.invalidate_cache()  # Required to ensure the ORM fetches the updated payment_state
-                if move.payment_state in ('paid', 'in_payment'):
-                    _logger.info("Successfully reconciled payment %s with invoice %s. Invoice status: %s",
-                                 payment.name, move.name, move.payment_state)
-                else:
-                    _logger.warning("Reconciliation performed but invoice %s status did not update. Current state: %s",
-                                    move.name, move.payment_state)
-
-            return payment
-
-        except Exception:
-            _logger.error("Error creating and reconciling payment: %s", traceback.format_exc())
+        # Check if invoice is already paid or draft
+        if move.payment_state in ('paid', 'in_payment'):
+            _logger.info("Invoice %s is already paid, skipping payment creation.", move.name)
             return None
+
+        if move.state != 'posted':
+            raise ValueError(_("Invoice %s is not posted and cannot accept Telebirr payment.") % move.name)
+
+        # 2. Prepare Payment Values
+        journal_id = self._get_telebirr_journal()
+        if not journal_id:
+            raise ValueError(_("Telebirr payment journal is not configured."))
+
+        payment_vals = {
+            'date': datetime.now().date(),
+            'amount': payment_amount,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'ref': payment_ref,
+            'journal_id': journal_id,
+            'currency_id': move.currency_id.id,
+            'partner_id': move.partner_id.id,
+            'payment_method_line_id': self._get_payment_method_line_id(journal_id),
+            # Link to the invoice's move ID for context
+            'purpose': move.name,
+        }
+
+        # 3. Create and Post Payment
+        payment = Payment.create(payment_vals)
+        payment.action_post()
+
+        # CRITICAL CHECK: Stop if the payment's journal entry failed to post
+        if payment.move_id.state != 'posted':
+            _logger.error(
+                "Payment Move (ID: %s) failed to post for invoice %s. Please check Telebirr Journal setup (accounts and currency).",
+                payment.move_id.id, move.name)
+            return None
+
+        # 4. Reconcile Payment with Invoice (THE LINKING STEP)
+
+        # Find the outstanding receivable line of the original invoice
+        invoice_lines = move.line_ids.filtered(
+            lambda line: line.account_type == 'asset_receivable'
+                         and not line.reconciled
+                         and line.balance > 0  # Debit line (outstanding balance)
+                         and abs(line.amount_residual_currency) >= payment_amount
+        )
+
+        # Find the corresponding receivable line of the payment move
+        payment_lines = payment.move_id.line_ids.filtered(
+            lambda line: line.account_type == 'asset_receivable'
+                         and not line.reconciled
+                         and line.balance < 0  # Credit line (payment made)
+        )
+
+        # Reconcile if we found the necessary outstanding lines
+        if invoice_lines and payment_lines:
+            # Ensure the lines use the same account (sanity check)
+            if invoice_lines[0].account_id.id != payment_lines[0].account_id.id:
+                _logger.error(
+                    "Reconciliation failed: Receivable accounts do not match between invoice (%s) and payment (%s).",
+                    invoice_lines[0].account_id.name, payment_lines[0].account_id.name)
+                return payment
+
+            # Perform the reconciliation
+            (invoice_lines | payment_lines).reconcile()
+
+            # Verify status change
+            move.invalidate_cache()  # Required to ensure the ORM fetches the updated payment_state
+            if move.payment_state in ('paid', 'in_payment'):
+                _logger.info("Successfully reconciled payment %s with invoice %s. Invoice status: %s",
+                             payment.name, move.name, move.payment_state)
+            else:
+                _logger.warning("Reconciliation performed but invoice %s status did not update. Current state: %s",
+                                move.name, move.payment_state)
+
+        return payment
+
+    def _build_payment_reference(self, callback_data, move):
+        ref_token = (
+            callback_data.get('transaction_id')
+            or callback_data.get('originator_conversation_id')
+            or callback_data.get('conversation_id')
+            or move.name
+            or str(move.id)
+        )
+        return f"Telebirr-{ref_token}"
+
+    def _lock_invoice_for_update(self, move):
+        request.env.cr.execute("SELECT id FROM account_move WHERE id = %s FOR UPDATE", [move.id])
+
+    def _is_retryable_db_error(self, exc):
+        return isinstance(exc, PsycopgError) and getattr(exc, 'pgcode', None) in RETRYABLE_PG_CODES
+
+    def _is_unique_violation(self, exc):
+        return isinstance(exc, PsycopgError) and getattr(exc, 'pgcode', None) == errorcodes.UNIQUE_VIOLATION
+
+    def _create_payment_with_retry(self, move, callback_data, max_attempts=5):
+        for attempt in range(1, max_attempts + 1):
+            try:
+                # Keep callback transaction alive if a retriable DB conflict occurs.
+                with request.env.cr.savepoint():
+                    return self._create_payment(move, callback_data)
+            except Exception as exc:
+                if self._is_retryable_db_error(exc) and attempt < max_attempts:
+                    wait_seconds = min(2.0, 0.25 * (2 ** (attempt - 1)))
+                    _logger.warning(
+                        "Retryable DB error while creating Telebirr payment for invoice %s (tx=%s, pgcode=%s, attempt=%s/%s). Retrying in %.2fs.",
+                        move.name,
+                        callback_data.get('transaction_id'),
+                        getattr(exc, 'pgcode', None),
+                        attempt,
+                        max_attempts,
+                        wait_seconds,
+                    )
+                    time.sleep(wait_seconds)
+                    continue
+                _logger.error("Error creating and reconciling payment: %s", traceback.format_exc())
+                raise
+
+    def _get_or_create_request_log(self, request_log, move, callback_data):
+        if request_log or not callback_data.get('originator_conversation_id'):
+            return request_log
+
+        originator = callback_data.get('originator_conversation_id')
+        vals = {
+            'move_id': move.id,
+            'conversation_id': originator,
+            'state': 'pending',
+            'sent_by': move.tele_user.id or move.create_uid.id,
+        }
+
+        try:
+            with request.env.cr.savepoint():
+                return request.env['telebirr.request'].sudo().create(vals)
+        except Exception as exc:
+            if self._is_unique_violation(exc):
+                return request.env['telebirr.request'].sudo().search([('conversation_id', '=', originator)], limit=1)
+            raise
 
     def _get_telebirr_journal(self):
         """Get or create Telebirr payment journal, ensuring proper accounts are set (Odoo 16)"""
@@ -180,7 +255,8 @@ class TelebirrCallbackController(http.Controller):
             }
 
             result = root.xpath('//api:Result', namespaces=namespaces)
-            if not result: return "ERROR", 400
+            if not result:
+                return Response("ERROR: Missing Result node", status=400)
             result = result[0]
 
             callback_data = {
@@ -206,13 +282,7 @@ class TelebirrCallbackController(http.Controller):
                     )
                     return Response("ERROR: Invoice not found", status=404)
 
-            if not request_log and callback_data['originator_conversation_id']:
-                request_log = request.env['telebirr.request'].sudo().create({
-                    'move_id': move.id,
-                    'conversation_id': callback_data['originator_conversation_id'],
-                    'state': 'pending',
-                    'sent_by': move.tele_user.id or move.create_uid.id,
-                })
+            request_log = self._get_or_create_request_log(request_log, move, callback_data)
 
             # Ensure the invoice is posted before processing payment
             if move.state != 'posted':
@@ -236,7 +306,7 @@ class TelebirrCallbackController(http.Controller):
 
                 self._update_request_log(request_log, callback_data, 'success')
 
-                payment = self._create_payment(move, callback_data)
+                payment = self._create_payment_with_retry(move, callback_data)
 
                 if payment:
                     move.message_post(
@@ -258,9 +328,9 @@ class TelebirrCallbackController(http.Controller):
 
             return Response("ERROR_RECEIVED", status=200)
 
-        except Exception as e:
-            _logger.exception("Error: %s", str(e))
-            return "ERROR", 500
+        except etree.XMLSyntaxError as e:
+            _logger.exception("Invalid Telebirr callback XML: %s", str(e))
+            return Response("ERROR: Invalid XML", status=400)
 
     def _find_request_log(self, originator_conversation_id, transaction_id):
         RequestLog = request.env['telebirr.request'].sudo()
