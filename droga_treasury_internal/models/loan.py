@@ -140,11 +140,11 @@ class AccountLoanModifaied(models.Model):
                     record.state="active"    
                             
    
-    @api.depends('name')
+    @api.depends('loan_type', 'loan_type.name', 'bank_id', 'bank_id.name', 'loan_statement_number')
     def _commpute_description(self):
         for record in self:
             name=""
-            if record.name and record.id:
+            if record.id:
                 num=record.id
 
                 string_num=str(num)
@@ -157,10 +157,10 @@ class AccountLoanModifaied(models.Model):
                 if len(string_num)<5:
                     string_num="0"+string_num
 
-                name=record.loan_type.name
-                short_name=name[0:3].upper()
-                bank_name = record.bank_id.name or record.name or ''
-                name=short_name+"/"+ bank_name+ "/"+string_num
+                name = record.loan_type.name or ''
+                short_name = (name[0:3] if name else 'LOA').upper()
+                bank_name = record.bank_id.name or record.loan_statement_number or ''
+                name = short_name + "/" + bank_name + "/" + string_num
             record.descrip=name             
 
 

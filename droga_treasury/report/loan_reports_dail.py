@@ -8,8 +8,8 @@ class AccountLoanDailyReports(models.Model):
     _name="account.loan.reports"
     _description = "Loanreport "
 
-    # Keep explicit field type to avoid inheriting stale many2one metadata during upgrades.
-    name = fields.Char(string="Bank", required=True)
+    # Keep DB-compatible type for legacy report table (`account_loan_reports.name` FK -> res_bank).
+    name = fields.Many2one('res.bank', string="Bank", required=True)
     bank_id = fields.Many2one('res.bank', string="Bank Record")
     
     daily_report_ids = fields.One2many(
