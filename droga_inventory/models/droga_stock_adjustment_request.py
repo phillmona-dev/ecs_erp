@@ -155,6 +155,9 @@ class droga_stock_adjustment_request(models.Model):
         picking_id.remark=self.remark
 
     def action_open_adj(self):
+        if not self.operation_type:
+            raise UserError("Please fill operation type.")
+
         self.set_activity_done()
 
         self.create_transfer()
