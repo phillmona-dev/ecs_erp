@@ -14,7 +14,6 @@ class AccountLoan(models.Model):
     _description = "Loan"
 
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
-
     bank_id = fields.Many2one('res.bank', string="Bank Record")
 
     loan_type = fields.Many2one(
