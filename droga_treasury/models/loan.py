@@ -15,8 +15,6 @@ class AccountLoan(models.Model):
 
     _inherit = ['mail.thread', 'mail.activity.mixin', 'image.mixin']
 
-    # Keep `name` as Char for backward-compatible schema upgrades (existing DB column is varchar).
-    name_old = fields.Char(string="Bank")
     bank_id = fields.Many2one('res.bank', string="Bank Record")
 
     loan_type = fields.Many2one(
@@ -113,11 +111,11 @@ class AccountLoan(models.Model):
                                 if not record.isinterest:
                                     schedule = self.env['account.loan.schedule'].create(
                                         {'acount_loan_id': record.id, 'payment_date': dt, 'payment_amount': payment,
-                                            'name': i+1, 'prencipal': ppay, 'interest': ipay, 'balance': balance})
+                                            'name': str(i+1), 'prencipal': ppay, 'interest': ipay, 'balance': balance})
                                 elif record.isinterest:
                                     schedule = self.env['account.loan.schedule'].create(
                                         {'acount_loan_id': record.id, 'payment_date': dt, 'payment_amount': payment,
-                                            'name': i+1, 'prencipal': cpay, 'interest': 0, 'balance': balance+rint})
+                                            'name': str(i+1), 'prencipal': cpay, 'interest': 0, 'balance': balance+rint})
                                 at = dt
                                 nloop -= 1
                                 i = i+1
@@ -228,27 +226,12 @@ class AccountLoan(models.Model):
 
     #loan_renews_ids = fields.One2many('account.loan.renews', 'acount_loan_id', string="Renews")
 
-    @api.onchange('bank_id')
-    def _onchange_bank_id(self):
+    def name_get(self):
+        result = []
         for record in self:
-            if record.bank_id:
-                record.name = record.bank_id.name
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            bank_id = vals.get('bank_id')
-            if bank_id and not vals.get('name'):
-                bank = self.env['res.bank'].browse(bank_id)
-                vals['name'] = bank.name
-        return super().create(vals_list)
-
-    def write(self, vals):
-        bank_id = vals.get('bank_id')
-        if bank_id and not vals.get('name'):
-            bank = self.env['res.bank'].browse(bank_id)
-            vals = dict(vals, name=bank.name)
-        return super().write(vals)
+            display_name = record.bank_id.name or record.loan_statement_number or str(record.id)
+            result.append((record.id, display_name))
+        return result
 
     @api.depends('loan_renew_ids')
     def compute_renew(self):
@@ -345,11 +328,11 @@ class AccountLoan(models.Model):
                 if not record.isinterest:
                     schedule = self.env['account.loan.renew.schedule'].create(
                         {'acount_loan_id': record.id, 'payment_date': dt, 'payment_amount': payment,
-                         'name': i+1, 'prencipal': ppay, 'interest': ipay, 'balance': balance})
+                         'name': str(i+1), 'prencipal': ppay, 'interest': ipay, 'balance': balance})
                 elif record.isinterest:
                     schedule = self.env['account.loan.renew.schedule'].create(
                         {'acount_loan_id': record.id, 'payment_date': dt, 'payment_amount': payment,
-                         'name': i+1, 'prencipal': cpay, 'interest': 0, 'balance': balance+rint})
+                         'name': str(i+1), 'prencipal': cpay, 'interest': 0, 'balance': balance+rint})
                 at = dt
                 tadd -= 1
                 i = i+1

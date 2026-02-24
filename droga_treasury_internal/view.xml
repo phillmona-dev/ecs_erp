@@ -9,7 +9,7 @@
              <xpath expr="//field[@name='next_payment_date']" position="after">
                 <field name="future_payment"  />
         </xpath>
-        <xpath expr="//field[@name='name']" position="before">
+        <xpath expr="//field[@name='bank_id']" position="before">
                 <field name="descrip"  />
         </xpath>
         <xpath expr="//button[@name='compute_daily_crons']" position="replace">
@@ -30,7 +30,7 @@
                 <xpath expr="//field[@name='loan_amount']" position="after">
                 <field name="future_payment"  />
                
-        </xpath>  <xpath expr="//field[@name='name']" position="replace">
+        </xpath>  <xpath expr="//field[@name='bank_id']" position="replace">
                 <field name="descrip"  />
         </xpath>
             
@@ -43,7 +43,7 @@
         <field name="arch" type="xml">
             
                
-          <xpath expr="//field[@name='name']" position="before">
+          <xpath expr="//field[@name='bank_id']" position="before">
                 <field name="descrip"  />
         </xpath>
             
@@ -56,7 +56,7 @@
         <field name="arch" type="xml">
             
                
-        <xpath expr="//field[@name='name']" position="before">
+        <xpath expr="//field[@name='bank_id']" position="before">
                 <field name="descrip"  />
         </xpath>
             
@@ -69,7 +69,7 @@
         <field name="arch" type="xml">
             
                
-       <xpath expr="//field[@name='name']" position="before">
+       <xpath expr="//field[@name='bank_id']" position="before">
                 <field name="descrip"  />
         </xpath>
             
@@ -82,7 +82,7 @@
         <field name="inherit_id" ref="droga_treasury.account_loan_view_tree"/>
         <field name="arch" type="xml">
             
-                <xpath expr="//field[@name='name']" position="replace">
+                <xpath expr="//field[@name='bank_id']" position="replace">
                 <field name="descrip"  />
         </xpath>
             

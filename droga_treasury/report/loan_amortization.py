@@ -37,7 +37,7 @@ class droga_account_loan_reports_xls(models.TransientModel):
 
         #The file name is stored under filename
         datetime_string = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        bank_name = self.loan_id.bank_id.name or self.loan_id.name or 'bank'
+        bank_name = self.loan_id.bank_id.name or self.loan_id.loan_statement_number or 'bank'
         filename = '%s_%s_%s' % ('Loan Amortization ', bank_name, datetime_string)
         filename += '%2Exlsx'
 
@@ -124,7 +124,7 @@ class droga_account_loan_reports_xls(models.TransientModel):
         sheet.merge_range('A' + str(row_start + 1) + ':O' + str(row_start + 1), self.loan_id.company_id.name, header_format)
         sheet.merge_range('A' + str(row_start + 2) + ':O' + str(row_start + 2), "LOAN AMORTIZATION", header_format)
         sheet.merge_range('K' + str(row_start + 3) + ':L' + str(row_start + 3), "BANK",title_format_num )
-        bank_name = self.loan_id.bank_id.name or self.loan_id.name or ''
+        bank_name = self.loan_id.bank_id.name or self.loan_id.loan_statement_number or ''
         sheet.merge_range('M' + str(row_start + 3) + ':M' + str(row_start + 3), bank_name, title_format_num)
         contractdate= self.loan_id['contract_date'].strftime("%Y/%m/%d")
         sheet.merge_range('K' + str(row_start + 4) + ':L' + str(row_start + 4), "Loan Type", title_format_num)

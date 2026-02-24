@@ -5,7 +5,7 @@
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
             <tree string="Loan">
-                <field name="name"/>
+                <field name="bank_id"/>
                 
 
                 <field name="loan_type"/>

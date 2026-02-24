@@ -17,7 +17,7 @@ model-->
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
             <search>
-                <field name="name"/>
+                <field name="loan_statement_number"/>
                 <field name="bank_id"/>
                 <field name="loan_amount"/>
                 <field name="contract_date"/>
@@ -39,7 +39,7 @@ model-->
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
             <tree string="Loan" default_order='id'>
-                <field name="name"/>
+                <field name="bank_id"/>
 
 
                 <field name="loan_type"/>
@@ -86,7 +86,6 @@ model-->
                     <group>
                         <group>
                             <field name="bank_id"/>
-                            <field name="name"/>
                             <field name="loan_amount"/>
                             <field name="loan_statement_number"/>
 
@@ -294,7 +293,7 @@ model-->
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
             <tree string="Loan" create="false" edit="false">
-                <field name="name"/>
+                <field name="bank_id"/>
                 <field name="loan_amount"/>
                 <field name="loan_type"/>
                 <field name="loan_amount"/>
