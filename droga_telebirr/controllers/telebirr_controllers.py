@@ -4,7 +4,6 @@ import logging
 from lxml import etree
 from datetime import datetime
 import traceback
-import time
 
 from psycopg2 import Error as PsycopgError, errorcodes
 
@@ -21,27 +20,34 @@ class TelebirrCallbackController(http.Controller):
     def _create_payment(self, move, callback_data):
         """Create payment record and reconcile it with the invoice"""
         Payment = request.env['account.payment'].sudo()
-        transaction_id = callback_data.get('transaction_id')
         payment_ref = self._build_payment_reference(callback_data, move)
+
+        # Fast idempotent exits before acquiring a row lock.
+        if move.payment_state in ('paid', 'in_payment'):
+            _logger.info("Invoice %s is already paid, skipping payment creation.", move.name)
+            return None
+        existing_payment = self._find_existing_payment(payment_ref)
+        if existing_payment:
+            _logger.info("Payment already exists for ref %s, skipping create.", payment_ref)
+            return existing_payment
 
         # Serialize processing for the same invoice to avoid duplicate payments on concurrent callbacks.
         self._lock_invoice_for_update(move)
 
-        if payment_ref:
-            existing_payment = Payment.search([('ref', '=', payment_ref)], limit=1)
-            if existing_payment:
-                _logger.info("Payment already exists for ref %s, skipping create.", payment_ref)
-                return existing_payment
+        # Re-check after lock for race safety.
+        move.invalidate_cache(['payment_state', 'state', 'amount_residual'])
+        if move.payment_state in ('paid', 'in_payment'):
+            _logger.info("Invoice %s became paid while waiting for lock, skipping.", move.name)
+            return None
+        existing_payment = self._find_existing_payment(payment_ref)
+        if existing_payment:
+            _logger.info("Payment already exists for ref %s after lock, skipping create.", payment_ref)
+            return existing_payment
 
         # 1. Determine Amount (Use residual amount - what is still owed)
         payment_amount = move.amount_residual
 
         # We assume a full payment for simplicity, if partial is needed, adjust payment_amount here.
-
-        # Check if invoice is already paid or draft
-        if move.payment_state in ('paid', 'in_payment'):
-            _logger.info("Invoice %s is already paid, skipping payment creation.", move.name)
-            return None
 
         if move.state != 'posted':
             raise ValueError(_("Invoice %s is not posted and cannot accept Telebirr payment.") % move.name)
@@ -126,6 +132,11 @@ class TelebirrCallbackController(http.Controller):
         )
         return f"Telebirr-{ref_token}"
 
+    def _find_existing_payment(self, payment_ref):
+        if not payment_ref:
+            return request.env['account.payment'].sudo().browse()
+        return request.env['account.payment'].sudo().search([('ref', '=', payment_ref)], limit=1)
+
     def _lock_invoice_for_update(self, move):
         request.env.cr.execute("SELECT id FROM account_move WHERE id = %s FOR UPDATE", [move.id])
 
@@ -135,26 +146,36 @@ class TelebirrCallbackController(http.Controller):
     def _is_unique_violation(self, exc):
         return isinstance(exc, PsycopgError) and getattr(exc, 'pgcode', None) == errorcodes.UNIQUE_VIOLATION
 
-    def _create_payment_with_retry(self, move, callback_data, max_attempts=5):
+    def _create_payment_with_retry(self, move, callback_data, max_attempts=3):
+        payment_ref = self._build_payment_reference(callback_data, move)
         for attempt in range(1, max_attempts + 1):
             try:
                 # Keep callback transaction alive if a retriable DB conflict occurs.
                 with request.env.cr.savepoint():
                     return self._create_payment(move, callback_data)
             except Exception as exc:
-                if self._is_retryable_db_error(exc) and attempt < max_attempts:
-                    wait_seconds = min(2.0, 0.25 * (2 ** (attempt - 1)))
+                if self._is_retryable_db_error(exc):
+                    existing_payment = self._find_existing_payment(payment_ref)
+                    if existing_payment:
+                        _logger.info("Payment already exists for ref %s after retryable DB conflict.", payment_ref)
+                        return existing_payment
+                    if attempt < max_attempts:
+                        _logger.warning(
+                            "Retryable DB error while creating Telebirr payment for invoice %s (tx=%s, pgcode=%s, attempt=%s/%s). Retrying immediately.",
+                            move.name,
+                            callback_data.get('transaction_id'),
+                            getattr(exc, 'pgcode', None),
+                            attempt,
+                            max_attempts,
+                        )
+                        continue
                     _logger.warning(
-                        "Retryable DB error while creating Telebirr payment for invoice %s (tx=%s, pgcode=%s, attempt=%s/%s). Retrying in %.2fs.",
+                        "Retryable DB error persisted for invoice %s (tx=%s, pgcode=%s). Returning without creating duplicate payment.",
                         move.name,
                         callback_data.get('transaction_id'),
                         getattr(exc, 'pgcode', None),
-                        attempt,
-                        max_attempts,
-                        wait_seconds,
                     )
-                    time.sleep(wait_seconds)
-                    continue
+                    return None
                 _logger.error("Error creating and reconciling payment: %s", traceback.format_exc())
                 raise
 
@@ -268,19 +289,19 @@ class TelebirrCallbackController(http.Controller):
                 'conversation_id': self._extract_xml_text(result, './/res:ConversationID', namespaces),
             }
 
-            move = self._find_invoice(callback_data['originator_conversation_id'], callback_data['transaction_id'])
             request_log = self._find_request_log(callback_data['originator_conversation_id'], callback_data['transaction_id'])
+            move = request_log.move_id if request_log and request_log.move_id else self._find_invoice(
+                callback_data['originator_conversation_id'],
+                callback_data['transaction_id'],
+            )
 
             if not move:
-                if request_log and request_log.move_id:
-                    move = request_log.move_id
-                else:
-                    _logger.error(
-                        "Telebirr callback ignored: no invoice found for originator=%s transaction=%s",
-                        callback_data['originator_conversation_id'],
-                        callback_data['transaction_id'],
-                    )
-                    return Response("ERROR: Invoice not found", status=404)
+                _logger.error(
+                    "Telebirr callback ignored: no invoice found for originator=%s transaction=%s",
+                    callback_data['originator_conversation_id'],
+                    callback_data['transaction_id'],
+                )
+                return Response("ERROR: Invoice not found", status=404)
 
             request_log = self._get_or_create_request_log(request_log, move, callback_data)
 
@@ -289,6 +310,10 @@ class TelebirrCallbackController(http.Controller):
                 _logger.warning("Invoice %s is not posted, cannot apply payment.", move.name)
 
             if callback_data['result_code'] == '0':
+                # Duplicate success callback fast-path.
+                if request_log and request_log.state == 'success' and move.payment_state in ('paid', 'in_payment'):
+                    return Response("SUCCESS", status=200)
+
                 move_vals = {
                     'telebirr_status': 'success',
                     'telebirr_result_code': callback_data['result_code'],
@@ -397,20 +422,13 @@ class TelebirrCallbackController(http.Controller):
         return result[0] if result else None
 
     def _find_invoice(self, originator_conversation_id, transaction_id):
-        Move = request.env['account.move']
-        RequestLog = request.env['telebirr.request']
+        Move = request.env['account.move'].sudo()
         if originator_conversation_id:
-            req = RequestLog.sudo().search([('conversation_id', '=', originator_conversation_id)], limit=1)
-            if req and req.move_id:
-                return req.move_id
-            move = Move.sudo().search([('telebirr_conversation_id', '=', originator_conversation_id)], limit=1)
+            move = Move.search([('telebirr_conversation_id', '=', originator_conversation_id)], limit=1)
             if move:
                 return move
         if transaction_id:
-            req = RequestLog.sudo().search([('transaction_id', '=', transaction_id)], limit=1)
-            if req and req.move_id:
-                return req.move_id
-            move = Move.sudo().search([('telebirr_transaction_id', '=', transaction_id)], limit=1)
+            move = Move.search([('telebirr_transaction_id', '=', transaction_id)], limit=1)
             if move:
                 return move
         return None
