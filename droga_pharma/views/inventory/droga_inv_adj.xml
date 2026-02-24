@@ -39,6 +39,7 @@
                         <group>
                             <field name="source_location_id" required="1" domain="['|',('complete_name','like','Partners/'),'|',('has_access','=',True),('con_type','=','DIL')]" options="{'no_create':True,'no_open':True}"/>
                             <field name="dest_location_id" required="1" domain="['|',('complete_name','like','Partners/'),'|',('has_access','=',True),('con_type','=','DIL')]" options="{'no_create':True,'no_open':True}"/>
+                            <field name="operation_type" options="{'no_create':True,'no_open':True}"/>
                         </group>
                     </group>
                     <notebook>
