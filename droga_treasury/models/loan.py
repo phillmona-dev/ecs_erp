@@ -113,11 +113,11 @@ class AccountLoan(models.Model):
                                 if not record.isinterest:
                                     schedule = self.env['account.loan.schedule'].create(
                                         {'acount_loan_id': record.id, 'payment_date': dt, 'payment_amount': payment,
-                                            'name': i+1, 'prencipal': ppay, 'interest': ipay, 'balance': balance})
+                                            'name_old': i+1, 'prencipal': ppay, 'interest': ipay, 'balance': balance})
                                 elif record.isinterest:
                                     schedule = self.env['account.loan.schedule'].create(
                                         {'acount_loan_id': record.id, 'payment_date': dt, 'payment_amount': payment,
-                                            'name': i+1, 'prencipal': cpay, 'interest': 0, 'balance': balance+rint})
+                                            'name_old': i+1, 'prencipal': cpay, 'interest': 0, 'balance': balance+rint})
                                 at = dt
                                 nloop -= 1
                                 i = i+1
@@ -232,7 +232,7 @@ class AccountLoan(models.Model):
     def _onchange_bank_id(self):
         for record in self:
             if record.bank_id:
-                record.name = record.bank_id.name
+                record.name_old = record.bank_id.name
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -240,14 +240,14 @@ class AccountLoan(models.Model):
             bank_id = vals.get('bank_id')
             if bank_id and not vals.get('name'):
                 bank = self.env['res.bank'].browse(bank_id)
-                vals['name'] = bank.name
+                vals['name_old'] = bank.name
         return super().create(vals_list)
 
     def write(self, vals):
         bank_id = vals.get('bank_id')
-        if bank_id and not vals.get('name'):
+        if bank_id and not vals.get('name_old'):
             bank = self.env['res.bank'].browse(bank_id)
-            vals = dict(vals, name=bank.name)
+            vals = dict(vals, name_old=bank.name)
         return super().write(vals)
 
     @api.depends('loan_renew_ids')
@@ -345,11 +345,11 @@ class AccountLoan(models.Model):
                 if not record.isinterest:
                     schedule = self.env['account.loan.renew.schedule'].create(
                         {'acount_loan_id': record.id, 'payment_date': dt, 'payment_amount': payment,
-                         'name': i+1, 'prencipal': ppay, 'interest': ipay, 'balance': balance})
+                         'name_old': i+1, 'prencipal': ppay, 'interest': ipay, 'balance': balance})
                 elif record.isinterest:
                     schedule = self.env['account.loan.renew.schedule'].create(
                         {'acount_loan_id': record.id, 'payment_date': dt, 'payment_amount': payment,
-                         'name': i+1, 'prencipal': cpay, 'interest': 0, 'balance': balance+rint})
+                         'name_old': i+1, 'prencipal': cpay, 'interest': 0, 'balance': balance+rint})
                 at = dt
                 tadd -= 1
                 i = i+1
