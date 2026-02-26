@@ -13,6 +13,7 @@ class inventory_request_extension(models.Model):
 
 class sale_order_extension(models.Model):
     _inherit = 'sale.order'
+    tender_origin_form = fields.Many2one('droga.tender.master', readonly=True)
     tender_origin_form_tender=fields.Many2one('droga.tender.master',readonly=True)
     po_tender=fields.Many2many('purchase.order',string='Purchase order')
     client_po_ref=fields.Char('Client PO ref')

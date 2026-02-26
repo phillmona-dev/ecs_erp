@@ -6,7 +6,14 @@ from odoo.exceptions import ValidationError
 
 
 class HrContract(models.Model):
-    _inherit = 'hr.contract'
+    _inherit = 'hr.version'
+
+    state = fields.Selection(
+        [('open', 'Running'), ('close', 'Closed')],
+        compute='_compute_legacy_contract_state',
+        search='_search_legacy_contract_state',
+        string='State',
+    )
 
     housing_allowance = fields.Float("Housing Allowance", default=0, tracking=True)
     transport_allowance = fields.Float("Transport Allowance", default=0)
@@ -34,6 +41,33 @@ class HrContract(models.Model):
     payments_deduction_links = fields.Many2many('hr.payslip.input.type', string='Payment & Deductions Groups')
 
     # get contract rate
+    @api.depends('active', 'contract_date_start', 'contract_date_end')
+    def _compute_legacy_contract_state(self):
+        today = fields.Date.today()
+        for record in self:
+            is_open = bool(
+                record.active
+                and (not record.contract_date_start or record.contract_date_start <= today)
+                and (not record.contract_date_end or record.contract_date_end >= today)
+            )
+            record.state = 'open' if is_open else 'close'
+
+    def _search_legacy_contract_state(self, operator, value):
+        if operator not in ('=', '!=') or value not in ('open', 'close'):
+            return []
+
+        today = fields.Date.today()
+        open_domain = [
+            ('active', '=', True),
+            '|', ('contract_date_start', '=', False), ('contract_date_start', '<=', today),
+            '|', ('contract_date_end', '=', False), ('contract_date_end', '>=', today),
+        ]
+        open_ids = self.search(open_domain).ids
+
+        if (operator == '=' and value == 'open') or (operator == '!=' and value == 'close'):
+            return [('id', 'in', open_ids)]
+        return [('id', 'not in', open_ids)]
+
     def get_employee_rate(self, payment_code):
         amount = 0
         for record in self:
@@ -124,3 +158,16 @@ class HrContract(models.Model):
     # if record.analytic_account_id.plan_id.name != 'Cost Center' and record.analytic_account_id.plan_id.name != ' ':
     # record.analytic_account_id = ''
     # raise ValidationError('Please select a cost center')
+
+
+class HrEmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    # v16 compatibility field used by payroll reports.
+    first_contract_date = fields.Date(compute='_compute_first_contract_date', store=True)
+
+    @api.depends('version_ids.contract_date_start')
+    def _compute_first_contract_date(self):
+        for employee in self:
+            contract_dates = [d for d in employee.version_ids.mapped('contract_date_start') if d]
+            employee.first_contract_date = min(contract_dates) if contract_dates else False

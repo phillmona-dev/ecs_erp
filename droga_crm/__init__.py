@@ -4,24 +4,9 @@ from . import controllers
 from . import models,reports,wizards
 
 
-from odoo import api, SUPERUSER_ID
-def create_days(cr, registry):
-  env = api.Environment(cr, SUPERUSER_ID, {})
-  env['droga.crm.settings.day'].sudo().create({
-      'day': 'Monday',
-  })
-  env['droga.crm.settings.day'].sudo().create({
-      'day': 'Tuesday',
-  })
-  env['droga.crm.settings.day'].sudo().create({
-      'day': 'Wednesday',
-  })
-  env['droga.crm.settings.day'].sudo().create({
-      'day': 'Thursday',
-  })
-  env['droga.crm.settings.day'].sudo().create({
-      'day': 'Firday',
-  })
-  env['droga.crm.settings.day'].sudo().create({
-      'day': 'Saturday',
-  })
+def create_days(env):
+    day_model = env["droga.crm.settings.day"].sudo()
+    existing_days = set(day_model.search([]).mapped("day"))
+    for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Firday", "Saturday"]:
+        if day not in existing_days:
+            day_model.create({"day": day})

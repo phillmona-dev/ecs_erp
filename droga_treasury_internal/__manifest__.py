@@ -13,7 +13,7 @@
     'website': "www.drogapharma.com",
 
     'category': 'Treasury',
-    'version': '1.0',
+    'version': '19.0.1.0.0',
 
     'data': [
         'data/cron_interest.xml',

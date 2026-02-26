@@ -46,27 +46,29 @@ class droga_crm_contacts(models.Model):
         string='Shared Groups',default=_get_teams
     )
 
-    has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
 
     def _search_has_access(self, operator, value):
         if operator == '=':
+            if not request:
+                return [('id', 'in', [])]
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             if self.env.user.has_group('droga_crm.crm_cust'):
-                has_access = self.env['droga.crm.contacts'].sudo().search([])
-                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
-            elif not request or len(ses) == 0:
+                x_has_access = self.env['droga.crm.contacts'].sudo().search([])
+                return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
+            elif len(ses) == 0:
                 return [('id', 'in', [])]
             else:
-                has_access = self.env['droga.crm.contacts'].sudo().search(
+                x_has_access = self.env['droga.crm.contacts'].sudo().search(
                     [('sales_teams', 'in', ses[0].pro_id[0].team.shares_group_with.ids if len(ses)>0 else [])])
-                return [('id', 'in', [x.id for x in has_access] if has_access else [])]
+                return [('id', 'in', [x.id for x in x_has_access] if x_has_access else [])]
         else:
             return [('id', 'in', [])]
 
     def _compute_has_access(self):
         for rec in self:
-            rec.has_access = False
+            rec.x_has_access = False
 
     def _get_descr(self):
         for record in self:

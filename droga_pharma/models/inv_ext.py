@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 
-import simplejson
 from lxml import etree
 
 from odoo import fields, models, api
@@ -134,7 +133,14 @@ class droga_purchase_uom_extension(models.Model):
             return
 
         # TODO: Remove when onchanges are replaced with computes
-        if not (self.env.context.get('origin_po_id') and self.product_uom and self.product_id.uom_id.category_id == self.product_uom_category_id):
+        origin_po_uom_ok = False
+        if self.env.context.get('origin_po_id') and self.product_uom:
+            try:
+                self.product_id.uom_id._compute_quantity(1.0, self.product_uom, raise_if_failure=True)
+                origin_po_uom_ok = True
+            except UserError:
+                origin_po_uom_ok = False
+        if not origin_po_uom_ok:
             if self.order_id.request_type=='Pharmacy':
                 self.product_uom=self.product_uom_pharma
                 self.product_uom_pharma=False

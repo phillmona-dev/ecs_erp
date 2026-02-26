@@ -7,23 +7,12 @@
             <xpath expr="//form/header" position="inside">
 
                 <!-- Project contractor part  -->
-                <button name="request_pr"
-                        attrs="{'invisible': ['|',('state', 'not in', ('draft')),('menu_from','!=','PR')]}"
-                        string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
-                <button name="stmg_approve"
-                        attrs="{'invisible': ['|',('state', 'not in', ('pmg')),('menu_from','!=','PR')]}"
-                        groups="droga_project.proj_engineer"
-                        string="Approve" type="object" class="oe_highlight" data-hotkey="v"/>
-                <button name="amend"
-                        attrs="{'invisible': ['|',('state', 'not in', ('stmg','mtmg')),('menu_from','!=','PR')]}"
-                        groups="droga_project.proj_engineer"
-                        string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
-                <button name="action_cancel"
-                        attrs="{'invisible': ['|',('state', 'not in', ('draft')),('menu_from','!=','PR')]}"
-                        string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+                <button name="request_pr" string="Request" type="object" class="oe_highlight" data-hotkey="v" invisible="(state not in ['draft']) or (menu_from != 'PR')"/>
+                <button name="stmg_approve" groups="droga_project.proj_engineer" string="Approve" type="object" class="oe_highlight" data-hotkey="v" invisible="(state not in ['pmg']) or (menu_from != 'PR')"/>
+                <button name="amend" groups="droga_project.proj_engineer" string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v" invisible="(state not in ['stmg', 'mtmg']) or (menu_from != 'PR')"/>
+                <button name="action_cancel" string="Cancel" type="object" class="oe_highlight" data-hotkey="v" invisible="(state not in ['draft']) or (menu_from != 'PR')"/>
 
-                <field name="state" widget="statusbar" attrs="{'invisible': [('menu_from','!=','PR')]}"
-                       statusbar_visible="draft,pmg,waiting,processed"/>
+                <field name="state" widget="statusbar" statusbar_visible="draft,pmg,waiting,processed" invisible="(menu_from != 'PR')"/>
 
             </xpath>
         </field>

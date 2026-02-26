@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
         <record id="stock_menu_avail" model="ir.ui.view">
@@ -10,34 +10,34 @@
                 <xpath expr="//notebook" position="inside">
                     <page string="Physiotherapy sales access">
                         <field name="warehouse_ids_pt_disp" mode="tree">
-                            <tree create="0">
-                                <field name="name"></field>
-                                <field name="code"></field>
-                            </tree>
+                            <list create="0">
+                                <field name="name"/>
+                                <field name="code"/>
+                            </list>
                         </field>
                     </page>
                     <page string="Store Access Import and WS">
                         <field name="warehouse_ids_im_ws" mode="tree">
-                            <tree create="0">
-                                <field name="name"></field>
-                                <field name="code"></field>
-                            </tree>
+                            <list create="0">
+                                <field name="name"/>
+                                <field name="code"/>
+                            </list>
                         </field>
                     </page>
                     <page string="Store Access Pharmacy">
                         <field name="warehouse_ids_ph" mode="tree">
-                            <tree create="0">
-                                <field name="name"></field>
-                                <field name="code"></field>
-                            </tree>
+                            <list create="0">
+                                <field name="name"/>
+                                <field name="code"/>
+                            </list>
                         </field>
                     </page>
                     <page string="Pharmacy sales access">
                         <field name="warehouse_ids_ph_disp" mode="tree">
-                            <tree create="0">
-                                <field name="name"></field>
-                                <field name="code"></field>
-                            </tree>
+                            <list create="0">
+                                <field name="name"/>
+                                <field name="code"/>
+                            </list>
                         </field>
                     </page>
                 </xpath>

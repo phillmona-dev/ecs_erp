@@ -28,7 +28,7 @@ class PreImportPermit(models.Model):
                      res_model_id = self.env['ir.model'].search([('model', '=', 'droga.reg.pre.import.permit.header')]).id,
                      user_id=user_id, summary= message, note= message,
                      activity_type_id=4,
-                     date_deadline=fields.datetime.now())
+                     date_deadline=fields.Datetime.now())
         self.env['mail.activity'].sudo().create(todos)
 
     manufacturer = fields.Char(string='Vendor')

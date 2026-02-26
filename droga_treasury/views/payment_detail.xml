@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
 
@@ -6,27 +6,26 @@
     <field name="name">account_loan_repayment_detail.view.tree</field>
     <field name="model">account.loan.repayment.detail</field>
     <field name="arch" type="xml">
-        <tree string="Monthly Postings" editable="bottom" >
+        <list string="Monthly Postings" editable="bottom">
             
             
             <field name="desc" width="12"/>
             <field name="reference" width="11"/>
-            <field name="value_date"  width="11"/>
-            <field name="principal_repayment"  width="11"/>
-            <field name="is_interest"  width="11"/>
+            <field name="value_date" width="11"/>
+            <field name="principal_repayment" width="11"/>
+            <field name="is_interest" width="11"/>
                                     
-            <field name="is_penality"  width="11"/>
-            <field name="total_payment"  width="11"/>
-            <field name="post"  width="11"/>
-             <button  type="object" name="compute_postt" string="Post"
-                        class="oe_stat_button" icon="fa-file-text" />
+            <field name="is_penality" width="11"/>
+            <field name="total_payment" width="11"/>
+            <field name="post" width="11"/>
+             <button type="object" name="compute_postt" string="Post" class="oe_stat_button" icon="fa-file-text"/>
                                     
-        </tree>
+        </list>
     </field>
 </record>
    <record id="account_loan_payment_detail_action" model="ir.actions.act_window">
     <field name="name">Payment Detail</field>
     <field name="res_model">account.loan.repayment.detail</field>
-    <field name="view_mode">tree</field>
+    <field name="view_mode">list</field>
 </record>
 </odoo>

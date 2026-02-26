@@ -2,7 +2,7 @@
     <record id="account_loan_action" model="ir.actions.act_window">
         <field name="name">Loan</field>
         <field name="res_model">account.loan</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
 
         <!-- <field name="context">{'search_default_remaining_days':}</field> -->
     </record>
@@ -27,7 +27,7 @@ model-->
                 <filter string="Archived" name="isactive" domain="[('isactive', '=',False)]"/>
                 <filter string="Loan" name="isactive" domain="[('isactive', '=',True)]"/>
                 <filter string="Recent" name="remaining_days" domain="[('remaining_days', '&lt;',15)]"/>
-                <!-- <group expand="0" string="Group By">
+                <!-- <group string="Group By">
                    <filter string="Loan Type" name="loan_type" context="{'group_by': loan_type}"/>
                    <filter string="Status" name="state" context="{'group_by': state}"/>
                </group> -->
@@ -38,22 +38,18 @@ model-->
         <field name="name">account.loan.view.tree</field>
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
-            <tree string="Loan" default_order='id'>
+            <list string="Loan" default_order="id">
                 <field name="bank_id"/>
 
 
                 <field name="loan_type"/>
                 <field name="anual_interest_rate"/>
                 <field name="loan_amount"/>
-                <field name="state" widget="badge" decoration-success="state == 'active'"
-                       decoration-info="state == 'draft'" decoration-danger="state == 'overdue'"
-                />
+                <field name="state" widget="badge" decoration-success="state == 'active'" decoration-info="state == 'draft'" decoration-danger="state == 'overdue'"/>
 
-                <button type="object" name="open_monthly" string="Monthly Closings"
-                        class="oe_stat_button" icon="fa-file-text"
-                />
+                <button type="object" name="open_monthly" string="Monthly Closings" class="oe_stat_button" icon="fa-file-text"/>
 
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -68,16 +64,9 @@ model-->
                     <button name="compute_schedule" string="Schedule" type="object"/>
                     <button name="compute_renew" string="Renew" type="object"/>
                     <button name="compute_done" string="Done" type="object"/>
-                    <button type="object" name="compute_daily_crons" string="Calculate Interest"
-                            class="oe_stat_button" icon="fa-file-text"
-                            context="{'default_acount_monthly_closing_id':active_id}"
+                    <button type="object" name="compute_daily_crons" string="Calculate Interest" class="oe_stat_button" icon="fa-file-text"/>
 
-                    />
-
-                    <field name="state" widget="statusbar" nolabel="1"
-                           decoration-success="state == 'active' or state == 'done'"
-                           decoration-info="state == 'draft' or state == 'overdue'"
-                    />
+                    <field name="state" widget="statusbar" nolabel="1" decoration-success="state == 'active' or state == 'done'" decoration-info="state == 'draft' or state == 'overdue'"/>
 
                 </header>
                 <sheet>
@@ -117,10 +106,8 @@ model-->
                                         <group name="name">
                                             <field name="total_number_of_payment"/>
                                             <field name="schedule_numberof_payment"/>
-                                            <field name="remaining_days"
-                                                   attrs="{'invisible': [('remaining_days', '&lt;=', '0')]}"/>
-                                            <field name="overdue_days"
-                                                   attrs="{'invisible': [('remaining_days', '&gt;=', '0')]}"/>
+                                            <field name="remaining_days" invisible="(remaining_days &lt;= '0')"/>
+                                            <field name="overdue_days" invisible="(remaining_days &gt;= '0')"/>
                                             <field name="next_payment_date"/>
                                             <field name="daily_interest_rate"/>
                                         </group>
@@ -131,14 +118,14 @@ model-->
                                 <page name="droga_renew" string="Penality Range">
                                     <field name="penality_range_ids">
 
-                                        <tree editable="bottom">
+                                        <list editable="bottom">
                                             <field name="name" width="20%"/>
                                             <field name="num_days" width="20%"/>
                                             <field name="anual_penality_rate" width="20%"/>
                                             <field name="daily_penality_rate" width="20%"/>
 
 
-                                        </tree>
+                                        </list>
                                     </field>
 
 
@@ -148,7 +135,7 @@ model-->
                                 <page name="droga_renew" string="Renew">
                                     <field name="loan_renew_ids">
 
-                                        <tree editable="bottom">
+                                        <list editable="bottom">
                                             <field name="name" width="15%"/>
                                             <field name="payment_amount" width="15%"/>
                                             <field name="anual_interest_rate" width="10%"/>
@@ -157,7 +144,7 @@ model-->
                                             <field name="renew_date" width="15%"/>
                                             <field name="renew_start_date" width="15%"/>
 
-                                        </tree>
+                                        </list>
                                     </field>
 
 
@@ -197,14 +184,14 @@ model-->
                                 <page string="Interest">
 
                                     <field name="loan_interest_ids">
-                                        <tree editable="bottom" create="0" delete="0">
+                                        <list editable="bottom" create="0" delete="0">
                                             <field name="daily_interest_amount"/>
                                             <field name="daily_penality_amount"/>
                                             <field name="daily_interest_total"/>
 
                                             <field name="value_date"/>
 
-                                        </tree>
+                                        </list>
                                     </field>
 
                                 </page>
@@ -213,7 +200,7 @@ model-->
                                 <page string="Payment Schedule">
 
                                     <field name="loan_schedule_ids">
-                                        <tree editable="bottom" create="0" delete="0">
+                                        <list editable="bottom" create="0" delete="0">
                                             <field name="name"/>
                                             <field name="payment_date"/>
                                             <field name="payment_amount"/>
@@ -221,7 +208,7 @@ model-->
                                             <field name="interest"/>
                                             <field name="balance"/>
 
-                                        </tree>
+                                        </list>
                                     </field>
 
                                 </page>
@@ -229,7 +216,7 @@ model-->
                                 <page name="schedule" string="Renewed Schedule">
 
                                     <field name="loan_old_ids" style="pointer-events:none;">
-                                        <tree editable="bottom" create="0" delete="0">
+                                        <list editable="bottom" create="0" delete="0">
                                             <field name="name" width="20%"/>
                                             <field name="payment_date" width="15%"/>
                                             <field name="payment_amount" width="15%"/>
@@ -238,7 +225,7 @@ model-->
                                             <field name="balance" width="20%"/>
 
 
-                                        </tree>
+                                        </list>
                                     </field>
 
                                 </page>
@@ -247,7 +234,7 @@ model-->
                             </notebook>
                         </page>
                         <page string="Other">
-                            <group name="name" string="company" invisible='1'>
+                            <group name="name" string="company" invisible="1">
                                 <field name="company_id"/>
                             </group>
                             <group>
@@ -272,11 +259,7 @@ model-->
                         </page>
 
                     </notebook>
-                    <button type="object" name="compute_daily_crons" string="Calculate Interest"
-                            class="oe_stat_button" icon="fa-file-text"
-                            context="{'default_acount_monthly_closing_id':active_id}"
-
-                    />
+                    <button type="object" name="compute_daily_crons" string="Calculate Interest" class="oe_stat_button" icon="fa-file-text"/>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" groups="base.group_user"/>
@@ -292,7 +275,7 @@ model-->
         <field name="name">account.loan.view.tree.report</field>
         <field name="model">account.loan</field>
         <field name="arch" type="xml">
-            <tree string="Loan" create="false" edit="false">
+            <list string="Loan" create="false" edit="false">
                 <field name="bank_id"/>
                 <field name="loan_amount"/>
                 <field name="loan_type"/>
@@ -301,22 +284,20 @@ model-->
                 <field name="cumulative_interest"/>
                 <field name="payment"/>
                 <!-- <field name=" next_payment_date"/>  -->
-                <field name="remaining_days" attrs="{'invisible': [('remaining_days', '&lt;=', '0')]}"/>
-                <field name="overdue_days" attrs="{'invisible': [('remaining_days', '&gt;=', '0')]}"/>
+                <field name="remaining_days" invisible="(remaining_days &lt;= '0')"/>
+                <field name="overdue_days" invisible="(remaining_days &gt;= '0')"/>
 
-                <field name="state" widget="badge" decoration-success="state == 'active'"
-                       decoration-info="state == 'draft'" decoration-danger="state == 'overdue'"
-                />
+                <field name="state" widget="badge" decoration-success="state == 'active'" decoration-info="state == 'draft'" decoration-danger="state == 'overdue'"/>
 
 
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="account_loan_action_report" model="ir.actions.act_window">
         <field name="name">Loan Status Summary</field>
         <field name="res_model">account.loan</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="view_id" ref="account_loan_view_tree_report"/>
     </record>
 

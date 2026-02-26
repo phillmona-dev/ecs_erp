@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
         <!-- Add Telebirr button to form view -->
@@ -9,11 +9,7 @@
             <field name="arch" type="xml">
                 <!-- Add button to button box -->
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_send_to_telebirr"
-                        type="object"
-                        class="oe_stat_button"
-                        icon="fa-phone"
-                        attrs="{'invisible': [('telebirr_status', '=', 'success')]}">
+                <button name="action_send_to_telebirr" type="object" class="oe_stat_button" icon="fa-phone" invisible="(telebirr_status == 'success')">
                     <div class="o_field_widget o_stat_info">
                         <!-- Added style to override text-transform: uppercase -->
                         <span class="o_stat_text" style="text-transform: none !important;">Send</span>
@@ -24,20 +20,20 @@
                 <!-- Add Telebirr fields after invoice date -->
                 <xpath expr="//field[@name='invoice_date']" position="after">
 <!--                    <group string="Telebirr Information" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}">-->
-                    <field name="mobile_no"></field>
-                    <field name="telebirr_conversation_id" String="telebirr ID" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}" string="Telebirr ID" readonly="1"/>
-                    <field name="telebirr_status" String="telebirr status" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
-                    <field name="telebirr_transaction_id" String="telebirr Transaction ID" readonly="1" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
-                    <field name="telebirr_response_date" String="telebirr Response Date" readonly="1" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}"/>
-                    <field name="telebirr_request_ids" readonly="1" attrs="{'invisible': [('telebirr_conversation_id', '=', False)]}">
-                        <tree create="0" edit="0" delete="0">
+                    <field name="mobile_no"/>
+                    <field name="telebirr_conversation_id" String="telebirr ID" string="Telebirr ID" readonly="1" invisible="(telebirr_conversation_id == False)"/>
+                    <field name="telebirr_status" String="telebirr status" invisible="(telebirr_conversation_id == False)"/>
+                    <field name="telebirr_transaction_id" String="telebirr Transaction ID" readonly="1" invisible="(telebirr_conversation_id == False)"/>
+                    <field name="telebirr_response_date" String="telebirr Response Date" readonly="1" invisible="(telebirr_conversation_id == False)"/>
+                    <field name="telebirr_request_ids" readonly="1" invisible="(telebirr_conversation_id == False)">
+                        <list create="0" edit="0" delete="0">
                             <field name="sent_at"/>
                             <field name="conversation_id"/>
                             <field name="state"/>
                             <field name="transaction_id"/>
                             <field name="result_code"/>
                             <field name="callback_at"/>
-                        </tree>
+                        </list>
                     </field>
 
                 </xpath>

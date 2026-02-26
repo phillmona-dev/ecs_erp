@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="view_droga_bond_requests_tree" model="ir.ui.view">
         <field name="name">droga.bond.requests.tree</field>
         <field name="model">droga.bond.requests</field>
         <field name="arch" type="xml">
-            <tree delete="0">
+            <list delete="0">
                 <field name="letter_number" string="Request Number"/>
                 <field name="bank"/>
                 <field name="client"/>
@@ -18,9 +18,8 @@
                 <field name="amount"/>
                 <field name="request_type"/>
                 <field name="on_behalf_of"/>
-                <button icon="fa-credit-card-alt" type="object" string="Get report" name="get_bond_letter"
-                        class="oe_stat_button"></button>
-            </tree>
+                <button icon="fa-credit-card-alt" type="object" string="Get report" name="get_bond_letter" class="oe_stat_button"/>
+            </list>
         </field>
     </record>
 
@@ -30,27 +29,16 @@
         <field name="arch" type="xml">
             <form delete="0">
                 <header>
-                    <button name="request"
-                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
-                            string="Request" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="bond_approve"
-                            attrs="{'invisible': [('state', 'not in', ('req'))]}"
-                            groups="droga_tender.bond_recepient"
-                            string="Letter sent" type="object" class="oe_highlight" data-hotkey="v"/>
-                    <button name="amend"
-                            attrs="{'invisible': [('state', 'not in', ('req'))]}"
-                            groups="droga_tender.bond_recepient"
-                            string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v"/>
-                    <button name="action_cancel"
-                            attrs="{'invisible': [('state', 'not in', ('draft'))]}"
-                            string="Cancel" type="object" class="oe_highlight" data-hotkey="v"/>
+                    <button name="request" string="Request" type="object" class="oe_highlight" data-hotkey="v" invisible="(state not in ['draft'])"/>
+                    <button name="bond_approve" groups="droga_tender.bond_recepient" string="Letter sent" type="object" class="oe_highlight" data-hotkey="v" invisible="(state not in ['req'])"/>
+                    <button name="amend" groups="droga_tender.bond_recepient" string="Amend" type="object" class="oe_highlight btn-warning" data-hotkey="v" invisible="(state not in ['req'])"/>
+                    <button name="action_cancel" string="Cancel" type="object" class="oe_highlight" data-hotkey="v" invisible="(state not in ['draft'])"/>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,req,pro"/>
                 </header>
                 <sheet string="New Bond Request">
                     <div class="oe_button_box" name="button_box">
-                        <button icon="fa-credit-card-alt" type="object" string="Get letter" name="get_bond_letter"
-                                class="oe_stat_button"></button>>
+                        <button icon="fa-credit-card-alt" type="object" string="Get letter" name="get_bond_letter" class="oe_stat_button"/>&gt;
                     </div>
                     <notebook>
                         <page string=" Bond Request Details">
@@ -72,8 +60,8 @@
                                     <field name="letter_number" readonly="1"/>
                                     <field name="request_type" readonly="1"/>
                                     <field name="on_behalf_of"/>
-                                    <field name="is_extension"></field>
-                                    <field name="to_be_extended_bond" options="{'no_create':True,'no_open':True}" attrs="{'invisible': [('is_extension', '=', False)]}"></field>
+                                    <field name="is_extension"/>
+                                    <field name="to_be_extended_bond" options="{'no_create':True,'no_open':True}" invisible="(is_extension == False)"/>
                                 </group>
                             </group>
                         </page>
@@ -92,7 +80,7 @@
     <record id="action_droga_bond_requests" model="ir.actions.act_window">
         <field name="name">Droga Bond Requests</field>
         <field name="res_model">droga.bond.requests</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
 </odoo>

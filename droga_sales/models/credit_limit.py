@@ -46,13 +46,12 @@ class cust_sales_credit_limit(models.Model):
     _inherit = 'sale.order'
 
     available_amount = fields.Float(string='Credit balance', related='partner_id.available_amount')
-    tender_origin_form = fields.Many2one('droga.tender.master', readonly=True)
     cash_upfront = fields.Float(string='Down payment')
     pay_type = fields.Boolean(related='payment_term_id.apply_credit_limit')
     mature_amount = fields.Monetary('Matured amount', compute='_get_mature_amount')
     show_invoice_button = fields.Boolean(compute='_get_mature_amount')
     manual_price = fields.Boolean('Manual price', default=False, required=True, tracking=True)
-    Vat_no = fields.Char(related='partner_id.vat', readonly='True')
+    Vat_no = fields.Char(related='partner_id.vat', readonly=True)
     cust_type_ext = fields.Many2one('droga.cust.type', related='partner_id.cust_type_ext', inverse='_cust_type_inv',
                                     string='Customer type')
     cust_id = fields.Integer(related='partner_id.id', readonly='True')

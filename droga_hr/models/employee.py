@@ -17,29 +17,22 @@ class Employee(models.Model):
 
     bank = fields.Many2one('res.bank', string="Bank")
     bank_account = fields.Char("Bank Account")
-    contract_type = fields.Many2one("hr.contract.type", string="Contract Type", required=True)
+    contract_type = fields.Many2one("hr.contract.type", string="Contract Type")
 
     is_attendance_required = fields.Boolean("Attendance Required", default=True)
     check_in = fields.Boolean("Check In", default=True)
     check_out = fields.Boolean("Check Out", default=True)
 
-    division = fields.Many2one("droga.hr.division", "Division", required=True)
+    division = fields.Many2one("droga.hr.division", "Division")
 
     tin_no = fields.Char('Tin')
     pension_no = fields.Char('Pension No')
 
     @api.model
     def create(self, vals):
-        # get sequence number for each company
-        # self_comp = self.with_company(self.company_id)
-
-        # genertae automatic employee ID
-        if vals['contract_type'] == 1:  # permanent
+        # Generate automatic employee ID when barcode is not explicitly set.
+        if not vals.get('barcode'):
             vals['barcode'] = self.env['ir.sequence'].next_by_code('employee.id') or '/'
-        elif vals['contract_type'] == 3:  # Contract
-            vals['barcode'] = self.env['ir.sequence'].next_by_code('employee.con.id') or '/'
-        else:
-            vals['barcode'] = self.env['ir.sequence'].next_by_code('employee.par.id') or '/'
 
         res = super(Employee, self).create(vals)
 
@@ -66,12 +59,12 @@ class EmployeePublic(models.Model):
     bank = fields.Many2one('res.bank', string="Bank")
     bank_account = fields.Char("Bank Account")
     department_name = fields.Char(related='department_id.name', store=True)
-    contract_type = fields.Many2one("hr.contract.type", string="Contract Type", required=True)
+    contract_type = fields.Many2one("hr.contract.type", string="Contract Type")
     is_attendance_required = fields.Boolean("Attendance Required", default=True)
     check_in = fields.Boolean("Check In", default=True)
     check_out = fields.Boolean("Check Out", default=True)
 
-    division = fields.Many2one("droga.hr.division", "Division", required=True)
+    division = fields.Many2one("droga.hr.division", "Division")
 
     tin_no = fields.Char('Tin')
     pension_no = fields.Char('Pension No')

@@ -8,7 +8,7 @@ class Purchase_Request_Report_By_Amount(models.Model):
     _auto = False
     _order = 'rank'
 
-    id = fields.Integer("Id")
+    id = fields.Id()
     product_id = fields.Many2one('product.product')
     total_price_etb = fields.Float("Total Amount")
     quantity = fields.Float("Quantity")

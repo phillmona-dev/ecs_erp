@@ -16,7 +16,7 @@
     # Categories can be used to filter modules in modules listing
     # for the full list
     'category': 'CRM Extension',
-    'version': '1.0',
+    'version': '19.0.1.0.0',
 
     # always loaded
     'data': [
@@ -40,11 +40,9 @@
         'views/settings/crm_prod_group.xml',
         'views/settings/city.xml',
         'views/settings/area.xml',
-        'views/lead_extension.xml',
         'reports/plan_analysis.xml',
         'reports/doctors_schedule.xml',
         'reports/done_activities.xml',
-        'wizards/lead2opp_ext.xml',
         'views/settings/promotor_sales_master.xml',
         'views/settings/pro_sales_entry.xml',
     ],

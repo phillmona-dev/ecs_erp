@@ -3,12 +3,12 @@
 
     <!-- Stock.picking.type default filter per warehouse access -->
     <record id="stock.stock_picking_type_action" model="ir.actions.act_window">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('x_has_access','=',True)]</field>
     </record>
 
     <!-- Stock transfers default filter per warehouse access -->
     <record id="stock.action_picking_tree_all" model="ir.actions.act_window">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('x_has_access','=',True)]</field>
         <field name="context">{'create': "0",'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
     </record>
 
@@ -24,20 +24,8 @@
 
     <!-- Stock transfers default filter per warehouse access -->
     <record id="stock.action_picking_tree_ready" model="ir.actions.act_window">
-        <field name="domain">[('has_access','=',True)]</field>
+        <field name="domain">[('x_has_access','=',True)]</field>
         <field name="context">{'show_title': True,'create': False,'contact_display': 'partner_address', 'search_default_available': 1}</field>
-    </record>
-
-    <!-- Location report filter per warehouse access -->
-    <record model="ir.actions.act_window" id="stock.dashboard_open_quants">
-        <field name="domain">[('has_read_access','=',True)]</field>
-        <field name="name">Stock on hand</field>
-    </record>
-
-    <!-- Location report filter per warehouse access -->
-    <record model="ir.actions.act_window" id="stock.location_open_quants">
-        <field name="domain">[('has_read_access','=',True)]</field>
-        <field name="name">Stock on hand</field>
     </record>
 
     <!-- Move lines history filter per warehouse access -->
@@ -57,11 +45,11 @@
         parent="stock.menu_warehouse_report" groups="stock.group_stock_manager" sequence="5"/>
 
     <!--- Transfers menu avail for finance reconcile only -->
-    <menuitem id="stock.all_picking" name="Inventory correction" parent="account.menu_finance_entries_accounting_miscellaneous" sequence="20"
+    <menuitem id="stock.all_picking" name="Inventory correction" parent="account.account_transactions_menu" sequence="20"
               action="stock.action_picking_tree_all" groups="droga_inventory.inv_prod_fin"/>
 
     <!--- OB adjustment menu avail for finance reconcile only -->
-    <menuitem id="stock.menu_action_inventory_tree" name="Stock take Adjustments" groups="droga_inventory.inv_prod_fin" parent="account.menu_finance_entries_accounting_miscellaneous" sequence="10" action="stock.action_view_inventory_tree" />
+    <menuitem id="stock.menu_action_inventory_tree" name="Stock take Adjustments" groups="droga_inventory.inv_prod_fin" parent="account.account_transactions_menu" sequence="10" action="stock.action_view_inventory_tree" />
 
     <!--- Pass context for reconciliation form -->
     <record id="stock.action_picking_tree_all" model="ir.actions.act_window">

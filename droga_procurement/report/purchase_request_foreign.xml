@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <!-- action for sales report -->
@@ -188,8 +188,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="request.env['droga.purhcase.request.market.analysis'].search([('purhcase_request_id', '=', o.name)])"
-                                   t-as="obj">
+                                <t t-foreach="request.env['droga.purhcase.request.market.analysis'].search([('purhcase_request_id', '=', o.name)])" t-as="obj">
                                     <tr>
                                         <td class="small">
                                             <span t-esc="obj_index + 1"/>
@@ -289,8 +288,7 @@
         <field name="view_mode">pivot</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_request_top_ten_detail_pivot')})]"/>
+        <field name="view_ids" eval="[(5, 0, 0),         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_request_top_ten_detail_pivot')})]"/>
 
     </record>
 
@@ -300,12 +298,12 @@
         <field name="name">Top 10 Items by Amount Tree View</field>
         <field name="model">droga.purchase.request.foreign.by.amount.report</field>
         <field name="arch" type="xml">
-            <tree string="Top 10 Items by Amount">
+            <list string="Top 10 Items by Amount">
                 <field name="product_id"/>
                 <field name="quantity"/>
                 <field name="total_price_etb"/>
                 <field name="rank" string="Top"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -358,7 +356,7 @@
     <record id="droga_purchase_request_foreign_by_amount_report_action" model="ir.actions.act_window">
         <field name="name">Top 10 Items by Amount</field>
         <field name="res_model">droga.purchase.request.foreign.by.amount.report</field>
-        <field name="view_mode">tree,pivot,graph</field>
+        <field name="view_mode">list,pivot,graph</field>
         <field name="domain">[]</field>
         <field name="context">{"search_default_top_10":1}</field>
         <field name="help" type="html">
@@ -374,12 +372,12 @@
         <field name="name">Top 10 Items by quantity Tree View</field>
         <field name="model">droga.purchase.request.foreign.by.quantity.report</field>
         <field name="arch" type="xml">
-            <tree string="Top 10 Items by quantity">
+            <list string="Top 10 Items by quantity">
                 <field name="product_id"/>
                 <field name="quantity"/>
                 <field name="total_price_etb"/>
                 <field name="rank" string="Top"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -432,7 +430,7 @@
     <record id="droga_purchase_request_foreign_by_quantity_report_action" model="ir.actions.act_window">
         <field name="name">Top 10 Items by Quantity</field>
         <field name="res_model">droga.purchase.request.foreign.by.quantity.report</field>
-        <field name="view_mode">tree,pivot,graph</field>
+        <field name="view_mode">list,pivot,graph</field>
         <field name="domain">[]</field>
         <field name="context">{"search_default_top_10":1}</field>
         <field name="help" type="html">

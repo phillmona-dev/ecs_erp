@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     droga_inventory_stock_move_reservation_form
 
@@ -21,19 +21,18 @@
         <field name="name">stock.move.reservation.tree</field>
         <field name="model">stock.move</field>
         <field name="arch" type="xml">
-            <tree editable="bottom" create="0" delete="0">
-                <field name="product_id" readonly="1"></field>
-                <field name="reference" readonly="1"></field>
-                <field name="origin" readonly="1"></field>
-                <field name="partner_id" string="Customer"></field>
-                <field name="reservation_discard_time"></field>
-                <field name="source_wh"></field>
-                <field name="reserve_indef"></field>
-                <field name="product_uom_qty" sum="Total" readonly="1"></field>
-                <field name="reserved_qty" sum="Total"></field>
-                <button icon="fa-credit-card-alt" type="object" string="View history" name="view_reg_hist"
-                        class="oe_stat_button"></button>
-            </tree>
+            <list editable="bottom" create="0" delete="0">
+                <field name="product_id" readonly="1"/>
+                <field name="reference" readonly="1"/>
+                <field name="origin" readonly="1"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="reservation_discard_time"/>
+                <field name="source_wh"/>
+                <field name="reserve_indef"/>
+                <field name="product_uom_qty" sum="Total" readonly="1"/>
+                <field name="reserved_qty" sum="Total"/>
+                <button icon="fa-credit-card-alt" type="object" string="View history" name="view_reg_hist" class="oe_stat_button"/>
+            </list>
         </field>
     </record>
 
@@ -42,13 +41,13 @@
         <field name="model">stock.move</field>
         <field name="arch" type="xml">
             <search>
-                <field name="product_id"></field>
-                <field name="reference" ></field>
-                <field name="origin" ></field>
-                <field name="source_wh"></field>
-                <field name="reserve_indef"></field>
-                <field name="product_uom_qty" ></field>
-                <field name="reserved_qty"></field>
+                <field name="product_id"/>
+                <field name="reference"/>
+                <field name="origin"/>
+                <field name="source_wh"/>
+                <field name="reserve_indef"/>
+                <field name="product_uom_qty"/>
+                <field name="reserved_qty"/>
             </search>
         </field>
     </record>
@@ -56,18 +55,11 @@
     <record id="droga_inventory_stock_move_reservation_action" model="ir.actions.act_window">
         <field name="name">Store reservation management</field>
         <field name="res_model">stock.move</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="droga_inventory_stock_move_reservation_search"></field>
-        <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_inventory_stock_move_reservation_tree')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('droga_inventory_stock_move_reservation_form')})]"/>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="droga_inventory_stock_move_reservation_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),                 (0, 0, {'view_mode': 'list', 'view_id': ref('droga_inventory_stock_move_reservation_tree')}),                 (0, 0, {'view_mode': 'form', 'view_id': ref('droga_inventory_stock_move_reservation_form')})]"/>
         <field name="domain">[('has_read_access','=',True),('origin','like','SO%'),('location_id.usage', '=', 'internal'),('location_dest_id.usage', '!=', 'internal'),('state','not in',['done','cancel','draft'])]</field>
     </record>
 
-    <menuitem
-            id="droga_stock_reserve_management_menu"
-            name="Store reservation management"
-            action="droga_inventory_stock_move_reservation_action"
-            groups="droga_inventory.stores_manager,droga_sales.sales_price_change_admin,droga_sales.sales_wholesale_approve_admin,droga_sales.sales_import_approve_admin"
-            parent="stock.menu_stock_warehouse_mgmt"/>
+    <menuitem id="droga_stock_reserve_management_menu" name="Store reservation management" action="droga_inventory_stock_move_reservation_action" groups="droga_inventory.stores_manager" parent="stock.menu_stock_warehouse_mgmt"/>
 </odoo>

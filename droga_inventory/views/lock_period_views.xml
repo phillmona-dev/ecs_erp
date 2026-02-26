@@ -5,12 +5,12 @@
         <field name="model">droga.inv.lock_period</field>
         <field name="arch" type="xml">
 
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
                 <field name="company_id"/>
-            </tree>
+            </list>
 
         </field>
     </record>
@@ -39,7 +39,7 @@
                 <sheet>
                     <div class="oe_right oe_button_box">
                     </div>
-                    <div></div>
+                    <div/>
                     <group colspan="4" col="4">
                         <group colspan="2">
                             <field name="name"/>
@@ -68,15 +68,10 @@
     <record model="ir.actions.act_window" id="lock_period_action_view">
         <field name="name">Locked Period</field>
         <field name="res_model">droga.inv.lock_period</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem
-            parent="account.menu_finance_entries_accounting_miscellaneous"
-            id="menu_stock_config_lock_period"
-            name="Lock Period for sales and Inv"
-            action="lock_period_action_view"
-            sequence="50"/>
+    <menuitem parent="account.account_transactions_menu" id="menu_stock_config_lock_period" name="Lock Period for sales and Inv" action="lock_period_action_view" sequence="50"/>
 
     <record id="base_uninstall_disable" model="ir.ui.view">
         <field name="name">uninstall.disable</field>

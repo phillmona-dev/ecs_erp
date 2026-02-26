@@ -1,33 +1,33 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="droga_stock_valuation_transactions_import_tree" model="ir.ui.view">
         <field name="name">droga.stock.valuation.tree.transaction.tree</field>
         <field name="model">droga.stock.valuation.layer</field>
         <field name="arch" type="xml">
-            <tree string="Stock transactions - All" default_order='move_date asc, move_type asc, svl_id asc' delete="false" create="false">
+            <list string="Stock transactions - All" default_order="move_date asc, move_type asc, svl_id asc" delete="false" create="false">
                 <field name="id"/>
                 <field name="move_date" string="Weighted Avg date"/>
                 <field name="move_date_initial"/>
                 <field name="move_type"/>
                 <field name="reference"/>
-                <field name="account_move_id" widget="many2one" options='{"no_open": False}'/>
+                <field name="account_move_id" widget="many2one" options="{&quot;no_open&quot;: False}"/>
                 <field name="inv_acc"/>
                 <field name="con_acc"/>
                 <field name="origin"/>
-                <field name='product_id'/>
-                <field name='categ_id'/>
-                <field name='warehouse_id'/>
-                <field name='uom_id'/>
-                <field name='quantity' sum="Total"/>
-                <field name='unit_cost'/>
-                <field name='value' sum="Total"/>
-                <field name='remaining_qty'/>
-                <field name='remaining_value'/>
-                <field name='move_date'/>
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="warehouse_id"/>
+                <field name="uom_id"/>
+                <field name="quantity" sum="Total"/>
+                <field name="unit_cost"/>
+                <field name="value" sum="Total"/>
+                <field name="remaining_qty"/>
+                <field name="remaining_value"/>
+                <field name="move_date"/>
 <!--                <button name="revaluate_after_date_button" string="UPD" type="object" class="btn-primary"/>-->
-                <field name='history_vals' invisible="1"/>
-                <button name="show_history" attrs="{'invisible': [('history_vals', '=', [])]}" string="Show History" type="object" class="btn-primary"/>
-            </tree>
+                <field name="history_vals" invisible="1"/>
+                <button name="show_history" string="Show History" type="object" class="btn-primary" invisible="(history_vals == [])"/>
+            </list>
         </field>
     </record>
 
@@ -35,7 +35,7 @@
         <field name="name">droga.stock.valuation.tree.history.tree</field>
         <field name="model">droga.stock.valuation.history</field>
         <field name="arch" type="xml">
-            <tree string="Stock Update history" delete="false" create="false">
+            <list string="Stock Update history" delete="false" create="false">
                 <field name="dsvl_id"/>
                 <field name="create_date" string="Update date"/>
                 <field name="reference"/>
@@ -43,10 +43,10 @@
                 <field name="unit_cost"/>
                 <field name="value" sum="Total"/>
                 <field name="to_value"/>
-                <field name='remaining_qty'/>
-                <field name='remaining_value'/>
-                <field name='upd_date'/>
-            </tree>
+                <field name="remaining_qty"/>
+                <field name="remaining_value"/>
+                <field name="upd_date"/>
+            </list>
         </field>
     </record>
 
@@ -58,42 +58,26 @@
                 <field name="move_date"/>
                 <field name="reference"/>
                 <field name="origin"/>
-                <field name='product_id'/>
-                <field name='categ_id'/>
-                <field name='warehouse_id'/>
-                <field name='id'/>
-                <field name='uom_id'/>
-                <field name='quantity'/>
-                <field name='unit_cost'/>
-                <field name='value'/>
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="warehouse_id"/>
+                <field name="id"/>
+                <field name="uom_id"/>
+                <field name="quantity"/>
+                <field name="unit_cost"/>
+                <field name="value"/>
 
                 <filter string="Product category" name="categ_id" domain="[]" context="{'group_by': 'categ_id'}"/>
 
-                <filter string="Today"
-                        domain="[('move_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('move_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
-                        name="today_trans"></filter>
+                <filter string="Today" domain="[('move_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('move_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]" name="today_trans"/>
 
-                <filter string="Current week"
-                    domain="[
-                        ('move_date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
-                        ('move_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
-                    name="current_week_sales"></filter>
+                <filter string="Current week" domain="[                         ('move_date', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),                         ('move_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]" name="current_week_sales"/>
 
-                <filter string="Previous week"
-                       domain="[
-                    ('move_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d 00:00:00')),
-                    ('move_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d 00:00:00'))]"
-                        name="previous_week_sales"></filter>
+                <filter string="Previous week" domain="[                     ('move_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d 00:00:00')),                     ('move_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d 00:00:00'))]" name="previous_week_sales"/>
 
-                <filter string="Current month"
-                        domain="[('move_date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('move_date','&gt;=',time.strftime('%%Y-%%m-01'))]"
-                        name="current_month_trans"></filter>
+                <filter string="Current month" domain="[('move_date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),                         ('move_date','&gt;=',time.strftime('%%Y-%%m-01'))]" name="current_month_trans"/>
 
-                <filter string="Previous month"
-                        domain="[('move_date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('move_date','&lt;',time.strftime('%%Y-%%m-01'))]"
-                        name="previous_month_trans"></filter>
+                <filter string="Previous month" domain="[('move_date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),                         ('move_date','&lt;',time.strftime('%%Y-%%m-01'))]" name="previous_month_trans"/>
             </search>
         </field>
     </record>
@@ -102,16 +86,10 @@
     <record model="ir.actions.act_window" id="droga_stock_valuation_transactions_import_action">
         <field name="name">Stock transactions - ALL</field>
         <field name="res_model">droga.stock.valuation.layer</field>
-        <field name="view_mode">tree</field>
-        <field name="search_view_id" ref="droga_stock_valuation_transactions_import_search"></field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="droga_stock_valuation_transactions_import_search"/>
         <field name="view_id" ref="droga_stock_valuation_transactions_import_tree"/>
     </record>
 
-    <menuitem
-            id="droga_sales_valuation_finance"
-            name="Stock valuation by type"
-            action="droga_stock_valuation_transactions_import_action"
-            parent="droga_finance.droga_reciveables_report"
-            groups="droga_finance.business_control_specialist_group,droga_inventory.inv_prod_fin"
-            sequence="25"/>
+    <menuitem id="droga_sales_valuation_finance" name="Stock valuation by type" action="droga_stock_valuation_transactions_import_action" parent="droga_finance.droga_reciveables_report" groups="droga_finance.business_control_specialist_group,droga_inventory.inv_prod_fin" sequence="25"/>
 </odoo>

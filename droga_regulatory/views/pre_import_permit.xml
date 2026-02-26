@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
         <!-- Form View -->
@@ -8,10 +8,8 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <field name="ra_status" invisible="1"></field>
-                        <button name="activty_for_ra" type="object" string="Submit to RA"
-                                class="btn-primary"
-                                attrs="{'invisible': [('ra_status', '=', 'ra')]}"/>
+                        <field name="ra_status" invisible="1"/>
+                        <button name="activty_for_ra" type="object" string="Submit to RA" class="btn-primary" invisible="(ra_status == 'ra')"/>
                     </header>
                     <sheet>
                         <h2>Pre-Import Permit</h2>
@@ -54,7 +52,7 @@
             <field name="name">pre.import.permit.tree</field>
             <field name="model">droga.reg.pre.import.permit.header</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="manufacturer"/>
                     <field name="proforma_invoice_no"/>
                     <field name="app_no"/>
@@ -63,7 +61,7 @@
                     <field name="date_generated"/>
                     <field name="no_days"/>
 
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -71,7 +69,7 @@
         <record id="action_pre_import_permit" model="ir.actions.act_window">
             <field name="name">Pre Import Permits</field>
             <field name="res_model">droga.reg.pre.import.permit.header</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
         </record>
     </data>
 </odoo>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <!-- tree view for crv documents -->
@@ -7,7 +7,7 @@
         <field name="name">Cash Receipt Voucher List</field>
         <field name="model">account.move.crv</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" width="15"/>
                 <field name="customer_name" width="15"/>
                 <field name="crv_ref" width="15"/>
@@ -15,7 +15,7 @@
                 <field name="payment_description" width="15"/>
                 <field name="amount_word" width="15"/>
 
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -25,7 +25,7 @@
     <record id="droga_account_move_crv_report_tree_action" model="ir.actions.act_window">
         <field name="name">Cash Receipt Voucher List</field>
         <field name="res_model">account.move.crv</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="help" type="html">

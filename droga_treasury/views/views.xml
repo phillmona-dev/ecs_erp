@@ -20,7 +20,7 @@
     <record model="ir.actions.act_window" id="droga_treasury.action_window">
       <field name="name">droga_treasury window</field>
       <field name="res_model">droga_treasury.droga_treasury</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">list,form</field>
     </record>
 -->
 

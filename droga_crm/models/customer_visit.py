@@ -91,6 +91,8 @@ class customer_visit_header(models.Model):
 
     def _search_field(self, operator, value):
         if operator=='=':
+            if not request:
+                return [('id','in',[])]
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             if len(ses)==0:
                 return [('id','in',[])]
@@ -102,6 +104,8 @@ class customer_visit_header(models.Model):
 
     def _search_field_app(self, operator, value):
         if operator=='=':
+            if not request:
+                return [('id','in',[])]
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             if len(ses)==0:
                 return [('id','in',[])]

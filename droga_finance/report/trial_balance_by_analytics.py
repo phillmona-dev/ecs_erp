@@ -8,7 +8,7 @@ class TrialBalanceByAnalytics(models.Model):
     _auto = False
     _order = 'account_id asc'
 
-    id = fields.Integer('Id')
+    id = fields.Id()
     account_id = fields.Many2one('account.account',string='Account')
     analytic_account_id = fields.Many2one('account.analytic.account',string='Analytic Account')
     company_id = fields.Many2one('res.company',string='Company',default=lambda self: self.env.company.id)
@@ -22,12 +22,12 @@ class TrialBalanceByAnalytics(models.Model):
         self.env.cr.execute("""
                                create or replace view droga_finance_trial_balance_by_analytics as (
 
-                                    select row_number()over() as id,aml.account_id,aal.account_id as analytic_account_id,aml.company_id,aml.date,aal.plan_id,sum(aml.debit) as debit,sum(aml.credit) as credit 
+                                    select row_number()over() as id,aml.account_id,aal.account_id as analytic_account_id,aml.company_id,aml.date,aaa.plan_id,sum(aml.debit) as debit,sum(aml.credit) as credit
                                     from account_move_line aml 
                                     left join account_analytic_line aal on aml.id=aal.move_line_id
+                                    left join account_analytic_account aaa on aal.account_id=aaa.id
                                     where aml.parent_state='posted' and aml.company_id=1
-                                    group by aml.account_id,aal.account_id,aml.company_id,aal.plan_id,aml.date
+                                    group by aml.account_id,aal.account_id,aml.company_id,aaa.plan_id,aml.date
 
                                )""")
-
 

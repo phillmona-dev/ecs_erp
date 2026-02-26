@@ -436,10 +436,10 @@ class droga_stock_transfer_office_supplies_request_detail(models.Model):
     # available_qty = fields.Float('Available', readonly=True, compute="get_count")
 
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
-                                  domain="[('category_id', '=', product_uom_category_id)]")
-    # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="[('category_id', '=', product_uom_category_id)]")
+                                  domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
+    # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(
-        related='product_id.uom_id.category_id', store=True)
+        related='product_id.uom_id.relative_uom_id', store=True)
 
     unit_price = fields.Float('Unit Price')
     total_price = fields.Float(

@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!-- final_registered_renewal_views.xml -->
-<odoo>
+<?xml version='1.0' encoding='utf-8'?>
+<!-- final_registered_renewal_views.xml --><odoo>
     <data noupdate="1">
        <record id="ir_cron_scheduler_registered_list_notify" model="ir.cron">
            <field name="name">Registered and renewal date notification</field>
@@ -10,7 +9,6 @@
 <!--           <field name="user_id" ref="base.user_root"/>-->
            <field name="interval_number">1</field>
            <field name="interval_type">days</field>
-           <field name="numbercall">-1</field>
        </record>
     </data>
     <data>
@@ -19,13 +17,13 @@
             <field name="name">final.registered.renewal.tree</field>
             <field name="model">droga.reg.final.registered.renewal</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="company_name"/>
                     <field name="approval_date"/>
                     <field name="registered_under"/>
                     <field name="remark"/>
                     <field name="product_type"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -51,7 +49,7 @@
                                 <field name="product_name"/>
                                 <field name="validity_date"/>
                                 <field name="pack_size"/>
-                                <field name="applicant" attrs="{'invisible': [('registered_under', '!=', 'other')]}"/>
+                                <field name="applicant" invisible="(registered_under != 'other')"/>
 
                             </group>
 
@@ -59,13 +57,13 @@
                         </group>
 
                         <field name="details">
-                            <tree>
+                            <list>
 
                                 <field name="follow_up"/>
                                 <field name="reminding_email"/>
 
 
-                            </tree>
+                            </list>
                         </field>
                     </sheet>
 
@@ -84,7 +82,7 @@
         <record id="action_final_registered_renewal" model="ir.actions.act_window">
             <field name="name">Final Registered and Renewal Follow Up Sheet</field>
             <field name="res_model">droga.reg.final.registered.renewal</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
         </record>
     </data>
 </odoo>

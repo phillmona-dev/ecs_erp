@@ -15,7 +15,7 @@
                     <p style="margin: 0px; padding: 0px; font-size: 13px;">
                         Dear <t t-out="object.supplier_id.name or ''">Brandon Freeman</t>
                         <t t-if="object.supplier_id.parent_id">
-                            (                            <t t-out="object.partner_id.supplier_id.name or ''">Azure Interior</t>)
+                            (<t t-out="object.supplier_id.parent_id.name or ''">Azure Interior</t>)
                         </t>
                         <br></br>
                         <br></br>
@@ -35,7 +35,6 @@
                 </div>
             </field>
             <!--<field name="report_template" ref="droga_purhcase_rfq_without_price_foreign_report_action"/>-->
-            <field name="report_name">RFQ_{{ (object.name or '').replace('/','_') }}</field>
             <field name="lang">{{ object.supplier_id.lang }}</field>
             <field name="auto_delete" eval="True"/>
         </record>

@@ -216,7 +216,7 @@ class droga_stock_cons_issue_detail(models.Model):
         digits='Product Unit of Measure', store=True,
         default=1.0, required=True, state={'done': [('readonly', True)]})
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
-                                  domain="[('category_id', '=', product_uom_category_id)]")
+                                  domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
 
     @api.depends('product_id')
     def get_uom(self):
@@ -229,8 +229,8 @@ class droga_stock_cons_issue_detail(models.Model):
     def set_uom(self):
         pass
 
-    # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="[('category_id', '=', product_uom_category_id)]")
-    product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
+    # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
+    product_uom_category_id = fields.Many2one(related='product_id.uom_id.relative_uom_id', store=True)
     available_qty = fields.Float('Available', readonly=True, compute="get_count")
 
     @api.depends('state', 'product_id', 'product_uom','warehouse_id')

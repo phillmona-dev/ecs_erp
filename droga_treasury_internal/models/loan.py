@@ -1,13 +1,9 @@
 from datetime import datetime, date, time, timedelta
-from pydoc import classname
-from turtle import write_docstringdict
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, ValidationError
 
 
 from odoo import api, fields, models
-
-from odoo.tools.convert import RecordDictWrapper
 
 
 class AccountLoanModifaied(models.Model):

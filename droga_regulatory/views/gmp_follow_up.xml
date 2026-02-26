@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!-- gmp_inspection_views.xml -->
-<odoo>
+<?xml version='1.0' encoding='utf-8'?>
+<!-- gmp_inspection_views.xml --><odoo>
     <data noupdate="1">
        <record id="ir_cron_scheduler_gmp_notify" model="ir.cron">
            <field name="name">GMP Due date notification</field>
@@ -10,7 +9,6 @@
 <!--           <field name="user_id" ref="base.user_root"/>-->
            <field name="interval_number">1</field>
            <field name="interval_type">days</field>
-           <field name="numbercall">-1</field>
        </record>
     </data>
     <data>
@@ -19,12 +17,12 @@
             <field name="name">gmp.inspection.tree</field>
             <field name="model">droga.reg.gmp.inspection</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="company_name"/>
                     <field name="product_line_description"/>
                     <field name="gmp_application_date"/>
                     <field name="renewal"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -59,9 +57,9 @@
                         </group>
 
                         <notebook>
-                            <page string="Document Attachment" attrs="{'invisible': [('document_sent', '=', False)]}">
+                            <page string="Document Attachment" invisible="(document_sent == False)">
                                 <group>
-                                    <field name="document_desc" />
+                                    <field name="document_desc"/>
                                     <button name="send_doc_notification" type="object" string="Send Notification" class="oe_highlight"/>
                                 </group>
                             </page>
@@ -93,7 +91,7 @@
                                 <div class="o_kanban_image">
                                 </div>
                                 <div class="oe_kanban_details">
-                                    <strong class="o_kanban_record_title" attrs="{'invisible': [('document_sent', '!=', True)]}">
+                                    <strong class="o_kanban_record_title" invisible="(document_sent != True)">
                                         <field name="document_desc"/>
                                     </strong>
                                     <hr/>
@@ -128,7 +126,7 @@
         <record id="action_gmp_inspection" model="ir.actions.act_window">
             <field name="name">GMP Inspections</field>
             <field name="res_model">droga.reg.gmp.inspection</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
         </record>
     </data>
 </odoo>

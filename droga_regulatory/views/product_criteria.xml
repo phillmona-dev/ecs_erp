@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
 
@@ -46,7 +46,7 @@
         <field name="model">product.criteria</field>
         <field name="arch" type="xml">
 
-            <tree>
+            <list>
                 <field name="product_demand"/>
                 <field name="level_of_professionals"/>
                 <field name="can_be_substituted"/>
@@ -64,13 +64,13 @@
                 <field name="expensive_medicine"/>
                 <field name="program_medicine"/>
                 <field name="storage_mechanism"/>
-            </tree>
+            </list>
         </field>
     </record>
     </data>
 <record id="action_medicine" model="ir.actions.act_window">
     <field name="name">Medicine</field>
     <field name="res_model">product.criteria</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
 </record>
 </odoo>

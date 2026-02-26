@@ -467,6 +467,17 @@ class account_move_line(models.Model):
     inv_origin=fields.Char('Inovice origin',store=True,compute='_get_origin')
     stat=fields.Char(string='Match Status',store=True,default='Unmatched')
 
+    def _get_linked_stock_move(self):
+        self.ensure_one()
+        move = self.move_id
+        if not move:
+            return self.env['stock.move']
+        if 'stock_move_id' in move._fields and move.stock_move_id:
+            return move.stock_move_id
+        if 'stock_move_ids' in move._fields and move.stock_move_ids:
+            return move.stock_move_ids[:1]
+        return self.env['stock.move']
+
     @api.depends('move_id.state')
     def _get_origin(self):
         for rec in self:
@@ -489,7 +500,8 @@ class account_move_line(models.Model):
 
     def update_cost_ref(self):
         for rec in self:
-            analytic = self.env['stock.move'].search([('id', '=', rec.move_id.stock_move_id.id)])
+            linked_move = rec._get_linked_stock_move()
+            analytic = linked_move if linked_move else self.env['stock.move']
             if not rec.inv_origin and len(analytic)>0:
                 if analytic[0].origin:
                     rec.inv_origin=analytic[0].origin
@@ -519,7 +531,10 @@ class account_move_line(models.Model):
 
             if rec.profit_cost_center=='-' and rec.account and rec.journal_id.id==2:
                 if rec.account.startswith('5'):
-                    analytic=self.env['stock.move.line'].search([('move_id','=',rec.move_id.stock_move_id.id)])
+                    linked_move = rec._get_linked_stock_move()
+                    analytic = self.env['stock.move.line']
+                    if linked_move:
+                        analytic = self.env['stock.move.line'].search([('move_id', '=', linked_move.id)])
                     if len(analytic)>0:
                         rec.profit_cost_center=analytic[0].trans_warehouse.linked_analytic.name if analytic[0].trans_warehouse.linked_analytic else rec.profit_cost_center
         return ret
@@ -568,8 +583,8 @@ class account_move_line(models.Model):
                 record.origin_ref = '-'
 
     @api.onchange('analytic_distribution')
-    def analytic_distribution(self):
-        ValidationError("Hello")
+    def _onchange_analytic_distribution(self):
+        self.get_acc_move()
 
 class AccountInvoiceReportSalesCost(models.Model):
     _inherit = 'account.invoice.report'

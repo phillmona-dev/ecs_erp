@@ -1,7 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo.http import request
-from odoo.tools.safe_eval import datetime
 
 
 class MarketAnalysis(models.Model):

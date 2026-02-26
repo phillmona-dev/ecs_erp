@@ -2,7 +2,6 @@ from ast import literal_eval
 from collections import defaultdict
 from datetime import timedelta,datetime
 
-import simplejson
 from lxml import etree
 #from pkg_resources import _
 
@@ -36,7 +35,7 @@ class droga_stock_move_line_extension(models.Model):
                 rec.source_wh_type = rec.location_id.warehouse_id.wh_type
             else:
                 rec.source_wh_type = rec.location_dest_id.warehouse_id.wh_type
-    has_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     has_read_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_read_access',
                                 search='_search_has_read_access')
@@ -72,16 +71,18 @@ class droga_stock_move_line_extension(models.Model):
             else:
                 rec.qty_done = rec.import_quant
 
-    @api.depends('qty_done','product_id.import_uom_new','reserved_uom_qty')
+    @api.depends('qty_done', 'quantity', 'product_id.import_uom_new', 'reserved_uom_qty')
     def _get_on_hand(self):
         for rec in self:
+            done_qty = rec.qty_done if 'qty_done' in rec._fields else rec.quantity
+            reserved_qty = rec.reserved_uom_qty if 'reserved_uom_qty' in rec._fields else rec.quantity
             if rec.company_id.id==1 and rec.product_id.import_uom_new.factor!=0:
-                rec.import_quant = rec.qty_done / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
-                rec.reserved_uom_qty_done = rec.reserved_uom_qty / (
+                rec.import_quant = done_qty / (rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
+                rec.reserved_uom_qty_done = reserved_qty / (
                         rec.product_id.uom_id.factor / rec.product_id.import_uom_new.factor)
             else:
-                rec.import_quant = rec.qty_done
-                rec.reserved_uom_qty_done = rec.reserved_uom_qty
+                rec.import_quant = done_qty
+                rec.reserved_uom_qty_done = reserved_qty
 
     @api.depends('move_id.trans_type', 'move_id.trans_type_detail')
     def _get_trans_type(self):
@@ -108,19 +109,19 @@ class droga_stock_move_line_extension(models.Model):
 
         if operator == '=':
 
-            has_access = self.env['stock.move.line'].sudo().search(
-                ['|',('location_id.has_access', '=', True),('location_dest_id.has_access', '=', True)])
-            return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+            x_has_access = self.env['stock.move.line'].sudo().search(
+                ['|',('location_id.x_has_access', '=', True),('location_dest_id.x_has_access', '=', True)])
+            return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id', 'in', [])]
 
     def _compute_has_access(self):
         for rec in self:
 
-            if rec.location_id.has_access or rec.location_dest_id.has_access:
-                rec.has_access = True
+            if rec.location_id.x_has_access or rec.location_dest_id.x_has_access:
+                rec.x_has_access = True
             else:
-                rec.has_access = False
+                rec.x_has_access = False
 
     def _search_has_read_access(self, operator, value):
 
@@ -152,7 +153,7 @@ class droga_stock_move_line_extension(models.Model):
         return aggregated_move_lines
 class droga_warehouse_extension(models.Model):
     _inherit = 'stock.warehouse'
-    has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
 
     has_no_access=fields.Boolean('is_loc_not_accessible', default=False, compute='_compute_has_access',
@@ -177,9 +178,9 @@ class droga_warehouse_extension(models.Model):
             if len(compiled_wh_domain) == 0:
                 return [('id', 'in', self.env['stock.warehouse'])]
             else:
-                has_access = self.env['stock.warehouse'].sudo().search(
+                x_has_access = self.env['stock.warehouse'].sudo().search(
                     [('code', 'in', compiled_wh_domain)])
-                return [('id', 'not in', [x.id for x in has_access] if has_access else False)]
+                return [('id', 'not in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id', 'in', self.env['stock.warehouse'])]
 
@@ -191,9 +192,9 @@ class droga_warehouse_extension(models.Model):
             if len(compiled_wh_domain) == 0:
                 return [('id', 'in', [])]
             else:
-                has_access = self.env['stock.warehouse'].sudo().search(
+                x_has_access = self.env['stock.warehouse'].sudo().search(
                     [('code', 'in', compiled_wh_domain),'|',('active','=',True),('active','=',False)])
-                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+                return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id', 'in', [])]
 
@@ -203,10 +204,10 @@ class droga_warehouse_extension(models.Model):
 
         for rec in self:
             if rec.code in compiled_wh_domain:
-                rec.has_access = True
+                rec.x_has_access = True
                 rec.has_no_access = False
             else:
-                rec.has_access = False
+                rec.x_has_access = False
                 rec.has_no_access = True
 
     def write(self, vals):
@@ -242,7 +243,7 @@ class droga_location_extension(models.Model):
     name=fields.Char(tracking=True)
     location_id = fields.Many2one(tracking=True)
     wcode=fields.Char(related='warehouse_id.code')
-    has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     has_read_access = fields.Boolean('is_loc_accessible', default=False, compute='_compute_has_read_access',
                                 search='_search_has_read_access')
@@ -254,15 +255,15 @@ class droga_location_extension(models.Model):
             if len(compiled_wh_domain) == 0:
                 return [('id', 'in', [])]
             else:
-                has_access=self.env['stock.location']
+                x_has_access=self.env['stock.location']
                 if self.env.user.has_group('droga_inventory.inventory_stk'):
-                    has_access+= self.env['stock.location'].sudo().search(
+                    x_has_access+= self.env['stock.location'].sudo().search(
                         [('wcode', 'in', compiled_wh_domain) ,('con_type','!=','DIL')])
                 if self.env.user.has_group('droga_inventory.inventory_dm') :
-                    has_access+= self.env['stock.location'].sudo().search(
+                    x_has_access+= self.env['stock.location'].sudo().search(
                         [('wcode', 'in', compiled_wh_domain), ('con_type', '=', 'DIL')])
 
-                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+                return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id', 'in', [])]
 
@@ -288,9 +289,9 @@ class droga_location_extension(models.Model):
         for rec in self:
             if rec.wcode in compiled_wh_domain and ((self.env.user.has_group('droga_inventory.inventory_dm') and rec.con_type=='DIL') or
                                                     (self.env.user.has_group('droga_inventory.inventory_stk') and rec.con_type!='DIL')):
-                rec.has_access = True
+                rec.x_has_access = True
             else:
-                rec.has_access = False
+                rec.x_has_access = False
 
     def _compute_has_read_access(self):
         compiled_wh_domain=self.env.user.warehouse_ids_im_ws.mapped('code')+self.env.user.warehouse_ids_ph.mapped('code')
@@ -314,7 +315,7 @@ class droga_stock_picking_type_extension(models.Model):
         ('IM', 'Import'),
         ('WS', 'Wholesale'), ], string='Dispatch location.')
 
-    has_access=fields.Boolean('is_type_accessible',default=False,compute='_compute_has_access',search='_search_has_access')
+    x_has_access=fields.Boolean('is_type_accessible',default=False,compute='_compute_has_access',search='_search_has_access')
 
     request_type = fields.Selection(
         [("Local", "Local"), ("Foregin", "Foregin"), ("Pharmacy", "Pharmacy")], default="Local")
@@ -335,7 +336,7 @@ class droga_stock_picking_type_extension(models.Model):
             'default_immediate_transfer': default_immediate_tranfer,
             'default_company_id': self.env.company.id,
         }
-        domain = [('has_access','=',True)]
+        domain = [('x_has_access','=',True)]
 
         action_context = literal_eval(action['context'])
         context = {**action_context, **context}
@@ -353,13 +354,13 @@ class droga_stock_picking_type_extension(models.Model):
             if len(compiled_wh_domain)==0:
                 return [('id','in',[])]
             else:
-                has_access = self.env['stock.picking.type']
+                x_has_access = self.env['stock.picking.type']
                 if self.env.user.has_group('droga_inventory.inventory_stk'):
-                    has_access+=self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain),('dispatch_location','=',False)])
+                    x_has_access+=self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain),('dispatch_location','=',False)])
                 if self.env.user.has_group('droga_inventory.inventory_dm'):
-                    has_access+=(self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain),('dispatch_location','!=',False)]))
+                    x_has_access+=(self.env['stock.picking.type'].sudo().search([('warehouse_code','in',compiled_wh_domain),('dispatch_location','!=',False)]))
 
-                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+                return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id','in',[])]
 
@@ -369,9 +370,9 @@ class droga_stock_picking_type_extension(models.Model):
 
         for rec in self:
             if rec.warehouse_code in compiled_wh_domain:
-                rec.has_access=True
+                rec.x_has_access=True
             else:
-                rec.has_access=False
+                rec.x_has_access=False
 
 class droga_stock_uom_extension(models.Model):
     _inherit = 'uom.uom'
@@ -463,13 +464,18 @@ class val_layer(models.Model):
 
 class droga_inv_account_move(models.Model):
     _inherit = 'account.move'
-    @api.model
-    def create(self,vals):
-        to_ret=super(droga_inv_account_move, self).create(vals)
-        if to_ret.stock_move_id:
-            to_ret.date=to_ret.stock_move_id.date
-            for mv in to_ret.line_ids:
-                mv.date=to_ret.stock_move_id.date
+    @api.model_create_multi
+    def create(self, vals_list):
+        to_ret = super(droga_inv_account_move, self).create(vals_list)
+        for move in to_ret:
+            stock_move = False
+            if 'stock_move_id' in move._fields and move.stock_move_id:
+                stock_move = move.stock_move_id
+            elif 'stock_move_ids' in move._fields and move.stock_move_ids:
+                stock_move = move.stock_move_ids[:1]
+            if stock_move:
+                move.date = stock_move.date
+                move.line_ids.write({'date': stock_move.date})
         return to_ret
 
 class stock_move_mail_added(models.Model):
@@ -660,7 +666,7 @@ class droga_stock_move_extension(models.Model):
         for move in moves:
             move._do_unreserve()
 
-    has_access = fields.Boolean('is_move_accessible', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('is_move_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     has_read_access = fields.Boolean('is_move_accessible', default=False, compute='_compute_has_read_access',
                                 search='_search_has_read_access')
@@ -677,17 +683,17 @@ class droga_stock_move_extension(models.Model):
     def _search_has_access(self, operator, value):
 
         if operator == '=':
-            has_access = self.env['stock.move'].sudo().search(
-                #['|',('location_id.has_access', '=', True),('location_dest_id.has_access', '=', True)])
-                ['|','&', ('location_id.has_access', '=', True),('location_id.con_type', '!=', 'SRL'), '&',('location_dest_id.con_type', '!=', 'SRL'),('location_dest_id.has_access', '=', True)])
+            x_has_access = self.env['stock.move'].sudo().search(
+                #['|',('location_id.x_has_access', '=', True),('location_dest_id.x_has_access', '=', True)])
+                ['|','&', ('location_id.x_has_access', '=', True),('location_id.con_type', '!=', 'SRL'), '&',('location_dest_id.con_type', '!=', 'SRL'),('location_dest_id.x_has_access', '=', True)])
 
             if self.env.user.has_group('droga_inventory.inventory_dmi'):
-                has_access += (self.env['stock.move'].sudo().search([('picking_type_id.dispatch_location', '=', 'IM')]))
+                x_has_access += (self.env['stock.move'].sudo().search([('picking_type_id.dispatch_location', '=', 'IM')]))
             if self.env.user.has_group('droga_inventory.inventory_dmw'):
-                has_access += (self.env['stock.move'].sudo().search([('picking_type_id.dispatch_location', '=', 'WS')]))
+                x_has_access += (self.env['stock.move'].sudo().search([('picking_type_id.dispatch_location', '=', 'WS')]))
 
 
-            return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+            return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id', 'in', [])]
 
@@ -695,10 +701,10 @@ class droga_stock_move_extension(models.Model):
     def _compute_has_access(self):
         for rec in self:
 
-            if rec.location_id.has_access or rec.location_dest_id.has_access:
-                rec.has_access = True
+            if rec.location_id.x_has_access or rec.location_dest_id.x_has_access:
+                rec.x_has_access = True
             else:
-                rec.has_access = False
+                rec.x_has_access = False
 
     def _search_has_read_access(self, operator, value):
 
@@ -778,7 +784,7 @@ class droga_stock_picking_extension(models.Model):
     warehouse_list=fields.Many2many('stock.warehouse')
     from_wh = fields.Char('From location',compute='_get_loc_descr')
     to_wh = fields.Char('To location',compute='_get_loc_descr')
-    has_access = fields.Boolean('is_pick_accessible', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('is_pick_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     from_reconcile_menu=fields.Boolean('Menu is opened from reconciliation menu',default=False)
     to_correct_ref=fields.Char('To correct reference')
@@ -819,17 +825,17 @@ class droga_stock_picking_extension(models.Model):
     def _search_has_access(self, operator, value):
 
         if operator == '=':
-            has_access = self.env['stock.picking'].sudo().search(
-                #['|',('location_id.has_access', '=', True),('location_dest_id.has_access', '=', True)])
-                ['|','&', ('location_id.has_access', '=', True),('location_id.con_type', '!=', 'SRL'), '&',('location_dest_id.con_type', '!=', 'SRL'),('location_dest_id.has_access', '=', True)])
+            x_has_access = self.env['stock.picking'].sudo().search(
+                #['|',('location_id.x_has_access', '=', True),('location_dest_id.x_has_access', '=', True)])
+                ['|','&', ('location_id.x_has_access', '=', True),('location_id.con_type', '!=', 'SRL'), '&',('location_dest_id.con_type', '!=', 'SRL'),('location_dest_id.x_has_access', '=', True)])
 
             if self.env.user.has_group('droga_inventory.inventory_dmi'):
-                has_access += (self.env['stock.picking'].sudo().search([('picking_type_id.dispatch_location', '=', 'IM')]))
+                x_has_access += (self.env['stock.picking'].sudo().search([('picking_type_id.dispatch_location', '=', 'IM')]))
             if self.env.user.has_group('droga_inventory.inventory_dmw'):
-                has_access += (self.env['stock.picking'].sudo().search([('picking_type_id.dispatch_location', '=', 'WS')]))
+                x_has_access += (self.env['stock.picking'].sudo().search([('picking_type_id.dispatch_location', '=', 'WS')]))
 
 
-            return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+            return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id', 'in', [])]
 
@@ -845,10 +851,10 @@ class droga_stock_picking_extension(models.Model):
 
         for rec in self:
 
-            if rec.location_id.has_access or rec.location_dest_id.has_access:
-                rec.has_access = True
+            if rec.location_id.x_has_access or rec.location_dest_id.x_has_access:
+                rec.x_has_access = True
             else:
-                rec.has_access = False
+                rec.x_has_access = False
 
     @api.model
     def create(self, vals_list):
@@ -1020,7 +1026,9 @@ class droga_stock_product_extension(models.Model):
         for act in activity:
             act.sudo().action_done()
 
-    categ=fields.Many2one('uom.category',related='uom_id.category_id')
+    categ=fields.Many2one('uom.uom', related='uom_id.relative_uom_id')
+    # v19 dropped product.template.uom_po_id; keep a writable alias for legacy custom modules.
+    uom_po_id = fields.Many2one('uom.uom', string='Purchase UOM', related='uom_id', readonly=False, store=True)
     pharma_uom = fields.Many2one('uom.uom', string='Pharma UOM',tracking=True)
     import_uom_new = fields.Many2one('uom.uom', string='Import UOM', tracking=True)
     default_warehouse=fields.Many2one('stock.warehouse','Inventory warehouse',
@@ -1034,7 +1042,7 @@ class droga_stock_product_extension(models.Model):
     prod_approver = fields.Many2one('res.users', store=True)
 
 
-    has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('is_wh_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
 
     def _search_has_access(self, operator, value):
@@ -1052,9 +1060,9 @@ class droga_stock_product_extension(models.Model):
             if len(compiled_wh_domain) == 0:
                 return [('id', 'in', [])]
             else:
-                has_access = self.env['stock.warehouse'].sudo().search(
+                x_has_access = self.env['stock.warehouse'].sudo().search(
                     [('code', 'in', compiled_wh_domain)])
-                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+                return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id', 'in', [])]
 
@@ -1070,9 +1078,9 @@ class droga_stock_product_extension(models.Model):
 
         for rec in self:
             if rec.code in compiled_wh_domain:
-                rec.has_access = True
+                rec.x_has_access = True
             else:
-                rec.has_access = False
+                rec.x_has_access = False
 
     def write(self, vals_list):
         if not self.env.user.has_group('droga_inventory.droga_prod_app') and 'name' in vals_list:

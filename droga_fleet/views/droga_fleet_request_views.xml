@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <record id="droga_fleet_vehicle_custom" model="ir.ui.view">
@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//page[1]" position="attributes">
-                <attribute name='invisible'>1</attribute>
+                <attribute name="invisible">1</attribute>
             </xpath>
             <!--        <page string="Tax Info" position="attributes">-->
             <!--            <attribute name='invisible'>1</attribute>-->
@@ -26,8 +26,7 @@
                 <field name="cc"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page name="droga_rent_contract" string="Rent Contarct"
-                      attrs="{'invisible': [('vehicle_status', '!=', 'rented')] }">
+                <page name="droga_rent_contract" string="Rent Contarct" invisible="(vehicle_status != 'rented')">
                     <group>
                         <group>
                             <field name="four_wheels"/>
@@ -57,32 +56,29 @@
                 <page name="droga_fleet_insurance" string="Insurance">
                     <group>
                         <group>
-                            <field name="bolo_renewal_date"
-                                   attrs="{'invisible': [('vehicle_status', '!=', 'owned')] }"/>
-                            <field name="bolo_due_date" attrs="{'invisible': [('vehicle_status', '!=', 'owned')] }"/>
+                            <field name="bolo_renewal_date" invisible="(vehicle_status != 'owned')"/>
+                            <field name="bolo_due_date" invisible="(vehicle_status != 'owned')"/>
                         </group>
                         <group>
-                            <field name="insurance_renewal_date"
-                                   attrs="{'invisible': [('vehicle_status', '!=', 'owned')] }"/>
-                            <field name="insurance_due_date"
-                                   attrs="{'invisible': [('vehicle_status', '!=', 'owned')] }"/>
+                            <field name="insurance_renewal_date" invisible="(vehicle_status != 'owned')"/>
+                            <field name="insurance_due_date" invisible="(vehicle_status != 'owned')"/>
                         </group>
                     </group>
 
                             <field name="service_details">
-                                <tree>
+                                <list>
                                     <field name="service_due_date"/>
                                      <field name="service_date"/>
 
-                                </tree>
+                                </list>
                             </field>
 
-                            <field name="contract_details" >
-                                <tree>
+                            <field name="contract_details">
+                                <list>
                                     <field name="contract_renewal_date"/>
                                      <field name="contract_due_date"/>
 
-                                </tree>
+                                </list>
                             </field>
 
                 </page>

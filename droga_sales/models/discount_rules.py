@@ -1,6 +1,5 @@
 from datetime import datetime
 from datetime import timedelta, date
-import simplejson
 from lxml import etree
 import math
 
@@ -86,6 +85,7 @@ class droga_price_discount_per_product_customer(models.Model):
 class sale_order_line(models.Model):
     _inherit = 'sale.order.line'
 
+    product_uom = fields.Many2one('uom.uom', related='product_uom_id', store=True, readonly=False)
     price_unit = fields.Float(
         string="Unit Price",
         compute='_compute_price_unit',
@@ -109,15 +109,23 @@ class sale_order_line(models.Model):
     wareh = fields.Many2one('stock.warehouse')
     store_placement = fields.Boolean('Placement', default=False)
     std_unit_price = fields.Float(readonly=True, string='UP Default')
-    has_access = fields.Boolean(related='order_id.has_access')
+    x_has_access = fields.Boolean(related='order_id.x_has_access')
     order_from = fields.Char(related='order_id.order_from')
-    has_cust_access = fields.Boolean(related='order_id.partner_id.is_cust_available')
+    has_cust_access = fields.Boolean(
+        related='order_id.partner_id.is_cust_available',
+        search='_search_has_cust_access',
+    )
     product_uom_pharma_qty=fields.Float('Quantity',default=1)
     product_uom_pharma_measure=fields.Many2one('uom.uom',store=True)
     product_uom_pharma_measure_descr=fields.Char(related='product_uom.name',string='Unit')
     has_pharma_access = fields.Boolean(default=False, related='order_id.has_pharma_access')
     disc_applied=fields.Float('Discount applied',default=0)
     pr_sales_logged_empid_code = fields.Char('hr.employee', related='order_id.pr_sales_logged_empid_code', store=True)
+
+    def _search_has_cust_access(self, operator, value):
+        partners = self.env['res.partner'].search([('is_cust_available', operator, value)])
+        return [('order_id.partner_id', 'in', partners.ids if partners else [0])]
+
     def write(self, vals):
         res = super(sale_order_line, self).write(vals)
         if self.order_id.state in ('sale', 'done','dispense') and ('product_uom_pharma_qty' in vals or 'price_unit' in vals):
@@ -132,7 +140,7 @@ class sale_order_line(models.Model):
                 and not line.display_type
         )
 
-    @api.depends('product_id', 'order_id.order_type', 'product_uom','product_uom_qty')
+    @api.depends('product_id', 'order_id.order_type', 'product_uom_id', 'product_uom_qty')
     def is_prod_available_method(self):
         selfsud = self.sudo()
         for rec in selfsud:
@@ -338,8 +346,8 @@ class sale_order_line(models.Model):
                     rec.discount=rec.order_id.discount
                     rec.price_unit=self._get_pharma_price(rec)
 
-    @api.depends('product_id', 'product_uom', 'product_uom_qty', 'tax_id', 'order_id.partner_id',
-                 'order_id.payment_term_id', 'manual_price','product_uom_pharma_qty','order_id.order_line.product_uom_pharma_qty','order_id.total_disc_pharma')
+    @api.depends('product_id', 'product_uom_id', 'product_uom_qty', 'tax_ids', 'order_id.partner_id',
+                 'order_id.payment_term_id', 'manual_price', 'product_uom_pharma_qty', 'order_id.order_line.product_uom_pharma_qty', 'order_id.total_disc_pharma')
     def _compute_price_unit(self):
         for line in self:
             if line.order_id.state in ('sale', 'cancel', 'done', 'fia','dispense','done') or line.is_downpayment:
@@ -538,7 +546,7 @@ class sale_order_ext(models.Model):
     operation_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
     final_approver = fields.Many2one('res.users', compute='_get_approvers', store=True)
     out_of_stock_items = fields.Char('Stock out items', compute='_get_stock_out')
-    has_access = fields.Boolean(default=False, search='_has_access', compute='_compute_has_access')
+    x_has_access = fields.Boolean(default=False, search='_has_access', compute='_compute_has_access')
     has_pharma_access = fields.Boolean(default=False, search='_has_pharma_access', compute='_compute_has_pharma_access')
     has_invoice_access = fields.Boolean(default=False, search='_has_invoice_access',
                                         compute='_compute_has_invoice_access')
@@ -667,9 +675,9 @@ class sale_order_ext(models.Model):
         for rec in self:
             if (rec.order_from == "IM-IM" and has_import_acc) or (rec.order_from == "IM-WS" and has_ws_acc) or (
                     rec.order_from == "EM-EM" and has_ema_acc):
-                rec.has_access = True
+                rec.x_has_access = True
             else:
-                rec.has_access = False
+                rec.x_has_access = False
 
     def _compute_has_pharma_access(self):
         for rec in self:
@@ -688,16 +696,24 @@ class sale_order_ext(models.Model):
     def _compute_has_access(self):
         if self.env.user.has_group('droga_crm.crm_cust'):
             for rec in self:
-                rec.has_access = True
+                rec.x_has_access = True
         elif not self.env.user.name.startswith('CRM'):
             for rec in self:
                 if self.env.user.id == rec.user.id:
-                    rec.has_access = True
+                    rec.x_has_access = True
+                else:
+                    rec.x_has_access = False
         else:
+            if not request:
+                for rec in self:
+                    rec.x_has_access = False
+                return
             for rec in self:
                 ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
-                if ses[0].pro_id == rec.pr_sales:
-                    rec.has_access = True
+                if ses and ses[0].pro_id == rec.pr_sales:
+                    rec.x_has_access = True
+                else:
+                    rec.x_has_access = False
 
     def _has_access(self, operator, value):
         if operator == '=':
@@ -707,6 +723,8 @@ class sale_order_ext(models.Model):
             if not self.env.user.name.startswith('CRM'):
                 sales = self.env['sale.order'].sudo().search([('user_id', '=', self.env.user.id)])
                 return [('id', 'in', [x.id for x in sales])]
+            if not request:
+                return [('id', 'in', [])]
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             if len(ses) == 0:
                 return [('id', 'in', [])]
@@ -1104,11 +1122,13 @@ class sale_order_ext(models.Model):
 
     def _search_field(self, operator, value):
         if operator == '=':
+            if not request:
+                return [('id', 'in', [])]
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             if len(ses) == 0:
                 return [('id', 'in', [])]
             else:
-                is_rec_owner = self.env['droga.customer.visit.header'].sudo().search(
+                is_rec_owner = self.env['sale.order'].sudo().search(
                     [('pr_sales', '=', ses[0].pro_id.ids[0])])
 
                 return [ ('id', 'in', [x.id for x in is_rec_owner] if is_rec_owner else False)]
@@ -1173,7 +1193,7 @@ class sale_order_ext(models.Model):
             for node in doc.xpath("//field"):
                 if node.get("modifiers") is None or node.get("name") in ('name', 'amount_total', 'selling_price','product_uom','wareh','date_order','tax_id', 'age'):
                     continue
-                modifiers = simplejson.loads(node.get("modifiers"))
+                modifiers = json.loads(node.get("modifiers"))
                 if self.user_has_groups('droga_sales.sales_price_change_admin') or self.user_has_groups(
                         'droga_sales.sales_import_approve_admin') or self.user_has_groups(
                     'droga_sales.sales_wholesale_approve_admin'):
@@ -1181,7 +1201,7 @@ class sale_order_ext(models.Model):
                 else:
                     modifiers['readonly'] = [['state', 'not in', ('draft', 'memb','req')]]
 
-                node.set('modifiers', simplejson.dumps(modifiers))
+                node.set('modifiers', json.dumps(modifiers))
             res['arch'] = etree.tostring(doc)
 
         return res

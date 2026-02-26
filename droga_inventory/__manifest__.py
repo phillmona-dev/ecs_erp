@@ -15,7 +15,7 @@
     # Categories can be used to filter modules in modules listing
     # for the full list
     'category': 'Inventory',
-    'version': '1.0',
+    'version': '19.0.1.0.0',
 
     # always loaded
     'data': [
@@ -54,6 +54,9 @@
 
     'depends': ['base',
                 'mail','stock',
+                'stock_account',
+                'stock_landed_costs',
+                'product_expiry',
                 'resource', 'droga_procurement','stock_barcode',
                 'web', 'crm'],
     "license": "AGPL-3",

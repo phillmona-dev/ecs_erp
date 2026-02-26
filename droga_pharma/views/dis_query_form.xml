@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
 
@@ -6,14 +6,14 @@
         <field name="name">drug.information.query.tree</field>
         <field name="model">drug.information.query</field>
         <field name="arch" type="xml">
-            <tree delete="0">
+            <list delete="0">
                 <field name="date"/>
                 <field name="requestor_name"/>
                 <field name="request_type"/>
                 <field name="diagnosis"/>
                 <field name="current_medications"/>
                 <field name="preferred_response_method"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -26,14 +26,11 @@
                 <form>
                     <header>
 
-                        <button name="open_enquire_form" string="Enquire" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('state', '!=', 'enquiry')]}"/>
+                        <button name="open_enquire_form" string="Enquire" type="object" class="oe_highlight" invisible="(state != 'enquiry')"/>
 
-                        <button name="open_respond_form" string="Respond" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('state', '!=', 'response')]}"/>
+                        <button name="open_respond_form" string="Respond" type="object" class="oe_highlight" invisible="(state != 'response')"/>
 
-                        <button name="open_feedback_form" string="Feedback" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('state', '!=', 'feedback')]}"/>
+                        <button name="open_feedback_form" string="Feedback" type="object" class="oe_highlight" invisible="(state != 'feedback')"/>
 
                         <field name="state" widget="statusbar" statusbar_visible="enquiry,response,feedback"/>
                     </header>
@@ -41,7 +38,7 @@
                     <sheet string="Drug Information Query Form">
 
                         <h3>Query</h3>
-                        <hr></hr>
+                        <hr/>
                         <notebook>
                             <!-- Page 1 -->
                             <page string="Requestor Information">
@@ -93,9 +90,9 @@
                             </page>
                         </notebook>
 
-                        <hr></hr>
+                        <hr/>
                         <h3>Response</h3>
-                        <hr></hr>
+                        <hr/>
 
                         <notebook>
                             <!-- Page  -->
@@ -129,9 +126,9 @@
                             </page>
 
                         </notebook>
-                        <hr></hr>
+                        <hr/>
                         <h3>FeedBack</h3>
-                        <hr></hr>
+                        <hr/>
 
                         <notebook>
                             <!-- Page  -->
@@ -184,7 +181,7 @@
     <record id="action_drug_information_query" model="ir.actions.act_window">
         <field name="name">Drug Information Query</field>
         <field name="res_model">drug.information.query</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="target">current</field>
     </record>
 

@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <!--action for payment report -->
     <record id="view_account_payment_report_tree" model="ir.ui.view">
         <field name="name">account.payment.tree</field>
         <field name="model">account.payment</field>
         <field name="arch" type="xml">
-            <tree edit="false" sample="1" create="false" delete="false" decoration-info="state == 'draft'"
-                  decoration-muted="state == 'cancel'">
+            <list edit="false" sample="1" create="false" delete="false" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
                 <header>
                     <button name="action_post" type="object" string="Confirm"/>
                 </header>
@@ -16,13 +15,11 @@
                 <field name="journal_id"/>
                 <field name="payment_method_line_id"/>
                 <field name="partner_id" string="Customer"/>
-                <field name="amount_signed" string="Amount in Currency" groups="base.group_multi_currency"
-                       optional="hide"/>
+                <field name="amount_signed" string="Amount in Currency" groups="base.group_multi_currency" optional="hide"/>
                 <field name="currency_id" string="Payment Currency" groups="base.group_multi_currency" optional="hide"/>
                 <field name="amount_company_currency_signed" widget="monetary" string="Amount" sum="Total"/>
-                <field name="state" widget="badge" decoration-info="state == 'draft'"
-                       decoration-success="state == 'posted'"/>
-            </tree>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'posted'"/>
+            </list>
         </field>
     </record>
 
@@ -46,23 +43,11 @@
             <xpath expr="//filter[@name='reconciled']" position="after">
                 <separator/>
 
-                <filter string="Today"
-                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
-                        name="today_sales"></filter>
-                <filter string="Current week sales"
-                    domain="[
-                        ('date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
-                        ('date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
-                    name="current_week_sales"></filter>
-                <filter string="Current Month"
-                        domain="[('date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
-                        name="current_month_sales"></filter>
-                <filter string="Previous Week"
-                        domain="[('date', '&lt;=', (context_today() - relativedelta(weeks=1,weekday=-1)).strftime('%Y-%m-%d')),('date', '&gt;=', (context_today() - relativedelta(weeks=2,weekday=0)).strftime('%Y-%m-%d'))]"
-                        name="previous_week_sales"></filter>
-                <filter string="Previous Month"
-                        domain="[('date', '&lt;=', (context_today() + relativedelta(months=-1,day=31)).strftime('%Y-%m-%d')),('date', '&gt;=', (context_today() - relativedelta(months=1,day=1)).strftime('%Y-%m-%d'))]"
-                        name="previous_month_sales"></filter>
+                <filter string="Today" domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]" name="today_sales"/>
+                <filter string="Current week sales" domain="[                         ('date', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),                         ('date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]" name="current_week_sales"/>
+                <filter string="Current Month" domain="[('date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]" name="current_month_sales"/>
+                <filter string="Previous Week" domain="[('date', '&lt;=', (context_today() - relativedelta(weeks=1,weekday=-1)).strftime('%Y-%m-%d')),('date', '&gt;=', (context_today() - relativedelta(weeks=2,weekday=0)).strftime('%Y-%m-%d'))]" name="previous_week_sales"/>
+                <filter string="Previous Month" domain="[('date', '&lt;=', (context_today() + relativedelta(months=-1,day=31)).strftime('%Y-%m-%d')),('date', '&gt;=', (context_today() - relativedelta(months=1,day=1)).strftime('%Y-%m-%d'))]" name="previous_month_sales"/>
             </xpath>
         </field>
     </record>
@@ -70,7 +55,7 @@
     <record id="action_account_payments_reports" model="ir.actions.act_window">
         <field name="name">Payments</field>
         <field name="res_model">account.payment</field>
-        <field name="view_mode">tree,pivot,graph</field>
+        <field name="view_mode">list,pivot,graph</field>
         <field name="context">{
             'default_payment_type': 'inbound',
             'default_partner_type': 'customer',
@@ -97,7 +82,7 @@
         <field name="name">droga.finance.payment.report.tree</field>
         <field name="model">droga.finance.payment.report</field>
         <field name="arch" type="xml">
-            <tree edit="false" sample="1" create="false" delete="false">
+            <list edit="false" sample="1" create="false" delete="false">
 
                 <field name="invoice_no" optional="show"/>
                 <field name="partner_id" optional="show"/>
@@ -112,8 +97,7 @@
                 <field name="paid_amount" optional="show"/>
                 <field name="settled_amount" optional="show"/>
                 <field name="payment_type" optional="hide"/>
-                <field name="due_days" decoration-danger="due_days &gt; 0"
-                       decoration-success="due_days &lt;=0"/>
+                <field name="due_days" decoration-danger="due_days &gt; 0" decoration-success="due_days &lt;=0"/>
 
                 <field name="paid_passed_days" optional="hide"/>
                 <field name="company_id" optional="hide"/>
@@ -121,7 +105,7 @@
                 <!--<field name="state" widget="badge" decoration-info="state == 'draft'"
                        decoration-success="state == 'posted'"/>-->
 
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -159,21 +143,11 @@
 
                 <separator/>
 
-                <filter string="Today"
-                        domain="[('paid_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('paid_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
-                        name="today_sales"></filter>
-                <filter string="Current Week"
-                        domain="[('paid_date', '&lt;=', (context_today() + relativedelta(weeks=0,weekday=-1)).strftime('%Y-%m-%d')),('paid_date', '&gt;=', (context_today() - relativedelta(weeks=1,weekday=0)).strftime('%Y-%m-%d'))]"
-                        name="current_week_sales"></filter>
-                <filter string="Current Month"
-                        domain="[('paid_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('paid_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"
-                        name="current_month_sales"></filter>
-                <filter string="Previous Week"
-                        domain="[('paid_date', '&lt;=', (context_today() - relativedelta(weeks=1,weekday=-1)).strftime('%Y-%m-%d')),('paid_date', '&gt;=', (context_today() - relativedelta(weeks=2,weekday=0)).strftime('%Y-%m-%d'))]"
-                        name="previous_week_sales"></filter>
-                <filter string="Previous Month"
-                        domain="[('paid_date', '&lt;=', (context_today() + relativedelta(months=-1,day=31)).strftime('%Y-%m-%d')),('paid_date', '&gt;=', (context_today() - relativedelta(months=1,day=1)).strftime('%Y-%m-%d'))]"
-                        name="previous_month_sales"></filter>
+                <filter string="Today" domain="[('paid_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('paid_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]" name="today_sales"/>
+                <filter string="Current Week" domain="[('paid_date', '&lt;=', (context_today() + relativedelta(weeks=0,weekday=-1)).strftime('%Y-%m-%d')),('paid_date', '&gt;=', (context_today() - relativedelta(weeks=1,weekday=0)).strftime('%Y-%m-%d'))]" name="current_week_sales"/>
+                <filter string="Current Month" domain="[('paid_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),('paid_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]" name="current_month_sales"/>
+                <filter string="Previous Week" domain="[('paid_date', '&lt;=', (context_today() - relativedelta(weeks=1,weekday=-1)).strftime('%Y-%m-%d')),('paid_date', '&gt;=', (context_today() - relativedelta(weeks=2,weekday=0)).strftime('%Y-%m-%d'))]" name="previous_week_sales"/>
+                <filter string="Previous Month" domain="[('paid_date', '&lt;=', (context_today() + relativedelta(months=-1,day=31)).strftime('%Y-%m-%d')),('paid_date', '&gt;=', (context_today() - relativedelta(months=1,day=1)).strftime('%Y-%m-%d'))]" name="previous_month_sales"/>
             </search>
         </field>
     </record>
@@ -181,7 +155,7 @@
     <record id="action_account_payments_customer_reports" model="ir.actions.act_window">
         <field name="name">Payments</field>
         <field name="res_model">droga.finance.payment.report</field>
-        <field name="view_mode">tree,pivot</field>
+        <field name="view_mode">list,pivot</field>
         <field name="domain">[('payment_type', '=', 'Customer')]</field>
         <field name="context">{
             'search_default_current_week_sales': 1,
@@ -202,7 +176,7 @@
     <record id="action_account_payments_vendor_reports" model="ir.actions.act_window">
         <field name="name">Payments</field>
         <field name="res_model">droga.finance.payment.report</field>
-        <field name="view_mode">tree,pivot</field>
+        <field name="view_mode">list,pivot</field>
         <field name="domain">[('payment_type', '=', 'Vendor')]</field>
         <field name="context">{
             'search_default_current_week_sales': 1,

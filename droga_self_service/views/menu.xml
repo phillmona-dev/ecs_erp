@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <menuitem id="self_service_main_menu" name="Self Service" groups="self_service_group"
-              web_icon="droga_self_service,static/description/icon.png" sequence="10"/>
+    <menuitem id="self_service_main_menu" name="Self Service" groups="self_service_group" sequence="10"/>
     <menuitem id="self_service_stock_menu" name="Stock" groups="self_service_group" sequence="1"
               parent="self_service_main_menu">
         <menuitem id="self_service_store_requisition_menu" name="Store Requisition" sequence="1"

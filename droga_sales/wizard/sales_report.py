@@ -12,18 +12,18 @@ class SalesReportWizard(models.TransientModel):
     date_from = fields.Date(string='Date From', required=True)
     date_to = fields.Date(string='Date To', required=True)
     item_code = fields.Many2one('product.product', string='Item Code')
-    city = fields.Many2one('res.city', string='City')
+    city = fields.Many2one('droga.crm.settings.city', string='City')
     # payment_type = fields.Selection([('cash', 'Cash'), ('credit', 'Credit')], string='Payment Type')
     sales_person = fields.Many2one('res.users', string='Sales Person')
     fileout = fields.Binary('File', readonly=True)
 
 
     def generate_report(self):
-        sales = self.env['account.move'].search([
+        sales = self.env['sale.order'].search([
             ('date_order', '>=', self.date_from),
             ('date_order', '<=', self.date_to),
             ('order_line.product_id', '=', self.item_code.id if self.item_code else None),
-            ('partner_id.city_id', '=', self.city.id if self.city else None),
+            ('partner_id.city_name', '=', self.city.id if self.city else None),
             # ('payment_type', '=', self.payment_type),
             ('user_id', '=', self.sales_person.id if self.sales_person else None),
             ('state', 'in', ('sale', 'done'))
@@ -76,4 +76,3 @@ class SalesReportWizard(models.TransientModel):
 
                 # Close the workbook
             workbook.close()
-

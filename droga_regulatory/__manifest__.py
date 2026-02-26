@@ -15,7 +15,7 @@
     # Categories can be used to filter modules in modules listing
     # for the full list
     'category': 'Buisness development and regulatory affairs',
-    'version': '1.0',
+    'version': '19.0.1.0.0',
 
     # always loaded
     'data': [

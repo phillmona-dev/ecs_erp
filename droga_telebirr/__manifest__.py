@@ -13,7 +13,7 @@
     'website': "https://afomsoft.com",
 
     'category': 'Droga telebirr integration',
-    'version': '0.1',
+    'version': '19.0.1.0.0',
 
     'depends': ['base','account','droga_finance','droga_sales','droga_inventory'],
 

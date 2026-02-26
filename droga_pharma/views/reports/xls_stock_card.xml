@@ -14,7 +14,7 @@
             <form string="" delete="0">
                 <group>
                     <group>
-                        <field name="warehouse" domain="[('has_access','=',True),'|',('active','=',True),('active','=',False)]" options="{'no_create':True,'no_open':True}"></field>
+                        <field name="warehouse" domain="[('x_has_access','=',True),'|',('active','=',True),('active','=',False)]" options="{'no_create':True,'no_open':True}"></field>
                         <field name="date_from"></field>
                         <field name="include_price" groups="droga_pharma.pharma_director,droga_pharma.pharma_supply_chain_manager"></field>
                     </group>

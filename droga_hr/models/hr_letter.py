@@ -131,15 +131,29 @@ class Letter(models.Model):
             record.employee_salary = 0
             record.employee_salary_word = ''
 
-            # get employee contract
-            emp_contracts = self.env["hr.contract"].search([('employee_id', '=', record.employee.id)])
+            # Odoo 19 uses hr.version instead of hr.contract.
+            emp_contracts = self.env["hr.version"].search(
+                [('employee_id', '=', record.employee.id)],
+                order='date_version desc',
+            )
 
             for emp_contract in emp_contracts:
-                if emp_contract.state == 'open':
-                    # get basic salary
-                    basic_salary = emp_contract.get_employee_rate("P001")
+                is_open = bool(
+                    ('is_current' in emp_contract._fields and emp_contract.is_current)
+                    or (
+                        not emp_contract.contract_date_end
+                        or emp_contract.contract_date_end >= fields.Date.today()
+                    )
+                )
+                if is_open:
+                    # Prefer custom payroll rate helper when available; otherwise use contract wage.
+                    if hasattr(emp_contract, 'get_employee_rate'):
+                        basic_salary = emp_contract.get_employee_rate("P001")
+                    else:
+                        basic_salary = emp_contract.wage or 0
                     record.employee_salary = basic_salary
                     record.employee_salary_word = self.number_to_words(basic_salary)
+                    break
 
 
 class LetterType(models.Model):

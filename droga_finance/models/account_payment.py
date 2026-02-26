@@ -13,6 +13,7 @@ class AccountPayment(models.Model):
 
     check_due_date = fields.Date("Check Due Date")
     vendor_supplier = fields.Char("Vendor/Customer Name")
+    transaction_no = fields.Char(related="move_id.transaction_no", string="Transaction Number", store=True, readonly=True)
 
     is_check_printed = fields.Selection([('Yes', 'Yes'), ('No', 'No')], default='No')
 

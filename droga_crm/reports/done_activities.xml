@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="done_activities_tree" model="ir.ui.view">
         <field name="name">droga.crm.done.activity.tree</field>
         <field name="model">droga.crm.done.activity</field>
         <field name="arch" type="xml">
-            <tree string="" expand="1" create="0" delete="0">
+            <list string="" expand="1" create="0" delete="0">
                 <field name="source_name"/>
                 <field name="contact_name"/>
                 <field name="sales_rep"/>
@@ -17,11 +17,11 @@
                 <field name="from_visit_plan" invisible="1"/>
                 <field name="from_visit_plan" invisible="1"/>
                 <field name="sales_area" string="Area"/>
-                <field name="visit_remark"></field>
+                <field name="visit_remark"/>
                 <field name="from_visit_plan_str" string="Visit planned?" widget="badge" decoration-danger="not from_visit_plan" decoration-success="from_visit_plan"/>
                 <field name="state" decoration-success="state == 'Done'" decoration-warning="state=='Pending'" decoration-info="state == 'Open'" decoration-danger="state == 'Cancelled'" widget="badge"/>
                 <field name="act_note" widget="html" optional="hide"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -38,41 +38,26 @@
                 <field name="action_date"/>
                 <field name="res_model_descr"/>
                 <field name="act_note"/>
-                <field name="visit_remark"></field>
-                <filter name="open" string="Open activities" domain="[('state', '=', 'Open')]" />
-                <filter name="cancel" string="Cancelled activities" domain="[('state', '=', 'Cancelled')]" />
-                <filter name="Done" string="Done activities" domain="[('state', '=', 'Done')]" />
+                <field name="visit_remark"/>
+                <filter name="open" string="Open activities" domain="[('state', '=', 'Open')]"/>
+                <filter name="cancel" string="Cancelled activities" domain="[('state', '=', 'Cancelled')]"/>
+                <filter name="Done" string="Done activities" domain="[('state', '=', 'Done')]"/>
                 <filter name="group_user" string="User" context="{'group_by':'sales_rep'}"/>
                 <filter name="group_team" string="Sales Team" context="{'group_by':'pr_team_custom'}"/>
                 <filter name="visit_remark" string="Feedback" context="{'group_by':'visit_remark'}"/>
 
-                <filter string="Today activities"
-                        domain="[('activity_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('activity_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
-                        name="today_sales"></filter>
+                <filter string="Today activities" domain="[('activity_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('activity_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]" name="today_sales"/>
 
-                <filter string="Current week activities"
-                    domain="[
-                        ('activity_date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
-                        ('activity_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
-                    name="current_week_sales"></filter>
+                <filter string="Current week activities" domain="[                         ('activity_date', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),                         ('activity_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]" name="current_week_sales"/>
 
-                <filter string="Previous week activities"
-                       domain="[('activity_date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),
-                       ('activity_date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]"
-                        name="previous_week_sales"></filter>
+                <filter string="Previous week activities" domain="[('activity_date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),                        ('activity_date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]" name="previous_week_sales"/>
 
-                <filter string="Current month activities"
-                        domain="[('activity_date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('activity_date','&gt;=',time.strftime('%%Y-%%m-01'))]"
-                        name="current_month_sales"></filter>
+                <filter string="Current month activities" domain="[('activity_date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),                         ('activity_date','&gt;=',time.strftime('%%Y-%%m-01'))]" name="current_month_sales"/>
 
-                <filter string="Previous month activities"
-                        domain="[('activity_date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('activity_date','&lt;',time.strftime('%%Y-%%m-01'))]"
-                name="previous_month_sales"></filter>
+                <filter string="Previous month activities" domain="[('activity_date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),                         ('activity_date','&lt;',time.strftime('%%Y-%%m-01'))]" name="previous_month_sales"/>
 
-                <filter name="unplanned" string="Unplanned Act." domain="[('from_visit_plan', '=', False)]" />
-                <filter name="planned" string="Planned Act." domain="[('from_visit_plan', '=', True)]" />
+                <filter name="unplanned" string="Unplanned Act." domain="[('from_visit_plan', '=', False)]"/>
+                <filter name="planned" string="Planned Act." domain="[('from_visit_plan', '=', True)]"/>
 
             </search>
         </field>
@@ -81,9 +66,9 @@
     <record model="ir.actions.act_window" id="action_done_activity">
         <field name="name">CRM Activities</field>
         <field name="res_model">droga.crm.done.activity</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="context">{"search_default_today_sales":1,'search_default_group_user': 1}</field>
-        <field name="domain">[('res_model', 'in', ('crm.lead','res.partner')),('has_access','=',True)]</field>
+        <field name="domain">[('res_model', 'in', ('crm.lead','res.partner')),('x_has_access','=',True)]</field>
     </record>
 
     <record model="ir.rule" id="activity_per_company">
@@ -93,17 +78,7 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
-    <menuitem
-            id="menu_done_activity"
-            name="Activities"
-            parent="menu_inq_vist_reports"
-            sequence="20"
-            action="action_done_activity"/>
+    <menuitem id="menu_done_activity" name="Activities" parent="menu_inq_vist_reports" sequence="20" action="action_done_activity"/>
 
-    <menuitem
-            id="menu_done_activity"
-            name="Activities"
-            parent="crm.crm_menu_root"
-            sequence="25"
-            action="action_done_activity"/>
+    <menuitem id="menu_done_activity" name="Activities" parent="crm.crm_menu_root" sequence="25" action="action_done_activity"/>
 </odoo>

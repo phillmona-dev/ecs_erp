@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="droga_pharma_action_itr_tree" model="ir.ui.view">
         <field name="name">droga.pharma.itr.form</field>
@@ -8,27 +8,26 @@
                 <sheet>
                    <group string="Stock card">
                         <group>
-                            <field name="branch" required="1" domain="[('has_access','=',True),('has_dispensary_location','=',True)]" options="{'no_create':True,'no_open':True}"></field>
-                            <field name="date_from"></field>
+                            <field name="branch" required="1" domain="[('x_has_access','=',True),('has_dispensary_location','=',True)]" options="{'no_create':True,'no_open':True}"/>
+                            <field name="date_from"/>
                         </group>
                         <group>
-                            <field name="product" options="{'no_create':True,'no_open':True}" domain="['|', ('active', '=', False), ('active', '=', True)]"></field>
-                            <field name="date_to"></field>
+                            <field name="product" options="{'no_create':True,'no_open':True}" domain="['|', ('active', '=', False), ('active', '=', True)]"/>
+                            <field name="date_to"/>
                         </group>
                        <button name="load_results" type="object" string="Load results"/>
                     </group>
 
                     <notebook>
                         <page string="ITR Detail">
-                            <field name="results"
-                                   attrs="{'readonly':1}">
-                                <tree editable="false">
+                            <field name="results" readonly="True">
+                                <list>
                                     <field name="product"/>
                                     <field name="cogs" string="QOGS"/>
                                     <field name="av_inv" string="Avg.Inv.Qty"/>
                                     <field name="inv_tur"/>
                                     <field name="dsi"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>

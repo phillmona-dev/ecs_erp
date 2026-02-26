@@ -11,7 +11,7 @@
 <!--                <page string="Employees" attrs="{'invisible': [('supplier_rank', '>', 0)]}"-->
 <!--                      groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_dp_admin,droga_pharma.pharma_di_admin">-->
 <!--                    <field name="employees" mode="tree,kanban">-->
-<!--                        <tree editable="1" create="1">-->
+<!--                        <tree editable="bottom" create="1">-->
 <!--                            <field name="employee_name"/>-->
 <!--                            <field name="gender"/>-->
 <!--                            <field name="cust_id"/>-->
@@ -84,7 +84,7 @@
 <!--                <page string="Memberships" attrs="{'invisible': [(1, '>', 0)]}"-->
 <!--                      groups="droga_pharma.pharma_br_admin,droga_pharma.pharma_dp_admin,droga_pharma.pharma_di_admin">-->
 <!--                    <field name="memberships_partner" mode="tree,kanban">-->
-<!--                        <tree editable="0" create="0">-->
+<!--                        <tree create="0">-->
 <!--                            <field name="prod"/>-->
 <!--                            <field name="prod_descr"/>-->
 <!--                            <field name="sales_ref"/>-->

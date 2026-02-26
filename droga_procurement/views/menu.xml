@@ -51,7 +51,7 @@
               parent="purchase.menu_purchase_root"
               groups="purchase.group_purchase_manager,purchase.group_purchase_user">
         <menuitem id="droga_store_request_pharmacy_menu" name="Store Requisition" sequence="1"
-                  action="droga_inventory.droga_inventory_office_supplies_request_pharmacy_warehouse_action"
+                  action="droga_purchase_request_pharmacy_action"
                   groups="purchase.group_purchase_manager,purchase.group_purchase_user"/>
         <menuitem id="droga_purhcase_request_pharmacy_menu" name="Purchase Request" sequence="2"
                   action="droga_purchase_request_pharmacy_action"

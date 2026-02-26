@@ -189,8 +189,8 @@ class droga_stock_adjustment_request_detail(models.Model):
 
     product_id = fields.Many2one('product.product', index=True, required=True)
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
-                                  domain="[('category_id', '=', product_uom_category_id)]")
-    product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
+                                  domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
+    product_uom_category_id = fields.Many2one(related='product_id.uom_id.relative_uom_id', store=True)
     lot_ser_no = fields.Many2one('stock.lot', string='Lot/Ser.No.')
     expiry_date = fields.Datetime('Expiry Date', related='lot_ser_no.expiration_date')
     ref=fields.Char(related='stock_adjustment_header.to_correct_ref.name')

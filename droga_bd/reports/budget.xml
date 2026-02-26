@@ -11,7 +11,7 @@
         <field name="print_report_name">'Budget Summary Report - %s' % (object.name)
         </field>
         <field name="paperformat_id" ref="droga_bd.paperformat_droga_budget_landscape_a4"/>
-        <field name="binding_model_id" ref="account_budget.model_crossovered_budget"/>
+        <field name="binding_model_id" ref="model_crossovered_budget"/>
         <field name="binding_type">report</field>
     </record>
 
@@ -25,7 +25,7 @@
         <field name="print_report_name">'Budget Detail Report - %s' % (object.name)
         </field>
         <field name="paperformat_id" ref="droga_bd.paperformat_droga_budget_landscape_a4"/>
-        <field name="binding_model_id" ref="account_budget.model_crossovered_budget"/>
+        <field name="binding_model_id" ref="model_crossovered_budget"/>
         <field name="binding_type">report</field>
     </record>
 

@@ -6,7 +6,7 @@ class ProcurementLeadTimeReports(models.Model):
     _name = 'droga.purchase.foreign.procurement.lead.time.report'
     _auto = False
 
-    id = fields.Integer("Id")
+    id = fields.Id()
     pr_request_id = fields.Many2one('droga.purhcase.request', "Purchase Request")
     pr_date = fields.Date(string="PR Date")
     pr_state = fields.Char(string='PR State')

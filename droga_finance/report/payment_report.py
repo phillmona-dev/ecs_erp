@@ -8,7 +8,7 @@ class PaymentReport(models.Model):
 
     _auto = False
 
-    id = fields.Integer('Id')
+    id = fields.Id()
     partner_id = fields.Many2one("res.partner")
     payment_type = fields.Char("Payment Type")
     category = fields.Char("Customer Category")
@@ -140,7 +140,7 @@ class AccountPaymentLinK(models.Model):
 
     _auto = False
 
-    id = fields.Integer('Id')
+    id = fields.Id()
     payment_id = fields.Many2one("account.payment")
     move_id = fields.Many2one("account.move")
     payment_move_id = fields.Many2one("account.move")

@@ -21,11 +21,11 @@
 #############################################################################
 {
     "name": "Odoo rest API",
-    "description": """The Rest API for Odoo 16""",
+    "description": """The Rest API for Odoo 19""",
     "summary": """This app helps to interact with odoo
      backend with help of rest api requests""",
     "category": "Tools",
-    "version": "16.0.1.0.1",
+    "version": "19.0.1.0.0",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',

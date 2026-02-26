@@ -1,8 +1,12 @@
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 import logging
-import pdfkit
 import base64
+
+try:
+    import pdfkit
+except Exception:
+    pdfkit = None
 
 _logger = logging.getLogger(__name__)
 

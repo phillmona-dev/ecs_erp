@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <!-- tree view -->
     <record id="view_move_line_trial_balance_tree" model="ir.ui.view">
         <field name="name">Trial Balance Tree View</field>
         <field name="model">account.move.line</field>
         <field name="arch" type="xml">
-            <tree limit="1000">
+            <list limit="1000">
                 <field name="account_id"/>
                 <field name="date"/>
                 <field name="move_name"/>
@@ -19,7 +19,7 @@
 
                 <field name="profit_cost_center"/>
 
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -31,8 +31,8 @@
                 <field name="account_id"/>
                 <field name="date"/>
                 <field name="move_name"/>
-                <field name="debit" />
-                <field name="credit" />
+                <field name="debit"/>
+                <field name="credit"/>
                 <field name="balance"/>
                 <!--
                 <field name="profit_cost_center"/>
@@ -42,30 +42,15 @@
                 <filter name="group_journal" string="Journal Type" context="{'group_by':'journal_id'}"/>
                 <filter name="group_journal" string="Journal Type" context="{'group_by':'journal_id'}"/>
                 
-                <filter string="Today transactions"
-                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
-                        name="today_transactions"></filter>
+                <filter string="Today transactions" domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]" name="today_transactions"/>
 
-                <filter string="Current week transactions"
-                    domain="[
-                        ('date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
-                        ('date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"
-                    name="current_week_transactions"></filter>
+                <filter string="Current week transactions" domain="[                         ('date', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),                         ('date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]" name="current_week_transactions"/>
 
-                <filter string="Previous week transactions"
-                       domain="[('date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),
-                       ('date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]"
-                        name="previous_week_transactions"></filter>
+                <filter string="Previous week transactions" domain="[('date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),                        ('date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]" name="previous_week_transactions"/>
 
-                <filter string="Current month transactions"
-                        domain="[('date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('date','&gt;=',time.strftime('%%Y-%%m-01'))]"
-                        name="current_month_transactions"></filter>
+                <filter string="Current month transactions" domain="[('date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),                         ('date','&gt;=',time.strftime('%%Y-%%m-01'))]" name="current_month_transactions"/>
 
-                <filter string="Previous month transactions"
-                        domain="[('date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('date','&lt;',time.strftime('%%Y-%%m-01'))]"
-                name="previous_month_transactions"></filter>
+                <filter string="Previous month transactions" domain="[('date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),                         ('date','&lt;',time.strftime('%%Y-%%m-01'))]" name="previous_month_transactions"/>
                 
             </search>
         </field>
@@ -75,11 +60,10 @@
     <record id="view_move_line_trial_balance_action" model="ir.actions.act_window">
         <field name="name">Ledger detail by cost center</field>
         <field name="res_model">account.move.line</field>
-        <field name="view_mode">tree,pivot</field>
+        <field name="view_mode">list,pivot</field>
         <field name="context">{}</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('view_move_line_trial_balance_tree')})]"/>
-        <field name="search_view_id" ref="view_move_line_trial_balance_search"></field>
+        <field name="view_ids" eval="[(5, 0, 0),                 (0, 0, {'view_mode': 'list', 'view_id': ref('view_move_line_trial_balance_tree')})]"/>
+        <field name="search_view_id" ref="view_move_line_trial_balance_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Trial Balance
@@ -96,7 +80,7 @@
         <field name="name">Trial Balance By Analytics Tree View</field>
         <field name="model">droga.finance.trial.balance.by.analytics</field>
         <field name="arch" type="xml">
-            <tree limit="1000">
+            <list limit="1000">
                 <field name="account_id"/>
                 <field name="analytic_account_id"/>
                 <field name="plan_id"/>
@@ -105,7 +89,7 @@
                 <field name="debit"/>
                 <field name="credit"/>
 
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -129,7 +113,7 @@
     <record id="view_trial_balance_by_analytics_action" model="ir.actions.act_window">
         <field name="name">Trial Balance By Analytics</field>
         <field name="res_model">droga.finance.trial.balance.by.analytics</field>
-        <field name="view_mode">pivot,tree</field>
+        <field name="view_mode">pivot,list</field>
         <field name="context">{}</field>
 
         <field name="help" type="html">

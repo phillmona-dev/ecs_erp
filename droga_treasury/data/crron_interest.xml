@@ -5,12 +5,10 @@
        <field name="name">Daily Interest</field>
        <field name="model_id" ref="model_account_loan"/>
        <field name="state">code</field>
-       <field name="code">model.compute_daily_cron()</field>
+       <field name="code">model.compute_daily_crons()</field>
        <field name="user_id" ref="base.user_root"/>
        <field name='interval_number'>1</field>
        <field name='interval_type'>days</field>
-       <field name="numbercall">-1</field>
-       <field name="doall" eval="False"/>
    </record>
 </data>
 </odoo>

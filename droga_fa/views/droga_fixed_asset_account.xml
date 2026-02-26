@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <!-- inherited asset form view -->
@@ -7,7 +7,7 @@
         <field name="model">account.asset</field>
         <field name="inherit_id" ref="account_asset.view_account_asset_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@class='oe_title']" position="before">
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
 
                 <div class="oe_title">
                     <label for="name" name="model_asset_number_label" string="Asset Code"/>
@@ -24,13 +24,11 @@
             </xpath>
 
             <xpath expr="//button[@name='set_to_cancelled']" position="after">
-                <button type="object" name="generate_asset_id" string="Get Asset Code"
-                        attrs="{'invisible': [('asset_number', '=', True)]}"/>
+                <button type="object" name="generate_asset_id" string="Get Asset Code" invisible="(asset_number == True)"/>
             </xpath>
 
              <xpath expr="//button[@name='set_to_cancelled']" position="after">
-                <button type="object" name="button_update_analytic" string="Update Analytics"
-                    groups="droga_finance.account_chief_finance_officer_group"    />
+                <button type="object" name="button_update_analytic" string="Update Analytics" groups="droga_finance.account_chief_finance_officer_group"/>
             </xpath>
         </field>
     </record>
@@ -39,7 +37,7 @@
     <record id="inherit_for_account_asset_tree" model="ir.ui.view">
         <field name="name">Asset</field>
         <field name="model">account.asset</field>
-        <field name="inherit_id" ref="account_asset.view_account_asset_purchase_tree"/>
+        <field name="inherit_id" ref="account_asset.view_account_asset_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="before">
                 <field name="asset_number" readonly="1"/>
@@ -68,12 +66,12 @@
         <field name="name">Asset</field>
         <field name="model">account.asset.subcat</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <list editable="bottom">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="asset_cat" options="{'no_create':True,'no_open':True}"/>
                 <field name="sequence"/>
-            </tree>
+            </list>
         </field>
     </record>
 

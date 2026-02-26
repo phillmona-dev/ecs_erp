@@ -1276,7 +1276,7 @@ class CustomerOutStandingBalanceQuery(models.Model):
     _auto = False
     _order = 'partner_id'
 
-    id = fields.Integer('Id')
+    id = fields.Id()
     invoice_id = fields.Char("Number")
     partner_id = fields.Many2one("res.partner")
     cust_org_type = fields.Char("Customer Category")
@@ -1323,15 +1323,20 @@ class CustomerOutStandingBalanceQuery(models.Model):
         self.env.cr.execute("""
                    create or replace view droga_finance_customer_balance as (
 
-                         select  row_number() over () as id,a.name as invoice_id,a.partner_id,COALESCE(ct.cust_org_type,'Others') as cust_org_type,a.sales_type,COALESCE(s.order_type,'Others') as order_type,
-                        CASE
-                          WHEN s.tender_origin_form_tender IS NULL Then 'Marketing'
-                          WHEN s.tender_origin_form_tender IS not NULL Then'Tender'
-                          ELSE 'Data Not Found'
-                         END AS sales_channel,'' as sales_initiator,
-                        a.invoice_date_due,CURRENT_DATE-a.invoice_date_due as date_diff,a.amount_residual,a.amount_total_signed as amount_total
-                        from account_move a left join sale_order s on a.invoice_origin=s.name
-                        left join res_partner r on r.id=a.partner_id left join droga_cust_type ct on ct.id=r.cust_type_ext
+                        select
+                            row_number() over () as id,
+                            a.name as invoice_id,
+                            a.partner_id,
+                            'Others'::varchar as cust_org_type,
+                            a.sales_type,
+                            'Others'::varchar as order_type,
+                            'Data Not Found'::varchar as sales_channel,
+                            ''::varchar as sales_initiator,
+                            a.invoice_date_due,
+                            (CURRENT_DATE - a.invoice_date_due)::integer as date_diff,
+                            a.amount_residual,
+                            a.amount_total_signed as amount_total
+                        from account_move a
 
                         where a.payment_state in('not_paid','partial')
                         and a.move_type in('out_invoice') and amount_residual!=0  and a.partner_id is not null  and a.state in('posted')    

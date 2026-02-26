@@ -128,7 +128,7 @@ class DrogaStockValuationLayer(models.Model):
                 'to_value': to_value,
                 'remaining_qty': rec.remaining_qty,
                 'remaining_value': rec.remaining_value,
-                'upd_date': fields.datetime.now()
+                'upd_date': fields.Datetime.now()
             }
 
             rec.env['droga.stock.valuation.history'].create(dsval)
@@ -285,8 +285,10 @@ class DrogaStockValuationLayer(models.Model):
             if svl.currency_id.is_zero(svl.value):
                 continue
             move = svl.stock_move_id
-            if not move:
+            if not move and 'stock_valuation_layer_id' in svl._fields:
                 move = svl.stock_valuation_layer_id.stock_move_id
+            if not move:
+                continue
             am_vals += move.with_company(svl.company_id)._account_entry_move_custom(svl.quantity, svl.description,
                                                                                     svl.id, svl.value)
         for val in am_vals:
@@ -317,6 +319,45 @@ class DrogaStockValuationLayer(models.Model):
             trans.inv_acc = inv_acc.id
         return inv_acc.id if inv_acc else False
 
+    def _get_table_columns(self, table_name):
+        self.env.cr.execute(
+            """
+            SELECT column_name
+              FROM information_schema.columns
+             WHERE table_schema = 'public'
+               AND table_name = %s
+            """,
+            (table_name,),
+        )
+        return {row[0] for row in self.env.cr.fetchall()}
+
+    def _update_account_move_totals_sql(self, account_move_id, amount):
+        columns = self._get_table_columns('account_move')
+        if not columns:
+            return
+
+        abs_amount = abs(amount)
+        set_parts = []
+        params = []
+
+        for column in ('amount_total', 'amount_total_signed', 'amount_total_in_currency_signed'):
+            if column in columns:
+                set_parts.append(f"{column} = %s")
+                params.append(abs_amount)
+        if 'core_amt' in columns:
+            set_parts.append("core_amt = CASE core_amt WHEN 0 THEN 0 ELSE %s END")
+            params.append(abs_amount)
+        if 'non_core_amt' in columns:
+            set_parts.append("non_core_amt = CASE non_core_amt WHEN 0 THEN 0 ELSE %s END")
+            params.append(abs_amount)
+
+        if not set_parts:
+            return
+
+        query = "UPDATE account_move SET " + ", ".join(set_parts) + " WHERE id = %s"
+        params.append(account_move_id)
+        self.env.cr.execute(query, tuple(params))
+
     def revaluate_after_date_upd_ledger(self, reference=''):
         ret = self
         if ret.account_move_id:
@@ -330,13 +371,7 @@ class DrogaStockValuationLayer(models.Model):
                 self.updatesalescost(ret)
                 self.revaluate_after_date(ret, reference=reference)
                 return
-            query1 = """
-                                    update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
-                                    case non_core_amt when 0 then 0 else %s end where id=%s
-                                """
-            self.env.cr.execute(query1, (
-                abs(ret.value), abs(ret.value), abs(ret.value), abs(ret.value), abs(ret.value),
-                ret.account_move_id.id))
+            self._update_account_move_totals_sql(ret.account_move_id.id, ret.value)
 
             query2 = """
                                                 update account_move_line set 
@@ -503,14 +538,8 @@ class DrogaStockValuationLayer(models.Model):
                     cur_trans.account_move_id.id,
                 )
                 return
-            # write a query to update
-            query1 = """
-                update account_move set amount_total=%s,amount_total_signed=%s,amount_total_in_currency_signed=%s,core_amt=case core_amt when 0 then 0 else %s end,non_core_amt=
-                case non_core_amt when 0 then 0 else %s end where id=%s
-            """
-            self.env.cr.execute(query1,
-                                (abs(cur_trans.value), abs(cur_trans.value), abs(cur_trans.value), abs(cur_trans.value),
-                                 abs(cur_trans.value), cur_trans.account_move_id.id))
+            # Update account move totals with optional custom columns only when available.
+            self._update_account_move_totals_sql(cur_trans.account_move_id.id, cur_trans.value)
 
             query2 = """
                         update account_move_line set 
@@ -749,17 +778,102 @@ class ProductCategory(models.Model):
 
     property_valuation = fields.Selection(selection_add=[
         ('custom_posting', 'Custom Posting')
-    ], company_dependent=True, copy=True, required=True, ondelete={'custom_posting': 'set default'})
+    ], ondelete={'custom_posting': 'set null'})
 
 
 class StockMovesVal(models.Model):
     _inherit = 'stock.move'
 
+    def _account_analytic_entry_move(self):
+        """v19 compat: legacy callers still use this removed method name."""
+        parent = super(StockMovesVal, self)
+        if hasattr(parent, '_account_analytic_entry_move'):
+            return parent._account_analytic_entry_move()
+        if hasattr(self, '_create_analytic_move'):
+            return self.sudo()._create_analytic_move()
+        return False
+
+    def _get_accounting_data_for_valuation_custom(self):
+        """v19-safe fallback for valuation accounts/journal lookup."""
+        self.ensure_one()
+        accounts_data = self.product_id.product_tmpl_id.get_product_accounts()
+        journal = accounts_data.get('stock_journal') or self.company_id.account_stock_journal_id
+        acc_valuation = accounts_data.get('stock_valuation')
+        acc_src = self.location_id.valuation_account_id or accounts_data.get('stock_input')
+        acc_dest = self.location_dest_id.valuation_account_id or accounts_data.get('stock_output')
+
+        if not journal:
+            raise UserError(
+                _("You don't have any stock journal defined on your product category.")
+            )
+        if not acc_valuation:
+            raise UserError(
+                _("You don't have any stock valuation account defined on your product category.")
+            )
+        if not acc_src:
+            raise UserError(
+                _("You don't have any input valuation account configured for the source location/product.")
+            )
+        if not acc_dest:
+            raise UserError(
+                _("You don't have any output valuation account configured for the destination location/product.")
+            )
+
+        return journal.id, acc_src.id, acc_dest.id, acc_valuation.id
+
+    def _prepare_account_move_line_custom(
+        self,
+        qty,
+        cost,
+        credit_account_id,
+        debit_account_id,
+        svl_id,
+        description,
+    ):
+        """Build account.move lines without relying on removed v16 helpers."""
+        self.ensure_one()
+
+        if not credit_account_id or not debit_account_id:
+            return []
+
+        amount = self.company_id.currency_id.round(abs(cost))
+        partner = self.picking_id.partner_id
+        partner_id = (
+            self.env['res.partner']._find_accounting_partner(partner).id
+            if partner
+            else False
+        )
+        line_common = {
+            'name': description,
+            'product_id': self.product_id.id,
+            'quantity': qty,
+            'product_uom_id': self.product_id.uom_id.id,
+            'ref': description,
+            'partner_id': partner_id,
+        }
+
+        return [
+            (0, 0, {
+                **line_common,
+                'account_id': credit_account_id,
+                'debit': 0.0,
+                'credit': amount,
+            }),
+            (0, 0, {
+                **line_common,
+                'account_id': debit_account_id,
+                'debit': amount,
+                'credit': 0.0,
+            }),
+        ]
+
     def _account_entry_move_custom(self, qty, description, svl_id, cost):
         """ Accounting Valuation Entries """
         self.ensure_one()
         am_vals = []
-        if self.product_id.type != 'product':
+        if (hasattr(self.product_id, 'type') and self.product_id.type != 'product') or (
+            hasattr(self.product_id, 'is_storable') and not self.product_id.is_storable
+        ):
             # no stock valuation for consumable products
             return am_vals
         if self.restrict_partner_id and self.restrict_partner_id != self.company_id.partner_id:
@@ -769,7 +883,10 @@ class StockMovesVal(models.Model):
         company_from = self._is_out() and self.mapped('move_line_ids.location_id.company_id') or False
         company_to = self._is_in() and self.mapped('move_line_ids.location_dest_id.company_id') or False
 
-        journal_id, acc_src, acc_dest, acc_valuation = self._get_accounting_data_for_valuation()
+        if hasattr(self, '_get_accounting_data_for_valuation'):
+            journal_id, acc_src, acc_dest, acc_valuation = self._get_accounting_data_for_valuation()
+        else:
+            journal_id, acc_src, acc_dest, acc_valuation = self._get_accounting_data_for_valuation_custom()
         # Create Journal Entry for products arriving in the company; in case of routes making the link between several
         # warehouse of the same company, the transit location belongs to this company, so we don't need to create accounting entries
         if self._is_in():
@@ -824,37 +941,52 @@ class StockMovesVal(models.Model):
                         is_returned=True)._prepare_account_move_vals_custom(acc_valuation, acc_src, journal_id, qty,
                                                                             description, svl_id, cost))
 
-        return am_vals
+        return [vals for vals in am_vals if vals]
 
     def _prepare_account_move_vals_custom(self, credit_account_id, debit_account_id, journal_id, qty, description,
                                           svl_id, cost):
         self.ensure_one()
-        valuation_partner_id = self._get_partner_id_for_valuation_lines()
+        partner = self.picking_id.partner_id
+        valuation_partner_id = (
+            self.env['res.partner']._find_accounting_partner(partner).id
+            if partner
+            else False
+        )
         svl = self.env['droga.stock.valuation.layer'].browse(svl_id)
-        move_ids = self._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id, svl.svl_id,
-                                                   description)
+        if hasattr(self, '_prepare_account_move_line'):
+            move_ids = self._prepare_account_move_line(
+                qty, cost, credit_account_id, debit_account_id, svl.svl_id, description
+            )
+        else:
+            move_ids = self._prepare_account_move_line_custom(
+                qty, cost, credit_account_id, debit_account_id, svl.svl_id, description
+            )
+        if not move_ids:
+            return {}
 
         # Custom added to back post
         if svl.move_date:
             date = svl.move_date
         elif self.env.context.get('force_period_date'):
             date = self.env.context.get('force_period_date')
-        elif svl.account_move_line_id:
+        elif 'account_move_line_id' in svl._fields and svl.account_move_line_id:
             date = svl.account_move_line_id.date
         else:
             date = fields.Date.context_today(self)
-        return {
+
+        vals = {
             'journal_id': journal_id,
             'line_ids': move_ids,
             'partner_id': valuation_partner_id,
             'date': date,
             'ref': description,
-            'stock_move_id': self.id,
-            # 'droga_stock_valuation_layer_ids': [(6, None, [svl_id])],
-            # 'stock_valuation_layer_ids': [(6, None, [svl.svl_id])],
             'move_type': 'entry',
-            'is_storno': self.env.context.get('is_returned') and self.env.company.account_storno,
         }
+        if 'stock_move_id' in self.env['account.move']._fields:
+            vals['stock_move_id'] = self.id
+        if 'is_storno' in self.env['account.move']._fields:
+            vals['is_storno'] = self.env.context.get('is_returned') and self.env.company.account_storno
+        return vals
 
 
 class DrogaAccountMove(models.Model):

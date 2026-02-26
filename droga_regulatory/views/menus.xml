@@ -3,7 +3,6 @@
 
 
     <menuitem id="regulatory_main_menu" name="Regulatory"
-              web_icon="droga_ra,static/description/icon.png"
               sequence="10">
 
         <menuitem

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
         <record id="view_droga_bdr_agents_form" model="ir.ui.view">
@@ -40,21 +40,21 @@
             <field name="name">Droga BDR Agents Tree</field>
             <field name="model">droga.bdr.agents</field>
             <field name="arch" type="xml">
-                <tree editable="top">
+                <list editable="top">
                     <field name="company_name"/>
-                    <field name="products_list"  widget="many2many_tags" />
+                    <field name="products_list" widget="many2many_tags"/>
                     <field name="email"/>
                     <field name="phone_no"/>
                     <field name="website"/>
                     <field name="partnership_status"/>
-                </tree>
+                </list>
             </field>
         </record>
 
         <record id="action_droga_bdr_agents" model="ir.actions.act_window">
             <field name="name">Droga BDR Agents</field>
             <field name="res_model">droga.bdr.agents</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
 
         </record>
 

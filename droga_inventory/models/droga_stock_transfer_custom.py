@@ -277,7 +277,7 @@ class droga_stock_transfer_custom_detail(models.Model):
     def set_uom(self):
         pass
 
-    # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="[('category_id', '=', product_uom_category_id)]")
-    product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
+    # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
+    product_uom_category_id = fields.Many2one(related='product_id.uom_id.relative_uom_id', store=True)
     import_uom = fields.Many2one(related='product_id.import_uom_new', store=True)
     pharma_uom = fields.Many2one(related='product_id.uom_id', store=True)

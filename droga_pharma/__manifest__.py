@@ -15,7 +15,7 @@
     # Categories can be used to filter modules in modules listing
     # for the full list
     'category': 'Pharmacy Extension',
-    'version': '1.0',
+    'version': '19.0.1.0.0',
 
     # always loaded
     'data': [
@@ -29,11 +29,11 @@
         'reports/stock_availability.xml',
         'reports/mtm_report_view.xml',
         'views/droga_physio_sales.xml',
+        'views/companies.xml',
         'views/customers.xml',
         'views/droga_pharmacy_sales.xml',
         'reports/daily_sales.xml',
         'views/droga_physio_list.xml',
-        'views/companies.xml',
         'views/children.xml',
         'views/reports/xls_stock_card.xml',
         'reports/stock_card_inquiry.xml',
@@ -88,9 +88,9 @@
         'views/update_stock.xml',
         'views/cust_approval_kanban.xml',
         'views/inventory/droga_pharma_transfer_custom.xml',
+        'views/inventory/droga_pharma_inventory_menus.xml',
         'views/inventory/location_extension.xml',
         'views/inventory/droga_inv_adj.xml',
-        'views/inventory/droga_pharma_inventory_menus.xml',
         'views/inventory/inventory_delivery_slip_extension.xml',
         'views/inventory/inter_pharmacy_transfer_custom.xml',
         'views/procurement_extension.xml',
@@ -103,6 +103,7 @@
 
     'depends': ['base', 'hr', 'droga_sales','droga_crm','droga_finance',
                 'mail', 'stock', 'http_routing', 'sale',
+                'product_expiry',
                 'resource', 'stock', 'droga_inventory',
                 'web', 'crm'],
     "license": "AGPL-3",

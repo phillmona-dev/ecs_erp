@@ -35,7 +35,7 @@
     </record>
 
     <menuitem id="pos_report" name="POS Reports" sequence="1"
-              parent="account_accountant.menu_accounting" action="pos_report_action">
+              parent="account.menu_finance_entries" action="pos_report_action">
     </menuitem>
 
 </odoo>

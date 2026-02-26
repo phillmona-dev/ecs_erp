@@ -23,7 +23,7 @@ from odoo import api, fields, models
 from odoo.addons.base_import.models.base_import import ImportValidationError
 from odoo.tools.translate import _
 from odoo.tools.mimetypes import guess_mimetype
-from odoo.tools import config, DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT, pycompat
+from odoo.tools import config, DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
 try:
     import xlrd
     try:

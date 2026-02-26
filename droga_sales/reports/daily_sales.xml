@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <!-- tree view for cashier for daily sales -->
@@ -7,7 +7,7 @@
         <field name="model">account.move</field>
         <field name="priority" eval="100000000"/>
         <field name="arch" type="xml">
-            <tree create="0" edit="0" delete="0">
+            <list create="0" edit="0" delete="0">
                 <field name="name"/>
                 <field name="FSInvoiceNumber"/>
                 <field name="invoice_partner_display_name" string="Customer"/>
@@ -17,9 +17,8 @@
                 <field name="amount_untaxed_signed" sum="total"/>
                 <field name="amount_total_signed" sum="total"/>
                 <field name="payment_state" invisible="1"/>
-                <field name="state" widget="badge" decoration-info="state == 'draft'"
-                       decoration-success="state == 'posted'"/>
-            </tree>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'posted'"/>
+            </list>
         </field>
 
     </record>
@@ -41,14 +40,10 @@
             </field>
             <filter name="due_date" position="after">
 
-                <filter name="today" string="Today"
-                        domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
-                <filter name="yesterday" string="Yesterday"
-                        domain="[('invoice_date', '&gt;', (context_today() + relativedelta(days=-2)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today().strftime('%Y-%m-%d')))]"/>
-                <filter name="this_week" string="This Week"
-                        domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=0, weekday=5)).strftime('%Y-%m-%d'))]"/>
-                <filter name="last_week" string="Last Week"
-                        domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=5)).strftime('%Y-%m-%d'))]"/>
+                <filter name="today" string="Today" domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="yesterday" string="Yesterday" domain="[('invoice_date', '&gt;', (context_today() + relativedelta(days=-2)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today().strftime('%Y-%m-%d')))]"/>
+                <filter name="this_week" string="This Week" domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=0, weekday=5)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_week" string="Last Week" domain="[('invoice_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d')), ('invoice_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=5)).strftime('%Y-%m-%d'))]"/>
             </filter>
 
         </field>
@@ -58,8 +53,7 @@
     <record id="daily_sales_for_cashier_tree_action" model="ir.actions.act_window">
         <field name="name">Daily Sales</field>
         <field name="res_model">account.move</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('daily_sales_for_cashier_tree_view')})]"/>
+        <field name="view_ids" eval="[(5, 0, 0),         (0, 0, {'view_mode': 'list', 'view_id': ref('daily_sales_for_cashier_tree_view')})]"/>
         <field name="domain">[('create_uid', '=', uid),('move_type', '=', 'out_invoice')]</field>
         <field name="context">{"search_default_today":1}</field>
         <field name="help" type="html">
@@ -70,8 +64,6 @@
     </record>
 
     <!-- add menu on sales report -->
-    <menuitem id="daily_sales_for_cashier_tree_menu" name="Daily Sales Report" parent="sale.sale_menu_root"
-              action="daily_sales_for_cashier_tree_action"
-              groups="droga_sales.sales_wholesale_invoicer,droga_sales.sales_import_invoicer,droga_sales.ema_invoicer" sequence="41"/>
+    <menuitem id="daily_sales_for_cashier_tree_menu" name="Daily Sales Report" parent="sale.sale_menu_root" action="daily_sales_for_cashier_tree_action" groups="droga_sales.sales_wholesale_invoicer,droga_sales.sales_import_invoicer,droga_sales.ema_invoicer" sequence="41"/>
 
 </odoo>

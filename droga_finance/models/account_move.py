@@ -50,8 +50,6 @@ class AccountMove(models.Model):
 
     branch_address = fields.Many2one('droga.sales.branch.address', compute='get_branch_address')
 
-    payment_request_id = fields.Integer(related='payment_id.payment_request_id.id')
-
     bank_payment_ref = fields.Char("Payment Ref", store=True)
 
     @api.model
@@ -152,8 +150,13 @@ class AccountMove(models.Model):
                                         record.sales_channel = analytic_plan.display_name
                         break
 
-                if record.cost_center == "Others" and record.stock_move_id:
-                    record.cost_center = record.stock_move_id.trans_warehouse.linked_analytic.display_name
+                stock_move = False
+                if 'stock_move_id' in record._fields and record.stock_move_id:
+                    stock_move = record.stock_move_id
+                elif 'stock_move_ids' in record._fields and record.stock_move_ids:
+                    stock_move = record.stock_move_ids[:1]
+                if record.cost_center == "Others" and stock_move:
+                    record.cost_center = stock_move.trans_warehouse.linked_analytic.display_name
 
     def _get_sales_info_update(self):
         self.sales_initiator = ''
@@ -173,8 +176,13 @@ class AccountMove(models.Model):
                                 if analytic_plan.plan_id.complete_name == 'Cost Center':
                                     record.cost_center = analytic_plan.display_name
                         break
-                if record.cost_center == "Others" and record.stock_move_id:
-                    record.cost_center = record.stock_move_id.trans_warehouse.linked_analytic.display_name
+                stock_move = False
+                if 'stock_move_id' in record._fields and record.stock_move_id:
+                    stock_move = record.stock_move_id
+                elif 'stock_move_ids' in record._fields and record.stock_move_ids:
+                    stock_move = record.stock_move_ids[:1]
+                if record.cost_center == "Others" and stock_move:
+                    record.cost_center = stock_move.trans_warehouse.linked_analytic.display_name
 
     @api.depends('invoice_date', 'invoice_payment_term_id')
     def update_due_days(self):
@@ -696,8 +704,6 @@ class AccountWithholding(models.Model):
                 withholding.amount_before_vat = (withholding_amount * 100) / withholding_tax
             else:
                 withholding.amount_before_vat = (withholding.withholding_amount * 100) / withholding_tax
-
-
 
 
 

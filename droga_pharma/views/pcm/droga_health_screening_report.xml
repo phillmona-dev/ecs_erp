@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <!-- Tree View for Health Screening -->
@@ -6,7 +6,7 @@
         <field name="name">droga.health.screening.tree</field>
         <field name="model">droga.health.screening</field>
         <field name="arch" type="xml">
-            <tree string="Health Screening Records" create="0">
+            <list string="Health Screening Records" create="0">
                 <field name="client_id"/>
                 <field name="age"/>
                 <field name="sex"/>
@@ -19,7 +19,7 @@
                 <field name="fasting_glucose"/>
                 <field name="rbs_glucose"/>
                 <field name="screening_type"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -41,14 +41,10 @@
                 <field name="rbs_glucose"/>
                 <field name="screening_type"/>
                 
-                <filter name="today" string="Today"
-                        domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
-                <filter name="yesterday" string="Yesterday"
-                        domain="[('create_date', '&gt;', (context_today() + relativedelta(days=-2)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today().strftime('%Y-%m-%d')))]"/>
-                <filter name="this_week" string="This Week"
-                        domain="[('create_date', '&gt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(weeks=0, weekday=5)).strftime('%Y-%m-%d'))]"/>
-                <filter name="last_week" string="Last Week"
-                        domain="[('create_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=5)).strftime('%Y-%m-%d'))]"/>
+                <filter name="today" string="Today" domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="yesterday" string="Yesterday" domain="[('create_date', '&gt;', (context_today() + relativedelta(days=-2)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today().strftime('%Y-%m-%d')))]"/>
+                <filter name="this_week" string="This Week" domain="[('create_date', '&gt;', (context_today() + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(weeks=0, weekday=5)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_week" string="Last Week" domain="[('create_date', '&gt;', (context_today() + relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today() + relativedelta(weeks=-1, weekday=5)).strftime('%Y-%m-%d'))]"/>
             </search>
         </field>
     </record>
@@ -86,11 +82,9 @@
     <record id="droga_all_health_screening_action" model="ir.actions.act_window">
         <field name="name">Health Screenings</field>
         <field name="res_model">droga.health.screening</field>
-        <field name="view_mode">tree,form</field>  <!-- Added both tree and form views -->
-        <field name="search_view_id" ref="droga_health_screening_search"></field>
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_health_screening_tree')}),
-         (0, 0, {'view_mode': 'form', 'view_id': ref('droga_health_screening_form')})]"/>
+        <field name="view_mode">list,form</field>  <!-- Added both tree and form views -->
+        <field name="search_view_id" ref="droga_health_screening_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),         (0, 0, {'view_mode': 'list', 'view_id': ref('droga_health_screening_tree')}),          (0, 0, {'view_mode': 'form', 'view_id': ref('droga_health_screening_form')})]"/>
     </record>
 
 </odoo>

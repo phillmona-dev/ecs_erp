@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <!-- tree view for cashier for daily sales -->
@@ -7,7 +7,7 @@
         <field name="model">account.move</field>
         <field name="priority" eval="100000000"/>
         <field name="arch" type="xml">
-            <tree create="0" edit="0" delete="0">
+            <list create="0" edit="0" delete="0">
                 <field name="name" optional="show"/>
                 <field name="FSInvoiceNumber" optional="show"/>
                 <field name="invoice_partner_display_name" string="Customer" optional="show"/>
@@ -19,9 +19,8 @@
                 <!--<field name="amount_untaxed_signed" sum="total"/>-->
                 <field name="amount_total_signed" sum="total" string="Amount" optional="show"/>
                 <field name="payment_state" invisible="1"/>
-                <field name="state" widget="badge" decoration-info="state == 'draft'"
-                       decoration-success="state == 'posted'" optional="show"/>
-            </tree>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'posted'" optional="show"/>
+            </list>
         </field>
 
     </record>
@@ -31,8 +30,7 @@
     <record id="daily_sales_for_cashier_tree_action1" model="ir.actions.act_window">
         <field name="name">Daily Sales</field>
         <field name="res_model">account.move</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('daily_sales_for_cashier_tree_view1')})]"/>
+        <field name="view_ids" eval="[(5, 0, 0),         (0, 0, {'view_mode': 'list', 'view_id': ref('daily_sales_for_cashier_tree_view1')})]"/>
         <field name="domain">[('create_uid', '=', uid),('move_type', '=', 'out_invoice')]</field>
         <field name="context">{"search_default_today":1}</field>
         <field name="help" type="html">
@@ -43,8 +41,6 @@
     </record>
 
     <!-- add menu on sales report -->
-    <menuitem id="daily_sales_for_cashier1_tree_menu" name="Daily Sales Report" parent="droga_pharma.physio_main_menu"
-              action="daily_sales_for_cashier_tree_action1"
-              sequence="100"/>
+    <menuitem id="daily_sales_for_cashier1_tree_menu" name="Daily Sales Report" parent="droga_pharma.physio_main_menu" action="daily_sales_for_cashier_tree_action1" sequence="100"/>
 
 </odoo>

@@ -22,7 +22,7 @@ class droga_pharma_compounding_detail(models.Model):
 
     qty=fields.Float('Quantity')
     ingredient=fields.Many2one('product.template',string='Ingredient')
-    product_uom_category_id = fields.Many2one(related='ingredient.uom_id.category_id', store=True)
+    product_uom_category_id = fields.Many2one(related='ingredient.uom_id.relative_uom_id', store=True)
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, required=True,
-                                  domain="[('category_id', '=', product_uom_category_id)]")
+                                  domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
     uom_remark=fields.Char('UOM remark')

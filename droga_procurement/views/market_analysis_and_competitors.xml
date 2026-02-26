@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <record id="droga_procurement_purchase_request_market_analysis" model="ir.ui.view">
@@ -16,16 +16,16 @@
                     <notebook>
                         <page name="name" string="Market analysis">
                             <field name="market_analysis" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="importer_name" required="1"></field>
-                                    <field name="manufacturer" required="1"></field>
-                                    <field name="unit"></field>
-                                    <field name="avail_stock" required="1"></field>
-                                    <field name="sell_up" required="1"></field>
-                                    <field name="epss_volume" required="1"></field>
-                                    <field name="local_man_status"></field>
-                                    <field name="remark"></field>
-                                </tree>
+                                <list editable="bottom">
+                                    <field name="importer_name" required="1"/>
+                                    <field name="manufacturer" required="1"/>
+                                    <field name="unit"/>
+                                    <field name="avail_stock" required="1"/>
+                                    <field name="sell_up" required="1"/>
+                                    <field name="epss_volume" required="1"/>
+                                    <field name="local_man_status"/>
+                                    <field name="remark"/>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -48,12 +48,12 @@
                     <notebook>
                         <page name="name" string="Suppliers list">
                             <field name="suppliers_list" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="manufacturer" required="1"></field>
-                                    <field name="unit_price"></field>
-                                    <field name="shelf_life" required="1"></field>
-                                    <field name="is_sup_regsitered" required="1"></field>
-                                </tree>
+                                <list editable="bottom">
+                                    <field name="manufacturer" required="1"/>
+                                    <field name="unit_price"/>
+                                    <field name="shelf_life" required="1"/>
+                                    <field name="is_sup_regsitered" required="1"/>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -76,17 +76,17 @@
                     <notebook>
                         <page name="name" string="Suppliers list">
                             <field name="competitors_comparative" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="importer" required="1"></field>
-                                    <field name="manufacturer" required="1"></field>
-                                    <field name="unit"></field>
-                                    <field name="p_up"></field>
-                                    <field name="p_qty"></field>
-                                    <field name="p_date"></field>
-                                    <field name="e_u_p" string=""></field>
-                                    <field name="e_u_p"></field>
-                                    <field name="EPSA_winner" required="1"></field>
-                                </tree>
+                                <list editable="bottom">
+                                    <field name="importer" required="1"/>
+                                    <field name="manufacturer" required="1"/>
+                                    <field name="unit"/>
+                                    <field name="p_up"/>
+                                    <field name="p_qty"/>
+                                    <field name="p_date"/>
+                                    <field name="e_u_p" string=""/>
+                                    <field name="e_u_p"/>
+                                    <field name="EPSA_winner" required="1"/>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -109,16 +109,16 @@
                     <notebook>
                         <page name="name" string="Expected Cost">
                             <field name="expected_costs">
-                                <tree editable="bottom">
-                                    <field name="tax_amount" />
-                                    <field name="demurrage_cost" />
-                                    <field name="estimated_arriving_cost" />
-                                    <field name="expected_selling_price" />
-                                    <field name="port_of_loading" />
-                                    <field name="less_container" />
-                                    <field name="estimated_arrival_date" />
-                                    <field name="unassembled_form" />
-                                </tree>
+                                <list editable="bottom">
+                                    <field name="tax_amount"/>
+                                    <field name="demurrage_cost"/>
+                                    <field name="estimated_arriving_cost"/>
+                                    <field name="expected_selling_price"/>
+                                    <field name="port_of_loading"/>
+                                    <field name="less_container"/>
+                                    <field name="estimated_arrival_date"/>
+                                    <field name="unassembled_form"/>
+                                </list>
                             </field>
                         </page>
                     </notebook>

@@ -33,7 +33,6 @@
     <menuitem
             id="droga_sales_mr_waiter_report_menu"
             name="Sales waiter report"
-            action="droga_sales.droga_sales_waiteraction"
             parent="droga_crm.menu_visit_reports"
             groups="crm_mr"
             sequence="17"/>

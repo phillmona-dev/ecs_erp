@@ -6,7 +6,7 @@ from odoo.exceptions import ValidationError
 class HrPayrollPaymentDeductions(models.Model):
     _name = 'hr.payroll.payment.deduction'
 
-    contract_id = fields.Many2one("hr.contract", domain="[('state', '=', 'open')]")
+    contract_id = fields.Many2one("hr.version", domain="[('state', '=', 'open')]")
     employee_id = fields.Many2one(related='contract_id.employee_id')
     input_type = fields.Selection([('Payment', 'Payment'), ('Deduction', 'Deduction')])
     input_types = fields.Many2one('hr.payslip.input.type', 'Input Types')
@@ -23,8 +23,10 @@ class HrPayrollPaymentDeductions(models.Model):
         pds = self.env["hr.payroll.payment.deduction"].search([('contract_id.state', '!=', 'open')])
 
         for pd in pds:
-            # Get the active contract for the employee
-            active_contract = pd.employee_id.contract_id.filtered(lambda c: c.state == 'open')
+            # Get the active contract(version) for the employee
+            active_contract = pd.employee_id.current_version_id
+            if active_contract and active_contract.state != 'open':
+                active_contract = False
             if active_contract:
                 # update the contract id
                 pd.contract_id = active_contract.id

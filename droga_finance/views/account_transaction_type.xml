@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
 
@@ -6,7 +6,7 @@
     <record id="account_transaction_type_action" model="ir.actions.act_window">
         <field name="name">Transaction Type</field>
         <field name="res_model">account.transaction.type</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
@@ -21,12 +21,12 @@
         <field name="name">account.transaction.type.view.tree</field>
         <field name="model">account.transaction.type</field>
         <field name="arch" type="xml">
-            <tree string="Transaction Type">
-                <field name="name" />
-                <field name="assignment" />
-                <field name="description" />
-                <field name="company_id" />
-            </tree>
+            <list string="Transaction Type">
+                <field name="name"/>
+                <field name="assignment"/>
+                <field name="description"/>
+                <field name="company_id"/>
+            </list>
         </field>
     </record>
 
@@ -39,23 +39,23 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="name" />
-                            <field name="assignment" />
-                            <field name="transaction_type" />
+                            <field name="name"/>
+                            <field name="assignment"/>
+                            <field name="transaction_type"/>
                         </group>
                         <group>
-                            <field name="description" />
-                            <field name="payment_method" />
-                            <field name="company_id" />
+                            <field name="description"/>
+                            <field name="payment_method"/>
+                            <field name="company_id"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Posting Cycles">
                             <field name="posting_cycles" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="fiscal_year" />
-                                    <field name="sequence" />
-                                </tree>
+                                <list editable="bottom">
+                                    <field name="fiscal_year"/>
+                                    <field name="sequence"/>
+                                </list>
                             </field>
                         </page>
                     </notebook>

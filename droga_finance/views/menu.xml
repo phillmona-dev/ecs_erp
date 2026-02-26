@@ -5,9 +5,9 @@
         <field name="name">Purchase Orders</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">purchase.order</field>
-        <field name="view_mode">tree,kanban,form,pivot,graph,calendar,activity</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,calendar,activity</field>
         <field name="view_ids" eval="[(5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_view_tree')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('purchase.purchase_order_view_tree')}),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('purchase.purchase_order_view_kanban_without_dashboard')}),
         ]"/>
         <field name="domain">[('request_type','=','Local')]</field>
@@ -28,9 +28,9 @@
         <field name="name">Purchase Orders</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">purchase.order</field>
-        <field name="view_mode">tree,kanban,form,pivot,graph,calendar,activity</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,calendar,activity</field>
         <field name="view_ids" eval="[(5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase.purchase_order_view_tree')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('purchase.purchase_order_view_tree')}),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('purchase.purchase_order_view_kanban_without_dashboard')}),
         ]"/>
         <field name="domain">[('request_type','=','Foregin')]</field>
@@ -50,7 +50,7 @@
 
     <!--menus -->
     <menuitem id="droag_account_request_froms" name="Approvals" sequence="30"
-              parent="account_accountant.menu_accounting" groups="account.group_account_manager">
+              parent="account.menu_finance_entries" groups="account.group_account_manager">
         <menuitem id="droag_account_payment_request_froms" name="Payment Request" sequence="1"
                   groups="account.group_account_manager">
 
@@ -65,7 +65,7 @@
     </menuitem>
 
     <menuitem id="droga_account_check_followup_menu" name="Check Followup" action="droga_account_check_followup_action"
-              groups="account.group_account_manager" parent="account_accountant.menu_accounting" sequence="10"/>
+              groups="account.group_account_manager" parent="account.menu_finance_entries" sequence="10"/>
 
     <menuitem id="droga_account_transaction_type_menu" name="Transaction Type" action="account_transaction_type_action"
               groups="account.group_account_manager" parent="account.account_account_menu" sequence="1"/>
@@ -143,7 +143,7 @@
     <!-- check setting menu-->
     <menuitem id="droga_check_setting_finance_menu" name="Check Setting" sequence="4"
               action="check_setting_action"
-              groups="account.group_account_manager" parent="account.account_banks_menu"/>
+              groups="account.group_account_manager" parent="account.menu_finance_configuration"/>
 
 
 </odoo>

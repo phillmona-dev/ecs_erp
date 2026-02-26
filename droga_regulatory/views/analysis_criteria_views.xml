@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
         <record id="droga_product_analysis_tree_action" model="ir.actions.act_window">
             <field name="name">Product analysis criterias</field>
             <field name="res_model">droga.bdr.analysis.criteria.header</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
         </record>
 
         <record id="droga_product_analysis_tree_view" model="ir.ui.view">
@@ -12,10 +12,10 @@
             <field name="model">droga.bdr.analysis.criteria.header</field>
             <field name="arch" type="xml">
 
-                <tree string="Product analysis criterias">
+                <list string="Product analysis criterias">
                     <field name="header"/>
                     <button type="object" string="delete" name="delete_record"/>
-                </tree>
+                </list>
 
             </field>
         </record>
@@ -28,7 +28,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="header" string='Configration name'/>
+                                <field name="header" string="Configration name"/>
 
                             </group>
                             <group>
@@ -39,14 +39,14 @@
 
 
                         <field name="criteria_detail">
-                            <tree string="Product Analysis Criteria" editable="top">
+                            <list string="Product Analysis Criteria" editable="top">
 
                                 <field name="criteria"/>
                                 <field name="minimum_score"/>
                                 <field name="maximum_score"/>
                                 <field name="weight"/>
 
-                            </tree>
+                            </list>
                         </field>
                     </sheet>
 

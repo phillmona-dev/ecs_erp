@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem name="Fleet" id="fleet.menu_root" sequence="220" groups="fleet.fleet_group_user,droga_fleet.droga_driver" web_icon="fleet,static/description/icon.svg"/>
+    <menuitem name="Fleet" id="fleet.menu_root" sequence="220" groups="fleet.fleet_group_user,droga_fleet.droga_driver"/>
     <menuitem parent="fleet.menu_root"
               id="form_menu_fleet_requests"
               name="Fleet Requests"

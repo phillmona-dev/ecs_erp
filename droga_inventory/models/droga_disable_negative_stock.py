@@ -5,7 +5,7 @@ from datetime import datetime
 
 class StockQuant(models.Model):
     _inherit = "stock.quant"
-    has_access=fields.Boolean(related='warehouse_id.has_access')
+    x_has_access=fields.Boolean(related='warehouse_id.x_has_access')
     has_read_access = fields.Boolean(related='location_id.has_read_access')
     import_quant=fields.Float('On Hand Quantity',compute='_get_on_hand',store=True)
     import_counted_view = fields.Float('Import counted', compute='_get_import_counted', store=True)
@@ -163,7 +163,7 @@ class StockQuant(models.Model):
         """
         if not self.env['ir.config_parameter'].sudo().get_param('stock.skip_quant_tasks'):
             self._quant_tasks()
-        domain=[('has_access','=',True)]
+        domain=[('x_has_access','=',True)]
         ctx = dict(self.env.context or {})
         ctx['inventory_report_mode'] = True
         ctx.pop('group_by', None)

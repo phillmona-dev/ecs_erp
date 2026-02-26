@@ -44,7 +44,7 @@ class done_activity(models.Model):
     check_out_dt = fields.Datetime('Check out datetime',compute='_getcheckout',store=True)
     durationdescr=fields.Char('Duration in minutes',compute='_getcheckout',store=True,default="-")
     pr_team_custom = fields.Many2one('crm.team', related='sales_rep.team', string='CRM Team', store=True)
-    has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('Has access?', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     pr_sales_logged_empid_code = fields.Char('hr.employee', related='sales_rep.employee.barcode', store=True)
 
@@ -75,22 +75,24 @@ class done_activity(models.Model):
             rec.from_visit_plan_str="Yes" if rec.from_visit_plan else "No"
     def _search_has_access(self, operator, value):
         if operator == '=':
+            if not request:
+                return [('id', 'in', [])]
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             if self.env.user.has_group('droga_crm.crm_emp_administrator'):
-                has_access = self.env['droga.crm.done.activity'].sudo().search([])
-                return [('id', 'in', [x.id for x in has_access] if has_access else False)]
-            elif not request or len(ses) == 0:
+                x_has_access = self.env['droga.crm.done.activity'].sudo().search([])
+                return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
+            elif len(ses) == 0:
                 return [('id', 'in', [])]
             else:
-                has_access = self.env['droga.crm.done.activity'].sudo().search(
+                x_has_access = self.env['droga.crm.done.activity'].sudo().search(
                     ['|',('sales_rep.supervisor','=',ses[0].pro_id[0].id if len(ses) > 0 else False),('sales_rep', '=', ses[0].pro_id[0].id if len(ses) > 0 else False)])
-                return [('id', 'in', [x.id for x in has_access] if has_access else [])]
+                return [('id', 'in', [x.id for x in x_has_access] if x_has_access else [])]
         else:
             return [('id', 'in', [])]
 
     def _compute_has_access(self):
         for rec in self:
-            rec.has_access = False
+            rec.x_has_access = False
 
     @api.depends('lead_id.check_in_descr')
     def _getcheckin(self):

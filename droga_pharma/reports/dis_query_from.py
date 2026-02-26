@@ -1,5 +1,4 @@
 from odoo import api, fields, models
-from odoo.exceptions import Warning
 
 
 class DrugInformationQuery(models.Model):

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="droga_location_warehouse_extension" model="ir.ui.view">
         <field name="name">Location</field>
@@ -36,7 +36,7 @@
         <field name="model">stock.move.line</field>
         <field name="inherit_id" ref="stock.view_move_line_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//form/sheet/group/group/div[2]/field[@name='qty_done']" position="attributes">
+            <xpath expr="//form/sheet/group/group/div/field[@name='quantity']" position="attributes">
                 <attribute name="readonly">True</attribute>
             </xpath>
             <xpath expr="//form/sheet/group/group/field[@name='lot_id']" position="attributes">
@@ -53,104 +53,64 @@
         <field name="arch" type="xml">
 
             <xpath expr="//form/header/button[@name='action_cancel']" position="replace">
-                <button name="action_cancel"
-                        attrs="{'invisible': [('state', 'not in', ('assigned', 'confirmed', 'draft', 'waiting'))]}"
-                        string="Cancel" groups="droga_inventory.inv_prod_fin" type="object" data-hotkey="z"/>
+                <button name="action_cancel" string="Cancel" groups="droga_inventory.inv_prod_fin" type="object" data-hotkey="z" invisible="(state not in ['assigned', 'confirmed', 'draft', 'waiting'])"/>
             </xpath>
 
-            <xpath expr="//form/header/button[@name='action_open_label_type']" position="attributes">
-                <attribute name="invisible">True</attribute>
+            <xpath expr="//form/sheet/notebook/page/field/list/field[@name='product_uom_qty']" position="before">
+                <field name="location_id" column_invisible="(parent.from_reconcile_menu == False)"/>
+                <field name="location_dest_id" column_invisible="(parent.from_reconcile_menu == False)"/>
             </xpath>
 
-            <xpath expr="//form/header/button[@name='action_toggle_is_locked']" position="attributes">
-                <attribute name="invisible">True</attribute>
+            <xpath expr="//form/sheet/notebook/page/field/list/field[@name='product_uom']" position="replace">
+                <field name="source_wh_type" invisible="1"/>
+                <field name="product_uom" column_invisible="(source_wh_type != 'PH')"/>
+                <field name="import_uom" column_invisible="(source_wh_type == 'PH')"/>
+                <field name="barcode_product" readonly="1"/>
+                <field name="barcode_scanned"/>
+                <field name="barcode_status" decoration-danger="barcode_status == 'Mismatch'" decoration-success="barcode_status == 'Match'" widget="badge" readonly="1"/>
             </xpath>
 
-            <xpath expr="//form/header/button[@name='action_toggle_is_locked'][2]" position="attributes">
-                <attribute name="invisible">True</attribute>
+            <xpath expr="//form/sheet/notebook/page/field/list" position="attributes">
+                <attribute name="create">0</attribute>
+                <attribute name="delete">0</attribute>
             </xpath>
 
-            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="before">
-                <field name="location_id"
-                       attrs="{'column_invisible':[('parent.from_reconcile_menu', '=', False)]}"></field>
-                <field name="location_dest_id"
-                       attrs="{'column_invisible':[('parent.from_reconcile_menu', '=', False)]}"></field>
+            <xpath expr="//form/sheet/notebook/page/field/list/field[@name='product_uom_qty']" position="replace">
+                <field name="source_wh_type" invisible="1"/>
+                <field name="product_uom_qty" column_invisible="(source_wh_type != 'PH')"/>
+                <field name="import_quant" column_invisible="(source_wh_type == 'PH')"/>
             </xpath>
 
-            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom']" position="replace">
-                <field name="source_wh_type" invisible="1"></field>
-                <field name="product_uom"
-                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
-                <field name="import_uom"
-                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
-                <field name="barcode_product" readonly="1"></field>
-                <field name="barcode_scanned"></field>
-                <field name="barcode_status" decoration-danger="barcode_status == 'Mismatch'" decoration-success="barcode_status == 'Match'" widget="badge" readonly="1"></field>
-            </xpath>
-
-            <xpath expr="//form/sheet/notebook/page/field/tree" position="attributes">
-                <attribute name='create'>0</attribute>
-                <attribute name='delete'>0</attribute>
-            </xpath>
-
-            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="replace">
-                <field name="source_wh_type" invisible="1"></field>
-                <field name="product_uom_qty"
-                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
-                <field name="import_quant"
-                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
-            </xpath>
-
-            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='quantity_done']" position="replace">
-                <field name="source_wh_type" invisible="1"></field>
-                <field name="quantity_done"
-                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
-                <field name="import_quant_done"
-                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
-            </xpath>
-
-            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='reserved_availability']" position="replace">
-                <field name="source_wh_type" invisible="1"></field>
-                <field name="reserved_availability"
-                       attrs="{'column_invisible':[('source_wh_type', '!=', 'PH')]}"></field>
-                <field name="reserved_availability_done"
-                       attrs="{'column_invisible':[('source_wh_type', '=', 'PH')]}"></field>
+            <xpath expr="//form/sheet/notebook/page/field/list/field[@name='quantity']" position="replace">
+                <field name="source_wh_type" invisible="1"/>
+                <field name="quantity" column_invisible="(source_wh_type != 'PH')"/>
+                <field name="import_quant_done" column_invisible="(source_wh_type == 'PH')"/>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='origin']" position="replace">
-                <field name="origin" readonly="1" attrs="{'invisible': [('origin', '=', False)]}"></field>
-                <field name="trans_issue_request" readonly="1"
-                       attrs="{'invisible': [('trans_issue_request', '=', False)]}"></field>
-                <field name="office_request" readonly="1"
-                       attrs="{'invisible': [('office_request', '=', False)]}"></field>
-                <field name="cons_sample_issue_request" readonly="1"
-                       attrs="{'invisible': [('cons_sample_issue_request', '=', False)]}"></field>
-                <field name="cons_receive_request" readonly="1"
-                       attrs="{'invisible': [('cons_receive_request', '=', False)]}"></field>
-                <field name="to_correct_pick" options="{'no_create': True}"
-                       attrs="{'invisible':[('from_reconcile_menu', '=', False)],'required':[('from_reconcile_menu', '=', True)]}"/>
-                <field name="pharmacy_unit"></field>
-                <field name="remark"
-                       attrs="{'invisible':[('from_reconcile_menu', '=', False)],'required':[('from_reconcile_menu', '=', True)]}"/>
+                <field name="origin" readonly="1" invisible="(origin == False)"/>
+                <field name="trans_issue_request" readonly="1" invisible="(trans_issue_request == False)"/>
+                <field name="office_request" readonly="1" invisible="(office_request == False)"/>
+                <field name="cons_sample_issue_request" readonly="1" invisible="(cons_sample_issue_request == False)"/>
+                <field name="cons_receive_request" readonly="1" invisible="(cons_receive_request == False)"/>
+                <field name="to_correct_pick" options="{'no_create': True}" invisible="(from_reconcile_menu == False)" required="(from_reconcile_menu == True)"/>
+                <field name="pharmacy_unit"/>
+                <field name="remark" invisible="(from_reconcile_menu == False)" required="(from_reconcile_menu == True)"/>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='location_id'][2]" position="replace">
-                <field name="location_id_type" invisible="1"></field>
-                <field name="from_reconcile_menu" invisible="1"></field>
-                <field name="location_id" options="{'no_create': True}" groups="stock.group_stock_multi_locations"
-                       attrs="{'invisible':[('from_reconcile_menu', '=', False)],'readonly':[('from_reconcile_menu', '=', False)]}"/>
-                <field name="from_wh"
-                       attrs="{'invisible':[('from_reconcile_menu', '=', True)],'readonly':True}"></field>
+                <field name="location_id_type" invisible="1"/>
+                <field name="from_reconcile_menu" invisible="1"/>
+                <field name="location_id" options="{'no_create': True}" groups="stock.group_stock_multi_locations" invisible="(from_reconcile_menu == False)" readonly="(from_reconcile_menu == False)"/>
+                <field name="from_wh" invisible="(from_reconcile_menu == True)" readonly="True"/>
             </xpath>
 
             <xpath expr="//form/sheet/group/group/field[@name='location_dest_id'][2]" position="replace">
-                <field name="location_dest_id_type" invisible="1"></field>
-                <field name="from_reconcile_menu" invisible="1"></field>
-                <field name="location_dest_id" groups="stock.group_stock_multi_locations"
-                       attrs="{'invisible':[('from_reconcile_menu', '=', False)],'readonly':[('from_reconcile_menu', '=', False)]}"/>
-                <field name="to_wh" attrs="{'invisible':[('from_reconcile_menu', '=', True)],'readonly':True}"></field>
-                <field name="request_no"
-                       attrs="{'invisible':[('from_reconcile_menu', '=', False)],'required':[('from_reconcile_menu', '=', True)],'readonly':True}"/>
+                <field name="location_dest_id_type" invisible="1"/>
+                <field name="from_reconcile_menu" invisible="1"/>
+                <field name="location_dest_id" groups="stock.group_stock_multi_locations" invisible="(from_reconcile_menu == False)" readonly="(from_reconcile_menu == False)"/>
+                <field name="to_wh" invisible="(from_reconcile_menu == True)" readonly="True"/>
+                <field name="request_no" invisible="(from_reconcile_menu == False)" required="(from_reconcile_menu == True)" readonly="True"/>
             </xpath>
         </field>
     </record>
@@ -161,8 +121,7 @@
         <field name="inherit_id" ref="droga_procurement.droga_purhcase_request_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='purpose']" position="after">
-                <field string='Store origin' name="store_origin_form"
-                       attrs="{'invisible': [('store_origin_form', '=', False)]}"></field>
+                <field string="Store origin" name="store_origin_form" invisible="(store_origin_form == False)"/>
             </xpath>
         </field>
     </record>
@@ -172,52 +131,36 @@
         <field name="model">stock.move.line</field>
         <field name="inherit_id" ref="stock.view_stock_move_line_operation_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree/field[@name='location_id'][2]" position="replace">
-                <field string='From' name="location_id" options="{'no_create': True}"
-                       attrs="{'readonly': ['&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"
-                       domain="[('has_access','=',True),'|',('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"
-                       invisible="not context.get('show_source_location')"/>
+            <xpath expr="//list/field[@name='location_id']" position="replace">
+                <field string="From" name="location_id" options="{'no_create': True}" domain="[('x_has_access','=',True),'|',('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]" invisible="not context.get('show_source_location')"/>
             </xpath>
-            <xpath expr="//tree/field[@name='location_dest_id'][2]" position="replace">
-                <field name="location_dest_id"
-                       attrs="{'readonly': ['&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"
-                       invisible="not context.get('show_destination_location')"
-                       domain="[('has_access','=',True), '|',('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
+            <xpath expr="//list/field[@name='location_dest_id']" position="replace">
+                <field name="location_dest_id" invisible="not context.get('show_destination_location')" domain="[('x_has_access','=',True), '|',('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
             </xpath>
-            <xpath expr="//tree/field[@name='reserved_uom_qty']" position="replace">
-                <field name="reserved_uom_qty" invisible="1"></field>
-            </xpath>
-
-            <xpath expr="//tree/field[@name='qty_done']" position="replace">
-                <field name="source_wh_type" invisible="1"></field>
-                <field name="pharmacy_unit" invisible="1"></field>
-                <field name="qty_done"
-                       attrs="{'column_invisible':[('pharmacy_unit', '!=', True)],'readonly': ['|', '&amp;', ('state', '=', 'done'), ('is_locked', '=', True), '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"></field>
-                <field name="import_quant"
-                       attrs="{'column_invisible':[('pharmacy_unit', '=', True)],'readonly': ['|', '&amp;', ('state', '=', 'done'), ('is_locked', '=', True), '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"></field>
+            <xpath expr="//list/field[@name='quantity']" position="replace">
+                <field name="source_wh_type" invisible="1"/>
+                <field name="pharmacy_unit" invisible="1"/>
+                <field name="qty_done" column_invisible="(pharmacy_unit != True)" readonly="((state == 'done') and (is_locked == True))"/>
+                <field name="import_quant" column_invisible="(pharmacy_unit == True)" readonly="((state == 'done') and (is_locked == True))"/>
 
 
             </xpath>
 
-            <xpath expr="//tree/field[@name='product_uom_id']" position="replace">
-                <field name="pharmacy_unit" invisible="1"></field>
-                <field name="product_uom_id" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom"
-                        attrs="{'column_invisible':[('pharmacy_unit', '!=', True)],'readonly': ['|', '|', ('reserved_uom_qty', '!=', 0.0),
-                                                '&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True),
-                                                '&amp;', ('state', '=', 'done'), ('id', '!=', False)]}"/>
-                <field name="import_uom" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom"
-                        attrs="{'column_invisible':[('pharmacy_unit', '=', True)],'readonly': False}"/>
+            <xpath expr="//list/field[@name='product_uom_id']" position="replace">
+                <field name="pharmacy_unit" invisible="1"/>
+                <field name="product_uom_id" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom" column_invisible="(pharmacy_unit != True)" readonly="((reserved_uom_qty != 0.0) or ((state == 'done') and (id != False)))"/>
+                <field name="import_uom" options="{'no_open': True, 'no_create': True}" string="Unit of Measure" groups="uom.group_uom" column_invisible="(pharmacy_unit == True)" readonly="False"/>
             </xpath>
         </field>
     </record>
 
     <record id="uom_extension" model="ir.ui.view">
-        <field name="name">droga.uom.category.inherited</field>
-        <field name="model">uom.category</field>
-        <field name="inherit_id" ref="uom.product_uom_categ_form_view"/>
+        <field name="name">droga.uom.uom.inherited</field>
+        <field name="model">uom.uom</field>
+        <field name="inherit_id" ref="uom.product_uom_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='name']" position="after">
-                <field name="uom_title"></field>
+            <xpath expr="//form/sheet/group/group[@name='uom_details']/field[@name='name']" position="after">
+                <field name="uom_title"/>
             </xpath>
         </field>
     </record>
@@ -229,11 +172,11 @@
         <field name="inherit_id" ref="stock.view_warehouse"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/group/field[@name='code']" position="after">
-                <field name="wh_type"></field>
-                <field name="telebirr_id"></field>
-                <field name="telebirr_cred" password="True"></field>
-                <field name="telebirr_pass" password="True"></field>
-                <field name="telebirr_operid"></field>
+                <field name="wh_type"/>
+                <field name="telebirr_id"/>
+                <field name="telebirr_cred" password="True"/>
+                <field name="telebirr_pass" password="True"/>
+                <field name="telebirr_operid"/>
             </xpath>
             <xpath expr="//form/sheet" position="after">
                 <div class="oe_chatter">
@@ -251,11 +194,11 @@
         <field name="inherit_id" ref="product.product_category_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/group/field[@name='parent_id']" position="after">
-                <field name="avail_in_product_master"></field>
-                <field name="off_supplies"></field>
-                <field name="group_type"></field>
-                <field name="reservation_period"></field>
-                <field name="batch_expiry_alert_date"></field>
+                <field name="avail_in_product_master"/>
+                <field name="off_supplies"/>
+                <field name="group_type"/>
+                <field name="reservation_period"/>
+                <field name="batch_expiry_alert_date"/>
             </xpath>
         </field>
     </record>
@@ -265,27 +208,26 @@
         <field name="model">stock.move</field>
         <field name="inherit_id" ref="stock.view_move_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree/field[@name='product_uom_qty']" position="before">
-                <field name="reservation_discard_time"></field>
-                <field name="reserved_availability" sum="Total Quantity"></field>
+            <xpath expr="//list/field[@name='product_uom_qty']" position="before">
+                <field name="reservation_discard_time"/>
             </xpath>
 
-            <xpath expr="//tree/field[@name='product_uom_qty']" position="replace">
-                <field name="import_quant_done"></field>
+            <xpath expr="//list/field[@name='product_uom_qty']" position="replace">
+                <field name="import_quant_done"/>
             </xpath>
 
-            <xpath expr="//tree/field[@name='product_uom']" position="replace">
-                <field name="import_uom" string="Unit"></field>
+            <xpath expr="//list/field[@name='product_uom']" position="replace">
+                <field name="import_uom" string="Unit"/>
             </xpath>
 
-            <xpath expr="//tree/field[@name='location_id']" position="attributes">
-                <attribute name='invisible'>1</attribute>
+            <xpath expr="//list/field[@name='location_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//tree/field[@name='location_dest_id']" position="attributes">
-                <attribute name='invisible'>1</attribute>
+            <xpath expr="//list/field[@name='location_dest_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
 
-            <xpath expr="//tree/field[@name='product_id']" position="after">
+            <xpath expr="//list/field[@name='product_id']" position="after">
                 <field name="trans_type_detail" optional="show"/>
                 <field name="trans_warehouse" optional="show"/>
             </xpath>
@@ -297,28 +239,28 @@
         <field name="model">stock.move.line</field>
         <field name="inherit_id" ref="stock.view_move_line_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree/field[@name='location_id']" position="attributes">
-                <attribute name='invisible'>1</attribute>
+            <xpath expr="//list/field[@name='location_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//tree/field[@name='location_dest_id']" position="attributes">
-                <attribute name='invisible'>1</attribute>
+            <xpath expr="//list/field[@name='location_dest_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
 
-            <xpath expr="//tree/field[@name='product_id']" position="after">
+            <xpath expr="//list/field[@name='product_id']" position="after">
                 <field name="trans_type_detail" string="Transactinon type" optional="show"/>
                 <field name="trans_warehouse" string="Warehouse" optional="show"/>
             </xpath>
 
-            <xpath expr="//tree/field[@name='qty_done']" position="replace">
-                <field name="pharmacy_unit" invisible="1"></field>
-                <field name="import_quant" string="Quantity" attrs="{'column_invisible':[('pharmacy_unit', '!=', True)]}"></field>
-                <field name="qty_done" string="Quantity" attrs="{'column_invisible':[('pharmacy_unit', '!=', False)]}"></field>
+            <xpath expr="//list/field[@name='quantity']" position="replace">
+                <field name="pharmacy_unit" invisible="1"/>
+                <field name="import_quant" string="Quantity" column_invisible="(pharmacy_unit != True)"/>
+                <field name="qty_done" string="Quantity" column_invisible="(pharmacy_unit != False)"/>
             </xpath>
 
-            <xpath expr="//tree/field[@name='product_uom_id']" position="replace">
-                <field name="pharmacy_unit" invisible="1"></field>
-                <field name="import_uom" string="Unit" attrs="{'column_invisible':[('pharmacy_unit', '!=', True)]}"></field>
-                <field name="product_uom_id" string="Unit" attrs="{'column_invisible':[('pharmacy_unit', '!=', False)]}"></field>
+            <xpath expr="//list/field[@name='product_uom_id']" position="replace">
+                <field name="pharmacy_unit" invisible="1"/>
+                <field name="import_uom" string="Unit" column_invisible="(pharmacy_unit != True)"/>
+                <field name="product_uom_id" string="Unit" column_invisible="(pharmacy_unit != False)"/>
             </xpath>
         </field>
     </record>
@@ -327,16 +269,12 @@
     <record model="ir.ui.view" id="view_stock_quant_tree_editable_inherit_disable_create_update">
         <field name="name">stock.quant.tree.editable.inherit.disable.update.create</field>
         <field name="model">stock.quant</field>
-        <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"></field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree" position="attributes">
+            <xpath expr="//list" position="attributes">
                 <attribute name="editable"/>
                 <attribute name="js_class"/>
                 <attribute name="create">False</attribute>
-            </xpath>
-
-            <xpath expr="//button[@name='%(stock.action_view_inventory_tree)d']" position="attributes">
-                <attribute name="invisible">True</attribute>
             </xpath>
 
         </field>

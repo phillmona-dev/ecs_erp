@@ -1,15 +1,15 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
         <record id="droga_fleet_request_tree_action" model="ir.actions.act_window">
             <field name="name">Fleet request</field>
             <field name="res_model">droga.fleet.request</field>
-            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_mode">list,form,kanban</field>
         </record>
         <record id="droga_fleet_request_tree_action_user_only" model="ir.actions.act_window">
             <field name="name">Fleet request</field>
             <field name="res_model">droga.fleet.request</field>
-            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_mode">list,form,kanban</field>
             <field name="domain">[('create_uid','=',uid)]</field>
         </record>
         <record id="droga_fleet_request_form" model="ir.ui.view">
@@ -18,47 +18,26 @@
             <field name="arch" type="xml">
                 <form string="Fleet Request">
                     <header>
-                        <field name="status" widget="statusbar"
-                               statusbar_visible="draft,submitted,approved,assigned,completed"/>/>
+                        <field name="status" widget="statusbar" statusbar_visible="draft,submitted,approved,assigned,completed"/>/&gt;
 
-                        <button name="submit_fleet_request" string="Submit" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('status', '!=', 'draft')]}"
-                        />
+                        <button name="submit_fleet_request" string="Submit" type="object" class="oe_highlight" invisible="(status != 'draft')"/>
 
 
-                        <button name="accept_request" string="Accept Request" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('status', '!=', 'submitted')]}"
-                                groups="droga_fleet.droga_fleet_manager"/>
+                        <button name="accept_request" string="Accept Request" type="object" class="oe_highlight" groups="droga_fleet.droga_fleet_manager" invisible="(status != 'submitted')"/>
 
-                        <button name="reject_request" string="Reject Request" type="object" class="btn-danger"
-                                attrs="{'invisible': [('status', '!=', 'submitted')]}"
-                                groups="droga_fleet.droga_fleet_manager"/>
+                        <button name="reject_request" string="Reject Request" type="object" class="btn-danger" groups="droga_fleet.droga_fleet_manager" invisible="(status != 'submitted')"/>
 
 
-                        <button name="driver_assigned" string="Assign Driver" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('status', '!=', 'approved')]}"
-                                groups="droga_fleet.droga_fleet_manager"
-                        />
+                        <button name="driver_assigned" string="Assign Driver" type="object" class="oe_highlight" groups="droga_fleet.droga_fleet_manager" invisible="(status != 'approved')"/>
 
 
-                        <button name="reject_driver" string="Cancel Driver Assignment" type="object" class="btn-danger"
-                                attrs="{'invisible': [('status', '!=', 'approved')]}"
-                                groups="droga_fleet.droga_fleet_manager"/>
+                        <button name="reject_driver" string="Cancel Driver Assignment" type="object" class="btn-danger" groups="droga_fleet.droga_fleet_manager" invisible="(status != 'approved')"/>
 
-                        <button name="driver_assigned_queue" string="Assign Driver" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('status', '!=', 'queued')]}"
-                                groups="droga_fleet.droga_fleet_manager"
-                        />
+                        <button name="driver_assigned_queue" string="Assign Driver" type="object" class="oe_highlight" groups="droga_fleet.droga_fleet_manager" invisible="(status != 'queued')"/>
 
-                        <button name="reject_driver_queue" string="Cancel Driver Assignment" type="object"
-                                class="btn-danger"
-                                attrs="{'invisible': [('status', '!=', 'queued')]}"
-                                groups="droga_fleet.droga_fleet_manager"/>
+                        <button name="reject_driver_queue" string="Cancel Driver Assignment" type="object" class="btn-danger" groups="droga_fleet.droga_fleet_manager" invisible="(status != 'queued')"/>
 
-                        <button name="completed" string="Mark As Completed" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('status', '!=', 'assigned')]}"
-                                groups="droga_fleet.droga_fleet_manager"
-                        />
+                        <button name="completed" string="Mark As Completed" type="object" class="oe_highlight" groups="droga_fleet.droga_fleet_manager" invisible="(status != 'assigned')"/>
 
 
                     </header>
@@ -70,20 +49,17 @@
                         <group>
 
                             <group>
-                                <field name="sale_origin" invisible="1"></field>
-                                <field name="requested_by" attrs="{'readonly': [('status', '!=', 'draft')]}"/>
-                                <field name="request_type"
-                                       attrs="{'readonly': ['|',('status', '!=', 'draft'),('sale_origin','!=',False)]}"/>
-                                <field name="company" attrs="{'readonly': [('status', '!=', 'draft')]}"/>
-                                <field name="sale_origin" readonly="1"
-                                       attrs="{'invisible': [('sale_origin', '=', False)]}"/>
+                                <field name="sale_origin" invisible="1"/>
+                                <field name="requested_by" readonly="(status != 'draft')"/>
+                                <field name="request_type" readonly="(status != 'draft') or (sale_origin != False)"/>
+                                <field name="company" readonly="(status != 'draft')"/>
+                                <field name="sale_origin" readonly="1" invisible="(sale_origin == False)"/>
 
                             </group>
                             <group>
                                 <field name="date" readonly="1"/>
-                                <field name="purpose" attrs="{'readonly': [('status', '!=', 'draft')]}"/>
-                                <field name="department" attrs="{'readonly': [('status', '!=', 'draft')]}"
-                                />
+                                <field name="purpose" readonly="(status != 'draft')"/>
+                                <field name="department" readonly="(status != 'draft')"/>
                             </group>
                         </group>
 
@@ -96,41 +72,27 @@
                         <notebook>
                             <page string="Requests">
                                 <field name="task_ids">
-                                    <tree editable="bottom">
+                                    <list editable="bottom">
                                         <field name="request_type" invisible="1"/>
                                         <field name="status" invisible="1"/>
 
 
-                                        <field name="requested_for"
-                                               attrs="{'readonly':[('parent.status', '!=', 'draft')] , 'column_invisible' : [('parent.request_type', '!=', 'employee_transportation')]}"/>
-                                        <field name="delivered_to"
-                                               attrs="{'readonly':[('parent.status', '!=', 'draft')] ,  'column_invisible' : [('parent.request_type', '!=', 'resource_transportation')]}"/>
-                                        <field name="resource_name"
-                                               attrs="{'readonly':[('parent.status', '!=', 'draft')] ,  'column_invisible' : [('parent.request_type', '!=', 'resource_transportation')]}"/>
-                                        <field name="amount" string="Quantity"
-                                               attrs="{'readonly':[('parent.status', '!=', 'draft')] ,  'column_invisible' : [('parent.request_type', '!=', 'resource_transportation')] }"/>
+                                        <field name="requested_for" readonly="(parent.status != 'draft')" column_invisible="(parent.request_type != 'employee_transportation')"/>
+                                        <field name="delivered_to" readonly="(parent.status != 'draft')" column_invisible="(parent.request_type != 'resource_transportation')"/>
+                                        <field name="resource_name" readonly="(parent.status != 'draft')" column_invisible="(parent.request_type != 'resource_transportation')"/>
+                                        <field name="amount" string="Quantity" readonly="(parent.status != 'draft')" column_invisible="(parent.request_type != 'resource_transportation')"/>
 
-                                        <field name="from_location"
-                                               attrs="{'readonly':[('parent.status', '!=', 'draft')]}"/>
-                                        <field name="to_location"
-                                               attrs="{'readonly':[('parent.status', '!=', 'draft')]}"/>
-                                        <field name="service_time"
-                                               attrs="{'readonly':[('parent.status', '!=', 'draft')]}"/>
-                                        <field name="comment" attrs="{'readonly':[('parent.status', '!=', 'draft')]}"/>
+                                        <field name="from_location" readonly="(parent.status != 'draft')"/>
+                                        <field name="to_location" readonly="(parent.status != 'draft')"/>
+                                        <field name="service_time" readonly="(parent.status != 'draft')"/>
+                                        <field name="comment" readonly="(parent.status != 'draft')"/>
 
-                                        <field name="vehicle" options="{'no_create': True, 'no_open': True}"
-                                               attrs="{'readonly':[('parent.status', '!=', 'approved')]}"
-                                               domain="[('available', '=', True)]"
-                                               groups="droga_fleet.droga_fleet_manager"/>
-                                        <field name="chauffeur_drivers" options="{'no_create': True, 'no_open': True}"
-                                               attrs="{'readonly':[('parent.status', '!=', 'approved')]}"
-                                               groups="droga_fleet.droga_fleet_manager"/>
+                                        <field name="vehicle" options="{'no_create': True, 'no_open': True}" domain="[('available', '=', True)]" groups="droga_fleet.droga_fleet_manager" readonly="(parent.status != 'approved')"/>
+                                        <field name="chauffeur_drivers" options="{'no_create': True, 'no_open': True}" groups="droga_fleet.droga_fleet_manager" readonly="(parent.status != 'approved')"/>
 
-                                        <field name="time_taken"
-                                               attrs="{'readonly':[('parent.status', '!=', 'draft')]}"
-                                               groups="droga_fleet.droga_fleet_manager"/>
+                                        <field name="time_taken" groups="droga_fleet.droga_fleet_manager" readonly="(parent.status != 'draft')"/>
 
-                                    </tree>
+                                    </list>
                                 </field>
 
                             </page>
@@ -156,7 +118,7 @@
             <field name="model">droga.fleet.request</field>
             <field name="arch" type="xml">
 
-                <tree string="Fleet Requests">
+                <list string="Fleet Requests">
 
 
                     <field name="name"/>
@@ -171,16 +133,10 @@
                     <field name="vehicle_used"/>
                     <field name="travel_log"/>
                     <field name="date"/>
-                    <field name="status"
-                           decoration-success="status == 'completed'"
-                           decoration-info="status == 'assigned'"
-                           decoration-muted="status =='queued'"
-                           decoration-primary="status == 'approved'"
-                           decoration-danger="status == 'cancelled'"
-                           widget="badge"/>
+                    <field name="status" decoration-success="status == 'completed'" decoration-info="status == 'assigned'" decoration-muted="status =='queued'" decoration-primary="status == 'approved'" decoration-danger="status == 'cancelled'" widget="badge"/>
 
 
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -267,7 +223,7 @@
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
 
-                <xpath expr="//field[@name='study_school']" position="after">
+                <xpath expr="//field[@name='study_field']" position="after">
                     <field name="driver_license_type"/>
                 </xpath>
 

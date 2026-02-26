@@ -1,32 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="droga_crm_saels_target_tree" model="ir.ui.view">
         <field name="name">droga.crm.sales.target.header.tree</field>
         <field name="model">droga.crm.sales.target.header</field>
         <field name="arch" type="xml">
-            <tree string="" editable="top" delete="0">
+            <list string="" editable="top" delete="0">
                 <header>
                     <button name="get_reports_all" type="object" string="Get reports - all" class="oe_highlight"/>
                     <button name="get_reports_prod" type="object" string="Get reports - by product group" class="oe_highlight"/>
                 </header>
-                <field name="sales_team" widget="many2many_tags" options="{'no_create':True,'no_open':True}" ></field>
-                <field name="type"></field>
-                <field name="date_from"></field>
-                <field name="date_to"></field>
-                <field name="detail_count"></field>
-                <field name="rate"></field>
-                <field name="status"></field>
-                <button icon="fa-credit-card-alt"
-                        type="object" string=" Target detail"
-                                            name="target_detail_open" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        type="object" string=" Duplicate"
-                                            name="duplicate_entry" class="oe_stat_button"/>
-                <button icon="fa-credit-card-alt"
-                        type="object" string=" Get report"
-                                            name="get_report" class="oe_stat_button"/>
-            </tree>
+                <field name="sales_team" widget="many2many_tags" options="{'no_create':True,'no_open':True}"/>
+                <field name="type"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="detail_count"/>
+                <field name="rate"/>
+                <field name="status"/>
+                <button icon="fa-credit-card-alt" type="object" string=" Target detail" name="target_detail_open" class="oe_stat_button"/>
+                <button icon="fa-credit-card-alt" type="object" string=" Duplicate" name="duplicate_entry" class="oe_stat_button"/>
+                <button icon="fa-credit-card-alt" type="object" string=" Get report" name="get_report" class="oe_stat_button"/>
+            </list>
         </field>
     </record>
 
@@ -35,21 +28,21 @@
         <field name="model">droga.crm.sales.target.header</field>
         <field name="arch" type="xml">
             <search>
-                <field name="sales_team"></field>
-                <field name="type"></field>
-                <field name="date_from"></field>
-                <field name="date_to"></field>
-                <field name="status"></field>
+                <field name="sales_team"/>
+                <field name="type"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="status"/>
 
-                <filter name="active" string="Active" domain="[('status', '=', 'Active')]" />
-                <filter name="closed" string="Closed" domain="[('status', '=', 'Closed')]" />
+                <filter name="active" string="Active" domain="[('status', '=', 'Active')]"/>
+                <filter name="closed" string="Closed" domain="[('status', '=', 'Closed')]"/>
 
                 <separator/>
 
-                <filter name="daily" string="Daily" domain="[('type', '=', 'Daily')]" />
-                <filter name="weekly" string="Weekly" domain="[('type', '=', 'Weekly')]" />
-                <filter name="monthly" string="Monthly" domain="[('type', '=', 'Monthly')]" />
-                <filter name="quarterly" string="Quarterly" domain="[('type', '=', 'Quarterly')]" />
+                <filter name="daily" string="Daily" domain="[('type', '=', 'Daily')]"/>
+                <filter name="weekly" string="Weekly" domain="[('type', '=', 'Weekly')]"/>
+                <filter name="monthly" string="Monthly" domain="[('type', '=', 'Monthly')]"/>
+                <filter name="quarterly" string="Quarterly" domain="[('type', '=', 'Quarterly')]"/>
             </search>
         </field>
     </record>
@@ -60,15 +53,15 @@
         <field name="arch" type="xml">
             <form delete="0">
                 <field name="target_detail" mode="tree">
-                    <tree string="" editable="top" delete="0">
-                        <field name="indicator" widget="many2many_tags"></field>
-                        <field name="prod_group"></field>
-                        <field name="me_too_core"></field>
-                        <field name="type"></field>
-                        <field name="target_qty"></field>
-                        <field name="target_amt"></field>
-                        <field name="remark"></field>
-                    </tree>
+                    <list string="" editable="top" delete="0">
+                        <field name="indicator" widget="many2many_tags"/>
+                        <field name="prod_group"/>
+                        <field name="me_too_core"/>
+                        <field name="type"/>
+                        <field name="target_qty"/>
+                        <field name="target_amt"/>
+                        <field name="remark"/>
+                    </list>
                 </field>
             </form>
         </field>
@@ -78,20 +71,20 @@
         <field name="name">droga.crm.sales.target.header.report</field>
         <field name="model">droga.crm.sales.target.report</field>
         <field name="arch" type="xml">
-            <tree create="0" delete="0">
-                <field name="sales_team"></field>
-                <field name="header_id"></field>
-                <field name="indicator" widget="many2many_tags"></field>
-                <field name="prod_group"></field>
-                <field name="me_too_core"></field>
-                <field name="target_qty" invisible="context.get('qty', False)"></field>
-                <field name="ach_qty" invisible="context.get('qty', False)"></field>
-                <field name="ach_qty_pct" invisible="context.get('qty', False)" decoration-success="ach_qty_pct &gt;= 80" decoration-danger="ach_qty_pct &lt;= 50 and ach_qty_pct &gt; 0" decoration-warning="ach_qty_pct &lt; 80 and ach_qty_pct &gt; 50" decoration-info="ach_qty_pct == 0" widget="badge"></field>
-                <field name="target_amt" invisible="context.get('amt', False)"></field>
-                <field name="ach_amt" invisible="context.get('amt', False)"></field>
-                <field name="ach_amt_pct" invisible="context.get('amt', False)" decoration-success="ach_amt_pct &gt;= 80" decoration-danger="ach_amt_pct &lt;= 50 and ach_amt_pct &gt; 0" decoration-warning="ach_amt_pct &lt; 80 and ach_amt_pct &gt; 50" decoration-info="ach_amt_pct == 0" widget="badge"></field>
-                <field name="remark"></field>
-            </tree>
+            <list create="0" delete="0">
+                <field name="sales_team"/>
+                <field name="header_id"/>
+                <field name="indicator" widget="many2many_tags"/>
+                <field name="prod_group"/>
+                <field name="me_too_core"/>
+                <field name="target_qty" invisible="context.get('qty', False)"/>
+                <field name="ach_qty" invisible="context.get('qty', False)"/>
+                <field name="ach_qty_pct" invisible="context.get('qty', False)" decoration-success="ach_qty_pct &gt;= 80" decoration-danger="ach_qty_pct &lt;= 50 and ach_qty_pct &gt; 0" decoration-warning="ach_qty_pct &lt; 80 and ach_qty_pct &gt; 50" decoration-info="ach_qty_pct == 0" widget="badge"/>
+                <field name="target_amt" invisible="context.get('amt', False)"/>
+                <field name="ach_amt" invisible="context.get('amt', False)"/>
+                <field name="ach_amt_pct" invisible="context.get('amt', False)" decoration-success="ach_amt_pct &gt;= 80" decoration-danger="ach_amt_pct &lt;= 50 and ach_amt_pct &gt; 0" decoration-warning="ach_amt_pct &lt; 80 and ach_amt_pct &gt; 50" decoration-info="ach_amt_pct == 0" widget="badge"/>
+                <field name="remark"/>
+            </list>
         </field>
     </record>
 
@@ -100,18 +93,18 @@
         <field name="model">droga.crm.sales.target.report</field>
         <field name="arch" type="xml">
             <search>
-                <field name="sales_team"></field>
-                <field name="indicator"></field>
-                <field name="prod_group"></field>
-                <field name="me_too_core"></field>
-                <field name="target_qty"></field>
-                <field name="ach_qty"></field>
-                <field name="ach_qty_pct"></field>
-                <field name="target_amt"></field>
-                <field name="ach_amt"></field>
-                <field name="ach_amt_pct"></field>
-                <field name="remark"></field>
-                <field name="header_id"></field>
+                <field name="sales_team"/>
+                <field name="indicator"/>
+                <field name="prod_group"/>
+                <field name="me_too_core"/>
+                <field name="target_qty"/>
+                <field name="ach_qty"/>
+                <field name="ach_qty_pct"/>
+                <field name="target_amt"/>
+                <field name="ach_amt"/>
+                <field name="ach_amt_pct"/>
+                <field name="remark"/>
+                <field name="header_id"/>
 
                 <filter name="group_header_id" string="Header ID" context="{'group_by':'header_id'}"/>
                 <filter name="group_sales_team" string="Sales team" context="{'group_by':'sales_team'}"/>
@@ -124,19 +117,12 @@
     <record id="droga_crm_saels_target_action" model="ir.actions.act_window">
         <field name="name">Sales target</field>
         <field name="res_model">droga.crm.sales.target.header</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="droga_crm_saels_target_search"></field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="droga_crm_saels_target_search"/>
         <field name="context">{"search_default_active":1}</field>
     </record>
 
-    <menuitem
-        id="droga_crm_saels_target"
-        name="Sales target reports"
-        action="droga_crm_saels_target_action"
-        parent="menu_vist_log"
-        groups="crm_nsm"
-        active="False"
-        sequence="21"/>
+    <menuitem id="droga_crm_saels_target" name="Sales target reports" action="droga_crm_saels_target_action" parent="menu_vist_log" groups="crm_nsm" active="False" sequence="21"/>
 
 
 
@@ -169,11 +155,11 @@
             <form string="" delete="0">
                 <group>
                     <group>
-                        <field name="date_from"></field>
-                        <field name="type"></field>
+                        <field name="date_from"/>
+                        <field name="type"/>
                     </group>
                     <group>
-                        <field name="date_to"></field>
+                        <field name="date_to"/>
                     </group>
                 </group>
                 <footer>

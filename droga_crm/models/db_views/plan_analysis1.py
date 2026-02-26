@@ -51,6 +51,8 @@ class droga_crm_grade_vs_schedule(models.Model):
     is_record_owner = fields.Boolean('Show plan', store=False, compute="_is_record_owner", search="_search_field")
     def _search_field(self, operator, value):
         if operator=='=':
+            if not request:
+                return [('id','in',[])]
             ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
             if len(ses)==0:
                 return [('id','in',[])]
@@ -86,4 +88,3 @@ class droga_crm_grade_vs_schedule(models.Model):
                 (select a.parent_name||' - '||a.contact_name as contact_name,b.grade,b.visit_times_per_month,c.full_name,d.city_descr,a.contact_area,'Contact' as cust_type,a.id,a.company_id from droga_crm_contacts a left join droga_cust_grade b on a.cont_grade=b.id left join droga_cust_type c on a.contact_type=c.id left join droga_crm_settings_city d on a.contact_area=d.id where a.contact_area is not null) y on 1=1 limit 1000)) g 
            ) 
          """)
-

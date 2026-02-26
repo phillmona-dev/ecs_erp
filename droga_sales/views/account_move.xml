@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <record id="action_print_to_pos_peds" model="ir.actions.client">
@@ -16,13 +16,8 @@
         <field name="arch" type="xml">
 
             <xpath expr="//button[@name='button_draft']" position="replace">
-                <button name="button_draft" string="Reset to Draft" type="object"
-                        groups="droga_finance.account_payable_accountant_group,droga_finance.account_recivables_accountant_group,droga_finance.account_receivable_team_leader_group,droga_finance.account_recivables_cashier_accountant_group,droga_finance.account_chief_finance_officer_group,droga_finance.account_payable_team_leader_group"
-                        attrs="{'invisible' : [('show_reset_to_draft_button', '=', False)]}" data-hotkey="q"/>
-                <button name="button_draft" string="Reset to Draft" type="object"
-                        groups="droga_finance.account_payable_accountant_group,droga_finance.account_recivables_accountant_group,droga_finance.account_receivable_team_leader_group,droga_finance.account_recivables_cashier_accountant_group,droga_finance.account_chief_finance_officer_group,droga_finance.account_payable_team_leader_group"
-                        attrs="{'invisible' : ['|',('show_reset_to_draft_button', '!=', False),('state','=','draft')]}"
-                        data-hotkey="q"/>
+                <button name="button_draft" string="Reset to Draft" type="object" groups="droga_finance.account_payable_accountant_group,droga_finance.account_recivables_accountant_group,droga_finance.account_receivable_team_leader_group,droga_finance.account_recivables_cashier_accountant_group,droga_finance.account_chief_finance_officer_group,droga_finance.account_payable_team_leader_group" data-hotkey="q" invisible="(show_reset_to_draft_button == False)"/>
+                <button name="button_draft" string="Reset to Draft" type="object" groups="droga_finance.account_payable_accountant_group,droga_finance.account_recivables_accountant_group,droga_finance.account_receivable_team_leader_group,droga_finance.account_recivables_cashier_accountant_group,droga_finance.account_chief_finance_officer_group,droga_finance.account_payable_team_leader_group" data-hotkey="q" invisible="(show_reset_to_draft_button != False) or (state == 'draft')"/>
                 <button name="generate_sales_xml" string="Send To POS" type="object" groups="droga_sales.maraki_pos_access"/>
             </xpath>
             <form position="attributes">
@@ -30,16 +25,13 @@
             </form>
 
             <xpath expr="//button[@name='button_set_checked']" position="after">
-                <button type="object" name="print_sales_attachment" string="Sales Attachment"
-                        attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}"/>
-                <button type="object" name="set_analytic_accounts" string="Fill Analytic-Tax" groups="droga_sales.analytic_tax_access"
-                        attrs="{'invisible': ['|',('move_type', 'not in', ('out_invoice','in_invoice')),('state', '!=', 'draft')]}"/>
-                <button type="object" name="set_analytic_accounts_only" string="Fill Analytic-Account only"
-                        attrs="{'invisible': ['|',('move_type', 'not in', ('out_invoice','in_invoice')),('state', '!=', 'draft')]}"/>
+                <button type="object" name="print_sales_attachment" string="Sales Attachment" invisible="(move_type != 'out_invoice')"/>
+                <button type="object" name="set_analytic_accounts" string="Fill Analytic-Tax" groups="droga_sales.analytic_tax_access" invisible="(move_type not in ['out_invoice', 'in_invoice']) or (state != 'draft')"/>
+                <button type="object" name="set_analytic_accounts_only" string="Fill Analytic-Account only" invisible="(move_type not in ['out_invoice', 'in_invoice']) or (state != 'draft')"/>
             </xpath>
 
             <xpath expr="//form/sheet/notebook/page[@name='other_info']" position="after">
-                <page string="FS Info" attrs="{'invisible': [('move_type', 'not in', ('out_invoice','in_invoice'))]}">
+                <page string="FS Info" invisible="(move_type not in ['out_invoice', 'in_invoice'])">
 
                     <group>
                         <group>
@@ -64,25 +56,21 @@
             </xpath>
 
 
-            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='product_uom_id']"
-                   position="after">
+            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/list/field[@name='product_uom_id']" position="after">
 
-                <field name="item_uom_alternate" optional="hide"
-                       attrs="{'readonly': [('parent.state', 'not in', ('draft'))],'invisible': [('parent.move_type', '!=', 'out_invoice')]}"/>
+                <field name="item_uom_alternate" optional="hide" readonly="(parent.state not in ['draft'])" invisible="(parent.move_type != 'out_invoice')"/>
             </xpath>
 
-            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='price_total']"
-                   position="after">
+            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/list/field[@name='price_total']" position="after">
                 <field name="item_code" invisible="1"/>
             </xpath>
 
-            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='product_uom_id']"
-                   position="replace">
+            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/list/field[@name='product_uom_id']" position="replace">
                 <field name="product_uom_id" string="UoM" groups="uom.group_uom" readonly="True" optional="show"/>
             </xpath>
 
 
-            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree" position="attributes">
+            <xpath expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/list" position="attributes">
                 <attribute name="limit">500</attribute>
             </xpath>
 
@@ -98,7 +86,7 @@
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
-                <field name="cust_region" string="Region"></field>
+                <field name="cust_region" string="Region"/>
                 <field name="FSInvoiceNumber" string="FS Number"/>
             </xpath>
 

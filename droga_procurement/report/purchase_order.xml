@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <!-- Inherit Purchase  report (from module purchase) -->
     <template id="report_purchase_order_inherit" inherit_id="purchase.report_purchaseorder_document">
-        <xpath expr="/t[1]/t[1]/div[1]/table[1]/tbody[1]/t[2]/tr[1]/t[1]/td[4]/span[2]" position="replace">
-            <span t-field="line.product_uom.uom_title" groups="uom.group_uom"/>
+        <xpath expr="//span[@t-field='line.product_uom_id.name']" position="replace">
+            <span t-esc="getattr(line.product_uom_id, 'uom_title', False) or line.product_uom_id.name" groups="uom.group_uom"/>
         </xpath>
         <xpath expr="//div[@id='total']" position="after">
             <t t-if="o.request_type=='Foregin'">
@@ -89,9 +89,7 @@
         <field name="name">Purchase Order</field>
         <field name="res_model">purchase.order</field>
         <field name="view_mode">pivot</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-
-         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_order_cost_report_pivot')}),]"/>
+        <field name="view_ids" eval="[(5, 0, 0),           (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_order_cost_report_pivot')}),]"/>
         <field name="domain">[('request_type','=','Foregin')]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
@@ -122,9 +120,7 @@
         <field name="name">Purchase Order</field>
         <field name="res_model">purchase.order.line</field>
         <field name="view_mode">pivot</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-
-         (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_order_by_product_report_pivot')}),]"/>
+        <field name="view_ids" eval="[(5, 0, 0),           (0, 0, {'view_mode': 'pivot', 'view_id': ref('droga_purchase_order_by_product_report_pivot')}),]"/>
         <field name="domain">[('order_id.request_type','=','Foregin')]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
@@ -139,13 +135,13 @@
         <field name="name">Price Variance Between RFQ and PO</field>
         <field name="model">purchase.order.line</field>
         <field name="arch" type="xml">
-            <tree string="Purchase Order">
-                <field name="order_id"  />
-                <field name="product_id" />
+            <list string="Purchase Order">
+                <field name="order_id"/>
+                <field name="product_id"/>
                 <field name="price_total" string="PO Price"/>
                 <field name="rfq_price_total_etb" string="RFQ Price"/>
                 <field name="price_variance_with_rfq" string="Variance"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -154,9 +150,7 @@
         <field name="name">Purchase Order</field>
         <field name="res_model">purchase.order.line</field>
         <field name="view_mode">pivot</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-
-         (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_purchase_order_by_product_price_variance_rfq_po_report_tree')}),]"/>
+        <field name="view_ids" eval="[(5, 0, 0),           (0, 0, {'view_mode': 'list', 'view_id': ref('droga_purchase_order_by_product_price_variance_rfq_po_report_tree')}),]"/>
         <field name="domain">[('order_id.request_type','=','Foregin')]</field>
         <field name="context">{}</field>
         <field name="help" type="html">

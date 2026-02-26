@@ -1,5 +1,9 @@
 from email.policy import default
-import pandas as pd
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 
 from odoo import models, fields, api
 from datetime import datetime, date, timedelta
@@ -165,9 +169,19 @@ class droga_tender_master(models.Model):
         return days
 
     def count_weekends_pandas(self,start_date, end_date):
-        dates = pd.date_range(start_date, end_date)
-        weekends = dates[dates.weekday.isin([5, 6])]
-        return weekends.shape[0]
+        if pd:
+            dates = pd.date_range(start_date, end_date)
+            weekends = dates[dates.weekday.isin([5, 6])]
+            return weekends.shape[0]
+        if not start_date or not end_date:
+            return 0
+        day_count = 0
+        current = start_date
+        while current <= end_date:
+            if current.weekday() in (5, 6):
+                day_count += 1
+            current += timedelta(days=1)
+        return day_count
     @api.depends("closing_date_gre")
     def get_status(self):
         for record in self:

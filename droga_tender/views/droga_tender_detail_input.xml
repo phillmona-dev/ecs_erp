@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
 
@@ -7,10 +7,10 @@
             <field name="name">droga.tender.submission.detail.excel.tree</field>
             <field name="model">droga.tender.submission.detail</field>
             <field name="arch" type="xml">
-                <tree editable="top">
-                    <field name="lot_number"></field>
-                    <field name="item_des_list"></field>
-                </tree>
+                <list editable="top">
+                    <field name="lot_number"/>
+                    <field name="item_des_list"/>
+                </list>
             </field>
         </record>
 
@@ -19,8 +19,8 @@
             <field name="model">droga.tender.submission.detail</field>
             <field name="arch" type="xml">
                 <search>
-                    <field name="lot_number"></field>
-                    <field name="item_des_list"></field>
+                    <field name="lot_number"/>
+                    <field name="item_des_list"/>
                 </search>
             </field>
         </record>
@@ -28,7 +28,7 @@
      <record id="droga_tender_detail_submission_excel" model="ir.actions.act_window">
             <field name="name">Tender submission detail excel</field>
             <field name="res_model">droga.tender.submission.detail</field>
-            <field name="view_mode">tree</field>
-            <field name="search_view_id" ref="droga_tender_detail_submission_excel_search"></field>
+            <field name="view_mode">list</field>
+            <field name="search_view_id" ref="droga_tender_detail_submission_excel_search"/>
         </record>
 </odoo>

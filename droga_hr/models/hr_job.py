@@ -37,7 +37,7 @@ class HrJobSalary(models.Model):
     _order = 'date_from'
 
     job_id = fields.Many2one("hr.job")
-    contract_id = fields.Many2one("hr.contract")
+    contract_id = fields.Many2one("hr.version")
     name = fields.Char("Description", required=True)
     date_from = fields.Date("Date From")
     date_to = fields.Date("Date To")

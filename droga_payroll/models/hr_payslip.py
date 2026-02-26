@@ -25,7 +25,7 @@ class HrPayslip(models.Model):
     @api.depends('employee_id', 'date_from', 'date_to')
     def _compute_days_outside_contract(self):
         for payslip in self:
-            contract = self.env['hr.contract'].search([('employee_id', '=', payslip.employee_id.id)], limit=1)
+            contract = payslip.version_id
             if not contract:
                 payslip.days_outside_contract = 0
                 continue

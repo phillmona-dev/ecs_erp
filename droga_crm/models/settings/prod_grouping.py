@@ -30,14 +30,18 @@ class droga_product_template(models.Model):
                                    search="_search_prod_avail")
 
     def _get_groups(self):
+        if not request:
+            return False
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
         return False if len(ses) == 0 else ses[0].pro_id[0].p_groups.ids
 
     pr_avail_groups = fields.Many2many('droga.crm.settings.prod_group', default=_get_groups)
 
     def _search_prod_avail(self, operator, value):
+        if not request:
+            return [('id', 'in', [])]
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
-        if not request or len(ses) == 0:
+        if len(ses) == 0:
             return [('id', 'in', [])]
 
         if self.env.user.has_group('droga_crm.crm_core_only'):

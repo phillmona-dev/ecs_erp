@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <!-- tree view for odoo overtime -->
     <record id="hr_attendance_over_time_report_tree_view" model="ir.ui.view">
         <field name="name">Over Time Report</field>
         <field name="model">droga.hr.attendance.over.time</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="employee_badge_id"/>
                 <field name="employee_id"/>
                 <field name="department"/>
@@ -15,10 +15,9 @@
                 <field name="worked_hours" widget="float_time"/>
                 <field name="real_worked_hours" widget="float_time"/>
                 <field name="over_time_hour" widget="float_time"/>
-                <field name="approval_status" widget="badge" decoration-success="approval_status == 'Approved'"
-                       decoration-warning="approval_status == 'Not Approved'"/>
+                <field name="approval_status" widget="badge" decoration-success="approval_status == 'Approved'" decoration-warning="approval_status == 'Not Approved'"/>
 
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -35,29 +34,15 @@
                 <field name="check_out"/>
                 <field name="over_time_hour"/>
 
-                <filter string="Today"
-                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
-                        name="today_trans"></filter>
+                <filter string="Today" domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]" name="today_trans"/>
 
-                <filter string="Current week"
-                        domain="[('date', '&lt;=', ((context_today()+relativedelta(weeks=0, weekday=-1)).strftime('%Y-%m-%d'))),
-                    ('date', '&gt;=', ((context_today()-relativedelta(weeks=1, weekday=0)).strftime('%Y-%m-%d')))]"
-                        name="current_week_trans"></filter>
+                <filter string="Current week" domain="[('date', '&lt;=', ((context_today()+relativedelta(weeks=0, weekday=-1)).strftime('%Y-%m-%d'))),                     ('date', '&gt;=', ((context_today()-relativedelta(weeks=1, weekday=0)).strftime('%Y-%m-%d')))]" name="current_week_trans"/>
 
-                <filter string="Previous week"
-                        domain="[('date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),
-                       ('date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]"
-                        name="previous_week_trans"></filter>
+                <filter string="Previous week" domain="[('date', '&gt;=', ((context_today()+relativedelta(weeks=-2, days=1, weekday=0)).strftime('%%Y-%%m-%%d'))),                        ('date', '&lt;=', ((context_today()+relativedelta(weeks=-1, weekday=6)).strftime('%%Y-%%m-%%d')))]" name="previous_week_trans"/>
 
-                <filter string="Current month"
-                        domain="[('date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('date','&gt;=',time.strftime('%%Y-%%m-01'))]"
-                        name="current_month_trans"></filter>
+                <filter string="Current month" domain="[('date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')),                         ('date','&gt;=',time.strftime('%%Y-%%m-01'))]" name="current_month_trans"/>
 
-                <filter string="Previous month"
-                        domain="[('date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),
-                        ('date','&lt;',time.strftime('%%Y-%%m-01'))]"
-                        name="previous_month_trans"></filter>
+                <filter string="Previous month" domain="[('date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),                         ('date','&lt;',time.strftime('%%Y-%%m-01'))]" name="previous_month_trans"/>
 
                 <separator/>
                 <filter name="not_approved" string="Not Approved" domain="[('approval_status', '=', 'Not Approved')]"/>
@@ -72,7 +57,7 @@
     <record id="hr_attendance_over_time_report_action" model="ir.actions.act_window">
         <field name="name">Over Time Report</field>
         <field name="res_model">droga.hr.attendance.over.time</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
@@ -88,7 +73,7 @@
         <field name="name">Over Time Report</field>
         <field name="model">droga.hr.attendance.over.time</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="employee_badge_id"/>
                 <field name="employee_id"/>
                 <field name="department"/>
@@ -98,14 +83,10 @@
                 <field name="worked_hours" widget="float_time"/>
                 <field name="real_worked_hours" widget="float_time"/>
                 <field name="over_time_hour" widget="float_time"/>
-                <field name="approval_status" widget="badge" decoration-success="approval_status == 'Approved'"
-                       decoration-warning="approval_status == 'Not Approved'"
-                       decoration-danger="approval_status == 'Rejected'"/>
-                <button name="approve_over_time" type="object" string="Approve" class="oe_highlight"
-                        confirm="Are you sure?"/>
-                <button name="reject_over_time" type="object" string="Reject" class="oe_highlight"
-                        confirm="Are you sure?"/>
-            </tree>
+                <field name="approval_status" widget="badge" decoration-success="approval_status == 'Approved'" decoration-warning="approval_status == 'Not Approved'" decoration-danger="approval_status == 'Rejected'"/>
+                <button name="approve_over_time" type="object" string="Approve" class="oe_highlight" confirm="Are you sure?"/>
+                <button name="reject_over_time" type="object" string="Reject" class="oe_highlight" confirm="Are you sure?"/>
+            </list>
         </field>
     </record>
 
@@ -113,9 +94,8 @@
     <record id="hr_attendance_over_time_report_approval_action" model="ir.actions.act_window">
         <field name="name">Over Time Report</field>
         <field name="res_model">droga.hr.attendance.over.time</field>
-        <field name="view_mode">tree</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-        (0, 0, {'view_mode': 'tree', 'view_id': ref('hr_attendance_over_time_report_tree_approval_view')})]"/>
+        <field name="view_mode">list</field>
+        <field name="view_ids" eval="[(5, 0, 0),         (0, 0, {'view_mode': 'list', 'view_id': ref('hr_attendance_over_time_report_tree_approval_view')})]"/>
         <field name="domain">[('manager_id.user_id','=',uid)]</field>
         <field name="context">{"search_default_not_approved":1,"search_default_current_week_trans":1}</field>
         <field name="help" type="html">

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data noupdate="1">
         <record id="ir_cron_scheduler_notification_action" model="ir.cron">
@@ -9,7 +9,6 @@
             <field name="user_id" ref="base.user_root"/>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
         </record>
     </data>
 
@@ -22,24 +21,21 @@
                 <field name="maintenance_status" widget="statusbar"/>
             </header>
             <xpath expr="//page[1]" position="attributes">
-                <attribute name='invisible'>1</attribute>
+                <attribute name="invisible">1</attribute>
             </xpath>
             <!--        <page string="Tax Info" position="attributes">-->
             <!--            <attribute name='invisible'>1</attribute>-->
             <!--        </page>-->
             <xpath expr="//field[@name='location']" position="after">
                 <field name="vehicle_status" groups="droga_fleet.droga_fleet_manager"/>
-                <field name="available" />
+                <field name="available"/>
 
             </xpath>
 
 
             <xpath expr="//field[@name='tag_ids']" position="after">
-                <button type="object" name="add_to_maintenance" string="Add To Maintenance"
-                        attrs="{'invisible': [('maintenance_status', '!=', 'maintenance_completed')] }"
-                        class="btn-danger"/>
-                <button type="object" name="remove_from_maintenance" string="Maintenance Completed"
-                        attrs="{'invisible': [('maintenance_status', '!=', 'in_maintenance')] }" class="oe_highlight"/>
+                <button type="object" name="add_to_maintenance" string="Add To Maintenance" class="btn-danger" invisible="(maintenance_status != 'maintenance_completed')"/>
+                <button type="object" name="remove_from_maintenance" string="Maintenance Completed" class="oe_highlight" invisible="(maintenance_status != 'in_maintenance')"/>
             </xpath>
 
 
@@ -53,9 +49,7 @@
                 <field name="cc" groups="droga_fleet.droga_fleet_manager"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page name="droga_rent_contract" string="Rent Contarct"
-                      attrs="{'invisible': [('vehicle_status', '!=', 'rented')] }"
-                      groups="droga_fleet.droga_fleet_manager">
+                <page name="droga_rent_contract" string="Rent Contarct" groups="droga_fleet.droga_fleet_manager" invisible="(vehicle_status != 'rented')">
                     <group>
                         <group>
                             <field name="four_wheels"/>
@@ -85,34 +79,28 @@
                 <page name="droga_fleet_insurance" string="Insurance">
                     <group>
                         <group>
-                            <field name="bolo_renewal_date" attrs="{'invisible': [('vehicle_status', '!=', 'owned')] }"
-                                   groups="droga_fleet.droga_fleet_manager"/>
-                            <field name="bolo_due_date" attrs="{'invisible': [('vehicle_status', '!=', 'owned')] }"
-                                   groups="droga_fleet.droga_fleet_manager"/>
+                            <field name="bolo_renewal_date" groups="droga_fleet.droga_fleet_manager" invisible="(vehicle_status != 'owned')"/>
+                            <field name="bolo_due_date" groups="droga_fleet.droga_fleet_manager" invisible="(vehicle_status != 'owned')"/>
 
                             <field name="service_details" groups="droga_fleet.droga_fleet_manager">
-                                <tree>
+                                <list>
                                     <field name="service_due_date"/>
                                     <field name="service_date"/>
 
-                                </tree>
+                                </list>
                             </field>
 
                         </group>
                         <group>
-                            <field name="insurance_renewal_date"
-                                   attrs="{'invisible': [('vehicle_status', '!=', 'owned')] }"
-                                   groups="droga_fleet.droga_fleet_manager"/>
-                            <field name="insurance_due_date" attrs="{'invisible': [('vehicle_status', '!=', 'owned')] }"
-                                   groups="droga_fleet.droga_fleet_manager"/>
+                            <field name="insurance_renewal_date" groups="droga_fleet.droga_fleet_manager" invisible="(vehicle_status != 'owned')"/>
+                            <field name="insurance_due_date" groups="droga_fleet.droga_fleet_manager" invisible="(vehicle_status != 'owned')"/>
 
-                            <field name="contract_details" attrs="{'invisible': [('vehicle_status', '=', 'owned')] }"
-                                   groups="droga_fleet.droga_fleet_manager">
-                                <tree>
+                            <field name="contract_details" groups="droga_fleet.droga_fleet_manager" invisible="(vehicle_status == 'owned')">
+                                <list>
                                     <field name="contract_renewal_date"/>
                                     <field name="contract_due_date"/>
 
-                                </tree>
+                                </list>
                             </field>
                         </group>
 
@@ -137,16 +125,13 @@
 
 
                         <group>
-                              <field name="rent_fee"
-                                     attrs="{'invisible': [('vehicle_status', '=', 'owned')] }"
-                                     groups="droga_fleet.droga_fleet_manager"/>
+                              <field name="rent_fee" groups="droga_fleet.droga_fleet_manager" invisible="(vehicle_status == 'owned')"/>
 
                         </group>
 
 
                         <group>
-                              <field name="fuel_consumption_per_quota"
-                                     groups="droga_fleet.droga_fleet_manager"/>
+                              <field name="fuel_consumption_per_quota" groups="droga_fleet.droga_fleet_manager"/>
 
                         </group>
 
@@ -155,11 +140,11 @@
                     <group>
                         <group>
                             <field name="maintenance_fees" groups="droga_fleet.droga_fleet_manager">
-                                <tree editable="bottom">
-                                    <field name="date"></field>
-                                    <field name="cost"></field>
-                                    <field name="type"></field>
-                                </tree>
+                                <list editable="bottom">
+                                    <field name="date"/>
+                                    <field name="cost"/>
+                                    <field name="type"/>
+                                </list>
                             </field>
 
 

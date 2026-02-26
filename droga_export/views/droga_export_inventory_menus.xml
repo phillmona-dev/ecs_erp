@@ -4,13 +4,11 @@
             id="droga_project_inventory"
             name="Inventory"
             parent="project.menu_main_pm"
-            groups="droga_project.proj_stkeeper"
             sequence="99">
         <menuitem
                 action="stock.stock_picking_type_action"
                 id="droga_project_stock_picking_type_menu"
                 sequence="1"
-                groups="droga_project.proj_stkeeper"
                 name="Overview"/>
         <menuitem
                 id="droga_project_transfer_menu"

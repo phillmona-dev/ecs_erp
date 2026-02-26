@@ -17,10 +17,10 @@
     # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Uncategorized',
-    'version': '0.1',
+    'version': '19.0.1.0.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_contract', 'hr_payroll', 'droga_hr'],
+    'depends': ['base', 'hr', 'hr_payroll', 'droga_hr'],
 
     # always loaded
     'data': [
@@ -33,7 +33,6 @@
         'report/hr_payslip_line.xml',
         'data/mail_template.xml',
         'views/hr_payslip.xml',
-        'views/hr_payslip_employees.xml',
         'report/hr_payslip_run.xml',
         'report/hr_payroll_mor_reports.xml',
         'views/Menu.xml',

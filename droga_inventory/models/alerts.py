@@ -63,22 +63,22 @@ class prod_availability(models.Model):
             else:
                 rec.availability = 'Available'
 
-    has_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_access',
+    x_has_access = fields.Boolean('is_move_line_accessible', default=False, compute='_compute_has_access',
                                 search='_search_has_access')
     def _search_has_access(self, operator, value):
         if operator == '=':
-            has_access = self.env['product.availability.pharmacy'].sudo().search(
-                ['|',('warehouse.has_access', '=', True),('warehouse.has_access', '=', True)])
-            return [('id', 'in', [x.id for x in has_access] if has_access else False)]
+            x_has_access = self.env['product.availability.pharmacy'].sudo().search(
+                ['|',('warehouse.x_has_access', '=', True),('warehouse.x_has_access', '=', True)])
+            return [('id', 'in', [x.id for x in x_has_access] if x_has_access else False)]
         else:
             return [('id', 'in', [])]
 
     def _compute_has_access(self):
         for rec in self:
-            if rec.warehouse.has_access or rec.warehouse.has_access:
-                rec.has_access = True
+            if rec.warehouse.x_has_access or rec.warehouse.x_has_access:
+                rec.x_has_access = True
             else:
-                rec.has_access = False
+                rec.x_has_access = False
 class product_alerts(models.Model):
     _inherit = 'product.template'
     most_recent_so_alert_date=fields.Date('Most recent alert time',default=datetime.now().date(),store=True)

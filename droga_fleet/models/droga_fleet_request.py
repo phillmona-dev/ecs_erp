@@ -214,7 +214,7 @@ class FleetRequest(models.Model):
                      res_model_id=self.env['ir.model'].search([('model', '=', 'droga.fleet.request')]).id,
                      user_id=user_id, summary='Assign Driver', note='Assign Driver',
                      activity_type_id=4,
-                     date_deadline=fields.datetime.now())
+                     date_deadline=fields.Datetime.now())
 
         self.env['mail.activity'].sudo().create(todos)
 
@@ -225,7 +225,7 @@ class FleetRequest(models.Model):
                      res_model_id=self.env['ir.model'].search([('model', '=', 'droga.fleet.request')]).id,
                      user_id=user_id, summary='Grant Approval', note='Incoming fleet',
                      activity_type_id=4,
-                     date_deadline=fields.datetime.now())
+                     date_deadline=fields.Datetime.now())
         print(str(self.env['ir.model'].search([('model', '=', 'droga.fleet.request')]).id))
         self.env['mail.activity'].sudo().create(todos)
     def create_activity_reverse(self, user_id):
@@ -234,7 +234,7 @@ class FleetRequest(models.Model):
                      res_model_id=self.env['ir.model'].search([('model', '=', 'droga.fleet.request')]).id,
                      user_id=user_id, summary='Fleet Request Approval', note='Fleet Request Approval',
                      activity_type_id=4,
-                     date_deadline=fields.datetime.now())
+                     date_deadline=fields.Datetime.now())
 
         self.env['mail.activity'].sudo().create(todos)
 
@@ -336,7 +336,7 @@ class FleetRequest(models.Model):
                      res_model_id=task.env['ir.model'].search([('model', '=', 'droga.fleet.request.task')]).id,
                      user_id=user_id, summary='Delivery', note='Delivery',
                      activity_type_id=4,
-                     date_deadline=fields.datetime.now())
+                     date_deadline=fields.Datetime.now())
         print(str(self.env['ir.model'].search([('model', '=', 'droga.fleet.request')]).id))
         self.env['mail.activity'].sudo().create(todos)
 
@@ -466,7 +466,7 @@ class RequestTasks(models.Model):
 
     def start(self):
         for task in self:
-            current_time = fields.datetime.now()
+            current_time = fields.Datetime.now()
             task.start_time = current_time
             task.task_stage = 'delivered'
 
@@ -499,7 +499,7 @@ class RequestTasks(models.Model):
 
     def delivered(self):
         for task in self:
-                current_time = fields.datetime.now()
+                current_time = fields.Datetime.now()
                 time_difference = current_time - task.start_time
                 task.time_taken = time_difference
 

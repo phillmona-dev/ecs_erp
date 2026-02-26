@@ -14,8 +14,17 @@ class pharma_res_partner(models.Model):
     active = fields.Boolean(default=True,related='partner.active')
     city_name = fields.Many2one('droga.crm.settings.city', related='partner.city_name')
     company_id = fields.Many2one('res.company', 'Company', related='partner.company_id')
-    is_cust_available=fields.Boolean('Show cust', related='partner.is_cust_available')
+    is_cust_available=fields.Boolean(
+        'Show cust',
+        related='partner.is_cust_available',
+        search='_search_is_cust_available',
+    )
     is_company=fields.Boolean(string='Is a Company', related='partner.is_company')
+
+    def _search_is_cust_available(self, operator, value):
+        partners = self.env['res.partner'].search([('is_cust_available', operator, value)])
+        return [('partner', 'in', partners.ids if partners else [0])]
+
     @api.depends('partner.name','partner.city_name')
     def _get_name(self):
         for rec in self:
@@ -52,7 +61,8 @@ class cust_contact_extension(models.Model):
     city_name = fields.Many2one('droga.crm.settings.city', tracking=True)
     area = fields.Many2one('droga.crm.settings.area')
     location = fields.Char('Location')
-    contacts = fields.One2many('droga.crm.contacts', 'parent_customer',domain=[('has_access', '=', True)])
+    mobile = fields.Char(string="Mobile")
+    contacts = fields.One2many('droga.crm.contacts', 'parent_customer',domain=[('x_has_access', '=', True)])
     street = fields.Char(compute='_get_add')
     key_account = fields.Boolean('Key account')
     x_exclude_maturity_for_reconciliation = fields.Boolean('Temporarly exclude maturity for reconciliation',tracking=True)
@@ -88,25 +98,25 @@ class cust_contact_extension(models.Model):
 
     def _def_rec(self):
         cid = self.env.company.id
-        acc = self.env['account.account'].search([('company_id', '=', cid), ('code', '=', '114001')])
-        return acc[0].id if len(acc) > 0 else False
+        acc = self.env['account.account'].search([('company_ids', 'in', cid), ('code', '=', '114001')], limit=1)
+        return acc.id or False
 
     property_account_receivable_id = fields.Many2one('account.account', company_dependent=True,
                                                      string="Account Receivable",
-                                                     domain="[('account_type', '=', 'asset_receivable'), ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
+                                                     domain="[('account_type', '=', 'asset_receivable'), ('deprecated', '=', False), ('company_ids', 'in', [current_company_id])]",
                                                      help="This account will be used instead of the default one as the receivable account for the current partner",
-                                                     required=True, default=_def_rec)
+                                                     required=False, default=_def_rec)
 
     def _def_pay(self):
         cid = self.env.company.id
-        acc = self.env['account.account'].search([('company_id', '=', cid), ('code', '=', '211001')])
-        return acc[0].id if len(acc) > 0 else False
+        acc = self.env['account.account'].search([('company_ids', 'in', cid), ('code', '=', '211001')], limit=1)
+        return acc.id or False
 
     property_account_payable_id = fields.Many2one('account.account', company_dependent=True,
                                                   string="Account Payable",
-                                                  domain="[('account_type', '=', 'liability_payable'), ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
+                                                  domain="[('account_type', '=', 'liability_payable'), ('deprecated', '=', False), ('company_ids', 'in', [current_company_id])]",
                                                   help="This account will be used instead of the default one as the payable account for the current partner",
-                                                  required=True, default=_def_pay)
+                                                  required=False, default=_def_pay)
 
     def write(self, vals):
         for rec in self:
@@ -202,8 +212,10 @@ class cust_contact_extension(models.Model):
     def _search_cust_avail(self, operator, value):
         if not self.env.user.name.upper().startswith('CRM') and self.env.user.has_group('droga_crm.crm_cust'):
             return [('id', 'in', [x.id for x in self.env['res.partner'].search([(1, '=', 1)])])]
+        if not request:
+            return [('id', 'in', [])]
         ses = self.env['droga.pro.sales.master.visit'].search([('s_id', '=', request.session.sid)])
-        if not request or len(ses) == 0:
+        if len(ses) == 0:
             return [('id', 'in', [])]
         is_cust_avail = self.env['res.partner'].sudo().search(
             [('city_name', 'in', ses[0].pro_id[0].p_regions.ids)])
@@ -241,7 +253,14 @@ class account_move_pr_sales(models.Model):
     _inherit = "account.move"
     cust_location = fields.Many2one('droga.crm.settings.city', related='partner_id.city_name')
     cust_region = fields.Many2one('droga.crm.settings.region', related='partner_id.city_name.parent_id')
-    is_cust_available = fields.Boolean(related='partner_id.is_cust_available')
+    is_cust_available = fields.Boolean(
+        related='partner_id.is_cust_available',
+        search='_search_is_cust_available',
+    )
+
+    def _search_is_cust_available(self, operator, value):
+        partners = self.env['res.partner'].search([('is_cust_available', operator, value)])
+        return [('partner_id', 'in', partners.ids if partners else [0])]
 
     def _get_pr_sales_logged(self):
         sale = self.env['sale.order'].search([('name', '=', self.invoice_origin)])

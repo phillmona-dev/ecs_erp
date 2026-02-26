@@ -5,7 +5,7 @@
         <field name = "model_id" search="[('model','=','droga.crm.grade.vs.schedule.view')]"/>
         <field name = "groups" eval = "[(4, ref ('crm_mr'))]" />
         <field name = "perm_read" eval = "True" />
-        <field name = "domain_force"> [('is_record_owner', '=', True)] </field>
+        <field name = "domain_force"> [('userid', '=', user.name)] </field>
     </record>
 
 </odoo>

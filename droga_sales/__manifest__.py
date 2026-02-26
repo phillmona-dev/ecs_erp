@@ -13,10 +13,11 @@
     'website': "https://afomsoft.com",
 
     'category': 'Uncategorized',
-    'version': '0.1',
+    'version': '19.0.1.0.0',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'account', 'resource', 'stock', 'sale','sales_team', 'sale_stock', 'droga_crm','droga_inventory','account_reports', 'uom',
+                'product_expiry',
                 'hr'],
 
     # always loaded

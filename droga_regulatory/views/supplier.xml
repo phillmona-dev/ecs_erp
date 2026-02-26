@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
         <record id="view_supplier_analysis_form" model="ir.ui.view">
@@ -18,7 +18,7 @@
                         <notebook>
                                 <page string="Analysis Completed">
                                       <field name="sup_criteria_ids">
-                                        <tree editable="top">
+                                        <list editable="top">
                                             <field name="prod_list" readonly="1"/>
                                             <field name="criteria" readonly="1"/>
                                             <field name="min_val" readonly="1"/>
@@ -26,7 +26,7 @@
                                             <field name="weight" readonly="1"/>
                                             <field name="total_score" readonly="1"/>
                                             <field name="score" readonly="1"/>prod_list
-                                        </tree>
+                                        </list>
                                     </field>
                                 </page>
                         </notebook>
@@ -48,7 +48,7 @@
             <field name="name">supplier.analysis.tree</field>
             <field name="model">supplier.analysis</field>
             <field name="arch" type="xml">
-                <tree >
+                <list>
 
                             <field name="name"/>
                             <field name="products"/>
@@ -56,14 +56,14 @@
 <!--                            <field name="delivery_rating"/>-->
                             <field name="price_rating"/>
 
-                </tree>
+                </list>
             </field>
         </record>
 
         <record id="action_supplier_analysis" model="ir.actions.act_window">
             <field name="name">Supplier Analysis</field>
             <field name="res_model">supplier.analysis</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
         </record>
     </data>
 </odoo>

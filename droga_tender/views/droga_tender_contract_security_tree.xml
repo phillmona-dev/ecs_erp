@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="droga_tender_performance_view_form" model="ir.ui.view">
         <field name="name">droga.tender.perormance.view.form</field>
@@ -9,17 +9,17 @@
                     <notebook>
                         <page name="name" string="Performance Security">
                             <field name="performance_security" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="issue_date" required="1"></field>
-                                    <field name="bank" options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="bank_number"></field>
-                                    <field name="starting_date" required="1"></field>
-                                    <field name="security_amount" widget='monetary' required="1"></field>
-                                    <field name="security_period_in_days" required="1"></field>
-                                    <field name="dead_line_date"></field>
-                                    <field name="status"></field>
-                                </tree>               
+                                <list editable="bottom">
+                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="issue_date" required="1"/>
+                                    <field name="bank" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="bank_number"/>
+                                    <field name="starting_date" required="1"/>
+                                    <field name="security_amount" widget="monetary" required="1"/>
+                                    <field name="security_period_in_days" required="1"/>
+                                    <field name="dead_line_date"/>
+                                    <field name="status"/>
+                                </list>               
                             </field>
                         </page>
                     </notebook>
@@ -38,17 +38,17 @@
                     <notebook>
                         <page name="name" string="Advance Security">
                             <field name="advance_security" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="issue_date" required="1"></field>
-                                    <field name="bank" options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="bank_number"></field>
-                                    <field name="starting_date" required="1"></field>
-                                    <field name="security_amount" required="1"></field>
-                                    <field name="security_period_in_days" required="1"></field>
-                                    <field name="dead_line_date"></field>
-                                    <field name="status"></field>
-                                </tree>
+                                <list editable="bottom">
+                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="issue_date" required="1"/>
+                                    <field name="bank" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="bank_number"/>
+                                    <field name="starting_date" required="1"/>
+                                    <field name="security_amount" required="1"/>
+                                    <field name="security_period_in_days" required="1"/>
+                                    <field name="dead_line_date"/>
+                                    <field name="status"/>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -67,18 +67,18 @@
                     <notebook>
                         <page name="name" string="Bid Security">
                             <field name="bid_security" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="issue_date" required="1"></field>
-                                    <field name="bank" options="{'no_create':True,'no_open':True}"></field>
-                                    <field name="bank_number"></field>
-                                    <field name="starting_date" required="1"></field>
-                                    <field name="security_amount" required="1"></field>
-                                    <field name="security_period_in_days" required="1"></field>
-                                    <field name="dead_line_date"></field>
-                                    <field name="status"></field>
-                                    <button name="extend_bid_request" string="Extend request" type="object" />
-                                </tree>
+                                <list editable="bottom">
+                                    <field name="security_type" required="1" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="issue_date" required="1"/>
+                                    <field name="bank" options="{'no_create':True,'no_open':True}"/>
+                                    <field name="bank_number"/>
+                                    <field name="starting_date" required="1"/>
+                                    <field name="security_amount" required="1"/>
+                                    <field name="security_period_in_days" required="1"/>
+                                    <field name="dead_line_date"/>
+                                    <field name="status"/>
+                                    <button name="extend_bid_request" string="Extend request" type="object"/>
+                                </list>
                             </field>
                         </page>
                     </notebook>

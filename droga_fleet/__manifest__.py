@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Droga Fleet',
-    'version': '1.0',
+    'version': '19.0.1.0.0',
     'author': "Afomsoft Technologies",
     'website': "https://afomsoft.com",
     'summary': 'Manage your fleet and track car costs',

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <!-- inherit  landed cost -->
     <record id="stock_landed_cost_inherited_form_view" model="ir.ui.view">
@@ -7,31 +7,25 @@
         <field name="inherit_id" ref="stock_landed_costs.view_stock_landed_cost_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='button_validate']" position="after">
-                <button name="button_validate_cron" string="Validate for large LC" states="draft" type="object"/>
+                <button name="button_validate_cron" string="Validate for large LC" type="object" invisible="state not in ['draft']"/>
             </xpath>
 
             <xpath expr="//field[@name='picking_ids']" position="replace">
-                <field name="target_model" required="True"></field>
-                <field name="picking_ids" widget="many2many_tags"
-                                    options="{'no_create':True,'no_open':True}" attrs="{'readonly': ['|',('state','=','done'),('target_model', '!=', 'picking')]}"
-                                    domain="[('company_id', '=', company_id), ('move_ids.stock_valuation_layer_ids', '!=', False)]"/>
-                <field name="purchase_orders" widget="many2many_tags"
-                                    options="{'no_create':True,'no_open':True}" attrs="{'readonly': ['|',('state','=','done'),('target_model', '!=', 'pos')]}"
-                                    domain="[('company_id', '=', company_id)]"/>
-                <field name="lc" options="{'no_create':True,'no_open':True}" required="1"
-                       attrs="{'readonly': [('state', '=', 'done')]}"/>
+                <field name="target_model" required="True"/>
+                <field name="picking_ids" widget="many2many_tags" options="{'no_create':True,'no_open':True}" domain="[('company_id', '=', company_id), '|', ('move_ids.is_in', '!=', False), ('move_ids.is_out', '!=', False)]" readonly="(state == 'done') or (target_model != 'picking')"/>
+                <field name="purchase_orders" widget="many2many_tags" options="{'no_create':True,'no_open':True}" domain="[('company_id', '=', company_id)]" readonly="(state == 'done') or (target_model != 'pos')"/>
+                <field name="lc" options="{'no_create':True,'no_open':True}" required="1" readonly="(state == 'done')"/>
             </xpath>
 
             <xpath expr="//field[@name='vendor_bill_id']" position="after">
-                <field name="grn_total" readonly="True"></field>
-                <field name="purchase_total" readonly="True"></field>
-                <field name="lc_rate" readonly="True"></field>
+                <field name="grn_total" readonly="True"/>
+                <field name="purchase_total" readonly="True"/>
+                <field name="lc_rate" readonly="True"/>
             </xpath>
 
             <xpath expr="//button[@name='button_validate']" position="after">
 
-                <button name="button_update_analytics" string="Update Analytics" states="done" class="oe_highlight"
-                        type="object"/>
+                <button name="button_update_analytics" string="Update Analytics" class="oe_highlight" type="object" invisible="state not in ['done']"/>
             </xpath>
         </field>
     </record>

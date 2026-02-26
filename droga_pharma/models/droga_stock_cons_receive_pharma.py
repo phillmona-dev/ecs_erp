@@ -221,7 +221,7 @@ class droga_stock_cons_receive_detail_pharma(models.Model):
     amount = fields.Float('Amount',compute='compute_amount')
 
     product_uom = fields.Many2one('uom.uom', "UoM", store=True, compute='get_uom', inverse='set_uom', required=True,
-                                  domain="[('category_id', '=', product_uom_category_id)]")
+                                  domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
 
     @api.depends('product_id')
     def get_sell_price(self):
@@ -244,8 +244,8 @@ class droga_stock_cons_receive_detail_pharma(models.Model):
     def set_uom(self):
         pass
 
-    # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="[('category_id', '=', product_uom_category_id)]")
-    product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', store=True)
+    # product_uom = fields.Many2one('uom.uom', "UoM", required=True, domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]")
+    product_uom_category_id = fields.Many2one(related='product_id.uom_id.relative_uom_id', store=True)
 
 
 class droga_stock_picking_extension_pharma(models.Model):

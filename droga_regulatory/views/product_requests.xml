@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
         <record id="sequence_bdr_requests" model="ir.sequence">
@@ -14,8 +14,7 @@
                 <form>
                     <header>
                         <field name="status" widget="statusbar"/>
-                        <button name="submit_req" string="Submit" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('status', '!=', 'draft')]}"/>
+                        <button name="submit_req" string="Submit" type="object" class="oe_highlight" invisible="(status != 'draft')"/>
 
 
                     </header>
@@ -78,13 +77,13 @@
             <field name="name">droga.bdr.requests.header.tree</field>
             <field name="model">droga.bdr.requests.header</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="request_no"/>
                     <field name="requested_by"/>
                     <field name="date"/>
                     <field name="department"/>
                     <field name="company_id"/>
-                </tree>
+                </list>
             </field>
         </record>
     </data>
@@ -93,7 +92,7 @@
     <record id="action_droga_bdr_requests_header" model="ir.actions.act_window">
         <field name="name">BDR Requests</field>
         <field name="res_model">droga.bdr.requests.header</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
 

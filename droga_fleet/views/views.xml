@@ -20,7 +20,7 @@
     <record model="ir.actions.act_window" id="droga_fleet.action_window">
       <field name="name">droga_fleet window</field>
       <field name="res_model">droga_fleet.droga_fleet</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">list,form</field>
     </record>
 -->
 

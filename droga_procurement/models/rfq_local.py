@@ -394,9 +394,9 @@ class Rfq_Detail_local(models.Model):
         'Total Price', compute="_compute_total", store=True)
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
-                                  domain="[('category_id', '=', product_uom_category_id)]", required=True)
+                                  domain="['|', ('id', '=', product_uom_category_id), ('relative_uom_id', '=', product_uom_category_id)]", required=True)
     product_uom_category_id = fields.Many2one(
-        related='product_id.uom_id.category_id')
+        related='product_id.uom_id.relative_uom_id')
 
     price_subtotal = fields.Float(
         compute='_compute_total', string='Subtotal', readonly=True, store=True)

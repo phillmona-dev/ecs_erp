@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="droga_pharma_product_tree" model="ir.ui.view">
         <field name="name">droga.pharma.products.list</field>
         <field name="model">product.template</field>
         <field name="arch" type="xml">
-            <tree string="" create="true" delete="false" expand="1">
-                <field name="default_code" string="Internal reference"></field>
-                <field name="name"></field>
-                <field name="pharma_uom"></field>
-                <field name="list_price_phar"></field>
-                <field name="categ_id"></field>
-            </tree>
+            <list string="" create="true" delete="false" expand="1">
+                <field name="default_code" string="Internal reference"/>
+                <field name="name"/>
+                <field name="pharma_uom"/>
+                <field name="list_price_phar"/>
+                <field name="categ_id"/>
+            </list>
         </field>
     </record>
 
@@ -21,28 +21,22 @@
             <form string="Product" delete="0">
                 <header>
                 <field name="reg_status" invisible="1"/>
-                <button name="approve" type="object" class="btn-primary"
-                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app,droga_pharma.pharma_director"
-                    string="Approve"/>
-                <button name="reject" type="object" class="btn-danger"
-                    attrs="{'invisible': [('reg_status', 'not in', ['waiting'])]}" groups="droga_inventory.droga_prod_app,droga_pharma.pharma_director"
-                    string="Reject"/>
+                <button name="approve" type="object" class="btn-primary" groups="droga_inventory.droga_prod_app,droga_pharma.pharma_director" string="Approve" invisible="(reg_status not in ['waiting'])"/>
+                <button name="reject" type="object" class="btn-danger" groups="droga_inventory.droga_prod_app,droga_pharma.pharma_director" string="Reject" invisible="(reg_status not in ['waiting'])"/>
                 </header>
                 <sheet name="product_form">
-                    <field name='product_variant_count' invisible='1'/>
-                    <field name='is_product_variant' invisible='1'/>
-                    <field name='attribute_line_ids' invisible='1'/>
+                    <field name="product_variant_count" invisible="1"/>
+                    <field name="is_product_variant" invisible="1"/>
+                    <field name="attribute_line_ids" invisible="1"/>
                     <field name="type" invisible="1"/>
                     <field name="company_id" invisible="1"/>
-                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
-                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="(active == True)"/>
                     <field name="id" invisible="True"/>
                     <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
                     <div class="oe_title">
                         <label for="name" string="Product Name"/>
                         <h1>
                             <div class="d-flex">
-                                <field name="priority" widget="priority" class="me-3"/>
                                 <field class="text-break" name="name" placeholder="e.g. Name, strength, dosage form"/>
                             </div>
                         </h1>
@@ -70,73 +64,54 @@
                                 <group name="group_standard_price">
                                     <label for="list_price_phar"/>
                                     <div name="pricing">
-                                        <field name="list_price_phar" class="oe_inline" widget='monetary'
-                                               options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                                        <field name="list_price_phar" class="oe_inline" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}"/>
                                     </div>
-                                    <field name="default_code" string="Product code"></field>
-                                    <field name="categ" readonly="1" invisible="1"></field>
-                                    <field name="uom_id" options="{'no_create': True}"
-                                           required="True"/>
-                                    <field name="uom_po_id" invisible="1"></field>
-                                    <field name="pharma_filler" invisible="True"></field>
+                                    <field name="default_code" string="Product code"/>
+                                    <field name="categ" readonly="1" invisible="1"/>
+                                    <field name="uom_id" options="{'no_create': True}" required="True"/>
+                                    <field name="uom_po_id" invisible="1"/>
+                                    <field name="pharma_filler" invisible="True"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="cost_currency_id" invisible="1"/>
                                     <field name="product_variant_id" invisible="1"/>
                                 </group>
                             </group>
                             <group string="Internal Notes">
-                                <field colspan="2" name="description" nolabel="1"
-                                       placeholder="This note is only for internal purposes."/>
+                                <field colspan="2" name="description" nolabel="1" placeholder="This note is only for internal purposes."/>
                             </group>
                         </page>
-                        <page string="Membership E-Card information"
-                              attrs="{'invisible': [('pharma_detailed_type', '!=', 'membershipcard')]}">
+                        <page string="Membership E-Card information" invisible="(pharma_detailed_type != 'membershipcard')">
                             <group>
-                                <field name="duration"></field>
-                                <field name="min_amt"></field>
-                                <field name="mtm_discount" string="MTM / counsel discount in %"></field>
+                                <field name="duration"/>
+                                <field name="min_amt"/>
+                                <field name="mtm_discount" string="MTM / counsel discount in %"/>
                             </group>
                         </page>
-                        <page string="MTM E-Card information"
-                              attrs="{'invisible': [('pharma_detailed_type', '!=', 'mtmcard')]}">
+                        <page string="MTM E-Card information" invisible="(pharma_detailed_type != 'mtmcard')">
                             <group>
-                                <field name="no_of_sessions"></field>
-                                <field name="tf_in_months"></field>
+                                <field name="no_of_sessions"/>
+                                <field name="tf_in_months"/>
                             </group>
                         </page>
-                        <page string="Screening reagents"
-                              attrs="{'invisible': [('pharma_detailed_type', '!=', 'hthscreen')]}">
-                            <tree>
-                                <field name="screening_reagents"></field>
-                            </tree>
+                        <page string="Screening reagents" invisible="(pharma_detailed_type != 'hthscreen')">
+                            <list>
+                                <field name="screening_reagents"/>
+                            </list>
                         </page>
-                        <page string="Inventory" name="inventory" groups="product.group_stock_packaging"
-                              attrs="{'invisible':[('type', '=', 'service')]}">
+                        <page string="Inventory" name="inventory" groups="product.group_stock_packaging" invisible="(type == 'service')">
                             <group name="inventory">
-                                <group name="group_lots_and_weight" string="Logistics"
-                                       attrs="{'invisible': [('type', 'not in', ['product', 'consu'])]}">
-                                    <label for="weight"
-                                           attrs="{'invisible':[('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}"/>
-                                    <div class="o_row" name="weight"
-                                         attrs="{'invisible':[('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}">
+                                <group name="group_lots_and_weight" string="Logistics" invisible="(type not in ['product', 'consu'])">
+                                    <label for="weight" invisible="(product_variant_count &gt; 1) and (is_product_variant == False)"/>
+                                    <div class="o_row" name="weight" invisible="(product_variant_count &gt; 1) and (is_product_variant == False)">
                                         <field name="weight" class="oe_inline"/>
                                         <field name="weight_uom_name"/>
                                     </div>
-                                    <label for="volume"
-                                           attrs="{'invisible':[('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}"/>
-                                    <div class="o_row" name="volume"
-                                         attrs="{'invisible':[('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}">
+                                    <label for="volume" invisible="(product_variant_count &gt; 1) and (is_product_variant == False)"/>
+                                    <div class="o_row" name="volume" invisible="(product_variant_count &gt; 1) and (is_product_variant == False)">
                                         <field name="volume" string="Volume" class="oe_inline"/>
                                         <field name="volume_uom_name"/>
                                     </div>
                                 </group>
-                            </group>
-                            <group name="packaging" string="Packaging"
-                                   colspan="4"
-                                   attrs="{'invisible':['|', ('type', 'not in', ['product', 'consu']), ('product_variant_count', '>', 1), ('is_product_variant', '=', False)]}"
-                                   groups="product.group_stock_packaging">
-                                <field colspan="2" name="packaging_ids" nolabel="1"
-                                       context="{'tree_view_ref':'product.product_packaging_tree_view2', 'default_company_id': company_id}"/>
                             </group>
                         </page>
                     </notebook>
@@ -156,11 +131,9 @@
         <field name="name">Products</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.template</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="context">{"search_default_service": 1, 'default_detailed_type': 'service','default_categ_id':630,'default_name':'REAGENT - ','default_pharmacy_group_id':28,'default_pharma_detailed_type':'Compounding'}</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('droga_pharma.droga_pharma_product_tree')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('droga_pharma.droga_pharma_product_form')})]"/>
+        <field name="view_ids" eval="[(5, 0, 0),                 (0, 0, {'view_mode': 'list', 'view_id': ref('droga_pharma.droga_pharma_product_tree')}),                 (0, 0, {'view_mode': 'form', 'view_id': ref('droga_pharma.droga_pharma_product_form')})]"/>
         <field name="search_view_id" ref="stock.product_template_search_form_view_stock"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

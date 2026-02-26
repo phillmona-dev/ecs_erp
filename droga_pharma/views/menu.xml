@@ -4,14 +4,13 @@
     <record id="droga_pharma_free_sample_consignment_issue_action" model="ir.actions.act_window">
         <field name="name">Promotional issue request</field>
         <field name="res_model">droga.inventory.consignment.issue</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="context">{'default_issue_type': 'SIF','default_menu_from':'PH'}</field>
         <field name="domain">[('create_uid','=',uid),('issue_type','=','SIF')]</field>
     </record>
 
 
     <menuitem id="pharma_main_menu" name="Pharmacy chain"
-              web_icon="droga_pharma,static/description/icon.png"
               groups="pharma_settings_admin,pharma_br_admin,pharma_dp_admin,pharma_ip_admin,pharma_supply_chain_manager,pharma_di_admin,pharma_director,droga_pharma.pharma_fin"
               sequence="10">
 

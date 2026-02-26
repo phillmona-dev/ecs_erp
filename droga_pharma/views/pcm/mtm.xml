@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data noupdate="1">
        <record id="ir_cron_scheduler_mtm_follow_up" model="ir.cron">
@@ -9,7 +9,6 @@
            <field name="user_id" ref="base.user_root"/>
            <field name="interval_number">1</field>
            <field name="interval_type">days</field>
-           <field name="numbercall">-1</field>
        </record>
     </data>
 
@@ -30,20 +29,20 @@
     <record id="droga_pharma_mtm_action" model="ir.actions.act_window">
         <field name="name">MTM registration</field>
         <field name="res_model">droga.pharma.mtm.header</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="droga_pharma_mtm_search"></field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="droga_pharma_mtm_search"/>
     </record>
 
     <record id="droga_pharma_mtm_tree_view" model="ir.ui.view">
         <field name="name">droga.pharma.mtm.tree.view</field>
         <field name="model">droga.pharma.mtm.header</field>
         <field name="arch" type="xml">
-            <tree string="" delete="0" create="0">
+            <list string="" delete="0" create="0">
                 <field name="client"/>
                 <field name="wareh"/>
 <!--                <field name="sales_origin"/>-->
                 <field name="mobile"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -58,9 +57,9 @@
                         <div style="width: 50%;">
                             <div>
                                 <h5>Patient's Personal Info</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"></div>
+                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"/>
                                 <group>
-                                    <field name="client" readonly="1"></field>
+                                    <field name="client" readonly="1"/>
                                     <field name="gender" readonly="0"/>
                                     <field name="weight" string="Weight (KG)" readonly="0"/>
                                     <field name="height" string="Height (CM)" readonly="0"/>
@@ -76,7 +75,7 @@
                             <br/>
                             <div>
                                 <h5>Contact Info</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"></div>
+                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"/>
                                 <group>
                                     <field name="mobile" readonly="0"/>
                                     <field name="address"/>
@@ -88,7 +87,7 @@
                         <div style="width: 50%;">
                             <div>
                                 <h5>Patient's Medication info</h5>
-                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"></div>
+                                <div style="width: 50%; height: 1px; background-color: #555;margin-bottom: 10px;margin-top: -5px;"/>
                                 <group>
 
                                         <field name="medical" readonly="0"/>
@@ -113,41 +112,39 @@
                     <notebook>
                         <page string="Drugs list">
                             <field name="detail_mtm" mode="tree">
-                                <tree editable="bottom" create="1">
-                                    <field name="date"></field>
-                                    <field name="indication"></field>
-                                    <field name="drug"></field>
-                                    <field name="frequency"></field>
-                                    <field name="frequency_type"></field>
-                                    <field name="start_date"></field>
-                                    <field name="stop_date"></field>
-                                    <field name="remark"></field>
-                                </tree>
+                                <list editable="bottom" create="1">
+                                    <field name="date"/>
+                                    <field name="indication"/>
+                                    <field name="drug"/>
+                                    <field name="frequency"/>
+                                    <field name="frequency_type"/>
+                                    <field name="start_date"/>
+                                    <field name="stop_date"/>
+                                    <field name="remark"/>
+                                </list>
                             </field>
                         </page>
                         <page string="MTM Detail">
 
                             <field name="detail_mtm_followup" mode="tree">
-                                <tree editable="bottom" create="1">
-                                    <field name="date_follow_up"></field>
-                                    <field name="time"></field>
-                                    <field name="origin_sales" readonly="1"></field>
-                                    <field name="current_status"></field>
-                                    <button icon="fa-credit-card-alt"
-                                            type="object" string=" Detail"
-                                            name="open_follow_up_form" class="oe_highlight"/>
-                                </tree>
+                                <list editable="bottom" create="1">
+                                    <field name="date_follow_up"/>
+                                    <field name="time"/>
+                                    <field name="origin_sales" readonly="1"/>
+                                    <field name="current_status"/>
+                                    <button icon="fa-credit-card-alt" type="object" string=" Detail" name="open_follow_up_form" class="oe_highlight"/>
+                                </list>
                             </field>
                         </page>
                         <page string="MTM Status">
                             <field name="mtm_history">
-                                <tree editable="0" create="0" delete="0">
+                                <list create="0" delete="0">
                                     <field name="origin_sales" readonly="1" options="{'no_create':True,'no_open':True}"/>
                                     <field name="cons_start_date" readonly="1"/>
                                     <field name="cons_end_date" readonly="1"/>
                                     <field name="active_status" readonly="1"/>
                                     <field name="no_of_sessions_left" readonly="1"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>

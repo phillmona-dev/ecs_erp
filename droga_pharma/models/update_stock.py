@@ -201,7 +201,7 @@ class droga_update_stock_move_po(models.TransientModel):
     po_line=fields.Many2one('purchase.order.line')
     reference=fields.Char('Reference',related='po_line.order_id.name')
     product_qty=fields.Float('Product quantity',related='po_line.product_qty')
-    product_uom=fields.Many2one('uom.uom',string='UOM',related='po_line.product_uom')
+    product_uom=fields.Many2one('uom.uom',string='UOM',related='po_line.product_uom_id')
     price_unit=fields.Float('Unit price',related='po_line.price_unit')
     qty_received = fields.Float('Qty received',related='po_line.qty_received')
     qty_to_invoice = fields.Float('Qty to invoice',related='po_line.qty_to_invoice')

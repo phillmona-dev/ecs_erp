@@ -16,7 +16,7 @@
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="inherit_id" ref="droga_inventory.droga_inventory_consignment_issue_view_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree/field[@name='cons_ref']" position="after">
+            <xpath expr="//list/field[@name='cons_ref']" position="after">
                 <field name="user_id_des" readonly="1" string="Requested by"></field>
             </xpath>
         </field>
@@ -27,7 +27,7 @@
         <field name="model">droga.inventory.consignment.issue</field>
         <field name="inherit_id" ref="droga_inventory.droga_inventory_consignment_issue_view_tree_sales"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree/field[@name='cons_ref']" position="after">
+            <xpath expr="//list/field[@name='cons_ref']" position="after">
                 <field name="user_id_des" readonly="1" string="Requested by"></field>
             </xpath>
         </field>
@@ -41,7 +41,7 @@
         <field name="model">droga.inventory.consignment.receive</field>
         <field name="inherit_id" ref="droga_inventory.droga_inventory_consignment_receive_view_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree/field[@name='cons_ref']" position="after">
+            <xpath expr="//list/field[@name='cons_ref']" position="after">
                 <field name="user_id_des" readonly="1" string="Requested by"></field>
             </xpath>
         </field>

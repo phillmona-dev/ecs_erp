@@ -21,6 +21,22 @@ class HrPayslipRun(models.Model):
 
     division = fields.Many2one('droga.hr.division')
 
+    def _get_valid_version_ids(self, date_start=None, date_end=None, structure_id=None, company_id=None, employee_ids=None, schedule_pay=None):
+        version_ids = super()._get_valid_version_ids(
+            date_start=date_start,
+            date_end=date_end,
+            structure_id=structure_id,
+            company_id=company_id,
+            employee_ids=employee_ids,
+            schedule_pay=schedule_pay,
+        )
+        if not self.division:
+            return version_ids
+        versions = self.env['hr.version'].browse(version_ids).filtered(
+            lambda v: v.employee_id and v.employee_id.division.id == self.division.id
+        )
+        return versions.ids
+
     @api.depends('date_start', 'date_end')
     def get_outgoing_email(self):
         self.mail_server = ""

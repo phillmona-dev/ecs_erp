@@ -331,9 +331,14 @@ class droga_cons_inherit(models.Model):
         for det in self.detail_entries:
             raw_uom = det.product_id.uom_id
             line_uom = det.product_uom or raw_uom
-            if not raw_uom or not line_uom or line_uom.category_id.id != raw_uom.category_id.id:
+            if not raw_uom or not line_uom:
                 continue
-            actual_qty_by_product[det.product_id.id] += line_uom._compute_quantity(det.product_uom_qty, raw_uom)
+            try:
+                actual_qty_by_product[det.product_id.id] += line_uom._compute_quantity(
+                    det.product_uom_qty, raw_uom, raise_if_failure=True
+                )
+            except UserError:
+                continue
 
         if not actual_qty_by_product:
             return {}
@@ -363,10 +368,15 @@ class droga_cons_inherit(models.Model):
                 if not raw_product:
                     continue
                 raw_uom = raw_product.uom_id
-                if not sale_uom or not raw_uom or sale_uom.category_id.id != raw_uom.category_id.id:
+                if not sale_uom or not raw_uom:
                     continue
                 qty_in_sale_uom = (ord_line.product_uom_qty * 100.0) / finish_line.rate_in_pct
-                qty_in_raw_uom = sale_uom._compute_quantity(qty_in_sale_uom, raw_uom)
+                try:
+                    qty_in_raw_uom = sale_uom._compute_quantity(
+                        qty_in_sale_uom, raw_uom, raise_if_failure=True
+                    )
+                except UserError:
+                    continue
                 expected_qty_by_product[raw_product.id] += qty_in_raw_uom
 
         scale_by_product = {}
@@ -1041,11 +1051,13 @@ class droga_sale_inherit(models.Model):
             source_uom = ord.product_uom or ord.product_id.uom_id
             target_uom = raw_product.import_uom_new or raw_product.uom_id
             required_qty = (ord.product_uom_qty * 100) / finish_line.rate_in_pct
-            if (
-                source_uom and target_uom
-                and source_uom.category_id.id == target_uom.category_id.id
-            ):
-                required_qty = source_uom._compute_quantity(required_qty, target_uom)
+            if source_uom and target_uom:
+                try:
+                    required_qty = source_uom._compute_quantity(
+                        required_qty, target_uom, raise_if_failure=True
+                    )
+                except UserError:
+                    pass
             itemsdetail.append({
                 'company_id': self.company_id.id,
                 'product_id': raw_product.id,

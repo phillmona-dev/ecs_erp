@@ -20,7 +20,7 @@ class EmployeePayrollRate(models.Model):
     badge_id = fields.Char('Badge ID')
     department_id = fields.Many2one('hr.department', 'Department')  # Fixed model name
     first_contract_date = fields.Date('First Contract Date')
-    contract_id = fields.Many2one('hr.contract', 'Contract')
+    contract_id = fields.Many2one('hr.version', 'Contract')
     job_id = fields.Many2one('hr.job', 'Job Position')
     payment_type = fields.Many2one('hr.job.salary.payment', 'Payment Type')  # Ensure model exists
     amount = fields.Float('Amount')
@@ -36,15 +36,17 @@ class EmployeePayrollRate(models.Model):
             FROM (
                 SELECT 
                     h.company_id, c.employee_id, h.barcode AS badge_id,
-                    c.department_id, h.first_contract_date, c.id AS contract_id,
+                    c.department_id, c.contract_date_start AS first_contract_date, c.id AS contract_id,
                     c.job_id, jsd.payment_type, jsd.amount  
                 FROM hr_employee h
-                INNER JOIN hr_contract c ON h.id = c.employee_id
+                INNER JOIN hr_version c ON h.id = c.employee_id
                 INNER JOIN hr_job_salary js ON c.job_id = js.job_id
                 INNER JOIN hr_job_salary_detail jsd ON js.id = jsd.job_detail_id
                 WHERE 
                     h.active = TRUE 
-                    AND c.state = 'open' 
+                    AND c.active = TRUE
+                    AND (c.contract_date_start IS NULL OR c.contract_date_start <= CURRENT_DATE)
+                    AND (c.contract_date_end IS NULL OR c.contract_date_end >= CURRENT_DATE)
                     AND js.state = 'Active' 
                     AND (c.custom_salary_structure =false or c.custom_salary_structure is null) 
                     AND jsd.amount != 0
@@ -53,15 +55,17 @@ class EmployeePayrollRate(models.Model):
                 
                 SELECT 
                     h.company_id, c.employee_id, h.barcode AS badge_id,
-                    c.department_id, h.first_contract_date, c.id AS contract_id,
+                    c.department_id, c.contract_date_start AS first_contract_date, c.id AS contract_id,
                     c.job_id, jsd.payment_type, jsd.amount  
                 FROM hr_employee h
-                INNER JOIN hr_contract c ON h.id = c.employee_id
+                INNER JOIN hr_version c ON h.id = c.employee_id
                 INNER JOIN hr_job_salary js ON c.id=js.contract_id 
                 INNER JOIN hr_job_salary_detail jsd ON js.id = jsd.job_detail_id
                 WHERE 
                     h.active = TRUE 
-                    AND c.state = 'open' 
+                    AND c.active = TRUE
+                    AND (c.contract_date_start IS NULL OR c.contract_date_start <= CURRENT_DATE)
+                    AND (c.contract_date_end IS NULL OR c.contract_date_end >= CURRENT_DATE)
                     AND js.state = 'Active' 
                     AND (c.custom_salary_structure =true or custom_salary_structure is null) 
                     AND jsd.amount != 0
@@ -230,17 +234,18 @@ class EmployeePayrollRateRun(models.Model):
         # enquiry active employee ids
         employees = self.env['hr.employee'].search([('active', '=', True),
                                                     ('company_id', '=', self.company_id.id),
-                                                    ('contract_ids.state', '=', 'open')])
+                                                    ('version_id.state', '=', 'open')])
 
         # get fuel rate
         fuel_rate = self.get_fuel_rate()
 
         for employee in employees:
+            contract = employee.version_id
             sheet.write(row_start, 0, row_start - 2, border)
             sheet.write(row_start, 1, employee.barcode, border)
             sheet.write(row_start, 2, employee.name, border)
-            sheet.write(row_start, 3, employee.contract_id.job_id.name if employee.contract_id.job_id else ' ', border)
-            sheet.write(row_start, 4, getattr(employee.contract_id.analytic_account_id, 'name', ' '), border)
+            sheet.write(row_start, 3, contract.job_id.name if contract and contract.job_id else ' ', border)
+            sheet.write(row_start, 4, getattr(contract.analytic_account_id, 'name', ' ') if contract else ' ', border)
             sheet.write(row_start, 5, employee.first_contract_date, date_format)
 
             num = 0

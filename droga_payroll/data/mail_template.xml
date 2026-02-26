@@ -58,8 +58,6 @@
             <field name="email_from">{{object.mail_server}}</field>
             <field name="email_to">{{object.employee_id.work_email}}</field>
             
-            <field name="report_name">Payslip of {{object.employee_id.name}} for month {{object.period.description}}
-            </field>
             <field name="lang">{{object.employee_id.lang}}</field>
             <field name="auto_delete" eval="True"/>
         </record>

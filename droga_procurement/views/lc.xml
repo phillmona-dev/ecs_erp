@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
     <!-- tree view report for lc -->
@@ -6,7 +6,7 @@
         <field name="name">droga.purchase.lc.view.tree</field>
         <field name="model">droga.purchase.lc</field>
         <field name="arch" type="xml">
-            <tree string="LC Tracking" create="0" delete="0" edit="0" duplicate="0">
+            <list string="LC Tracking" create="0" delete="0" edit="0" duplicate="0">
                 <field name="name" optional="show"/>
                 <field name="purchase_order_id" optional="show"/>
                 <field name="rfq_no" optional="show" string="RFQ No"/>
@@ -14,14 +14,11 @@
                 <field name="bank" optional="show"/>
                 <field name="branch" optional="show"/>
                 <field name="start_date" optional="show"/>
-                <field name="count_days" decoration-success="count_days &lt;= 30"
-                       decoration-warning="count_days &lt;= 69" decoration-danger="count_days &gt;= 70" widget="badge"
-                       optional="show"/>
+                <field name="count_days" decoration-success="count_days &lt;= 30" decoration-warning="count_days &lt;= 69" decoration-danger="count_days &gt;= 70" widget="badge" optional="show"/>
                 <field name="total_amount_etb" optional="show" sum="Total"/>
                 <field name="total_amount_usd" optional="show" sum="Total"/>
-                <field name="state" decoration-warning="state in('Draft')" decoration-success="state == 'Active'"
-                       decoration-danger="state == 'Expired'" decoration-muted="state in('Closed')" widget="badge"/>
-            </tree>
+                <field name="state" decoration-warning="state in('Draft')" decoration-success="state == 'Active'" decoration-danger="state == 'Expired'" decoration-muted="state in('Closed')" widget="badge"/>
+            </list>
         </field>
     </record>
 
@@ -49,11 +46,8 @@
         <field name="arch" type="xml">
             <form string="" create="0" delete="0">
                 <header>
-                    <button name="submit_request" type="object" states="Draft" string="Submit" class="oe_highlight"
-                            id="submit_request" data-hotkey="v" confirm="Are you sure the request is approved?"/>
-                    <button name="cancel_request" type="object" states="Active" string="Submit" class="oe_highlight"
-                            id="cancel_request" data-hotkey="v"
-                            confirm="Are you sure you want to cancel the LC request?"/>
+                    <button name="submit_request" type="object" string="Submit" class="oe_highlight" id="submit_request" data-hotkey="v" confirm="Are you sure the request is approved?" invisible="state not in ['Draft']"/>
+                    <button name="cancel_request" type="object" string="Submit" class="oe_highlight" id="cancel_request" data-hotkey="v" confirm="Are you sure you want to cancel the LC request?" invisible="state not in ['Active']"/>
 
                     <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
@@ -96,12 +90,12 @@
                     <notebook>
                         <page string="LC Draft Reconciliation">
                             <field name="lc_details" mode="tree">
-                                <tree editable="bottom" create="0" delete="0">
+                                <list editable="bottom" create="0" delete="0">
                                     <field name="order" width="10"/>
                                     <field name="name" width="30"/>
                                     <field name="state" width="15"/>
                                     <field name="remark" width="25"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <!--<page string="Shipping Reconciliation">
@@ -148,7 +142,7 @@
                 <separator/>
                 <filter name="start_date" string="Date" date="start_date"/>
 
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="Vendor" name="vendor" domain="[]" context="{'group_by': 'supplier_id'}"/>
                     <filter string="Date" name="start_date" domain="[]" context="{'group_by': 'start_date'}"/>
                 </group>
@@ -159,7 +153,7 @@
     <record id="droga_purchase_lc_report_action" model="ir.actions.act_window">
         <field name="name">LC Report</field>
         <field name="res_model">droga.purchase.lc</field>
-        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_mode">list,form,pivot</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
 

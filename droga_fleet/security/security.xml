@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record model="ir.module.category" id="droga_fleet">
         <field name="name">Fleet</field>
@@ -7,23 +8,18 @@
 
     <record id="droga_fleet_manager" model="res.groups">
         <field name="name">Fleet Manager</field>
-        <field name="category_id" ref="droga_fleet"/>
-    </record>
+        </record>
      <record id="droga_general_service_manager" model="res.groups">
         <field name="name">General Service Manager</field>
-        <field name="category_id" ref="droga_fleet"/>
-    </record>
+        </record>
     <record id="droga_hr_manager" model="res.groups">
         <field name="name">HR Manager</field>
-        <field name="category_id" ref="droga_fleet"/>
-    </record>
+        </record>
      <record id="droga_driver" model="res.groups">
         <field name="name">Driver</field>
-        <field name="category_id" ref="droga_fleet"/>
-    </record>
+        </record>
     <record id="sales_request" model="res.groups">
         <field name="name">Sales vehicle request access</field>
-        <field name="category_id" ref="droga_fleet"/>
-    </record>
+        </record>
 
 </odoo>
