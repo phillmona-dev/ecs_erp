@@ -13,6 +13,7 @@ class droga_export_status(models.Model):
     status = fields.Selection(
         [('Draft', 'Draft'), ('Done', 'Done')], default="Draft")
 
+
     def update_pay(self):
         for rec in self:
             if not rec.sales_to:
