@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu for Employee Self Service -->
+    <menuitem id="menu_ecs_self_service_root"
+              name="Self Service"
+              sequence="5"
+              web_icon="hr,static/description/icon.png"/>
+
+    <!-- Operations -->
+    <menuitem id="menu_ecs_self_service_operations"
+              name="My Requests"
+              parent="menu_ecs_self_service_root"
+              sequence="10"/>
+
+    <menuitem id="menu_my_pr"
+              name="Purchase Requests"
+              parent="menu_ecs_self_service_operations"
+              action="action_my_purchase_requests"
+              sequence="10"/>
+
+    <menuitem id="menu_my_payment_request"
+              name="Payment Requests"
+              parent="menu_ecs_self_service_operations"
+              action="action_my_payment_requests"
+              sequence="20"/>
+
+    <menuitem id="menu_my_store_req"
+              name="Store Requisitions"
+              parent="menu_ecs_self_service_operations"
+              action="action_my_store_requisitions"
+              sequence="30"/>
+
+    <menuitem id="menu_my_headcount"
+              name="Headcount Requests"
+              parent="menu_ecs_self_service_operations"
+              action="action_my_headcount_requests"
+              sequence="40"/>
+
+</odoo>

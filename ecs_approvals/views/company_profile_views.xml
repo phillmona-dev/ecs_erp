@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_company_profile_list" model="ir.ui.view">
+        <field name="name">ecs.company.profile.list</field>
+        <field name="model">ecs.company.profile</field>
+        <field name="arch" type="xml">
+            <list string="Company Profiles">
+                <field name="sequence" widget="handle"/>
+                <field name="company_id"/>
+                <field name="company_code"/>
+                <field name="requires_sales"/>
+                <field name="requires_project"/>
+                <field name="requires_school_operations"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_company_profile_form" model="ir.ui.view">
+        <field name="name">ecs.company.profile.form</field>
+        <field name="model">ecs.company.profile</field>
+        <field name="arch" type="xml">
+            <form string="Company Profile">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="company_code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="ERP Scope">
+                            <field name="requires_sales" readonly="1"/>
+                            <field name="requires_project" readonly="1"/>
+                            <field name="requires_school_operations" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_company_profile_search" model="ir.ui.view">
+        <field name="name">ecs.company.profile.search</field>
+        <field name="model">ecs.company.profile</field>
+        <field name="arch" type="xml">
+            <search string="Company Profiles">
+                <field name="company_id"/>
+                <field name="company_code"/>
+                <filter name="requires_sales" string="Sales Scope" domain="[('requires_sales', '=', True)]"/>
+                <filter name="requires_project" string="Project Scope" domain="[('requires_project', '=', True)]"/>
+                <filter name="requires_school_operations" string="School Scope" domain="[('requires_school_operations', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_company_code" string="Company Type" context="{'group_by': 'company_code'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_company_profile" model="ir.actions.act_window">
+        <field name="name">Company Profiles</field>
+        <field name="res_model">ecs.company.profile</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_company_code': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ecs_hr_root"
+              name="HR"
+              sequence="20"
+              web_icon="hr,static/description/icon.png"
+              groups="ecs_approvals.group_ecs_hr_user"/>
+
+    <menuitem id="menu_ecs_hr_operations"
+              name="Operations"
+              parent="menu_ecs_hr_root"
+              sequence="10"/>
+
+    <menuitem id="menu_attendance_report"
+              name="Attendance Report"
+              parent="menu_ecs_hr_operations"
+              action="action_attendance_report"
+              sequence="10"/>
+
+    <menuitem id="menu_overtime_report"
+              name="Overtime Reports"
+              parent="menu_ecs_hr_operations"
+              action="action_overtime_report"
+              sequence="20"/>
+
+    <menuitem id="menu_headcount_request"
+              name="Headcount Requests"
+              parent="menu_ecs_hr_operations"
+              action="action_headcount_request"
+              sequence="30"/>
+
+    <menuitem id="menu_hr_letters"
+              name="HR Letters"
+              parent="menu_ecs_hr_operations"
+              action="action_hr_letter"
+              sequence="40"/>
+
+    <!-- My HR (self-service section) -->
+    <menuitem id="menu_my_hr"
+              name="My HR"
+              parent="menu_ecs_hr_root"
+              sequence="50"/>
+
+    <menuitem id="menu_my_overtime"
+              name="My Overtime Reports"
+              parent="menu_my_hr"
+              action="action_my_overtime"
+              sequence="10"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_ecs_hr_config"
+              name="Configuration"
+              parent="menu_ecs_hr_root"
+              sequence="90"
+              groups="ecs_approvals.group_ecs_hr_manager"/>
+
+    <menuitem id="menu_hr_divisions"
+              name="Divisions / Business Units"
+              parent="menu_ecs_hr_config"
+              action="action_hr_division"
+              sequence="10"/>
+</odoo>

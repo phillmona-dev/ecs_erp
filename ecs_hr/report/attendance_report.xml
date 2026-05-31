@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Attendance Summary Report Template -->
+    <template id="report_attendance_summary_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2 class="text-center">Attendance Report</h2>
+                <h4 class="text-center">
+                    <t t-esc="docs[0].company_id.name"/> —
+                    <t t-esc="docs[0].date" t-options="{'widget': 'date'}"/>
+                </h4>
+                <hr/>
+                <table class="table table-sm table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Real Hours</th>
+                            <th>OT Hours</th>
+                            <th>Late (min)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="docs" t-as="line">
+                            <tr t-att-class="'table-danger' if line.is_absent else ''">
+                                <td><t t-esc="line.employee_id.name"/></td>
+                                <td><t t-esc="line.department_id.name or ''"/></td>
+                                <td><t t-esc="line.check_in" t-options="{'widget': 'datetime'}"/></td>
+                                <td><t t-esc="line.check_out" t-options="{'widget': 'datetime'}"/></td>
+                                <td><t t-esc="'%.2f' % line.real_hours"/></td>
+                                <td><t t-esc="'%.2f' % line.overtime_hours"/></td>
+                                <td><t t-esc="'%.0f' % line.late_minutes"/></td>
+                                <td>
+                                    <t t-if="line.is_absent">ABSENT</t>
+                                    <t t-else="">PRESENT</t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <report
+        id="action_report_attendance_summary"
+        model="ecs.hr.attendance.report"
+        string="Attendance Summary"
+        report_type="qweb-pdf"
+        name="ecs_hr.report_attendance_summary_document"
+        file="ecs_hr.report_attendance_summary_document"
+        print_report_name="'Attendance Report - %s' % (object.date)"
+    />
+</odoo>

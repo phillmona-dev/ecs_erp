@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_form_ecs_procurement" model="ir.ui.view">
+        <field name="name">purchase.order.ecs.procurement.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <div class="oe_button_box" name="ecs_import_button_box">
+                    <button name="action_view_ecs_foreign_currency_requests" type="object" class="oe_stat_button" icon="fa-money" invisible="ecs_foreign_currency_request_count == 0">
+                        <field name="ecs_foreign_currency_request_count" widget="statinfo" string="Forex Requests"/>
+                    </button>
+                    <button name="action_view_ecs_letters_credit" type="object" class="oe_stat_button" icon="fa-bank" invisible="ecs_letter_credit_count == 0">
+                        <field name="ecs_letter_credit_count" widget="statinfo" string="LCs"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="ecs_purchase_request_id" readonly="1"/>
+                <field name="ecs_rfq_id" readonly="1"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_create_ecs_foreign_currency_request" string="Create Forex Request" type="object" groups="ecs_approvals.group_ecs_procurement_manager"/>
+                <button name="action_create_ecs_letter_credit" string="Create LC" type="object" groups="ecs_approvals.group_ecs_procurement_manager"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

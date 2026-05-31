@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ecs_payroll_root"
+              name="ECS Payroll"
+              sequence="30"
+              groups="ecs_approvals.group_ecs_payroll_manager,ecs_approvals.group_ecs_hr_manager"/>
+
+    <menuitem id="menu_ecs_payroll_operations"
+              name="Operations"
+              parent="menu_ecs_payroll_root"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_payroll_recurring_input"
+              name="Recurring Payments and Deductions"
+              parent="menu_ecs_payroll_operations"
+              action="action_ecs_payroll_recurring_input"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_payroll_variable_input"
+              name="Variable Payroll Inputs"
+              parent="menu_ecs_payroll_operations"
+              action="action_ecs_payroll_variable_input"
+              sequence="20"/>
+
+
+
+    <menuitem id="menu_ecs_payroll_reports"
+              name="Reports"
+              parent="menu_ecs_payroll_root"
+              sequence="50"/>
+
+
+    <menuitem id="menu_ecs_payroll_config"
+              name="Configuration"
+              parent="menu_ecs_payroll_root"
+              sequence="90"
+              groups="ecs_approvals.group_ecs_payroll_manager"/>
+
+    <menuitem id="menu_ecs_payroll_period"
+              name="Payroll Periods"
+              parent="menu_ecs_payroll_config"
+              action="action_ecs_payroll_period"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_payroll_rate"
+              name="Payroll Rates"
+              parent="menu_ecs_payroll_config"
+              action="action_ecs_payroll_rate"
+              sequence="20"/>
+
+    <menuitem id="menu_ecs_payroll_tax_bracket"
+              name="Tax Brackets"
+              parent="menu_ecs_payroll_config"
+              action="action_ecs_payroll_tax_bracket"
+              sequence="30"/>
+</odoo>

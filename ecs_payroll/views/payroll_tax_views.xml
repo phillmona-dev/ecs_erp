@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_payroll_tax_bracket_list" model="ir.ui.view">
+        <field name="name">ecs.payroll.tax.bracket.list</field>
+        <field name="model">ecs.payroll.tax.bracket</field>
+        <field name="arch" type="xml">
+            <list string="Payroll Tax Brackets" editable="bottom">
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="lower_bound"/>
+                <field name="upper_bound"/>
+                <field name="rate"/>
+                <field name="deduction"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_payroll_tax_bracket_search" model="ir.ui.view">
+        <field name="name">ecs.payroll.tax.bracket.search</field>
+        <field name="model">ecs.payroll.tax.bracket</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="date_from"/>
+                <field name="company_id"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_effective_date" string="Effective Date" context="{'group_by': 'date_from'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_payroll_tax_bracket" model="ir.actions.act_window">
+        <field name="name">Tax Brackets</field>
+        <field name="res_model">ecs.payroll.tax.bracket</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_ecs_payroll_tax_bracket_search"/>
+    </record>
+</odoo>

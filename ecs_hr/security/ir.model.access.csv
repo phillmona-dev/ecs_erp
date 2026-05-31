@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ecs_hr_division_manager,HR Division Manager,ecs_hr.model_ecs_hr_division,ecs_approvals.group_ecs_hr_manager,1,1,1,1
+access_ecs_hr_division_officer,HR Division Officer,ecs_hr.model_ecs_hr_division,ecs_approvals.group_ecs_hr_user,1,1,1,0
+access_ecs_hr_division_user,HR Division User,ecs_hr.model_ecs_hr_division,ecs_approvals.group_ecs_auditor,1,0,0,0
+access_ecs_attendance_report_manager,Attendance Report Manager,ecs_hr.model_ecs_hr_attendance_report,ecs_approvals.group_ecs_hr_manager,1,1,1,1
+access_ecs_attendance_report_officer,Attendance Report Officer,ecs_hr.model_ecs_hr_attendance_report,ecs_approvals.group_ecs_hr_user,1,1,1,0
+access_ecs_attendance_report_user,Attendance Report User,ecs_hr.model_ecs_hr_attendance_report,ecs_approvals.group_ecs_auditor,1,0,0,0
+access_ecs_overtime_manager,Overtime Report Manager,ecs_hr.model_ecs_hr_overtime_report,ecs_approvals.group_ecs_hr_manager,1,1,1,1
+access_ecs_overtime_officer,Overtime Report Officer,ecs_hr.model_ecs_hr_overtime_report,ecs_approvals.group_ecs_hr_user,1,1,1,0
+access_ecs_overtime_user,Overtime Report User,ecs_hr.model_ecs_hr_overtime_report,ecs_approvals.group_ecs_self_service,1,1,1,0
+access_ecs_headcount_manager,Headcount Request Manager,ecs_hr.model_ecs_hr_headcount_request,ecs_approvals.group_ecs_hr_manager,1,1,1,1
+access_ecs_headcount_officer,Headcount Request Officer,ecs_hr.model_ecs_hr_headcount_request,ecs_approvals.group_ecs_hr_user,1,1,1,0
+access_ecs_headcount_user,Headcount Request User,ecs_hr.model_ecs_hr_headcount_request,ecs_approvals.group_ecs_self_service,1,1,1,0
+access_ecs_hr_letter_manager,HR Letter Manager,ecs_hr.model_ecs_hr_letter,ecs_approvals.group_ecs_hr_manager,1,1,1,1
+access_ecs_hr_letter_officer,HR Letter Officer,ecs_hr.model_ecs_hr_letter,ecs_approvals.group_ecs_hr_user,1,1,1,0
+access_ecs_hr_letter_user,HR Letter User,ecs_hr.model_ecs_hr_letter,ecs_approvals.group_ecs_auditor,1,0,0,0

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ecs_treasury_root"
+              name="ECS Treasury"
+              sequence="65"
+              groups="ecs_approvals.group_ecs_finance_user,ecs_approvals.group_ecs_finance_manager"/>
+
+    <menuitem id="menu_ecs_treasury_facility"
+              name="Treasury Facilities"
+              parent="menu_ecs_treasury_root"
+              action="action_ecs_treasury_facility"
+              sequence="10"/>
+</odoo>

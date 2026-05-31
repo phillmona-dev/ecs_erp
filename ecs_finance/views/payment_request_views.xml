@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Payment Request List ─────────────────────────────────────── -->
+    <record id="view_payment_request_tree" model="ir.ui.view">
+        <field name="name">ecs.finance.payment.request.tree</field>
+        <field name="model">ecs.finance.payment.request</field>
+        <field name="arch" type="xml">
+            <list string="Payment Requests"
+                  decoration-info="state == 'submitted'"
+                  decoration-warning="state == 'verified'"
+                  decoration-success="state == 'approved'"
+                  decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="request_by"/>
+                <field name="department_id"/>
+                <field name="payee_id"/>
+                <field name="amount"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="payment_type"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'submitted'"
+                       decoration-warning="state in ('verified','budget_approved')"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Payment Request Form ─────────────────────────────────────── -->
+    <record id="view_payment_request_form" model="ir.ui.view">
+        <field name="name">ecs.finance.payment.request.form</field>
+        <field name="model">ecs.finance.payment.request</field>
+        <field name="arch" type="xml">
+            <form string="Payment Request">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success"
+                            invisible="state not in ('submitted','verified','budget_approved')"
+                            groups="ecs_approvals.group_ecs_finance_manager,ecs_approvals.group_ecs_finance_controller"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            class="btn-danger"
+                            invisible="state not in ('submitted','verified','budget_approved')"
+                            groups="ecs_approvals.group_ecs_finance_manager,ecs_approvals.group_ecs_finance_controller"/>
+                    <button name="action_generate_payment" string="Generate Payment"
+                            type="object" class="btn-primary"
+                            invisible="state != 'approved' or payment_id != False"
+                            groups="ecs_approvals.group_ecs_finance_user,ecs_approvals.group_ecs_finance_manager"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('approved','cancelled')"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object"
+                            invisible="state not in ('cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,verified,budget_approved,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_payment" type="object"
+                                class="oe_stat_button" icon="fa-bank"
+                                invisible="not payment_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Payment</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Request Details">
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="request_by"/>
+                            <field name="department_id"/>
+                            <field name="request_date" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Payment Details">
+                            <field name="payee_id"/>
+                            <field name="bank_account_id"
+                                   invisible="payment_type != 'bank_transfer'"/>
+                            <field name="amount" readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="payment_type" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Budget &amp; Accounting">
+                        <group>
+                            <field name="budget_position_id"/>
+                            <field name="expense_account_id"/>
+                        </group>
+                        <group>
+                            <field name="remaining_budget" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="is_over_budget" widget="boolean"
+                                   decoration-danger="is_over_budget"/>
+                            <field name="analytic_distribution" widget="analytic_distribution"/>
+                        </group>
+                    </group>
+                    <group string="Purpose">
+                        <field name="purpose" nolabel="1" placeholder="Describe the purpose of this payment..."/>
+                    </group>
+                    <group string="Amount in Words" invisible="not amount_in_words">
+                        <field name="amount_in_words" nolabel="1" readonly="1"/>
+                    </group>
+                    <group invisible="not rejection_reason" string="Rejection Reason">
+                        <field name="rejection_reason" nolabel="1" readonly="1"
+                               decoration-danger="rejection_reason"/>
+                    </group>
+                    <notebook>
+                        <page string="Approval History" name="approval_history">
+                            <field name="approval_log_ids" readonly="1">
+                                <list create="false" delete="false">
+                                    <field name="action_date"/>
+                                    <field name="action"/>
+                                    <field name="level"/>
+                                    <field name="user_id"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Search View ──────────────────────────────────────────────── -->
+    <record id="view_payment_request_search" model="ir.ui.view">
+        <field name="name">ecs.finance.payment.request.search</field>
+        <field name="model">ecs.finance.payment.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Payment Requests">
+                <field name="name" string="Reference"/>
+                <field name="payee_id"/>
+                <field name="request_by"/>
+                <field name="department_id"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Submitted" name="submitted" domain="[('state','=','submitted')]"/>
+                <filter string="Pending Approval" name="pending"
+                        domain="[('state','in',['submitted','verified','budget_approved'])]"/>
+                <filter string="Approved" name="approved" domain="[('state','=','approved')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <filter string="My Requests" name="my_requests"
+                        domain="[('submitted_by','=',uid)]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Status" name="by_state" context="{'group_by':'state'}"/>
+                    <filter string="Department" name="by_dept" context="{'group_by':'department_id'}"/>
+                    <filter string="Payment Type" name="by_type" context="{'group_by':'payment_type'}"/>
+                    <filter string="Company" name="by_company" context="{'group_by':'company_id'}"
+                            groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Action ───────────────────────────────────────────────────── -->
+    <record id="action_payment_request" model="ir.actions.act_window">
+        <field name="name">Payment Requests</field>
+        <field name="res_model">ecs.finance.payment.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_payment_request_search"/>
+        <field name="domain">[('company_id', 'in', allowed_company_ids)]</field>
+        <field name="context">{'search_default_pending': 1}</field>
+    </record>
+
+    <!-- ── My Payment Requests (for self-service) ───────────────────── -->
+    <record id="action_my_payment_requests" model="ir.actions.act_window">
+        <field name="name">My Payment Requests</field>
+        <field name="res_model">ecs.finance.payment.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('submitted_by','=',uid)]</field>
+    </record>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_ecs_sales" model="ir.ui.view">
+        <field name="name">res.partner.form.ecs.sales</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Put credit control fields under Sales & Purchases tab -->
+            <xpath expr="//group[@name='sale']" position="inside">
+                <field name="cust_credit_limit"/>
+                <field name="unsettled_amount" readonly="1"/>
+                <field name="available_amount" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

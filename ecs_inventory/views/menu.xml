@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ecs_inventory_root"
+              name="ECS Inventory"
+              parent="stock.menu_stock_root"
+              sequence="80"
+              groups="ecs_approvals.group_ecs_inventory_user,ecs_approvals.group_ecs_inventory_manager,ecs_approvals.group_ecs_auditor"/>
+
+    <menuitem id="menu_ecs_inventory_operations"
+              name="Operations"
+              parent="menu_ecs_inventory_root"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_inventory_request"
+              name="Inventory Requests"
+              parent="menu_ecs_inventory_operations"
+              action="action_ecs_inventory_request"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_inventory_request_transfer"
+              name="Internal Transfers"
+              parent="menu_ecs_inventory_operations"
+              action="action_ecs_inventory_request_transfer"
+              sequence="20"/>
+
+    <menuitem id="menu_ecs_inventory_request_adjustment"
+              name="Stock Adjustments"
+              parent="menu_ecs_inventory_operations"
+              action="action_ecs_inventory_request_adjustment"
+              sequence="30"/>
+
+    <menuitem id="menu_ecs_inventory_configuration"
+              name="Configuration"
+              parent="menu_ecs_inventory_root"
+              sequence="90"
+              groups="ecs_approvals.group_ecs_inventory_manager"/>
+
+    <menuitem id="menu_ecs_inventory_transaction_type"
+              name="Transaction Types"
+              parent="menu_ecs_inventory_configuration"
+              action="action_ecs_inventory_transaction_type"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_inventory_lock_period"
+              name="Lock Periods"
+              parent="menu_ecs_inventory_configuration"
+              action="action_ecs_inventory_lock_period"
+              sequence="20"/>
+</odoo>

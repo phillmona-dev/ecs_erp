@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ecs_procurement_root"
+              name="ECS Procurement"
+              sequence="40"
+              groups="ecs_approvals.group_ecs_procurement_user,ecs_approvals.group_ecs_procurement_manager"/>
+
+    <menuitem id="menu_ecs_procurement_operations"
+              name="Operations"
+              parent="menu_ecs_procurement_root"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_purchase_request_all"
+              name="All Purchase Requests"
+              parent="menu_ecs_procurement_operations"
+              action="action_ecs_purchase_request"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_purchase_request_local"
+              name="Local Purchase Requests"
+              parent="menu_ecs_procurement_operations"
+              action="action_ecs_purchase_request_local"
+              sequence="20"/>
+
+    <menuitem id="menu_ecs_purchase_request_foreign"
+              name="Foreign Purchase Requests"
+              parent="menu_ecs_procurement_operations"
+              action="action_ecs_purchase_request_foreign"
+              sequence="30"/>
+
+    <menuitem id="menu_ecs_purchase_rfq"
+              name="Requests for Quotation"
+              parent="menu_ecs_procurement_operations"
+              action="action_ecs_purchase_rfq"
+              sequence="50"/>
+
+    <menuitem id="menu_ecs_procurement_imports"
+              name="Import Operations"
+              parent="menu_ecs_procurement_root"
+              sequence="20"/>
+
+    <menuitem id="menu_ecs_foreign_currency_request"
+              name="Foreign Currency Requests"
+              parent="menu_ecs_procurement_imports"
+              action="action_ecs_foreign_currency_request"
+              sequence="10"/>
+
+    <menuitem id="menu_ecs_letter_credit"
+              name="Letters of Credit"
+              parent="menu_ecs_procurement_imports"
+              action="action_ecs_letter_credit"
+              sequence="20"/>
+</odoo>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_inventory_request_list" model="ir.ui.view">
+        <field name="name">ecs.inventory.request.list</field>
+        <field name="model">ecs.inventory.request</field>
+        <field name="arch" type="xml">
+            <list string="Inventory Requests">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="request_type"/>
+                <field name="requester_employee_id"/>
+                <field name="department_id"/>
+                <field name="source_location_id"/>
+                <field name="destination_location_id"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_inventory_request_form" model="ir.ui.view">
+        <field name="name">ecs.inventory.request.form</field>
+        <field name="model">ecs.inventory.request</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Request">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary" invisible="state not in ('submitted', 'verified', 'budget_approved')" groups="ecs_approvals.group_ecs_inventory_manager"/>
+                    <button name="action_create_picking" string="Create Transfer" type="object" class="btn-primary" invisible="state != 'approved' or picking_count != 0"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('approved', 'cancelled')"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,verified,budget_approved,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_pickings" type="object" class="oe_stat_button" icon="fa-truck" invisible="picking_count == 0">
+                            <field name="picking_count" widget="statinfo" string="Transfers"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="request_type"/>
+                            <field name="transaction_type_id"/>
+                            <field name="picking_type_id"/>
+                            <field name="purpose"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="request_date"/>
+                            <field name="scheduled_date"/>
+                            <field name="requester_employee_id"/>
+                            <field name="department_id"/>
+                        </group>
+                    </group>
+                    <group string="Locations">
+                        <field name="source_location_id"/>
+                        <field name="destination_location_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="quantity"/>
+                                    <field name="available_qty" readonly="1"/>
+                                    <field name="lot_id"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Approval History">
+                            <field name="approval_log_ids" readonly="1">
+                                <list>
+                                    <field name="action_date"/>
+                                    <field name="action"/>
+                                    <field name="level"/>
+                                    <field name="user_id"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_inventory_request_search" model="ir.ui.view">
+        <field name="name">ecs.inventory.request.search</field>
+        <field name="model">ecs.inventory.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="purpose"/>
+                <field name="requester_employee_id"/>
+                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                <filter name="internal_transfer" string="Internal Transfers" domain="[('request_type','=','internal_transfer')]"/>
+                <filter name="stock_adjustment" string="Stock Adjustments" domain="[('request_type','=','stock_adjustment')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_type" string="Request Type" context="{'group_by': 'request_type'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_inventory_request" model="ir.actions.act_window">
+        <field name="name">Inventory Requests</field>
+        <field name="res_model">ecs.inventory.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ecs_inventory_request_search"/>
+    </record>
+
+    <record id="action_ecs_inventory_request_transfer" model="ir.actions.act_window">
+        <field name="name">Internal Transfer Requests</field>
+        <field name="res_model">ecs.inventory.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('request_type','=','internal_transfer')]</field>
+        <field name="context">{'default_request_type': 'internal_transfer'}</field>
+    </record>
+
+    <record id="action_ecs_inventory_request_adjustment" model="ir.actions.act_window">
+        <field name="name">Stock Adjustment Requests</field>
+        <field name="res_model">ecs.inventory.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('request_type','=','stock_adjustment')]</field>
+        <field name="context">{'default_request_type': 'stock_adjustment'}</field>
+    </record>
+</odoo>

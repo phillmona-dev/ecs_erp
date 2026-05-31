@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ecs_projects_root"
+              name="ECS Projects"
+              parent="project.menu_main_pm"
+              sequence="80"
+              groups="ecs_approvals.group_ecs_project_user,ecs_approvals.group_ecs_project_manager"/>
+</odoo>

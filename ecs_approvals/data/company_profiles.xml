@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="company_import_export" model="res.company">
+        <field name="name">Company A - Import &amp; Export</field>
+    </record>
+
+    <record id="company_construction" model="res.company">
+        <field name="name">Company B - Construction</field>
+    </record>
+
+    <record id="company_private_school" model="res.company">
+        <field name="name">Company C - Private School</field>
+    </record>
+
+    <record id="profile_import_export" model="ecs.company.profile">
+        <field name="sequence">10</field>
+        <field name="company_id" ref="company_import_export"/>
+        <field name="company_code">import_export</field>
+        <field name="notes">Electronics import/sales and construction materials import/sales.</field>
+    </record>
+
+    <record id="profile_construction" model="ecs.company.profile">
+        <field name="sequence">20</field>
+        <field name="company_id" ref="company_construction"/>
+        <field name="company_code">construction</field>
+        <field name="notes">Construction projects, site management, contracts, project costing, and equipment tracking.</field>
+    </record>
+
+    <record id="profile_private_school" model="ecs.company.profile">
+        <field name="sequence">30</field>
+        <field name="company_id" ref="company_private_school"/>
+        <field name="company_code">school</field>
+        <field name="notes">Finance, HR, payroll, procurement, and inventory only. Academic features are intentionally excluded.</field>
+    </record>
+</odoo>

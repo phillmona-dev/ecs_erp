@@ -1,0 +1,552 @@
+/* ═══════════════════════════════════════════════════════
+   ECS THEME — Premium Mocha/Cream Glassmorphic Grid CSS
+   phillipos1212@gmail.com © 2025
+   ═══════════════════════════════════════════════════════ */
+
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300%3B400%3B500%3B600%3B700%3B800&display=swap");
+
+/* ── Reset & Base ─────────────────────────────────────── */
+.ecs-login-body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: #faf5f0; /* Cream background matching GlowLink theme exactly */
+  color: #271714; /* Dark warm mocha for text visibility */
+}
+
+/* ── Cream Grid Background ────────────────────────────── */
+.ecs-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-color: #faf5f0;
+  overflow: hidden;
+}
+
+.ecs-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(39, 23, 20, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(39, 23, 20, 0.03) 1px, transparent 1px);
+  background-size: 8% 10vh;
+}
+
+.ecs-bg-glow {
+  position: absolute;
+  top: -15%;
+  right: -15%;
+  width: 80%;
+  height: 135%;
+  background: radial-gradient(circle at 75% 40%, rgba(245, 176, 116, 0.16) 0%, rgba(245, 176, 116, 0.04) 45%, transparent 75%);
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+.ecs-bg-glow-left {
+  position: absolute;
+  top: 10%;
+  left: -15%;
+  width: 65%;
+  height: 90%;
+  background: radial-gradient(circle at 20% 50%, rgba(0, 180, 180, 0.08) 0%, rgba(0, 180, 180, 0.01) 50%, transparent 80%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.ecs-bg-glow-card {
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  transform: translate(-50%, -50%);
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle at center, rgba(245, 176, 116, 0.12) 0%, rgba(245, 176, 116, 0.02) 45%, transparent 75%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+/* ── Header Navigation Bar ────────────────────────────── */
+.ecs-header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: rgba(250, 245, 240, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(39, 23, 20, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  z-index: 10;
+}
+
+.ecs-home-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid rgba(39, 23, 20, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  color: rgba(39, 23, 20, 0.8);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.ecs-home-btn:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(39, 23, 20, 0.25);
+  color: #271714;
+  transform: translateY(-1px);
+}
+
+.ecs-header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.ecs-header-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ecs-header-logo-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #00a8a8; /* Cyan/Teal circle logo */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
+.ecs-logo-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #271714;
+  line-height: 1.2;
+}
+.ecs-logo-subtitle {
+  font-size: 0.75rem;
+  color: rgba(39, 23, 20, 0.5);
+  font-weight: 400;
+}
+
+.ecs-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ecs-header-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(39, 23, 20, 0.1);
+  color: rgba(39, 23, 20, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ecs-header-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.85);
+  color: #271714;
+  border-color: rgba(39, 23, 20, 0.2);
+}
+
+/* ── Split Layout Grid ────────────────────────────────── */
+.ecs-layout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  padding-top: 72px; /* For header */
+  box-sizing: border-box;
+}
+
+/* ── LEFT — Brand Panel ───────────────────────────────── */
+.ecs-brand-panel {
+  flex: 0 0 55%;
+  display: flex;
+  align-items: center;
+  padding-left: 8%;
+  padding-right: 5%;
+  box-sizing: border-box;
+}
+
+.ecs-brand-inner {
+  max-width: 580px;
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ecs-badge {
+  display: inline-block;
+  border: 1px solid rgba(217, 119, 6, 0.4);
+  background: rgba(217, 119, 6, 0.08);
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: #d97706; /* Amber orange badge color */
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 28px;
+}
+
+.ecs-brand-title {
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  font-weight: 400; /* Regular weight title matching the image */
+  line-height: 1.25;
+  margin: 0 0 24px;
+  color: #271714; /* Dark for visibility */
+}
+
+.ecs-brand-tagline {
+  font-size: 0.98rem;
+  color: rgba(39, 23, 20, 0.6); /* Muted brown for taglines */
+  line-height: 1.65;
+  margin: 0;
+  font-weight: 300;
+  max-width: 480px;
+}
+
+/* ── RIGHT — Form Panel ───────────────────────────────── */
+.ecs-form-panel {
+  flex: 0 0 45%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 8%;
+  box-sizing: border-box;
+}
+
+/* ── Light Frosted Glass Card ─────────────────────────── */
+.ecs-glass-card {
+  width: 100%;
+  max-width: 430px;
+  background: rgba(255, 255, 255, 0.48); /* Light frosted white glass */
+  border: 1px solid rgba(39, 23, 20, 0.08);
+  border-radius: 28px;
+  padding: 44px 38px 40px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 24px 60px rgba(39, 23, 20, 0.06),
+    0 0 40px rgba(255, 255, 255, 0.2) inset;
+  box-sizing: border-box;
+  animation: cardFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both 0.1s;
+}
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Card header welcome styling */
+.ecs-card-header {
+  margin-bottom: 28px;
+}
+.ecs-card-title {
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: #271714;
+  margin: 0 0 8px;
+}
+.ecs-card-subtitle {
+  font-size: 0.88rem;
+  color: rgba(39, 23, 20, 0.6);
+  margin: 0;
+}
+
+/* ── Alerts ───────────────────────────────────────────── */
+.ecs-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  border: 1px solid;
+}
+.ecs-alert-danger { background: rgba(239, 68, 68, 0.06); border-color: rgba(239, 68, 68, 0.15); color: #dc2626; }
+.ecs-alert-success { background: rgba(34, 197, 94, 0.06); border-color: rgba(34, 197, 94, 0.15); color: #16a34a; }
+
+/* ── Login Form Styles ────────────────────────────────── */
+.ecs-field-group {
+  margin-bottom: 20px;
+}
+
+.ecs-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(39, 23, 20, 0.5);
+  margin-bottom: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ecs-input-wrapper {
+  position: relative;
+}
+
+.ecs-input {
+  width: 100%;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(39, 23, 20, 0.15);
+  border-radius: 16px;
+  color: #271714;
+  font-size: 0.92rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.ecs-input::placeholder {
+  color: rgba(39, 23, 20, 0.25);
+}
+.ecs-input:focus {
+  border-color: rgba(217, 119, 6, 0.6); /* Warm amber border on focus */
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+}
+.ecs-input:hover:not(:focus) {
+  border-color: rgba(39, 23, 20, 0.28);
+}
+
+/* Chrome autofill fix to preserve styling in light mode */
+.ecs-input:-webkit-autofill,
+.ecs-input:-webkit-autofill:hover,
+.ecs-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #faf6f2 inset;
+  -webkit-text-fill-color: #271714;
+  caret-color: #271714;
+  border-color: rgba(217, 119, 6, 0.4);
+}
+
+/* Password right padding for eye button */
+.ecs-input-right-padding {
+  padding-right: 50px;
+}
+
+/* Password visibility toggle button */
+.ecs-pw-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(39, 23, 20, 0.4);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+.ecs-pw-toggle:hover {
+  color: rgba(39, 23, 20, 0.7);
+}
+
+/* ── Primary Submit Button ────────────────────────────── */
+.ecs-submit-group {
+  margin-top: 28px;
+  margin-bottom: 24px;
+}
+
+.ecs-btn-signin {
+  width: 100%;
+  padding: 15px 24px;
+  background: linear-gradient(90deg, #ff4c00 0%, #ff6f00 100%);
+  border: none;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  /* The electric dual-glow effect matching the user's design screenshot */
+  box-shadow: 
+    0 0 16px rgba(0, 168, 168, 0.4), 
+    0 0 32px rgba(255, 76, 0, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.15) inset;
+}
+
+.ecs-btn-signin:hover {
+  background: linear-gradient(90deg, #ff5714 0%, #ff7c14 100%);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 0 24px rgba(0, 168, 168, 0.6), 
+    0 0 40px rgba(255, 76, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.15) inset;
+}
+
+.ecs-btn-signin:active {
+  transform: translateY(1px);
+}
+
+.ecs-btn-arrow {
+  font-size: 0.88rem;
+  transition: transform 0.2s ease;
+}
+.ecs-btn-signin:hover .ecs-btn-arrow {
+  transform: translateX(3px);
+}
+
+/* Loading animations */
+.ecs-btn-loader { display: none; gap: 4px; }
+.ecs-btn-loader span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  animation: loaderBounce 0.8s ease-in-out infinite;
+}
+.ecs-btn-loader span:nth-child(2) { animation-delay: 0.15s; }
+.ecs-btn-loader span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes loaderBounce {
+  0%,100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(-5px); opacity: 1; }
+}
+.ecs-btn-signin.ecs-loading .ecs-btn-text,
+.ecs-btn-signin.ecs-loading .ecs-btn-arrow { display: none; }
+.ecs-btn-signin.ecs-loading .ecs-btn-loader { display: flex; }
+.ecs-btn-signin.ecs-loading { cursor: not-allowed; pointer-events: none; }
+
+.ecs-btn-superuser {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid rgba(39, 23, 20, 0.08);
+  border-radius: 12px;
+  color: rgba(39, 23, 20, 0.4);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ecs-btn-superuser:hover { border-color: rgba(39, 23, 20, 0.15); color: rgba(39, 23, 20, 0.6); }
+
+/* ── "Or continue with" Section ─────────────────────── */
+.ecs-social-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(39, 23, 20, 0.35);
+}
+.ecs-social-divider::before,
+.ecs-social-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(39, 23, 20, 0.08);
+}
+.ecs-social-divider::before { margin-right: 12px; }
+.ecs-social-divider::after { margin-left: 12px; }
+
+.ecs-social-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.ecs-social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(39, 23, 20, 0.12);
+  border-radius: 16px;
+  color: rgba(39, 23, 20, 0.75);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ecs-social-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(39, 23, 20, 0.25);
+  color: #271714;
+}
+
+/* ── Bottom Helper Links ────────────────────────────── */
+.ecs-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.83rem;
+  margin-top: 10px;
+}
+.ecs-footer-link {
+  color: rgba(39, 23, 20, 0.5);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.ecs-footer-link:hover {
+  color: #271714;
+}
+.ecs-link-highlight {
+  color: #d97706; /* Amber orange link color */
+  font-weight: 500;
+}
+.ecs-link-highlight:hover {
+  color: #b45309;
+}
+
+/* ── Responsive Adaptation ───────────────────────────── */
+@media (max-width: 1024px) {
+  .ecs-header-bar { padding: 0 24px; }
+  .ecs-brand-panel { padding-left: 6%; }
+  .ecs-form-panel { padding-right: 6%; }
+  .ecs-brand-title { font-size: 2.2rem; }
+}
+
+@media (max-width: 860px) {
+  .ecs-layout { flex-direction: column; overflow-y: auto; }
+  .ecs-brand-panel { display: none; }
+  .ecs-form-panel {
+    flex: 1;
+    padding: 40px 24px;
+    align-items: center;
+    width: 100%;
+  }
+  .ecs-glass-card {
+    max-width: 440px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ecs-header-bar { padding: 0 16px; }
+  .ecs-header-logo-text { display: none; }
+  .ecs-form-panel { padding: 24px 16px; }
+  .ecs-glass-card { padding: 32px 20px 24px; }
+}

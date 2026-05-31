@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Transaction Type List ────────────────────────────────────── -->
+    <record id="view_transaction_type_tree" model="ir.ui.view">
+        <field name="name">ecs.finance.transaction.type.tree</field>
+        <field name="model">ecs.finance.transaction.type</field>
+        <field name="arch" type="xml">
+            <list string="Transaction Types">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="transaction_category"/>
+                <field name="journal_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Transaction Type Form ────────────────────────────────────── -->
+    <record id="view_transaction_type_form" model="ir.ui.view">
+        <field name="name">ecs.finance.transaction.type.form</field>
+        <field name="model">ecs.finance.transaction.type</field>
+        <field name="arch" type="xml">
+            <form string="Finance Transaction Type">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="code" string="Code"/>
+                        <h1><field name="code" placeholder="e.g. CPV"/></h1>
+                        <h2><field name="name" placeholder="e.g. Cash Payment Voucher"/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="transaction_category"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="journal_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_transaction_type" model="ir.actions.act_window">
+        <field name="name">Transaction Types</field>
+        <field name="res_model">ecs.finance.transaction.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('company_id', 'in', allowed_company_ids)]</field>
+    </record>
+</odoo>

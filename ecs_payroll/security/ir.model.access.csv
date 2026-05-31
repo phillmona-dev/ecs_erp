@@ -1,0 +1,18 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ecs_payroll_period_manager,ecs.payroll.period manager,model_ecs_payroll_period,ecs_approvals.group_ecs_payroll_manager,1,1,1,1
+access_ecs_payroll_period_hr,ecs.payroll.period hr,model_ecs_payroll_period,ecs_approvals.group_ecs_hr_manager,1,0,0,0
+access_ecs_payroll_period_auditor,ecs.payroll.period auditor,model_ecs_payroll_period,ecs_approvals.group_ecs_auditor,1,0,0,0
+access_ecs_payroll_rate_manager,ecs.payroll.rate manager,model_ecs_payroll_rate,ecs_approvals.group_ecs_payroll_manager,1,1,1,1
+access_ecs_payroll_rate_auditor,ecs.payroll.rate auditor,model_ecs_payroll_rate,ecs_approvals.group_ecs_auditor,1,0,0,0
+access_ecs_payroll_tax_bracket_manager,ecs.payroll.tax.bracket manager,model_ecs_payroll_tax_bracket,ecs_approvals.group_ecs_payroll_manager,1,1,1,1
+access_ecs_payroll_tax_bracket_auditor,ecs.payroll.tax.bracket auditor,model_ecs_payroll_tax_bracket,ecs_approvals.group_ecs_auditor,1,0,0,0
+access_ecs_payroll_recurring_input_manager,ecs.payroll.recurring.input manager,model_ecs_payroll_recurring_input,ecs_approvals.group_ecs_payroll_manager,1,1,1,1
+access_ecs_payroll_recurring_input_hr,ecs.payroll.recurring.input hr,model_ecs_payroll_recurring_input,ecs_approvals.group_ecs_hr_manager,1,1,1,0
+access_ecs_payroll_recurring_input_auditor,ecs.payroll.recurring.input auditor,model_ecs_payroll_recurring_input,ecs_approvals.group_ecs_auditor,1,0,0,0
+access_ecs_payroll_variable_input_manager,ecs.payroll.variable.input manager,model_ecs_payroll_variable_input,ecs_approvals.group_ecs_payroll_manager,1,1,1,1
+access_ecs_payroll_variable_input_hr,ecs.payroll.variable.input hr,model_ecs_payroll_variable_input,ecs_approvals.group_ecs_hr_manager,1,1,1,0
+access_ecs_payroll_variable_input_auditor,ecs.payroll.variable.input auditor,model_ecs_payroll_variable_input,ecs_approvals.group_ecs_auditor,1,0,0,0
+access_ecs_payroll_input_type_manager,ecs.payroll.input.type manager,model_ecs_payroll_input_type,ecs_approvals.group_ecs_payroll_manager,1,1,1,1
+access_ecs_payroll_input_type_hr,ecs.payroll.input.type hr,model_ecs_payroll_input_type,ecs_approvals.group_ecs_hr_manager,1,0,0,0
+access_ecs_payroll_line_manager,ecs.payroll.line manager,model_ecs_payroll_line,ecs_approvals.group_ecs_payroll_manager,1,1,1,1
+access_ecs_payroll_line_hr,ecs.payroll.line hr,model_ecs_payroll_line,ecs_approvals.group_ecs_hr_manager,1,0,0,0

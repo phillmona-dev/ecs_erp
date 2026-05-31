@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_foreign_currency_request_list" model="ir.ui.view">
+        <field name="name">ecs.foreign.currency.request.list</field>
+        <field name="model">ecs.foreign.currency.request</field>
+        <field name="arch" type="xml">
+            <list string="Foreign Currency Requests">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="purchase_order_id"/>
+                <field name="supplier_id"/>
+                <field name="requested_amount"/>
+                <field name="company_amount"/>
+                <field name="payment_due_date"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_foreign_currency_request_form" model="ir.ui.view">
+        <field name="name">ecs.foreign.currency.request.form</field>
+        <field name="model">ecs.foreign.currency.request</field>
+        <field name="arch" type="xml">
+            <form string="Foreign Currency Request">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary" invisible="state not in ('submitted', 'verified', 'budget_approved')" groups="ecs_approvals.group_ecs_procurement_approver,ecs_approvals.group_ecs_procurement_manager"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('approved', 'cancelled')"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,verified,budget_approved,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="request_type"/>
+                            <field name="purchase_order_id"/>
+                            <field name="rfq_id"/>
+                            <field name="supplier_id"/>
+                            <field name="purpose"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id"/>
+                            <field name="requested_amount"/>
+                            <field name="exchange_rate"/>
+                            <field name="company_amount"/>
+                            <field name="payment_due_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="requester_employee_id"/>
+                            <field name="department_id"/>
+                            <field name="request_date"/>
+                        </group>
+                        <group>
+                            <field name="bank_id"/>
+                            <field name="bank_branch"/>
+                            <field name="nbe_number"/>
+                            <field name="bank_approved_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Approval History">
+                            <field name="approval_log_ids" readonly="1">
+                                <list>
+                                    <field name="action_date"/>
+                                    <field name="action"/>
+                                    <field name="level"/>
+                                    <field name="user_id"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_foreign_currency_request_search" model="ir.ui.view">
+        <field name="name">ecs.foreign.currency.request.search</field>
+        <field name="model">ecs.foreign.currency.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="purchase_order_id"/>
+                <field name="supplier_id"/>
+                <field name="purpose"/>
+                <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_foreign_currency_request" model="ir.actions.act_window">
+        <field name="name">Foreign Currency Requests</field>
+        <field name="res_model">ecs.foreign.currency.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ecs_foreign_currency_request_search"/>
+    </record>
+
+    <record id="view_ecs_letter_credit_list" model="ir.ui.view">
+        <field name="name">ecs.letter.credit.list</field>
+        <field name="model">ecs.letter.credit</field>
+        <field name="arch" type="xml">
+            <list string="Letters of Credit">
+                <field name="name"/>
+                <field name="bank_lc_number"/>
+                <field name="purchase_order_id"/>
+                <field name="supplier_id"/>
+                <field name="bank_id"/>
+                <field name="issue_date"/>
+                <field name="expiry_date"/>
+                <field name="lc_amount"/>
+                <field name="company_amount"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_letter_credit_form" model="ir.ui.view">
+        <field name="name">ecs.letter.credit.form</field>
+        <field name="model">ecs.letter.credit</field>
+        <field name="arch" type="xml">
+            <form string="Letter of Credit">
+                <header>
+                    <button name="action_activate" string="Activate" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_refresh_expiry" string="Refresh Expiry" type="object" invisible="state not in ('draft', 'active')"/>
+                    <button name="action_mark_expired" string="Mark Expired" type="object" invisible="state in ('expired', 'closed')"/>
+                    <button name="action_close" string="Close" type="object" invisible="state == 'closed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,expired,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="purchase_order_id"/>
+                            <field name="rfq_id"/>
+                            <field name="supplier_id"/>
+                            <field name="bank_lc_number"/>
+                            <field name="bank_id"/>
+                            <field name="branch"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id"/>
+                            <field name="lc_amount"/>
+                            <field name="exchange_rate"/>
+                            <field name="company_amount"/>
+                            <field name="margin_percent"/>
+                            <field name="margin_amount"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                            <field name="last_shipment_date"/>
+                            <field name="shipment_mode"/>
+                        </group>
+                        <group>
+                            <field name="vessel_or_flight"/>
+                            <field name="bill_of_lading"/>
+                            <field name="etd"/>
+                            <field name="eta"/>
+                        </group>
+                    </group>
+                    <group string="Clearance">
+                        <field name="customs_declaration"/>
+                        <field name="customs_clearance_date"/>
+                        <field name="goods_release_date"/>
+                    </group>
+                    <notebook>
+                        <page string="Documents">
+                            <field name="document_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="document_type"/>
+                                    <field name="name"/>
+                                    <field name="received_date"/>
+                                    <field name="status"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_letter_credit_search" model="ir.ui.view">
+        <field name="name">ecs.letter.credit.search</field>
+        <field name="model">ecs.letter.credit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="bank_lc_number"/>
+                <field name="purchase_order_id"/>
+                <field name="supplier_id"/>
+                <filter name="active" string="Active" domain="[('state','=','active')]"/>
+                <filter name="expired" string="Expired" domain="[('state','=','expired')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_bank" string="Bank" context="{'group_by': 'bank_id'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_letter_credit" model="ir.actions.act_window">
+        <field name="name">Letters of Credit</field>
+        <field name="res_model">ecs.letter.credit</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ecs_letter_credit_search"/>
+    </record>
+</odoo>

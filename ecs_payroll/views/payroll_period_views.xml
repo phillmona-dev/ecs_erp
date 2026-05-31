@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_payroll_period_list" model="ir.ui.view">
+        <field name="name">ecs.payroll.period.list</field>
+        <field name="model">ecs.payroll.period</field>
+        <field name="arch" type="xml">
+            <list string="Payroll Periods" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="state" widget="badge"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_payroll_period_form" model="ir.ui.view">
+        <field name="name">ecs.payroll.period.form</field>
+        <field name="model">ecs.payroll.period</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Period">
+                <header>
+                    <button name="action_close" string="Close" type="object" invisible="state != 'open'"/>
+                    <button name="action_reopen" string="Reopen" type="object" invisible="state != 'closed'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ecs_payroll_period" model="ir.actions.act_window">
+        <field name="name">Payroll Periods</field>
+        <field name="res_model">ecs.payroll.period</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

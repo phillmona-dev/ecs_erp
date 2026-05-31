@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Approval Log — List View -->
+    <record id="view_ecs_approval_log_tree" model="ir.ui.view">
+        <field name="name">ecs.approval.log.tree</field>
+        <field name="model">ecs.approval.log</field>
+        <field name="arch" type="xml">
+            <list string="Approval History" create="false" delete="false" edit="false"
+                  decoration-success="action in ('approve','budget_approve')"
+                  decoration-danger="action == 'reject'"
+                  decoration-muted="action == 'cancel'">
+                <field name="action_date"/>
+                <field name="res_name" string="Document"/>
+                <field name="action"/>
+                <field name="level" string="Level"/>
+                <field name="user_id"/>
+                <field name="note"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Approval Log — Form View (read-only) -->
+    <record id="view_ecs_approval_log_form" model="ir.ui.view">
+        <field name="name">ecs.approval.log.form</field>
+        <field name="model">ecs.approval.log</field>
+        <field name="arch" type="xml">
+            <form string="Approval Log Entry" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="res_model"/>
+                            <field name="res_name"/>
+                            <field name="action"/>
+                            <field name="level"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="action_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note" nolabel="1" placeholder="Note or rejection reason..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Approval Log — Action -->
+    <record id="action_ecs_approval_log" model="ir.actions.act_window">
+        <field name="name">Approval History</field>
+        <field name="res_model">ecs.approval.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_boq_mgr,BOQ Manager,model_ecs_construction_boq,group_construction_manager,1,1,1,1
+access_boq_usr,BOQ User,model_ecs_construction_boq,group_construction_user,1,1,1,0
+access_boq_line_mgr,BOQ Line Manager,model_ecs_construction_boq_line,group_construction_manager,1,1,1,1
+access_boq_line_usr,BOQ Line User,model_ecs_construction_boq_line,group_construction_user,1,1,1,0
+access_contract_mgr,Contract Manager,model_ecs_construction_contract,group_construction_manager,1,1,1,1
+access_contract_usr,Contract User,model_ecs_construction_contract,group_construction_user,1,0,0,0
+access_progress_billing_mgr,Progress Billing Manager,model_ecs_progress_billing,group_construction_manager,1,1,1,1
+access_progress_billing_usr,Progress Billing User,model_ecs_progress_billing,group_construction_user,1,1,1,0
+access_progress_billing_line_mgr,Progress Billing Line Manager,model_ecs_progress_billing_line,group_construction_manager,1,1,1,1
+access_progress_billing_line_usr,Progress Billing Line User,model_ecs_progress_billing_line,group_construction_user,1,1,1,0

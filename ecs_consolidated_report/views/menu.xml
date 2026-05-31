@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu for Consolidated Reports -->
+    <menuitem id="menu_ecs_report_root"
+              name="ECS Reports"
+              sequence="90"
+              web_icon="account,static/description/icon.png"/>
+
+    <!-- Operations / Wizards -->
+    <menuitem id="menu_ecs_report_wizards"
+              name="Consolidated Wizards"
+              parent="menu_ecs_report_root"
+              sequence="10"/>
+
+    <menuitem id="menu_report_consolidated_pl"
+              name="Profit &amp; Loss"
+              parent="menu_ecs_report_wizards"
+              action="action_consolidated_pl"
+              sequence="10"/>
+
+    <menuitem id="menu_report_consolidated_cash"
+              name="Cash &amp; Bank Position"
+              parent="menu_ecs_report_wizards"
+              action="action_consolidated_cash_position"
+              sequence="20"/>
+
+    <menuitem id="menu_report_kpi_dashboard"
+              name="KPI Summary Dashboard"
+              parent="menu_ecs_report_wizards"
+              action="action_kpi_dashboard"
+              sequence="30"/>
+</odoo>
