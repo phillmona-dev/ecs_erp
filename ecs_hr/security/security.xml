@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_hr_division_company" model="ir.rule">
+        <field name="name">HR Division: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_hr_division"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_attendance_report_company" model="ir.rule">
+        <field name="name">Attendance Report: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_hr_attendance_report"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_overtime_report_company" model="ir.rule">
+        <field name="name">Overtime Report: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_hr_overtime_report"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_headcount_company" model="ir.rule">
+        <field name="name">Headcount Request: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_hr_headcount_request"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_hr_letter_company" model="ir.rule">
+        <field name="name">HR Letter: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_hr_letter"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_overtime_self_service_own" model="ir.rule">
+        <field name="name">Overtime: Self Service Own Records</field>
+        <field name="model_id" ref="model_ecs_hr_overtime_report"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('ecs_approvals.group_ecs_self_service'))]"/>
+    </record>
+
+    <record id="rule_headcount_self_service_own" model="ir.rule">
+        <field name="name">Headcount: Self Service Own Records</field>
+        <field name="model_id" ref="model_ecs_hr_headcount_request"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('ecs_approvals.group_ecs_self_service'))]"/>
+    </record>
+</odoo>

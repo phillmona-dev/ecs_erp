@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_consolidated_pl,Consolidated PL,model_ecs_consolidated_pl,,1,1,1,1
+access_consolidated_pl_line,Consolidated PL Line,model_ecs_consolidated_pl_line,,1,1,1,1
+access_consolidated_cash_position,Consolidated Cash Position,model_ecs_consolidated_cash_position,,1,1,1,1
+access_consolidated_cash_position_line,Consolidated Cash Position Line,model_ecs_consolidated_cash_position_line,,1,1,1,1
+access_kpi_dashboard,ECS KPI Dashboard,model_ecs_kpi_dashboard,,1,1,1,1

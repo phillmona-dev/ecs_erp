@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── HR Employee: ECS payroll fields ── -->
+    <record id="view_employee_form_ecs_payroll" model="ir.ui.view">
+        <field name="name">hr.employee.form.ecs.payroll</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Add allowance fields under the payroll information page -->
+            <xpath expr="//page[@name='payroll_information']/group[@name='payroll_group']" position="inside">
+                <group string="ECS Allowances" col="3">
+                    <field name="housing_allowance"/>
+                    <field name="transport_allowance"/>
+                    <field name="representation_allowance"/>
+                    <field name="fuel_allowance"/>
+                    <field name="acting_allowance"/>
+                    <field name="telephone_allowance"/>
+                    <field name="sales_commission"/>
+                </group>
+                <group string="Options">
+                    <field name="pension_contribution"/>
+                    <field name="is_sales_employee"/>
+                    <field name="uses_canteen"/>
+                    <field name="has_company_vehicle"/>
+                    <field name="paid_by_usd"/>
+                    <field name="payroll_input_type_ids" widget="many2many_tags"/>
+                </group>
+                <group string="Recurring Payments and Deductions" colspan="2">
+                    <field name="recurring_input_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="input_category"/>
+                            <field name="input_type_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="amount"/>
+                            <field name="total_amount"/>
+                            <field name="remaining_amount" readonly="1"/>
+                        </list>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

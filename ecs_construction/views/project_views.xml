@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_project_form_ecs_construction" model="ir.ui.view">
+        <field name="name">project.project.form.ecs.construction</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="foreman_id"/>
+                <field name="engineer_id"/>
+                <field name="warehouse_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

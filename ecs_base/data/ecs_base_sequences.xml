@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        ECS Base — Pre-defined sequences.
+        Each module/company creates its own sequences dynamically via
+        EcsSequenceService._create_sequence(). These XML sequences are
+        only fallback/reference entries.
+    -->
+
+    <!-- Employee sequence template (used by ecs_hr) -->
+    <record id="seq_ecs_employee" model="ir.sequence">
+        <field name="name">ECS Employee ID</field>
+        <field name="code">ecs.seq.emp</field>
+        <field name="prefix">EMP/</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+        <field name="number_next">1</field>
+        <field name="implementation">no_gap</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

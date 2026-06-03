@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cash Receipt Voucher (CRV) Report -->
+    <template id="report_crv_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <div class="row">
+                    <div class="col-6"><h2>Cash Receipt Voucher</h2></div>
+                    <div class="col-6 text-end">
+                        <strong>CRV No: </strong><t t-esc="o.crv_number or o.name"/><br/>
+                        <strong>Date: </strong>
+                        <t t-esc="o.crv_date or o.invoice_date"
+                           t-options="{'widget': 'date'}"/>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <strong>Received From:</strong>
+                        <t t-esc="o.partner_id.name"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Amount:</strong>
+                        <t t-esc="o.amount_total"
+                           t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <strong>Amount in Words:</strong>
+                        <t t-esc="o.amount_in_words"/>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <strong>Being Payment For:</strong>
+                        <t t-esc="o.narration or o.ref or ''"/>
+                    </div>
+                </div>
+                <hr class="mt-5"/>
+                <div class="row mt-5">
+                    <div class="col-4 text-center">
+                        <div class="border-top mt-5 pt-1">Cashier</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="border-top mt-5 pt-1">Finance Officer</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="border-top mt-5 pt-1">Received By</div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <record id="action_report_crv" model="ir.actions.report">
+        <field name="name">Cash Receipt Voucher</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ecs_finance.report_crv_document</field>
+        <field name="report_file">ecs_finance.report_crv_document</field>
+        <field name="print_report_name">'CRV - %s' % (object.crv_number or object.name)</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

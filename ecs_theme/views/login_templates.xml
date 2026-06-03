@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ECS THEME — Premium Mocha/Amber Grid Login Layout Override
+         Replaces standard layout with mocha grid background, header bar,
+         and elegant split content panels matching the requested layout.
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <record id="ecs_login_layout" model="ir.ui.view">
+        <field name="name">ECS Login Layout</field>
+        <field name="inherit_id" ref="web.login_layout"/>
+        <field name="mode">extension</field>
+        <field name="arch" type="xml">
+            <xpath expr="//t[@t-call='web.frontend_layout']" position="replace">
+                <t t-call="web.frontend_layout">
+                    <t t-set="html_data" t-value="{'style': 'height:100%; overflow:hidden;'}"/>
+                    <t t-set="body_classname" t-value="'ecs-login-body'"/>
+                    <t t-set="no_header" t-value="True"/>
+                    <t t-set="no_footer" t-value="True"/>
+
+                    <!-- ── Warm Grid Background ────────────────────────── -->
+                    <div class="ecs-bg">
+                        <div class="ecs-bg-grid"/>
+                        <div class="ecs-bg-glow"/>
+                        <div class="ecs-bg-glow-left"/>
+                        <div class="ecs-bg-glow-card"/>
+                    </div>
+
+                    <!-- ── Navigation Header Bar ───────────────────────── -->
+                    <header class="ecs-header-bar">
+                        <div class="ecs-header-left">
+                            <a href="/" class="ecs-home-btn">
+                                <i class="fa fa-arrow-left" aria-hidden="true"/>
+                                <span>Home</span>
+                            </a>
+                            <div class="ecs-header-logo-group">
+                                <div class="ecs-header-logo-circle">E</div>
+                                <div class="ecs-header-logo-text">
+                                    <div class="ecs-logo-title">ECS Enterprise</div>
+                                    <div class="ecs-logo-subtitle">Access your workspace</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ecs-header-right">
+                            <button type="button" class="ecs-header-icon-btn" aria-label="Translate">
+                                <i class="fa fa-language" aria-hidden="true"/>
+                            </button>
+                            <button type="button" class="ecs-header-icon-btn" aria-label="Theme toggle">
+                                <i class="fa fa-sun-o" aria-hidden="true"/>
+                            </button>
+                        </div>
+                    </header>
+
+                    <!-- ── Main Grid Layout ─────────────────────────────── -->
+                    <div class="ecs-layout">
+
+                        <!-- LEFT PANEL — Premium Taglines -->
+                        <div class="ecs-brand-panel" aria-hidden="true">
+                            <div class="ecs-brand-inner">
+                                <div class="ecs-badge">
+                                    <span>Frictionless Enterprise</span>
+                                </div>
+                                <h1 class="ecs-brand-title">
+                                    Operations, finance, and logistics in one premium experience.
+                                </h1>
+                                <p class="ecs-brand-tagline">
+                                    Departments collaborate faster, managers stay in control, and executives finally get a clean operational view of the business.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT PANEL — Mocha Login Card -->
+                        <div class="ecs-form-panel">
+                            <div class="ecs-glass-card" role="main">
+
+                                <!-- Welcome copy -->
+                                <div class="ecs-card-header">
+                                    <h2 class="ecs-card-title">Welcome back</h2>
+                                    <p class="ecs-card-subtitle">Sign in with your username and password.</p>
+                                </div>
+
+                                <!-- Error / Message alerts -->
+                                <div t-if="error" class="ecs-alert ecs-alert-danger" role="alert">
+                                    <i class="fa fa-exclamation-circle" aria-hidden="true"/>
+                                    <span><t t-esc="error"/></span>
+                                </div>
+                                <div t-if="message" class="ecs-alert ecs-alert-success" role="status">
+                                    <i class="fa fa-check-circle" aria-hidden="true"/>
+                                    <span><t t-esc="message"/></span>
+                                </div>
+
+                                <!-- Login form — action/auth logic UNCHANGED -->
+                                <t t-out="0"/>
+
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ECS THEME — Premium Login Form Override
+         Explicitly defined as extension mode view to guarantee global loading.
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <record id="ecs_login" model="ir.ui.view">
+        <field name="name">ECS Login Form</field>
+        <field name="inherit_id" ref="web.login"/>
+        <field name="mode">extension</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="replace">
+                <form t-attf-class="oe_login_form ecs-login-form #{'' if login else 'd-none'}"
+                      role="form"
+                      t-attf-action="/web/login"
+                      method="post"
+                      onsubmit="this.action = '/web/login' + location.hash"
+                      novalidate="novalidate">
+
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                    <!-- Database selector (multi-db) -->
+                    <div class="ecs-field-group" t-if="databases and len(databases) > 1">
+                        <label for="db" class="ecs-label">Database</label>
+                        <div class="ecs-input-row">
+                            <input type="text" name="db" t-att-value="request.db"
+                                   id="db" class="ecs-input" required="required" readonly="readonly"/>
+                            <a role="button" href="/web/database/selector" class="ecs-db-btn"
+                               aria-label="Select database">
+                                <i class="fa fa-database" aria-hidden="true"/>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Email field -->
+                    <div class="ecs-field-group">
+                        <label for="login" class="ecs-label">Username</label>
+                        <div class="ecs-input-wrapper">
+                            <input type="text"
+                                   placeholder="Email or Username"
+                                   name="login"
+                                   t-att-value="login"
+                                   id="login"
+                                   class="ecs-input"
+                                   required="required"
+                                   autocapitalize="off"
+                                   autocomplete="username"/>
+                        </div>
+                    </div>
+
+                    <!-- Password field with eye icon toggle -->
+                    <div class="ecs-field-group">
+                        <label for="password" class="ecs-label">Password</label>
+                        <div class="ecs-input-wrapper">
+                            <input type="password"
+                                   placeholder="Password"
+                                   name="password"
+                                   id="password"
+                                   class="ecs-input ecs-input-right-padding"
+                                   required="required"
+                                   autocomplete="current-password"
+                                   t-att-autofocus="'autofocus' if login else None"
+                                   maxlength="4096"/>
+                            <button type="button"
+                                    class="ecs-pw-toggle"
+                                    id="ecs-pw-toggle"
+                                    aria-label="Show or hide password"
+                                    tabindex="-1">
+                                <i class="fa fa-eye" id="ecs-pw-icon" aria-hidden="true"/>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submit button -->
+                    <div class="ecs-submit-group">
+                        <button type="submit" class="ecs-btn-signin" id="ecs-signin-btn">
+                            <span class="ecs-btn-text">Sign in</span>
+                            <span class="ecs-btn-loader" aria-hidden="true">
+                                <span/><span/><span/>
+                            </span>
+                            <i class="fa fa-sign-in ecs-btn-arrow" aria-hidden="true"/>
+                        </button>
+                        <t t-if="debug">
+                            <button type="submit" name="redirect" value="/web/become"
+                                    class="ecs-btn-superuser">
+                                Sign in as superuser
+                            </button>
+                        </t>
+                        <div class="o_login_auth"/>
+                    </div>
+
+                    <!-- Continue with social layout -->
+                    <div class="ecs-social-divider">
+                        <span>or continue with</span>
+                    </div>
+
+                    <div class="ecs-social-row">
+                        <button type="button" class="ecs-social-btn">
+                            <i class="fa fa-google" aria-hidden="true"/>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" class="ecs-social-btn">
+                            <i class="fa fa-facebook" aria-hidden="true"/>
+                            <span>Facebook</span>
+                        </button>
+                    </div>
+
+                    <!-- Bottom helper links -->
+                    <div class="ecs-card-footer">
+                        <a href="#" class="ecs-footer-link">Forgot password?</a>
+                        <a href="#" class="ecs-footer-link ecs-link-highlight">New here? Create account</a>
+                    </div>
+
+                    <input type="hidden" name="type" value="password"/>
+                    <input type="hidden" name="redirect" t-att-value="redirect"/>
+                </form>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

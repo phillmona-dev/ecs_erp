@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_payroll_variable_input_list" model="ir.ui.view">
+        <field name="name">ecs.payroll.variable.input.list</field>
+        <field name="model">ecs.payroll.variable.input</field>
+        <field name="arch" type="xml">
+            <list string="Variable Payroll Inputs" decoration-success="state == 'paid'">
+                <field name="employee_id"/>
+                <field name="division_id"/>
+                <field name="period_id"/>
+                <field name="input_type_id"/>
+                <field name="amount"/>
+                <field name="state" widget="badge"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_payroll_variable_input_form" model="ir.ui.view">
+        <field name="name">ecs.payroll.variable.input.form</field>
+        <field name="model">ecs.payroll.variable.input</field>
+        <field name="arch" type="xml">
+            <form string="Variable Payroll Input">
+                <header>
+                    <button name="action_approve" string="Approve" type="object" invisible="state != 'draft'"/>
+                    <button name="action_mark_paid" string="Mark Paid" type="object" invisible="state != 'approved'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('paid','cancelled')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="employee_id"/>
+                            <field name="division_id" readonly="1"/>
+                            <field name="period_id"/>
+                        </group>
+                        <group>
+                            <field name="input_type_id"/>
+                            <field name="amount"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="note" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_payroll_variable_input_search" model="ir.ui.view">
+        <field name="name">ecs.payroll.variable.input.search</field>
+        <field name="model">ecs.payroll.variable.input</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="period_id"/>
+                <field name="input_type_id"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="paid" string="Paid" domain="[('state', '=', 'paid')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_payroll_variable_input" model="ir.actions.act_window">
+        <field name="name">Variable Payroll Inputs</field>
+        <field name="res_model">ecs.payroll.variable.input</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ecs_payroll_variable_input_search"/>
+        <field name="context">{'search_default_draft': 1}</field>
+    </record>
+</odoo>

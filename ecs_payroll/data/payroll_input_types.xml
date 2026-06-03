@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="input_type_ecs_bonus" model="ecs.payroll.input.type">
+        <field name="name">Bonus</field>
+        <field name="code">BONUS</field>
+    </record>
+    <record id="input_type_ecs_commission" model="ecs.payroll.input.type">
+        <field name="name">Commission</field>
+        <field name="code">COMM</field>
+    </record>
+    <record id="input_type_ecs_overtime" model="ecs.payroll.input.type">
+        <field name="name">Overtime</field>
+        <field name="code">OT</field>
+    </record>
+    <record id="input_type_ecs_other_payment" model="ecs.payroll.input.type">
+        <field name="name">Other Payment</field>
+        <field name="code">OTHPAY</field>
+    </record>
+    <record id="input_type_ecs_canteen" model="ecs.payroll.input.type">
+        <field name="name">Canteen Deduction</field>
+        <field name="code">CANDED</field>
+    </record>
+    <record id="input_type_ecs_loan" model="ecs.payroll.input.type">
+        <field name="name">Loan Deduction</field>
+        <field name="code">LOAN</field>
+    </record>
+    <record id="input_type_ecs_fuel" model="ecs.payroll.input.type">
+        <field name="name">Fuel Deduction</field>
+        <field name="code">FUEL</field>
+    </record>
+    <record id="input_type_ecs_mobile_card" model="ecs.payroll.input.type">
+        <field name="name">Mobile Card</field>
+        <field name="code">MOBCAR</field>
+    </record>
+    <record id="input_type_ecs_sacco_registration" model="ecs.payroll.input.type">
+        <field name="name">SACCO Registration</field>
+        <field name="code">SACOREG</field>
+    </record>
+    <record id="input_type_ecs_sacco_saving" model="ecs.payroll.input.type">
+        <field name="name">SACCO Saving</field>
+        <field name="code">SACOSAV</field>
+    </record>
+    <record id="input_type_ecs_sacco_additional" model="ecs.payroll.input.type">
+        <field name="name">SACCO Additional Saving</field>
+        <field name="code">SACOSAVAD</field>
+    </record>
+    <record id="input_type_ecs_sacco_share" model="ecs.payroll.input.type">
+        <field name="name">SACCO Share Payment</field>
+        <field name="code">SACOSHA</field>
+    </record>
+    <record id="input_type_ecs_sacco_payment" model="ecs.payroll.input.type">
+        <field name="name">SACCO Loan Payment</field>
+        <field name="code">SACOPAY</field>
+    </record>
+    <record id="input_type_ecs_edir" model="ecs.payroll.input.type">
+        <field name="name">Edir</field>
+        <field name="code">EDIR</field>
+    </record>
+    <record id="input_type_ecs_edir_registration" model="ecs.payroll.input.type">
+        <field name="name">Edir Registration</field>
+        <field name="code">EDIRR</field>
+    </record>
+    <record id="input_type_ecs_cost_sharing" model="ecs.payroll.input.type">
+        <field name="name">Cost Sharing</field>
+        <field name="code">COSTSHA</field>
+    </record>
+    <record id="input_type_ecs_sport_contribution" model="ecs.payroll.input.type">
+        <field name="name">Sport Contribution</field>
+        <field name="code">SPOCONT</field>
+    </record>
+    <record id="input_type_ecs_other_deduction" model="ecs.payroll.input.type">
+        <field name="name">Other Deduction</field>
+        <field name="code">OTHDED</field>
+    </record>
+</odoo>

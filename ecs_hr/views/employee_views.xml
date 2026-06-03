@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Employee form inherit — add ECS fields ─────────────────── -->
+    <record id="view_employee_ecs_form" model="ir.ui.view">
+        <field name="name">hr.employee.ecs.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Employee ID and Amharic Name at the top -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="employee_code" readonly="1"
+                       invisible="not employee_code"/>
+                <field name="amharic_name" placeholder="ስም በአማርኛ"/>
+            </xpath>
+            <!-- Add Ethiopian HR fields in Private Info tab -->
+            <xpath expr="//page[@name='personal_information']//group[1]" position="inside">
+                <field name="tin_no"/>
+                <field name="pension_no"/>
+                <field name="hire_date"/>
+                <field name="retire_date" readonly="1"/>
+                <field name="years_of_service" readonly="1" widget="float_time"/>
+                <field name="division_id"
+                       domain="[('company_id','=',company_id)]"/>
+            </xpath>
+            <!-- Bank details -->
+            <xpath expr="//page[@name='personal_information']//group[2]" position="inside">
+                <field name="bank_name"/>
+                <field name="bank_account_no"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Employee list inherit — show employee code ─────────────── -->
+    <record id="view_employee_ecs_tree" model="ir.ui.view">
+        <field name="name">hr.employee.ecs.tree</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="employee_code" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="division_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

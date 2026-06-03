@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ECS Base top-level menu (hidden — child menus appear in each company app) -->
+    <menuitem id="menu_ecs_base_root"
+              name="ECS Administration"
+              sequence="100"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_ecs_approval_log"
+              name="Approval History"
+              parent="menu_ecs_base_root"
+              action="action_ecs_approval_log"
+              sequence="10"
+              groups="base.group_system"/>
+</odoo>

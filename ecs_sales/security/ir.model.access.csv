@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ecs_sales_discount_rule_manager,Discount Rule Manager,ecs_sales.model_ecs_sales_discount_rule,ecs_sales.group_sales_manager,1,1,1,1
+access_ecs_sales_discount_rule_user,Discount Rule User,ecs_sales.model_ecs_sales_discount_rule,ecs_sales.group_sales_user,1,0,0,0
+access_ecs_sales_discount_rule_public,Discount Rule Public,ecs_sales.model_ecs_sales_discount_rule,base.group_user,1,0,0,0

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_consolidated_pl_form" model="ir.ui.view">
+        <field name="name">ecs.consolidated.pl.form</field>
+        <field name="model">ecs.consolidated.pl</field>
+        <field name="arch" type="xml">
+            <form string="Consolidated Profit &amp; Loss">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Consolidated Profit &amp; Loss</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="company_currency_id"/>
+                            <field name="company_ids" widget="many2many_tags" placeholder="All Companies"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_generate_report" string="Generate Report" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                    <notebook invisible="not line_ids">
+                        <page string="P&amp;L by Company" name="pl_lines">
+                            <field name="line_ids">
+                                <list readonly="1">
+                                    <field name="company_id"/>
+                                    <field name="revenue"/>
+                                    <field name="expense"/>
+                                    <field name="net_profit" class="fw-bold"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="total_revenue"/>
+                                <field name="total_expense"/>
+                                <field name="net_profit" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_consolidated_pl" model="ir.actions.act_window">
+        <field name="name">Consolidated Profit &amp; Loss</field>
+        <field name="res_model">ecs.consolidated.pl</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

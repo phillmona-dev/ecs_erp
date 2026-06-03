@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_payroll_period_company" model="ir.rule">
+        <field name="name">Payroll Period: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_payroll_period"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_payroll_rate_company" model="ir.rule">
+        <field name="name">Payroll Rate: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_payroll_rate"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_payroll_tax_bracket_company" model="ir.rule">
+        <field name="name">Payroll Tax Bracket: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_payroll_tax_bracket"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_recurring_input_company" model="ir.rule">
+        <field name="name">Recurring Payroll Input: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_payroll_recurring_input"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_variable_input_company" model="ir.rule">
+        <field name="name">Variable Payroll Input: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_payroll_variable_input"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Account Move: Inherit form to add ECS fields ────────────── -->
+    <record id="view_account_move_ecs_form" model="ir.ui.view">
+        <field name="name">account.move.ecs.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Add transaction type and number after the reference field -->
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="transaction_type_id"
+                       invisible="move_type not in ('entry','in_invoice','in_receipt')"
+                       domain="[('company_id','=',company_id)]"/>
+                <field name="transaction_no" readonly="1"
+                       invisible="not transaction_no"/>
+            </xpath>
+            <!-- Add withholding status in the info area -->
+            <xpath expr="//field[@name='payment_state']" position="after">
+                <field name="withholding_state" widget="badge"
+                       decoration-info="withholding_state == 'pending'"
+                       decoration-success="withholding_state == 'done'"
+                       invisible="withholding_state == 'not_applicable'"/>
+                <field name="withholding_amount"
+                       invisible="withholding_state not in ('pending','done')"/>
+            </xpath>
+            <!-- Amount in words at bottom of form -->
+            <xpath expr="//field[@name='narration']" position="before">
+                <field name="amount_in_words" readonly="1"
+                       invisible="not amount_in_words"
+                       string="Amount in Words"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Withholding buttons in action menu -->
+    <record id="view_account_move_ecs_buttons" model="ir.ui.view">
+        <field name="name">account.move.ecs.buttons</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[last()]" position="after">
+                <button name="action_compute_withholding"
+                        string="Compute Withholding" type="object"
+                        class="btn-secondary"
+                        invisible="state != 'posted' or move_type not in ('in_invoice','in_receipt') or withholding_state != 'not_applicable'"
+                        groups="ecs_approvals.group_ecs_finance_user,ecs_approvals.group_ecs_finance_manager"/>
+                <button name="action_post_withholding_entry"
+                        string="Post Withholding Entry" type="object"
+                        class="btn-warning"
+                        invisible="withholding_state != 'pending'"
+                        groups="ecs_approvals.group_ecs_finance_user,ecs_approvals.group_ecs_finance_manager"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ecs_approvals"
+              name="Approvals &amp; Companies"
+              parent="ecs_base.menu_ecs_base_root"
+              sequence="5"
+              groups="ecs_approvals.group_ecs_company_manager,ecs_approvals.group_ecs_owner,base.group_system"/>
+
+    <menuitem id="menu_ecs_company_profiles"
+              name="Company Profiles"
+              parent="menu_ecs_approvals"
+              action="action_ecs_company_profile"
+              sequence="10"
+              groups="ecs_approvals.group_ecs_company_manager,ecs_approvals.group_ecs_owner,base.group_system"/>
+</odoo>

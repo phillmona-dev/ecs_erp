@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_overtime_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2 class="text-center">Overtime Report</h2>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <strong>Reference:</strong> <t t-esc="o.name"/><br/>
+                        <strong>Employee:</strong> <t t-esc="o.employee_id.name"/><br/>
+                        <strong>Department:</strong> <t t-esc="o.department_id.name or '-'"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Date:</strong>
+                        <t t-esc="o.date" t-options="{'widget': 'date'}"/><br/>
+                        <strong>Overtime Hours:</strong> <t t-esc="'%.2f' % o.overtime_hours"/> hrs<br/>
+                        <strong>Status:</strong> <t t-esc="o.state"/>
+                    </div>
+                </div>
+                <hr/>
+                <p><strong>Reason / Work Done:</strong></p>
+                <p><t t-esc="o.reason"/></p>
+                <hr class="mt-5"/>
+                <div class="row mt-5">
+                    <div class="col-4 text-center">
+                        <div class="border-top mt-5 pt-1">Employee</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="border-top mt-5 pt-1">Direct Manager</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="border-top mt-5 pt-1">HR Manager</div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <record id="action_report_overtime" model="ir.actions.report">
+        <field name="name">Overtime Report</field>
+        <field name="model">ecs.hr.overtime.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ecs_hr.report_overtime_document</field>
+        <field name="report_file">ecs_hr.report_overtime_document</field>
+        <field name="print_report_name">'Overtime - %s - %s' % (object.employee_id.name, object.date)</field>
+        <field name="binding_model_id" ref="model_ecs_hr_overtime_report"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
