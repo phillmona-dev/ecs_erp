@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_project_project_ecs_company" model="ir.rule">
+        <field name="name">ECS projects multi-company</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

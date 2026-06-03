@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_inventory_transaction_type_list" model="ir.ui.view">
+        <field name="name">ecs.inventory.transaction.type.list</field>
+        <field name="model">ecs.inventory.transaction.type</field>
+        <field name="arch" type="xml">
+            <list string="Inventory Transaction Types">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="source_usage"/>
+                <field name="destination_usage"/>
+                <field name="picking_type_id"/>
+                <field name="requires_lot"/>
+                <field name="affects_valuation"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_inventory_transaction_type_form" model="ir.ui.view">
+        <field name="name">ecs.inventory.transaction.type.form</field>
+        <field name="model">ecs.inventory.transaction.type</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Transaction Type">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="operation_type"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="picking_type_id"/>
+                            <field name="source_usage"/>
+                            <field name="destination_usage"/>
+                            <field name="requires_lot"/>
+                            <field name="affects_valuation"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_inventory_transaction_type_search" model="ir.ui.view">
+        <field name="name">ecs.inventory.transaction.type.search</field>
+        <field name="model">ecs.inventory.transaction.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <separator/>
+                    <filter name="group_operation_type" string="Operation Type" context="{'group_by': 'operation_type'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_inventory_transaction_type" model="ir.actions.act_window">
+        <field name="name">Transaction Types</field>
+        <field name="res_model">ecs.inventory.transaction.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ecs_inventory_transaction_type_search"/>
+    </record>
+</odoo>

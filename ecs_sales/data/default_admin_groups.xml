@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <function model="res.users" name="write">
+        <value model="res.users" search="[('id', '=', ref('base.user_admin'))]"/>
+        <value eval="{
+            'group_ids': [(4, ref('ecs_sales.group_sales_manager'))],
+        }"/>
+    </function>
+</odoo>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_dashboard_form" model="ir.ui.view">
+        <field name="name">ecs.kpi.dashboard.form</field>
+        <field name="model">ecs.kpi.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Executive KPI Summary">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Executive KPI Summary Dashboard</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_currency_id"/>
+                        </group>
+                        <group>
+                            <field name="company_ids" widget="many2many_tags" placeholder="All Companies"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_calculate_kpis" string="Refresh Metrics" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                    <group string="Procurement KPIs">
+                        <group>
+                            <field name="avg_pr_to_po_lead_time"/>
+                            <field name="pending_pr_count"/>
+                        </group>
+                        <group>
+                            <field name="open_rfq_count"/>
+                        </group>
+                    </group>
+                    <group string="HR &amp; Payroll KPIs">
+                        <group>
+                            <field name="total_headcount"/>
+                        </group>
+                        <group>
+                            <field name="monthly_payroll_cost"/>
+                            <field name="avg_overtime_hours"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_kpi_dashboard" model="ir.actions.act_window">
+        <field name="name">Executive KPI Summary</field>
+        <field name="res_model">ecs.kpi.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

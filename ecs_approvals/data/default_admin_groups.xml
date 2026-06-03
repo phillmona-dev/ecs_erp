@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <function model="res.users" name="write">
+        <value model="res.users" search="[('id', '=', ref('base.user_admin'))]"/>
+        <value eval="{
+            'group_ids': [
+                (4, ref('ecs_approvals.group_ecs_owner')),
+                (4, ref('ecs_approvals.group_ecs_company_manager')),
+                (4, ref('ecs_approvals.group_ecs_finance_manager')),
+                (4, ref('ecs_approvals.group_ecs_finance_controller')),
+                (4, ref('ecs_approvals.group_ecs_hr_manager')),
+                (4, ref('ecs_approvals.group_ecs_payroll_manager')),
+                (4, ref('ecs_approvals.group_ecs_procurement_manager')),
+                (4, ref('ecs_approvals.group_ecs_inventory_manager')),
+                (4, ref('ecs_approvals.group_ecs_sales_manager')),
+                (4, ref('ecs_approvals.group_ecs_project_manager')),
+                (4, ref('ecs_approvals.group_ecs_auditor')),
+                (4, ref('ecs_approvals.group_ecs_self_service')),
+            ],
+        }"/>
+    </function>
+</odoo>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_overtime_tree" model="ir.ui.view">
+        <field name="name">ecs.hr.overtime.report.tree</field>
+        <field name="model">ecs.hr.overtime.report</field>
+        <field name="arch" type="xml">
+            <list string="Overtime Reports"
+                  decoration-info="state == 'submitted'"
+                  decoration-success="state == 'approved'"
+                  decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="overtime_hours" string="OT Hours"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'submitted'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_overtime_form" model="ir.ui.view">
+        <field name="name">ecs.hr.overtime.report.form</field>
+        <field name="model">ecs.hr.overtime.report</field>
+        <field name="arch" type="xml">
+            <form string="Overtime Report">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success"
+                            invisible="state not in ('submitted','verified')"
+                            groups="ecs_approvals.group_ecs_hr_manager,ecs_approvals.group_ecs_hr_user"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            class="btn-danger"
+                            invisible="state not in ('submitted','verified')"
+                            groups="ecs_approvals.group_ecs_hr_manager,ecs_approvals.group_ecs_hr_user"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('approved','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="employee_id"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="overtime_hours"/>
+                            <field name="attendance_id"/>
+                        </group>
+                    </group>
+                    <group string="Reason / Work Done">
+                        <field name="reason" nolabel="1" placeholder="Describe the work performed during overtime..."/>
+                    </group>
+                    <notebook>
+                        <page string="Approval History">
+                            <field name="approval_log_ids" readonly="1">
+                                <list create="false" delete="false">
+                                    <field name="action_date"/>
+                                    <field name="action"/>
+                                    <field name="user_id"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_overtime_report" model="ir.actions.act_window">
+        <field name="name">Overtime Reports</field>
+        <field name="res_model">ecs.hr.overtime.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('company_id', 'in', allowed_company_ids)]</field>
+    </record>
+
+    <record id="action_my_overtime" model="ir.actions.act_window">
+        <field name="name">My Overtime Reports</field>
+        <field name="res_model">ecs.hr.overtime.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id','=',uid)]</field>
+    </record>
+</odoo>

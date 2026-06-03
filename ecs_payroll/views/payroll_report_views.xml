@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_payroll_report_wizard_form" model="ir.ui.view">
+        <field name="name">ecs.payroll.report.wizard.form</field>
+        <field name="model">ecs.payroll.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Report">
+                <group>
+                    <group>
+                        <field name="report_type"/>
+                        <field name="batch_id"/>
+                        <field name="period_id"/>
+                    </group>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="division_id"/>
+                        <field name="filename" invisible="1"/>
+                        <field name="fileout" invisible="1"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate_xlsx" string="Generate XLSX" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ecs_payroll_report_wizard" model="ir.actions.act_window">
+        <field name="name">Payroll Reports</field>
+        <field name="res_model">ecs.payroll.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_ecs_payroll_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

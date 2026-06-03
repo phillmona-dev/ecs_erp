@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_ecs_purchase_request_company" model="ir.rule">
+        <field name="name">ECS Purchase Request: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_purchase_request"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_purchase_request_line_company" model="ir.rule">
+        <field name="name">ECS Purchase Request Line: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_purchase_request_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_purchase_rfq_company" model="ir.rule">
+        <field name="name">ECS RFQ: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_purchase_rfq"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_purchase_rfq_quote_line_company" model="ir.rule">
+        <field name="name">ECS RFQ Quote Line: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_purchase_rfq_quote_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_foreign_currency_request_company" model="ir.rule">
+        <field name="name">ECS Foreign Currency Request: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_foreign_currency_request"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_letter_credit_company" model="ir.rule">
+        <field name="name">ECS Letter of Credit: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_letter_credit"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_import_document_line_company" model="ir.rule">
+        <field name="name">ECS Import Document Line: Company Isolation</field>
+        <field name="model_id" ref="model_ecs_import_document_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

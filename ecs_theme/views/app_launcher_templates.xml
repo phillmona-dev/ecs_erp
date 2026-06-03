@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="ecs_app_launcher" name="ECS App Launcher">
+        <t t-call="web.frontend_layout">
+            <t t-set="html_data" t-value="{'style': 'height:100%;'}"/>
+            <t t-set="body_classname" t-value="'ecs-login-body ecs-apps-body'"/>
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+
+            <div class="ecs-bg">
+                <div class="ecs-bg-grid"/>
+                <div class="ecs-bg-glow"/>
+                <div class="ecs-bg-glow-left"/>
+                <div class="ecs-bg-glow-card"/>
+            </div>
+
+            <header class="ecs-header-bar ecs-apps-header">
+                <div class="ecs-header-left">
+                    <div class="ecs-header-logo-group">
+                        <div class="ecs-header-logo-circle">E</div>
+                        <div class="ecs-header-logo-text">
+                            <div class="ecs-logo-title">ECS Enterprise</div>
+                            <div class="ecs-logo-subtitle" t-esc="header_subtitle"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="ecs-header-right">
+                    <a t-att-href="primary_url" class="ecs-home-btn ecs-back-btn">
+                        <span t-esc="primary_label"/>
+                    </a>
+                    <a href="/web/session/logout?redirect=/web/login" class="ecs-home-btn">
+                        <span>Sign out</span>
+                    </a>
+                </div>
+            </header>
+
+            <main class="ecs-apps-shell">
+                <section class="ecs-apps-hero">
+                    <div>
+                        <div class="ecs-badge">
+                            <span t-esc="badge"/>
+                        </div>
+                        <h1 class="ecs-apps-title" t-esc="title"/>
+                        <p class="ecs-apps-subtitle" t-esc="subtitle"/>
+                    </div>
+                    <div class="ecs-apps-stat">
+                        <span t-esc="app_count"/>
+                        <small t-esc="stat_label"/>
+                    </div>
+                </section>
+
+                <section class="ecs-search-panel" t-if="apps" t-att-data-total="app_count">
+                    <div class="ecs-search-row">
+                        <div class="ecs-search-box">
+                            <i class="fa fa-search" aria-hidden="true"/>
+                            <input id="ecs-app-search"
+                                   type="search"
+                                   placeholder="Search apps, modules, menus, or models..."
+                                   autocomplete="off"
+                                   aria-label="Search applications"/>
+                            <button type="button"
+                                    class="ecs-search-clear"
+                                    id="ecs-app-search-clear"
+                                    aria-label="Clear search">
+                                <i class="fa fa-times" aria-hidden="true"/>
+                            </button>
+                            <span class="ecs-search-shortcut">/</span>
+                        </div>
+                        <div class="ecs-search-meta">
+                            <strong id="ecs-visible-count" t-esc="app_count"/>
+                            <span>shown</span>
+                        </div>
+                    </div>
+
+                    <div class="ecs-filter-row" aria-label="Application filters">
+                        <t t-foreach="filter_options" t-as="filter_option">
+                            <button type="button"
+                                    t-att-class="'ecs-filter-chip%s' % (' is-active' if filter_option['value'] == 'all' else '')"
+                                    t-att-data-filter="filter_option['value']">
+                                <span t-esc="filter_option['label']"/>
+                            </button>
+                        </t>
+                    </div>
+                </section>
+
+                <section class="ecs-apps-grid" t-if="apps" id="ecs-app-grid">
+                    <t t-foreach="apps" t-as="app">
+                        <a t-att-href="app['url']"
+                           class="ecs-app-card"
+                           t-att-data-category="app['category']"
+                           t-att-data-search="'%s %s %s %s' % (app['name'], app['summary'], app['technical_name'], app['category_label'])">
+                            <div class="ecs-app-icon" t-esc="app['initial']"/>
+                            <div class="ecs-app-card-body">
+                                <h2 t-esc="app['name']"/>
+                                <p t-esc="app['summary']"/>
+                                <div class="ecs-app-tags">
+                                    <span t-esc="app['category_label']"/>
+                                    <span t-esc="app['technical_name']"/>
+                                </div>
+                            </div>
+                            <i class="fa fa-arrow-right ecs-app-arrow" aria-hidden="true"/>
+                        </a>
+                    </t>
+                </section>
+
+                <section class="ecs-no-results" id="ecs-no-results" hidden="hidden">
+                    <h2>No matching apps found</h2>
+                    <p>Try another keyword, clear the search, or switch filters.</p>
+                    <button type="button" class="ecs-btn-signin" id="ecs-reset-search">Reset Search</button>
+                </section>
+
+                <section class="ecs-empty-apps" t-if="not apps">
+                    <h2 t-esc="empty_title"/>
+                    <p t-esc="empty_subtitle"/>
+                    <a t-att-href="empty_button_url" class="ecs-btn-signin" t-esc="empty_button_label"/>
+                </section>
+            </main>
+
+            <script type="text/javascript">
+                //<![CDATA[
+                (function () {
+                    function initEcsLauncherSearch() {
+                        const searchInput = document.getElementById('ecs-app-search');
+                        const clearButton = document.getElementById('ecs-app-search-clear');
+                        const resetButton = document.getElementById('ecs-reset-search');
+                        const countElement = document.getElementById('ecs-visible-count');
+                        const noResults = document.getElementById('ecs-no-results');
+                        const cards = Array.from(document.querySelectorAll('.ecs-app-card'));
+                        const chips = Array.from(document.querySelectorAll('.ecs-filter-chip'));
+
+                        if (!searchInput || !cards.length) return;
+
+                        let activeFilter = 'all';
+
+                        function applyFilters() {
+                            const query = searchInput.value.trim().toLowerCase();
+                            let visibleCount = 0;
+
+                            cards.forEach(function (card) {
+                                const category = card.dataset.category || 'other';
+                                const searchText = (
+                                    card.dataset.search ||
+                                    card.textContent ||
+                                    ''
+                                ).toLowerCase();
+                                const matchesFilter = activeFilter === 'all' || category === activeFilter;
+                                const matchesQuery = !query || searchText.indexOf(query) !== -1;
+                                const isVisible = matchesFilter && matchesQuery;
+
+                                card.classList.toggle('is-hidden', !isVisible);
+                                card.hidden = !isVisible;
+                                if (isVisible) visibleCount += 1;
+                            });
+
+                            if (countElement) countElement.textContent = String(visibleCount);
+                            if (clearButton) clearButton.classList.toggle('is-visible', Boolean(query));
+                            if (noResults) noResults.hidden = visibleCount !== 0;
+                        }
+
+                        chips.forEach(function (chip) {
+                            chip.addEventListener('click', function () {
+                                activeFilter = chip.dataset.filter || 'all';
+                                chips.forEach(function (item) {
+                                    item.classList.toggle('is-active', item === chip);
+                                });
+                                applyFilters();
+                            });
+                        });
+
+                        searchInput.addEventListener('input', applyFilters);
+
+                        if (clearButton) {
+                            clearButton.addEventListener('click', function () {
+                                searchInput.value = '';
+                                searchInput.focus();
+                                applyFilters();
+                            });
+                        }
+
+                        if (resetButton) {
+                            resetButton.addEventListener('click', function () {
+                                activeFilter = 'all';
+                                searchInput.value = '';
+                                chips.forEach(function (chip) {
+                                    chip.classList.toggle('is-active', chip.dataset.filter === 'all');
+                                });
+                                searchInput.focus();
+                                applyFilters();
+                            });
+                        }
+
+                        document.addEventListener('keydown', function (event) {
+                            const activeTag = document.activeElement && document.activeElement.tagName;
+                            const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag);
+                            if (event.key === '/' && !isTyping) {
+                                event.preventDefault();
+                                searchInput.focus();
+                            }
+                            if (event.key === 'Escape' && document.activeElement === searchInput) {
+                                searchInput.value = '';
+                                applyFilters();
+                            }
+                        });
+
+                        applyFilters();
+                    }
+
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', initEcsLauncherSearch);
+                    } else {
+                        initEcsLauncherSearch();
+                    }
+                })();
+                //]]>
+            </script>
+        </t>
+    </template>
+</odoo>

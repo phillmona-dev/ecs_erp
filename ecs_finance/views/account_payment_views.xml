@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Account Payment: Inherit form ────────────────────────────── -->
+    <record id="view_account_payment_ecs_form" model="ir.ui.view">
+        <field name="name">account.payment.ecs.form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='memo']" position="before">
+                <field name="transaction_type_id"
+                       domain="[('company_id','=',company_id)]"/>
+                <field name="transaction_no" readonly="1"
+                       invisible="not transaction_no"/>
+            </xpath>
+            <xpath expr="//field[@name='memo']" position="after">
+                <field name="payee_name"/>
+                <field name="check_number"
+                       invisible="payment_method_code != 'check_printing'"/>
+                <field name="check_date"
+                       invisible="payment_method_code != 'check_printing'"/>
+                <field name="amount_in_words" readonly="1"
+                       invisible="not amount_in_words"/>
+                <field name="payment_request_id" readonly="1"
+                       invisible="not payment_request_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

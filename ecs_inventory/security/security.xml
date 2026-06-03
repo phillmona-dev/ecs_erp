@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_ecs_inventory_transaction_type_company" model="ir.rule">
+        <field name="name">ECS inventory transaction types multi-company</field>
+        <field name="model_id" ref="model_ecs_inventory_transaction_type"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_inventory_lock_period_company" model="ir.rule">
+        <field name="name">ECS inventory lock periods multi-company</field>
+        <field name="model_id" ref="model_ecs_inventory_lock_period"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_inventory_request_company" model="ir.rule">
+        <field name="name">ECS inventory requests multi-company</field>
+        <field name="model_id" ref="model_ecs_inventory_request"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_ecs_inventory_request_line_company" model="ir.rule">
+        <field name="name">ECS inventory request lines multi-company</field>
+        <field name="model_id" ref="model_ecs_inventory_request_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

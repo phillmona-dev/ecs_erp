@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ecs_construction_root"
+              name="Construction"
+              sequence="45"
+              web_icon="project,static/description/icon.png"
+              groups="ecs_construction.group_construction_user"/>
+
+    <menuitem id="menu_ecs_construction_operations"
+              name="Operations"
+              parent="menu_ecs_construction_root"
+              sequence="10"/>
+
+    <menuitem id="menu_construction_contracts"
+              name="Contracts"
+              parent="menu_ecs_construction_operations"
+              action="action_construction_contract"
+              sequence="10"/>
+
+    <menuitem id="menu_construction_progress_billing"
+              name="Progress Billing"
+              parent="menu_ecs_construction_operations"
+              action="action_progress_billing"
+              sequence="20"/>
+
+    <menuitem id="menu_construction_boq"
+              name="Bill of Quantities (BOQ)"
+              parent="menu_ecs_construction_operations"
+              action="action_boq"
+              sequence="30"/>
+</odoo>

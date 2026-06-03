@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ecs_treasury_facility_finance,ecs.treasury.facility finance,model_ecs_treasury_facility,ecs_approvals.group_ecs_finance_user,1,1,1,0
+access_ecs_treasury_facility_manager,ecs.treasury.facility manager,model_ecs_treasury_facility,ecs_approvals.group_ecs_finance_manager,1,1,1,1
+access_ecs_treasury_facility_auditor,ecs.treasury.facility auditor,model_ecs_treasury_facility,ecs_approvals.group_ecs_auditor,1,0,0,0

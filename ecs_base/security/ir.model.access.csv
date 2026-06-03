@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ecs_sequence_service_user,ecs.sequence.service user,ecs_base.model_ecs_sequence_service,base.group_user,1,0,0,0
+access_ecs_sequence_service_admin,ecs.sequence.service admin,ecs_base.model_ecs_sequence_service,base.group_system,1,1,1,1
+access_ecs_approval_log_user,ecs.approval.log user,ecs_base.model_ecs_approval_log,base.group_user,1,0,0,0
+access_ecs_approval_log_admin,ecs.approval.log admin,ecs_base.model_ecs_approval_log,base.group_system,1,1,1,0

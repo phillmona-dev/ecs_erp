@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_division_tree" model="ir.ui.view">
+        <field name="name">ecs.hr.division.tree</field>
+        <field name="model">ecs.hr.division</field>
+        <field name="arch" type="xml">
+            <list string="Divisions">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="manager_id"/>
+                <field name="employee_count" string="Staff"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_division_form" model="ir.ui.view">
+        <field name="name">ecs.hr.division.form</field>
+        <field name="model">ecs.hr.division</field>
+        <field name="arch" type="xml">
+            <form string="Division / Business Unit">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_employees" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="employee_count" widget="statinfo" string="Staff"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Division Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="manager_id"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="note" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_division" model="ir.actions.act_window">
+        <field name="name">Divisions</field>
+        <field name="res_model">ecs.hr.division</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('company_id', 'in', allowed_company_ids)]</field>
+    </record>
+</odoo>

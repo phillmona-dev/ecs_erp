@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:15
+    container_name: ecs-odoo19-db
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo19-db-data:/var/lib/postgresql/data/pgdata
+    restart: unless-stopped
+
+  odoo:
+    image: odoo:19.0
+    container_name: ecs-odoo19
+    depends_on:
+      - db
+    command:
+      - --database=ecs_odoo19
+      - --init=ecs_theme,ecs_base,ecs_approvals,ecs_finance,ecs_hr,ecs_inventory,ecs_payroll,ecs_procurement,ecs_projects,ecs_sales,ecs_self_service,ecs_treasury,ecs_construction,ecs_consolidated_report,ecs_api
+      - --update=ecs_theme,ecs_base,ecs_approvals,ecs_finance,ecs_hr,ecs_inventory,ecs_payroll,ecs_procurement,ecs_projects,ecs_sales,ecs_self_service,ecs_treasury,ecs_construction,ecs_consolidated_report,ecs_api
+    ports:
+      - "8070:8069"
+    environment:
+      HOST: db
+      PORT: 5432
+      USER: odoo
+      PASSWORD: odoo
+    volumes:
+      - odoo19-web-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ..:/mnt/extra-addons
+    restart: unless-stopped
+
+volumes:
+  odoo19-db-data:
+  odoo19-web-data:

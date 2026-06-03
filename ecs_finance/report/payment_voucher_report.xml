@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Payment Voucher Report (CPV / BPV)
+        ECS payment voucher template.
+    -->
+    <template id="report_payment_voucher_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <div class="row">
+                    <div class="col-6">
+                        <h2>
+                            <t t-if="o.transaction_type_id">
+                                <t t-esc="o.transaction_type_id.name"/>
+                            </t>
+                            <t t-else="">Payment Voucher</t>
+                        </h2>
+                    </div>
+                    <div class="col-6 text-end">
+                        <strong>Ref: </strong>
+                        <t t-esc="o.transaction_no or o.name"/><br/>
+                        <strong>Date: </strong>
+                        <t t-esc="o.date" t-options="{'widget': 'date'}"/>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <strong>Payee:</strong>
+                        <t t-esc="o.partner_id.name"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Amount:</strong>
+                        <t t-esc="o.amount"
+                           t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <strong>Amount in Words:</strong>
+                        <t t-esc="o.amount_in_words"/>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <strong>Description / Purpose:</strong>
+                        <t t-esc="o.memo or o.ref or ''"/>
+                    </div>
+                </div>
+                <hr class="mt-5"/>
+                <div class="row mt-5">
+                    <div class="col-3 text-center">
+                        <div class="border-top mt-5 pt-1">Prepared By</div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="border-top mt-5 pt-1">Checked By</div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="border-top mt-5 pt-1">Approved By</div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="border-top mt-5 pt-1">Received By</div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <record id="action_report_payment_voucher" model="ir.actions.report">
+        <field name="name">Payment Voucher</field>
+        <field name="model">account.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ecs_finance.report_payment_voucher_document</field>
+        <field name="report_file">ecs_finance.report_payment_voucher_document</field>
+        <field name="print_report_name">'Payment Voucher - %s' % (object.transaction_no or object.name)</field>
+        <field name="binding_model_id" ref="account.model_account_payment"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

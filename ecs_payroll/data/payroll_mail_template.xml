@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="email_template_ecs_payslip" model="mail.template">
+        <field name="name">ECS Payslip Email</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="subject">Payslip of {{ object.employee_id.name }} for {{ object.ecs_period_id.name or object.date_to }}</field>
+        <field name="email_from">{{ object.company_id.email or user.email_formatted }}</field>
+        <field name="email_to">{{ object.employee_id.work_email }}</field>
+        <field name="lang">{{ object.employee_id.lang or user.lang }}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear <t t-out="object.employee_id.name"/>,</p>
+                <p>
+                    Please find your payslip details for
+                    <strong><t t-out="object.ecs_period_id.name or object.date_to"/></strong>.
+                </p>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; border-bottom: 1px solid #ddd;">Description</th>
+                            <th style="text-align: right; border-bottom: 1px solid #ddd;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="object.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                            <tr>
+                                <td style="padding: 4px 0;">
+                                    <t t-out="line.name"/>
+                                </td>
+                                <td style="padding: 4px 0; text-align: right;">
+                                    <t t-out="'{:,.2f}'.format(line.total)"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <p>Regards,<br/><t t-out="object.company_id.name"/></p>
+            </div>
+        </field>
+    </record>
+
+    <record id="action_server_send_ecs_payslip_email" model="ir.actions.server">
+        <field name="name">Send ECS Payslip Email</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code">records.action_send_ecs_payslip_email()</field>
+    </record>
+
+    <record id="action_server_send_ecs_batch_payslip_email" model="ir.actions.server">
+        <field name="name">Send ECS Batch Payslip Emails</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip_run"/>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip_run"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code">records.action_send_ecs_payslip_email()</field>
+    </record>
+</odoo>

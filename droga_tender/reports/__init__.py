@@ -1,1 +1,0 @@
-from . import tender_master_xls

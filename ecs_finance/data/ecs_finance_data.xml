@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Default transaction types loaded for the main company.
+        Each new company should configure its own via
+        Finance > Configuration > Transaction Types.
+    -->
+    <data noupdate="1">
+
+        <!-- These are template records — no company_id so they serve as reference.
+             Actual per-company types are created by the Finance Manager via UI. -->
+
+        <record id="trans_type_cpv" model="ecs.finance.transaction.type">
+            <field name="name">Cash Payment Voucher</field>
+            <field name="code">CPV</field>
+            <field name="transaction_category">payment</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="trans_type_crv" model="ecs.finance.transaction.type">
+            <field name="name">Cash Receipt Voucher</field>
+            <field name="code">CRV</field>
+            <field name="transaction_category">receipt</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="trans_type_bpv" model="ecs.finance.transaction.type">
+            <field name="name">Bank Payment Voucher</field>
+            <field name="code">BPV</field>
+            <field name="transaction_category">payment</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="trans_type_brv" model="ecs.finance.transaction.type">
+            <field name="name">Bank Receipt Voucher</field>
+            <field name="code">BRV</field>
+            <field name="transaction_category">receipt</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="trans_type_jv" model="ecs.finance.transaction.type">
+            <field name="name">Journal Voucher</field>
+            <field name="code">JV</field>
+            <field name="transaction_category">journal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+    </data>
+</odoo>

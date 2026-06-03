@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_construction_contract_tree" model="ir.ui.view">
+        <field name="name">ecs.construction.contract.tree</field>
+        <field name="model">ecs.construction.contract</field>
+        <field name="arch" type="xml">
+            <list string="Contracts"
+                  decoration-success="state == 'active'"
+                  decoration-muted="state in ('closed', 'cancelled')">
+                <field name="name"/>
+                <field name="contract_type"/>
+                <field name="project_id"/>
+                <field name="partner_id"/>
+                <field name="contract_amount"/>
+                <field name="retention_pct" string="Retention %"/>
+                <field name="contract_start"/>
+                <field name="contract_end"/>
+                <field name="state" widget="badge"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_construction_contract_form" model="ir.ui.view">
+        <field name="name">ecs.construction.contract.form</field>
+        <field name="model">ecs.construction.contract</field>
+        <field name="arch" type="xml">
+            <form string="Construction Contract">
+                <header>
+                    <button name="action_activate" string="Activate" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_close" string="Close" type="object"
+                            class="btn-secondary" invisible="state != 'active'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('closed','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Contract Details">
+                            <field name="contract_type" readonly="state != 'draft'"/>
+                            <field name="project_id" readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Financial Terms">
+                            <field name="contract_amount" readonly="state != 'draft'"/>
+                            <field name="retention_pct" readonly="state != 'draft'"/>
+                            <field name="contract_start" readonly="state != 'draft'"/>
+                            <field name="contract_end" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_construction_contract" model="ir.actions.act_window">
+        <field name="name">Construction Contracts</field>
+        <field name="res_model">ecs.construction.contract</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
