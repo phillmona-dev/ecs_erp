@@ -6,6 +6,17 @@
 (function () {
     'use strict';
 
+    window.addEventListener('pageshow', function (event) {
+        const navigation = performance.getEntriesByType
+            ? performance.getEntriesByType('navigation')[0]
+            : null;
+        const isBackForward = navigation && navigation.type === 'back_forward';
+
+        if ((event.persisted || isBackForward) && document.querySelector('.ecs-login-form')) {
+            window.location.reload();
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
         initLoginInteractions();
         initLauncherSearch();
