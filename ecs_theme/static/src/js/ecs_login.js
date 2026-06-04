@@ -6,6 +6,8 @@
 (function () {
     'use strict';
 
+    let restoredLoginPage = false;
+
     window.addEventListener('pageshow', function (event) {
         const navigation = performance.getEntriesByType
             ? performance.getEntriesByType('navigation')[0]
@@ -13,7 +15,8 @@
         const isBackForward = navigation && navigation.type === 'back_forward';
 
         if ((event.persisted || isBackForward) && document.querySelector('.ecs-login-form')) {
-            window.location.reload();
+            restoredLoginPage = true;
+            window.location.replace(window.location.href);
         }
     });
 
@@ -45,7 +48,13 @@
         const btn    = document.getElementById('ecs-signin-btn');
 
         if (form && btn) {
-            form.addEventListener('submit', function () {
+            form.addEventListener('submit', function (event) {
+                if (restoredLoginPage) {
+                    event.preventDefault();
+                    window.location.replace(window.location.href);
+                    return;
+                }
+
                 btn.classList.add('ecs-loading');
                 btn.disabled = true;
                 // Safety reset after 8s in case of error
