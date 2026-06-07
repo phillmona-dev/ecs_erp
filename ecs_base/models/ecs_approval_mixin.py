@@ -107,6 +107,9 @@ class EcsApprovalMixin(models.AbstractModel):
             rec._log_approval_action('approve', level=level)
             rec._mark_activities_done()
             rec.write({'state': next_state})
+            if next_state != 'approved' and rec._is_policy_complete_after_state(next_state):
+                next_state = 'approved'
+                rec.write({'state': next_state})
 
             if next_state == 'approved':
                 rec.write({
@@ -184,6 +187,10 @@ class EcsApprovalMixin(models.AbstractModel):
         Override to return the res.users record who should receive the
         submit activity. Return False to skip activity creation.
         """
+        self.ensure_one()
+        policy = self._get_approval_policy()
+        if policy:
+            return policy.get_first_step_user()
         return False
 
     def _get_approve_approver(self):
@@ -191,6 +198,17 @@ class EcsApprovalMixin(models.AbstractModel):
         Override to return the next approver after an intermediate approval.
         Return False if no further routing is needed.
         """
+        self.ensure_one()
+        policy = self._get_approval_policy()
+        if policy:
+            level_by_state = {
+                'submitted': 1,
+                'verified': 2,
+                'budget_approved': 3,
+            }
+            step = policy.get_step_for_level(level_by_state.get(self.state, 0))
+            if step:
+                return step._get_approver_user(self)
         return False
 
     def _on_final_approval(self):
@@ -199,6 +217,50 @@ class EcsApprovalMixin(models.AbstractModel):
         Examples: create payment, post journal entries, record commitment.
         """
         pass
+
+    def _get_policy_amount(self):
+        """Best-effort amount hook used by configurable approval policies."""
+        self.ensure_one()
+        for field_name in ('amount', 'total_amount', 'amount_total'):
+            if field_name in self._fields:
+                return self[field_name] or 0.0
+        return 0.0
+
+    def _get_approval_policy(self):
+        """Return the matching ECS approval policy when ecs_approvals is installed."""
+        self.ensure_one()
+        if 'ecs.approval.policy' not in self.env:
+            return False
+        company = getattr(self, 'company_id', False) or self.env.company
+        return self.env['ecs.approval.policy'].find_policy(
+            self._name,
+            company,
+            self._get_policy_amount(),
+        )
+
+    def _get_group_users(self, group, company=False):
+        """Return users of a group across Odoo versions."""
+        if not group:
+            return self.env['res.users']
+        users = getattr(group, 'user_ids', self.env['res.users'])
+        if not users and hasattr(group, 'users'):
+            users = group.users
+        if company:
+            users = users.filtered(lambda user: company in user.company_ids)
+        return users
+
+    def _is_policy_complete_after_state(self, state):
+        """Detect when a policy has no remaining configured step."""
+        self.ensure_one()
+        policy = self._get_approval_policy()
+        if not policy:
+            return False
+        next_level_by_state = {
+            'verified': 2,
+            'budget_approved': 3,
+        }
+        next_level = next_level_by_state.get(state)
+        return bool(next_level and not policy.get_step_for_level(next_level))
 
     # ── Internal helpers ──────────────────────────────────────────────
 

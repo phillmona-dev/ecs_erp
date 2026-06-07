@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_approval_document_type_list" model="ir.ui.view">
+        <field name="name">ecs.approval.document.type.list</field>
+        <field name="model">ecs.approval.document.type</field>
+        <field name="arch" type="xml">
+            <list string="Approval Document Types" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="model"/>
+                <field name="company_specific"/>
+                <field name="policy_count"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_approval_document_type_form" model="ir.ui.view">
+        <field name="name">ecs.approval.document.type.form</field>
+        <field name="model">ecs.approval.document.type</field>
+        <field name="arch" type="xml">
+            <form string="Approval Document Type">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_policies" type="object" class="oe_stat_button" icon="fa-sitemap">
+                            <field name="policy_count" widget="statinfo" string="Policies"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="model_id"/>
+                            <field name="model"/>
+                            <field name="company_specific"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" nolabel="1"/>
+                        </page>
+                        <page string="Policies">
+                            <field name="policy_ids" readonly="1">
+                                <list>
+                                    <field name="company_id"/>
+                                    <field name="min_amount"/>
+                                    <field name="max_amount"/>
+                                    <field name="step_count"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_approval_document_type_search" model="ir.ui.view">
+        <field name="name">ecs.approval.document.type.search</field>
+        <field name="model">ecs.approval.document.type</field>
+        <field name="arch" type="xml">
+            <search string="Approval Document Types">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="model"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <separator/>
+                <filter name="group_model" string="Model" context="{'group_by': 'model'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_approval_document_type" model="ir.actions.act_window">
+        <field name="name">Document Types</field>
+        <field name="res_model">ecs.approval.document.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+
+    <record id="view_ecs_approval_policy_list" model="ir.ui.view">
+        <field name="name">ecs.approval.policy.list</field>
+        <field name="model">ecs.approval.policy</field>
+        <field name="arch" type="xml">
+            <list string="Approval Policies" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="company_id"/>
+                <field name="document_type_id"/>
+                <field name="min_amount"/>
+                <field name="max_amount"/>
+                <field name="step_count"/>
+                <field name="auto_submit_activity"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_approval_policy_form" model="ir.ui.view">
+        <field name="name">ecs.approval.policy.form</field>
+        <field name="model">ecs.approval.policy</field>
+        <field name="arch" type="xml">
+            <form string="Approval Policy">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="document_type_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Amount Range">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="min_amount"/>
+                            <field name="max_amount"/>
+                            <field name="auto_submit_activity"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Approval Steps">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="level"/>
+                                    <field name="name"/>
+                                    <field name="approver_type"/>
+                                    <field name="user_id" invisible="approver_type != 'user'"/>
+                                    <field name="group_id" invisible="approver_type != 'group'"/>
+                                    <field name="required"/>
+                                    <field name="can_delegate"/>
+                                    <field name="escalation_days"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_approval_policy_search" model="ir.ui.view">
+        <field name="name">ecs.approval.policy.search</field>
+        <field name="model">ecs.approval.policy</field>
+        <field name="arch" type="xml">
+            <search string="Approval Policies">
+                <field name="document_type_id"/>
+                <field name="company_id"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <separator/>
+                <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                <filter name="group_document_type" string="Document Type" context="{'group_by': 'document_type_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_approval_policy" model="ir.actions.act_window">
+        <field name="name">Approval Policies</field>
+        <field name="res_model">ecs.approval.policy</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1, 'search_default_group_company': 1}</field>
+    </record>
+</odoo>

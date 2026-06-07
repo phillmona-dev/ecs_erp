@@ -25,6 +25,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'data/default_admin_groups.xml',
         'views/purchase_request_views.xml',
         'views/purchase_rfq_views.xml',
         'views/import_tracking_views.xml',

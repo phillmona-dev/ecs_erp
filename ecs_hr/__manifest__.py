@@ -29,6 +29,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'data/default_admin_groups.xml',
         'views/employee_views.xml',
         'views/hr_division_views.xml',
         'views/attendance_views.xml',

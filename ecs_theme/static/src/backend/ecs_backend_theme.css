@@ -1,0 +1,356 @@
+/* ECS Backend Theme — shared premium ERP surface */
+
+:root {
+    --ecs-cream: #faf5f0;
+    --ecs-cream-2: #fffaf5;
+    --ecs-mocha: #271714;
+    --ecs-muted: rgba(39, 23, 20, 0.58);
+    --ecs-border: rgba(39, 23, 20, 0.1);
+    --ecs-border-strong: rgba(39, 23, 20, 0.18);
+    --ecs-teal: #00a8a8;
+    --ecs-teal-dark: #087f7f;
+    --ecs-amber: #d97706;
+    --ecs-purple: #7b4ba3;
+    --ecs-shadow: 0 18px 48px rgba(39, 23, 20, 0.1);
+    --ecs-shadow-soft: 0 8px 26px rgba(39, 23, 20, 0.08);
+    --ecs-radius: 18px;
+}
+
+.o_web_client {
+    color: var(--ecs-mocha);
+    background:
+        radial-gradient(circle at 90% 12%, rgba(217, 119, 6, 0.09), transparent 28rem),
+        radial-gradient(circle at 4% 42%, rgba(0, 168, 168, 0.08), transparent 25rem),
+        linear-gradient(180deg, var(--ecs-cream), #f7efe8 100%);
+}
+
+.o_web_client .o_action_manager,
+.o_web_client .o_action {
+    min-height: 0;
+    background: transparent;
+}
+
+.o_web_client .o_content {
+    min-height: 0;
+    overflow: auto;
+    background: transparent;
+}
+
+.o_web_client .o_main_navbar {
+    border: 0;
+    box-shadow: 0 10px 30px rgba(39, 23, 20, 0.12);
+    background:
+        linear-gradient(135deg, rgba(39, 23, 20, 0.96), rgba(77, 44, 39, 0.94)),
+        linear-gradient(90deg, rgba(0, 168, 168, 0.22), rgba(217, 119, 6, 0.2));
+}
+
+.o_web_client .o_control_panel {
+    border: 1px solid rgba(255, 255, 255, 0.64);
+    border-left: 0;
+    border-right: 0;
+    background: rgba(250, 245, 240, 0.78);
+    box-shadow: 0 8px 24px rgba(39, 23, 20, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.o_web_client .breadcrumb,
+.o_web_client .o_breadcrumb {
+    font-weight: 700;
+    color: var(--ecs-mocha);
+}
+
+.o_web_client .o_searchview,
+.o_web_client .o_searchview_input_container,
+.o_web_client .o_input,
+.o_web_client input,
+.o_web_client textarea,
+.o_web_client select {
+    border-color: var(--ecs-border);
+    border-radius: 12px;
+}
+
+.o_web_client .o_searchview {
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.o_web_client .o_searchview:focus-within,
+.o_web_client .o_input:focus,
+.o_web_client input:focus,
+.o_web_client textarea:focus,
+.o_web_client select:focus {
+    border-color: rgba(0, 168, 168, 0.5);
+    box-shadow: 0 0 0 3px rgba(0, 168, 168, 0.12);
+}
+
+.o_web_client .btn {
+    border-radius: 12px;
+    font-weight: 700;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+}
+
+.o_web_client .btn:hover {
+    transform: translateY(-1px);
+}
+
+.o_web_client .btn-primary,
+.o_web_client .o_form_button_save,
+.o_web_client .o_list_button_add,
+.o_web_client .o-kanban-button-new,
+.o_web_client .o_cp_buttons .btn-primary {
+    border-color: transparent;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--ecs-teal), var(--ecs-teal-dark));
+    box-shadow: 0 10px 22px rgba(0, 168, 168, 0.2);
+}
+
+.o_web_client .btn-primary:hover,
+.o_web_client .o_form_button_save:hover,
+.o_web_client .o_list_button_add:hover,
+.o_web_client .o-kanban-button-new:hover,
+.o_web_client .o_cp_buttons .btn-primary:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, #08bcbc, #077171);
+    box-shadow: 0 14px 30px rgba(0, 168, 168, 0.26);
+}
+
+.o_web_client .btn-secondary,
+.o_web_client .btn-light,
+.o_web_client .o_cp_buttons .btn:not(.btn-primary) {
+    border-color: rgba(39, 23, 20, 0.08);
+    color: rgba(39, 23, 20, 0.82);
+    background: rgba(255, 255, 255, 0.68);
+}
+
+.o_web_client .btn-secondary:hover,
+.o_web_client .btn-light:hover,
+.o_web_client .o_cp_buttons .btn:not(.btn-primary):hover {
+    border-color: rgba(0, 168, 168, 0.28);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.o_web_client .o_form_view .o_form_sheet_bg {
+    padding: 22px;
+    min-height: max-content;
+    overflow: visible;
+    background: transparent;
+}
+
+.o_web_client .o_form_view,
+.o_web_client .o_form_view .o_form_renderer,
+.o_web_client .o_form_view .o_form_renderer .o_form_sheet_bg {
+    min-height: 0;
+}
+
+.o_web_client .o_form_view .o_form_sheet {
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: var(--ecs-radius);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 250, 245, 0.78)),
+        radial-gradient(circle at 95% 0%, rgba(217, 119, 6, 0.09), transparent 18rem);
+    box-shadow: var(--ecs-shadow);
+    overflow: visible;
+}
+
+.o_web_client .o_form_view .o_group .o_wrap_label,
+.o_web_client .o_form_view .o_group .o_td_label,
+.o_web_client .o_form_label {
+    color: rgba(39, 23, 20, 0.72);
+    font-weight: 800;
+}
+
+.o_web_client .o_form_view .o_inner_group > tbody > tr > td {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.o_web_client .o_form_statusbar {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--ecs-border);
+    background: rgba(255, 250, 245, 0.78);
+}
+
+.o_web_client .o_statusbar_status .o_arrow_button,
+.o_web_client .o_statusbar_status .o_arrow_button.btn-secondary {
+    border-color: rgba(123, 75, 163, 0.16);
+    color: rgba(39, 23, 20, 0.68);
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.o_web_client .o_statusbar_status .o_arrow_button_current,
+.o_web_client .o_statusbar_status .o_arrow_button_current.btn-primary,
+.o_web_client .o_statusbar_status .o_arrow_button.o_arrow_button_current {
+    color: #ffffff;
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--ecs-purple), #9b68bd);
+    box-shadow: 0 10px 22px rgba(123, 75, 163, 0.22);
+}
+
+.o_web_client .o_notebook {
+    margin-top: 16px;
+}
+
+.o_web_client .o_notebook .nav-tabs {
+    gap: 6px;
+    border-bottom: 1px solid var(--ecs-border);
+}
+
+.o_web_client .o_notebook .nav-link {
+    border-radius: 12px 12px 0 0;
+    color: rgba(39, 23, 20, 0.64);
+    font-weight: 800;
+}
+
+.o_web_client .o_notebook .nav-link.active {
+    border-color: rgba(0, 168, 168, 0.22) rgba(0, 168, 168, 0.22) transparent;
+    color: var(--ecs-teal-dark);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.o_web_client .oe_button_box .oe_stat_button {
+    border: 1px solid rgba(0, 168, 168, 0.12);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.68);
+    box-shadow: var(--ecs-shadow-soft);
+    overflow: hidden;
+}
+
+.o_web_client .oe_button_box .oe_stat_button:hover {
+    border-color: rgba(0, 168, 168, 0.32);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.o_web_client .oe_button_box .oe_stat_button .o_stat_value,
+.o_web_client .oe_button_box .oe_stat_button .o_stat_text {
+    color: var(--ecs-mocha);
+}
+
+.o_web_client .o_list_renderer,
+.o_web_client .o_kanban_renderer {
+    padding: 18px;
+}
+
+.o_web_client .o_list_renderer .o_list_table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: var(--ecs-radius);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: var(--ecs-shadow-soft);
+    overflow: hidden;
+}
+
+.o_web_client .o_list_renderer .o_list_table thead th {
+    border-bottom: 1px solid var(--ecs-border);
+    color: rgba(39, 23, 20, 0.76);
+    background: rgba(250, 245, 240, 0.92);
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.o_web_client .o_list_renderer .o_data_row {
+    background: rgba(255, 255, 255, 0.68);
+}
+
+.o_web_client .o_list_renderer .o_data_row:hover {
+    background: rgba(0, 168, 168, 0.06);
+}
+
+.o_web_client .o_list_renderer .o_data_row.o_selected_row {
+    background: rgba(217, 119, 6, 0.08);
+}
+
+.o_web_client .o_list_renderer .o_list_number {
+    font-variant-numeric: tabular-nums;
+}
+
+.o_web_client .o-mail-Chatter,
+.o_web_client .o_Chatter {
+    border-left: 1px solid rgba(255, 255, 255, 0.64);
+    background: rgba(255, 250, 245, 0.62);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.o_web_client .o-mail-Chatter .o-mail-Message,
+.o_web_client .o_Chatter .o_Message {
+    border: 1px solid rgba(39, 23, 20, 0.06);
+    border-radius: 16px;
+    margin: 8px 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.68);
+}
+
+.o_web_client .o_dialog .modal-content,
+.o_web_client .modal .modal-content {
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 24px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 245, 0.94)),
+        radial-gradient(circle at 100% 0%, rgba(217, 119, 6, 0.09), transparent 20rem);
+    box-shadow: 0 30px 90px rgba(39, 23, 20, 0.24);
+    overflow: hidden;
+}
+
+.o_web_client .o_dialog .modal-body,
+.o_web_client .modal .modal-body {
+    max-height: calc(100vh - 14rem);
+    overflow: auto;
+}
+
+.o_web_client .o_dialog .modal-header,
+.o_web_client .modal .modal-header {
+    border-bottom: 1px solid var(--ecs-border);
+    background: rgba(250, 245, 240, 0.86);
+}
+
+.o_web_client .o_dialog .modal-title,
+.o_web_client .modal .modal-title {
+    color: var(--ecs-mocha);
+    font-weight: 900;
+}
+
+.o_web_client .o_dialog .modal-footer,
+.o_web_client .modal .modal-footer {
+    border-top: 1px solid var(--ecs-border);
+    background: rgba(255, 250, 245, 0.72);
+}
+
+.o_web_client .o_notification_manager .o_notification {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: var(--ecs-shadow);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.o_web_client .badge,
+.o_web_client .o_tag {
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.o_web_client .text-danger,
+.o_web_client .o_field_invalid {
+    color: #b42318 !important;
+}
+
+.o_web_client .text-success {
+    color: var(--ecs-teal-dark) !important;
+}
+
+@media (max-width: 1024px) {
+    .o_web_client .o_form_view .o_form_sheet_bg,
+    .o_web_client .o_list_renderer,
+    .o_web_client .o_kanban_renderer {
+        padding: 10px;
+    }
+
+    .o_web_client .o_form_view .o_form_sheet {
+        border-radius: 14px;
+    }
+}

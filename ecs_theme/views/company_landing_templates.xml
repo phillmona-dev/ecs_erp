@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="ecs_company_landing" name="ECS Company Landing">
+        <t t-call="web.frontend_layout">
+            <t t-set="html_data" t-value="{'style': 'height:100%;'}"/>
+            <t t-set="body_classname" t-value="'ecs-login-body ecs-apps-body ecs-company-home-body'"/>
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+
+            <div class="ecs-bg">
+                <div class="ecs-bg-grid"/>
+                <div class="ecs-bg-glow"/>
+                <div class="ecs-bg-glow-left"/>
+                <div class="ecs-bg-glow-card"/>
+            </div>
+
+            <header class="ecs-header-bar ecs-apps-header">
+                <div class="ecs-header-left">
+                    <div class="ecs-header-logo-group">
+                        <div class="ecs-header-logo-circle">E</div>
+                        <div class="ecs-header-logo-text">
+                            <div class="ecs-logo-title">ECS Enterprise</div>
+                            <div class="ecs-logo-subtitle" t-esc="company.name"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="ecs-header-right">
+                    <a href="/ecs/workspaces" class="ecs-home-btn ecs-back-btn">
+                        <span>Switch Workspace</span>
+                    </a>
+                    <a href="/ecs/apps" class="ecs-home-btn ecs-back-btn">
+                        <span>Open Apps</span>
+                    </a>
+                    <a href="/odoo" class="ecs-home-btn">
+                        <span>Workspace</span>
+                    </a>
+                    <a href="/web/session/logout?redirect=/web/login" class="ecs-home-btn">
+                        <span>Sign out</span>
+                    </a>
+                </div>
+            </header>
+
+            <main class="ecs-company-shell">
+                <section t-att-class="'ecs-company-hero ecs-company-hero--%s' % landing['gradient']">
+                    <div class="ecs-company-hero-copy">
+                        <div class="ecs-badge" t-esc="landing['badge']"/>
+                        <h1 t-esc="landing['headline']"/>
+                        <p t-esc="landing['subtitle']"/>
+                        <div class="ecs-company-actions">
+                            <a href="/ecs/apps" class="ecs-company-primary-action">
+                                <span>Launch Company Apps</span>
+                                <i class="fa fa-arrow-right" aria-hidden="true"/>
+                            </a>
+                            <a href="/ecs/all-apps" class="ecs-company-secondary-action">
+                                <span>View All ECS Apps</span>
+                            </a>
+                        </div>
+                    </div>
+                    <aside class="ecs-company-profile-card">
+                        <div class="ecs-company-avatar">
+                            <img t-if="company.logo" t-att-src="'/web/image/res.company/%s/logo' % company.id" alt="Company logo"/>
+                            <span t-if="not company.logo" t-esc="(company.name or 'E')[:1].upper()"/>
+                        </div>
+                        <div>
+                            <span class="ecs-company-kicker">Logged in as</span>
+                            <h2 t-esc="company.name"/>
+                            <p>
+                                <span t-esc="user_name"/>
+                                <span> · </span>
+                                <span t-esc="landing['accent']"/>
+                            </p>
+                        </div>
+                        <div class="ecs-company-health-grid">
+                            <div>
+                                <span t-esc="profile_state_label"/>
+                                <small>Governance</small>
+                            </div>
+                            <div>
+                                <span t-esc="profile_risk_label"/>
+                                <small>Risk Level</small>
+                            </div>
+                            <div>
+                                <span t-esc="ready_count"/>
+                                <small>Ready Modules</small>
+                            </div>
+                            <div>
+                                <span t-esc="missing_count"/>
+                                <small>Missing</small>
+                            </div>
+                        </div>
+                    </aside>
+                </section>
+
+                <section class="ecs-company-metrics">
+                    <article class="ecs-company-metric">
+                        <strong t-esc="quick_app_count"/>
+                        <span>Priority Apps</span>
+                    </article>
+                    <article class="ecs-company-metric">
+                        <strong t-esc="all_app_count"/>
+                        <span>Installed ECS Apps</span>
+                    </article>
+                    <article class="ecs-company-metric">
+                        <strong t-esc="profile_sector_label"/>
+                        <span>Business Sector</span>
+                    </article>
+                    <article class="ecs-company-metric">
+                        <strong t-esc="landing['accent']"/>
+                        <span>Operating Focus</span>
+                    </article>
+                </section>
+
+                <section class="ecs-company-content-grid">
+                    <div class="ecs-company-panel ecs-company-focus-panel">
+                        <div class="ecs-company-panel-header">
+                            <span>Company Focus</span>
+                            <h2>Today’s operating priorities</h2>
+                        </div>
+                        <ul class="ecs-company-focus-list">
+                            <t t-foreach="landing['focus']" t-as="item">
+                                <li>
+                                    <i class="fa fa-check" aria-hidden="true"/>
+                                    <span t-esc="item"/>
+                                </li>
+                            </t>
+                        </ul>
+                    </div>
+
+                    <div class="ecs-company-panel ecs-company-modules-panel">
+                        <div class="ecs-company-panel-header">
+                            <span>Governance Scope</span>
+                            <h2>Module readiness</h2>
+                        </div>
+                        <div class="ecs-company-scope-list" t-if="module_scope">
+                            <t t-foreach="module_scope_preview" t-as="scope">
+                                <div class="ecs-company-scope-row">
+                                    <div>
+                                        <strong t-esc="scope['name']"/>
+                                        <small t-esc="scope['owner']"/>
+                                    </div>
+                                    <span t-att-class="'ecs-company-state ecs-company-state--%s' % scope['state']" t-esc="scope['state_label']"/>
+                                </div>
+                            </t>
+                        </div>
+                        <div class="ecs-company-empty-note" t-if="not module_scope">
+                            Configure this company profile to see recommended ECS module readiness here.
+                        </div>
+                    </div>
+                </section>
+
+                <section class="ecs-company-app-section">
+                    <div class="ecs-company-section-title">
+                        <span>Fast Start</span>
+                        <h2>Recommended workspace apps</h2>
+                    </div>
+                    <div class="ecs-apps-grid ecs-company-app-grid" t-if="quick_apps">
+                        <t t-foreach="quick_apps" t-as="app">
+                            <a t-att-href="app['url']" class="ecs-app-card ecs-company-app-card">
+                                <div class="ecs-app-icon" t-esc="app['initial']"/>
+                                <div class="ecs-app-card-body">
+                                    <h2 t-esc="app['name']"/>
+                                    <p t-esc="app['summary']"/>
+                                    <div class="ecs-app-tags">
+                                        <span>Company App</span>
+                                        <span t-esc="app['technical_name']"/>
+                                    </div>
+                                </div>
+                                <i class="fa fa-arrow-right ecs-app-arrow" aria-hidden="true"/>
+                            </a>
+                        </t>
+                    </div>
+                    <section class="ecs-empty-apps" t-if="not quick_apps">
+                        <h2>No ECS apps are available yet</h2>
+                        <p>Install ECS modules or open the workspace to continue setup.</p>
+                        <a href="/odoo" class="ecs-btn-signin">Open Workspace</a>
+                    </section>
+                </section>
+            </main>
+        </t>
+    </template>
+
+    <template id="ecs_workspace_selector" name="ECS Workspace Selector">
+        <t t-call="web.frontend_layout">
+            <t t-set="html_data" t-value="{'style': 'height:100%;'}"/>
+            <t t-set="body_classname" t-value="'ecs-login-body ecs-apps-body ecs-workspace-body'"/>
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+
+            <div class="ecs-bg">
+                <div class="ecs-bg-grid"/>
+                <div class="ecs-bg-glow"/>
+                <div class="ecs-bg-glow-left"/>
+                <div class="ecs-bg-glow-card"/>
+            </div>
+
+            <header class="ecs-header-bar ecs-apps-header">
+                <div class="ecs-header-left">
+                    <div class="ecs-header-logo-group">
+                        <div class="ecs-header-logo-circle">E</div>
+                        <div class="ecs-header-logo-text">
+                            <div class="ecs-logo-title">ECS Enterprise</div>
+                            <div class="ecs-logo-subtitle">Choose your workspace</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ecs-header-right">
+                    <a href="/web/session/logout?redirect=/web/login" class="ecs-home-btn">
+                        <span>Sign out</span>
+                    </a>
+                </div>
+            </header>
+
+            <main class="ecs-workspace-shell">
+                <section class="ecs-workspace-hero">
+                    <div>
+                        <div class="ecs-badge">Workspace Selection</div>
+                        <h1>Where are we working today?</h1>
+                        <p>
+                            Select the company workspace you want to enter. ECS will load the correct landing page,
+                            module recommendations, approvals context, and company experience for that workspace.
+                        </p>
+                    </div>
+                    <div class="ecs-apps-stat">
+                        <span t-esc="workspace_count"/>
+                        <small>Available Workspaces</small>
+                    </div>
+                </section>
+
+                <section class="ecs-workspace-grid">
+                    <t t-foreach="workspaces" t-as="workspace">
+                        <form method="post" action="/ecs/workspaces/select" class="ecs-workspace-form">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="company_id" t-att-value="workspace['company'].id"/>
+                            <button type="submit"
+                                    t-att-class="'ecs-workspace-card ecs-company-hero--%s%s' % (workspace['landing']['gradient'], ' is-active' if workspace['company'].id == active_company.id else '')">
+                                <span class="ecs-workspace-active" t-if="workspace['company'].id == active_company.id">Current</span>
+                                <span class="ecs-workspace-avatar">
+                                    <img t-if="workspace['company'].logo" t-att-src="'/web/image/res.company/%s/logo' % workspace['company'].id" alt="Company logo"/>
+                                    <span t-if="not workspace['company'].logo" t-esc="(workspace['company'].name or 'E')[:1].upper()"/>
+                                </span>
+                                <span class="ecs-workspace-copy">
+                                    <small t-esc="workspace['landing']['badge']"/>
+                                    <strong t-esc="workspace['company'].name"/>
+                                    <em t-esc="workspace['landing']['subtitle']"/>
+                                </span>
+                                <span class="ecs-workspace-meta">
+                                    <span>
+                                        <b t-esc="workspace['profile_state_label']"/>
+                                        <small>Governance</small>
+                                    </span>
+                                    <span>
+                                        <b t-esc="workspace['ready_count']"/>
+                                        <small>Ready</small>
+                                    </span>
+                                    <span>
+                                        <b t-esc="workspace['missing_count']"/>
+                                        <small>Missing</small>
+                                    </span>
+                                </span>
+                                <span class="ecs-workspace-enter">
+                                    Enter Workspace
+                                    <i class="fa fa-arrow-right" aria-hidden="true"/>
+                                </span>
+                            </button>
+                        </form>
+                    </t>
+                </section>
+            </main>
+        </t>
+    </template>
+</odoo>

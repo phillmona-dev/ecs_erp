@@ -8,9 +8,13 @@
                 <field name="sequence" widget="handle"/>
                 <field name="company_id"/>
                 <field name="company_code"/>
+                <field name="governance_state"/>
+                <field name="risk_level"/>
+                <field name="company_manager_id"/>
                 <field name="requires_sales"/>
                 <field name="requires_project"/>
                 <field name="requires_school_operations"/>
+                <field name="missing_required_module_count"/>
                 <field name="active"/>
             </list>
         </field>
@@ -21,21 +25,76 @@
         <field name="model">ecs.company.profile</field>
         <field name="arch" type="xml">
             <form string="Company Profile">
+                <header>
+                    <button name="action_mark_configured" type="object" string="Mark Configured" class="btn-primary"
+                            invisible="governance_state != 'draft'"/>
+                    <button name="action_request_review" type="object" string="Request Review"
+                            invisible="governance_state not in ('draft', 'configured')"/>
+                    <button name="action_approve_governance" type="object" string="Approve Governance" class="btn-primary"
+                            groups="ecs_approvals.group_ecs_owner,base.group_system"
+                            invisible="governance_state != 'review'"/>
+                    <button name="action_reset_governance" type="object" string="Reset"
+                            groups="ecs_approvals.group_ecs_owner,base.group_system"
+                            invisible="governance_state == 'draft'"/>
+                    <field name="governance_state" widget="statusbar"
+                           statusbar_visible="draft,configured,review,approved"/>
+                </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_module_scope" type="object" class="oe_stat_button" icon="fa-cubes">
+                            <field name="module_scope_count" widget="statinfo" string="Modules"/>
+                        </button>
+                        <button name="action_view_module_scope" type="object" class="oe_stat_button" icon="fa-warning">
+                            <field name="missing_required_module_count" widget="statinfo" string="Missing"/>
+                        </button>
+                        <button name="action_view_approval_policies" type="object" class="oe_stat_button" icon="fa-sitemap">
+                            <field name="approval_policy_count" widget="statinfo" string="Policies"/>
+                        </button>
+                    </div>
                     <group>
                         <group>
                             <field name="company_id"/>
+                            <field name="legal_name"/>
                             <field name="company_code"/>
+                            <field name="sector"/>
+                            <field name="risk_level"/>
                             <field name="sequence"/>
                             <field name="active"/>
                         </group>
+                        <group string="Registration">
+                            <field name="tin_number"/>
+                            <field name="trade_license_no"/>
+                        </group>
+                    </group>
+                    <group>
                         <group string="ERP Scope">
                             <field name="requires_sales" readonly="1"/>
                             <field name="requires_project" readonly="1"/>
                             <field name="requires_school_operations" readonly="1"/>
                         </group>
+                        <group string="Responsible Managers">
+                            <field name="company_manager_id"/>
+                            <field name="finance_manager_id"/>
+                            <field name="hr_manager_id"/>
+                            <field name="procurement_manager_id"/>
+                        </group>
                     </group>
                     <notebook>
+                        <page string="Module Scope">
+                            <button name="action_generate_module_scope" type="object" string="Generate Recommended Scope"
+                                    class="btn-secondary"/>
+                            <field name="module_scope_ids" readonly="1">
+                                <list decoration-success="state == 'ready'" decoration-danger="state == 'missing'">
+                                    <field name="category"/>
+                                    <field name="name"/>
+                                    <field name="module_name"/>
+                                    <field name="required"/>
+                                    <field name="installed"/>
+                                    <field name="state"/>
+                                    <field name="owner_group_id"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Notes">
                             <field name="notes" nolabel="1"/>
                         </page>
@@ -53,11 +112,17 @@
             <search string="Company Profiles">
                 <field name="company_id"/>
                 <field name="company_code"/>
+                <field name="governance_state"/>
+                <field name="risk_level"/>
                 <filter name="requires_sales" string="Sales Scope" domain="[('requires_sales', '=', True)]"/>
                 <filter name="requires_project" string="Project Scope" domain="[('requires_project', '=', True)]"/>
                 <filter name="requires_school_operations" string="School Scope" domain="[('requires_school_operations', '=', True)]"/>
+                <filter name="needs_review" string="Needs Review" domain="[('governance_state', '=', 'review')]"/>
+                <filter name="approved" string="Approved" domain="[('governance_state', '=', 'approved')]"/>
                 <separator/>
                 <filter name="group_company_code" string="Company Type" context="{'group_by': 'company_code'}"/>
+                <filter name="group_governance_state" string="Governance Status" context="{'group_by': 'governance_state'}"/>
+                <filter name="group_risk_level" string="Risk Level" context="{'group_by': 'risk_level'}"/>
             </search>
         </field>
     </record>

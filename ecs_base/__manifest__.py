@@ -18,6 +18,7 @@
         'security/ir.model.access.csv',
         'security/security.xml',
         'data/ecs_base_sequences.xml',
+        'data/default_admin_groups.xml',
         'views/approval_log_views.xml',
         'views/menu.xml',
     ],

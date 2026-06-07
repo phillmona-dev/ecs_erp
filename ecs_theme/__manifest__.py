@@ -10,6 +10,7 @@
     'data': [
         'views/login_templates.xml',
         'views/app_launcher_templates.xml',
+        'views/company_landing_templates.xml',
     ],
     'assets': {
         'web.assets_frontend': [
@@ -19,6 +20,7 @@
         'web.assets_backend': [
             'ecs_theme/static/src/backend/ecs_launcher_systray.js',
             'ecs_theme/static/src/backend/ecs_launcher_systray.css',
+            'ecs_theme/static/src/backend/ecs_backend_theme.css',
         ],
     },
     'installable': True,

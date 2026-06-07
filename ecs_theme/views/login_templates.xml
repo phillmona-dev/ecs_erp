@@ -214,7 +214,7 @@
                     </div>
 
                     <input type="hidden" name="type" value="password"/>
-                    <input type="hidden" name="redirect" t-att-value="redirect or '/ecs/apps'"/>
+                    <input type="hidden" name="redirect" t-att-value="redirect or '/ecs/workspaces'"/>
                 </form>
             </xpath>
         </field>

@@ -125,18 +125,24 @@ class EcsForeignCurrencyRequest(models.Model):
                 raise UserError(_('Purpose is required before submission.'))
 
     def _get_submit_approver(self):
+        policy_approver = super()._get_submit_approver()
+        if policy_approver:
+            return policy_approver
         group = self.env.ref('ecs_approvals.group_ecs_finance_manager', raise_if_not_found=False)
         if not group:
             return False
-        users = group.users.filtered(lambda user: self.company_id in user.company_ids)
+        users = self._get_group_users(group, self.company_id)
         return users[:1] if users else False
 
     def _get_approve_approver(self):
         self.ensure_one()
+        policy_approver = super()._get_approve_approver()
+        if policy_approver:
+            return policy_approver
         if self.state == 'verified':
             group = self.env.ref('ecs_approvals.group_ecs_procurement_manager', raise_if_not_found=False)
             if group:
-                users = group.users.filtered(lambda user: self.company_id in user.company_ids)
+                users = self._get_group_users(group, self.company_id)
                 return users[:1] if users else False
         return False
 

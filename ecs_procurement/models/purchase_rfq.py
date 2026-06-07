@@ -178,10 +178,12 @@ class EcsPurchaseRfq(models.Model):
                     raise UserError(_('Product is required on selected quote lines.'))
                 vendor_lines[line.vendor_id] |= line
             for vendor, lines in vendor_lines.items():
+                picking_type = rfq.request_id._get_purchase_picking_type()
                 order = PurchaseOrder.create({
                     'partner_id': vendor.id,
                     'company_id': rfq.company_id.id,
                     'currency_id': rfq.currency_id.id,
+                    'picking_type_id': picking_type.id,
                     'origin': '%s / %s' % (rfq.request_id.name, rfq.name),
                     'ecs_purchase_request_id': rfq.request_id.id,
                     'ecs_rfq_id': rfq.id,
@@ -290,7 +292,7 @@ class EcsPurchaseRfqQuoteLine(models.Model):
             'product_id': self.product_id.id,
             'name': self.description,
             'product_qty': self.quantity,
-            'product_uom': self.product_uom_id.id,
+            'product_uom_id': self.product_uom_id.id,
             'price_unit': self.unit_price,
             'date_planned': fields.Date.today(),
         }

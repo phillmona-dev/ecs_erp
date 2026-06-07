@@ -165,6 +165,9 @@ class EcsPaymentRequest(models.Model):
     def _get_submit_approver(self):
         """Route to department manager on submission."""
         self.ensure_one()
+        policy_approver = super()._get_submit_approver()
+        if policy_approver:
+            return policy_approver
         if self.department_id and self.department_id.manager_id:
             return self.department_id.manager_id.user_id
         return False
@@ -175,21 +178,20 @@ class EcsPaymentRequest(models.Model):
         Budget Controller → Finance Manager → (CEO if > threshold)
         """
         self.ensure_one()
+        policy_approver = super()._get_approve_approver()
+        if policy_approver:
+            return policy_approver
         if self.state == 'submitted':
             # L2: Budget Controller
             group = self.env.ref('ecs_approvals.group_ecs_finance_controller', raise_if_not_found=False)
             if group:
-                users = group.users.filtered(
-                    lambda u: self.company_id in u.company_ids
-                )
+                users = self._get_group_users(group, self.company_id)
                 return users[:1] if users else False
         elif self.state == 'verified':
             # L3: Finance Manager
             group = self.env.ref('ecs_approvals.group_ecs_finance_manager', raise_if_not_found=False)
             if group:
-                users = group.users.filtered(
-                    lambda u: self.company_id in u.company_ids
-                )
+                users = self._get_group_users(group, self.company_id)
                 return users[:1] if users else False
         return False
 

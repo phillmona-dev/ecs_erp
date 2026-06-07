@@ -25,6 +25,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'data/default_admin_groups.xml',
         'views/inventory_request_views.xml',
         'views/inventory_transaction_type_views.xml',
         'views/inventory_lock_period_views.xml',

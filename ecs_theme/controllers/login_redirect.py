@@ -18,7 +18,7 @@ class EcsHome(Home):
                 return response
 
         if redirect != '/web/become':
-            redirect = '/ecs/apps'
+            redirect = '/ecs/workspaces'
             request.params['redirect'] = redirect
 
         response = super().web_login(redirect=redirect, **kw)
@@ -28,7 +28,7 @@ class EcsHome(Home):
     def _login_redirect(self, uid, redirect=None):
         if redirect == '/web/become':
             return super()._login_redirect(uid, redirect=redirect)
-        return '/ecs/apps'
+        return '/ecs/workspaces'
 
     @staticmethod
     def _set_login_no_store_headers(response):

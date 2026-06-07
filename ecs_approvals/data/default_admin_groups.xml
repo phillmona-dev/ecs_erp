@@ -4,6 +4,9 @@
         <value model="res.users" search="[('id', '=', ref('base.user_admin'))]"/>
         <value eval="{
             'group_ids': [
+                (4, ref('base.group_system')),
+                (4, ref('base.group_erp_manager')),
+                (4, ref('base.group_multi_company')),
                 (4, ref('ecs_approvals.group_ecs_owner')),
                 (4, ref('ecs_approvals.group_ecs_company_manager')),
                 (4, ref('ecs_approvals.group_ecs_finance_manager')),
@@ -16,6 +19,12 @@
                 (4, ref('ecs_approvals.group_ecs_project_manager')),
                 (4, ref('ecs_approvals.group_ecs_auditor')),
                 (4, ref('ecs_approvals.group_ecs_self_service')),
+            ],
+            'company_ids': [
+                (4, ref('base.main_company')),
+                (4, ref('ecs_approvals.company_import_export')),
+                (4, ref('ecs_approvals.company_construction')),
+                (4, ref('ecs_approvals.company_private_school')),
             ],
         }"/>
     </function>

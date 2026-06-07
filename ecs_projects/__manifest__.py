@@ -19,6 +19,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'data/default_admin_groups.xml',
         'views/project_views.xml',
         'views/menu.xml',
     ],

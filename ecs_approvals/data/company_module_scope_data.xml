@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="scope_import_export_finance" model="ecs.company.module.scope">
+        <field name="name">Finance</field>
+        <field name="profile_id" ref="profile_import_export"/>
+        <field name="category">finance</field>
+        <field name="module_name">ecs_finance</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_finance_manager"/>
+    </record>
+    <record id="scope_import_export_sales" model="ecs.company.module.scope">
+        <field name="name">Sales</field>
+        <field name="profile_id" ref="profile_import_export"/>
+        <field name="category">sales</field>
+        <field name="module_name">ecs_sales</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_sales_manager"/>
+    </record>
+    <record id="scope_import_export_inventory" model="ecs.company.module.scope">
+        <field name="name">Inventory</field>
+        <field name="profile_id" ref="profile_import_export"/>
+        <field name="category">inventory</field>
+        <field name="module_name">ecs_inventory</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_inventory_manager"/>
+    </record>
+
+    <record id="scope_construction_projects" model="ecs.company.module.scope">
+        <field name="name">Projects</field>
+        <field name="profile_id" ref="profile_construction"/>
+        <field name="category">projects</field>
+        <field name="module_name">ecs_projects</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_project_manager"/>
+    </record>
+    <record id="scope_construction_construction" model="ecs.company.module.scope">
+        <field name="name">Construction</field>
+        <field name="profile_id" ref="profile_construction"/>
+        <field name="category">construction</field>
+        <field name="module_name">ecs_construction</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_project_manager"/>
+    </record>
+    <record id="scope_construction_procurement" model="ecs.company.module.scope">
+        <field name="name">Procurement</field>
+        <field name="profile_id" ref="profile_construction"/>
+        <field name="category">procurement</field>
+        <field name="module_name">ecs_procurement</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_procurement_manager"/>
+    </record>
+
+    <record id="scope_school_hr" model="ecs.company.module.scope">
+        <field name="name">HR</field>
+        <field name="profile_id" ref="profile_private_school"/>
+        <field name="category">people</field>
+        <field name="module_name">ecs_hr</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_hr_manager"/>
+    </record>
+    <record id="scope_school_payroll" model="ecs.company.module.scope">
+        <field name="name">Payroll</field>
+        <field name="profile_id" ref="profile_private_school"/>
+        <field name="category">people</field>
+        <field name="module_name">ecs_payroll</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_payroll_manager"/>
+    </record>
+    <record id="scope_school_procurement" model="ecs.company.module.scope">
+        <field name="name">Procurement</field>
+        <field name="profile_id" ref="profile_private_school"/>
+        <field name="category">procurement</field>
+        <field name="module_name">ecs_procurement</field>
+        <field name="required" eval="True"/>
+        <field name="owner_group_id" ref="group_ecs_procurement_manager"/>
+    </record>
+</odoo>

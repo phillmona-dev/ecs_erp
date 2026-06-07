@@ -12,4 +12,25 @@
               action="action_ecs_company_profile"
               sequence="10"
               groups="ecs_approvals.group_ecs_company_manager,ecs_approvals.group_ecs_owner,base.group_system"/>
+
+    <menuitem id="menu_ecs_approval_policies"
+              name="Approval Policies"
+              parent="menu_ecs_approvals"
+              action="action_ecs_approval_policy"
+              sequence="20"
+              groups="ecs_approvals.group_ecs_company_manager,ecs_approvals.group_ecs_owner,base.group_system"/>
+
+    <menuitem id="menu_ecs_approval_document_types"
+              name="Document Types"
+              parent="menu_ecs_approvals"
+              action="action_ecs_approval_document_type"
+              sequence="30"
+              groups="ecs_approvals.group_ecs_company_manager,ecs_approvals.group_ecs_owner,base.group_system"/>
+
+    <menuitem id="menu_ecs_company_module_scope"
+              name="Module Scope"
+              parent="menu_ecs_approvals"
+              action="action_ecs_company_module_scope"
+              sequence="40"
+              groups="ecs_approvals.group_ecs_company_manager,ecs_approvals.group_ecs_owner,base.group_system"/>
 </odoo>

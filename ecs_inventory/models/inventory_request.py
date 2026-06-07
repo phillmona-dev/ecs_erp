@@ -142,12 +142,18 @@ class EcsInventoryRequest(models.Model):
 
     def _get_submit_approver(self):
         self.ensure_one()
+        policy_approver = super()._get_submit_approver()
+        if policy_approver:
+            return policy_approver
         if self.department_id.manager_id and self.department_id.manager_id.user_id:
             return self.department_id.manager_id.user_id
         return self._get_group_user('ecs_approvals.group_ecs_inventory_manager')
 
     def _get_approve_approver(self):
         self.ensure_one()
+        policy_approver = super()._get_approve_approver()
+        if policy_approver:
+            return policy_approver
         if self.state in ('submitted', 'verified', 'budget_approved'):
             return self._get_group_user('ecs_approvals.group_ecs_inventory_manager')
         return False
@@ -156,7 +162,7 @@ class EcsInventoryRequest(models.Model):
         group = self.env.ref(group_xmlid, raise_if_not_found=False)
         if not group:
             return False
-        users = group.users.filtered(lambda user: self.company_id in user.company_ids)
+        users = self._get_group_users(group, self.company_id)
         return users[:1] if users else False
 
     def _on_final_approval(self):

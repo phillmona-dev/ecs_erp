@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecs_company_module_scope_list" model="ir.ui.view">
+        <field name="name">ecs.company.module.scope.list</field>
+        <field name="model">ecs.company.module.scope</field>
+        <field name="arch" type="xml">
+            <list string="Company Module Scope"
+                  decoration-success="state == 'ready'"
+                  decoration-warning="state == 'optional'"
+                  decoration-danger="state == 'missing'">
+                <field name="company_id"/>
+                <field name="category"/>
+                <field name="name"/>
+                <field name="module_name"/>
+                <field name="required"/>
+                <field name="installed"/>
+                <field name="state"/>
+                <field name="owner_group_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecs_company_module_scope_form" model="ir.ui.view">
+        <field name="name">ecs.company.module.scope.form</field>
+        <field name="model">ecs.company.module.scope</field>
+        <field name="arch" type="xml">
+            <form string="Company Module Scope">
+                <header>
+                    <button name="action_open_module" type="object" string="Open Module" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="profile_id" readonly="1"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="module_name"/>
+                            <field name="required"/>
+                            <field name="installed" readonly="1"/>
+                            <field name="state" readonly="1"/>
+                            <field name="owner_group_id"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ecs_company_module_scope_search" model="ir.ui.view">
+        <field name="name">ecs.company.module.scope.search</field>
+        <field name="model">ecs.company.module.scope</field>
+        <field name="arch" type="xml">
+            <search string="Company Module Scope">
+                <field name="company_id"/>
+                <field name="name"/>
+                <field name="module_name"/>
+                <filter name="missing" string="Missing Required" domain="[('state', '=', 'missing')]"/>
+                <filter name="ready" string="Ready" domain="[('state', '=', 'ready')]"/>
+                <separator/>
+                <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                <filter name="group_category" string="Category" context="{'group_by': 'category'}"/>
+                <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ecs_company_module_scope" model="ir.actions.act_window">
+        <field name="name">Module Scope</field>
+        <field name="res_model">ecs.company.module.scope</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_company': 1}</field>
+    </record>
+</odoo>

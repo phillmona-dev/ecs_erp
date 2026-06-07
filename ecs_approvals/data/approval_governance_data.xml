@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="document_type_company_profile" model="ecs.approval.document.type">
+        <field name="name">Company Profile Governance</field>
+        <field name="code">COMPANY_PROFILE</field>
+        <field name="model">ecs.company.profile</field>
+        <field name="description">Approval governance for creating and maintaining ECS company profiles.</field>
+    </record>
+
+    <record id="document_type_payment_request" model="ecs.approval.document.type">
+        <field name="name">Payment Request</field>
+        <field name="code">PAYMENT_REQUEST</field>
+        <field name="model">ecs.finance.payment.request</field>
+        <field name="description">Finance payment request approval routing.</field>
+    </record>
+
+    <record id="document_type_purchase_request" model="ecs.approval.document.type">
+        <field name="name">Purchase Request</field>
+        <field name="code">PURCHASE_REQUEST</field>
+        <field name="model">ecs.purchase.request</field>
+        <field name="description">Local and foreign procurement request approval routing.</field>
+    </record>
+
+    <record id="document_type_inventory_request" model="ecs.approval.document.type">
+        <field name="name">Inventory Request</field>
+        <field name="code">INVENTORY_REQUEST</field>
+        <field name="model">ecs.inventory.request</field>
+        <field name="description">Inventory and store requisition approval routing.</field>
+    </record>
+
+    <record id="document_type_hr_overtime" model="ecs.approval.document.type">
+        <field name="name">Overtime Request</field>
+        <field name="code">HR_OVERTIME</field>
+        <field name="model">ecs.hr.overtime.report</field>
+        <field name="description">HR overtime review and approval routing.</field>
+    </record>
+
+    <record id="document_type_headcount" model="ecs.approval.document.type">
+        <field name="name">Headcount Request</field>
+        <field name="code">HEADCOUNT_REQUEST</field>
+        <field name="model">ecs.hr.headcount.request</field>
+        <field name="description">Headcount request approval routing.</field>
+    </record>
+
+    <record id="policy_company_profile_import_export" model="ecs.approval.policy">
+        <field name="document_type_id" ref="document_type_company_profile"/>
+        <field name="company_id" ref="company_import_export"/>
+        <field name="line_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'level': 1, 'name': 'Company Manager Review', 'approver_type': 'group', 'group_id': ref('group_ecs_company_manager')}),
+            (0, 0, {'level': 2, 'name': 'Owner Approval', 'approver_type': 'group', 'group_id': ref('group_ecs_owner')})
+        ]"/>
+    </record>
+
+    <record id="policy_company_profile_construction" model="ecs.approval.policy">
+        <field name="document_type_id" ref="document_type_company_profile"/>
+        <field name="company_id" ref="company_construction"/>
+        <field name="line_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'level': 1, 'name': 'Company Manager Review', 'approver_type': 'group', 'group_id': ref('group_ecs_company_manager')}),
+            (0, 0, {'level': 2, 'name': 'Owner Approval', 'approver_type': 'group', 'group_id': ref('group_ecs_owner')})
+        ]"/>
+    </record>
+
+    <record id="policy_company_profile_school" model="ecs.approval.policy">
+        <field name="document_type_id" ref="document_type_company_profile"/>
+        <field name="company_id" ref="company_private_school"/>
+        <field name="line_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'level': 1, 'name': 'Company Manager Review', 'approver_type': 'group', 'group_id': ref('group_ecs_company_manager')}),
+            (0, 0, {'level': 2, 'name': 'Owner Approval', 'approver_type': 'group', 'group_id': ref('group_ecs_owner')})
+        ]"/>
+    </record>
+
+    <record id="policy_payment_request_import_export" model="ecs.approval.policy">
+        <field name="document_type_id" ref="document_type_payment_request"/>
+        <field name="company_id" ref="company_import_export"/>
+        <field name="min_amount">0</field>
+        <field name="max_amount">0</field>
+        <field name="line_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'level': 1, 'name': 'Department Manager', 'approver_type': 'department_manager'}),
+            (0, 0, {'level': 2, 'name': 'Budget Controller', 'approver_type': 'group', 'group_id': ref('group_ecs_finance_controller')}),
+            (0, 0, {'level': 3, 'name': 'Finance Manager', 'approver_type': 'group', 'group_id': ref('group_ecs_finance_manager')})
+        ]"/>
+    </record>
+
+    <record id="policy_payment_request_construction" model="ecs.approval.policy">
+        <field name="document_type_id" ref="document_type_payment_request"/>
+        <field name="company_id" ref="company_construction"/>
+        <field name="min_amount">0</field>
+        <field name="max_amount">0</field>
+        <field name="line_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'level': 1, 'name': 'Department Manager', 'approver_type': 'department_manager'}),
+            (0, 0, {'level': 2, 'name': 'Budget Controller', 'approver_type': 'group', 'group_id': ref('group_ecs_finance_controller')}),
+            (0, 0, {'level': 3, 'name': 'Finance Manager', 'approver_type': 'group', 'group_id': ref('group_ecs_finance_manager')})
+        ]"/>
+    </record>
+
+    <record id="policy_purchase_request_import_export" model="ecs.approval.policy">
+        <field name="document_type_id" ref="document_type_purchase_request"/>
+        <field name="company_id" ref="company_import_export"/>
+        <field name="line_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'level': 1, 'name': 'Department Manager', 'approver_type': 'department_manager'}),
+            (0, 0, {'level': 2, 'name': 'Procurement Approver', 'approver_type': 'group', 'group_id': ref('group_ecs_procurement_approver')}),
+            (0, 0, {'level': 3, 'name': 'Procurement Manager', 'approver_type': 'group', 'group_id': ref('group_ecs_procurement_manager')})
+        ]"/>
+    </record>
+
+    <record id="policy_purchase_request_construction" model="ecs.approval.policy">
+        <field name="document_type_id" ref="document_type_purchase_request"/>
+        <field name="company_id" ref="company_construction"/>
+        <field name="line_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'level': 1, 'name': 'Department Manager', 'approver_type': 'department_manager'}),
+            (0, 0, {'level': 2, 'name': 'Procurement Approver', 'approver_type': 'group', 'group_id': ref('group_ecs_procurement_approver')}),
+            (0, 0, {'level': 3, 'name': 'Procurement Manager', 'approver_type': 'group', 'group_id': ref('group_ecs_procurement_manager')})
+        ]"/>
+    </record>
+
+    <record id="policy_hr_school" model="ecs.approval.policy">
+        <field name="document_type_id" ref="document_type_hr_overtime"/>
+        <field name="company_id" ref="company_private_school"/>
+        <field name="line_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'level': 1, 'name': 'HR Manager', 'approver_type': 'group', 'group_id': ref('group_ecs_hr_manager')})
+        ]"/>
+    </record>
+</odoo>

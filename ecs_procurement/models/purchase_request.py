@@ -163,12 +163,18 @@ class EcsPurchaseRequest(models.Model):
 
     def _get_submit_approver(self):
         self.ensure_one()
+        policy_approver = super()._get_submit_approver()
+        if policy_approver:
+            return policy_approver
         if self.department_id.manager_id and self.department_id.manager_id.user_id:
             return self.department_id.manager_id.user_id
         return False
 
     def _get_approve_approver(self):
         self.ensure_one()
+        policy_approver = super()._get_approve_approver()
+        if policy_approver:
+            return policy_approver
         group_xmlid = False
         if self.state == 'verified':
             group_xmlid = 'ecs_approvals.group_ecs_procurement_approver'
@@ -179,7 +185,7 @@ class EcsPurchaseRequest(models.Model):
         group = self.env.ref(group_xmlid, raise_if_not_found=False)
         if not group:
             return False
-        users = group.users.filtered(lambda user: self.company_id in user.company_ids)
+        users = self._get_group_users(group, self.company_id)
         return users[:1] if users else False
 
     def _on_final_approval(self):
@@ -204,10 +210,12 @@ class EcsPurchaseRequest(models.Model):
                 vendor_lines[line.vendor_id] |= line
 
             for vendor, lines in vendor_lines.items():
+                picking_type = request._get_purchase_picking_type()
                 order = PurchaseOrder.create({
                     'partner_id': vendor.id,
                     'company_id': request.company_id.id,
                     'currency_id': request.currency_id.id,
+                    'picking_type_id': picking_type.id,
                     'origin': request.name,
                     'ecs_purchase_request_id': request.id,
                     'order_line': [(0, 0, line._prepare_purchase_order_line()) for line in lines],
@@ -250,6 +258,23 @@ class EcsPurchaseRequest(models.Model):
         action['domain'] = [('id', 'in', self.rfq_ids.ids)]
         action['context'] = {'default_request_id': self.id}
         return action
+
+    def _get_purchase_picking_type(self):
+        self.ensure_one()
+        PickingType = self.env['stock.picking.type']
+        domain = [('code', '=', 'incoming')]
+        if 'company_id' in PickingType._fields:
+            domain += ['|', ('company_id', '=', self.company_id.id), ('company_id', '=', False)]
+        elif 'warehouse_id' in PickingType._fields:
+            domain.append(('warehouse_id.company_id', '=', self.company_id.id))
+        picking_type = PickingType.search(domain, limit=1)
+        if not picking_type:
+            picking_type = PickingType.search([('code', '=', 'incoming')], limit=1)
+        if not picking_type:
+            raise UserError(_(
+                'No incoming receipt operation is configured. Please create a warehouse or receipt operation for %s.'
+            ) % self.company_id.display_name)
+        return picking_type
 
 
 class EcsPurchaseRequestLine(models.Model):
@@ -295,7 +320,11 @@ class EcsPurchaseRequestLine(models.Model):
             if not line.product_id:
                 continue
             line.description = line.product_id.display_name
-            line.product_uom_id = line.product_id.uom_po_id or line.product_id.uom_id
+            line.product_uom_id = (
+                getattr(line.product_id, 'uom_po_id', False)
+                or getattr(line.product_id.product_tmpl_id, 'uom_po_id', False)
+                or line.product_id.uom_id
+            )
             if line.product_id.standard_price and not line.estimated_unit_price:
                 line.estimated_unit_price = line.product_id.standard_price
 
@@ -313,7 +342,7 @@ class EcsPurchaseRequestLine(models.Model):
             'product_id': self.product_id.id,
             'name': self.description,
             'product_qty': self.quantity,
-            'product_uom': self.product_uom_id.id,
+            'product_uom_id': self.product_uom_id.id,
             'price_unit': self.estimated_unit_price,
             'date_planned': self.date_required or fields.Date.today(),
         }

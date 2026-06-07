@@ -81,17 +81,21 @@ class EcsOvertimeReport(models.Model):
     def _get_submit_approver(self):
         """Route to direct manager on submission."""
         self.ensure_one()
+        policy_approver = super()._get_submit_approver()
+        if policy_approver:
+            return policy_approver
         mgr = self.employee_id.parent_id
         return mgr.user_id if mgr and mgr.user_id else False
 
     def _get_approve_approver(self):
         """Route to HR Manager after direct manager approves."""
         self.ensure_one()
+        policy_approver = super()._get_approve_approver()
+        if policy_approver:
+            return policy_approver
         if self.state == 'submitted':
             group = self.env.ref('ecs_approvals.group_ecs_hr_manager', raise_if_not_found=False)
             if group:
-                users = group.users.filtered(
-                    lambda u: self.company_id in u.company_ids
-                )
+                users = self._get_group_users(group, self.company_id)
                 return users[:1] if users else False
         return False

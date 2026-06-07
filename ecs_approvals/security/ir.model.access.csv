@@ -2,3 +2,15 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ecs_company_profile_user,ecs.company.profile user,model_ecs_company_profile,base.group_user,1,0,0,0
 access_ecs_company_profile_manager,ecs.company.profile manager,model_ecs_company_profile,ecs_approvals.group_ecs_company_manager,1,1,1,0
 access_ecs_company_profile_owner,ecs.company.profile owner,model_ecs_company_profile,ecs_approvals.group_ecs_owner,1,1,1,1
+access_ecs_approval_document_type_user,ecs.approval.document.type user,model_ecs_approval_document_type,base.group_user,1,0,0,0
+access_ecs_approval_document_type_manager,ecs.approval.document.type manager,model_ecs_approval_document_type,ecs_approvals.group_ecs_company_manager,1,1,1,0
+access_ecs_approval_document_type_owner,ecs.approval.document.type owner,model_ecs_approval_document_type,ecs_approvals.group_ecs_owner,1,1,1,1
+access_ecs_approval_policy_user,ecs.approval.policy user,model_ecs_approval_policy,base.group_user,1,0,0,0
+access_ecs_approval_policy_manager,ecs.approval.policy manager,model_ecs_approval_policy,ecs_approvals.group_ecs_company_manager,1,1,1,0
+access_ecs_approval_policy_owner,ecs.approval.policy owner,model_ecs_approval_policy,ecs_approvals.group_ecs_owner,1,1,1,1
+access_ecs_approval_policy_line_user,ecs.approval.policy.line user,model_ecs_approval_policy_line,base.group_user,1,0,0,0
+access_ecs_approval_policy_line_manager,ecs.approval.policy.line manager,model_ecs_approval_policy_line,ecs_approvals.group_ecs_company_manager,1,1,1,0
+access_ecs_approval_policy_line_owner,ecs.approval.policy.line owner,model_ecs_approval_policy_line,ecs_approvals.group_ecs_owner,1,1,1,1
+access_ecs_company_module_scope_user,ecs.company.module.scope user,model_ecs_company_module_scope,base.group_user,1,0,0,0
+access_ecs_company_module_scope_manager,ecs.company.module.scope manager,model_ecs_company_module_scope,ecs_approvals.group_ecs_company_manager,1,1,1,0
+access_ecs_company_module_scope_owner,ecs.company.module.scope owner,model_ecs_company_module_scope,ecs_approvals.group_ecs_owner,1,1,1,1

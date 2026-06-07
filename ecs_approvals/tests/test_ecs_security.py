@@ -30,3 +30,22 @@ class TestEcsApprovals(TransactionCase):
         multi_company = self.env.ref('base.group_multi_company')
         self.assertIn(company_manager, owner.implied_ids)
         self.assertIn(multi_company, owner.implied_ids)
+
+    def test_seeded_document_types_exist(self):
+        document_types = self.env['ecs.approval.document.type'].search([])
+        codes = set(document_types.mapped('code'))
+        self.assertIn('PAYMENT_REQUEST', codes)
+        self.assertIn('PURCHASE_REQUEST', codes)
+        self.assertIn('COMPANY_PROFILE', codes)
+
+    def test_seeded_approval_policy_has_steps(self):
+        policy = self.env.ref('ecs_approvals.policy_payment_request_import_export')
+        self.assertEqual(policy.company_id, self.env.ref('ecs_approvals.company_import_export'))
+        self.assertGreaterEqual(policy.step_count, 2)
+        self.assertEqual(policy.line_ids.sorted('level')[0].group_id, self.env.ref('ecs_approvals.group_ecs_finance_controller'))
+
+    def test_company_module_scope_tracks_required_modules(self):
+        scope = self.env.ref('ecs_approvals.scope_import_export_finance')
+        self.assertTrue(scope.required)
+        self.assertEqual(scope.company_id, self.env.ref('ecs_approvals.company_import_export'))
+        self.assertIn(scope.state, ('ready', 'missing'))
